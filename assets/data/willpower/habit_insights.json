@@ -1,0 +1,100 @@
+{
+  "bundles": {
+    "default_good": {
+      "sectionTitle": "İki bakış",
+      "cards": [
+        {
+          "kind": "islamic",
+          "title": "Küçük adımlar",
+          "body": "Allah en çok sevdiği ameli, devamlı olanıdır. İyi bir alışkanlık da böyle büyür: her gün biraz.",
+          "reference": "Hadis-i şerif — devamlılık üzerine (meal anlamı)"
+        },
+        {
+          "kind": "medical",
+          "title": "Alışkanlık ve beyin",
+          "body": "Tekrarlayan küçük eylemler, davranışı otomatikleştirir; stres hormonu düzeyini zamanla dengelemeye yardımcı olabilir. Kendine nazik ol."
+        }
+      ]
+    },
+    "default_bad": {
+      "sectionTitle": "İki bakış",
+      "cards": [
+        {
+          "kind": "islamic",
+          "title": "Tevekkül ve çaba",
+          "body": "Zor bir şeyi bırakmak hem niyet hem de sabır ister. Allah’ın yardımını dileyerek küçük adımlarla ilerlemek manevi güç verir.",
+          "reference": "Kur’an — sabır ve Allah’a yöneliş (meal anlamı)"
+        },
+        {
+          "kind": "medical",
+          "title": "Bırakma süreci",
+          "body": "Zararlı alışkanlıktan vazgeçişte ilk günler dalgalı olabilir; uyku, iştah ve ruh hâli değişebilir. Gerekirse bir hekime danış."
+        }
+      ]
+    },
+    "quran_daily": {
+      "sectionTitle": "Kur’an & zihin",
+      "cards": [
+        {
+          "kind": "islamic",
+          "title": "Tilavet ve huzur",
+          "body": "Kalpler ancak Allah’ı anmakla mutmain olur. Her gün bir miktar Kur’an ile kalbini tazelemek hem ibadet hem iç huzur için değerlidir.",
+          "reference": "Ra’d suresi, 28 — meal anlamı"
+        },
+        {
+          "kind": "medical",
+          "title": "Okuma ve stres",
+          "body": "Yavaş tempoda sessiz okuma, nefes ritmini düzenlemeye ve odaklanmaya yardımcı olabilir; günlük kaygıyı hafifletici bir mola sunar."
+        }
+      ]
+    },
+    "quit_smoking": {
+      "sectionTitle": "Sigara · iki bakış",
+      "cards": [
+        {
+          "kind": "islamic",
+          "title": "Beden emaneti",
+          "body": "Bedenine zarar verenden kaçınmak, emanete saygıdır. Bırakma kararı hem nefsinle barış hem de Rabb’ine yakınlık yolunda bir adımdır.",
+          "reference": "A’râf 7:56 — meal anlamı (zarardan sakınma)"
+        },
+        {
+          "kind": "medical",
+          "title": "Vücudun toparlanması",
+          "body": "Sigarayı bıraktıkça kalp-damar yükü ve solunum rahatlığı genelde iyileşme eğilimindedir; ilk haftalar istek (craving) dalgalı olabilir."
+        }
+      ]
+    },
+    "custom_good": {
+      "sectionTitle": "",
+      "cards": [
+        {
+          "kind": "islamic",
+          "title": "Niyet ve bereket",
+          "body": "Hayırlı bir alışkanlığı Allah rızası için sürdürmek, ona bereket katar. Küçük ama düzenli adımlar büyük değişim getirir.",
+          "reference": "Hadis — amellerin niyete göre olduğu (meal anlamı)"
+        },
+        {
+          "kind": "medical",
+          "title": "Düzenli rutin",
+          "body": "Aynı saatte tekrarlanan davranışlar uyku-uyanıklık ritmiyle uyum sağlayınca enerji ve odakta destek olabilir."
+        }
+      ]
+    },
+    "custom_bad": {
+      "sectionTitle": "",
+      "cards": [
+        {
+          "kind": "islamic",
+          "title": "Tövbe ve yenilenme",
+          "body": "Kötü alışkanlıktan yüz çevirmek tövbenin bir parçasıdır. Her temiz gün, Allah’ın merhametine yeni bir yaklaşmadır.",
+          "reference": "Tövbe ve sabır — meal anlamı"
+        },
+        {
+          "kind": "medical",
+          "title": "Bağımlılık ve beyin",
+          "body": "Alışkanlık döngüsü ödül sistemini etkiler; bırakırken geri dönüşler görülebilir. Destek ve gerektiğinde uzman yardımı süreci kolaylaştırır."
+        }
+      ]
+    }
+  }
+}

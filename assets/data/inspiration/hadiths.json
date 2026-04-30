@@ -1,0 +1,90 @@
+[
+  {
+    "id": "h_1",
+    "kind": "hadith",
+    "tr": "Güçlü kimse, öfke anında kendine hakim olandır.",
+    "ar": null,
+    "source": "Hadis-i şerif",
+    "verseReference": "Buhârî, Edeb, 76",
+    "layoutIndex": 8,
+    "reelsStyle": 13,
+    "emphasisTailLines": 0
+  },
+  {
+    "id": "h_2",
+    "kind": "hadith",
+    "tr": "Sabır, ilk sarsıntı anında gösterilendir.",
+    "ar": null,
+    "source": "Hadis-i şerif",
+    "verseReference": "Buhârî, Cenâiz, 32",
+    "layoutIndex": 8,
+    "reelsStyle": 13,
+    "emphasisTailLines": 0
+  },
+  {
+    "id": "h_3",
+    "kind": "hadith",
+    "tr": "Allah, yumuşak huylu ve güler yüzlü kimseyi sever.",
+    "ar": null,
+    "source": "Hadis-i şerif",
+    "verseReference": "Beyhakî, Şuabü’l-İmân, 6/441",
+    "layoutIndex": 8,
+    "reelsStyle": 13,
+    "emphasisTailLines": 0
+  },
+  {
+    "id": "h_4",
+    "kind": "hadith",
+    "tr": "Şüphesiz her zorlukla beraber bir kolaylık vardır.",
+    "ar": null,
+    "source": "Hadis-i şerif",
+    "verseReference": "Müslim, Birr, 105",
+    "layoutIndex": 8,
+    "reelsStyle": 13,
+    "emphasisTailLines": 0
+  },
+  {
+    "id": "h_5",
+    "kind": "hadith",
+    "tr": "Sabır aydınlıktır, sadaka burhandır.",
+    "ar": null,
+    "source": "Hadis-i şerif",
+    "verseReference": "Müslim, Tahâret, 1",
+    "layoutIndex": 8,
+    "reelsStyle": 13,
+    "emphasisTailLines": 0
+  },
+  {
+    "id": "h_6",
+    "kind": "hadith",
+    "tr": "Kalpler ancak Allah’ı anmakla huzur bulur.",
+    "ar": null,
+    "source": "Hadis-i şerif",
+    "verseReference": "Müslim, Zikir, 39",
+    "layoutIndex": 8,
+    "reelsStyle": 13,
+    "emphasisTailLines": 0
+  },
+  {
+    "id": "h_7",
+    "kind": "hadith",
+    "tr": "İman, sabır ve hoşgörüdür.",
+    "ar": null,
+    "source": "Hadis-i şerif",
+    "verseReference": "Deylemî, Müsnedü’l-Firdevs, 1/151",
+    "layoutIndex": 8,
+    "reelsStyle": 13,
+    "emphasisTailLines": 0
+  },
+  {
+    "id": "h_8",
+    "kind": "hadith",
+    "tr": "Güzel söz sadakadır.",
+    "ar": null,
+    "source": "Hadis-i şerif",
+    "verseReference": "Buhârî, Cihâd, 128",
+    "layoutIndex": 8,
+    "reelsStyle": 13,
+    "emphasisTailLines": 0
+  }
+]

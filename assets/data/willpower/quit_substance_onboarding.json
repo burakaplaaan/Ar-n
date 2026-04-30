@@ -1,0 +1,24 @@
+{
+  "templateId": "quit_substance",
+  "warningTitle": "Dikkat",
+  "warningSubtitle": "Bu yolda yalnız değilsin; destek şifadır",
+  "warningBody": [
+    "Uyuşturucu bağımlılığı ciddi bir sağlık sorunudur; uzman ve kurum desteği çoğu zaman gereklidir.",
+    "Uygulama yol gösterir; tedavi kararını mutlaka hekim veya bağımlılık uzmanı ile paylaş."
+  ],
+  "physicalTitle": "Beden ve beyin",
+  "physicalItems": [
+    { "icon": "psychology", "title": "Ödül sistemi", "subtitle": "Madde kullanımı beyin kimyasını uzun süre etkiler" },
+    { "icon": "bolt", "title": "Yoksunluk", "subtitle": "İlk aşamalar zorlayıcı olabilir; destek güvenli geçiş sağlar" },
+    { "icon": "favorite", "title": "İyileşme mümkün", "subtitle": "Her gün temiz kalmak beden için şifa yoludur" }
+  ],
+  "spiritualTitle": "İman ve şifa",
+  "spiritualItems": [
+    { "icon": "mosque", "title": "Şifa Allah'ındır", "subtitle": "Sebeplere sarılmak da kulluk ve emanete saygıdır" },
+    { "icon": "self_improvement", "title": "Sabır ve tevekkül", "subtitle": "Zor anlarda dua ve güvenilir yardım hattı yanındadır" }
+  ],
+  "verse": {
+    "text": "Zarar verenden kaçının.",
+    "ref": "İslam öğretisinde zarar giderme ilkesi (özet — motivasyon amaçlı)"
+  }
+}

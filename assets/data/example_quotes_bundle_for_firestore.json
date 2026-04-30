@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "items": [
+    {
+      "id": "demo_1",
+      "tags": ["genel", "sabır"],
+      "arabic": null,
+      "text": "Sabırla birlikte inen yardım, Allah'ın yardımıdır.",
+      "source": "Örnek — Firestore'da app_public/quotes_bundle belgesine yapıştırın"
+    }
+  ]
+}

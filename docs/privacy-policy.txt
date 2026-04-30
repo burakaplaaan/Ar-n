@@ -1,0 +1,40 @@
+Arin Privacy Policy
+Last updated: 2026-04-26
+
+Arin respects your privacy. This policy explains what data is processed, why it is processed, and how you can control it.
+
+1) Data we process
+- Depending on your usage and permissions, Arin may process:
+  - Location data (for prayer times and qibla direction),
+  - Notification preferences and reminder settings,
+  - Account information when you sign in,
+  - App diagnostics and crash reports.
+
+2) Why we process data
+- To calculate prayer times and show qibla direction.
+- To schedule and deliver local reminders.
+- To keep your preferences and app configuration.
+- To improve reliability and fix crashes.
+
+3) Storage and retention
+- Most habit, zikir, and preference data is stored on your device.
+- If you sign in, selected data may be synced with Firebase services.
+- Data is kept until you delete it in the app or remove your account.
+
+4) Third-party services
+- Arin uses:
+  - Firebase Authentication (sign-in),
+  - Cloud Firestore (data sync/storage),
+  - Firebase Analytics (usage analytics),
+  - Firebase Crashlytics (crash diagnostics).
+
+5) Your controls
+- You can deny location/notification permissions in device settings.
+- You can sign out from the app.
+- You can delete your account and local data from Settings.
+
+6) Children
+- Arin is not intended for children under 13 years old.
+
+7) Contact
+- For privacy questions: arin.app.help@gmail.com

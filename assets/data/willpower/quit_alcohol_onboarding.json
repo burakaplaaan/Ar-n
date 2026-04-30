@@ -1,0 +1,24 @@
+{
+  "templateId": "quit_alcohol",
+  "warningTitle": "Dikkat",
+  "warningSubtitle": "Alkolü bırakmak beden ve aklın iadesidir",
+  "warningBody": [
+    "Alkol bağımlılığı yavaş ilerler; bırakmak sabır, plan ve bazen profesyonel destek ister.",
+    "İlk günler zor olabilir; her alkolsüz gün beden emaneti için anlamlıdır."
+  ],
+  "physicalTitle": "Beden ve ruh hali",
+  "physicalItems": [
+    { "icon": "favorite", "title": "Uyku ve ruh hali", "subtitle": "Düzen azalınca dalgalanmalar görülebilir" },
+    { "icon": "bolt", "title": "Karaciğer ve enerji", "subtitle": "Bıraktıkça toparlanma eğilimi artar" },
+    { "icon": "psychology", "title": "Tetikleyiciler", "subtitle": "Ortam, yorgunluk veya stres isteği artırabilir" }
+  ],
+  "spiritualTitle": "Dini perspektif",
+  "spiritualItems": [
+    { "icon": "mosque", "title": "Emanet", "subtitle": "Sağlıklı aklı ve bedeni korumak sorumluluktur" },
+    { "icon": "self_improvement", "title": "Tövbe ve niyet", "subtitle": "Her temiz gün Rabbine yönelişin gücünü gösterir" }
+  ],
+  "verse": {
+    "text": "Şeytan, içki ve kumar ile ancak aranıza düşmanlık ve kin sokmak, sizi Allah'ı anmaktan ve namazdan alıkoymak ister. Artık vazgeçecek misiniz?",
+    "ref": "Maide 5:90-91 (meal özeti)"
+  }
+}

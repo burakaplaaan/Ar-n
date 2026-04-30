@@ -1,0 +1,1287 @@
+{
+  "@@locale": "en",
+  "languageSettingsTitle": "Language settings",
+  "languageSettingsSheetTitle": "App language",
+  "languageTurkishLabel": "Turkish",
+  "languageEnglishLabel": "English",
+  "languageArabicLabel": "Arabic",
+  "settingsPageHeader": "Settings",
+  "settingsSectionAccount": "Your account",
+  "settingsSectionAppearance": "Appearance",
+  "settingsSectionPrayerTimes": "Prayer times",
+  "settingsSectionApp": "App",
+  "settingsSectionSession": "Session",
+  "settingsMenuNotificationsSubtitle": "Prayer, purification, and dhikr",
+  "settingsMenuNotificationsTitle": "Notifications",
+  "settingsMenuAboutTitle": "About",
+  "settingsMenuAboutSubtitle": "Application information",
+  "settingsMenuPrivacyTitle": "Privacy policy",
+  "settingsMenuPrivacySubtitle": "How we process your data",
+  "settingsMenuSavedTitle": "Saved",
+  "settingsMenuSavedSubtitle": "Quotes you saved in Explore",
+  "settingsMenuAdminTitle": "Content management",
+  "settingsMenuAdminSubtitle": "Quote pools and Explore",
+  "settingsMenuContactTitle": "Contact us",
+  "settingsMenuContactSubtitle": "Support and feedback",
+  "settingsMenuComingSoon": "Write to us by email",
+  "settingsContactPageTitle": "Contact us",
+  "settingsContactSubtitle": "You can send suggestions, bug reports, or support requests directly by email.",
+  "settingsContactOpenMailAction": "Open mail app",
+  "settingsContactCopyMailAction": "Copy email address",
+  "settingsContactEmailCopied": "Email address copied.",
+  "settingsContactOpenFailed": "Could not open the mail app. You can copy the address and send manually.",
+  "settingsContactCopyFailed": "Could not copy the email address. Please enter it manually: arinapphelp@gmail.com",
+  "settingsContactMailSubject": "Arin app feedback",
+  "settingsContactMailBody": "Hi Arin team,\n\n",
+  "settingsGuestHint": "Guest mode — your data is stored on this device. Sign in to sync to cloud.",
+  "settingsAccountFallback": "Account",
+  "settingsSignInGoogle": "Sign in with Google",
+  "settingsSignInApple": "Sign in with Apple",
+  "settingsSessionHint": "To reset the app or remove your account:",
+  "settingsSignOutAction": "Sign out",
+  "settingsDeleteAccountAction": "Delete account and all data",
+  "settingsLightThemeTitle": "Light theme",
+  "settingsLightThemeSubtitle": "Softer bright background for easier reading",
+  "settingsProvinceLabel": "Province",
+  "settingsProvinceHint": "Type; e.g. \"ko\" → Kocaeli",
+  "settingsProvinceInvalid": "Pick a province from the list or keep typing.",
+  "settingsLocationUpdatedMessage": "Location updated: {city}",
+  "@settingsLocationUpdatedMessage": {
+    "placeholders": {
+      "city": {}
+    }
+  },
+  "settingsLocationFailedMessage": "Could not get location; check permission or GPS.",
+  "settingsProvinceUpdatedMessage": "{province} — prayer times updated",
+  "@settingsProvinceUpdatedMessage": {
+    "placeholders": {
+      "province": {}
+    }
+  },
+  "settingsSignOutDialogTitle": "Sign out",
+  "settingsSignOutDialogBody": "The app will reset starting from onboarding slides. All local data on this device will be deleted and your Firebase session will be closed.",
+  "settingsDialogCancel": "Cancel",
+  "settingsDeleteAllDataDialogTitle": "Delete all data",
+  "settingsDeleteAllDataDialogBody": "You are in guest mode. All app data on this device will be permanently deleted and you will return to onboarding screens.",
+  "settingsDeleteAction": "Delete",
+  "settingsDeleteAccountDialogTitle": "Permanently delete account",
+  "settingsDeleteAccountDialogBody": "Your cloud account will be deleted and all local data on this device will be cleared. This cannot be undone.",
+  "settingsDeleteProgressMessage": "Deleting your cloud and device data…",
+  "settingsCloudDeleteFailedMessage": "Cloud data could not be deleted. Check your internet connection and try again.",
+  "settingsAccountDeleteFailedMessage": "Account could not be deleted.",
+  "settingsAccountDeleteRetryMessage": "Account could not be deleted. Please try again later.",
+  "settingsGoogleSignInSuccess": "Signed in with Google.",
+  "settingsGoogleSignInCancelled": "Google sign-in was cancelled.",
+  "settingsGoogleSignInFailed": "Google sign-in failed. Please try again.",
+  "settingsAppleSignInSuccess": "Signed in with Apple.",
+  "settingsAppleSignInFailed": "Apple sign-in failed. Please try again.",
+  "settingsAuthServiceUnavailable": "Sign-in service is currently unavailable. Please try again shortly.",
+  "homeGreetingNight": "Good night",
+  "homeGreetingMorning": "Good morning",
+  "homeGreetingNoon": "Good afternoon",
+  "homeGreetingEvening": "Good evening",
+  "homeGuestUser": "Guest",
+  "homePrayerUrgentSemanticsLabel": "Attention, Fajr window is ending. Sunrise in {remaining}",
+  "@homePrayerUrgentSemanticsLabel": {
+    "placeholders": {
+      "remaining": {}
+    }
+  },
+  "homePrayerNextSemanticsLabel": "Next prayer {nextName}, remaining {remaining}",
+  "@homePrayerNextSemanticsLabel": {
+    "placeholders": {
+      "nextName": {},
+      "remaining": {}
+    }
+  },
+  "homePrayerUrgentBadge": "Urgent",
+  "homePrayerNextBadge": "Next",
+  "homePrayerTimesTitle": "Prayer Times",
+  "homePrayerNextRowHint": "Next prayer",
+  "homePrayerLoadFailedTitle": "Prayer times couldn't load",
+  "homePrayerLoadFailedBody": "Prayer times may be unavailable due to internet, location permission, or selected district.",
+  "homeRetryAction": "Retry",
+  "homeChangeDistrictAction": "Change district",
+  "homeOpenSettingsAction": "Open settings",
+  "homeRemainingPassed": "passed",
+  "homeRemainingFewSeconds": "a few seconds",
+  "homeRemainingHoursMinutes": "{hours} h {minutes} min",
+  "@homeRemainingHoursMinutes": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      },
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "homeRemainingHoursOnly": "{hours} h",
+  "@homeRemainingHoursOnly": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      }
+    }
+  },
+  "homeRemainingMinutesOnly": "{minutes} min",
+  "@homeRemainingMinutesOnly": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "homeLocationFreshNow": "Location up to date",
+  "homeLocationFreshMinutesAgo": "Updated {minutes} min ago",
+  "@homeLocationFreshMinutesAgo": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "homeLocationFreshHoursAgo": "Updated {hours} h ago",
+  "@homeLocationFreshHoursAgo": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      }
+    }
+  },
+  "homeLocationFreshDaysAgo": "Updated {days} day ago",
+  "@homeLocationFreshDaysAgo": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "homeDailyReminderTitle": "Today's reminder",
+  "homeNamazSetupTitle": "Set up prayer tracking",
+  "homeNamazSetupSubtitle": "Set it up in the Growth tab; once configured, this card appears here automatically.",
+  "homeNamazTrackingTitle": "Prayer tracking",
+  "homeNamazTrackingProgressLine": "Today {done}/5 · Tap for details",
+  "@homeNamazTrackingProgressLine": {
+    "placeholders": {
+      "done": {}
+    }
+  },
+  "onboardingNotificationPermissionDenied": "Notification permission was not granted. You can enable it later from Settings → Notifications for Adhan reminders.",
+  "onboardingGenderPromptWithName": "{name}, may we ask your gender?",
+  "@onboardingGenderPromptWithName": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "onboardingNotificationSkippedWarning": "Notifications stayed off. You won't receive Adhan reminders at prayer times — you can enable them later from Settings → Notifications.",
+  "onboardingOpenNowAction": "Enable now",
+  "commonPreview": "Preview",
+  "commonClose": "Close",
+  "commonCancel": "Cancel",
+  "commonDone": "Done",
+  "commonBack": "Back",
+  "prayerNameImsak": "Fajr",
+  "prayerNameSunrise": "Sunrise",
+  "prayerNameDhuhr": "Dhuhr",
+  "prayerNameAsr": "Asr",
+  "prayerNameMaghrib": "Maghrib",
+  "prayerNameIsha": "Isha",
+  "reminderOff": "Off",
+  "reminderAtExactTime": "At exact time",
+  "reminderMinutesBefore": "{minutes} min before",
+  "@reminderMinutesBefore": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "reminderCardSubtitle": "Per-prayer setup · Tap to edit durations",
+  "reminderFirstOff": "1st off",
+  "reminderFirstValue": "1st {value}",
+  "@reminderFirstValue": {
+    "placeholders": {
+      "value": {}
+    }
+  },
+  "reminderPairSecondOff": "{first} · 2nd off",
+  "@reminderPairSecondOff": {
+    "placeholders": {
+      "first": {}
+    }
+  },
+  "reminderPairSecondValue": "{first} · 2nd {second}",
+  "@reminderPairSecondValue": {
+    "placeholders": {
+      "first": {},
+      "second": {}
+    }
+  },
+  "reminderPermissionRequiredMessage": "Notification permission is required. You can enable it from Settings.",
+  "reminderPrayerNotificationTitle": "Prayer notifications",
+  "reminderCardDisabledHint": "Off · Enable the switch and set times",
+  "reminderLocalNotificationUnavailable": "Local notifications are unavailable in this environment.",
+  "reminderSectionTitle": "Reminder",
+  "reminderTwoAlertsPerPrayer": "Two alerts per prayer",
+  "reminderPerPrayerDifferentSounds": "Different sounds per prayer",
+  "reminderCurrentSound": "Current: {summary}",
+  "@reminderCurrentSound": {
+    "placeholders": {
+      "summary": {}
+    }
+  },
+  "reminderUsePhoneDefaultSubtitle": "Uses the notification sound configured in phone settings.",
+  "reminderChooseArinSoundsTitle": "Choose from Arin sounds",
+  "reminderChooseArinSoundsSubtitle": "Listen to Adhan and calm tones, then apply.",
+  "reminderPhoneSoundActiveAllPrayers": "The phone-selected sound is active for all prayers.",
+  "reminderApplyOwnSoundAllPrayers": "Apply your own audio file to all prayers.",
+  "reminderSetPerPrayerDifferentSound": "Set different sounds per prayer",
+  "reminderAllPrayersSoundTitle": "Sound for all prayers",
+  "reminderAllPrayersSoundSubtitle": "Make one selection to play the same sound for all prayers.",
+  "reminderBackToSingleSoundSelection": "Back to single sound selection",
+  "reminderPerPrayerSavedInstantly": "Per-prayer selections are saved instantly.",
+  "reminderEnableNotificationsAction": "Enable notifications",
+  "reminderDurationsPerPrayerTitle": "Durations for each prayer",
+  "reminderDurationsPerPrayerSubtitle": "Tap a row to choose the 1st and 2nd alerts separately.",
+  "reminderDualAlertTitle": "Two alerts — {prayerTitle}",
+  "@reminderDualAlertTitle": {
+    "placeholders": {
+      "prayerTitle": {}
+    }
+  },
+  "reminderDualAlertSubtitle": "1st alert: Off, exact time, or minutes before. 2nd alert: Off or minutes before.",
+  "reminderFirstAlertTitle": "1st alert",
+  "reminderSecondAlertTitle": "2nd alert",
+  "prayerSoundPickerTitle": "Notification sound",
+  "prayerSoundQuickAllSubtitle": "Pick one sound first; if needed, split by prayer in advanced settings.",
+  "prayerSoundApplyAllButton": "Apply selected sound to all prayers",
+  "prayerSoundAdvancedToggle": "Advanced settings (per prayer)",
+  "prayerSoundAppliedAllSuccess": "Selected sound applied to all prayers.",
+  "prayerSoundSystem": "Phone default sound",
+  "prayerSoundAdhanTurkish": "Adhan — Turkish cut (10s, from start)",
+  "prayerSoundAdhanDubai": "Adhan — Dubai / Ramadan (9s, from start)",
+  "prayerSoundAmbientFlute": "Calm — flute texture (6s, from start)",
+  "prayerSoundAmbientPianoGuitar": "Calm — piano & guitar (7s, from start)",
+  "prayerSoundAmbientEthereal": "Calm — ethereal voices (10s, from start)",
+  "prayerSoundPickFromPhone": "Pick sound from phone",
+  "prayerSoundClearUserFile": "Remove",
+  "prayerSoundUserFromPhone": "Sound selected from phone",
+  "prayerSoundUserFileActiveHint": "This prayer currently uses the file selected from your phone. If you choose a catalog sound, the file is removed.",
+  "prayerSoundSubtitlePerPrayer": "Per prayer: phone default, catalog tone, or your own file from phone. Save by applying.",
+  "prayerSoundImportFailed": "Could not import audio file. Try another file or format (WAV, M4A...).",
+  "prayerSoundPreviewSystem": "No preview available — your device default notification sound is used.",
+  "commonStart": "Start",
+  "commonRestart": "Restart",
+  "willpowerHabitNotFound": "Habit not found",
+  "namazProgramHomeHintActive": "Prayer tracking is active. It now appears on the Home card as well.",
+  "namazProgramPageTitle": "Worship",
+  "namazProgramVerseQuote": "\"Surely hearts find peace in the remembrance of Allah.\"\n(Surah Ar-Ra'd, 13:28 — translation)",
+  "namazProgramBreathingBreak": "Breathing break",
+  "namazProgramTodayPrayersTitle": "Today's prayers",
+  "namazProgramTodayProgress": "{done}/5 completed",
+  "@namazProgramTodayProgress": {
+    "placeholders": {
+      "done": {
+        "type": "int"
+      }
+    }
+  },
+  "namazProgramPercentDone": "%{percent} completed",
+  "@namazProgramPercentDone": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "namazProgramSystemNotificationSettings": "System notification settings",
+  "namazProgramRecentDaysTitle": "Recent days",
+  "namazProgramRecentDaysSubtitle": "Each box shows prayers completed that day (e.g. 3/5).",
+  "breathingPhaseInhale": "Inhale",
+  "breathingPhaseHold": "Hold",
+  "breathingPhaseExhale": "Exhale",
+  "breathingCycleProgress": "Cycle {current}/{total}",
+  "@breathingCycleProgress": {
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "breathingFinishAction": "Finish",
+  "breathingSecondsLabel": "{seconds} sec",
+  "@breathingSecondsLabel": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "breathingIntroTitle": "4-7-8 Breathing Therapy",
+  "breathingIntroSubtitle": "A slow-paced breathing routine that helps reduce stress and anxiety.",
+  "breathingIntroCycles": "{cycles} cycles",
+  "@breathingIntroCycles": {
+    "placeholders": {
+      "cycles": {
+        "type": "int"
+      }
+    }
+  },
+  "breathingIntroApproxMinutes": "~2 min",
+  "breathingPhaseHintInhale": "seconds inhale",
+  "breathingPhaseHintHold": "seconds hold",
+  "breathingPhaseHintExhale": "seconds exhale",
+  "breathingSessionCompleteTitle": "Session complete",
+  "breathingSessionCompleteSubtitle": "{cycles} cycles completed. You can do one more round or exit.",
+  "@breathingSessionCompleteSubtitle": {
+    "placeholders": {
+      "cycles": {
+        "type": "int"
+      }
+    }
+  },
+  "breathingBottomHint": "While holding, heart rhythm slows down; continue at a comfortable pace. Stop if you feel dizzy.",
+  "quitProgramNotFound": "Program not found",
+  "quitOnboardingCommitmentMinLengthError": "Please write a promise to yourself (at least 8 characters).",
+  "quitOnboardingQuickStartTitle": "Start the counter now",
+  "quitOnboardingQuickStartBody": "Your counter will start from this moment. You can complete your pledge later from the program.",
+  "quitOnboardingAbortAction": "Cancel",
+  "quitOnboardingExitDraftTitle": "Exit setup?",
+  "quitOnboardingExitDraftBody": "Your progress in this setup round will not be saved. You can start again later.",
+  "quitOnboardingStayAction": "Stay",
+  "quitOnboardingExitAction": "Exit",
+  "quitOnboardingContentLoadFailed": "Setup content failed to load. Please try again.",
+  "quitOnboardingAppBarTitle": "Setup",
+  "quitOnboardingSealTitlePrefix": "Seal your promise",
+  "quitOnboardingSealHoldHint": "Press and hold",
+  "quitOnboardingContinueAction": "Continue",
+  "quitOnboardingQuickStartInlineAction": "Start the counter now, complete the program later",
+  "quitOnboardingCommitmentTitle": "Your promise to yourself",
+  "quitOnboardingCommitmentSubtitle": "Keep it short and clear; you can edit it before sealing.",
+  "quitOnboardingCommitmentHint": "Starting today…",
+  "quitOnboardingExamplesSectionTitle": "Example sentences",
+  "quitProgramRestartTitle": "Restart",
+  "quitProgramRestartPrompt": "The counter will reset. What should happen to your history?",
+  "quitProgramRestartKeepHistoryTitle": "Keep history",
+  "quitProgramRestartKeepHistorySubtitle": "The counter starts from zero; your previous attempt, daily marks, and stats are preserved.",
+  "quitProgramRestartWipeTitle": "Start from scratch",
+  "quitProgramRestartWipeSubtitle": "All historical daily marks are deleted too. This cannot be undone.",
+  "quitProgramElapsedHms": "{hours} h {minutes} min {seconds} sec",
+  "@quitProgramElapsedHms": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      },
+      "minutes": {
+        "type": "int"
+      },
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "quitProgramElapsedMs": "{minutes} min {seconds} sec",
+  "@quitProgramElapsedMs": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      },
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "quitProgramElapsedS": "{seconds} sec",
+  "@quitProgramElapsedS": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "quitProgramTabProgress": "Progress",
+  "quitProgramTabTips": "Tips",
+  "quitProgramTipsLoadFailed": "Content failed to load",
+  "quitProgramTipsWatermark": "هِدَايَة",
+  "quitProgramTipsHeroTitle": "Guidance",
+  "quitProgramTipsHeroSubtitle": "Awareness, patience, and practical suggestions to make your path gentler.",
+  "quitProgramDaysUpper": "DAYS",
+  "quitProgramStartNowAction": "I quit from this moment",
+  "quitProgramStatFullDays": "Full days",
+  "quitProgramDash": "—",
+  "quitProgramStatTimer": "Timer",
+  "quitProgramElapsedSinceQuitDays": "Elapsed: {days} days (since quit moment)",
+  "@quitProgramElapsedSinceQuitDays": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "quitProgramTasksTitle": "Tasks",
+  "quitProgramTasksSubtitle": "You progress as you complete day milestones.",
+  "quitProgramUiCounterSubtitleGeneric": "clean streak",
+  "quitProgramUiMetricsSectionTitleGeneric": "Progress indicators",
+  "quitProgramUiDisclaimerGeneric": "These indicators are for motivation only.",
+  "quitProgramUiEncouragementGeneric": "Every clean day matters; steady small steps create major transformation.",
+  "quitProgramUiClockHintGeneric": "When you tap, timer and indicators continue from this moment.",
+  "quitProgramMotivationStageStart": "The most valuable step of day one is simply to begin.",
+  "quitProgramMotivationStageWeek": "In the first week, patience matters; small steps lead to big change.",
+  "quitProgramMotivationStageMonth": "As you approach one month, keep going with steady patience.",
+  "quitProgramMotivationStageQuarter": "Around three months, consistency starts to show visible fruit.",
+  "quitProgramMotivationStageLong": "In the long run, every clean day is a meaningful gain.",
+  "quitMetricSmokingLung": "Lungs / breathing",
+  "quitMetricSmokingHeart": "Cardiovascular",
+  "quitMetricSmokingTeethMouth": "Teeth and mouth",
+  "quitMetricSmokingSmellTaste": "Smell and taste",
+  "quitMetricScreenFocusDepth": "Focus and depth",
+  "quitMetricScreenSleepRhythm": "Sleep rhythm",
+  "quitMetricScreenAwareness": "Screen awareness",
+  "quitMetricScreenInnerCalm": "Inner calm",
+  "quitMetricAlcoholLiverRecovery": "Liver recovery",
+  "quitMetricAlcoholSleepStability": "Sleep stability",
+  "quitMetricAlcoholMoodBalance": "Mood balance",
+  "quitMetricAlcoholClarity": "Mental clarity",
+  "quitMetricSubstanceBodyBalance": "Body balance",
+  "quitMetricSubstanceSleepRhythm": "Sleep rhythm",
+  "quitMetricSubstanceUrgeControl": "Urge control",
+  "quitMetricSubstanceSupportTracking": "Support and follow-up",
+  "quitMetricZinaDiscipline": "Self-discipline",
+  "quitMetricZinaBoundaryStrength": "Boundary strength",
+  "quitMetricZinaHeartCalm": "Heart calm",
+  "quitMetricZinaTawbaDirection": "Repentance direction",
+  "quitMilestone1Title": "First breath",
+  "quitMilestone1Subtitle": "One clean day",
+  "quitMilestone2Title": "First streak",
+  "quitMilestone2Subtitle": "48 hours",
+  "quitMilestone3Title": "Three days",
+  "quitMilestone3Subtitle": "Peak craving is passing",
+  "quitMilestone5Title": "Five days",
+  "quitMilestone5Subtitle": "Routine is breaking",
+  "quitMilestone7Title": "One week",
+  "quitMilestone7Subtitle": "First week completed",
+  "quitMilestone10Title": "Ten days",
+  "quitMilestone10Subtitle": "Willpower is strengthening",
+  "quitMilestone14Title": "Two weeks",
+  "quitMilestone14Subtitle": "Perception is recovering",
+  "quitMilestone21Title": "Three weeks",
+  "quitMilestone21Subtitle": "Habit loop is shifting",
+  "quitMilestone30Title": "One month",
+  "quitMilestone30Subtitle": "Major threshold",
+  "quitMilestone45Title": "Forty-five days",
+  "quitMilestone45Subtitle": "Rhythm is settling",
+  "quitMilestone60Title": "Two months",
+  "quitMilestone60Subtitle": "Body adapts",
+  "quitMilestone66Title": "Habit master",
+  "quitMilestone66Subtitle": "66-day line",
+  "quitMilestone90Title": "Three months",
+  "quitMilestone90Subtitle": "Noticeable health period",
+  "quitMilestone120Title": "Four months",
+  "quitMilestone120Subtitle": "Badge of determination",
+  "quitMilestone180Title": "Six months",
+  "quitMilestone180Subtitle": "Half a year",
+  "quitMilestone270Title": "Nine months",
+  "quitMilestone270Subtitle": "Long haul",
+  "quitMilestone365Title": "One year",
+  "quitMilestone365Subtitle": "Great glad tidings",
+  "quitMilestone500Title": "Five hundred days",
+  "quitMilestone500Subtitle": "Crown of perseverance",
+  "quitMilestone730Title": "Two years",
+  "quitMilestone730Subtitle": "Deep transformation",
+  "quitMilestone1000Title": "One thousand days",
+  "quitMilestone1000Subtitle": "Exceptional level",
+  "quitMilestoneInspiration365": "\"Indeed, the patient will be given their reward without measure.\" (Az-Zumar, 10)",
+  "quitMilestoneInspiration90": "\"Who is with Allah is never truly alone.\"",
+  "quitMilestoneInspiration30": "\"When you decide, then put your trust in Allah.\" (Aal Imran, 159)",
+  "quitMilestoneInspiration7": "\"With hardship comes ease.\" (Ash-Sharh, 6)",
+  "quitMilestoneInspiration1": "\"Surely with every hardship comes ease.\" (Ash-Sharh, 5)",
+  "quitMilestoneElapsedSummary": "{days} days clean — {subtitle}",
+  "@quitMilestoneElapsedSummary": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      },
+      "subtitle": {}
+    }
+  },
+  "quitMilestoneContinueAction": "Continue",
+  "quitProgramCompleteCommitmentTitle": "Complete your pledge",
+  "quitProgramCompleteCommitmentSubtitle": "Your counter is running — seal your program with the promise you wrote for yourself.",
+  "willpowerHubBreathingExerciseTitle": "Breathing exercise",
+  "willpowerHubBreathingExerciseSubtitle": "Slow breathing helps soften your body during stress.",
+  "willpowerHubArchiveHabitDialogTitle": "Permanently delete habit",
+  "willpowerHubArchiveHabitDialogBody": "This record and its related progress data are permanently deleted. This cannot be undone.",
+  "willpowerHubArchiveAction": "Delete permanently",
+  "willpowerHubHeaderTitle": "Growth & Purification",
+  "willpowerHubNoActiveHabits": "No active habits yet",
+  "willpowerHubActiveHabits": "{count} active habits",
+  "@willpowerHubActiveHabits": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "willpowerHubHabitCalendarTooltip": "Habit calendar",
+  "willpowerHubTabBuild": "Growth",
+  "willpowerHubTabQuit": "Purification",
+  "willpowerHubQuitCtaEarly": "Every clean minute returns as oxygen to your heart and lungs.",
+  "willpowerHubQuitCtaOngoing": "The first days are hard; your body has already started healing.",
+  "willpowerHubBuildCtaEarly": "Starting with small steps is enough.",
+  "willpowerHubBuildCtaOngoing": "Your routine is working well; keep going.",
+  "willpowerHubSummaryQuitLabel": "PURIFICATION",
+  "willpowerHubSummaryTodayLabel": "TODAY",
+  "willpowerHubSummaryCounterProgress": "counter progress",
+  "willpowerHubSummaryCompleted": "completed",
+  "willpowerHubInsightTagSpiritual": "SPIRITUAL",
+  "willpowerHubInsightTagHealth": "HEALTH",
+  "willpowerHubAddFirstBuild": "Add your first growth habit",
+  "willpowerHubAddFirstQuit": "Add your first purification habit",
+  "willpowerHubBuildEmptyTitle": "Your growth area is still empty",
+  "willpowerHubBuildEmptySubtitle": "Maintaining a beneficial habit is one of the simplest paths to spiritual growth.",
+  "willpowerHubKazaLabelSabah": "Fajr",
+  "willpowerHubKazaLabelOgle": "Dhuhr",
+  "willpowerHubKazaLabelIkindi": "Asr",
+  "willpowerHubKazaLabelAksam": "Magh",
+  "willpowerHubKazaLabelYatsi": "Isha",
+  "willpowerHubKazaLabelVitir": "Witr",
+  "willpowerHubKazaTrackingTitle": "Qada tracking",
+  "willpowerHubKazaRemainingLabel": "remaining",
+  "willpowerHubRemoveCardTooltip": "Remove card",
+  "willpowerHubHideKazaDialogTitle": "Remove qada card?",
+  "willpowerHubHideKazaDialogBody": "This card is hidden from the Growth screen. Account and counter data stay on device; you can add it again from the Routine workshop.",
+  "willpowerHubRemoveAction": "Remove",
+  "willpowerHubQuitEmptyTitle": "Your purification area is still empty",
+  "willpowerHubQuitEmptySubtitle": "Giving up a harmful habit is a powerful way to discipline the self.",
+  "willpowerHubPeriodPrefixWeek": "This week ",
+  "willpowerHubPeriodPrefixMonth": "This month ",
+  "willpowerHubPercentTargetReached": "{prefix}You reached the target percentage.",
+  "@willpowerHubPercentTargetReached": {
+    "placeholders": {
+      "prefix": {}
+    }
+  },
+  "willpowerHubPercentProgressStatus": "{prefix}%{progress} completed, %{left} left.",
+  "@willpowerHubPercentProgressStatus": {
+    "placeholders": {
+      "prefix": {},
+      "progress": {
+        "type": "int"
+      },
+      "left": {
+        "type": "int"
+      }
+    }
+  },
+  "willpowerHubTargetPending": "{prefix}Target pending.",
+  "@willpowerHubTargetPending": {
+    "placeholders": {
+      "prefix": {}
+    }
+  },
+  "willpowerHubUnitTargetAddPrompt": "{prefix}{target} {unit} target — tap the card to add.",
+  "@willpowerHubUnitTargetAddPrompt": {
+    "placeholders": {
+      "prefix": {},
+      "target": {
+        "type": "int"
+      },
+      "unit": {}
+    }
+  },
+  "willpowerHubUnitProgressTargetFilled": "{prefix}{progress} {unit} done; target is full.",
+  "@willpowerHubUnitProgressTargetFilled": {
+    "placeholders": {
+      "prefix": {},
+      "progress": {
+        "type": "int"
+      },
+      "unit": {}
+    }
+  },
+  "willpowerHubUnitProgressRemaining": "{prefix}You completed {progress} {unit}, {left} {unit} left.",
+  "@willpowerHubUnitProgressRemaining": {
+    "placeholders": {
+      "prefix": {},
+      "progress": {
+        "type": "int"
+      },
+      "unit": {},
+      "left": {
+        "type": "int"
+      }
+    }
+  },
+  "willpowerHubUnitTargetDoneSuper": "{prefix}{target} {unit} complete — great.",
+  "@willpowerHubUnitTargetDoneSuper": {
+    "placeholders": {
+      "prefix": {},
+      "target": {
+        "type": "int"
+      },
+      "unit": {}
+    }
+  },
+  "willpowerHubUnitProgressDidRemaining": "{prefix}You did {progress} {unit}, {left} {unit} left.",
+  "@willpowerHubUnitProgressDidRemaining": {
+    "placeholders": {
+      "prefix": {},
+      "progress": {
+        "type": "int"
+      },
+      "unit": {},
+      "left": {
+        "type": "int"
+      }
+    }
+  },
+  "willpowerHubAddEditHint": "Tap card to add or edit",
+  "willpowerHubQuitStatusSetupMissing": "Setup missing",
+  "willpowerHubQuitStatusClockRunning": "Counter running",
+  "willpowerHubQuitStatusProgramReady": "Program ready",
+  "willpowerHubTapCardForDetails": "Tap card for details",
+  "willpowerHubCompleteSetup": "Complete setup",
+  "willpowerHubStartClockHint": "Start the counter from “I quit from this moment” in the program",
+  "willpowerHubStreakSeriesLabel": "streak",
+  "willpowerHubStreakDaySeriesLabel": "day streak",
+  "qiblaHubCompassTitle": "Find the Qibla direction",
+  "qiblaHubCompassSubtitle": "Show the Kaaba direction using compass and location",
+  "qiblaHubOpenAction": "Open",
+  "qiblaHubZikirTitle": "Dhikr Counter",
+  "qiblaHubZikirFeatureSubtitle": "Digital counter with dhikr details, round history, and target (33/99)",
+  "qiblaHubBreathingTitle": "Breathing Exercise",
+  "qiblaHubBreathingSubtitle": "Calm down and refocus with the 4-7-8 breathing cycle",
+  "qiblaHubHealingTitle": "Healing Frequencies",
+  "qiblaHubHealingSubtitle": "A calming session with therapy tones, ambience, and sleep timer",
+  "languageChangedMessage": "Language changed: {languageName}",
+  "@languageChangedMessage": {
+    "placeholders": {
+      "languageName": {}
+    }
+  },
+  "adminIdentityBadge": "ADMIN",
+  "adminPoolsHint": "Select a pool, edit it, and save. Advanced operations are grouped below.",
+  "adminPoolsDropdownLabel": "Pool ({count} items)",
+  "@adminPoolsDropdownLabel": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "adminAdvancedActionsTitle": "Advanced actions",
+  "adminBackupCurrentPoolJson": "Back up this pool (JSON)",
+  "adminRestoreFromBackup": "Restore from backup",
+  "adminWritingInProgress": "Writing…",
+  "adminResetCompletely": "Reset completely",
+  "adminVersionLabel": "Version: v{version}",
+  "@adminVersionLabel": {
+    "placeholders": {
+      "version": {}
+    }
+  },
+  "adminSearchInPoolHint": "Search in pool ({count} records)",
+  "@adminSearchInPoolHint": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "adminAddAction": "Add",
+  "adminAddMissingRecords": "Add missing records",
+  "adminPoolLabelHomeNamazWisdom": "Home prayer card",
+  "adminPoolLabelPersonalizedQuotes": "Personalized quotes",
+  "adminPoolLabelWidgetQuote": "Widget / home screen quote",
+  "adminPoolLabelZikirDailyReflections": "Prayer time card (dhikr reflection)",
+  "adminPoolLabelHealingComfort": "Healing / comfort quotes",
+  "adminPoolLabelHubGelisimIslamic": "Growth — Islamic card",
+  "adminPoolLabelHubGelisimMedical": "Growth — health card",
+  "adminPoolLabelHubArinmaIslamic": "Purification — Islamic card",
+  "adminPoolLabelHubArinmaMedical": "Purification — health card",
+  "adminPoolLabelNotificationArinmaBodies": "Purification notification texts",
+  "adminSearchResultsCount": "{count} results",
+  "@adminSearchResultsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "adminPoolEmptyHint": "This pool is empty — you can add an item.",
+  "adminSearchNoResults": "No results match your search.",
+  "adminTapToEdit": "Tap to edit",
+  "adminEditTooltip": "Edit",
+  "adminInspireHint": "Add a card, fill in the text, then save. Background images: {count}.",
+  "@adminInspireHint": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "adminInspireAddNewCard": "Add new card",
+  "adminRefreshFromFirestore": "Refresh from Firestore",
+  "adminInspireVersionCards": "Version: v{version} · {count} cards",
+  "@adminInspireVersionCards": {
+    "placeholders": {
+      "version": {},
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "adminInspireNoCardsYet": "No Explore cards yet",
+  "adminInspireAddFirstCard": "Add first card",
+  "adminInspireCardLabel": "Card {index}",
+  "@adminInspireCardLabel": {
+    "placeholders": {
+      "index": {
+        "type": "int"
+      }
+    }
+  },
+  "adminInspireEmptyTextBadge": "Empty text",
+  "adminInspireDuplicateTooltip": "Duplicate",
+  "adminInspireShuffleDesignTooltip": "Shuffle design",
+  "adminInspireEmptyTextPreview": "(empty text — #{index})",
+  "@adminInspireEmptyTextPreview": {
+    "placeholders": {
+      "index": {
+        "type": "int"
+      }
+    }
+  },
+  "adminInspireImageNumberLabel": "Image #{index}",
+  "@adminInspireImageNumberLabel": {
+    "placeholders": {
+      "index": {}
+    }
+  },
+  "adminInspireContentKindLabel": "Content type",
+  "adminInspireContentKindQuote": "Quote",
+  "adminInspireContentKindVerse": "Verse",
+  "adminInspireContentKindHadith": "Hadith",
+  "adminInspireShowInMainFeedTitle": "Show in main feed (Mixed)",
+  "adminInspireShowInMainFeedSubtitle": "If unchecked, it appears only in Verse or Hadith filters.",
+  "adminInspireTurkishTextLabel": "Turkish text *",
+  "adminOptionalArabicLabel": "Arabic (optional)",
+  "adminOptionalSourceLabel": "Source (optional)",
+  "adminOptionalVerseRefLabel": "Verse / surah (optional)",
+  "adminInspireSaveAllChanges": "Save all card changes",
+  "adminDiagnosticsHint": "Automatic notification diagnostics. Logs here capture scheduling attempts.",
+  "adminDiagnosticsStatusSummaryTitle": "Status summary",
+  "adminDiagnosticsEnabled": "on",
+  "adminDiagnosticsDisabled": "off",
+  "adminDiagnosticsPrayerStatus": "Prayer: {status}",
+  "@adminDiagnosticsPrayerStatus": {"placeholders": {"status": {}}},
+  "adminDiagnosticsDailyStatus": "Daily: {status}",
+  "@adminDiagnosticsDailyStatus": {"placeholders": {"status": {}}},
+  "adminDiagnosticsMilestoneStatus": "Milestone: {status}",
+  "@adminDiagnosticsMilestoneStatus": {"placeholders": {"status": {}}},
+  "adminDiagnosticsTaskStatus": "Task: {status}",
+  "@adminDiagnosticsTaskStatus": {"placeholders": {"status": {}}},
+  "adminDiagnosticsZikirStatus": "Dhikr: {status}",
+  "@adminDiagnosticsZikirStatus": {"placeholders": {"status": {}}},
+  "adminDiagnosticsPendingQueue": "Pending queue: {count}",
+  "@adminDiagnosticsPendingQueue": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "adminRefreshAction": "Refresh",
+  "adminDiagnosticsExportLog": "Export log",
+  "adminDiagnosticsClearLog": "Clear log",
+  "adminDiagnosticsRecentEvents": "Recent events ({count})",
+  "@adminDiagnosticsRecentEvents": {"placeholders": {"count": {"type": "int"}}},
+  "adminDiagnosticsNoLogsHint": "No logs yet. Reopen the app, use it for a while, then refresh.",
+  "adminDiagnosticsOutcomeOk": "ok",
+  "adminDiagnosticsOutcomeError": "error",
+  "adminDiagnosticsOutcomeCooldownSkip": "skipped (cooldown)",
+  "adminDiagnosticsOutcomePendingGuardSkip": "skipped (pending guard)",
+  "adminDiagnosticsOutcomeDisabled": "disabled",
+  "adminDiagnosticsOutcomeInvalidPayloadSkip": "skipped (invalid payload)",
+  "adminDiagnosticsOutcomeUnknown": "unknown ({outcome})",
+  "@adminDiagnosticsOutcomeUnknown": {"placeholders": {"outcome": {}}},
+  "adminDevOffsetSavedAndRescheduled": "Offset saved; notifications rescheduled.",
+  "adminDevOffsetReset": "Offset reset.",
+  "adminDevOffsetDisabled": "Off (API times)",
+  "adminDevOffsetForwardMinutes": "Earlier: {minutes} min",
+  "@adminDevOffsetForwardMinutes": {"placeholders": {"minutes": {"type": "int"}}},
+  "adminDevOffsetBackwardMinutes": "Later: {minutes} min",
+  "@adminDevOffsetBackwardMinutes": {"placeholders": {"minutes": {"type": "int"}}},
+  "adminDevPrayerOffsetTitle": "Prayer time offset (this device only)",
+  "adminDevPrayerOffsetSubtitle": "Negative values shift all times earlier (notifications follow). API/server values are unchanged.",
+  "adminDevResetAction": "Reset",
+  "adminDevSaveAndRescheduleAction": "Save and reschedule",
+  "adminDevNotificationTestsTitle": "Notification tests",
+  "adminDevNotificationTestsSubtitle": "Use this to instantly test current channel and sound paths.",
+  "adminDevPrayerNotificationSent": "Prayer notification sent.",
+  "adminDevPrayerNotificationNowAction": "Prayer notification (now)",
+  "adminDevAppNotificationSent": "App notification sent.",
+  "adminDevAppNotificationNowAction": "Purification / app notification (now)",
+  "adminDevCrashlyticsTestTitle": "Crash report test (Crashlytics)",
+  "adminDevCrashlyticsDebugHint": "Debug build: collection is OFF. Install a release APK to test.",
+  "adminDevCrashlyticsReleaseHint": "Buttons below send a real error to Firebase Console → Crashlytics. Remove after confirming the report appears.",
+  "adminFirebaseNotReady": "Firebase is not ready.",
+  "adminDevCrashlyticsNonFatalSent": "Non-fatal record sent. It should appear in Console in a few minutes.",
+  "adminErrorWithReason": "Error: {reason}",
+  "@adminErrorWithReason": {"placeholders": {"reason": {}}},
+  "adminDevSendNonFatalTestAction": "Test: send non-fatal error",
+  "adminDevCrashNowFatalAction": "Test: crash app NOW (fatal)",
+  "adminDevCrashDialogTitle": "Crash the app?",
+  "adminDevCrashDialogBody": "The app will close in a few seconds. When reopened on the phone, the report is uploaded to Firebase (visible in Console a few minutes later).\n\nUse only to verify Crashlytics.",
+  "adminDevCrashAction": "Crash",
+  "adminDiagnosticsTitle": "Diagnostics",
+  "adminDevPlatformLabel": "Platform",
+  "adminDevBuildLabel": "Build",
+  "adminDevBuildModeRelease": "release",
+  "adminDevBuildModeProfile": "profile",
+  "adminDevBuildModeDebug": "debug",
+  "adminDevPlatformWeb": "web",
+  "adminDevPlatformUnknown": "unknown",
+  "adminDevUidLabel": "UID",
+  "adminDevPendingNotificationLabel": "Pending notifications",
+  "adminDevTapToRefresh": "tap to refresh",
+  "adminDiagnosticsError": "error",
+  "adminPoolDataUnavailable": "Pool data is currently unavailable.",
+  "adminPoolChangeAction": "Pool change",
+  "adminReviewBeforeSaveTitle": "Review before saving",
+  "adminPoolSaved": "Pool saved.",
+  "adminPoolSaveFailed": "Pool could not be saved.",
+  "adminUseSeedAllForPool": "Use “Seed all pools” for this pool.",
+  "adminNoBuiltInSeedForPool": "No built-in seed is defined for this pool.",
+  "adminSeedSelectedPoolDefaults": "Reset selected pool to defaults",
+  "adminPoolNotLoadedYet": "Pool is not loaded yet.",
+  "adminPoolBackupShareText": "Arin pool backup — {poolId} ({timestamp})",
+  "@adminPoolBackupShareText": {"placeholders": {"poolId": {}, "timestamp": {}}},
+  "adminPoolBackupShareSubject": "Arin pool backup",
+  "adminBackupCreationFailed": "Backup could not be created: {error}",
+  "@adminBackupCreationFailed": {"placeholders": {"error": {}}},
+  "adminBackupInvalidJsonObject": "Backup file could not be read: JSON object expected.",
+  "adminBackupPoolDocumentMissing": "Pool document was not found in backup file.",
+  "adminBackupItemsListMissing": "\"items\" list is missing in backup file.",
+  "adminBackupContainsUnreadableRecords": "Backup contains unreadable records; file may have been modified.",
+  "adminUnknownPool": "unknown pool",
+  "adminRestoreBackupTitle": "Restore backup",
+  "adminRestoreBackupDialogBody": "File: {fileName}\nPool in backup: {sourcePool}\nSelected pool: {selectedPool}\nRecord count: {itemCount}\n\n{warningText}These records will be written to the selected pool. Continue?",
+  "@adminRestoreBackupDialogBody": {
+    "placeholders": {
+      "fileName": {},
+      "sourcePool": {},
+      "selectedPool": {},
+      "itemCount": {"type": "int"},
+      "warningText": {}
+    }
+  },
+  "adminRestoreBackupDifferentPoolWarning": "Warning: backup is from a different pool.",
+  "adminRestoreFromBackupAction": "Restore from backup ({fileName})",
+  "@adminRestoreFromBackupAction": {"placeholders": {"fileName": {}}},
+  "adminRestoreBackupFailed": "Backup file could not be restored.",
+  "adminRequiresManagerOrFullAccessForMissingSeed": "Manager or full access is required to add missing records.",
+  "adminRequiresFullAccessForReset": "Full access is required for full reset.",
+  "adminBulkPreviewFailed": "Bulk operation preview could not be fetched.",
+  "adminSeedAllPoolsTitle": "Seed all pools",
+  "adminMergeSeedPreview": "Preview:\n• Checked pools: {poolCount}\n• Changed pools: {changedPoolCount}\n• Items to add: {addedItemCount}\n• Total items after operation: {targetItemCount}\n\nManual changes are preserved. Continue?",
+  "@adminMergeSeedPreview": {"placeholders": {"poolCount": {"type": "int"}, "changedPoolCount": {"type": "int"}, "addedItemCount": {"type": "int"}, "targetItemCount": {"type": "int"}}},
+  "adminResetSeedPreview": "Preview:\n• Checked pools: {poolCount}\n• Pools to overwrite: {changedPoolCount}\n• Current items: {currentItemCount}\n• New items: {targetItemCount}\n\nCurrent content will be removed. Make sure you backed up first. Continue?",
+  "@adminResetSeedPreview": {"placeholders": {"poolCount": {"type": "int"}, "changedPoolCount": {"type": "int"}, "currentItemCount": {"type": "int"}, "targetItemCount": {"type": "int"}}},
+  "adminOverwriteAction": "Overwrite",
+  "adminMissingItemsAddedToPools": "Missing items were added to pools.",
+  "adminAllPoolsOverwritten": "All pools were overwritten.",
+  "adminAuditAddMissingToAllPools": "Add missing entries to all pools",
+  "adminAuditResetAllPools": "Reset all pools",
+  "adminInspireCardsUnavailable": "Explore cards are currently unavailable.",
+  "adminRequiresManagerOrFullAccessForDiagnostics": "Manager or full access is required for diagnostics actions.",
+  "adminNotificationLogsCleared": "Notification logs cleared.",
+  "adminNotificationLogsShareText": "Arin notification logs ({timestamp})",
+  "@adminNotificationLogsShareText": {"placeholders": {"timestamp": {}}},
+  "adminNotificationLogsShareSubject": "Arin notification diagnostics",
+  "adminLogExportFailed": "Log export failed: {error}",
+  "@adminLogExportFailed": {"placeholders": {"error": {}}},
+  "adminInspireCardHasEmptyTurkishText": "There is a card with empty Turkish text; fill it or delete it.",
+  "adminReviewCardsBeforeSaveTitle": "Review before saving cards",
+  "adminInspireCardsWillBeUpdated": "Explore cards will be updated",
+  "adminInspireCardsSaved": "Explore cards saved.",
+  "adminInspireCardsSaveFailed": "Explore cards could not be saved.",
+  "adminAuditInspireCardsUpdated": "Explore cards were updated",
+  "adminCurrentRecordCount": "Current records: {count}",
+  "@adminCurrentRecordCount": {"placeholders": {"count": {"type": "int"}}},
+  "adminRecordCountToSave": "Records to save: {count}",
+  "@adminRecordCountToSave": {"placeholders": {"count": {"type": "int"}}},
+  "adminChangedRowCount": "Changed rows: {count}",
+  "@adminChangedRowCount": {"placeholders": {"count": {"type": "int"}}},
+  "adminConcurrentEditWarning": "If another admin saved meanwhile, the system will show a warning.",
+  "adminSaveAction": "Save",
+  "adminGrantsListFetchFailed": "Grant list could not be fetched.",
+  "adminGrantAccessAction": "Grant access",
+  "adminEditGrantAction": "Edit grant",
+  "adminEmailOrUidLabel": "Email or UID",
+  "adminLevelLabel": "Level",
+  "adminRoleContentLabel": "content - content",
+  "adminRoleManagerLabel": "manager - operations",
+  "adminRoleDeveloperLabel": "developer - full access",
+  "adminFullAccessRequiredForGrantManagement": "Full access is required for grant management.",
+  "adminEmailOrUidCannotBeEmpty": "Email or UID cannot be empty.",
+  "adminAccountAlreadyFullAccess": "This account already has full access in-app.",
+  "adminGrantSaved": "Grant saved.",
+  "adminGrantSaveFailed": "Grant could not be saved.",
+  "adminAuditGrantSaved": "Admin grant was added/updated",
+  "adminFullAccessAccountCannotBeRemoved": "This account has in-app full access and cannot be removed from panel.",
+  "adminRemoveGrantTitle": "Remove grant",
+  "adminRemoveGrantMessage": "Management access will be removed for {label}.",
+  "@adminRemoveGrantMessage": {"placeholders": {"label": {}}},
+  "adminGrantRemoved": "Grant removed.",
+  "adminGrantRemoveFailed": "Grant could not be removed.",
+  "adminAuditGrantRemoved": "Admin grant was removed",
+  "adminEditItemTitle": "Edit item",
+  "adminAddItemTitle": "Add item",
+  "adminWordLabel": "Quote",
+  "adminTextLabel": "Text",
+  "adminTurkishTextLabel": "Turkish text",
+  "adminTurkishLabel": "Turkish",
+  "adminArabicLabel": "Arabic",
+  "adminTypeLabel": "Type",
+  "adminReferenceLabel": "Reference",
+  "adminTitleLabel": "Title",
+  "adminOptionalSourceReferenceLabel": "Source / reference (optional)",
+  "adminWordCannotBeEmpty": "Quote cannot be empty.",
+  "adminTextCannotBeEmpty": "Text cannot be empty.",
+  "adminTurkishTextCannotBeEmpty": "Turkish text cannot be empty.",
+  "adminTurkishAndArabicRequired": "Turkish and Arabic fields are required.",
+  "adminTurkishArabicReferenceRequired": "Turkish, Arabic, and reference are required.",
+  "adminTitleAndTextRequired": "Title and text are required.",
+  "adminPoolItemWillBeEdited": "Pool item will be edited",
+  "adminNewPoolItemWillBeAdded": "A new item will be added to pool",
+  "adminVersionConflictError": "This content was updated by another admin. Please refresh and try again.",
+  "adminNoPermissionForOperation": "You do not have permission for this operation.",
+  "adminNetworkOrServiceUnavailable": "Internet connection is weak or service is temporarily unavailable.",
+  "adminOperationTimedOut": "Operation timed out. Please try again.",
+  "adminSessionCouldNotBeVerified": "Session could not be verified. Please sign in again.",
+  "adminAuthorizationCouldNotBeVerified": "Authorization could not be verified",
+  "adminAuthorizationCheckUnavailable": "Authorization check is currently unavailable.\nCheck your internet connection and try again.",
+  "adminBackToSettings": "Back to settings",
+  "adminNoAccessTitle": "No access",
+  "adminPageForAdminsOnly": "This page is for admins only.",
+  "adminPanelTitle": "Admin panel",
+  "adminPoolsTab": "Pools",
+  "adminInspireCardsTab": "Explore cards",
+  "adminDiagnosticsTab": "Diagnostics & logs",
+  "adminDeveloperTab": "Developer",
+  "adminGrantsTab": "Grants",
+  "adminSectionOnlyForFullAccess": "This section is available only with full access.",
+  "adminDeveloperToolsDeveloperOnly": "Developer tools are available only for developer level.",
+  "adminDeletePoolItemTitle": "Delete item from pool",
+  "adminDeletePoolItemMessage": "This item will be permanently deleted from pool \"{poolId}\" and written to Firestore immediately. It cannot be undone.",
+  "@adminDeletePoolItemMessage": {"placeholders": {"poolId": {}}},
+  "adminPoolItemWillBeDeleted": "Pool item will be deleted",
+  "adminRemoveCardFromListTitle": "Remove card from list",
+  "adminRemoveCardFromListMessage": "Card will be removed from local list. Press \"Save\" for changes to sync to Firestore.",
+  "adminRemoveAction": "Remove",
+  "adminDiagnosticsAccessDeniedTitle": "Diagnostics screen is available to manager and full access roles.",
+  "adminDiagnosticsAccessDeniedSubtitle": "Content managers can edit pools and Explore.",
+  "adminRoleContentPlain": "Content",
+  "adminRoleManagerPlain": "Manager",
+  "adminRoleDeveloperPlain": "Developer",
+  "adminRoleNonePlain": "None",
+  "adminGrantManagementAccessDeniedTitle": "Grant management is available only with full access.",
+  "adminGrantManagementAccessDeniedSubtitle": "Granting/removing admin levels can be done by developer role.",
+  "adminGrantHint": "Enter an email or UID to grant content, manager, or developer level.",
+  "adminFixedFullAccess": "Fixed full-access accounts: {emails}",
+  "@adminFixedFullAccess": {"placeholders": {"emails": {}}},
+  "adminDefinedGrants": "Defined grants ({count})",
+  "@adminDefinedGrants": {"placeholders": {"count": {"type": "int"}}},
+  "adminGrantsLoading": "Loading grants...",
+  "adminNoFirestoreGrantsYet": "No grants added through Firestore yet.",
+  "generalLoading": "Loading...",
+  "settingsPrivacyPageTitle": "Privacy Policy",
+  "settingsPrivacyLastUpdated": "Last updated: 26.04.2026",
+  "settingsPrivacyIntro": "Arin respects your privacy. This text explains which data is processed, why it is processed, and how you can manage these processes.",
+  "settingsPrivacyDataCollectedTitle": "Processed data",
+  "settingsPrivacyDataCollectedBody": "Depending on your usage and permissions, Arin may process location data for prayer times and qibla features, notification preferences, account details when you sign in, and app diagnostics data.",
+  "settingsPrivacyUsageTitle": "Why we process data",
+  "settingsPrivacyUsageBody": "Data is processed to calculate prayer times, show qibla direction, schedule reminders, preserve your settings, and improve app stability.",
+  "settingsPrivacyStorageTitle": "Storage and retention",
+  "settingsPrivacyStorageBody": "Most habit, zikr, and preference data is stored on your device. If you sign in, selected data may be synced with Firebase services. Data is kept until you delete it in the app or remove your account.",
+  "settingsPrivacyThirdPartyTitle": "Third-party services",
+  "settingsPrivacyThirdPartyBody": "Arin uses Firebase Authentication, Cloud Firestore, Firebase Analytics, and Firebase Crashlytics for sign-in, data sync, usage analytics, and crash diagnostics.",
+  "settingsPrivacyControlsTitle": "User control",
+  "settingsPrivacyControlsBody": "You can disable location and notification permissions from device settings, sign out from Settings, or delete your account and local data.",
+  "settingsPrivacyChildrenTitle": "Children's privacy",
+  "settingsPrivacyChildrenBody": "Arin is not designed for children under 13.",
+  "settingsPrivacyContactTitle": "Contact",
+  "settingsPrivacyContactBody": "For privacy questions: arinapphelp@gmail.com",
+  "notificationsHubTitle": "Notifications",
+  "notificationsHubHeadline": "Reminder center",
+  "notificationsHubSubhead": "Prayer, purification, and zikr — all in one place.",
+  "notificationsPermissionGranted": "Granted",
+  "notificationsPermissionDenied": "Disabled",
+  "notificationsPermissionLimited": "Limited",
+  "notificationsOpenOsSettings": "System notification settings",
+  "notificationsGateNotification": "Notifications",
+  "notificationsGateExactAlarm": "Exact alarm",
+  "notificationsGateBattery": "Battery exemption",
+  "notificationsGateAllGood": "Reminders are triggered on time.",
+  "notificationsGateMissing": "One or more permissions are missing — scheduled notifications may be delayed or never arrive.",
+  "notificationsGateRequestExact": "Enable exact alarm permission",
+  "notificationsGateRequestBattery": "Ignore battery optimization",
+  "notificationsDiagnosticsQueuedLabel": "Queued scheduled reminders",
+  "notificationsSectionGeneral": "General",
+  "notificationsSectionPrayer": "Prayer times",
+  "notificationsSectionArinma": "Purification and habits",
+  "notificationsPrayerRowTitle": "Time and sound",
+  "notificationsPrayerOnSubtitle": "Prayer notifications are on — tap to edit",
+  "notificationsPrayerOffSubtitle": "Prayer notifications are off — tap to enable",
+  "notificationsPrayerDetailTitle": "Prayer notifications",
+  "notificationsPrayerDetailSubtitle": "Separate timing and sound per prayer; main toggle is below.",
+  "notificationsArinmaDailyTitle": "Daily reminder",
+  "notificationsArinmaDailySubtitle": "Twice a day, a random quote or short motivation.",
+  "notificationsMilestoneTitle": "Milestone notifications",
+  "notificationsMilestoneSubtitle": "For example, sparse messages like 24 hours or 1 week on your quit journey.",
+  "notificationsTaskTitle": "Task reminder",
+  "notificationsTaskSubtitle": "At most one alert per day for incomplete tasks.",
+  "notificationsZikirTitle": "Zikr reminder",
+  "notificationsZikirSubtitle": "At your chosen time, a short reminder with your latest zikr text.",
+  "notificationsZikirTimeLabel": "Zikr time",
+  "notificationsZikirTimePickerTitle": "Zikr time",
+  "notificationsZikirTimePickerSubtitle": "A daily reminder at this time with your latest zikr text.",
+  "notificationsHealthDisclaimer": "Texts about health and purification are for general information and do not replace treatment. If you have a condition, consult your doctor.",
+  "notificationsNextReminderToday": "today",
+  "notificationsNextReminderTomorrow": "tomorrow",
+  "notificationsNextReminderUnderMinute": "< 1 min",
+  "notificationsNextReminderMinutes": "{minutes} min",
+  "@notificationsNextReminderMinutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "notificationsNextReminderHoursOnly": "{hours} h",
+  "@notificationsNextReminderHoursOnly": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      }
+    }
+  },
+  "notificationsNextReminderHoursMinutes": "{hours} h {minutes} min",
+  "@notificationsNextReminderHoursMinutes": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      },
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "notificationsNextReminderLine": "Next reminder: {dayLabel} {clock} · in {gap}",
+  "@notificationsNextReminderLine": {
+    "placeholders": {
+      "dayLabel": {},
+      "clock": {},
+      "gap": {}
+    }
+  },
+  "aboutArinHeadline": "Beside your path",
+  "aboutArinSubhead": "A small companion offering gentle reminders for your prayer, routine, and day",
+  "aboutArinParagraph1": "ARIN exists to help you keep your prayers on time, continue habits that are good for you, and slowly leave difficult patterns behind. Our goal is not pressure; we stay by your side as calm little reminders in busy days.",
+  "aboutArinParagraph2": "Sometimes the road is long, sometimes the day is full. That is why we offer a simple flow and clear reminders. We want to hear every point that feels missing or wrong; we are open to improving it together.",
+  "aboutArinParagraph3": "Small steps are the most effective in the long run. We hope you see ARIN as a peaceful companion that does not rush you and does not leave your path; may your day feel calm and light.",
+  "aboutArinClosingWish": "Wishing you beneficial use",
+  "surveyBack": "Back",
+  "surveyNext": "Continue",
+  "namazIbadetWarningTitle": "Attention",
+  "namazIbadetWarningSubtitle": "Prayer tracking is not for show; it is for organizing your heart with humility and honesty.",
+  "namazIbadetWarningBullet1": "Mark checks only for yourself; do not let it become a tool of showing off or pressure on others.",
+  "namazIbadetWarningBullet2": "If you miss a prayer time, do not belittle yourself; every return is repentance and a fresh start.",
+  "namazIbadetWarningBullet3": "You can manage notifications anytime from system settings; tracking should not become a burden.",
+  "namazIbadetCommitmentTitle": "Your promise to yourself",
+  "namazIbadetCommitmentHint": "Write a sincere sentence about your prayer (at least 8 characters).",
+  "namazIbadetCommitmentFieldHint": "A sentence from your heart...",
+  "namazIbadetCommitmentTooShort": "Please write a promise to yourself (at least 8 characters).",
+  "namazIbadetSealTitlePrefix": "Seal your promise",
+  "namazIbadetSealHoldHint": "Hold your finger down",
+  "namazIbadetSealSuccess": "Your promise is saved. Moving to the worship screen.",
+  "namazIbadetSealEncourageNotHolding": "When ready, hold the seal to reinforce your promise.",
+  "namazIbadetSealEncourageHolding": "Slow your breath and let your promise settle in your heart.",
+  "namazIbadetPrepTitle": "Preparation",
+  "namazIbadetExamplesTitle": "Examples",
+  "closeAction": "Close",
+  "saveAction": "Save",
+  "selectAction": "Select",
+  "quitPickerTemplateAlreadyExists": "This program is already in your list; only one item per template is allowed.",
+  "quitPickerOpenAction": "Open",
+  "quitPickerGoToListAction": "Go to list",
+  "quitPickerTemplateScreenTitle": "Quit screen addiction",
+  "quitPickerTemplateSmokingTitle": "Quit smoking",
+  "quitPickerTemplateAlcoholTitle": "Quit alcohol",
+  "quitPickerTemplateSubstanceTitle": "Quit substance use",
+  "quitPickerTemplateZinaTitle": "Quit zina",
+  "quitPickerHeaderTitle": "Purify from harmful habits",
+  "quitPickerHeaderSubtitle": "Select the habit you want to leave; use the box below for a custom goal.",
+  "quitPickerScreenLabel": "Screen",
+  "quitPickerScreenSubtitle": "Boundaries and calm",
+  "quitPickerSmokingLabel": "Smoking",
+  "quitPickerAlcoholLabel": "Alcohol",
+  "quitPickerSubstanceLabel": "Substance",
+  "quitPickerSubstanceSubtitle": "Support and tracking",
+  "quitPickerZinaLabel": "Zina",
+  "quitPickerDefaultSubtitle": "Purification program",
+  "quitPickerAlreadyAdded": "Already added",
+  "quitPickerAddCustomTitle": "Add custom",
+  "quitPickerAddCustomSubtitle": "Build your own purification routine.",
+  "buildProgramSetupQuranTitle": "Daily Qur'an program",
+  "buildProgramSetupDefaultTitle": "Program",
+  "buildProgramSetupHeadlineQuran": "One page each day",
+  "buildProgramSetupHeadlineDefault": "Start your program",
+  "buildProgramSetupBadge": "Preparation step",
+  "buildProgramSetupBodyQuran": "At least one page — small but consistent. Progress and tips are waiting on the next screen.",
+  "buildProgramSetupBodyDefault": "Progress and tips are waiting on the next screen.",
+  "buildProgramSetupAlreadyActive": "Your daily Qur'an program is already active. Redirected to the existing program.",
+  "buildProgramSetupQuranHabitTitle": "Daily Qur'an",
+  "buildProgramSetupStartAction": "Start program",
+  "buildProgramSetupPrincipleTitle": "Small and consistent is better than much then abandoned",
+  "buildProgramSetupPrincipleQuote": "Prophet Muhammad (peace be upon him): \"The deeds most beloved to Allah are those done regularly, even if they are small.\"",
+  "buildProgramDetailNotFound": "Program not found",
+  "buildProgramDetailTabGeneral": "General",
+  "buildProgramDetailTabTips": "Tips",
+  "buildProgramDetailTabProgress": "Progress",
+  "buildProgramDetailTodayQuestion": "Did you complete today's reading goal?",
+  "buildProgramDetailTodayDone": "Completed today",
+  "buildProgramDetailTodayPending": "Not marked yet today — tap",
+  "buildProgramDetailDayCount": "Day {days}",
+  "@buildProgramDetailDayCount": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "buildProgramDetailProgressIndicatorLabel": "Motivational progress indicator",
+  "buildProgramDetailRoutinePercent": "{percent}% routine alignment",
+  "@buildProgramDetailRoutinePercent": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "buildProgramDetailMilestoneLabel": "Day {day} — {percent}%",
+  "@buildProgramDetailMilestoneLabel": {
+    "placeholders": {
+      "day": {
+        "type": "int"
+      },
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "buildProgramDetailDisclaimer": "These indicators are for general motivation and are not scientific or medical measurements.",
+  "onboardingSlide1Title": "A breath inside the noise",
+  "onboardingSlide1Subtitle": "When your mind is racing, your inner voice often becomes a whisper. Small pauses — one breath, one brief stop — revive spiritual balance; the peace you seek outside sometimes first grows quietly within.",
+  "onboardingSlide2Title": "Start small, grow with consistency",
+  "onboardingSlide2Subtitle": "Track your habits in Growth and Purification. One day, one breath, one choice — keep the chain unbroken; purification is like climbing stairs, getting stronger step by step.",
+  "onboardingSlide3Title": "Prayer time and daily rhythm",
+  "onboardingSlide3Subtitle": "Keep prayer times close; let breathing exercises and growth tools stay with you in difficult moments. Bring your worship, tracking, and inner voice into the same rhythm.",
+  "onboardingSlide4Title": "Arin: together in one app",
+  "onboardingSlide4Subtitle": "From inspiration to daily habits, from prayer alerts to purification counters, your journey is here. If you are ready, let's begin together — you walk, we remind and accompany.",
+  "onboardingGetStarted": "Let's start",
+  "onboardingSkip": "Skip",
+  "onboardingNext": "Next",
+  "surveyNameTitle": "How should we address you?",
+  "surveyNameHint": "Your name",
+  "surveyGenderTitle": "May we ask your gender?",
+  "surveyGenderSubtitle": "To help you better...",
+  "surveyGenderMale": "Male",
+  "surveyGenderFemale": "Female",
+  "surveyMoodTitle": "Which tone is strongest in your inner world right now?",
+  "surveyMoodSubtitle": "Select signs that describe you; content and reminders adapt accordingly.",
+  "surveyDailyRhythmTitle": "Where does most of your day usually flow?",
+  "surveyDailyRhythmSubtitle": "Your pace and environment help us understand your best rhythm.",
+  "surveyInnerThemesTitle": "Which inner themes stand out for you?",
+  "surveyInnerThemesSubtitle": "You can select more than one; sincere signals help us know you better.",
+  "surveyNotificationTitle": "Notifications",
+  "surveyNotificationLead": "Let prayer reminders and daily messages reach you on time.",
+  "surveyNotificationSubtitle": "We need notification permission so prayer alerts and content suggestions are not missed. You can turn it off anytime in settings.",
+  "surveyNotificationAllow": "Allow notifications",
+  "surveyNotificationSkip": "Skip for now",
+  "surveyNotificationOpenSettings": "Open settings",
+  "surveySave": "Start ➔",
+  "surveyGenderDecline": "I prefer not to share",
+  "surveyNameGreetingPrefix": "Hello",
+  "surveySummaryTitle": "You are ready",
+  "surveySummarySubtitle": "We saved your core preferences. We will shape your Arin experience with these signals.",
+  "surveySummaryCardTitle": "Getting started summary",
+  "surveySummaryItemName": "Name",
+  "surveySummaryItemMood": "Mood signals",
+  "surveySummaryItemRhythm": "Daily rhythm signals",
+  "surveySummaryItemThemes": "Inner theme signals",
+  "surveySummaryItemNotificationOn": "On",
+  "surveySummaryItemNotificationOff": "Off",
+  "surveySummaryNotProvided": "Not provided",
+  "surveySummaryAction": "Go to home",
+  "surveySummarySaveError": "Could not save start data. Please try again.",
+  "moodHappy": "Happy",
+  "moodCalm": "Calm",
+  "moodStressed": "Stressed",
+  "moodSad": "Sad",
+  "moodGrateful": "Grateful",
+  "moodAnxious": "Anxious",
+  "moodMotivated": "Motivated",
+  "sectorStudent": "High school / University / Prep",
+  "sectorPrivate": "Private sector",
+  "sectorPublic": "Public sector",
+  "sectorBusiness": "Own business / Freelance",
+  "sectorTrade": "Trade",
+  "sectorHousehold": "Homemaker",
+  "sectorOther": "Other",
+  "needMotivation": "Motivation",
+  "needSabr": "Patience",
+  "needShukr": "Gratitude",
+  "needTawakkul": "Trust in God",
+  "needFocus": "Focus",
+  "needHealing": "Healing",
+  "needRizq": "Provision & Blessing",
+  "appPrepareTitle": "Preparing Arin for you",
+  "appPrepareSubtitle": "Prayer times and daily wisdom are loading for you...",
+  "shellExitConfirmBackTwice": "Press back once more to exit",
+  "inspireExploreTitle": "Explore",
+  "inspireSearchHint": "Search",
+  "inspireFilterTooltip": "Content type",
+  "inspireFilterMainFeed": "Main feed",
+  "inspireFilterQuote": "Quote",
+  "inspireFilterVerse": "Verse",
+  "inspireFilterHadith": "Hadith",
+  "inspireSearchNoResults": "No content matches this search.\nTry another word or an unaccented form.",
+  "inspireEmptyTitle": "No content yet",
+  "inspireEmptySubtitle": "Images: assets/inspiration/ (1.jpg, 2.jpg, ...).\nContent: assets/data/inspiration/*.json or Firestore app_public/inspiration_cards.",
+  "inspirePullToRefreshHint": "Pull down to refresh.",
+  "inspireLoadFailedTitle": "Could not load",
+  "inspirePullToRetryHint": "Pull down to try again.",
+  "viewerBackAction": "Back",
+  "viewerNoCard": "No card",
+  "asyncErrorDefaultTitle": "Something went wrong",
+  "asyncErrorDefaultMessage": "Your connection may be weak or the service is currently unreachable. Please try again shortly.",
+  "asyncErrorRetryAction": "Retry",
+  "asyncErrorTechnicalDetailsTitle": "Technical details",
+  "asyncErrorCopiedToClipboard": "Error copied to clipboard.",
+  "savedInspirationTitle": "Saved",
+  "savedInspirationLoadFailedPrefix": "Could not load",
+  "savedInspirationEmptyTitle": "Your heart journal is empty",
+  "savedInspirationEmptySubtitle": "Save quotes that touch you in Explore; let them gather here and return to you.",
+  "savedInspirationGoExploreAction": "Go to Explore",
+  "clockPickerCancelAction": "Cancel",
+  "clockPickerConfirmAction": "OK",
+  "clockPickerHourLabel": "Hour",
+  "clockPickerMinuteLabel": "Minute",
+  "salatWeekCelebrationTitle": "You completed the week",
+  "salatWeekCelebrationAction": "Alhamdulillah",
+  "adminEmailInviteLabel": "Email invite"
+}

@@ -1,0 +1,26 @@
+{
+  "version": 1,
+  "items": [
+    {
+      "imageIndex": 1,
+      "tr": "“\nAllah'ın\nseni\nkurtardığı\nşeye\ngeri\ndönme.”",
+      "ar": null,
+      "source": "Motivasyon",
+      "layoutIndex": 0,
+      "reelsStyle": 0,
+      "emphasisTailLines": 0,
+      "useLightTextOnImage": null
+    },
+    {
+      "imageIndex": 2,
+      "tr": "Kendi ana metnini buraya yaz.\nİkinci satır.",
+      "ar": null,
+      "verseReference": null,
+      "source": "Kaynak notu",
+      "layoutIndex": 0,
+      "reelsStyle": 1,
+      "emphasisTailLines": 0,
+      "useLightTextOnImage": null
+    }
+  ]
+}

@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Resource shrink: bu raw dosyaları yalnızca bildirim eklentisinde string adıyla kullanılıyor. -->
+<resources xmlns:tools="http://schemas.android.com/tools"
+    tools:keep="@raw/prayer_ntf_adhan_turkish,@raw/prayer_ntf_adhan_dubai,@raw/prayer_ntf_ambient_flute,@raw/prayer_ntf_ambient_piano_guitar,@raw/prayer_ntf_ambient_ethereal" />

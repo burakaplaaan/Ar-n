@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="default_web_client_id">746942620456-lm0rg914v26s3u2io9pif08vu24jfor0.apps.googleusercontent.com</string>
+    <string name="app_name">Arin</string>
+    <string name="widget_description">Daily quote and source — Arin</string>
+    <string name="widget_quote_description">Arin — daily quote</string>
+    <string name="widget_prayer_description">Arin — prayer times</string>
+    <string name="widget_quote_title">Arin · Quote</string>
+    <string name="widget_prayer_title">Arin · Prayer</string>
+    <string name="widget_brand_label">Arin</string>
+    <string name="widget_placeholder_quote_source">AT-TALAQ 3</string>
+    <string name="widget_placeholder_quote">Whoever puts trust in Allah,\nHe is sufficient for them.</string>
+    <string name="widget_placeholder_location">Location not set</string>
+</resources>

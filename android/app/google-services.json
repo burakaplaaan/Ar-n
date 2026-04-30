@@ -1,0 +1,62 @@
+{
+  "project_info": {
+    "project_number": "746942620456",
+    "project_id": "arinapp-7b136",
+    "storage_bucket": "arinapp-7b136.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:746942620456:android:bed9ebb88ccd4ebcef661d",
+        "android_client_info": {
+          "package_name": "com.arin.arin"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "746942620456-7o1dndnleabhr92lljo8r2bm9sii0t1q.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.arin.arin",
+            "certificate_hash": "5df358551c66cf181b2ed112194ae2130bb4a68d"
+          }
+        },
+        {
+          "client_id": "746942620456-8amuneosogdmk06npjk9fuhdlg539m26.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.arin.arin",
+            "certificate_hash": "86d89beb1b6364575de7dd6c74acb2d793902c24"
+          }
+        },
+        {
+          "client_id": "746942620456-lm0rg914v26s3u2io9pif08vu24jfor0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDUIzm17DZm8kdzOF3btvuHGtMai9frEf8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "746942620456-lm0rg914v26s3u2io9pif08vu24jfor0.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "746942620456-0u7n7mp8ue37dbnr5asv05c5ngo11qap.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.arin.arin"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

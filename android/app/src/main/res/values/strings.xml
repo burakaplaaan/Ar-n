@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Google ile giriş: Web OAuth istemci kimliği (Firebase Console → Authentication → Google → Web client ID).
+         google-services.json içinde oauth_client boş geldiğinde Gradle bu değeri otomatik üretmez; burada
+         tanımlamak native Google Sign-In akışının kimlik doğrulayıcıyı çözmesine yardımcı olur. -->
+    <string name="default_web_client_id">746942620456-lm0rg914v26s3u2io9pif08vu24jfor0.apps.googleusercontent.com</string>
+    <string name="app_name">Arın</string>
+    <string name="widget_description">Günlük söz ve kaynak — Arın</string>
+    <string name="widget_quote_description">Arın — günlük söz</string>
+    <string name="widget_prayer_description">Arın — namaz vakitleri</string>
+    <string name="widget_quote_title">Arın · Söz</string>
+    <string name="widget_prayer_title">Arın · Namaz</string>
+    <string name="widget_brand_label">Arın</string>
+    <string name="widget_placeholder_quote_source">TALAK 3</string>
+    <string name="widget_placeholder_quote">Kim Allah\'a tevekkül\nederse, O ona yeter.</string>
+    <string name="widget_placeholder_location">Konum ayarlanmadı</string>
+</resources>

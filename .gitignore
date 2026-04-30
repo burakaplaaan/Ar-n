@@ -1,0 +1,65 @@
+# Miscellaneous
+*.class
+*.log
+*.pyc
+*.swp
+.DS_Store
+.atom/
+.build/
+.buildlog/
+.history
+.svn/
+.swiftpm/
+migrate_working_dir/
+
+# IntelliJ related
+*.iml
+*.ipr
+*.iws
+.idea/
+
+# The .vscode folder contains launch configuration and tasks you configure in
+# VS Code which you may wish to be included in version control, so this line
+# is commented out by default.
+#.vscode/
+
+# Flutter/Dart/Pub related
+**/doc/api/
+**/ios/Flutter/.last_build_id
+.dart_tool/
+.flutter-plugins-dependencies
+.pub-cache/
+.pub/
+/build/
+/coverage/
+
+# Symbolication related
+app.*.symbols
+
+# Obfuscation related
+app.*.map.json
+
+# Android Studio will place build artifacts here
+/android/app/debug
+/android/app/profile
+/android/app/release
+
+# Gradle/Android project build output (not only repo-root /build/)
+/android/build/
+
+# CI/agent geçici çıktılar — repoya taşınmaz
+*.apk
+agent_tmp_*
+.analyze_output.txt
+.dart_fix_apply.txt
+.dart_fix_report.txt
+.jpg_dryrun.txt
+
+# Keşfet korpusu üretimi — `dart run tool/build_inspiration_corpus.dart` ile indirilir
+tool/quran_tr_sample.json
+
+# Korpus araçları (prune / sync) çalıştırılınca üretilen zaman damgalı yedekler.
+# Tool'lar artık bu dosyaları tool/_backups/ altına yazıyor; yine de dalgın bir
+# commit'i engellemek için *.bak.* her yerde yok sayılır.
+*.bak.*
+tool/_backups/

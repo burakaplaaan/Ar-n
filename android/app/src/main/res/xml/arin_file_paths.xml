@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Namaz bildirim sesleri: getFilesDir() altındaki WAV/MP3 için FileProvider content:// URI -->
+<!-- Keşfet paylaşımı: path_provider getTemporaryDirectory() → cache/ -->
+<paths>
+    <files-path name="app_files" path="." />
+    <cache-path name="share_cache" path="." />
+</paths>

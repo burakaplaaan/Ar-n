@@ -1,0 +1,117 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Admin — hibrit:
+    // 1) Aşağıdaki e-postalar her zaman tam yetkili developer.
+    // 2) `admin_users/{uid}.role`: content / manager / developer.
+    // 3) `admin_invites/{email}.role`: e-posta ile ön yetki.
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function authEmail() {
+      return signedIn() && request.auth.token.email != null
+        ? request.auth.token.email
+        : null;
+    }
+
+    function isFullAccessEmail() {
+      return authEmail() in [
+        'burakmelihkuzi@gmail.com',
+        'brkkpl5@gmail.com',
+        'seyirteknikerr@gmail.com',
+      ];
+    }
+
+    function adminUserDoc() {
+      return get(/databases/$(database)/documents/admin_users/$(request.auth.uid));
+    }
+
+    function adminInviteDoc() {
+      return get(/databases/$(database)/documents/admin_invites/$(authEmail()));
+    }
+
+    function adminUserRole() {
+      return exists(/databases/$(database)/documents/admin_users/$(request.auth.uid))
+        ? (
+          adminUserDoc().data.role == null || adminUserDoc().data.role == ''
+            ? 'content'
+            : adminUserDoc().data.role
+        )
+        : null;
+    }
+
+    function adminInviteRole() {
+      return authEmail() != null
+        && exists(/databases/$(database)/documents/admin_invites/$(authEmail()))
+        ? adminInviteDoc().data.role
+        : null;
+    }
+
+    function adminRole() {
+      return !signedIn()
+        ? null
+        : isFullAccessEmail()
+          ? 'developer'
+          : adminUserRole() != null
+            ? adminUserRole()
+            : adminInviteRole();
+    }
+
+    function isAdmin() {
+      return adminRole() in ['content', 'manager', 'developer'];
+    }
+
+    function isManagerOrDeveloper() {
+      return adminRole() in ['manager', 'developer'];
+    }
+
+    function isDeveloper() {
+      return adminRole() == 'developer';
+    }
+
+    // Admin listesi — developer tümünü yönetir; kullanıcı kendi kaydını
+    // okuyabilir ("ben admin miyim?" kontrolü için).
+    match /admin_users/{uid} {
+      allow get: if signedIn() && (request.auth.uid == uid || isDeveloper());
+      allow list: if isDeveloper();
+      allow write: if isDeveloper();
+    }
+
+    // E-posta ile yetki davetleri. Kullanıcı yalnızca kendi e-posta davetini
+    // okuyabilir; developer tümünü yönetir.
+    match /admin_invites/{email} {
+      allow get: if signedIn() && (authEmail() == email || isDeveloper());
+      allow list: if isDeveloper();
+      allow write: if isDeveloper();
+    }
+
+    // Admin işlem geçmişi. Yazma admin panelinden gelir; okuma developer.
+    match /admin_audit/{auditId} {
+      allow create: if isAdmin();
+      allow read: if isDeveloper();
+      allow update, delete: if false;
+    }
+
+    // Söz havuzları — herkes okur; yazma yalnızca admin.
+    match /quote_pools/{poolId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Genel app_public belgeleri (quotes_bundle vb.)
+    match /app_public/{docId} {
+      allow read: if true;
+      allow write: if isAdmin() && docId == 'inspiration_cards';
+    }
+
+    // Kullanıcı kök belgesi + alt belgeler
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+    match /users/{userId}/{document=**} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+  }
+}

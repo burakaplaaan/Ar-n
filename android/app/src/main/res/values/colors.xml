@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="arin_window_bg">#FF030806</color>
+    <!-- Home widget — AppColors ile uyumlu zümrüt / neon -->
+    <color name="widget_bg">#FF0F2419</color>
+    <color name="widget_border">#334ADE80</color>
+    <color name="widget_accent">#FF4ADE80</color>
+    <color name="widget_text_primary">#FFE6E1D8</color>
+    <color name="widget_text_secondary">#FFB2DFCE</color>
+    <!-- Söz / namaz widget — cam panel (gradient drawable ile birlikte) -->
+    <color name="widget_quote_glass">#9A000000</color>
+    <color name="widget_quote_border">#33FFFFFF</color>
+    <color name="widget_glass_outer">#22000000</color>
+    <!-- Gece / ay ışığı (API 23: 6 hane — 8 hane AARRGGBB drawable’da sorun çıkarabilir) -->
+    <color name="widget_glass_grad_start">#8FA8B8</color>
+    <color name="widget_glass_grad_end">#101820</color>
+    <color name="widget_glass_edge">#B8C8D8</color>
+    <color name="widget_glass_inner_highlight">#22FFFFFF</color>
+    <color name="widget_quote_text_white">#FFF8F6F2</color>
+    <color name="widget_quote_body">#FFF2F6FA</color>
+    <color name="widget_quote_white">#FFEFF5F0</color>
+    <color name="widget_text_muted">#CCE8E2D8</color>
+    <color name="widget_divider">#22FFFFFF</color>
+    <color name="widget_accent_soft">#E6D4B8</color>
+	<color name="ic_launcher_background">#0d2f32</color>
+</resources>

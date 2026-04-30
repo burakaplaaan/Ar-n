@@ -1,0 +1,24 @@
+{
+  "templateId": "quit_smoking",
+  "warningTitle": "Dikkat",
+  "warningSubtitle": "Bu yolculuk kolay olmayacak",
+  "warningBody": [
+    "Sigara bağımlılığı hem bedeni hem zihni etkiler.",
+    "Bırakmak sabır ve destek gerektirir; küçük adımlar büyük değişim getirir."
+  ],
+  "physicalTitle": "Fiziksel ve mental etkiler",
+  "physicalItems": [
+    { "icon": "psychology", "title": "Beyin kimyası", "subtitle": "Nikotin ödül sistemini etkiler" },
+    { "icon": "favorite", "title": "Stres algısı", "subtitle": "Bırakınca ilk günler zorlayıcı olabilir" },
+    { "icon": "bolt", "title": "Enerji dalgalanması", "subtitle": "Vücut yeniden dengelenir" }
+  ],
+  "spiritualTitle": "Manevi motivasyon",
+  "spiritualItems": [
+    { "icon": "mosque", "title": "Beden emaneti", "subtitle": "Sağlığını korumak değerlidir" },
+    { "icon": "self_improvement", "title": "İrade", "subtitle": "Her temiz gün bir zaferdir" }
+  ],
+  "verse": {
+    "text": "Ve kendine zarar verenleri bırakın.",
+    "ref": "A'raf 7:56 (meal anlamı — motivasyon amaçlı)"
+  }
+}

@@ -1,0 +1,181 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <!-- Namaz vakitleri: tam dakikada tetik (Doze’da inexact kaymasını azaltır) -->
+    <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+    <!-- Yeniden başlatmadan sonra zamanlanmış alarmları tekrar kur (plugin receiver). -->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <!-- Bazı OEM’ler (Xiaomi/Huawei/Oppo/Vivo) alarm clock’u bile whitelist dışıysa düşürüyor. -->
+    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
+    <!-- FOREGROUND_SERVICE ve FOREGROUND_SERVICE_MEDIA_PLAYBACK kaldırıldı:
+         Uygulama kodunda kendi Service'ini başlatmıyor (audioplayers
+         MediaPlayer süreç priority'sine güveniyor). İleride MediaSession
+         FGS eklenirse Android 14+ için bu izinler geri eklenecek.
+         Play Console "Prominent Disclosure" / data safety sayfasında
+         gereksiz izin beyanı tetiklememek için manifest'ten çıkarıldı. -->
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
+    <uses-permission
+        android:name="android.permission.READ_EXTERNAL_STORAGE"
+        android:maxSdkVersion="32" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <application
+        android:label="@string/app_name"
+        android:name="${applicationName}"
+        android:icon="@mipmap/ic_launcher">
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:launchMode="singleTop"
+            android:taskAffinity=""
+            android:theme="@style/LaunchTheme"
+            android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
+            android:hardwareAccelerated="true"
+            android:windowSoftInputMode="adjustResize">
+            <!-- Specifies an Android theme to apply to this Activity as soon as
+                 the Android process has started. This theme is visible to the user
+                 while the Flutter UI initializes. After that, this theme continues
+                 to determine the Window background behind the Flutter UI. -->
+            <meta-data
+              android:name="io.flutter.embedding.android.NormalTheme"
+              android:resource="@style/NormalTheme"
+              />
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity>
+        <!-- Don't delete the meta-data below.
+             This is used by the Flutter tool to generate GeneratedPluginRegistrant.java -->
+        <meta-data
+            android:name="flutterEmbedding"
+            android:value="2" />
+        <!-- Bazı emülatörlerde (BlueStacks vb.) Impeller boş ekran verebilir -->
+        <meta-data
+            android:name="io.flutter.embedding.android.EnableImpeller"
+            android:value="false" />
+        <!-- Yerel bildirim özel sesleri (content:// — file:// sistem tarafından çalınmıyor) -->
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/arin_file_paths" />
+        </provider>
+        <!-- Söz widget -->
+        <receiver
+            android:name=".ArinQuoteWidgetProvider"
+            android:exported="true"
+            android:label="@string/widget_quote_title">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/arin_quote_widget_info" />
+        </receiver>
+        <!-- Namaz vakitleri widget -->
+        <receiver
+            android:name=".ArinPrayerWidgetProvider"
+            android:exported="true"
+            android:label="@string/widget_prayer_title">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="com.arin.arin.action.PRAYER_WIDGET_TICK" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/arin_prayer_widget_info" />
+        </receiver>
+
+        <!-- flutter_local_notifications: plugin bu sınıfları kendi manifest’inde
+             BEYAN ETMİYOR; alarm `PendingIntent` ile çağırıyor. R8’in class’ı
+             "used" işaretlemesi ve Gson `Signature` attribute'unu koruması için
+             burada EXPLICIT deklare ediyoruz. Aksi halde AAR içindeki class
+             dex edilirken generic type bilgisi düşebiliyor ve
+             `TypeToken must be created with a type argument` hatasına yol
+             açıyor (ölç: Samsung A34 / OneUI 8 / API 36). -->
+        <receiver
+            android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationReceiver"
+            android:exported="false" />
+        <receiver
+            android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationBootReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+                <action android:name="android.intent.action.QUICKBOOT_POWERON" />
+                <action android:name="com.htc.intent.action.QUICKBOOT_POWERON" />
+            </intent-filter>
+        </receiver>
+        <receiver
+            android:name="com.dexterous.flutterlocalnotifications.ActionBroadcastReceiver"
+            android:exported="false" />
+    </application>
+    <!-- Required to query activities that can process text, see:
+         https://developer.android.com/training/package-visibility and
+         https://developer.android.com/reference/android/content/Intent#ACTION_PROCESS_TEXT.
+
+         In particular, this is used by the Flutter engine in io.flutter.plugin.text.ProcessTextPlugin. -->
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.PROCESS_TEXT"/>
+            <data android:mimeType="text/plain"/>
+        </intent>
+        <!-- Paylaşım (share_plus): Android 11+ queryIntentActivities / chooser -->
+        <intent>
+            <action android:name="android.intent.action.SEND" />
+            <data android:mimeType="image/*" />
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.SEND" />
+            <data android:mimeType="image/png" />
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.SEND" />
+            <data android:mimeType="*/*" />
+        </intent>
+        <!-- file_picker / Android 11+ (package visibility): İndirilenler, Medya vb. sağlayıcılar
+             görünsün; aksi halde yalnızca “Son” (boş) ve kısıtlı girişler kalabiliyor. -->
+        <intent>
+            <action android:name="android.intent.action.GET_CONTENT" />
+            <data android:mimeType="*/*" />
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.GET_CONTENT" />
+            <data android:mimeType="audio/*" />
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.OPEN_DOCUMENT" />
+            <data android:mimeType="*/*" />
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.OPEN_DOCUMENT_TREE" />
+        </intent>
+        <!-- Keşfet derin Stories paylaşımı: Instagram & Facebook için
+             resolveActivity çözümlenebilsin (Android 11+ package
+             visibility). share_plus chooser'ı zaten SEND intent ile
+             çalışıyor; bunlar DOĞRUDAN stories paylaşımı içindir. -->
+        <intent>
+            <action android:name="com.instagram.share.ADD_TO_STORY" />
+            <data android:mimeType="image/*" />
+        </intent>
+        <intent>
+            <action android:name="com.facebook.stories.ADD_TO_STORY" />
+            <data android:mimeType="image/*" />
+        </intent>
+        <!-- Sosyal uygulama paket görünürlüğü — InspirationShareService
+             "yüklü mü?" kontrolü ve grantUriPermission için. -->
+        <package android:name="com.instagram.android" />
+        <package android:name="com.facebook.katana" />
+        <package android:name="com.facebook.lite" />
+        <package android:name="com.whatsapp" />
+        <package android:name="com.whatsapp.w4b" />
+        <package android:name="org.telegram.messenger" />
+        <package android:name="com.twitter.android" />
+    </queries>
+</manifest>

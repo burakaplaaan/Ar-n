@@ -1,0 +1,21 @@
+ARIN — bildirim sesleri (CC0 kaynak özeti)
+=========================================
+
+Uygulamada kullanılan WAV dosyaları, aşağıdaki Freesound CC0 önizleme MP3’lerinin
+başından kırpılarak üretilmiştir (süreler dosya adlarında).
+
+Üretim komutu: cd tool/audio_trim && npm install && node trim_notification_assets.mjs
+
+Kaynak sayfalar (lisansı tekrar doğrula):
+- prayer_ntf_adhan_turkish.wav (10 sn) ← 01_adhan_turkish…mp3
+  https://freesound.org/people/sonically_sound/sounds/639494/
+- prayer_ntf_adhan_dubai.wav (9 sn) ← 02_adhan_ramadan…mp3
+  https://freesound.org/people/wshintani/sounds/195076/
+- prayer_ntf_ambient_flute.wav (6 sn) ← 05_ambient_flute…mp3
+  https://freesound.org/people/bassimat/sounds/840212/
+- prayer_ntf_ambient_piano_guitar.wav (7 sn) ← 06_ambient_piano…mp3
+  https://freesound.org/people/deadrobotmusic/sounds/703138/
+- prayer_ntf_ambient_ethereal.wav (10 sn) ← 09_ambient_ethereal…mp3
+  https://freesound.org/people/SanctuaryMuch/sounds/273643/
+
+Kaldırılan adaylar (projede kullanılmıyor): 03, 04, 07, 08 numaralı MP3’ler silindi.

@@ -1,0 +1,456 @@
+{
+  "islamic": [
+    {
+      "title": "Devamlılık",
+      "body": "Allah en çok devamlı olunan ameli sever. İyi alışkanlık küçük adımlarla büyür.",
+      "reference": "Hadis — devamlılık (meal anlamı)"
+    },
+    {
+      "title": "Niyet",
+      "body": "Ameller niyetlere göredir. Hayırlı yolu O’nun rızası için sürdürmek bereket katar.",
+      "reference": "Hadis — niyet (meal anlamı)"
+    },
+    {
+      "title": "Sabır",
+      "body": "Sabır imanın parçasıdır; zorlandığında doğruda kalmak manevi güç verir.",
+      "reference": "Bakara 2:153 — meal anlamı"
+    },
+    {
+      "title": "Tevekkül",
+      "body": "Sebepleri kullan, sonucu Allah’a bırak.",
+      "reference": "Tevbe 9:51 — meal anlamı"
+    },
+    {
+      "title": "Şükür",
+      "body": "Verilen nimeti fark etmek kalbi genişletir.",
+      "reference": "İbrahim 14:7 — meal anlamı"
+    },
+    {
+      "title": "Tefekkür",
+      "body": "Gökler ve yer ayetleridir; düşünmek kalbi tazeler.",
+      "reference": "Âl-i İmrân 3:191 — meal anlamı"
+    },
+    {
+      "title": "İstiğfar",
+      "body": "Tövbe kapısı açıktır; kalbi yumuşatır.",
+      "reference": "Nûh 71:10-12 — meal anlamı"
+    },
+    {
+      "title": "Namaz",
+      "body": "Vakitlere yaslanmak düzen ve iç huzuru besler.",
+      "reference": "Ra’d 13:28 — meal anlamı"
+    },
+    {
+      "title": "Kur’an",
+      "body": "Her gün bir miktar tilavet ruhu besler.",
+      "reference": "Ra’d 13:28 — meal anlamı"
+    },
+    {
+      "title": "Emanet",
+      "body": "Beden emanettir; zarardan sakınmak kulluğun parçasıdır.",
+      "reference": "A’râf 7:56 — meal anlamı"
+    },
+    {
+      "title": "Dua",
+      "body": "Dua ibadettir; yüreği yumuşatır.",
+      "reference": "Hadis — dua (meal anlamı)"
+    },
+    {
+      "title": "Merhamet",
+      "body": "Kendine ve başkasına merhamet, manevi dengeyi destekler.",
+      "reference": "Hadis — merhamet (meal anlamı)"
+    },
+    {
+      "title": "Doğruluk",
+      "body": "Doğru söz güveni ve huzuru besler.",
+      "reference": "İsrâ 17:35 — meal anlamı"
+    },
+    {
+      "title": "Gizli hayır",
+      "body": "İyiliği göstermemek niyeti sadeleştirebilir.",
+      "reference": "Hadis — gizli hayır (meal anlamı)"
+    },
+    {
+      "title": "İffet",
+      "body": "Gözü ve kalbi korumak iffet yolundadır.",
+      "reference": "Nûr 24:30-31 — meal anlamı"
+    },
+    {
+      "title": "Adalet",
+      "body": "Adaleti ayakta tutmak sorumluluktur.",
+      "reference": "Nisâ 4:135 — meal anlamı"
+    },
+    {
+      "title": "Yardımlaşma",
+      "body": "Müminler birbirinin yardımcısıdır.",
+      "reference": "Hadis — kardeşlik (meal anlamı)"
+    },
+    {
+      "title": "Sedat",
+      "body": "Acele şeytandandır; yavaşlamak bazen daha hayırlıdır.",
+      "reference": "Hadis — acele (meal anlamı)"
+    },
+    {
+      "title": "Hilm",
+      "body": "Öfkeyi yönetmek nefs terbiyesidir.",
+      "reference": "Âl-i İmrân 3:134 — meal anlamı"
+    },
+    {
+      "title": "Tevazu",
+      "body": "Kibirden kaçınmak kalbi büyütür.",
+      "reference": "Hadis — tevazu (meal anlamı)"
+    },
+    {
+      "title": "Ümit",
+      "body": "Rahmet ümidi düşüşte bile kalbi ayakta tutar.",
+      "reference": "Zuhruf 43:14 — meal anlamı"
+    },
+    {
+      "title": "Hedef",
+      "body": "Amacı net tutmak çabayı anlamlı kılar.",
+      "reference": "Hadis — niyet ve hedef (meal anlamı)"
+    },
+    {
+      "title": "Zaman",
+      "body": "Vakit değerlidir; boşa harcamaktan sakının.",
+      "reference": "Asr 103:1-3 — meal anlamı"
+    },
+    {
+      "title": "Bereket",
+      "body": "Devam ve iyi niyet bereketi çoğaltır.",
+      "reference": "Hadis — bereket (meal anlamı)"
+    },
+    {
+      "title": "Sükûnet",
+      "body": "Sükûnette dua ve düşünce derinleşir.",
+      "reference": "Ra’d 13:28 — meal anlamı"
+    },
+    {
+      "title": "Kardeşlik",
+      "body": "Birlikte hayır, yalnız kalmaktan iyidir.",
+      "reference": "Hadis — cemaat (meal anlamı)"
+    },
+    {
+      "title": "Rıza",
+      "body": "Allah rızası için yapılan iş kalbe huzur verir.",
+      "reference": "Beyyine 98:5 — meal anlamı"
+    },
+    {
+      "title": "Sabah niyeti",
+      "body": "Güne niyetle başlamak yön verir.",
+      "reference": "Hadis — sabah (meal anlamı)"
+    },
+    {
+      "title": "Gece vakti",
+      "body": "Gecenin sakinliğinde dua kalbi yumuşatır.",
+      "reference": "Hadis — gece (meal anlamı)"
+    },
+    {
+      "title": "İkram",
+      "body": "Misafire ikram sevaptır.",
+      "reference": "Hadis — misafir (meal anlamı)"
+    },
+    {
+      "title": "Anne-baba",
+      "body": "Anne babaya iyi davranmak kulluğun temelidir.",
+      "reference": "İsrâ 17:23 — meal anlamı"
+    },
+    {
+      "title": "Komşu",
+      "body": "Komşu hakkını gözetmek merhamettir.",
+      "reference": "Hadis — komşu (meal anlamı)"
+    },
+    {
+      "title": "Arınma",
+      "body": "Kalbi arındırmak nefsi düzenlemeye benzer.",
+      "reference": "Şuarâ 26:88-89 — meal anlamı"
+    },
+    {
+      "title": "Sırat",
+      "body": "Doğru yolda kalmak her gün tazelenir.",
+      "reference": "Fâtiha 1:6-7 — meal anlamı"
+    },
+    {
+      "title": "Korku ve ümit",
+      "body": "Allah’tan umarak ve O’ndan korkarak denge kur.",
+      "reference": "A’râf 7:56 — meal anlamı"
+    },
+    {
+      "title": "Sadaka",
+      "body": "Sadaka kalbi yumuşatır.",
+      "reference": "Hadis — sadaka (meal anlamı)"
+    },
+    {
+      "title": "Oruç",
+      "body": "Oruç nefs terbiyesidir.",
+      "reference": "Bakara 2:183 — meal anlamı"
+    },
+    {
+      "title": "Zikir",
+      "body": "Allah’ı anmak kalbi sakinleştirir.",
+      "reference": "Ra’d 13:28 — meal anlamı"
+    },
+    {
+      "title": "Güven",
+      "body": "Emanetli olmak imanın pratiğidir.",
+      "reference": "Hadis — emanet (meal anlamı)"
+    },
+    {
+      "title": "Çaba",
+      "body": "Çaba gösterene yardım yakındır.",
+      "reference": "Necm 53:39 — meal anlamı"
+    },
+    {
+      "title": "Tövbe",
+      "body": "Günahdan dönmek yenilenmedir.",
+      "reference": "Nûr 24:31 — meal anlamı"
+    },
+    {
+      "title": "Hikmet",
+      "body": "Hikmet hayırlarda derinlik katar.",
+      "reference": "Bakara 2:269 — meal anlamı"
+    },
+    {
+      "title": "İhlas",
+      "body": "İhlas ameli sadeleştirir.",
+      "reference": "Hadis — ihlas (meal anlamı)"
+    },
+    {
+      "title": "Haya",
+      "body": "Haya imandan bir parça denmiştir.",
+      "reference": "Hadis — haya (meal anlamı)"
+    },
+    {
+      "title": "Dost",
+      "body": "İyi dost seni hayıra çağırır.",
+      "reference": "Hadis — dostluk (meal anlamı)"
+    },
+    {
+      "title": "Kötülüğe karşı",
+      "body": "Kötülüğü iyilikle önlemenin güzelliği.",
+      "reference": "Fussilet 41:34 — meal anlamı"
+    },
+    {
+      "title": "Uzun yol",
+      "body": "Uzun vadeli hayır, kısa hazza üstün gelebilir.",
+      "reference": "Hadis — sabır (meal anlamı)"
+    },
+    {
+      "title": "Nefis",
+      "body": "Nefsi tanımak düzenlemeye başlamaktır.",
+      "reference": "Hadis — nefs (meal anlamı)"
+    },
+    {
+      "title": "Ayet düşüncesi",
+      "body": "Ayet üzerinde durmak kalbe işler.",
+      "reference": "Sâd 38:29 — meal anlamı"
+    },
+    {
+      "title": "Hayırda yarış",
+      "body": "Hayırda yarış topluma canlılık verir.",
+      "reference": "Hadis — hayır (meal anlamı)"
+    }
+  ],
+  "medical": [
+    {
+      "title": "Uyku ritmi",
+      "body": "Düzenli yatış-kalkış uyku kalitesini destekleyebilir."
+    },
+    {
+      "title": "Stres",
+      "body": "Kronik stres uyku ve iştahı etkileyebilir."
+    },
+    {
+      "title": "Alışkanlık",
+      "body": "Tekrar beyinde yollar oluşturur; yeni rutin zaman ister."
+    },
+    {
+      "title": "Hareket",
+      "body": "Düzenli hareket ruh hâli ve uyku için destekleyici olabilir."
+    },
+    {
+      "title": "Nefes",
+      "body": "Yavaş nefes anlık gerginlikte rahatlama hissi verebilir."
+    },
+    {
+      "title": "Ekran",
+      "body": "Gece ekranı uyku hormonunu olumsuz etkileyebilir."
+    },
+    {
+      "title": "Destek",
+      "body": "Güvenilir paylaşım dayanıklılığı artırabilir."
+    },
+    {
+      "title": "Tetikleyici",
+      "body": "Ortam ve zaman farkı döngüyü kırabilir."
+    },
+    {
+      "title": "İstek dalgası",
+      "body": "İstek çoğu zaman dakikalar içinde zayıflar."
+    },
+    {
+      "title": "İlerleme",
+      "body": "Küçük kazanımlar birikir; geri adımlar normal olabilir."
+    },
+    {
+      "title": "Ödül döngüsü",
+      "body": "Alternatif ödüller alışkanlık değişiminde yardımcı olabilir."
+    },
+    {
+      "title": "Uyku ortamı",
+      "body": "Karanlık ve serin oda uyku için destekleyici olabilir."
+    },
+    {
+      "title": "Kafein",
+      "body": "Öğleden sonra kafein uyku üzerinde etkili olabilir."
+    },
+    {
+      "title": "Alkol ve uyku",
+      "body": "Alkol uyku yapısını bozabilir."
+    },
+    {
+      "title": "Sigara ve solunum",
+      "body": "Bıraktıkça solunum iyileşme eğiliminde olabilir."
+    },
+    {
+      "title": "Nikotin çekilmesi",
+      "body": "İlk günler huzursuzluk görülebilir."
+    },
+    {
+      "title": "Egzersiz",
+      "body": "Hareket ruh hâlinde destekleyici olabilir (kişisel fark gösterir)."
+    },
+    {
+      "title": "Gün ışığı",
+      "body": "Gündüz ışığı sirkadiyen ritmi destekleyebilir."
+    },
+    {
+      "title": "Su",
+      "body": "Yeterli sıvı genel iyi his için önemlidir."
+    },
+    {
+      "title": "Öğün",
+      "body": "Düzenli öğünler enerji dalgalanmasını azaltabilir."
+    },
+    {
+      "title": "Farkındalık",
+      "body": "Kısa farkındalık nefesleri kaygıda rahatlatabilir."
+    },
+    {
+      "title": "Uyku borcu",
+      "body": "Uyku borcu birikir; telafi her zaman tam olmayabilir."
+    },
+    {
+      "title": "Oturma",
+      "body": "Uzun oturmada kısa molalar önerilir."
+    },
+    {
+      "title": "Baş ağrısı",
+      "body": "Stres ve uyku eksikliği tetikleyebilir."
+    },
+    {
+      "title": "Kalp hızı",
+      "body": "Düzensiz uyku kalp hızı değişkenliğini artırabilir."
+    },
+    {
+      "title": "Uzman desteği",
+      "body": "Bağımlılıkta profesyonel destek sık önerilir."
+    },
+    {
+      "title": "İlaç",
+      "body": "İlaç değişikliğinde hekimle görüşün."
+    },
+    {
+      "title": "Günlük",
+      "body": "İstek anlarını not etmek tetikleyicileri gösterir."
+    },
+    {
+      "title": "Yeni rutin",
+      "body": "Eski alışkanlık saatine mini yeni rutin eklenebilir."
+    },
+    {
+      "title": "Horlama",
+      "body": "Gündüz uykusu ve horlama için hekime danışılabilir."
+    },
+    {
+      "title": "Kaygı",
+      "body": "Şiddetli kaygıda uzman yardımı düşünün."
+    },
+    {
+      "title": "Ruh hâli",
+      "body": "Uzun süreli düşük ruh hâlinde destek arayın."
+    },
+    {
+      "title": "İzolasyon",
+      "body": "Sosyal izolasyon ruh hâlini olumsuz etkileyebilir."
+    },
+    {
+      "title": "Mikro mola",
+      "body": "Kısa molalar odak için denenebilir."
+    },
+    {
+      "title": "Ekran tonu",
+      "body": "Akşam sıcak ton filtreleri uyku için denenebilir."
+    },
+    {
+      "title": "Şeker",
+      "body": "Aşırı şeker enerjide dalgalanma yapabilir."
+    },
+    {
+      "title": "Kahvaltı",
+      "body": "Dengeli kahvaltı öğle açlığını yumuşatabilir."
+    },
+    {
+      "title": "Yoksunluk",
+      "body": "Ciddi yoksunlukta acil tıbbi destek gerekebilir."
+    },
+    {
+      "title": "Sigara anı",
+      "body": "Kısa yürüyüş veya nefes isteği anında denenebilir."
+    },
+    {
+      "title": "Uyku takibi",
+      "body": "Uyku günlüğü farkındalık sağlar."
+    },
+    {
+      "title": "İlaç etkileşimi",
+      "body": "OTC ürünler uyku üzerinde etkili olabilir."
+    },
+    {
+      "title": "Travma",
+      "body": "Travma sonrası belirtilerde terapi faydalı olabilir."
+    },
+    {
+      "title": "Aile sınırı",
+      "body": "Destek ve sağlıklı sınır birlikte önemlidir."
+    },
+    {
+      "title": "İş stresi",
+      "body": "İş-yaşam dengesi stres yönetiminin parçasıdır."
+    },
+    {
+      "title": "Mükemmellik",
+      "body": "Küçük adımlar ertelemeyi azaltabilir."
+    },
+    {
+      "title": "Uyku ilacı",
+      "body": "Uyku ilaçları uzun süreli tek çözüm olmamalıdır."
+    },
+    {
+      "title": "Melatonin",
+      "body": "Melatonin herkes için uygun olmayabilir; hekime danışın."
+    },
+    {
+      "title": "Aşırı egzersiz",
+      "body": "Toparlanmayı zorlaştırmamak için denge önemlidir."
+    },
+    {
+      "title": "Akşam sıvısı",
+      "body": "Gece idrara kalkmayı azaltmak için akşam sıvısı sınırı."
+    },
+    {
+      "title": "Gazlı içecek",
+      "body": "Bazı kişilerde huzursuzluk yapabilir."
+    }
+  ]
+}

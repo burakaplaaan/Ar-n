@@ -1,0 +1,1230 @@
+{
+  "@@locale": "ar",
+  "languageSettingsTitle": "إعدادات اللغة",
+  "languageSettingsSheetTitle": "لغة التطبيق",
+  "languageTurkishLabel": "التركية",
+  "languageEnglishLabel": "الإنجليزية",
+  "languageArabicLabel": "العربية",
+  "settingsPageHeader": "الإعدادات",
+  "settingsSectionAccount": "حسابك",
+  "settingsSectionAppearance": "المظهر",
+  "settingsSectionPrayerTimes": "مواقيت الصلاة",
+  "settingsSectionApp": "التطبيق",
+  "settingsSectionSession": "الجلسة",
+  "settingsMenuNotificationsSubtitle": "الصلاة والتزكية والذكر",
+  "settingsMenuNotificationsTitle": "الإشعارات",
+  "settingsMenuAboutTitle": "حول",
+  "settingsMenuAboutSubtitle": "معلومات التطبيق",
+  "settingsMenuPrivacyTitle": "سياسة الخصوصية",
+  "settingsMenuPrivacySubtitle": "كيف نعالج بياناتك",
+  "settingsMenuSavedTitle": "المحفوظات",
+  "settingsMenuSavedSubtitle": "الأقوال التي حفظتها في الاستكشاف",
+  "settingsMenuAdminTitle": "إدارة المحتوى",
+  "settingsMenuAdminSubtitle": "مخازن الأقوال والاستكشاف",
+  "settingsMenuContactTitle": "تواصل معنا",
+  "settingsMenuContactSubtitle": "الدعم والملاحظات",
+  "settingsMenuComingSoon": "راسلنا عبر البريد",
+  "settingsContactPageTitle": "تواصل معنا",
+  "settingsContactSubtitle": "يمكنك إرسال الاقتراحات أو بلاغات الأعطال أو طلبات الدعم مباشرة عبر البريد الإلكتروني.",
+  "settingsContactOpenMailAction": "فتح تطبيق البريد",
+  "settingsContactCopyMailAction": "نسخ عنوان البريد",
+  "settingsContactEmailCopied": "تم نسخ عنوان البريد.",
+  "settingsContactOpenFailed": "تعذر فتح تطبيق البريد. يمكنك نسخ العنوان والإرسال يدويًا.",
+  "settingsContactCopyFailed": "تعذر نسخ عنوان البريد. الرجاء إدخاله يدويًا: arinapphelp@gmail.com",
+  "settingsContactMailSubject": "ملاحظات تطبيق Arin",
+  "settingsContactMailBody": "مرحبًا فريق Arin،\n\n",
+  "settingsGuestHint": "وضع الضيف — بياناتك محفوظة على هذا الجهاز. سجّل الدخول للمزامنة السحابية.",
+  "settingsAccountFallback": "الحساب",
+  "settingsSignInGoogle": "تسجيل الدخول عبر Google",
+  "settingsSignInApple": "تسجيل الدخول عبر Apple",
+  "settingsSessionHint": "لإعادة ضبط التطبيق أو إزالة الحساب:",
+  "settingsSignOutAction": "تسجيل الخروج",
+  "settingsDeleteAccountAction": "حذف الحساب وجميع البيانات",
+  "settingsLightThemeTitle": "الثيم الفاتح",
+  "settingsLightThemeSubtitle": "خلفية فاتحة أهدأ لقراءة أسهل",
+  "settingsProvinceLabel": "المدينة",
+  "settingsProvinceHint": "اكتب مثلاً: \"ko\" ← Kocaeli",
+  "settingsProvinceInvalid": "اختر مدينة من القائمة أو تابع الكتابة.",
+  "settingsLocationUpdatedMessage": "تم تحديث الموقع: {city}",
+  "@settingsLocationUpdatedMessage": {
+    "placeholders": {
+      "city": {}
+    }
+  },
+  "settingsLocationFailedMessage": "تعذر الحصول على الموقع؛ تحقق من الإذن أو GPS.",
+  "settingsProvinceUpdatedMessage": "{province} — تم تحديث مواقيت الصلاة",
+  "@settingsProvinceUpdatedMessage": {
+    "placeholders": {
+      "province": {}
+    }
+  },
+  "settingsSignOutDialogTitle": "تسجيل الخروج",
+  "settingsSignOutDialogBody": "سيتم إعادة ضبط التطبيق بدءاً من شرائح التعريف. ستُحذف جميع البيانات المحلية على هذا الجهاز وسيتم إنهاء جلسة Firebase.",
+  "settingsDialogCancel": "إلغاء",
+  "settingsDeleteAllDataDialogTitle": "حذف جميع البيانات",
+  "settingsDeleteAllDataDialogBody": "أنت في وضع الضيف. سيتم حذف جميع بيانات التطبيق على هذا الجهاز نهائياً وستعود إلى شاشات التعريف.",
+  "settingsDeleteAction": "حذف",
+  "settingsDeleteAccountDialogTitle": "حذف الحساب نهائياً",
+  "settingsDeleteAccountDialogBody": "سيتم حذف حسابك السحابي كما سيتم مسح جميع البيانات المحلية على هذا الجهاز. لا يمكن التراجع عن ذلك.",
+  "settingsDeleteProgressMessage": "جارٍ حذف بيانات السحابة والجهاز…",
+  "settingsCloudDeleteFailedMessage": "تعذر حذف بيانات السحابة. تحقق من اتصال الإنترنت وحاول مرة أخرى.",
+  "settingsAccountDeleteFailedMessage": "تعذر حذف الحساب.",
+  "settingsAccountDeleteRetryMessage": "تعذر حذف الحساب. يرجى المحاولة لاحقاً.",
+  "settingsGoogleSignInSuccess": "تم تسجيل الدخول عبر Google.",
+  "settingsGoogleSignInCancelled": "تم إلغاء تسجيل الدخول عبر Google.",
+  "settingsGoogleSignInFailed": "فشل تسجيل الدخول عبر Google. حاول مرة أخرى.",
+  "settingsAppleSignInSuccess": "تم تسجيل الدخول عبر Apple.",
+  "settingsAppleSignInFailed": "فشل تسجيل الدخول عبر Apple. حاول مرة أخرى.",
+  "settingsAuthServiceUnavailable": "خدمة تسجيل الدخول غير متاحة حالياً. حاول بعد قليل.",
+  "homeGreetingNight": "مساء الخير",
+  "homeGreetingMorning": "صباح الخير",
+  "homeGreetingNoon": "نهارك سعيد",
+  "homeGreetingEvening": "مساء الخير",
+  "homeGuestUser": "ضيف",
+  "homePrayerUrgentSemanticsLabel": "تنبيه، وقت الفجر يوشك أن يخرج. يتبقى للشروق {remaining}",
+  "@homePrayerUrgentSemanticsLabel": {
+    "placeholders": {
+      "remaining": {}
+    }
+  },
+  "homePrayerNextSemanticsLabel": "الصلاة التالية {nextName}، المتبقي {remaining}",
+  "@homePrayerNextSemanticsLabel": {
+    "placeholders": {
+      "nextName": {},
+      "remaining": {}
+    }
+  },
+  "homePrayerUrgentBadge": "يوشك أن يخرج",
+  "homePrayerNextBadge": "التالي",
+  "homePrayerTimesTitle": "مواقيت الصلاة",
+  "homePrayerNextRowHint": "الصلاة القادمة",
+  "homePrayerLoadFailedTitle": "تعذر تحميل المواقيت",
+  "homePrayerLoadFailedBody": "قد يتعذر جلب المواقيت بسبب الإنترنت أو إذن الموقع أو الحي المحدد.",
+  "homeRetryAction": "إعادة المحاولة",
+  "homeChangeDistrictAction": "تغيير الحي",
+  "homeOpenSettingsAction": "فتح الإعدادات",
+  "homeRemainingPassed": "انتهى",
+  "homeRemainingFewSeconds": "ثوانٍ قليلة",
+  "homeRemainingHoursMinutes": "{hours} س {minutes} د",
+  "@homeRemainingHoursMinutes": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      },
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "homeRemainingHoursOnly": "{hours} س",
+  "@homeRemainingHoursOnly": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      }
+    }
+  },
+  "homeRemainingMinutesOnly": "{minutes} د",
+  "@homeRemainingMinutesOnly": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "homeLocationFreshNow": "الموقع مُحدَّث",
+  "homeLocationFreshMinutesAgo": "تم التحديث قبل {minutes} د",
+  "@homeLocationFreshMinutesAgo": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "homeLocationFreshHoursAgo": "تم التحديث قبل {hours} س",
+  "@homeLocationFreshHoursAgo": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      }
+    }
+  },
+  "homeLocationFreshDaysAgo": "تم التحديث قبل {days} يوم",
+  "@homeLocationFreshDaysAgo": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "homeDailyReminderTitle": "تذكير اليوم",
+  "homeNamazSetupTitle": "إعداد متابعة الصلاة",
+  "homeNamazSetupSubtitle": "قم بالإعداد من تبويب التطور؛ وبعد الإعداد ستظهر البطاقة هنا تلقائياً.",
+  "homeNamazTrackingTitle": "متابعة الصلاة",
+  "homeNamazTrackingProgressLine": "اليوم {done}/5 · اضغط للتفاصيل",
+  "@homeNamazTrackingProgressLine": {
+    "placeholders": {
+      "done": {}
+    }
+  },
+  "onboardingNotificationPermissionDenied": "لم يتم منح إذن الإشعارات. يمكنك تفعيله لاحقاً من الإعدادات ← الإشعارات لتذكيرات الأذان.",
+  "onboardingGenderPromptWithName": "{name}، هل يمكننا معرفة جنسك؟",
+  "@onboardingGenderPromptWithName": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "onboardingNotificationSkippedWarning": "بقيت الإشعارات مغلقة. لن تصلك تذكيرات الأذان في أوقات الصلاة — يمكنك تفعيلها لاحقاً من الإعدادات ← الإشعارات.",
+  "onboardingOpenNowAction": "فعّل الآن",
+  "commonPreview": "معاينة",
+  "commonClose": "إغلاق",
+  "commonCancel": "إلغاء",
+  "commonDone": "تم",
+  "commonBack": "رجوع",
+  "prayerNameImsak": "الفجر",
+  "prayerNameSunrise": "الشروق",
+  "prayerNameDhuhr": "الظهر",
+  "prayerNameAsr": "العصر",
+  "prayerNameMaghrib": "المغرب",
+  "prayerNameIsha": "العشاء",
+  "reminderOff": "مغلق",
+  "reminderAtExactTime": "في الوقت تماماً",
+  "reminderMinutesBefore": "قبل {minutes} د",
+  "@reminderMinutesBefore": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "reminderCardSubtitle": "إعداد منفصل لكل صلاة · اضغط لتعديل المدد",
+  "reminderFirstOff": "الأول مغلق",
+  "reminderFirstValue": "الأول {value}",
+  "@reminderFirstValue": {
+    "placeholders": {
+      "value": {}
+    }
+  },
+  "reminderPairSecondOff": "{first} · الثاني مغلق",
+  "@reminderPairSecondOff": {
+    "placeholders": {
+      "first": {}
+    }
+  },
+  "reminderPairSecondValue": "{first} · الثاني {second}",
+  "@reminderPairSecondValue": {
+    "placeholders": {
+      "first": {},
+      "second": {}
+    }
+  },
+  "reminderPermissionRequiredMessage": "إذن الإشعارات مطلوب. يمكنك تفعيله من الإعدادات.",
+  "reminderPrayerNotificationTitle": "إشعارات الصلاة",
+  "reminderCardDisabledHint": "مغلق · فعّل المفتاح واضبط الأوقات",
+  "reminderLocalNotificationUnavailable": "الإشعارات المحلية غير متاحة في هذه البيئة.",
+  "reminderSectionTitle": "التذكير",
+  "reminderTwoAlertsPerPrayer": "تنبيهان لكل صلاة",
+  "reminderPerPrayerDifferentSounds": "أصوات مختلفة لكل صلاة",
+  "reminderCurrentSound": "الحالي: {summary}",
+  "@reminderCurrentSound": {
+    "placeholders": {
+      "summary": {}
+    }
+  },
+  "reminderUsePhoneDefaultSubtitle": "يُستخدم صوت الإشعار المضبوط في إعدادات الهاتف.",
+  "reminderChooseArinSoundsTitle": "اختر من أصوات أرين",
+  "reminderChooseArinSoundsSubtitle": "استمع إلى نغمات الأذان والهدوء ثم طبّق.",
+  "reminderPhoneSoundActiveAllPrayers": "الصوت المختار من الهاتف مفعّل لكل الصلوات.",
+  "reminderApplyOwnSoundAllPrayers": "طبّق ملفك الصوتي الخاص على كل الصلوات.",
+  "reminderSetPerPrayerDifferentSound": "اضبط صوتاً مختلفاً لكل صلاة",
+  "reminderAllPrayersSoundTitle": "الصوت لكل الصلوات",
+  "reminderAllPrayersSoundSubtitle": "اختر مرة واحدة لتشغيل نفس الصوت لكل الصلوات.",
+  "reminderBackToSingleSoundSelection": "العودة لاختيار الصوت الواحد",
+  "reminderPerPrayerSavedInstantly": "اختيارات كل صلاة تُحفظ فوراً.",
+  "reminderEnableNotificationsAction": "تفعيل الإشعارات",
+  "reminderDurationsPerPrayerTitle": "المدد لكل صلاة",
+  "reminderDurationsPerPrayerSubtitle": "اضغط السطر لاختيار التنبيه الأول والثاني بشكل منفصل.",
+  "reminderDualAlertTitle": "تنبيهان — {prayerTitle}",
+  "@reminderDualAlertTitle": {
+    "placeholders": {
+      "prayerTitle": {}
+    }
+  },
+  "reminderDualAlertSubtitle": "التنبيه الأول: مغلق أو في الوقت أو قبله بدقائق. التنبيه الثاني: مغلق أو قبله بدقائق.",
+  "reminderFirstAlertTitle": "التنبيه الأول",
+  "reminderSecondAlertTitle": "التنبيه الثاني",
+  "prayerSoundPickerTitle": "صوت الإشعار",
+  "prayerSoundQuickAllSubtitle": "اختر صوتاً واحداً أولاً؛ وإذا أردت يمكنك التفصيل حسب كل صلاة من الإعدادات المتقدمة.",
+  "prayerSoundApplyAllButton": "تطبيق الصوت المختار على كل الصلوات",
+  "prayerSoundAdvancedToggle": "إعدادات متقدمة (لكل صلاة)",
+  "prayerSoundAppliedAllSuccess": "تم تطبيق الصوت المختار على كل الصلوات.",
+  "prayerSoundSystem": "الصوت الافتراضي للهاتف",
+  "prayerSoundAdhanTurkish": "أذان — معالجة تركية (10 ثوانٍ من البداية)",
+  "prayerSoundAdhanDubai": "أذان — دبي / رمضان (9 ثوانٍ من البداية)",
+  "prayerSoundAmbientFlute": "هدوء — نغمة فلوت (6 ثوانٍ من البداية)",
+  "prayerSoundAmbientPianoGuitar": "هدوء — بيانو وغيتار (7 ثوانٍ من البداية)",
+  "prayerSoundAmbientEthereal": "هدوء — أصوات حالمة (10 ثوانٍ من البداية)",
+  "prayerSoundPickFromPhone": "اختر صوتاً من الهاتف",
+  "prayerSoundClearUserFile": "إزالة",
+  "prayerSoundUserFromPhone": "الصوت المختار من الهاتف",
+  "prayerSoundUserFileActiveHint": "حالياً تُستخدم لهذا الوقت ملفك المختار من الهاتف. إذا اخترت صوتاً من الكتالوج فسيُزال الملف.",
+  "prayerSoundSubtitlePerPrayer": "لكل صلاة بشكل مستقل: صوت الهاتف الافتراضي، أو نغمة من الكتالوج، أو ملفك من الهاتف. احفظ عبر التطبيق.",
+  "prayerSoundImportFailed": "تعذر استيراد ملف الصوت. جرّب ملفاً أو تنسيقاً آخر (WAV, M4A...).",
+  "prayerSoundPreviewSystem": "لا توجد معاينة — سيتم استخدام صوت الإشعار الافتراضي في جهازك.",
+  "commonStart": "ابدأ",
+  "commonRestart": "إعادة",
+  "willpowerHabitNotFound": "لم يتم العثور على العادة",
+  "namazProgramHomeHintActive": "تم تفعيل تتبع الصلاة. سيظهر الآن أيضاً في بطاقة الصفحة الرئيسية.",
+  "namazProgramPageTitle": "العبادة",
+  "namazProgramVerseQuote": "\"ألا بذكر الله تطمئن القلوب.\"\n(سورة الرعد، 13:28 — ترجمة)",
+  "namazProgramBreathingBreak": "استراحة تنفّس",
+  "namazProgramTodayPrayersTitle": "صلوات اليوم",
+  "namazProgramTodayProgress": "{done}/5 مكتمل",
+  "@namazProgramTodayProgress": {
+    "placeholders": {
+      "done": {
+        "type": "int"
+      }
+    }
+  },
+  "namazProgramPercentDone": "اكتمل %{percent}",
+  "@namazProgramPercentDone": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "namazProgramSystemNotificationSettings": "إعدادات إشعارات النظام",
+  "namazProgramRecentDaysTitle": "الأيام الأخيرة",
+  "namazProgramRecentDaysSubtitle": "كل مربع يوضح عدد الصلوات المؤداة في ذلك اليوم (مثال 3/5).",
+  "breathingPhaseInhale": "شهيق",
+  "breathingPhaseHold": "حبس",
+  "breathingPhaseExhale": "زفير",
+  "breathingCycleProgress": "الدورة {current}/{total}",
+  "@breathingCycleProgress": {
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "breathingFinishAction": "إنهاء",
+  "breathingSecondsLabel": "{seconds} ث",
+  "@breathingSecondsLabel": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "breathingIntroTitle": "علاج التنفس 4-7-8",
+  "breathingIntroSubtitle": "نمط تنفّس بطيء يساعد على تقليل التوتر والقلق.",
+  "breathingIntroCycles": "{cycles} دورات",
+  "@breathingIntroCycles": {
+    "placeholders": {
+      "cycles": {
+        "type": "int"
+      }
+    }
+  },
+  "breathingIntroApproxMinutes": "~2 د",
+  "breathingPhaseHintInhale": "ثوانٍ شهيق",
+  "breathingPhaseHintHold": "ثوانٍ حبس",
+  "breathingPhaseHintExhale": "ثوانٍ زفير",
+  "breathingSessionCompleteTitle": "اكتملت الجلسة",
+  "breathingSessionCompleteSubtitle": "اكتملت {cycles} دورات. يمكنك القيام بجولة أخرى أو الخروج.",
+  "@breathingSessionCompleteSubtitle": {
+    "placeholders": {
+      "cycles": {
+        "type": "int"
+      }
+    }
+  },
+  "breathingBottomHint": "أثناء الحبس يتباطأ نبض القلب؛ واصل بوتيرة مريحة. توقّف إذا شعرت بدوار.",
+  "quitProgramNotFound": "لم يتم العثور على البرنامج",
+  "quitOnboardingCommitmentMinLengthError": "يرجى كتابة عهد لنفسك (8 أحرف على الأقل).",
+  "quitOnboardingQuickStartTitle": "ابدأ العداد الآن",
+  "quitOnboardingQuickStartBody": "سيبدأ العداد من هذه اللحظة. يمكنك إكمال عهدك لاحقاً من البرنامج.",
+  "quitOnboardingAbortAction": "تراجع",
+  "quitOnboardingExitDraftTitle": "هل تريد الخروج من الإعداد؟",
+  "quitOnboardingExitDraftBody": "لن يتم حفظ تقدمك في جولة الإعداد هذه. يمكنك البدء مجدداً لاحقاً.",
+  "quitOnboardingStayAction": "ابقَ",
+  "quitOnboardingExitAction": "خروج",
+  "quitOnboardingContentLoadFailed": "تعذر تحميل محتوى الإعداد. يرجى المحاولة مرة أخرى.",
+  "quitOnboardingAppBarTitle": "الإعداد",
+  "quitOnboardingSealTitlePrefix": "اختم عهدك",
+  "quitOnboardingSealHoldHint": "اضغط مطولاً",
+  "quitOnboardingContinueAction": "متابعة",
+  "quitOnboardingQuickStartInlineAction": "ابدأ العداد الآن، وأكمل البرنامج لاحقاً",
+  "quitOnboardingCommitmentTitle": "عهدك لنفسك",
+  "quitOnboardingCommitmentSubtitle": "اكتبها قصيرة وواضحة؛ يمكنك تعديلها قبل الختم.",
+  "quitOnboardingCommitmentHint": "ابتداءً من اليوم…",
+  "quitOnboardingExamplesSectionTitle": "جمل نموذجية",
+  "quitProgramRestartTitle": "إعادة البدء",
+  "quitProgramRestartPrompt": "سيتم تصفير العداد. ماذا تريد أن يحدث للسجل؟",
+  "quitProgramRestartKeepHistoryTitle": "الاحتفاظ بالسجل",
+  "quitProgramRestartKeepHistorySubtitle": "يبدأ العداد من الصفر، لكن تبقى محاولتك السابقة وعلاماتك اليومية وإحصاءاتك محفوظة.",
+  "quitProgramRestartWipeTitle": "البدء من الصفر",
+  "quitProgramRestartWipeSubtitle": "سيتم حذف جميع العلامات اليومية السابقة أيضاً. لا يمكن التراجع.",
+  "quitProgramElapsedHms": "{hours} س {minutes} د {seconds} ث",
+  "@quitProgramElapsedHms": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      },
+      "minutes": {
+        "type": "int"
+      },
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "quitProgramElapsedMs": "{minutes} د {seconds} ث",
+  "@quitProgramElapsedMs": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      },
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "quitProgramElapsedS": "{seconds} ث",
+  "@quitProgramElapsedS": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "quitProgramTabProgress": "التقدم",
+  "quitProgramTabTips": "نصائح",
+  "quitProgramTipsLoadFailed": "تعذر تحميل المحتوى",
+  "quitProgramTipsWatermark": "هِدَايَة",
+  "quitProgramTipsHeroTitle": "هداية",
+  "quitProgramTipsHeroSubtitle": "وعي وصبر واقتراحات عملية لتخفيف الطريق عليك.",
+  "quitProgramDaysUpper": "يوم",
+  "quitProgramStartNowAction": "أقلعت من هذه اللحظة",
+  "quitProgramStatFullDays": "أيام كاملة",
+  "quitProgramDash": "—",
+  "quitProgramStatTimer": "العداد",
+  "quitProgramElapsedSinceQuitDays": "المدة المنقضية: {days} يوم (من لحظة الإقلاع)",
+  "@quitProgramElapsedSinceQuitDays": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "quitProgramTasksTitle": "المهام",
+  "quitProgramTasksSubtitle": "تتقدم كلما أكملت عتبات الأيام.",
+  "quitProgramUiCounterSubtitleGeneric": "أيام نظيفة",
+  "quitProgramUiMetricsSectionTitleGeneric": "مؤشرات التقدم",
+  "quitProgramUiDisclaimerGeneric": "هذه المؤشرات لأغراض التحفيز فقط.",
+  "quitProgramUiEncouragementGeneric": "كل يوم نظيف له قيمة؛ الخطوات الصغيرة الثابتة تصنع تحولاً كبيراً.",
+  "quitProgramUiClockHintGeneric": "عند الضغط، يستمر العداد والمؤشرات من هذه اللحظة.",
+  "quitProgramMotivationStageStart": "أهم خطوة في اليوم الأول هي أن تبدأ.",
+  "quitProgramMotivationStageWeek": "في الأسبوع الأول، الصبر مهم؛ الخطوات الصغيرة تصنع فرقاً كبيراً.",
+  "quitProgramMotivationStageMonth": "مع اقتراب الشهر الأول، استمر بثبات وصبر.",
+  "quitProgramMotivationStageQuarter": "نحو ثلاثة أشهر، يظهر أثر الاستمرارية بشكل أوضح.",
+  "quitProgramMotivationStageLong": "على المدى الطويل، كل يوم نظيف هو مكسب حقيقي.",
+  "quitMetricSmokingLung": "الرئتان / التنفس",
+  "quitMetricSmokingHeart": "القلب والأوعية",
+  "quitMetricSmokingTeethMouth": "الأسنان والفم",
+  "quitMetricSmokingSmellTaste": "الشم والتذوق",
+  "quitMetricScreenFocusDepth": "التركيز والعمق",
+  "quitMetricScreenSleepRhythm": "إيقاع النوم",
+  "quitMetricScreenAwareness": "وعي الشاشة",
+  "quitMetricScreenInnerCalm": "السكينة الداخلية",
+  "quitMetricAlcoholLiverRecovery": "تعافي الكبد",
+  "quitMetricAlcoholSleepStability": "استقرار النوم",
+  "quitMetricAlcoholMoodBalance": "توازن المزاج",
+  "quitMetricAlcoholClarity": "صفاء الذهن",
+  "quitMetricSubstanceBodyBalance": "توازن الجسد",
+  "quitMetricSubstanceSleepRhythm": "إيقاع النوم",
+  "quitMetricSubstanceUrgeControl": "إدارة الرغبة",
+  "quitMetricSubstanceSupportTracking": "الدعم والمتابعة",
+  "quitMetricZinaDiscipline": "انضباط النفس",
+  "quitMetricZinaBoundaryStrength": "قوة الحدود",
+  "quitMetricZinaHeartCalm": "سكينة القلب",
+  "quitMetricZinaTawbaDirection": "اتجاه التوبة",
+  "quitMilestone1Title": "أول نفس",
+  "quitMilestone1Subtitle": "يوم نظيف واحد",
+  "quitMilestone2Title": "أول سلسلة",
+  "quitMilestone2Subtitle": "48 ساعة",
+  "quitMilestone3Title": "ثلاثة أيام",
+  "quitMilestone3Subtitle": "ذروة الرغبة تمر",
+  "quitMilestone5Title": "خمسة أيام",
+  "quitMilestone5Subtitle": "الروتين ينكسر",
+  "quitMilestone7Title": "أسبوع واحد",
+  "quitMilestone7Subtitle": "اكتمل الأسبوع الأول",
+  "quitMilestone10Title": "عشرة أيام",
+  "quitMilestone10Subtitle": "الإرادة تزداد قوة",
+  "quitMilestone14Title": "أسبوعان",
+  "quitMilestone14Subtitle": "الإدراك يتعافى",
+  "quitMilestone21Title": "ثلاثة أسابيع",
+  "quitMilestone21Subtitle": "حلقة العادة تتغير",
+  "quitMilestone30Title": "شهر واحد",
+  "quitMilestone30Subtitle": "عتبة مهمة",
+  "quitMilestone45Title": "خمسة وأربعون يوماً",
+  "quitMilestone45Subtitle": "النظام يستقر",
+  "quitMilestone60Title": "شهران",
+  "quitMilestone60Subtitle": "الجسم يتأقلم",
+  "quitMilestone66Title": "سيد العادة",
+  "quitMilestone66Subtitle": "خط 66 يوماً",
+  "quitMilestone90Title": "ثلاثة أشهر",
+  "quitMilestone90Subtitle": "مرحلة صحية واضحة",
+  "quitMilestone120Title": "أربعة أشهر",
+  "quitMilestone120Subtitle": "شارة العزم",
+  "quitMilestone180Title": "ستة أشهر",
+  "quitMilestone180Subtitle": "نصف عام",
+  "quitMilestone270Title": "تسعة أشهر",
+  "quitMilestone270Subtitle": "نَفَس طويل",
+  "quitMilestone365Title": "سنة واحدة",
+  "quitMilestone365Subtitle": "بشارة عظيمة",
+  "quitMilestone500Title": "خمسمائة يوم",
+  "quitMilestone500Subtitle": "تاج المثابرة",
+  "quitMilestone730Title": "سنتان",
+  "quitMilestone730Subtitle": "تحول جذري",
+  "quitMilestone1000Title": "ألف يوم",
+  "quitMilestone1000Subtitle": "مستوى استثنائي",
+  "quitMilestoneInspiration365": "\"إِنَّمَا يُوَفَّى الصَّابِرُونَ أَجْرَهُمْ بِغَيْرِ حِسَابٍ.\" (الزمر، 10)",
+  "quitMilestoneInspiration90": "\"من كان مع الله فلا يكون وحيداً.\"",
+  "quitMilestoneInspiration30": "\"فإذا عزمت فتوكل على الله.\" (آل عمران، 159)",
+  "quitMilestoneInspiration7": "\"فَإِنَّ مَعَ الْعُسْرِ يُسْرًا.\" (الشرح، 6)",
+  "quitMilestoneInspiration1": "\"إِنَّ مَعَ الْعُسْرِ يُسْرًا.\" (الشرح، 5)",
+  "quitMilestoneElapsedSummary": "{days} يوماً من النظافة — {subtitle}",
+  "@quitMilestoneElapsedSummary": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      },
+      "subtitle": {}
+    }
+  },
+  "quitMilestoneContinueAction": "متابعة",
+  "quitProgramCompleteCommitmentTitle": "أكمل عهدك",
+  "quitProgramCompleteCommitmentSubtitle": "العداد يعمل — اختم برنامجك بالعهد الذي كتبته لنفسك.",
+  "willpowerHubBreathingExerciseTitle": "تمرين التنفس",
+  "willpowerHubBreathingExerciseSubtitle": "التنفس البطيء يهدّئ جسدك في لحظات التوتر.",
+  "willpowerHubArchiveHabitDialogTitle": "أرشفة العادة",
+  "willpowerHubArchiveHabitDialogBody": "سيتم إزالة هذا السجل من القائمة دون حذفه نهائياً. يمكنك إعادته لاحقاً.",
+  "willpowerHubArchiveAction": "أرشفة",
+  "willpowerHubHeaderTitle": "التطور والتزكية",
+  "willpowerHubNoActiveHabits": "لا توجد عادات نشطة بعد",
+  "willpowerHubActiveHabits": "{count} عادات نشطة",
+  "@willpowerHubActiveHabits": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "willpowerHubHabitCalendarTooltip": "تقويم العادات",
+  "willpowerHubTabBuild": "التطور",
+  "willpowerHubTabQuit": "التزكية",
+  "willpowerHubQuitCtaEarly": "كل دقيقة نظيفة تعود أكسجيناً لقلبك ورئتيك.",
+  "willpowerHubQuitCtaOngoing": "الأيام الأولى صعبة، لكن جسدك بدأ يتعافى بالفعل.",
+  "willpowerHubBuildCtaEarly": "البداية بخطوات صغيرة تكفي.",
+  "willpowerHubBuildCtaOngoing": "روتينك يسير جيداً؛ واصل.",
+  "willpowerHubSummaryQuitLabel": "التزكية",
+  "willpowerHubSummaryTodayLabel": "اليوم",
+  "willpowerHubSummaryCounterProgress": "تقدم العداد",
+  "willpowerHubSummaryCompleted": "اكتمل",
+  "willpowerHubInsightTagSpiritual": "روحي",
+  "willpowerHubInsightTagHealth": "صحي",
+  "willpowerHubAddFirstBuild": "أضف أول عادة تطوير",
+  "willpowerHubAddFirstQuit": "أضف أول عادة تزكية",
+  "willpowerHubBuildEmptyTitle": "مساحة التطور ما زالت فارغة",
+  "willpowerHubBuildEmptySubtitle": "المواظبة على عادة نافعة هي من أبسط طرق النمو الروحي.",
+  "willpowerHubKazaLabelSabah": "فجر",
+  "willpowerHubKazaLabelOgle": "ظهر",
+  "willpowerHubKazaLabelIkindi": "عصر",
+  "willpowerHubKazaLabelAksam": "مغرب",
+  "willpowerHubKazaLabelYatsi": "عشاء",
+  "willpowerHubKazaLabelVitir": "وتر",
+  "willpowerHubKazaTrackingTitle": "متابعة القضاء",
+  "willpowerHubKazaRemainingLabel": "المتبقي",
+  "willpowerHubRemoveCardTooltip": "إزالة البطاقة",
+  "willpowerHubHideKazaDialogTitle": "إزالة بطاقة القضاء؟",
+  "willpowerHubHideKazaDialogBody": "سيتم إخفاء هذه البطاقة من شاشة التطور. تبقى بيانات الحساب والعداد على الجهاز، ويمكنك إضافتها مجدداً من ورشة الروتين.",
+  "willpowerHubRemoveAction": "إزالة",
+  "willpowerHubQuitEmptyTitle": "مساحة التزكية ما زالت فارغة",
+  "willpowerHubQuitEmptySubtitle": "ترك عادة ضارة طريق قوي لتأديب النفس.",
+  "willpowerHubPeriodPrefixWeek": "هذا الأسبوع ",
+  "willpowerHubPeriodPrefixMonth": "هذا الشهر ",
+  "willpowerHubPercentTargetReached": "{prefix}وصلت إلى النسبة المستهدفة.",
+  "@willpowerHubPercentTargetReached": {
+    "placeholders": {
+      "prefix": {}
+    }
+  },
+  "willpowerHubPercentProgressStatus": "{prefix}اكتمل %{progress}، والمتبقي %{left}.",
+  "@willpowerHubPercentProgressStatus": {
+    "placeholders": {
+      "prefix": {},
+      "progress": {
+        "type": "int"
+      },
+      "left": {
+        "type": "int"
+      }
+    }
+  },
+  "willpowerHubTargetPending": "{prefix}الهدف بانتظار التحديد.",
+  "@willpowerHubTargetPending": {
+    "placeholders": {
+      "prefix": {}
+    }
+  },
+  "willpowerHubUnitTargetAddPrompt": "{prefix}الهدف {target} {unit} — اضغط البطاقة للإضافة.",
+  "@willpowerHubUnitTargetAddPrompt": {
+    "placeholders": {
+      "prefix": {},
+      "target": {
+        "type": "int"
+      },
+      "unit": {}
+    }
+  },
+  "willpowerHubUnitProgressTargetFilled": "{prefix}أنجزت {progress} {unit}؛ اكتمل الهدف.",
+  "@willpowerHubUnitProgressTargetFilled": {
+    "placeholders": {
+      "prefix": {},
+      "progress": {
+        "type": "int"
+      },
+      "unit": {}
+    }
+  },
+  "willpowerHubUnitProgressRemaining": "{prefix}أنجزت {progress} {unit}، والمتبقي {left} {unit}.",
+  "@willpowerHubUnitProgressRemaining": {
+    "placeholders": {
+      "prefix": {},
+      "progress": {
+        "type": "int"
+      },
+      "unit": {},
+      "left": {
+        "type": "int"
+      }
+    }
+  },
+  "willpowerHubUnitTargetDoneSuper": "{prefix}اكتمل {target} {unit} — رائع.",
+  "@willpowerHubUnitTargetDoneSuper": {
+    "placeholders": {
+      "prefix": {},
+      "target": {
+        "type": "int"
+      },
+      "unit": {}
+    }
+  },
+  "willpowerHubUnitProgressDidRemaining": "{prefix}قمت بـ {progress} {unit}، والمتبقي {left} {unit}.",
+  "@willpowerHubUnitProgressDidRemaining": {
+    "placeholders": {
+      "prefix": {},
+      "progress": {
+        "type": "int"
+      },
+      "unit": {},
+      "left": {
+        "type": "int"
+      }
+    }
+  },
+  "willpowerHubAddEditHint": "اضغط البطاقة للإضافة أو التعديل",
+  "willpowerHubQuitStatusSetupMissing": "الإعداد غير مكتمل",
+  "willpowerHubQuitStatusClockRunning": "العداد يعمل",
+  "willpowerHubQuitStatusProgramReady": "البرنامج جاهز",
+  "willpowerHubTapCardForDetails": "اضغط البطاقة للتفاصيل",
+  "willpowerHubCompleteSetup": "أكمل الإعداد",
+  "willpowerHubStartClockHint": "ابدأ العداد من خيار «أقلعت من هذه اللحظة» داخل البرنامج",
+  "willpowerHubStreakSeriesLabel": "سلسلة",
+  "willpowerHubStreakDaySeriesLabel": "سلسلة الأيام",
+  "qiblaHubCompassTitle": "اعثر على اتجاه القبلة",
+  "qiblaHubCompassSubtitle": "اعرض اتجاه الكعبة باستخدام البوصلة والموقع",
+  "qiblaHubOpenAction": "فتح",
+  "qiblaHubZikirTitle": "عداد الذكر",
+  "qiblaHubZikirFeatureSubtitle": "عداد رقمي مع تفاصيل الذكر، سجل الجولات، والهدف (33/99)",
+  "qiblaHubBreathingTitle": "تمرين التنفس",
+  "qiblaHubBreathingSubtitle": "اهدأ واستعد تركيزك عبر دورة التنفس 4-7-8",
+  "qiblaHubHealingTitle": "ترددات الشفاء",
+  "qiblaHubHealingSubtitle": "جلسة هادئة مع نغمات علاجية، أجواء صوتية، ومؤقت نوم",
+  "languageChangedMessage": "تم تغيير اللغة إلى: {languageName}",
+  "@languageChangedMessage": {
+    "placeholders": {
+      "languageName": {}
+    }
+  },
+  "adminIdentityBadge": "المشرف",
+  "adminPoolsHint": "اختر مخزنًا، عدّل ثم احفظ. العمليات المتقدمة بالأسفل.",
+  "adminPoolsDropdownLabel": "المخزن ({count} عنصر)",
+  "@adminPoolsDropdownLabel": {"placeholders": {"count": {"type": "int"}}},
+  "adminAdvancedActionsTitle": "عمليات متقدمة",
+  "adminBackupCurrentPoolJson": "نسخ احتياطي لهذا المخزن (JSON)",
+  "adminRestoreFromBackup": "استعادة من النسخة الاحتياطية",
+  "adminWritingInProgress": "جارٍ الكتابة…",
+  "adminResetCompletely": "إعادة تعيين كاملة",
+  "adminVersionLabel": "الإصدار: v{version}",
+  "@adminVersionLabel": {"placeholders": {"version": {}}},
+  "adminSearchInPoolHint": "ابحث داخل المخزن ({count} سجل)",
+  "@adminSearchInPoolHint": {"placeholders": {"count": {"type": "int"}}},
+  "adminAddAction": "إضافة",
+  "adminAddMissingRecords": "إضافة السجلات الناقصة",
+  "adminPoolLabelHomeNamazWisdom": "بطاقة الصلاة في الصفحة الرئيسية",
+  "adminPoolLabelPersonalizedQuotes": "اقتباسات مخصصة",
+  "adminPoolLabelWidgetQuote": "اقتباس الودجت / الشاشة الرئيسية",
+  "adminPoolLabelZikirDailyReflections": "بطاقة وقت الصلاة (تأمل الذكر)",
+  "adminPoolLabelHealingComfort": "اقتباسات الشفاء / المواساة",
+  "adminPoolLabelHubGelisimIslamic": "التطور — بطاقة إسلامية",
+  "adminPoolLabelHubGelisimMedical": "التطور — بطاقة صحية",
+  "adminPoolLabelHubArinmaIslamic": "التزكية — بطاقة إسلامية",
+  "adminPoolLabelHubArinmaMedical": "التزكية — بطاقة صحية",
+  "adminPoolLabelNotificationArinmaBodies": "نصوص إشعار التزكية",
+  "adminSearchResultsCount": "{count} نتيجة",
+  "@adminSearchResultsCount": {"placeholders": {"count": {"type": "int"}}},
+  "adminPoolEmptyHint": "هذا المخزن فارغ — يمكنك إضافة عنصر.",
+  "adminSearchNoResults": "لا توجد نتائج مطابقة.",
+  "adminTapToEdit": "اضغط للتعديل",
+  "adminEditTooltip": "تعديل",
+  "adminInspireHint": "أضف بطاقة ثم املأ النص واحفظ. صور الخلفية: {count}.",
+  "@adminInspireHint": {"placeholders": {"count": {"type": "int"}}},
+  "adminInspireAddNewCard": "إضافة بطاقة جديدة",
+  "adminRefreshFromFirestore": "تحديث من Firestore",
+  "adminInspireVersionCards": "الإصدار: v{version} · {count} بطاقة",
+  "@adminInspireVersionCards": {"placeholders": {"version": {}, "count": {"type": "int"}}},
+  "adminInspireNoCardsYet": "لا توجد بطاقات استكشاف بعد",
+  "adminInspireAddFirstCard": "أضف أول بطاقة",
+  "adminInspireCardLabel": "البطاقة {index}",
+  "@adminInspireCardLabel": {
+    "placeholders": {
+      "index": {
+        "type": "int"
+      }
+    }
+  },
+  "adminInspireEmptyTextBadge": "نص فارغ",
+  "adminInspireDuplicateTooltip": "نسخ",
+  "adminInspireShuffleDesignTooltip": "خلط التصميم",
+  "adminInspireEmptyTextPreview": "(نص فارغ — #{index})",
+  "@adminInspireEmptyTextPreview": {"placeholders": {"index": {"type": "int"}}},
+  "adminInspireImageNumberLabel": "الصورة #{index}",
+  "@adminInspireImageNumberLabel": {"placeholders": {"index": {}}},
+  "adminInspireContentKindLabel": "نوع المحتوى",
+  "adminInspireContentKindQuote": "مقولة",
+  "adminInspireContentKindVerse": "آية",
+  "adminInspireContentKindHadith": "حديث",
+  "adminInspireShowInMainFeedTitle": "إظهار في الخلاصة الرئيسية",
+  "adminInspireShowInMainFeedSubtitle": "عند الإلغاء سيظهر فقط ضمن فلاتر الآية أو الحديث.",
+  "adminInspireTurkishTextLabel": "النص التركي *",
+  "adminOptionalArabicLabel": "العربية (اختياري)",
+  "adminOptionalSourceLabel": "المصدر (اختياري)",
+  "adminOptionalVerseRefLabel": "الآية / السورة (اختياري)",
+  "adminInspireSaveAllChanges": "حفظ كل تغييرات البطاقات",
+  "adminDiagnosticsHint": "تشخيص الإشعارات التلقائي. يتم حفظ محاولات الجدولة هنا.",
+  "adminDiagnosticsStatusSummaryTitle": "ملخص الحالة",
+  "adminDiagnosticsEnabled": "مفعّل",
+  "adminDiagnosticsDisabled": "معطّل",
+  "adminDiagnosticsPrayerStatus": "الصلاة: {status}",
+  "@adminDiagnosticsPrayerStatus": {"placeholders": {"status": {}}},
+  "adminDiagnosticsDailyStatus": "اليومي: {status}",
+  "@adminDiagnosticsDailyStatus": {"placeholders": {"status": {}}},
+  "adminDiagnosticsMilestoneStatus": "الإنجاز: {status}",
+  "@adminDiagnosticsMilestoneStatus": {"placeholders": {"status": {}}},
+  "adminDiagnosticsTaskStatus": "المهمة: {status}",
+  "@adminDiagnosticsTaskStatus": {"placeholders": {"status": {}}},
+  "adminDiagnosticsZikirStatus": "الذكر: {status}",
+  "@adminDiagnosticsZikirStatus": {"placeholders": {"status": {}}},
+  "adminDiagnosticsPendingQueue": "الطابور المعلّق: {count}",
+  "@adminDiagnosticsPendingQueue": {"placeholders": {"count": {"type": "int"}}},
+  "adminRefreshAction": "تحديث",
+  "adminDiagnosticsExportLog": "تصدير السجل",
+  "adminDiagnosticsClearLog": "مسح السجل",
+  "adminDiagnosticsRecentEvents": "آخر الأحداث ({count})",
+  "@adminDiagnosticsRecentEvents": {"placeholders": {"count": {"type": "int"}}},
+  "adminDiagnosticsNoLogsHint": "لا يوجد سجل بعد. أعد فتح التطبيق واستخدمه قليلًا ثم حدّث.",
+  "adminDiagnosticsOutcomeOk": "نجاح",
+  "adminDiagnosticsOutcomeError": "خطأ",
+  "adminDiagnosticsOutcomeCooldownSkip": "تم التخطي (فترة التهدئة)",
+  "adminDiagnosticsOutcomePendingGuardSkip": "تم التخطي (حماية المعلّق)",
+  "adminDiagnosticsOutcomeDisabled": "معطّل",
+  "adminDiagnosticsOutcomeInvalidPayloadSkip": "تم التخطي (بيانات غير صالحة)",
+  "adminDiagnosticsOutcomeUnknown": "غير معروف ({outcome})",
+  "@adminDiagnosticsOutcomeUnknown": {"placeholders": {"outcome": {}}},
+  "adminDevOffsetSavedAndRescheduled": "تم حفظ الإزاحة وإعادة جدولة الإشعارات.",
+  "adminDevOffsetReset": "تمت إعادة تعيين الإزاحة.",
+  "adminDevOffsetDisabled": "معطّل (أوقات API)",
+  "adminDevOffsetForwardMinutes": "أبكر: {minutes} د",
+  "@adminDevOffsetForwardMinutes": {"placeholders": {"minutes": {"type": "int"}}},
+  "adminDevOffsetBackwardMinutes": "أبعد: {minutes} د",
+  "@adminDevOffsetBackwardMinutes": {"placeholders": {"minutes": {"type": "int"}}},
+  "adminDevPrayerOffsetTitle": "إزاحة أوقات الصلاة (هذا الجهاز فقط)",
+  "adminDevPrayerOffsetSubtitle": "القيم السالبة تقدّم كل الأوقات (والإشعارات كذلك). لا يتغير API/الخادم.",
+  "adminDevResetAction": "إعادة تعيين",
+  "adminDevSaveAndRescheduleAction": "حفظ وإعادة جدولة",
+  "adminDevNotificationTestsTitle": "اختبارات الإشعارات",
+  "adminDevNotificationTestsSubtitle": "لتجربة القناة والصوت الحاليين فورًا.",
+  "adminDevPrayerNotificationSent": "تم إرسال إشعار الصلاة.",
+  "adminDevPrayerNotificationNowAction": "إشعار الصلاة (الآن)",
+  "adminDevAppNotificationSent": "تم إرسال إشعار التطبيق.",
+  "adminDevAppNotificationNowAction": "إشعار التطبيق (الآن)",
+  "adminDevCrashlyticsTestTitle": "اختبار تقارير الأعطال (Crashlytics)",
+  "adminDevCrashlyticsDebugHint": "إصدار Debug: الجمع متوقف. ثبّت APK بنمط release للاختبار.",
+  "adminDevCrashlyticsReleaseHint": "الأزرار أدناه ترسل خطأ حقيقيًا إلى Firebase Console → Crashlytics.",
+  "adminFirebaseNotReady": "Firebase غير جاهز.",
+  "adminDevCrashlyticsNonFatalSent": "تم إرسال سجل non-fatal. سيظهر خلال دقائق.",
+  "adminErrorWithReason": "خطأ: {reason}",
+  "@adminErrorWithReason": {"placeholders": {"reason": {}}},
+  "adminDevSendNonFatalTestAction": "اختبار: إرسال خطأ non-fatal",
+  "adminDevCrashNowFatalAction": "اختبار: تعطيل التطبيق الآن (fatal)",
+  "adminDevCrashDialogTitle": "تعطيل التطبيق؟",
+  "adminDevCrashDialogBody": "سيغلق التطبيق خلال ثوانٍ. بعد فتحه مجددًا يُرفع التقرير إلى Firebase.\n\nاستخدمه فقط للتحقق من Crashlytics.",
+  "adminDevCrashAction": "تعطيل",
+  "adminDiagnosticsTitle": "التشخيص",
+  "adminDevPlatformLabel": "المنصة",
+  "adminDevBuildLabel": "البنية",
+  "adminDevBuildModeRelease": "إصدار",
+  "adminDevBuildModeProfile": "بروفايل",
+  "adminDevBuildModeDebug": "تصحيح",
+  "adminDevPlatformWeb": "ويب",
+  "adminDevPlatformUnknown": "غير معروف",
+  "adminDevUidLabel": "UID",
+  "adminDevPendingNotificationLabel": "الإشعارات المعلّقة",
+  "adminDevTapToRefresh": "اضغط للتحديث",
+  "adminDiagnosticsError": "خطأ",
+  "adminPoolDataUnavailable": "بيانات المخزن غير متاحة حاليًا.",
+  "adminPoolChangeAction": "تعديل المخزن",
+  "adminReviewBeforeSaveTitle": "مراجعة قبل الحفظ",
+  "adminPoolSaved": "تم حفظ المخزن.",
+  "adminPoolSaveFailed": "تعذر حفظ المخزن.",
+  "adminUseSeedAllForPool": "استخدم \"زرع كل المخازن\" لهذا المخزن.",
+  "adminNoBuiltInSeedForPool": "لا توجد بيانات افتراضية مدمجة لهذا المخزن.",
+  "adminSeedSelectedPoolDefaults": "إعادة المخزن المحدد إلى الافتراضي",
+  "adminPoolNotLoadedYet": "لم يتم تحميل المخزن بعد.",
+  "adminPoolBackupShareText": "نسخة احتياطية لمخزن Arin — {poolId} ({timestamp})",
+  "@adminPoolBackupShareText": {"placeholders": {"poolId": {}, "timestamp": {}}},
+  "adminPoolBackupShareSubject": "نسخة احتياطية لمخزن Arin",
+  "adminBackupCreationFailed": "تعذر إنشاء النسخة الاحتياطية: {error}",
+  "@adminBackupCreationFailed": {"placeholders": {"error": {}}},
+  "adminBackupInvalidJsonObject": "تعذر قراءة الملف الاحتياطي: مطلوب كائن JSON.",
+  "adminBackupPoolDocumentMissing": "مستند المخزن غير موجود في ملف النسخ الاحتياطي.",
+  "adminBackupItemsListMissing": "قائمة \"items\" غير موجودة في ملف النسخ الاحتياطي.",
+  "adminBackupContainsUnreadableRecords": "توجد سجلات غير قابلة للقراءة؛ ربما تم تعديل الملف.",
+  "adminUnknownPool": "مخزن غير معروف",
+  "adminRestoreBackupTitle": "استعادة النسخة الاحتياطية",
+  "adminRestoreBackupDialogBody": "الملف: {fileName}\nالمخزن في النسخة: {sourcePool}\nالمخزن المحدد: {selectedPool}\nعدد السجلات: {itemCount}\n\n{warningText}سيتم كتابة هذه السجلات إلى المخزن المحدد. متابعة؟",
+  "@adminRestoreBackupDialogBody": {"placeholders": {"fileName": {}, "sourcePool": {}, "selectedPool": {}, "itemCount": {"type": "int"}, "warningText": {}}},
+  "adminRestoreBackupDifferentPoolWarning": "تحذير: النسخة من مخزن مختلف.",
+  "adminRestoreFromBackupAction": "استعادة من النسخة ({fileName})",
+  "@adminRestoreFromBackupAction": {"placeholders": {"fileName": {}}},
+  "adminRestoreBackupFailed": "تعذر استعادة ملف النسخة الاحتياطية.",
+  "adminRequiresManagerOrFullAccessForMissingSeed": "يلزم صلاحية مدير أو كاملة لإضافة السجلات الناقصة.",
+  "adminRequiresFullAccessForReset": "يلزم صلاحية كاملة لإعادة التعيين الكامل.",
+  "adminBulkPreviewFailed": "تعذر جلب معاينة العملية الجماعية.",
+  "adminSeedAllPoolsTitle": "زرع كل المخازن",
+  "adminMergeSeedPreview": "معاينة:\n• المخازن المفحوصة: {poolCount}\n• المخازن المتغيرة: {changedPoolCount}\n• العناصر التي ستُضاف: {addedItemCount}\n• إجمالي العناصر بعد العملية: {targetItemCount}\n\nسيتم الحفاظ على التعديلات اليدوية. متابعة؟",
+  "@adminMergeSeedPreview": {"placeholders": {"poolCount": {"type": "int"}, "changedPoolCount": {"type": "int"}, "addedItemCount": {"type": "int"}, "targetItemCount": {"type": "int"}}},
+  "adminResetSeedPreview": "معاينة:\n• المخازن المفحوصة: {poolCount}\n• المخازن التي ستُستبدل: {changedPoolCount}\n• العناصر الحالية: {currentItemCount}\n• العناصر الجديدة: {targetItemCount}\n\nسيتم حذف المحتوى الحالي. تأكد من النسخ الاحتياطي أولًا. متابعة؟",
+  "@adminResetSeedPreview": {"placeholders": {"poolCount": {"type": "int"}, "changedPoolCount": {"type": "int"}, "currentItemCount": {"type": "int"}, "targetItemCount": {"type": "int"}}},
+  "adminOverwriteAction": "استبدال",
+  "adminMissingItemsAddedToPools": "تمت إضافة العناصر الناقصة إلى المخازن.",
+  "adminAllPoolsOverwritten": "تمت إعادة كتابة كل المخازن.",
+  "adminAuditAddMissingToAllPools": "إضافة العناصر الناقصة إلى جميع المخازن",
+  "adminAuditResetAllPools": "إعادة تعيين جميع المخازن",
+  "adminInspireCardsUnavailable": "بطاقات الاستكشاف غير متاحة حاليًا.",
+  "adminRequiresManagerOrFullAccessForDiagnostics": "يلزم صلاحية مدير أو كاملة لإجراءات التشخيص.",
+  "adminNotificationLogsCleared": "تم مسح سجلات الإشعارات.",
+  "adminNotificationLogsShareText": "سجلات إشعارات Arin ({timestamp})",
+  "@adminNotificationLogsShareText": {"placeholders": {"timestamp": {}}},
+  "adminNotificationLogsShareSubject": "تشخيص إشعارات Arin",
+  "adminLogExportFailed": "فشل تصدير السجل: {error}",
+  "@adminLogExportFailed": {"placeholders": {"error": {}}},
+  "adminInspireCardHasEmptyTurkishText": "هناك بطاقة بنص تركي فارغ؛ املأها أو احذفها.",
+  "adminReviewCardsBeforeSaveTitle": "مراجعة قبل حفظ البطاقات",
+  "adminInspireCardsWillBeUpdated": "سيتم تحديث بطاقات الاستكشاف",
+  "adminInspireCardsSaved": "تم حفظ بطاقات الاستكشاف.",
+  "adminInspireCardsSaveFailed": "تعذر حفظ بطاقات الاستكشاف.",
+  "adminAuditInspireCardsUpdated": "تم تحديث بطاقات الاستكشاف",
+  "adminCurrentRecordCount": "السجلات الحالية: {count}",
+  "@adminCurrentRecordCount": {"placeholders": {"count": {"type": "int"}}},
+  "adminRecordCountToSave": "السجلات للحفظ: {count}",
+  "@adminRecordCountToSave": {"placeholders": {"count": {"type": "int"}}},
+  "adminChangedRowCount": "الأسطر المتغيرة: {count}",
+  "@adminChangedRowCount": {"placeholders": {"count": {"type": "int"}}},
+  "adminConcurrentEditWarning": "إذا حفظ مشرف آخر أثناء ذلك فسيظهر تحذير.",
+  "adminSaveAction": "حفظ",
+  "adminGrantsListFetchFailed": "تعذر جلب قائمة الصلاحيات.",
+  "adminGrantAccessAction": "منح صلاحية",
+  "adminEditGrantAction": "تعديل الصلاحية",
+  "adminEmailOrUidLabel": "البريد أو UID",
+  "adminLevelLabel": "المستوى",
+  "adminRoleContentLabel": "content - محتوى",
+  "adminRoleManagerLabel": "manager - عمليات",
+  "adminRoleDeveloperLabel": "developer - صلاحية كاملة",
+  "adminFullAccessRequiredForGrantManagement": "يلزم صلاحية كاملة لإدارة الصلاحيات.",
+  "adminEmailOrUidCannotBeEmpty": "لا يمكن أن يكون البريد أو UID فارغًا.",
+  "adminAccountAlreadyFullAccess": "هذا الحساب لديه صلاحية كاملة بالفعل داخل التطبيق.",
+  "adminGrantSaved": "تم حفظ الصلاحية.",
+  "adminGrantSaveFailed": "تعذر حفظ الصلاحية.",
+  "adminAuditGrantSaved": "تمت إضافة/تحديث صلاحية المشرف",
+  "adminFullAccessAccountCannotBeRemoved": "هذا الحساب بصلاحية كاملة داخل التطبيق ولا يمكن إزالته من اللوحة.",
+  "adminRemoveGrantTitle": "إزالة الصلاحية",
+  "adminRemoveGrantMessage": "ستتم إزالة صلاحية الإدارة لـ {label}.",
+  "@adminRemoveGrantMessage": {"placeholders": {"label": {}}},
+  "adminGrantRemoved": "تمت إزالة الصلاحية.",
+  "adminGrantRemoveFailed": "تعذر إزالة الصلاحية.",
+  "adminAuditGrantRemoved": "تمت إزالة صلاحية المشرف",
+  "adminEditItemTitle": "تعديل عنصر",
+  "adminAddItemTitle": "إضافة عنصر",
+  "adminWordLabel": "مقولة",
+  "adminTextLabel": "نص",
+  "adminTurkishTextLabel": "النص التركي",
+  "adminTurkishLabel": "تركي",
+  "adminArabicLabel": "عربي",
+  "adminTypeLabel": "النوع",
+  "adminReferenceLabel": "مرجع",
+  "adminTitleLabel": "عنوان",
+  "adminOptionalSourceReferenceLabel": "المصدر / المرجع (اختياري)",
+  "adminWordCannotBeEmpty": "لا يمكن أن تكون المقولة فارغة.",
+  "adminTextCannotBeEmpty": "لا يمكن أن يكون النص فارغًا.",
+  "adminTurkishTextCannotBeEmpty": "لا يمكن أن يكون النص التركي فارغًا.",
+  "adminTurkishAndArabicRequired": "حقلا التركي والعربي مطلوبان.",
+  "adminTurkishArabicReferenceRequired": "التركي والعربي والمرجع مطلوبة.",
+  "adminTitleAndTextRequired": "العنوان والنص مطلوبان.",
+  "adminPoolItemWillBeEdited": "سيتم تعديل عنصر المخزن",
+  "adminNewPoolItemWillBeAdded": "سيتم إضافة عنصر جديد إلى المخزن",
+  "adminVersionConflictError": "تم تحديث هذا المحتوى بواسطة مشرف آخر. رجاءً حدّث وحاول مجددًا.",
+  "adminNoPermissionForOperation": "لا تملك صلاحية لهذه العملية.",
+  "adminNetworkOrServiceUnavailable": "الاتصال ضعيف أو الخدمة غير متاحة مؤقتًا.",
+  "adminOperationTimedOut": "انتهت مهلة العملية. حاول مرة أخرى.",
+  "adminSessionCouldNotBeVerified": "تعذر التحقق من الجلسة. يرجى تسجيل الدخول مجددًا.",
+  "adminAuthorizationCouldNotBeVerified": "تعذر التحقق من الصلاحية",
+  "adminAuthorizationCheckUnavailable": "فحص الصلاحية غير متاح الآن.\nتحقق من اتصال الإنترنت ثم أعد المحاولة.",
+  "adminBackToSettings": "العودة إلى الإعدادات",
+  "adminNoAccessTitle": "لا صلاحية",
+  "adminPageForAdminsOnly": "هذه الصفحة للمشرفين فقط.",
+  "adminPanelTitle": "لوحة الإدارة",
+  "adminPoolsTab": "المخازن",
+  "adminInspireCardsTab": "بطاقات الاستكشاف",
+  "adminDiagnosticsTab": "التشخيص والسجل",
+  "adminDeveloperTab": "المطور",
+  "adminGrantsTab": "الصلاحيات",
+  "adminSectionOnlyForFullAccess": "هذا القسم متاح للصلاحية الكاملة فقط.",
+  "adminDeveloperToolsDeveloperOnly": "أدوات المطور متاحة لمستوى developer فقط.",
+  "adminDeletePoolItemTitle": "حذف عنصر من المخزن",
+  "adminDeletePoolItemMessage": "سيتم حذف هذا العنصر نهائيًا من المخزن \"{poolId}\" وكتابته فورًا إلى Firestore. لا يمكن التراجع.",
+  "@adminDeletePoolItemMessage": {"placeholders": {"poolId": {}}},
+  "adminPoolItemWillBeDeleted": "سيتم حذف عنصر من المخزن",
+  "adminRemoveCardFromListTitle": "إزالة البطاقة من القائمة",
+  "adminRemoveCardFromListMessage": "ستزال البطاقة من القائمة المحلية. اضغط \"حفظ\" لمزامنة التغييرات مع Firestore.",
+  "adminRemoveAction": "إزالة",
+  "adminDiagnosticsAccessDeniedTitle": "شاشة التشخيص متاحة للمدير والصلاحية الكاملة.",
+  "adminDiagnosticsAccessDeniedSubtitle": "مديرو المحتوى يمكنهم تعديل المخازن والاستكشاف.",
+  "adminRoleContentPlain": "محتوى",
+  "adminRoleManagerPlain": "مدير",
+  "adminRoleDeveloperPlain": "مطور",
+  "adminRoleNonePlain": "لا شيء",
+  "adminGrantManagementAccessDeniedTitle": "إدارة الصلاحيات متاحة للصلاحية الكاملة فقط.",
+  "adminGrantManagementAccessDeniedSubtitle": "منح/إزالة مستويات المشرف تتم عبر دور developer.",
+  "adminGrantHint": "أدخل بريدًا أو UID لمنح مستوى content أو manager أو developer.",
+  "adminFixedFullAccess": "حسابات الصلاحية الكاملة الثابتة: {emails}",
+  "@adminFixedFullAccess": {"placeholders": {"emails": {}}},
+  "adminDefinedGrants": "الصلاحيات المعرفة ({count})",
+  "@adminDefinedGrants": {"placeholders": {"count": {"type": "int"}}},
+  "adminGrantsLoading": "جارٍ تحميل الصلاحيات...",
+  "adminNoFirestoreGrantsYet": "لا توجد صلاحيات مضافة عبر Firestore بعد.",
+  "generalLoading": "جارٍ التحميل...",
+  "settingsPrivacyPageTitle": "سياسة الخصوصية",
+  "settingsPrivacyLastUpdated": "آخر تحديث: 26.04.2026",
+  "settingsPrivacyIntro": "تحترم Arin خصوصيتك. يوضح هذا النص ما البيانات التي تتم معالجتها، ولماذا تتم معالجتها، وكيف يمكنك إدارة هذه العمليات.",
+  "settingsPrivacyDataCollectedTitle": "البيانات المُعالجة",
+  "settingsPrivacyDataCollectedBody": "اعتمادًا على استخدامك والأذونات التي تمنحها، قد تعالج Arin بيانات الموقع لميزات مواقيت الصلاة والقبلة، وتفضيلات الإشعارات، وبيانات الحساب عند تسجيل الدخول، وبيانات تشخيص التطبيق.",
+  "settingsPrivacyUsageTitle": "لماذا نعالج البيانات",
+  "settingsPrivacyUsageBody": "تُعالج البيانات لحساب مواقيت الصلاة، وعرض اتجاه القبلة، وجدولة التذكيرات، والحفاظ على إعداداتك، وتحسين استقرار التطبيق.",
+  "settingsPrivacyStorageTitle": "التخزين والاحتفاظ",
+  "settingsPrivacyStorageBody": "يتم حفظ معظم بيانات العادات والذكر والتفضيلات على جهازك. إذا سجّلت الدخول، قد تتم مزامنة بيانات محددة مع خدمات Firebase. يتم الاحتفاظ بالبيانات حتى تحذفها من التطبيق أو تزيل حسابك.",
+  "settingsPrivacyThirdPartyTitle": "خدمات الطرف الثالث",
+  "settingsPrivacyThirdPartyBody": "تستخدم Arin خدمات Firebase Authentication وCloud Firestore وFirebase Analytics وFirebase Crashlytics لتسجيل الدخول ومزامنة البيانات وتحليل الاستخدام وتشخيص الأعطال.",
+  "settingsPrivacyControlsTitle": "تحكم المستخدم",
+  "settingsPrivacyControlsBody": "يمكنك إيقاف أذونات الموقع والإشعارات من إعدادات الجهاز، أو تسجيل الخروج من صفحة الإعدادات، أو حذف حسابك وبياناتك المحلية.",
+  "settingsPrivacyChildrenTitle": "خصوصية الأطفال",
+  "settingsPrivacyChildrenBody": "تطبيق Arin غير مصمم للأطفال دون 13 عامًا.",
+  "settingsPrivacyContactTitle": "التواصل",
+  "settingsPrivacyContactBody": "للاستفسارات المتعلقة بالخصوصية: arinapphelp@gmail.com",
+  "notificationsHubTitle": "الإشعارات",
+  "notificationsHubHeadline": "مركز التذكيرات",
+  "notificationsHubSubhead": "الصلاة والتزكية والذكر — كلها في مكان واحد.",
+  "notificationsPermissionGranted": "مسموح",
+  "notificationsPermissionDenied": "موقوف",
+  "notificationsPermissionLimited": "محدود",
+  "notificationsOpenOsSettings": "إعدادات إشعارات النظام",
+  "notificationsGateNotification": "الإشعارات",
+  "notificationsGateExactAlarm": "منبّه دقيق",
+  "notificationsGateBattery": "استثناء البطارية",
+  "notificationsGateAllGood": "تعمل التذكيرات في الوقت المحدد.",
+  "notificationsGateMissing": "هناك إذن واحد أو أكثر مفقود — قد تتأخر الإشعارات المجدولة أو لا تصل.",
+  "notificationsGateRequestExact": "تفعيل إذن المنبّه الدقيق",
+  "notificationsGateRequestBattery": "تجاهل تحسين البطارية",
+  "notificationsDiagnosticsQueuedLabel": "التذكيرات المجدولة في الطابور",
+  "notificationsSectionGeneral": "عام",
+  "notificationsSectionPrayer": "مواقيت الصلاة",
+  "notificationsSectionArinma": "التزكية والعادات",
+  "notificationsPrayerRowTitle": "الوقت والصوت",
+  "notificationsPrayerOnSubtitle": "إشعارات الصلاة مفعلة — اضغط للتعديل",
+  "notificationsPrayerOffSubtitle": "إشعارات الصلاة متوقفة — اضغط للتفعيل",
+  "notificationsPrayerDetailTitle": "إشعارات الصلاة",
+  "notificationsPrayerDetailSubtitle": "لكل وقت إعداد صوت ومدة مستقلان؛ المفتاح الرئيسي بالأسفل.",
+  "notificationsArinmaDailyTitle": "تذكير يومي",
+  "notificationsArinmaDailySubtitle": "مرتان يوميًا، مقولة عشوائية أو تحفيز قصير.",
+  "notificationsMilestoneTitle": "إشعارات الإنجاز",
+  "notificationsMilestoneSubtitle": "مثل رسائل متباعدة عند 24 ساعة أو أسبوع في رحلة الإقلاع.",
+  "notificationsTaskTitle": "تذكير المهام",
+  "notificationsTaskSubtitle": "بحد أقصى تنبيه واحد يوميًا للمهام غير المكتملة.",
+  "notificationsZikirTitle": "تذكير الذكر",
+  "notificationsZikirSubtitle": "في الوقت الذي اخترته، تذكير قصير بآخر نص ذكر لديك.",
+  "notificationsZikirTimeLabel": "وقت الذكر",
+  "notificationsZikirTimePickerTitle": "وقت الذكر",
+  "notificationsZikirTimePickerSubtitle": "تذكير يومي في هذا الوقت بآخر نص ذكر لديك.",
+  "notificationsHealthDisclaimer": "النصوص المتعلقة بالصحة والتزكية هي للتوعية العامة ولا تغني عن العلاج. إذا كان لديك حالة صحية فاستشر طبيبك.",
+  "notificationsNextReminderToday": "اليوم",
+  "notificationsNextReminderTomorrow": "غدًا",
+  "notificationsNextReminderUnderMinute": "< دقيقة",
+  "notificationsNextReminderMinutes": "{minutes} دقيقة",
+  "@notificationsNextReminderMinutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "notificationsNextReminderHoursOnly": "{hours} س",
+  "@notificationsNextReminderHoursOnly": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      }
+    }
+  },
+  "notificationsNextReminderHoursMinutes": "{hours} س {minutes} د",
+  "@notificationsNextReminderHoursMinutes": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      },
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "notificationsNextReminderLine": "التذكير التالي: {dayLabel} {clock} · بعد {gap}",
+  "@notificationsNextReminderLine": {
+    "placeholders": {
+      "dayLabel": {},
+      "clock": {},
+      "gap": {}
+    }
+  },
+  "aboutArinHeadline": "إلى جانب طريقك",
+  "aboutArinSubhead": "رفيق صغير يقدم لك تذكيرات لطيفة لصلاتك وتنظيمك ويومك",
+  "aboutArinParagraph1": "وُجد ARIN ليساعدك على الحفاظ على صلاتك في وقتها، والاستمرار في العادات النافعة، والتخفف تدريجيًا من الأنماط المتعبة. هدفنا ليس الضغط عليك، بل البقاء بجانبك بتذكيرات هادئة في الأيام المزدحمة.",
+  "aboutArinParagraph2": "أحيانًا يكون الطريق طويلًا، وأحيانًا يكون اليوم ممتلئًا. لذلك نقدم تدفقًا بسيطًا وتذكيرات واضحة. نرغب في سماع أي نقطة تبدو ناقصة أو غير مناسبة؛ ونحن منفتحون على تحسينها معًا.",
+  "aboutArinParagraph3": "الخطوات الصغيرة هي الأكثر فاعلية على المدى الطويل. نأمل أن ترى ARIN رفيقًا هادئًا لا يستعجلك ولا يترك طريقك؛ نتمنى لك يومًا ساكنًا وخفيفًا.",
+  "aboutArinClosingWish": "نتمنى لك استخدامًا مباركًا",
+  "surveyBack": "رجوع",
+  "surveyNext": "متابعة",
+  "namazIbadetWarningTitle": "تنبيه",
+  "namazIbadetWarningSubtitle": "تتبع الصلاة ليس للمظاهر؛ بل لتنظيم قلبك بخشوع وصدق.",
+  "namazIbadetWarningBullet1": "ضع العلامات لنفسك فقط؛ ولا تجعله وسيلة للرياء أو الضغط على الآخرين.",
+  "namazIbadetWarningBullet2": "إذا فاتك وقت صلاة فلا تحتقر نفسك؛ كل رجوع هو توبة وبداية جديدة.",
+  "namazIbadetWarningBullet3": "يمكنك إدارة الإشعارات في أي وقت من إعدادات النظام؛ لا ينبغي أن يتحول التتبع إلى عبء.",
+  "namazIbadetCommitmentTitle": "وعدك لنفسك",
+  "namazIbadetCommitmentHint": "اكتب جملة صادقة عن صلاتك (8 أحرف على الأقل).",
+  "namazIbadetCommitmentFieldHint": "جملة من قلبك...",
+  "namazIbadetCommitmentTooShort": "يرجى كتابة وعد لنفسك (8 أحرف على الأقل).",
+  "namazIbadetSealTitlePrefix": "اختم وعدك",
+  "namazIbadetSealHoldHint": "أبق إصبعك ضاغطًا",
+  "namazIbadetSealSuccess": "تم حفظ وعدك. جارٍ الانتقال إلى شاشة العبادة.",
+  "namazIbadetSealEncourageNotHolding": "عندما تكون جاهزًا، اضغط مطولًا على الختم لتثبيت وعدك.",
+  "namazIbadetSealEncourageHolding": "أبطئ تنفسك ودع وعدك يستقر في قلبك.",
+  "namazIbadetPrepTitle": "تهيئة",
+  "namazIbadetExamplesTitle": "أمثلة",
+  "closeAction": "إغلاق",
+  "saveAction": "حفظ",
+  "selectAction": "اختيار",
+  "quitPickerTemplateAlreadyExists": "هذا البرنامج موجود بالفعل في قائمتك؛ يُسمح بعنصر واحد فقط لكل قالب.",
+  "quitPickerOpenAction": "فتح",
+  "quitPickerGoToListAction": "الذهاب إلى القائمة",
+  "quitPickerTemplateScreenTitle": "التخلص من إدمان الشاشة",
+  "quitPickerTemplateSmokingTitle": "الإقلاع عن التدخين",
+  "quitPickerTemplateAlcoholTitle": "الإقلاع عن الكحول",
+  "quitPickerTemplateSubstanceTitle": "الإقلاع عن المخدرات",
+  "quitPickerTemplateZinaTitle": "الإقلاع عن الزنا",
+  "quitPickerHeaderTitle": "التطهر من العادات السيئة",
+  "quitPickerHeaderSubtitle": "اختر العادة التي تريد تركها؛ واستخدم الخيار بالأسفل لهدف مخصص.",
+  "quitPickerScreenLabel": "الشاشة",
+  "quitPickerScreenSubtitle": "حدود وهدوء",
+  "quitPickerSmokingLabel": "التدخين",
+  "quitPickerAlcoholLabel": "الكحول",
+  "quitPickerSubstanceLabel": "المخدرات",
+  "quitPickerSubstanceSubtitle": "دعم ومتابعة",
+  "quitPickerZinaLabel": "الزنا",
+  "quitPickerDefaultSubtitle": "برنامج تطهير",
+  "quitPickerAlreadyAdded": "مضاف بالفعل",
+  "quitPickerAddCustomTitle": "إضافة مخصص",
+  "quitPickerAddCustomSubtitle": "أنشئ روتين التطهير الخاص بك.",
+  "buildProgramSetupQuranTitle": "برنامج القرآن اليومي",
+  "buildProgramSetupDefaultTitle": "برنامج",
+  "buildProgramSetupHeadlineQuran": "صفحة لكل يوم",
+  "buildProgramSetupHeadlineDefault": "ابدأ برنامجك",
+  "buildProgramSetupBadge": "خطوة تهيئة",
+  "buildProgramSetupBodyQuran": "على الأقل صفحة واحدة — قليل لكنه مستمر. التقدم والنصائح بانتظارك في الشاشة التالية.",
+  "buildProgramSetupBodyDefault": "التقدم والنصائح بانتظارك في الشاشة التالية.",
+  "buildProgramSetupAlreadyActive": "برنامج القرآن اليومي لديك مفعّل بالفعل. تم توجيهك إلى البرنامج الحالي.",
+  "buildProgramSetupQuranHabitTitle": "القرآن اليومي",
+  "buildProgramSetupStartAction": "ابدأ البرنامج",
+  "buildProgramSetupPrincipleTitle": "القليل المستمر خير من الكثير المنقطع",
+  "buildProgramSetupPrincipleQuote": "قال النبي ﷺ: \"أحب الأعمال إلى الله أدومها وإن قل.\"",
+  "buildProgramDetailNotFound": "لم يتم العثور على البرنامج",
+  "buildProgramDetailTabGeneral": "عام",
+  "buildProgramDetailTabTips": "نصائح",
+  "buildProgramDetailTabProgress": "التقدم",
+  "buildProgramDetailTodayQuestion": "هل أكملت هدف القراءة اليوم؟",
+  "buildProgramDetailTodayDone": "تم الإكمال اليوم",
+  "buildProgramDetailTodayPending": "لم يتم التعليم بعد اليوم — اضغط",
+  "buildProgramDetailDayCount": "اليوم {days}",
+  "@buildProgramDetailDayCount": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "buildProgramDetailProgressIndicatorLabel": "مؤشر تقدم تحفيزي",
+  "buildProgramDetailRoutinePercent": "اتساق الروتين {percent}%",
+  "@buildProgramDetailRoutinePercent": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "buildProgramDetailMilestoneLabel": "اليوم {day} — {percent}%",
+  "@buildProgramDetailMilestoneLabel": {
+    "placeholders": {
+      "day": {
+        "type": "int"
+      },
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "buildProgramDetailDisclaimer": "هذه المؤشرات للتحفيز العام وليست قياسات علمية أو طبية.",
+  "onboardingSlide1Title": "نَفَس وسط الضجيج",
+  "onboardingSlide1Subtitle": "عندما يركض الذهن، يهمس الصوت الداخلي غالبًا. التوقفات الصغيرة — نفس واحد، وقفة قصيرة — تنعش التوازن الروحي؛ فالسكينة التي تبحث عنها في الخارج قد تنبت أولًا بهدوء في الداخل.",
+  "onboardingSlide2Title": "ابدأ صغيرًا، وانمُ بالاستمرار",
+  "onboardingSlide2Subtitle": "سجّل عاداتك في التطوير والتزكية. يوم واحد، نفس واحد، اختيار واحد — تقدّم دون كسر السلسلة؛ فالتزكية مثل صعود السلالم، قوة بعد قوة.",
+  "onboardingSlide3Title": "الوقت والصلاة وتنظيم يومك",
+  "onboardingSlide3Subtitle": "اجعل أوقات الصلاة بقربك؛ ولتكن تمارين التنفس ومساحة التقوية معك في اللحظات الصعبة. اجمع عبادتك وتتبعك وصوتك الداخلي على إيقاع واحد.",
+  "onboardingSlide4Title": "Arin: كل شيء في تطبيق واحد",
+  "onboardingSlide4Subtitle": "من الإلهام إلى العادات اليومية، ومن تنبيهات الأوقات إلى عدّاد التزكية، رحلتك هنا. إن كنت جاهزًا فلنبدأ معًا — أنت تمضي ونحن نذكّرك ونرافقك.",
+  "onboardingGetStarted": "لنبدأ",
+  "onboardingSkip": "تخطي",
+  "onboardingNext": "التالي",
+  "surveyNameTitle": "كيف تحب أن نخاطبك؟",
+  "surveyNameHint": "اسمك",
+  "surveyGenderTitle": "هل يمكننا معرفة جنسك؟",
+  "surveyGenderSubtitle": "لمساعدتك بشكل أفضل...",
+  "surveyGenderMale": "ذكر",
+  "surveyGenderFemale": "أنثى",
+  "surveyMoodTitle": "ما النبرة الأبرز في داخلك الآن؟",
+  "surveyMoodSubtitle": "اختر الإشارات التي تصفك؛ ليتكيّف المحتوى والتذكير معها.",
+  "surveyDailyRhythmTitle": "أين يمضي معظم يومك عادةً؟",
+  "surveyDailyRhythmSubtitle": "الإيقاع والبيئة يساعداننا على فهم النمط الأنسب لك.",
+  "surveyInnerThemesTitle": "ما الموضوعات الداخلية الأبرز لديك؟",
+  "surveyInnerThemesSubtitle": "يمكنك اختيار أكثر من خيار؛ الإشارات الصادقة تساعدنا على فهمك بشكل أفضل.",
+  "surveyNotificationTitle": "الإشعارات",
+  "surveyNotificationLead": "ليصلك تذكير الصلاة ورسائل اليوم في وقتها.",
+  "surveyNotificationSubtitle": "نحتاج إذن الإشعارات حتى لا تفوتك تنبيهات الأوقات واقتراحات المحتوى. يمكنك إيقافها في أي وقت من الإعدادات.",
+  "surveyNotificationAllow": "السماح بالإشعارات",
+  "surveyNotificationSkip": "تخطي الآن",
+  "surveyNotificationOpenSettings": "فتح الإعدادات",
+  "surveySave": "ابدأ ➔",
+  "surveyGenderDecline": "أفضل عدم المشاركة",
+  "surveyNameGreetingPrefix": "مرحبًا",
+  "surveySummaryTitle": "أنت جاهز",
+  "surveySummarySubtitle": "حفظنا تفضيلاتك الأساسية. سنشكّل تجربة Arin وفق هذه الإشارات.",
+  "surveySummaryCardTitle": "ملخص البداية",
+  "surveySummaryItemName": "الاسم",
+  "surveySummaryItemMood": "إشارات المزاج",
+  "surveySummaryItemRhythm": "إشارات الإيقاع اليومي",
+  "surveySummaryItemThemes": "إشارات المواضيع الداخلية",
+  "surveySummaryItemNotificationOn": "مفعّل",
+  "surveySummaryItemNotificationOff": "متوقف",
+  "surveySummaryNotProvided": "غير محدد",
+  "surveySummaryAction": "الانتقال إلى الرئيسية",
+  "surveySummarySaveError": "تعذر حفظ بيانات البداية. يرجى المحاولة مرة أخرى.",
+  "moodHappy": "سعيد",
+  "moodCalm": "هادئ",
+  "moodStressed": "متوتر",
+  "moodSad": "حزين",
+  "moodGrateful": "ممتن",
+  "moodAnxious": "قلِق",
+  "moodMotivated": "متحمس",
+  "sectorStudent": "ثانوي / جامعة / تحضيري",
+  "sectorPrivate": "القطاع الخاص",
+  "sectorPublic": "القطاع الحكومي",
+  "sectorBusiness": "عملي الخاص / مستقل",
+  "sectorTrade": "التجارة",
+  "sectorHousehold": "رب/ربة منزل",
+  "sectorOther": "أخرى",
+  "needMotivation": "الدافعية",
+  "needSabr": "الصبر",
+  "needShukr": "الشكر",
+  "needTawakkul": "التوكل",
+  "needFocus": "التركيز",
+  "needHealing": "الشفاء",
+  "needRizq": "الرزق والبركة",
+  "appPrepareTitle": "نجهّز Arin لك",
+  "appPrepareSubtitle": "يتم تحميل أوقات الصلاة وكلمات اليوم لك...",
+  "shellExitConfirmBackTwice": "اضغط رجوع مرة أخرى للخروج",
+  "inspireExploreTitle": "استكشاف",
+  "inspireSearchHint": "بحث",
+  "inspireFilterTooltip": "نوع المحتوى",
+  "inspireFilterMainFeed": "التدفق الرئيسي",
+  "inspireFilterQuote": "قول",
+  "inspireFilterVerse": "آية",
+  "inspireFilterHadith": "حديث",
+  "inspireSearchNoResults": "لا يوجد محتوى مطابق لهذا البحث.\nجرّب كلمة مختلفة أو كتابة مبسطة.",
+  "inspireEmptyTitle": "لا يوجد محتوى بعد",
+  "inspireEmptySubtitle": "الصور: assets/inspiration/ (1.jpg, 2.jpg, ...).\nالمحتوى: assets/data/inspiration/*.json أو Firestore app_public/inspiration_cards.",
+  "inspirePullToRefreshHint": "اسحب لأسفل للتحديث.",
+  "inspireLoadFailedTitle": "تعذر التحميل",
+  "inspirePullToRetryHint": "اسحب لأسفل للمحاولة مرة أخرى.",
+  "viewerBackAction": "رجوع",
+  "viewerNoCard": "لا توجد بطاقة",
+  "asyncErrorDefaultTitle": "حدث خطأ ما",
+  "asyncErrorDefaultMessage": "قد يكون الاتصال ضعيفًا أو الخدمة غير متاحة الآن. حاول مرة أخرى بعد قليل.",
+  "asyncErrorRetryAction": "إعادة المحاولة",
+  "asyncErrorTechnicalDetailsTitle": "تفاصيل تقنية",
+  "asyncErrorCopiedToClipboard": "تم نسخ الخطأ إلى الحافظة.",
+  "savedInspirationTitle": "المحفوظات",
+  "savedInspirationLoadFailedPrefix": "تعذر التحميل",
+  "savedInspirationEmptyTitle": "دفتر قلبك فارغ",
+  "savedInspirationEmptySubtitle": "احفظ الكلمات التي تلمسك في الاستكشاف؛ لتجتمع هنا وتعود إليك.",
+  "savedInspirationGoExploreAction": "الذهاب إلى الاستكشاف",
+  "clockPickerCancelAction": "إلغاء",
+  "clockPickerConfirmAction": "تم",
+  "clockPickerHourLabel": "الساعة",
+  "clockPickerMinuteLabel": "الدقيقة",
+  "salatWeekCelebrationTitle": "أكملت الأسبوع",
+  "salatWeekCelebrationAction": "الحمد لله",
+  "adminEmailInviteLabel": "دعوة بريد إلكتروني"
+}

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ARIN — Kırpılmış bildirim sesleri (uygulama ile aynı)</title>
+  <style>
+    :root { --bg: #0d1210; --card: #161b17; --text: #e8e4dc; --muted: #9aa69a; --accent: #4caf87; }
+    body { font-family: system-ui, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 24px 18px 48px; line-height: 1.5; }
+    h1 { font-size: 1.25rem; margin: 0 0 8px; }
+    .lead { color: var(--muted); font-size: 0.92rem; margin: 0 0 20px; max-width: 48rem; }
+    .card { background: var(--card); border: 1px solid rgba(76,175,135,.22); border-radius: 14px; padding: 14px 16px; margin-bottom: 12px; max-width: 38rem; }
+    .card h2 { font-size: 0.95rem; margin: 0 0 6px; color: var(--accent); }
+    .meta { font-size: 0.8rem; color: var(--muted); margin-bottom: 8px; }
+    audio { width: 100%; }
+  </style>
+</head>
+<body>
+  <h1>Uygulamaya entegre edilen kırpılmış sesler</h1>
+  <p class="lead">
+    Bu dosyalar <code>assets/sounds/prayer/</code> ile aynı (baştan N saniye, hafif fade-out).
+    Kaynak: Freesound CC0 önizleme MP3 → <code>tool/audio_trim</code> ile WAV.
+  </p>
+
+  <div class="card">
+    <h2>1 — Ezan Türkçe işleme (10 sn)</h2>
+    <p class="meta">prayer_ntf_adhan_turkish.wav</p>
+    <audio controls preload="none" src="../assets/sounds/prayer/prayer_ntf_adhan_turkish.wav"></audio>
+  </div>
+  <div class="card">
+    <h2>2 — Ezan Dubai / Ramadan (9 sn)</h2>
+    <p class="meta">prayer_ntf_adhan_dubai.wav</p>
+    <audio controls preload="none" src="../assets/sounds/prayer/prayer_ntf_adhan_dubai.wav"></audio>
+  </div>
+  <div class="card">
+    <h2>3 — Huzur flute (6 sn)</h2>
+    <p class="meta">prayer_ntf_ambient_flute.wav</p>
+    <audio controls preload="none" src="../assets/sounds/prayer/prayer_ntf_ambient_flute.wav"></audio>
+  </div>
+  <div class="card">
+    <h2>4 — Huzur piyano &amp; gitar (7 sn)</h2>
+    <p class="meta">prayer_ntf_ambient_piano_guitar.wav</p>
+    <audio controls preload="none" src="../assets/sounds/prayer/prayer_ntf_ambient_piano_guitar.wav"></audio>
+  </div>
+  <div class="card">
+    <h2>5 — Huzur ethereal voices (10 sn)</h2>
+    <p class="meta">prayer_ntf_ambient_ethereal.wav</p>
+    <audio controls preload="none" src="../assets/sounds/prayer/prayer_ntf_ambient_ethereal.wav"></audio>
+  </div>
+
+  <p class="lead" style="margin-top:24px">Kalan MP3 adayları: 01, 02, 05, 06, 09 dosya adlarıyla <code>sound_candidates/</code> içinde.</p>
+</body>
+</html>

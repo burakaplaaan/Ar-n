@@ -1,0 +1,9 @@
+# TEMPLATE — gerçek key.properties dosyası .gitignore'da.
+# Yeni bir geliştirici release AAB build etmek isterse:
+#   1) Bu dosyanın kopyasını al → `android/key.properties` olarak kaydet
+#   2) Kendi upload keystore şifreleriyle doldur
+#   3) `android/app/<keystore_name>.jks` dosyasını güvenli kanaldan al
+storePassword=YOUR_STORE_PASSWORD
+keyPassword=YOUR_KEY_PASSWORD
+keyAlias=arin-upload
+storeFile=arin-upload.jks

@@ -1,0 +1,35 @@
+FOTOĞRAFLAR — assets/inspiration/
+================================
+Dosya adları: 1.jpg, 2.jpg, 3.jpg … aralıksız.
+İlk eksik numarada tarama durur (ör. 5.jpg yoksa sadece 1–4 listelenir).
+118 ve sonrası için önceki dosyaların hepsi mevcut olmalı.
+
+SÖZLER — Firebase (önerilen)
+=============================
+Firestore tek belge (güncelleme = yeni sürüm, uygulama güncellemesi gerekmez):
+
+  Koleksiyon: app_public
+  Belge ID: inspiration_cards
+
+Belge alanları:
+  version: number
+  items: array
+
+items[] içinde her öğe:
+  imageIndex   (number, zorunlu) — hangi N.jpg (1, 2, …)
+  tr           (string, zorunlu) — ana metin; satır kırımı için \n kullan
+  ar           (string, isteğe bağlı)
+  source       (string, isteğe bağlı)
+  layoutIndex  (number, isteğe bağlı, 0–19) — klasik overlay düzeni
+  reelsStyle   (number, isteğe bağlı, 0–6) — tam ekran Reels tipografi
+  emphasisTailLines (number, isteğe bağlı) — sondan kaç satır altın vurgu
+  useLightTextOnImage (boolean|null, isteğe bağlı)
+      null = görselin MERKEZ parlaklığına göre otomatik açık/koyu yazı
+
+Örnek yapı: assets/data/firestore_inspiration_bundle.example.json
+İçeriği kopyalayıp Console’da belgeye yapıştırabilirsin.
+
+Yerel yedek (Firebase yoksa)
+===========================
+Uygulama, Firestore’da kayıt yoksa lib/data/inspiration/inspiration_fallback_catalog.dart
+içindeki şablonları imageIndex’e göre döngüyle kullanır.

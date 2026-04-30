@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="default_web_client_id">746942620456-lm0rg914v26s3u2io9pif08vu24jfor0.apps.googleusercontent.com</string>
+    <string name="app_name">آرين</string>
+    <string name="widget_description">اقتباس يومي والمصدر — آرين</string>
+    <string name="widget_quote_description">آرين — اقتباس يومي</string>
+    <string name="widget_prayer_description">آرين — مواقيت الصلاة</string>
+    <string name="widget_quote_title">آرين · اقتباس</string>
+    <string name="widget_prayer_title">آرين · الصلاة</string>
+    <string name="widget_brand_label">آرين</string>
+    <string name="widget_placeholder_quote_source">الطلاق ٣</string>
+    <string name="widget_placeholder_quote">وَمَنْ يَتَوَكَّلْ عَلَى اللَّهِ\nفَهُوَ حَسْبُهُ.</string>
+    <string name="widget_placeholder_location">الموقع غير مضبوط</string>
+</resources>

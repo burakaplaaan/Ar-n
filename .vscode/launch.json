@@ -1,0 +1,14 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "arin (Android)",
+      "request": "launch",
+      "type": "dart",
+      "program": "lib/main.dart",
+      "toolArgs": [
+        "--dart-define=GOOGLE_OAUTH_WEB_CLIENT_ID=746942620456-lm0rg914v26s3u2io9pif08vu24jfor0.apps.googleusercontent.com"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,148 @@
+// lib/presentation/qibla/qibla_hub_page.dart
+// Kıble sekmesi kökü: araç paneli + iç Navigator ile pusula ekranı.
+
+import 'dart:async';
+
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+
+import '../../core/router/app_router.dart';
+import '../../data/services/audio_session_coordinator.dart';
+import 'qibla_hub_navigator_key.dart';
+import 'qibla_page.dart';
+import 'qibla_tools_dashboard_page.dart';
+import 'qibla_nested_swipe_back.dart';
+import 'qibla_shell_swipe_provider.dart';
+import 'zikir_matik_page.dart';
+import 'healing_frequencies/healing_frequencies_page.dart';
+import '../willpower/breathing_exercise_page.dart';
+
+abstract final class QiblaHubRoutes {
+  static const String dashboard = '/';
+  static const String compass = '/compass';
+  static const String zikir = '/zikir';
+  static const String breathing = '/breathing';
+  static const String healing = '/healing';
+}
+
+/// [Navigator] gözlemcisi: araç paneli dışına çıkıldığında shell kaydırmayı kilitler.
+class _QiblaHubShellSwipeObserver extends NavigatorObserver {
+  _QiblaHubShellSwipeObserver(this._ref);
+
+  final WidgetRef _ref;
+
+  void _applyForTop(Route<dynamic>? top) {
+    final name = top?.settings.name;
+    final atDashboard = name == QiblaHubRoutes.dashboard;
+    _ref.read(qiblaHubBlocksShellSwipeProvider.notifier).state = !atDashboard;
+  }
+
+  void _pauseHealingIfLeaving(Route<dynamic>? from, Route<dynamic>? to) {
+    final fromHealing = from?.settings.name == QiblaHubRoutes.healing;
+    final toHealing = to?.settings.name == QiblaHubRoutes.healing;
+    if (fromHealing && !toHealing) {
+      unawaited(AudioSessionCoordinator.pauseOwner(AudioSessionOwner.healing));
+    }
+  }
+
+  @override
+  void didPush(Route<dynamic> route, Route<dynamic>? previousRoute) {
+    _pauseHealingIfLeaving(previousRoute, route);
+    _applyForTop(route);
+  }
+
+  @override
+  void didPop(Route<dynamic> route, Route<dynamic>? previousRoute) {
+    _pauseHealingIfLeaving(route, previousRoute);
+    _applyForTop(previousRoute);
+  }
+
+  @override
+  void didReplace({Route<dynamic>? newRoute, Route<dynamic>? oldRoute}) {
+    _pauseHealingIfLeaving(oldRoute, newRoute);
+    if (newRoute != null) _applyForTop(newRoute);
+  }
+
+  @override
+  void didRemove(Route<dynamic> route, Route<dynamic>? previousRoute) {
+    _pauseHealingIfLeaving(route, previousRoute);
+    _applyForTop(previousRoute);
+  }
+}
+
+/// Shell ve `/qibla` rotası bu widget’ı kullanır; alt rota yığını hub içinde kalır.
+class QiblaHubPage extends ConsumerStatefulWidget {
+  const QiblaHubPage({super.key});
+
+  @override
+  ConsumerState<QiblaHubPage> createState() => _QiblaHubPageState();
+}
+
+class _QiblaHubPageState extends ConsumerState<QiblaHubPage> {
+  _QiblaHubShellSwipeObserver? _shellSwipeObserver;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      ref.read(qiblaHubBlocksShellSwipeProvider.notifier).state = false;
+    });
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _shellSwipeObserver ??= _QiblaHubShellSwipeObserver(ref);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Navigator(
+      key: qiblaHubNavigatorKey,
+      observers: [_shellSwipeObserver!],
+      initialRoute: QiblaHubRoutes.dashboard,
+      onGenerateRoute: (RouteSettings settings) {
+        switch (settings.name) {
+          case QiblaHubRoutes.compass:
+            final args = settings.arguments is Map
+                ? settings.arguments as Map
+                : const {};
+            final fromHome = args['fromHomeShortcut'] == true;
+            return MaterialPageRoute<void>(
+              settings: settings,
+              builder: (context) => QiblaNestedSwipeBack(
+                onBack: fromHome ? () => context.go(AppRoutes.home) : null,
+                child: QiblaPage(exitToHomeOnBack: fromHome),
+              ),
+            );
+          case QiblaHubRoutes.zikir:
+            return MaterialPageRoute<void>(
+              settings: settings,
+              builder: (_) =>
+                  const QiblaNestedSwipeBack(child: ZikirMatikPage()),
+            );
+          case QiblaHubRoutes.breathing:
+            return MaterialPageRoute<void>(
+              settings: settings,
+              builder: (_) =>
+                  const QiblaNestedSwipeBack(child: BreathingExercisePage()),
+            );
+          case QiblaHubRoutes.healing:
+            return MaterialPageRoute<void>(
+              settings: settings,
+              builder: (_) =>
+                  const QiblaNestedSwipeBack(child: HealingFrequenciesPage()),
+            );
+          case QiblaHubRoutes.dashboard:
+          default:
+            return MaterialPageRoute<void>(
+              settings: settings,
+              builder: (_) => const QiblaToolsDashboardPage(),
+            );
+        }
+      },
+    );
+  }
+}

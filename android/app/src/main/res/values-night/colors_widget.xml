@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Dark ortamda beyazı bir ton yumuşatıp göz yorgunluğunu azalt. -->
+    <color name="widget_quote_text_white">#FFE2E6EC</color>
+    <color name="widget_text_muted">#C4D3DBE4</color>
+</resources>

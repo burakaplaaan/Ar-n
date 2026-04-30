@@ -1,0 +1,179 @@
+{
+  "entries": [
+    {
+      "id": "c001",
+      "tags": ["sabr", "stresli", "kaygi", "uzgun"],
+      "arabic": "وَاصْبِرْ وَمَا صَبْرُكَ إِلَّا بِاللَّهِ",
+      "text": "Sabret; senin sabrın yalnızca Allah iledir.",
+      "source": "Nahl Suresi, 127. Ayet"
+    },
+    {
+      "id": "c002",
+      "tags": ["sabr", "kaygi", "uzgun", "sifa"],
+      "arabic": "إِنَّ مَعَ الْعُسْرِ يُسْرًا",
+      "text": "Şüphesiz güçlüğün yanında bir kolaylık vardır.",
+      "source": "İnşirah Suresi, 6. Ayet"
+    },
+    {
+      "id": "c003",
+      "tags": ["sabr", "tevekkul", "kaygi"],
+      "arabic": "وَمَن يَتَوَكَّلْ عَلَى اللَّهِ فَهُوَ حَسْبُهُ",
+      "text": "Kim Allah'a tevekkül ederse O ona yeter.",
+      "source": "Talak Suresi, 3. Ayet"
+    },
+    {
+      "id": "c004",
+      "tags": ["tevekkul", "motivasyon", "stresli"],
+      "arabic": "وَعَلَى اللَّهِ فَتَوَكَّلُوا إِن كُنتُم مُّؤْمِنِينَ",
+      "text": "Eğer gerçekten mümin iseniz yalnızca Allah'a tevekkül edin.",
+      "source": "Maide Suresi, 23. Ayet"
+    },
+    {
+      "id": "c005",
+      "tags": ["tevekkul", "sabr"],
+      "arabic": null,
+      "text": "Ümit ve korku arasında yüzen kalp, Allah'a en yakın kalptir.",
+      "source": "Hz. Ali (r.a.)"
+    },
+    {
+      "id": "c006",
+      "tags": ["sukur", "mutlu", "motive"],
+      "arabic": "لَئِن شَكَرْتُمْ لَأَزِيدَنَّكُمْ",
+      "text": "Eğer şükrederseniz elbette size nimetimi artırırım.",
+      "source": "İbrahim Suresi, 7. Ayet"
+    },
+    {
+      "id": "c007",
+      "tags": ["sukur", "mutlu", "sakin"],
+      "arabic": null,
+      "text": "Sana verilen nimetlere şükret; zira şükür nimetin bağıdır.",
+      "source": "Hz. Ali (r.a.)"
+    },
+    {
+      "id": "c008",
+      "tags": ["rizik", "ticaret", "bereket"],
+      "arabic": "وَمَا مِن دَابَّةٍ فِي الْأَرْضِ إِلَّا عَلَى اللَّهِ رِزْقُهَا",
+      "text": "Yeryüzünde hiçbir canlı yoktur ki rızkı Allah'a ait olmasın.",
+      "source": "Hud Suresi, 6. Ayet"
+    },
+    {
+      "id": "c009",
+      "tags": ["rizik", "ticaret", "bereket"],
+      "arabic": null,
+      "text": "Sabah erkenden kalkın, çünkü sabah vakti rızıkta bereket vardır.",
+      "source": "Hz. Fatıma'ya (r.a.) atfedilen rivayet"
+    },
+    {
+      "id": "c010",
+      "tags": ["ticaret", "rizik"],
+      "arabic": null,
+      "text": "Alışverişinizde dürüst olun; zira dürüst tüccar, peygamberler ve şehitlerle birliktedir.",
+      "source": "Tirmizi, Hadis No: 1209"
+    },
+    {
+      "id": "c011",
+      "tags": ["ticaret"],
+      "arabic": null,
+      "text": "Helal kazancı aramak, her Müslüman'a farzdır.",
+      "source": "Beyhaki, Şuabü'l-İman"
+    },
+    {
+      "id": "c012",
+      "tags": ["odaklanma", "student", "ogretim"],
+      "arabic": "وَقُل رَّبِّ زِدْنِي عِلْمًا",
+      "text": "De ki: Rabbim, benim ilmimi artır.",
+      "source": "Taha Suresi, 114. Ayet"
+    },
+    {
+      "id": "c013",
+      "tags": ["odaklanma", "student", "motivasyon"],
+      "arabic": null,
+      "text": "İlim öğrenmek, her Müslüman'a farzdır.",
+      "source": "İbn Mace, Hadis No: 224"
+    },
+    {
+      "id": "c014",
+      "tags": ["odaklanma", "motivasyon"],
+      "arabic": null,
+      "text": "Beşikten mezara kadar ilim öğrenin.",
+      "source": "Müslim Alimler"
+    },
+    {
+      "id": "c015",
+      "tags": ["motivasyon", "motive"],
+      "arabic": "إِنَّ اللَّهَ لَا يُغَيِّرُ مَا بِقَوْمٍ حَتَّىٰ يُغَيِّرُوا مَا بِأَنفُسِهِمْ",
+      "text": "Allah bir toplumu, onlar kendilerini değiştirmedikçe değiştirmez.",
+      "source": "Ra'd Suresi, 11. Ayet"
+    },
+    {
+      "id": "c016",
+      "tags": ["motivasyon", "motive", "sabr"],
+      "arabic": null,
+      "text": "Yavaş yavaş yapılan amel, Allah katında en sevimli ameldir.",
+      "source": "Buhari, Hadis No: 6465"
+    },
+    {
+      "id": "c017",
+      "tags": ["sifa", "uzgun", "kaygi"],
+      "arabic": "وَإِذَا مَرِضْتُ فَهُوَ يَشْفِينِ",
+      "text": "Hastalandığımda bana şifa veren O'dur.",
+      "source": "Şuara Suresi, 80. Ayet"
+    },
+    {
+      "id": "c018",
+      "tags": ["sifa", "sabr"],
+      "arabic": null,
+      "text": "Başa gelen her musibet, Müslüman'ın günahlarına kefaret olur.",
+      "source": "Buhari, Hadis No: 5641"
+    },
+    {
+      "id": "c019",
+      "tags": ["sakin", "tevekkul"],
+      "arabic": "أَلَا بِذِكْرِ اللَّهِ تَطْمَئِنُّ الْقُلُوبُ",
+      "text": "Dikkat edin! Kalpler yalnızca Allah'ın zikriyle huzur bulur.",
+      "source": "Ra'd Suresi, 28. Ayet"
+    },
+    {
+      "id": "c020",
+      "tags": ["sakin", "mutlu", "sukur"],
+      "arabic": null,
+      "text": "Güzelliklerine bak; şükredecek çok şey bulursun.",
+      "source": "Bilgelik sözü"
+    },
+    {
+      "id": "c021",
+      "tags": ["memur", "isci", "motivasyon"],
+      "arabic": null,
+      "text": "Biriniz bir iş yaptığında onu sağlam ve kaliteli yapsın.",
+      "source": "Beyhaki"
+    },
+    {
+      "id": "c022",
+      "tags": ["memur", "isci", "ticaret"],
+      "arabic": null,
+      "text": "Allah işini iyi yapanı sever.",
+      "source": "Hadis"
+    },
+    {
+      "id": "c023",
+      "tags": ["ev_hayati", "aile", "sukur"],
+      "arabic": null,
+      "text": "Evini cennet bahçesi yap; temizliği, merhameti ve şükrü eksik etme.",
+      "source": "Bilgelik sözü"
+    },
+    {
+      "id": "c024",
+      "tags": ["genel", "sabr", "motivasyon", "sukur", "tevekkul"],
+      "arabic": "بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ",
+      "text": "Rahman ve Rahim olan Allah'ın adıyla her işe başla.",
+      "source": "Kur'an-ı Kerim"
+    },
+    {
+      "id": "c025",
+      "tags": ["genel"],
+      "arabic": null,
+      "text": "Bir gün iyi bir şey yaptıysan, o gün ziyan olmamıştır.",
+      "source": "Hz. Ömer (r.a.) "
+    }
+  ]
+}

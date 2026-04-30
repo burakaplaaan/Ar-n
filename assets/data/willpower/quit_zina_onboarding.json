@@ -1,0 +1,24 @@
+{
+  "templateId": "quit_zina",
+  "warningTitle": "Dikkat",
+  "warningSubtitle": "İffet yolunda sabır ve sınır birlikte yürür",
+  "warningBody": [
+    "Harama yaklaşmak kalbi hırpalayabilir; tövbe ve sınır koymak yenilenmenin kapısıdır.",
+    "Bu program manevi disiplin ve farkındalık sunar; kişisel durumunda âlim veya danışman istişaresi faydalı olabilir."
+  ],
+  "physicalTitle": "Nefis ve tetikleyiciler",
+  "physicalItems": [
+    { "icon": "psychology", "title": "Düşünce ve tetik", "subtitle": "Yalnızlık, yorgunluk veya ekran tetikleyici olabilir" },
+    { "icon": "bolt", "title": "Anlık arzu", "subtitle": "Dalga geçer; o anda durmak zaferdir" },
+    { "icon": "favorite", "title": "Mahremiyet", "subtitle": "Sınır çizmek kendine ve başkasına saygıdır" }
+  ],
+  "spiritualTitle": "İffet ve sınır",
+  "spiritualItems": [
+    { "icon": "mosque", "title": "Gözün hıfzı", "subtitle": "Haramdan bakan göz günah yazdırır; çevirmek ibadettir" },
+    { "icon": "self_improvement", "title": "Nefis terbiyesi", "subtitle": "Her ret, kalbi iffete bir adım daha yaklaştırır" }
+  ],
+  "verse": {
+    "text": "Mümin erkeklere söyle, gözlerini harama çevirsinler ve iffetlerini korusunlar. Mümin kadınlara da söyle...",
+    "ref": "Nur 24:30-31 (meal özeti — mahremiyet ve iffet)"
+  }
+}

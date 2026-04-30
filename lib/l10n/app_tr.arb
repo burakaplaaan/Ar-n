@@ -1,0 +1,1420 @@
+{
+  "@@locale": "tr",
+  "languageSettingsTitle": "Dil ayarları",
+  "languageSettingsSheetTitle": "Uygulama dili",
+  "languageTurkishLabel": "Türkçe",
+  "languageEnglishLabel": "İngilizce",
+  "languageArabicLabel": "Arapça",
+  "settingsPageHeader": "Ayarlar",
+  "settingsSectionAccount": "Hesabınız",
+  "settingsSectionAppearance": "Görünüm",
+  "settingsSectionPrayerTimes": "Namaz vakitleri",
+  "settingsSectionApp": "Uygulama",
+  "settingsSectionSession": "Oturum",
+  "settingsMenuNotificationsSubtitle": "Namaz, arınma ve zikir",
+  "settingsMenuNotificationsTitle": "Bildirimler",
+  "settingsMenuAboutTitle": "Hakkında",
+  "settingsMenuAboutSubtitle": "Uygulama bilgileri",
+  "settingsMenuPrivacyTitle": "Gizlilik Politikası",
+  "settingsMenuPrivacySubtitle": "Verilerinizi nasıl işlediğimiz",
+  "settingsMenuSavedTitle": "Kaydedilenler",
+  "settingsMenuSavedSubtitle": "Keşfet’te kaydettiğin sözler",
+  "settingsMenuAdminTitle": "İçerik yönetimi",
+  "settingsMenuAdminSubtitle": "Söz havuzları ve Keşfet",
+  "settingsMenuContactTitle": "Bize ulaşın",
+  "settingsMenuContactSubtitle": "Destek ve geri bildirim",
+  "settingsMenuComingSoon": "E-posta ile direkt yaz",
+  "settingsContactPageTitle": "Bize ulaşın",
+  "settingsContactSubtitle": "Öneri, hata bildirimi veya destek talebini doğrudan bize e-posta ile iletebilirsin.",
+  "settingsContactOpenMailAction": "Mail uygulamasını aç",
+  "settingsContactCopyMailAction": "E-posta adresini kopyala",
+  "settingsContactEmailCopied": "E-posta adresi kopyalandı.",
+  "settingsContactOpenFailed": "Mail uygulaması açılamadı. Adresi kopyalayıp manuel gönderebilirsin.",
+  "settingsContactCopyFailed": "E-posta adresi kopyalanamadı. Lütfen manuel olarak yazın: arinapphelp@gmail.com",
+  "settingsContactMailSubject": "Arın uygulaması geri bildirimi",
+  "settingsContactMailBody": "Selam Arın ekibi,\n\n",
+  "settingsGuestHint": "Misafir — veriler bu cihazda. Buluta kaydetmek için giriş yapın.",
+  "settingsAccountFallback": "Hesap",
+  "settingsSignInGoogle": "Google ile giriş",
+  "settingsSignInApple": "Apple ile giriş",
+  "settingsSessionHint": "Uygulamayı sıfırlamak veya hesabı kaldırmak için:",
+  "settingsSignOutAction": "Çıkış yap",
+  "settingsDeleteAccountAction": "Hesabı ve verileri tamamen sil",
+  "settingsLightThemeTitle": "Açık tema",
+  "settingsLightThemeSubtitle": "Daha kapalı açık zemin; okuması rahat",
+  "settingsProvinceLabel": "İl",
+  "settingsProvinceHint": "Yazın; örn. \"ko\" → Kocaeli",
+  "settingsProvinceInvalid": "Listeden bir il seçin veya yazmaya devam edin.",
+  "settingsLocationUpdatedMessage": "Konum güncellendi: {city}",
+  "@settingsLocationUpdatedMessage": {
+    "placeholders": {
+      "city": {}
+    }
+  },
+  "settingsLocationFailedMessage": "Konum alınamadı; izin veya GPS’i kontrol edin.",
+  "settingsProvinceUpdatedMessage": "{province} — namaz vakitleri güncellendi",
+  "@settingsProvinceUpdatedMessage": {
+    "placeholders": {
+      "province": {}
+    }
+  },
+  "settingsSignOutDialogTitle": "Çıkış yap",
+  "settingsSignOutDialogBody": "Bilgilendirme slaytlarından başlayarak uygulama sıfırlanır. Bu cihazdaki tüm yerel veriler silinir; Firebase oturumunuz kapanır.",
+  "settingsDialogCancel": "İptal",
+  "settingsDeleteAllDataDialogTitle": "Tüm verileri sil",
+  "settingsDeleteAllDataDialogBody": "Misafir modundasınız. Bu cihazdaki tüm uygulama verileri kalıcı olarak silinir ve bilgilendirme ekranlarına dönersiniz.",
+  "settingsDeleteAction": "Sil",
+  "settingsDeleteAccountDialogTitle": "Hesabı kalıcı sil",
+  "settingsDeleteAccountDialogBody": "Bulut hesabınız silinir; bu cihazdaki tüm yerel veriler de temizlenir. Geri alınamaz.",
+  "settingsDeleteProgressMessage": "Bulut ve cihaz verileriniz siliniyor…",
+  "settingsCloudDeleteFailedMessage": "Bulut verileriniz silinemedi. İnternet bağlantınızı kontrol edip tekrar deneyin.",
+  "settingsAccountDeleteFailedMessage": "Hesap silinemedi.",
+  "settingsAccountDeleteRetryMessage": "Hesap silinemedi. Lütfen biraz sonra tekrar deneyin.",
+  "settingsGoogleSignInSuccess": "Google ile giriş yapıldı.",
+  "settingsGoogleSignInCancelled": "Google ile giriş iptal edildi.",
+  "settingsGoogleSignInFailed": "Google ile giriş yapılamadı. Lütfen tekrar deneyin.",
+  "settingsAppleSignInSuccess": "Apple ile giriş yapıldı.",
+  "settingsAppleSignInFailed": "Apple ile giriş yapılamadı. Lütfen tekrar deneyin.",
+  "settingsAuthServiceUnavailable": "Giriş servisine şu anda ulaşılamıyor. Lütfen birazdan tekrar deneyin.",
+  "homeGreetingNight": "Hayırlı Geceler",
+  "homeGreetingMorning": "Hayırlı Sabahlar",
+  "homeGreetingNoon": "Hayırlı Öğlenler",
+  "homeGreetingEvening": "Hayırlı Akşamlar",
+  "homeGuestUser": "Misafir",
+  "homePrayerUrgentSemanticsLabel": "Dikkat, imsak vakti çıkıyor. Güneş doğuşuna {remaining} kaldı",
+  "@homePrayerUrgentSemanticsLabel": {
+    "placeholders": {
+      "remaining": {}
+    }
+  },
+  "homePrayerNextSemanticsLabel": "Sıradaki namaz {nextName}, kalan {remaining}",
+  "@homePrayerNextSemanticsLabel": {
+    "placeholders": {
+      "nextName": {},
+      "remaining": {}
+    }
+  },
+  "homePrayerUrgentBadge": "Çıkıyor",
+  "homePrayerNextBadge": "Sıradaki",
+  "homePrayerTimesTitle": "Namaz Vakitleri",
+  "homePrayerNextRowHint": "Sıradaki vakit",
+  "homePrayerLoadFailedTitle": "Vakitler yüklenemedi",
+  "homePrayerLoadFailedBody": "İnternet, konum izni veya seçili ilçe nedeniyle vakitler alınamamış olabilir.",
+  "homeRetryAction": "Tekrar dene",
+  "homeChangeDistrictAction": "İlçe değiştir",
+  "homeOpenSettingsAction": "Ayarları aç",
+  "homeRemainingPassed": "geçti",
+  "homeRemainingFewSeconds": "birkaç saniye",
+  "homeRemainingHoursMinutes": "{hours} saat {minutes} dakika",
+  "@homeRemainingHoursMinutes": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      },
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "homeRemainingHoursOnly": "{hours} saat",
+  "@homeRemainingHoursOnly": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      }
+    }
+  },
+  "homeRemainingMinutesOnly": "{minutes} dakika",
+  "@homeRemainingMinutesOnly": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "homeLocationFreshNow": "Konum güncel",
+  "homeLocationFreshMinutesAgo": "{minutes} dk önce güncellendi",
+  "@homeLocationFreshMinutesAgo": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "homeLocationFreshHoursAgo": "{hours} sa önce güncellendi",
+  "@homeLocationFreshHoursAgo": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      }
+    }
+  },
+  "homeLocationFreshDaysAgo": "{days} gün önce güncellendi",
+  "@homeLocationFreshDaysAgo": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "homeDailyReminderTitle": "Bugünün hatırlatıcısı",
+  "homeNamazSetupTitle": "Namaz takibini kur",
+  "homeNamazSetupSubtitle": "Kurulum Gelişim sekmesinden yapılır; kurduktan sonra kartın burada otomatik görünür.",
+  "homeNamazTrackingTitle": "Namaz takibi",
+  "homeNamazTrackingProgressLine": "Bugün {done}/5 · Detaylar için dokun",
+  "@homeNamazTrackingProgressLine": {
+    "placeholders": {
+      "done": {}
+    }
+  },
+  "onboardingNotificationPermissionDenied": "Bildirim izni verilmedi. Ezan vakitleri için Ayarlar → Bildirimler'den açabilirsin.",
+  "onboardingGenderPromptWithName": "{name}, cinsiyetinizi öğrenebilir miyiz?",
+  "@onboardingGenderPromptWithName": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "onboardingNotificationSkippedWarning": "Bildirimler kapalı kaldı. Namaz vakitlerinde ezan hatırlatması gelmez — sonra Ayarlar → Bildirimler'den açabilirsin.",
+  "onboardingOpenNowAction": "Şimdi aç",
+  "commonPreview": "Önizle",
+  "commonClose": "Kapat",
+  "commonCancel": "İptal",
+  "commonDone": "Tamam",
+  "commonBack": "Geri",
+  "prayerNameImsak": "İmsak",
+  "prayerNameSunrise": "Güneş",
+  "prayerNameDhuhr": "Öğle",
+  "prayerNameAsr": "İkindi",
+  "prayerNameMaghrib": "Akşam",
+  "prayerNameIsha": "Yatsı",
+  "reminderOff": "Kapalı",
+  "reminderAtExactTime": "Tam vakitte",
+  "reminderMinutesBefore": "{minutes} dk önce",
+  "@reminderMinutesBefore": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "reminderCardSubtitle": "Her vakit ayrı · Süreleri düzenlemek için dokun",
+  "reminderFirstOff": "1. kapalı",
+  "reminderFirstValue": "1. {value}",
+  "@reminderFirstValue": {
+    "placeholders": {
+      "value": {}
+    }
+  },
+  "reminderPairSecondOff": "{first} · 2. kapalı",
+  "@reminderPairSecondOff": {
+    "placeholders": {
+      "first": {}
+    }
+  },
+  "reminderPairSecondValue": "{first} · 2. {second}",
+  "@reminderPairSecondValue": {
+    "placeholders": {
+      "first": {},
+      "second": {}
+    }
+  },
+  "reminderPermissionRequiredMessage": "Bildirim izni gerekli. Ayarlardan açabilirsin.",
+  "reminderPrayerNotificationTitle": "Vakit bildirimi",
+  "reminderCardDisabledHint": "Kapalı · Anahtarı aç, vakitleri ayarla",
+  "reminderLocalNotificationUnavailable": "Bu ortamda yerel bildirim yok.",
+  "reminderSectionTitle": "Hatırlatıcı",
+  "reminderTwoAlertsPerPrayer": "Vakit başına iki uyarı",
+  "reminderPerPrayerDifferentSounds": "Vakitlere göre ayrı sesler",
+  "reminderCurrentSound": "Şu an: {summary}",
+  "@reminderCurrentSound": {
+    "placeholders": {
+      "summary": {}
+    }
+  },
+  "reminderUsePhoneDefaultSubtitle": "Telefon ayarlarındaki bildirim sesi kullanılır.",
+  "reminderChooseArinSoundsTitle": "Arın seslerinden seç",
+  "reminderChooseArinSoundsSubtitle": "Ezan ve huzur tonlarını dinleyip uygula.",
+  "reminderPhoneSoundActiveAllPrayers": "Telefondan seçilen ses tüm vakitlerde aktif.",
+  "reminderApplyOwnSoundAllPrayers": "Kendi ses dosyanı tüm vakitlere uygula.",
+  "reminderSetPerPrayerDifferentSound": "Vakitlere göre ayrı ses ayarla",
+  "reminderAllPrayersSoundTitle": "Tüm vakitler için ses",
+  "reminderAllPrayersSoundSubtitle": "Tek seçim yap; tüm vakitlerde aynı ses çalsın.",
+  "reminderBackToSingleSoundSelection": "Tek ses seçimine dön",
+  "reminderPerPrayerSavedInstantly": "Vakit bazlı seçimler anında kaydedilir.",
+  "reminderEnableNotificationsAction": "Bildirimleri aç",
+  "reminderDurationsPerPrayerTitle": "Her vakit için süreler",
+  "reminderDurationsPerPrayerSubtitle": "Satıra dokun; 1. ve 2. uyarıyı ayrı seç.",
+  "reminderDualAlertTitle": "İki uyarı — {prayerTitle}",
+  "@reminderDualAlertTitle": {
+    "placeholders": {
+      "prayerTitle": {}
+    }
+  },
+  "reminderDualAlertSubtitle": "1. uyarı: Kapalı, tam vakit veya dakika önce. 2. uyarı: Kapalı veya dakika önce.",
+  "reminderFirstAlertTitle": "1. uyarı",
+  "reminderSecondAlertTitle": "2. uyarı",
+  "prayerSoundPickerTitle": "Bildirim sesi",
+  "prayerSoundQuickAllSubtitle": "Önce tek ses seç; istersen detaylı ayarda vakit bazında ayrılaştır.",
+  "prayerSoundApplyAllButton": "Seçtiğim sesi tüm vakitlere uygula",
+  "prayerSoundAdvancedToggle": "Detaylı ayar (vakit bazlı)",
+  "prayerSoundAppliedAllSuccess": "Seçilen ses tüm vakitlere uygulandı.",
+  "prayerSoundSystem": "Telefonun varsayılan sesi",
+  "prayerSoundAdhanTurkish": "Ezan — Türkçe işleme (10 sn, baştan)",
+  "prayerSoundAdhanDubai": "Ezan — Dubai / Ramadan (9 sn, baştan)",
+  "prayerSoundAmbientFlute": "Huzur — flute doku (6 sn, baştan)",
+  "prayerSoundAmbientPianoGuitar": "Huzur — piyano & gitar (7 sn, baştan)",
+  "prayerSoundAmbientEthereal": "Huzur — ethereal voices (10 sn, baştan)",
+  "prayerSoundPickFromPhone": "Telefondan ses seç",
+  "prayerSoundClearUserFile": "Kaldır",
+  "prayerSoundUserFromPhone": "Telefondan seçilen ses",
+  "prayerSoundUserFileActiveHint": "Bu vakit için şu an telefondan seçilen dosya kullanılıyor. Katalogdan bir ses seçersen dosya kalkar.",
+  "prayerSoundSubtitlePerPrayer": "Her vakit için ayrı ayrı: telefonun varsayılan sesi, katalogdan ton veya telefondan kendi dosyan. Uygula ile kaydet.",
+  "prayerSoundImportFailed": "Ses dosyası alınamadı. Başka bir dosya veya format dene (WAV, M4A…).",
+  "prayerSoundPreviewSystem": "Önizleme yok — cihazının varsayılan bildirim sesi kullanılır.",
+  "commonStart": "Başla",
+  "commonRestart": "Yeniden",
+  "willpowerHabitNotFound": "Alışkanlık bulunamadı",
+  "namazProgramHomeHintActive": "Namaz takibi aktif. Artık Anasayfa kartında da görünür.",
+  "namazProgramPageTitle": "İbadet",
+  "namazProgramVerseQuote": "“Şüphesiz kalpler, Allah’ı anmakla huzur bulur.”\n(Ra’d suresi, 13:28 — meal)",
+  "namazProgramBreathingBreak": "Nefes molası",
+  "namazProgramTodayPrayersTitle": "Bugünün namazları",
+  "namazProgramTodayProgress": "{done}/5 tamam",
+  "@namazProgramTodayProgress": {
+    "placeholders": {
+      "done": {
+        "type": "int"
+      }
+    }
+  },
+  "namazProgramPercentDone": "%{percent} tamamlandı",
+  "@namazProgramPercentDone": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "namazProgramSystemNotificationSettings": "Sistem bildirim ayarları",
+  "namazProgramRecentDaysTitle": "Son günler",
+  "namazProgramRecentDaysSubtitle": "Her kutu o gün kılınan vakit sayısı (ör. 3/5).",
+  "breathingPhaseInhale": "Nefes al",
+  "breathingPhaseHold": "Tut",
+  "breathingPhaseExhale": "Nefes ver",
+  "breathingCycleProgress": "Döngü {current}/{total}",
+  "@breathingCycleProgress": {
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "breathingFinishAction": "Bitir",
+  "breathingSecondsLabel": "{seconds} sn",
+  "@breathingSecondsLabel": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "breathingIntroTitle": "4-7-8 Nefes Terapisi",
+  "breathingIntroSubtitle": "Stres ve kaygıyı azaltan, yavaş tempolu nefes düzeni.",
+  "breathingIntroCycles": "{cycles} döngü",
+  "@breathingIntroCycles": {
+    "placeholders": {
+      "cycles": {
+        "type": "int"
+      }
+    }
+  },
+  "breathingIntroApproxMinutes": "~2 dk",
+  "breathingPhaseHintInhale": "saniye al",
+  "breathingPhaseHintHold": "saniye tut",
+  "breathingPhaseHintExhale": "saniye ver",
+  "breathingSessionCompleteTitle": "Bu seans tamam",
+  "breathingSessionCompleteSubtitle": "{cycles} döngü tamamlandı. İstersen bir tur daha yapabilir veya çıkabilirsin.",
+  "@breathingSessionCompleteSubtitle": {
+    "placeholders": {
+      "cycles": {
+        "type": "int"
+      }
+    }
+  },
+  "breathingBottomHint": "Tutarken kalp ritmi yavaşlar; rahat bir tempoda devam et. Baş dönmesi olursa dur.",
+  "quitProgramNotFound": "Program bulunamadı",
+  "quitOnboardingCommitmentMinLengthError": "Lütfen kendine bir söz yaz (en az 8 karakter).",
+  "quitOnboardingQuickStartTitle": "Sayacı şimdi başlat",
+  "quitOnboardingQuickStartBody": "Sayacın bu andan itibaren çalışmaya başlar. Ahdini dilediğin zaman programdan tamamlayabilirsin.",
+  "quitOnboardingAbortAction": "Vazgeç",
+  "quitOnboardingExitDraftTitle": "Hazırlıktan çıkılsın mı?",
+  "quitOnboardingExitDraftBody": "Bu hazırlık turundaki ilerlemen kaydedilmez. İstersen daha sonra yeniden başlayabilirsin.",
+  "quitOnboardingStayAction": "Kal",
+  "quitOnboardingExitAction": "Çık",
+  "quitOnboardingContentLoadFailed": "Hazırlık içeriği yüklenemedi. Lütfen tekrar deneyin.",
+  "quitOnboardingAppBarTitle": "Hazırlık",
+  "quitOnboardingSealTitlePrefix": "Sözünü mühürle",
+  "quitOnboardingSealHoldHint": "Parmağını basılı tut",
+  "quitOnboardingContinueAction": "Devam",
+  "quitOnboardingQuickStartInlineAction": "Sayacı hemen başlat, programı sonra tamamla",
+  "quitOnboardingCommitmentTitle": "Kendine sözün",
+  "quitOnboardingCommitmentSubtitle": "Kısa ve net yaz; mühürlemeden önce düzenleyebilirsin.",
+  "quitOnboardingCommitmentHint": "Bugünden itibaren…",
+  "quitOnboardingExamplesSectionTitle": "Örnek cümleler",
+  "quitProgramRestartTitle": "Yeniden başla",
+  "quitProgramRestartPrompt": "Sayaç sıfırlanacak. Geçmişin ne olsun?",
+  "quitProgramRestartKeepHistoryTitle": "Geçmişi sakla",
+  "quitProgramRestartKeepHistorySubtitle": "Sayaç sıfırdan başlar; önceki denemen, günlük işaretlerin ve istatistiklerin korunur.",
+  "quitProgramRestartWipeTitle": "Sıfırdan başla",
+  "quitProgramRestartWipeSubtitle": "Tüm geçmiş günlük işaretler de silinir. Geri alınamaz.",
+  "quitProgramElapsedHms": "{hours} sa {minutes} dk {seconds} sn",
+  "@quitProgramElapsedHms": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      },
+      "minutes": {
+        "type": "int"
+      },
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "quitProgramElapsedMs": "{minutes} dk {seconds} sn",
+  "@quitProgramElapsedMs": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      },
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "quitProgramElapsedS": "{seconds} sn",
+  "@quitProgramElapsedS": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "quitProgramTabProgress": "İlerleme",
+  "quitProgramTabTips": "İpuçları",
+  "quitProgramTipsLoadFailed": "İçerik yüklenemedi",
+  "quitProgramTipsWatermark": "هِدَايَة",
+  "quitProgramTipsHeroTitle": "Hidayet",
+  "quitProgramTipsHeroSubtitle": "Şuur, sabır ve pratik öneriler — yolunu yumuşatmak için.",
+  "quitProgramDaysUpper": "GÜN",
+  "quitProgramStartNowAction": "Bu andan bıraktım",
+  "quitProgramStatFullDays": "Tam gün",
+  "quitProgramDash": "—",
+  "quitProgramStatTimer": "Sayaç",
+  "quitProgramElapsedSinceQuitDays": "Geçen süre: {days} gün (bırakma anından)",
+  "@quitProgramElapsedSinceQuitDays": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "quitProgramTasksTitle": "Görevler",
+  "quitProgramTasksSubtitle": "Gün eşiklerini tamamladıkça ilerlersin.",
+  "quitProgramUiCounterSubtitleGeneric": "temiz kalış",
+  "quitProgramUiMetricsSectionTitleGeneric": "İlerleme göstergeleri",
+  "quitProgramUiDisclaimerGeneric": "Motivasyon amaçlı göstergelerdir.",
+  "quitProgramUiEncouragementGeneric": "Her temiz gün değerlidir; sabit ve küçük adımlar büyük dönüşümler getirir.",
+  "quitProgramUiClockHintGeneric": "Tıkladığında süre ve göstergeler bu ana göre ilerler.",
+  "quitProgramMotivationStageStart": "İlk günün en değerli adımı: başlamak.",
+  "quitProgramMotivationStageWeek": "İlk hafta sabır; küçük adımlar büyük değişim getirir.",
+  "quitProgramMotivationStageMonth": "Bir aya yaklaşırken sabırla devam.",
+  "quitProgramMotivationStageQuarter": "Üç aylık süreçte sabır meyvesini gösterir.",
+  "quitProgramMotivationStageLong": "Uzun solukta her temiz gün değerlidir.",
+  "quitMetricSmokingLung": "Ciğer / solunum",
+  "quitMetricSmokingHeart": "Kalp-damar",
+  "quitMetricSmokingTeethMouth": "Diş ve ağız",
+  "quitMetricSmokingSmellTaste": "Koku ve tat",
+  "quitMetricScreenFocusDepth": "Odak ve derinlik",
+  "quitMetricScreenSleepRhythm": "Uyku düzeni",
+  "quitMetricScreenAwareness": "Ekran farkındalığı",
+  "quitMetricScreenInnerCalm": "İç huzur",
+  "quitMetricAlcoholLiverRecovery": "Karaciğer toparlanması",
+  "quitMetricAlcoholSleepStability": "Uyku istikrarı",
+  "quitMetricAlcoholMoodBalance": "Ruh hali dengesi",
+  "quitMetricAlcoholClarity": "Zihin berraklığı",
+  "quitMetricSubstanceBodyBalance": "Beden dengesi",
+  "quitMetricSubstanceSleepRhythm": "Uyku ritmi",
+  "quitMetricSubstanceUrgeControl": "İstek yönetimi",
+  "quitMetricSubstanceSupportTracking": "Destek ve takip",
+  "quitMetricZinaDiscipline": "Nefis disiplini",
+  "quitMetricZinaBoundaryStrength": "Sınır gücü",
+  "quitMetricZinaHeartCalm": "Kalp sükûnu",
+  "quitMetricZinaTawbaDirection": "Tövbe istikameti",
+  "quitMilestone1Title": "İlk nefes",
+  "quitMilestone1Subtitle": "Bir gün temiz",
+  "quitMilestone2Title": "İlk seri",
+  "quitMilestone2Subtitle": "48 saat",
+  "quitMilestone3Title": "Üç gün",
+  "quitMilestone3Subtitle": "İstek zirvesi geçiyor",
+  "quitMilestone5Title": "Beş gün",
+  "quitMilestone5Subtitle": "Rutin kırılıyor",
+  "quitMilestone7Title": "Bir hafta",
+  "quitMilestone7Subtitle": "İlk hafta tamam",
+  "quitMilestone10Title": "On gün",
+  "quitMilestone10Subtitle": "İrade güçleniyor",
+  "quitMilestone14Title": "İki hafta",
+  "quitMilestone14Subtitle": "Algı toparlanıyor",
+  "quitMilestone21Title": "Üç hafta",
+  "quitMilestone21Subtitle": "Alışkanlık döngüsü",
+  "quitMilestone30Title": "Bir ay",
+  "quitMilestone30Subtitle": "Önemli eşik",
+  "quitMilestone45Title": "Kırk beş gün",
+  "quitMilestone45Subtitle": "Düzen oturuyor",
+  "quitMilestone60Title": "İki ay",
+  "quitMilestone60Subtitle": "Beden adapte",
+  "quitMilestone66Title": "Alışkanlık ustası",
+  "quitMilestone66Subtitle": "66 gün çizgisi",
+  "quitMilestone90Title": "Üç ay",
+  "quitMilestone90Subtitle": "Sağlıkta belirgin dönem",
+  "quitMilestone120Title": "Dört ay",
+  "quitMilestone120Subtitle": "Kararlılık nişanı",
+  "quitMilestone180Title": "Altı ay",
+  "quitMilestone180Subtitle": "Yarım yıl",
+  "quitMilestone270Title": "Dokuz ay",
+  "quitMilestone270Subtitle": "Uzun soluk",
+  "quitMilestone365Title": "Bir yıl",
+  "quitMilestone365Subtitle": "Büyük müjde",
+  "quitMilestone500Title": "Beş yüz gün",
+  "quitMilestone500Subtitle": "Azim tacı",
+  "quitMilestone730Title": "İki yıl",
+  "quitMilestone730Subtitle": "Kökten değişim",
+  "quitMilestone1000Title": "Bin gün",
+  "quitMilestone1000Subtitle": "Eşsiz seviye",
+  "quitMilestoneInspiration365": "\"Sabredenlere mükâfatları hesapsız verilir.\" (Zümer, 10)",
+  "quitMilestoneInspiration90": "\"Allah ile beraber olan, asla yalnız kalmaz.\"",
+  "quitMilestoneInspiration30": "\"Azmettin mi, artık Allah'a tevekkül et.\" (Âl-i İmrân, 159)",
+  "quitMilestoneInspiration7": "\"Zorlukla beraber bir kolaylık vardır.\" (İnşirâh, 6)",
+  "quitMilestoneInspiration1": "\"Muhakkak her güçlüğün yanında bir kolaylık vardır.\" (İnşirâh, 5)",
+  "quitMilestoneElapsedSummary": "{days} gündür temiz — {subtitle}",
+  "@quitMilestoneElapsedSummary": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      },
+      "subtitle": {}
+    }
+  },
+  "quitMilestoneContinueAction": "Devam et",
+  "quitProgramCompleteCommitmentTitle": "Ahdini tamamla",
+  "quitProgramCompleteCommitmentSubtitle": "Sayaç çalışıyor — programını kendine yazdığın sözle mühürle.",
+  "willpowerHubBreathingExerciseTitle": "Nefes egzersizi",
+  "willpowerHubBreathingExerciseSubtitle": "Yavaş nefes; stres anında bedenini yumuşatır.",
+  "willpowerHubArchiveHabitDialogTitle": "Alışkanlığı kalıcı sil",
+  "willpowerHubArchiveHabitDialogBody": "Bu kayıt ve ilişkili ilerleme verileri kalıcı olarak silinir. Geri alınamaz.",
+  "willpowerHubArchiveAction": "Kalıcı sil",
+  "willpowerHubHeaderTitle": "Gelişim & Arınma",
+  "willpowerHubNoActiveHabits": "Henüz aktif alışkanlık yok",
+  "willpowerHubActiveHabits": "{count} aktif alışkanlık",
+  "@willpowerHubActiveHabits": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "willpowerHubHabitCalendarTooltip": "Alışkanlık takvimi",
+  "willpowerHubTabBuild": "Gelişim",
+  "willpowerHubTabQuit": "Arınma",
+  "willpowerHubQuitCtaEarly": "Her temiz dakika kalbine ve ciğerlerine oksijen olarak döner.",
+  "willpowerHubQuitCtaOngoing": "İlk günler zor; bedenin zaten iyileşmeye başladı.",
+  "willpowerHubBuildCtaEarly": "Küçük adımlarla başlamak yeterli.",
+  "willpowerHubBuildCtaOngoing": "Düzenin sana iyi gidiyor; devam.",
+  "willpowerHubSummaryQuitLabel": "ARINMA",
+  "willpowerHubSummaryTodayLabel": "BUGÜN",
+  "willpowerHubSummaryCounterProgress": "sayaç ilerlemesi",
+  "willpowerHubSummaryCompleted": "tamamlandı",
+  "willpowerHubInsightTagSpiritual": "MANEVİ",
+  "willpowerHubInsightTagHealth": "SAĞLIK",
+  "willpowerHubAddFirstBuild": "İlk gelişimini ekle",
+  "willpowerHubAddFirstQuit": "İlk arınmanı ekle",
+  "willpowerHubBuildEmptyTitle": "Gelişim alanın henüz boş",
+  "willpowerHubBuildEmptySubtitle": "Hayır katan bir alışkanlığı sürdürmek, manevi gelişimin en sade yoludur.",
+  "willpowerHubKazaLabelSabah": "Sab",
+  "willpowerHubKazaLabelOgle": "Öğl",
+  "willpowerHubKazaLabelIkindi": "İkn",
+  "willpowerHubKazaLabelAksam": "Akş",
+  "willpowerHubKazaLabelYatsi": "Yat",
+  "willpowerHubKazaLabelVitir": "Vit",
+  "willpowerHubKazaTrackingTitle": "Kaza takibi",
+  "willpowerHubKazaRemainingLabel": "kalan",
+  "willpowerHubRemoveCardTooltip": "Kartı kaldır",
+  "willpowerHubHideKazaDialogTitle": "Kaza kartını kaldır?",
+  "willpowerHubHideKazaDialogBody": "Bu kart Gelişim ekranından gizlenir. Hesap ve sayaç verilerin cihazda kalır; Rutin atölyesinden tekrar ekleyebilirsin.",
+  "willpowerHubRemoveAction": "Kaldır",
+  "willpowerHubQuitEmptyTitle": "Arınma alanın henüz boş",
+  "willpowerHubQuitEmptySubtitle": "Zararlı bir alışkanlıktan vazgeçmek, nefsini terbiye etmenin güçlü bir yoludur.",
+  "willpowerHubPeriodPrefixWeek": "Bu hafta ",
+  "willpowerHubPeriodPrefixMonth": "Bu ay ",
+  "willpowerHubPercentTargetReached": "{prefix}Hedef yüzdesine ulaştın.",
+  "@willpowerHubPercentTargetReached": {
+    "placeholders": {
+      "prefix": {}
+    }
+  },
+  "willpowerHubPercentProgressStatus": "{prefix}%{progress} tamamlandı, %{left} kaldı.",
+  "@willpowerHubPercentProgressStatus": {
+    "placeholders": {
+      "prefix": {},
+      "progress": {
+        "type": "int"
+      },
+      "left": {
+        "type": "int"
+      }
+    }
+  },
+  "willpowerHubTargetPending": "{prefix}Hedef bekleniyor.",
+  "@willpowerHubTargetPending": {
+    "placeholders": {
+      "prefix": {}
+    }
+  },
+  "willpowerHubUnitTargetAddPrompt": "{prefix}{target} {unit} hedef — eklemek için karta dokun.",
+  "@willpowerHubUnitTargetAddPrompt": {
+    "placeholders": {
+      "prefix": {},
+      "target": {
+        "type": "int"
+      },
+      "unit": {}
+    }
+  },
+  "willpowerHubUnitProgressTargetFilled": "{prefix}{progress} {unit} tamam; hedef doldu.",
+  "@willpowerHubUnitProgressTargetFilled": {
+    "placeholders": {
+      "prefix": {},
+      "progress": {
+        "type": "int"
+      },
+      "unit": {}
+    }
+  },
+  "willpowerHubUnitProgressRemaining": "{prefix}{progress} {unit} tamamladın, {left} {unit} kaldı.",
+  "@willpowerHubUnitProgressRemaining": {
+    "placeholders": {
+      "prefix": {},
+      "progress": {
+        "type": "int"
+      },
+      "unit": {},
+      "left": {
+        "type": "int"
+      }
+    }
+  },
+  "willpowerHubUnitTargetDoneSuper": "{prefix}{target} {unit} tamam — süper.",
+  "@willpowerHubUnitTargetDoneSuper": {
+    "placeholders": {
+      "prefix": {},
+      "target": {
+        "type": "int"
+      },
+      "unit": {}
+    }
+  },
+  "willpowerHubUnitProgressDidRemaining": "{prefix}{progress} {unit} yaptın, {left} {unit} kaldı.",
+  "@willpowerHubUnitProgressDidRemaining": {
+    "placeholders": {
+      "prefix": {},
+      "progress": {
+        "type": "int"
+      },
+      "unit": {},
+      "left": {
+        "type": "int"
+      }
+    }
+  },
+  "willpowerHubAddEditHint": "Ekleme ve düzenleme için karta dokun",
+  "willpowerHubQuitStatusSetupMissing": "Hazırlık eksik",
+  "willpowerHubQuitStatusClockRunning": "Sayaç açık",
+  "willpowerHubQuitStatusProgramReady": "Program hazır",
+  "willpowerHubTapCardForDetails": "Detaylar için karta dokun",
+  "willpowerHubCompleteSetup": "Kurulumu tamamla",
+  "willpowerHubStartClockHint": "Programda “Bu andan bıraktım” ile sayacı başlat",
+  "willpowerHubStreakSeriesLabel": "seri",
+  "willpowerHubStreakDaySeriesLabel": "gün serisi",
+  "qiblaHubCompassTitle": "Kıble yönünü bul",
+  "qiblaHubCompassSubtitle": "Pusula ve konum ile Kâbe yönünü göster",
+  "qiblaHubOpenAction": "Aç",
+  "qiblaHubZikirTitle": "Zikirmatik",
+  "qiblaHubZikirFeatureSubtitle": "Dijital sayaç; zikir bilgisi, tur geçmişi ve hedef (33/99)",
+  "qiblaHubBreathingTitle": "Nefes Egzersizi",
+  "qiblaHubBreathingSubtitle": "4-7-8 nefes döngüsü ile sakinleş, odağını toparla",
+  "qiblaHubHealingTitle": "İyileştirici Frekanslar",
+  "qiblaHubHealingSubtitle": "Terapi tonları, ambiyans ve uyku zamanlayıcısı ile sakin bir oturum",
+  "generalLoading": "Yükleniyor...",
+  "settingsPrivacyPageTitle": "Gizlilik Politikası",
+  "settingsPrivacyLastUpdated": "Son güncelleme: 26.04.2026",
+  "settingsPrivacyIntro": "Arin gizliliğinize saygı duyar. Bu metin, hangi verilerin işlendiğini, neden işlendiğini ve bu süreçleri nasıl yönetebileceğinizi açıklar.",
+  "settingsPrivacyDataCollectedTitle": "İşlenen veriler",
+  "settingsPrivacyDataCollectedBody": "Kullanımınıza ve verdiğiniz izinlere bağlı olarak Arin; namaz vakti ve kıble özellikleri için konum verisi, bildirim tercihleri, giriş yaptığınızda hesap bilgileri ve uygulama tanılama verilerini işleyebilir.",
+  "settingsPrivacyUsageTitle": "Verileri neden işliyoruz",
+  "settingsPrivacyUsageBody": "Veriler; namaz vakitlerini hesaplamak, kıble yönünü göstermek, hatırlatıcıları planlamak, ayarlarınızı korumak ve uygulama kararlılığını iyileştirmek amacıyla işlenir.",
+  "settingsPrivacyStorageTitle": "Saklama ve süre",
+  "settingsPrivacyStorageBody": "Alışkanlık, zikir ve tercih verilerinin büyük kısmı cihazınızda tutulur. Hesapla giriş yaparsanız seçili veriler Firebase servisleriyle eşitlenebilir. Veriler, uygulama içinden silene veya hesabınızı kaldırana kadar saklanır.",
+  "settingsPrivacyThirdPartyTitle": "Üçüncü taraf servisler",
+  "settingsPrivacyThirdPartyBody": "Arin; oturum açma, veri eşitleme, kullanım analizi ve çökme tanılama için Firebase Authentication, Cloud Firestore, Firebase Analytics ve Firebase Crashlytics kullanır.",
+  "settingsPrivacyControlsTitle": "Kullanıcı kontrolü",
+  "settingsPrivacyControlsBody": "Konum ve bildirim izinlerini cihaz ayarlarından kapatabilir, Ayarlar ekranından çıkış yapabilir veya hesabınızı ve yerel verilerinizi silebilirsiniz.",
+  "settingsPrivacyChildrenTitle": "Çocukların gizliliği",
+  "settingsPrivacyChildrenBody": "Arin, 13 yaş altı çocuklara yönelik olarak tasarlanmamıştır.",
+  "settingsPrivacyContactTitle": "İletişim",
+  "settingsPrivacyContactBody": "Gizlilik ile ilgili sorularınız için: arinapphelp@gmail.com",
+  "notificationsHubTitle": "Bildirimler",
+  "notificationsHubHeadline": "Hatırlatıcı merkezi",
+  "notificationsHubSubhead": "Namaz, arınma ve zikir — hepsi tek yerden.",
+  "notificationsPermissionGranted": "İzin verildi",
+  "notificationsPermissionDenied": "İzin kapalı",
+  "notificationsPermissionLimited": "Kısıtlı",
+  "notificationsOpenOsSettings": "Sistem bildirim ayarları",
+  "notificationsGateNotification": "Bildirim",
+  "notificationsGateExactAlarm": "Tam zamanlayıcı",
+  "notificationsGateBattery": "Pil muafiyeti",
+  "notificationsGateAllGood": "Hatırlatıcılar zamanında tetiklenir.",
+  "notificationsGateMissing": "Bir veya daha fazla izin eksik — zamanlanan bildirimler gecikebilir ya da hiç gelmeyebilir.",
+  "notificationsGateRequestExact": "Tam zamanlayıcı iznini aç",
+  "notificationsGateRequestBattery": "Pil optimizasyonunu muaf tut",
+  "notificationsDiagnosticsQueuedLabel": "Kuyruğa alınan zamanlı hatırlatıcı",
+  "notificationsSectionGeneral": "Genel",
+  "notificationsSectionPrayer": "Namaz vakitleri",
+  "notificationsSectionArinma": "Arınma ve alışkanlıklar",
+  "notificationsPrayerRowTitle": "Vakit ve ses",
+  "notificationsPrayerOnSubtitle": "Vakit bildirimleri açık — dokunup düzenle",
+  "notificationsPrayerOffSubtitle": "Vakit bildirimleri kapalı — dokunup açabilirsin",
+  "notificationsPrayerDetailTitle": "Namaz bildirimleri",
+  "notificationsPrayerDetailSubtitle": "Her vakit için ayrı süre ve ses; ana anahtar aşağıda.",
+  "notificationsArinmaDailyTitle": "Günlük hatırlatıcı",
+  "notificationsArinmaDailySubtitle": "Gün içinde 2 defa rastgele bir söz ya da kısa motivasyon.",
+  "notificationsMilestoneTitle": "Milestone bildirimleri",
+  "notificationsMilestoneSubtitle": "Örn. bırakma yolculuğunda 24 saat, 1 hafta gibi seyrek mesajlar.",
+  "notificationsTaskTitle": "Görev hatırlatıcısı",
+  "notificationsTaskSubtitle": "Tamamlanmamış görev için günde en fazla bir uyarı.",
+  "notificationsZikirTitle": "Zikir hatırlatıcısı",
+  "notificationsZikirSubtitle": "Seçtiğin saatte, son zikirindeki metinle kısa bir hatırlatma.",
+  "notificationsZikirTimeLabel": "Zikir saati",
+  "notificationsZikirTimePickerTitle": "Zikir saati",
+  "notificationsZikirTimePickerSubtitle": "Her gün bu saatte son zikir metninle hatırlatma.",
+  "notificationsHealthDisclaimer": "Sağlık ve arınma ile ilgili metinler genel bilgilendirme amaçlıdır; tedavi yerine geçmez. Rahatsızlığınız varsa doktorunuza danışın.",
+  "notificationsNextReminderToday": "bugün",
+  "notificationsNextReminderTomorrow": "yarın",
+  "notificationsNextReminderUnderMinute": "< 1 dk",
+  "notificationsNextReminderMinutes": "{minutes} dk",
+  "@notificationsNextReminderMinutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "notificationsNextReminderHoursOnly": "{hours} sa",
+  "@notificationsNextReminderHoursOnly": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      }
+    }
+  },
+  "notificationsNextReminderHoursMinutes": "{hours} sa {minutes} dk",
+  "@notificationsNextReminderHoursMinutes": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      },
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "notificationsNextReminderLine": "Bir sonraki hatırlatıcı: {dayLabel} {clock} · {gap} sonra",
+  "@notificationsNextReminderLine": {
+    "placeholders": {
+      "dayLabel": {},
+      "clock": {},
+      "gap": {}
+    }
+  },
+  "aboutArinHeadline": "Yolun yanında",
+  "aboutArinSubhead": "Namazına, düzenine ve gününe yumuşak hatırlatmalar sunan küçük bir arkadaş",
+  "aboutArinParagraph1": "ARIN; namazını vaktinde tutmana, sana iyi gelen alışkanlıkları sürdürüp zorlayan huyları yavaşça geride bırakmana yardımcı olmak için var. Amacımız baskı kurmak değil; yoğun günlerde kaybolan küçük hatırlatmalarla yanında, sakin bir köşede durmak.",
+  "aboutArinParagraph2": "Bazen yol uzun, bazen gün çok dolu olur. Bu yüzden sade bir düzen ve net hatırlatmalar sunuyoruz. Eksik veya yanlış hissettiren her noktayı duymak isteriz; birlikte düzeltmeye ve geliştirmeye açığız.",
+  "aboutArinParagraph3": "Küçük adımlar, uzun vadede en çok işe yarayanlardır. ARIN’i acele ettirmeyen, yolunu yalnız bırakmayan huzurlu bir eşlik gibi düşünmeni dileriz; günün sana sakin ve hafif geçsin.",
+  "aboutArinClosingWish": "Hayırlı kullanımlar dileriz",
+  "languageChangedMessage": "Dil değiştirildi: {languageName}",
+  "@languageChangedMessage": {
+    "placeholders": {
+      "languageName": {}
+    }
+  },
+  "adminIdentityBadge": "ADMIN",
+  "adminPoolsHint": "Havuz seç, düzenle ve kaydet. İleri düzey işlemler altta toplanır.",
+  "adminPoolsDropdownLabel": "Havuz ({count} öğe)",
+  "@adminPoolsDropdownLabel": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "adminAdvancedActionsTitle": "Gelişmiş işlemler",
+  "adminBackupCurrentPoolJson": "Bu havuzu yedekle (JSON)",
+  "adminRestoreFromBackup": "Yedekten geri yükle",
+  "adminWritingInProgress": "Yazılıyor…",
+  "adminResetCompletely": "Tamamen sıfırla",
+  "adminVersionLabel": "Sürüm: v{version}",
+  "@adminVersionLabel": {
+    "placeholders": {
+      "version": {}
+    }
+  },
+  "adminSearchInPoolHint": "Havuz içinde ara ({count} kayıt)",
+  "@adminSearchInPoolHint": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "adminAddAction": "Ekle",
+  "adminAddMissingRecords": "Eksik kayıtları ekle",
+  "adminPoolLabelHomeNamazWisdom": "Ana sayfa namaz kartı",
+  "adminPoolLabelPersonalizedQuotes": "Kişiselleştirilmiş sözler",
+  "adminPoolLabelWidgetQuote": "Widget / ana ekran sözü",
+  "adminPoolLabelZikirDailyReflections": "Namaz vakit kartı (zikir yansıması)",
+  "adminPoolLabelHealingComfort": "İyileşme / teselli sözleri",
+  "adminPoolLabelHubGelisimIslamic": "Gelişim — İslami kart",
+  "adminPoolLabelHubGelisimMedical": "Gelişim — sağlık kartı",
+  "adminPoolLabelHubArinmaIslamic": "Arınma — İslami kart",
+  "adminPoolLabelHubArinmaMedical": "Arınma — sağlık kartı",
+  "adminPoolLabelNotificationArinmaBodies": "Arınma bildirimi metinleri",
+  "adminSearchResultsCount": "{count} sonuç",
+  "@adminSearchResultsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "adminPoolEmptyHint": "Bu havuz boş — öğe ekleyebilirsin.",
+  "adminSearchNoResults": "Aramana uyan sonuç yok.",
+  "adminTapToEdit": "Düzenlemek için dokun",
+  "adminEditTooltip": "Düzenle",
+  "adminInspireHint": "Kart ekle, metni doldur, sonra kaydet. Arka plan görselleri: {count} adet.",
+  "@adminInspireHint": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "adminInspireAddNewCard": "Yeni kart ekle",
+  "adminRefreshFromFirestore": "Firestore’dan yenile",
+  "adminInspireVersionCards": "Sürüm: v{version} · {count} kart",
+  "@adminInspireVersionCards": {
+    "placeholders": {
+      "version": {},
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "adminInspireNoCardsYet": "Henüz Keşfet kartı yok",
+  "adminInspireAddFirstCard": "İlk kartı ekle",
+  "adminInspireCardLabel": "Kart {index}",
+  "@adminInspireCardLabel": {
+    "placeholders": {
+      "index": {
+        "type": "int"
+      }
+    }
+  },
+  "adminInspireEmptyTextBadge": "Boş metin",
+  "adminInspireDuplicateTooltip": "Kopyala",
+  "adminInspireShuffleDesignTooltip": "Tasarımı yeniden karıştır",
+  "adminInspireEmptyTextPreview": "(boş metin — #{index})",
+  "@adminInspireEmptyTextPreview": {
+    "placeholders": {
+      "index": {
+        "type": "int"
+      }
+    }
+  },
+  "adminInspireImageNumberLabel": "Görsel #{index}",
+  "@adminInspireImageNumberLabel": {
+    "placeholders": {
+      "index": {}
+    }
+  },
+  "adminInspireContentKindLabel": "İçerik türü",
+  "adminInspireContentKindQuote": "Özlü söz",
+  "adminInspireContentKindVerse": "Âyet",
+  "adminInspireContentKindHadith": "Hadis",
+  "adminInspireShowInMainFeedTitle": "Ana akışta göster (Karma)",
+  "adminInspireShowInMainFeedSubtitle": "İşaretli değilse yalnızca Ayet veya Hadis filtresinden görünür.",
+  "adminInspireTurkishTextLabel": "Türkçe metin *",
+  "adminOptionalArabicLabel": "Arapça (isteğe bağlı)",
+  "adminOptionalSourceLabel": "Kaynak (isteğe bağlı)",
+  "adminOptionalVerseRefLabel": "Âyet / sure (isteğe bağlı)",
+  "adminInspireSaveAllChanges": "Tüm kart değişikliklerini kaydet",
+  "adminDiagnosticsHint": "Otomatik bildirim tanısı. Buradaki loglar planlama denemelerini kaydeder.",
+  "adminDiagnosticsStatusSummaryTitle": "Durum özeti",
+  "adminDiagnosticsEnabled": "açık",
+  "adminDiagnosticsDisabled": "kapalı",
+  "adminDiagnosticsPrayerStatus": "Namaz: {status}",
+  "@adminDiagnosticsPrayerStatus": {
+    "placeholders": {
+      "status": {}
+    }
+  },
+  "adminDiagnosticsDailyStatus": "Günlük: {status}",
+  "@adminDiagnosticsDailyStatus": {
+    "placeholders": {
+      "status": {}
+    }
+  },
+  "adminDiagnosticsMilestoneStatus": "Eşik: {status}",
+  "@adminDiagnosticsMilestoneStatus": {
+    "placeholders": {
+      "status": {}
+    }
+  },
+  "adminDiagnosticsTaskStatus": "Görev: {status}",
+  "@adminDiagnosticsTaskStatus": {
+    "placeholders": {
+      "status": {}
+    }
+  },
+  "adminDiagnosticsZikirStatus": "Zikir: {status}",
+  "@adminDiagnosticsZikirStatus": {
+    "placeholders": {
+      "status": {}
+    }
+  },
+  "adminDiagnosticsPendingQueue": "Bekleyen kuyruk: {count}",
+  "@adminDiagnosticsPendingQueue": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "adminRefreshAction": "Yenile",
+  "adminDiagnosticsExportLog": "Log dışa aktar",
+  "adminDiagnosticsClearLog": "Log temizle",
+  "adminDiagnosticsRecentEvents": "Son olaylar ({count})",
+  "@adminDiagnosticsRecentEvents": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "adminDiagnosticsNoLogsHint": "Henüz log yok. Uygulamayı yeniden açıp bir süre kullan, sonra yenile.",
+  "adminDiagnosticsOutcomeOk": "başarılı",
+  "adminDiagnosticsOutcomeError": "hata",
+  "adminDiagnosticsOutcomeCooldownSkip": "atlandı (bekleme süresi)",
+  "adminDiagnosticsOutcomePendingGuardSkip": "atlandı (bekleyen koruması)",
+  "adminDiagnosticsOutcomeDisabled": "devre dışı",
+  "adminDiagnosticsOutcomeInvalidPayloadSkip": "atlandı (geçersiz yük)",
+  "adminDiagnosticsOutcomeUnknown": "bilinmiyor ({outcome})",
+  "@adminDiagnosticsOutcomeUnknown": {"placeholders": {"outcome": {}}},
+  "adminDevOffsetSavedAndRescheduled": "Kaydırma kaydedildi; bildirimler yenilendi.",
+  "adminDevOffsetReset": "Kaydırma sıfırlandı.",
+  "adminDevOffsetDisabled": "Kapalı (API saatleri)",
+  "adminDevOffsetForwardMinutes": "Öne: {minutes} dk",
+  "@adminDevOffsetForwardMinutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "adminDevOffsetBackwardMinutes": "Geriye: {minutes} dk",
+  "@adminDevOffsetBackwardMinutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "adminDevPrayerOffsetTitle": "Vakit kaydırma (yalnızca bu cihazda)",
+  "adminDevPrayerOffsetSubtitle": "Negatif = tüm vakitleri öne çeker (bildirim planı da buna göre). API / sunucu değişmez.",
+  "adminDevResetAction": "Sıfırla",
+  "adminDevSaveAndRescheduleAction": "Kaydet ve yeniden planla",
+  "adminDevNotificationTestsTitle": "Bildirim testleri",
+  "adminDevNotificationTestsSubtitle": "Mevcut kanal ve ses yollarını anında denemek için.",
+  "adminDevPrayerNotificationSent": "Namaz bildirimi gönderildi.",
+  "adminDevPrayerNotificationNowAction": "Namaz bildirimi (şimdi)",
+  "adminDevAppNotificationSent": "Uygulama bildirimi gönderildi.",
+  "adminDevAppNotificationNowAction": "Arınma / uygulama bildirimi (şimdi)",
+  "adminDevCrashlyticsTestTitle": "Çökme raporu testi (Crashlytics)",
+  "adminDevCrashlyticsDebugHint": "Debug build: toplama KAPALI. Test etmek için release APK kur.",
+  "adminDevCrashlyticsReleaseHint": "Aşağıdaki butonlar Firebase Console → Crashlytics’e gerçek bir hata gönderir. Raporun göründüğünü doğruladıktan sonra kaldırabilirsin.",
+  "adminFirebaseNotReady": "Firebase hazır değil.",
+  "adminDevCrashlyticsNonFatalSent": "Non-fatal kayıt gönderildi. Console’da birkaç dakika içinde görünür.",
+  "adminErrorWithReason": "Hata: {reason}",
+  "@adminErrorWithReason": {
+    "placeholders": {
+      "reason": {}
+    }
+  },
+  "adminDevSendNonFatalTestAction": "Test: non-fatal hata gönder",
+  "adminDevCrashNowFatalAction": "Test: uygulamayı ŞİMDİ çöktür (fatal)",
+  "adminDevCrashDialogTitle": "Uygulamayı çöktür?",
+  "adminDevCrashDialogBody": "Uygulama birkaç saniye içinde kapanacak. Telefonda tekrar açtığında rapor Firebase’e yüklenir (birkaç dakika sonra Console’da görünür).\n\nSadece Crashlytics testini doğrulamak için kullan.",
+  "adminDevCrashAction": "Çöktür",
+  "adminDiagnosticsTitle": "Tanılama",
+  "adminDevPlatformLabel": "Platform",
+  "adminDevBuildLabel": "Build",
+  "adminDevBuildModeRelease": "release",
+  "adminDevBuildModeProfile": "profile",
+  "adminDevBuildModeDebug": "debug",
+  "adminDevPlatformWeb": "web",
+  "adminDevPlatformUnknown": "bilinmiyor",
+  "adminDevUidLabel": "UID",
+  "adminDevPendingNotificationLabel": "Bekleyen bildirim",
+  "adminDevTapToRefresh": "yenilemek için dokun",
+  "adminDiagnosticsError": "hata",
+  "adminPoolDataUnavailable": "Havuz verisi şu anda alınamıyor.",
+  "adminPoolChangeAction": "Havuz değişikliği",
+  "adminReviewBeforeSaveTitle": "Kaydetmeden önce kontrol",
+  "adminPoolSaved": "Havuz kaydedildi.",
+  "adminPoolSaveFailed": "Havuz kaydedilemedi.",
+  "adminUseSeedAllForPool": "Bu havuz için “Tüm havuzları tohumla” kullanın.",
+  "adminNoBuiltInSeedForPool": "Bu havuz için yerleşik tohumlama tanımlı değil.",
+  "adminSeedSelectedPoolDefaults": "Seçili havuzu varsayılanla yenile",
+  "adminPoolNotLoadedYet": "Havuz henüz yüklenmedi.",
+  "adminPoolBackupShareText": "Arın havuz yedeği — {poolId} ({timestamp})",
+  "@adminPoolBackupShareText": {
+    "placeholders": {
+      "poolId": {},
+      "timestamp": {}
+    }
+  },
+  "adminPoolBackupShareSubject": "Arın havuz yedeği",
+  "adminBackupCreationFailed": "Yedek oluşturulamadı: {error}",
+  "@adminBackupCreationFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "adminBackupInvalidJsonObject": "Yedek dosyası okunamadı: JSON nesnesi bekleniyor.",
+  "adminBackupPoolDocumentMissing": "Yedek dosyasında havuz belgesi bulunamadı.",
+  "adminBackupItemsListMissing": "Yedek dosyasında \"items\" listesi yok.",
+  "adminBackupContainsUnreadableRecords": "Yedekte okunamayan kayıt var; dosya değiştirilmemiş olmalı.",
+  "adminUnknownPool": "bilinmeyen havuz",
+  "adminRestoreBackupTitle": "Yedeği geri yükle",
+  "adminRestoreBackupDialogBody": "Dosya: {fileName}\nYedekteki havuz: {sourcePool}\nSeçili havuz: {selectedPool}\nKayıt sayısı: {itemCount}\n\n{warningText}Bu kayıtlar seçili havuza yazılacak. Devam edilsin mi?",
+  "@adminRestoreBackupDialogBody": {
+    "placeholders": {
+      "fileName": {},
+      "sourcePool": {},
+      "selectedPool": {},
+      "itemCount": {
+        "type": "int"
+      },
+      "warningText": {}
+    }
+  },
+  "adminRestoreBackupDifferentPoolWarning": "Uyarı: Yedek farklı bir havuzdan geliyor.",
+  "adminRestoreFromBackupAction": "Yedekten geri yükleme ({fileName})",
+  "@adminRestoreFromBackupAction": {
+    "placeholders": {
+      "fileName": {}
+    }
+  },
+  "adminRestoreBackupFailed": "Yedek dosyası geri yüklenemedi.",
+  "adminRequiresManagerOrFullAccessForMissingSeed": "Eksik kayıt ekleme için manager veya tam yetki gerekir.",
+  "adminRequiresFullAccessForReset": "Tam sıfırlama için tam yetki gerekir.",
+  "adminBulkPreviewFailed": "Toplu işlem ön izlemesi alınamadı.",
+  "adminSeedAllPoolsTitle": "Tüm havuzları tohumla",
+  "adminMergeSeedPreview": "Ön izleme:\n• Kontrol edilen havuz: {poolCount}\n• Değişecek havuz: {changedPoolCount}\n• Eklenecek kayıt: {addedItemCount}\n• İşlem sonrası toplam kayıt: {targetItemCount}\n\nMevcut manuel değişiklikler korunur. Devam edilsin mi?",
+  "@adminMergeSeedPreview": {
+    "placeholders": {
+      "poolCount": {
+        "type": "int"
+      },
+      "changedPoolCount": {
+        "type": "int"
+      },
+      "addedItemCount": {
+        "type": "int"
+      },
+      "targetItemCount": {
+        "type": "int"
+      }
+    }
+  },
+  "adminResetSeedPreview": "Ön izleme:\n• Kontrol edilen havuz: {poolCount}\n• Üzerine yazılacak havuz: {changedPoolCount}\n• Mevcut kayıt: {currentItemCount}\n• Yeni kayıt: {targetItemCount}\n\nMevcut içerik silinir. Önce yedek aldığından emin ol. Devam edilsin mi?",
+  "@adminResetSeedPreview": {
+    "placeholders": {
+      "poolCount": {
+        "type": "int"
+      },
+      "changedPoolCount": {
+        "type": "int"
+      },
+      "currentItemCount": {
+        "type": "int"
+      },
+      "targetItemCount": {
+        "type": "int"
+      }
+    }
+  },
+  "adminOverwriteAction": "Üzerine yaz",
+  "adminMissingItemsAddedToPools": "Eksik öğeler havuzlara eklendi.",
+  "adminAllPoolsOverwritten": "Tüm havuzlar yeniden yazıldı.",
+  "adminAuditAddMissingToAllPools": "Tüm havuzlara eksikleri ekle",
+  "adminAuditResetAllPools": "Tüm havuzları sıfırla",
+  "adminInspireCardsUnavailable": "Keşfet kartları şu anda alınamıyor.",
+  "adminRequiresManagerOrFullAccessForDiagnostics": "Tanı işlemleri için manager veya tam yetki gerekir.",
+  "adminNotificationLogsCleared": "Bildirim logları temizlendi.",
+  "adminNotificationLogsShareText": "Arın bildirim logları ({timestamp})",
+  "@adminNotificationLogsShareText": {
+    "placeholders": {
+      "timestamp": {}
+    }
+  },
+  "adminNotificationLogsShareSubject": "Arın bildirim tanısı",
+  "adminLogExportFailed": "Log dışa aktarımı başarısız: {error}",
+  "@adminLogExportFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "adminInspireCardHasEmptyTurkishText": "Boş Türkçe metinli kart var; doldur veya sil.",
+  "adminReviewCardsBeforeSaveTitle": "Kartları kaydetmeden önce kontrol",
+  "adminInspireCardsWillBeUpdated": "Keşfet kartları güncellenecek",
+  "adminInspireCardsSaved": "Keşfet kartları kaydedildi.",
+  "adminInspireCardsSaveFailed": "Keşfet kartları kaydedilemedi.",
+  "adminAuditInspireCardsUpdated": "Keşfet kartları güncellendi",
+  "adminCurrentRecordCount": "Mevcut kayıt: {count}",
+  "@adminCurrentRecordCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "adminRecordCountToSave": "Kaydedilecek kayıt: {count}",
+  "@adminRecordCountToSave": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "adminChangedRowCount": "Değişen satır: {count}",
+  "@adminChangedRowCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "adminConcurrentEditWarning": "Başka bir yönetici bu sırada kayıt yaptıysa sistem uyarı verir.",
+  "adminSaveAction": "Kaydet",
+  "adminGrantsListFetchFailed": "Yetki listesi alınamadı.",
+  "adminGrantAccessAction": "Yetki ver",
+  "adminEditGrantAction": "Yetkiyi düzenle",
+  "adminEmailOrUidLabel": "E-posta veya UID",
+  "adminLevelLabel": "Seviye",
+  "adminRoleContentLabel": "content - içerik",
+  "adminRoleManagerLabel": "manager - operasyon",
+  "adminRoleDeveloperLabel": "developer - tam yetki",
+  "adminFullAccessRequiredForGrantManagement": "Yetki yönetimi için tam yetki gerekir.",
+  "adminEmailOrUidCannotBeEmpty": "E-posta veya UID boş olamaz.",
+  "adminAccountAlreadyFullAccess": "Bu hesap uygulama içinde zaten tam yetkilidir.",
+  "adminGrantSaved": "Yetki kaydedildi.",
+  "adminGrantSaveFailed": "Yetki kaydedilemedi.",
+  "adminAuditGrantSaved": "Admin yetkisi verildi/güncellendi",
+  "adminFullAccessAccountCannotBeRemoved": "Bu hesap uygulama içinde tam yetkilidir; panelden kaldırılamaz.",
+  "adminRemoveGrantTitle": "Yetkiyi kaldır",
+  "adminRemoveGrantMessage": "{label} için yönetim yetkisi kaldırılacak.",
+  "@adminRemoveGrantMessage": {
+    "placeholders": {
+      "label": {}
+    }
+  },
+  "adminGrantRemoved": "Yetki kaldırıldı.",
+  "adminGrantRemoveFailed": "Yetki kaldırılamadı.",
+  "adminAuditGrantRemoved": "Admin yetkisi kaldırıldı",
+  "adminEditItemTitle": "Öğeyi düzenle",
+  "adminAddItemTitle": "Öğe ekle",
+  "adminWordLabel": "Söz",
+  "adminTextLabel": "Metin",
+  "adminTurkishTextLabel": "Türkçe metin",
+  "adminTurkishLabel": "Türkçe",
+  "adminArabicLabel": "Arapça",
+  "adminTypeLabel": "Tür",
+  "adminReferenceLabel": "Referans",
+  "adminTitleLabel": "Başlık",
+  "adminOptionalSourceReferenceLabel": "Kaynak / referans (isteğe bağlı)",
+  "adminWordCannotBeEmpty": "Söz boş olamaz.",
+  "adminTextCannotBeEmpty": "Metin boş olamaz.",
+  "adminTurkishTextCannotBeEmpty": "Türkçe metin boş olamaz.",
+  "adminTurkishAndArabicRequired": "Türkçe ve Arapça alanları gerekli.",
+  "adminTurkishArabicReferenceRequired": "Türkçe, Arapça ve referans gerekli.",
+  "adminTitleAndTextRequired": "Başlık ve metin gerekli.",
+  "adminPoolItemWillBeEdited": "Havuz öğesi düzenlenecek",
+  "adminNewPoolItemWillBeAdded": "Havuza yeni öğe eklenecek",
+  "adminVersionConflictError": "Bu içerik başka bir yönetici tarafından güncellenmiş. Lütfen yenileyip tekrar dene.",
+  "adminNoPermissionForOperation": "Bu işlem için yetkiniz yok.",
+  "adminNetworkOrServiceUnavailable": "İnternet bağlantısı zayıf veya servis geçici olarak kapalı.",
+  "adminOperationTimedOut": "İşlem zaman aşımına uğradı. Lütfen tekrar deneyin.",
+  "adminSessionCouldNotBeVerified": "Oturum doğrulanamadı. Lütfen tekrar giriş yapın.",
+  "adminAuthorizationCouldNotBeVerified": "Yetki doğrulanamadı",
+  "adminAuthorizationCheckUnavailable": "Şu anda yetki kontrolü yapılamıyor.\nİnternet bağlantını kontrol edip tekrar dene.",
+  "adminBackToSettings": "Ayarlara dön",
+  "adminNoAccessTitle": "Erişim yok",
+  "adminPageForAdminsOnly": "Bu sayfa yalnızca yöneticiler içindir.",
+  "adminPanelTitle": "Yönetim paneli",
+  "adminPoolsTab": "Havuzlar",
+  "adminInspireCardsTab": "Keşfet kartları",
+  "adminDiagnosticsTab": "Tanı & log",
+  "adminDeveloperTab": "Geliştirici",
+  "adminGrantsTab": "Yetkiler",
+  "adminSectionOnlyForFullAccess": "Bu bölüm yalnızca tam yetkiye açıktır.",
+  "adminDeveloperToolsDeveloperOnly": "Geliştirici araçlarını sadece developer seviyesi kullanabilir.",
+  "adminDeletePoolItemTitle": "Öğeyi havuzdan sil",
+  "adminDeletePoolItemMessage": "Bu öğe \"{poolId}\" havuzundan kalıcı olarak silinecek ve Firestore’a hemen yazılacak. Geri alınamaz.",
+  "@adminDeletePoolItemMessage": {
+    "placeholders": {
+      "poolId": {}
+    }
+  },
+  "adminPoolItemWillBeDeleted": "Havuzdan öğe silinecek",
+  "adminRemoveCardFromListTitle": "Kartı listeden çıkar",
+  "adminRemoveCardFromListMessage": "Kart yerel listeden silinecek. Değişiklik Firestore’a yansımak için \"Kaydet\"e basman gerekir.",
+  "adminRemoveAction": "Çıkar",
+  "adminDiagnosticsAccessDeniedTitle": "Tanı ekranı manager ve tam yetkiye açıktır.",
+  "adminDiagnosticsAccessDeniedSubtitle": "İçerik yöneticileri havuz ve Keşfet düzenleyebilir.",
+  "adminRoleContentPlain": "İçerik",
+  "adminRoleManagerPlain": "Yönetici",
+  "adminRoleDeveloperPlain": "Geliştirici",
+  "adminRoleNonePlain": "Yok",
+  "adminGrantManagementAccessDeniedTitle": "Yetki yönetimi yalnızca tam yetkiye açıktır.",
+  "adminGrantManagementAccessDeniedSubtitle": "Admin seviyesi verme ve kaldırma işlemlerini developer yapar.",
+  "adminGrantHint": "E-posta veya UID girip content, manager ya da developer seviyesi verebilirsin.",
+  "adminFixedFullAccess": "Sabit tam yetkililer: {emails}",
+  "@adminFixedFullAccess": {
+    "placeholders": {
+      "emails": {}
+    }
+  },
+  "adminDefinedGrants": "Tanımlı yetkiler ({count})",
+  "@adminDefinedGrants": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "adminGrantsLoading": "Yetkiler yükleniyor...",
+  "adminNoFirestoreGrantsYet": "Henüz Firestore üzerinden eklenmiş yetki yok.",
+  "surveyBack": "Geri",
+  "surveyNext": "Devam Et",
+  "namazIbadetWarningTitle": "Dikkat",
+  "namazIbadetWarningSubtitle": "Namaz takibi bir gösteriş alanı değil; kalbini huşû ve dürüstlükle düzenlemek içindir.",
+  "namazIbadetWarningBullet1": "Tikleri yalnızca kendin için işaretle; riya veya başkasına baskı aracı olmasın.",
+  "namazIbadetWarningBullet2": "Vakit kaçırınca kendini küçümseme; her dönüş tövbe ve yeniden başlamaktır.",
+  "namazIbadetWarningBullet3": "Bildirimleri istediğin zaman sistem ayarlarından yönetebilirsin; takip yük olmamalı.",
+  "namazIbadetCommitmentTitle": "Kendine sözün",
+  "namazIbadetCommitmentHint": "Namazına dair içten bir cümle yaz (en az 8 karakter).",
+  "namazIbadetCommitmentFieldHint": "Kalbinden geçen bir cümle…",
+  "namazIbadetCommitmentTooShort": "Lütfen kendine bir söz yaz (en az 8 karakter).",
+  "namazIbadetSealTitlePrefix": "Sözünü mühürle",
+  "namazIbadetSealHoldHint": "Parmağını basılı tut",
+  "namazIbadetSealSuccess": "Sözün kaydedildi. İbadet ekranına geçiyorsun.",
+  "namazIbadetSealEncourageNotHolding": "Hazır olduğunda mührü basılı tutarak pekiştir.",
+  "namazIbadetSealEncourageHolding": "Nefesini yavaşlat, sözünü kalbine indir.",
+  "namazIbadetPrepTitle": "Hazırlık",
+  "namazIbadetExamplesTitle": "Örnekler",
+  "closeAction": "Kapat",
+  "saveAction": "Kaydet",
+  "selectAction": "Seç",
+  "quitPickerTemplateAlreadyExists": "Bu program zaten listenizde; aynı şablondan yalnızca bir tane olabilir.",
+  "quitPickerOpenAction": "Aç",
+  "quitPickerGoToListAction": "Listeye git",
+  "quitPickerTemplateScreenTitle": "Ekrandan arınma",
+  "quitPickerTemplateSmokingTitle": "Sigaradan arınma",
+  "quitPickerTemplateAlcoholTitle": "Alkolden arınma",
+  "quitPickerTemplateSubstanceTitle": "Uyuşturucudan arınma",
+  "quitPickerTemplateZinaTitle": "Zinadan arınma",
+  "quitPickerHeaderTitle": "Kötü alışkanlıklardan arınma",
+  "quitPickerHeaderSubtitle": "Kurtulmak istediğin alışkanlığı seç; özel bir hedef için alttaki kutuyu kullan.",
+  "quitPickerScreenLabel": "Ekran",
+  "quitPickerScreenSubtitle": "Sınır ve dinginlik",
+  "quitPickerSmokingLabel": "Sigara",
+  "quitPickerAlcoholLabel": "Alkol",
+  "quitPickerSubstanceLabel": "Uyuşturucu",
+  "quitPickerSubstanceSubtitle": "Destek ve takip",
+  "quitPickerZinaLabel": "Zina",
+  "quitPickerDefaultSubtitle": "Arınma programı",
+  "quitPickerAlreadyAdded": "Zaten ekli",
+  "quitPickerAddCustomTitle": "Özel ekle",
+  "quitPickerAddCustomSubtitle": "Kendi arınma rutinini oluştur.",
+  "buildProgramSetupQuranTitle": "Günlük Kur'an programı",
+  "buildProgramSetupDefaultTitle": "Program",
+  "buildProgramSetupHeadlineQuran": "Her güne bir sayfa",
+  "buildProgramSetupHeadlineDefault": "Programını başlat",
+  "buildProgramSetupBadge": "Hazırlık adımı",
+  "buildProgramSetupBodyQuran": "En az bir sayfa — küçük ama süreklilik. İlerleme ve ipuçları bir sonraki ekranda seni bekliyor.",
+  "buildProgramSetupBodyDefault": "İlerleme ve ipuçları bir sonraki ekranda.",
+  "buildProgramSetupAlreadyActive": "Günlük Kur'an programın zaten açık. Mevcut programa yönlendirildi.",
+  "buildProgramSetupQuranHabitTitle": "Günlük Kur'an",
+  "buildProgramSetupStartAction": "Programı başlat",
+  "buildProgramSetupPrincipleTitle": "Azı sürekli, çoğu terkten hayırlı",
+  "buildProgramSetupPrincipleQuote": "Hz. Peygamber (s.a.v.): \"Amellerin Allah'a en sevimli olanı, az da olsa devamlı olanıdır.\"",
+  "buildProgramDetailNotFound": "Program bulunamadı",
+  "buildProgramDetailTabGeneral": "Genel",
+  "buildProgramDetailTabTips": "İpuçları",
+  "buildProgramDetailTabProgress": "İlerleme",
+  "buildProgramDetailTodayQuestion": "Bugün okuma hedefini tamamladın mı?",
+  "buildProgramDetailTodayDone": "Bugün tamamlandı",
+  "buildProgramDetailTodayPending": "Bugün henüz işaretlenmedi — dokun",
+  "buildProgramDetailDayCount": "{days}. gün",
+  "@buildProgramDetailDayCount": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "buildProgramDetailProgressIndicatorLabel": "Motivasyonel ilerleme göstergesi",
+  "buildProgramDetailRoutinePercent": "%{percent} rutin oturumu",
+  "@buildProgramDetailRoutinePercent": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "buildProgramDetailMilestoneLabel": "{day}. gün — %{percent}",
+  "@buildProgramDetailMilestoneLabel": {
+    "placeholders": {
+      "day": {
+        "type": "int"
+      },
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "buildProgramDetailDisclaimer": "Bu göstergeler genel motivasyon içindir; bilimsel veya tıbbi ölçüm değildir.",
+  "onboardingSlide1Title": "Gürültünün içinde bir nefes",
+  "onboardingSlide1Subtitle": "Zihin koştururken iç sesin çoğu zaman fısıltıda kalır. Küçük duruşlar — bir nefes, bir anlık duraklama — manevi dengeyi yeşertir; dışarıda aradığın huzur, bazen önce içerde sessizce filizlenir.",
+  "onboardingSlide2Title": "Küçük başla, istikrarla büyü",
+  "onboardingSlide2Subtitle": "Gelişim ve Arınma’da alışkanlıklarını kayıt altına al. Bir gün, bir nefes, bir seçim — zinciri kırmadan ilerle; arınma da merdiven çıkmak gibi, basamak basamak güçlenir.",
+  "onboardingSlide3Title": "Vakit, namaz ve günlük düzen",
+  "onboardingSlide3Subtitle": "Namaz saatlerini yanında tut; nefes egzersizi ve güçlenme alanın zor anlarda yanında olsun. İbadetini, takibini ve iç sesini aynı ritimde topla.",
+  "onboardingSlide4Title": "Arın: tek uygulamada bir arada",
+  "onboardingSlide4Subtitle": "İlhamdan günlük alışkanlığa, vakit bildiriminden arınma sayacına kadar yolculuğun burada. Hazırsan birlikte başlayalım — sen yürü, biz hatırlatır ve eşlik ederiz.",
+  "onboardingGetStarted": "Başlayalım",
+  "onboardingSkip": "Geç",
+  "onboardingNext": "İleri",
+  "surveyNameTitle": "Sana nasıl hitap edelim?",
+  "surveyNameHint": "İsminiz",
+  "surveyGenderTitle": "Cinsiyetini öğrenebilir miyiz?",
+  "surveyGenderSubtitle": "Sana daha iyi yardımcı olabilmek için...",
+  "surveyGenderMale": "Erkek",
+  "surveyGenderFemale": "Kadın",
+  "surveyMoodTitle": "Şu an iç dünyanda hangi ton daha baskın?",
+  "surveyMoodSubtitle": "Kendini tanımlayan işaretleri seç; içerik ve hatırlatmalar buna göre yumuşar.",
+  "surveyDailyRhythmTitle": "Günün büyük kısmı genelde nerede akıyor?",
+  "surveyDailyRhythmSubtitle": "Tempo ve ortam, sana uygun ritmi anlamamıza yardım eder.",
+  "surveyInnerThemesTitle": "İç dünyanda öne çıkan temalar hangileri?",
+  "surveyInnerThemesSubtitle": "Birden fazla seçebilirsin; samimi işaretler bize seni daha iyi tanıtmaya yardım eder.",
+  "surveyNotificationTitle": "Bildirimler",
+  "surveyNotificationLead": "Namaz hatırlatmaları ve günün mesajları zamanında ulaşsın.",
+  "surveyNotificationSubtitle": "Vakit bildirimleri ile içerik önerilerinin kaçmaması için bildirim iznine ihtiyacımız var. İstediğin zaman ayarlardan kapatabilirsin.",
+  "surveyNotificationAllow": "Bildirimlere izin ver",
+  "surveyNotificationSkip": "Şimdilik geç",
+  "surveyNotificationOpenSettings": "Ayarlardan aç",
+  "surveySave": "Başla ➔",
+  "surveyGenderDecline": "Paylaşmak istemiyorum",
+  "surveyNameGreetingPrefix": "Merhaba",
+  "surveySummaryTitle": "Hazırsın",
+  "surveySummarySubtitle": "Temel tercihlerini kaydettik. Arın deneyimini bu işaretlere göre şekillendireceğiz.",
+  "surveySummaryCardTitle": "Başlangıç özeti",
+  "surveySummaryItemName": "Hitap",
+  "surveySummaryItemMood": "Ruh hali işaretlerin",
+  "surveySummaryItemRhythm": "Günlük akış işaretlerin",
+  "surveySummaryItemThemes": "İç tema işaretlerin",
+  "surveySummaryItemNotificationOn": "Açık",
+  "surveySummaryItemNotificationOff": "Kapalı",
+  "surveySummaryNotProvided": "Belirtilmedi",
+  "surveySummaryAction": "Ana ekrana geç",
+  "surveySummarySaveError": "Başlangıç kaydedilemedi. Lütfen tekrar dene.",
+  "moodHappy": "Mutlu",
+  "moodCalm": "Sakin",
+  "moodStressed": "Stresli",
+  "moodSad": "Üzgün",
+  "moodGrateful": "Şükrediyorum",
+  "moodAnxious": "Kaygılı",
+  "moodMotivated": "Motive",
+  "sectorStudent": "Lise / Üniversite / Hazırlık",
+  "sectorPrivate": "Özel Sektör",
+  "sectorPublic": "Kamu Personeli",
+  "sectorBusiness": "Kendi İşim / Serbest",
+  "sectorTrade": "Ticaret",
+  "sectorHousehold": "Ev Hanımı / Ev Erkeği",
+  "sectorOther": "Diğer",
+  "needMotivation": "Motivasyon",
+  "needSabr": "Sabır",
+  "needShukr": "Şükür",
+  "needTawakkul": "Tevekkül",
+  "needFocus": "Odaklanma",
+  "needHealing": "Şifa",
+  "needRizq": "Rızık & Bereket",
+  "appPrepareTitle": "Arına hazırlanıyoruz",
+  "appPrepareSubtitle": "Namaz vakitleri ve günün sözleri senin için yükleniyor…",
+  "shellExitConfirmBackTwice": "Çıkmak için geri tuşuna bir kez daha basın",
+  "inspireExploreTitle": "Keşfet",
+  "inspireSearchHint": "Ara",
+  "inspireFilterTooltip": "İçerik türü",
+  "inspireFilterMainFeed": "Ana akış",
+  "inspireFilterQuote": "Söz",
+  "inspireFilterVerse": "Ayet",
+  "inspireFilterHadith": "Hadis",
+  "inspireSearchNoResults": "Bu aramaya uygun içerik yok.\nFarklı kelime veya\nşekilsiz yazım deneyin\n(ör. karde, kardes → kardeş).",
+  "inspireEmptyTitle": "Henüz içerik yok",
+  "inspireEmptySubtitle": "Görseller: assets/inspiration/ (1.jpg, 2.jpg, …).\nİçerik: assets/data/inspiration/*.json veya Firestore app_public/inspiration_cards.",
+  "inspirePullToRefreshHint": "Yenilemek için aşağı çekin.",
+  "inspireLoadFailedTitle": "Yüklenemedi",
+  "inspirePullToRetryHint": "Tekrar denemek için aşağı çekin.",
+  "viewerBackAction": "Geri",
+  "viewerNoCard": "Kart yok",
+  "asyncErrorDefaultTitle": "Bir şeyler ters gitti",
+  "asyncErrorDefaultMessage": "Bağlantın zayıf olabilir ya da hizmete şu an ulaşamıyoruz. Az sonra tekrar dene.",
+  "asyncErrorRetryAction": "Tekrar dene",
+  "asyncErrorTechnicalDetailsTitle": "Teknik ayrıntı",
+  "asyncErrorCopiedToClipboard": "Hata panoya kopyalandı.",
+  "savedInspirationTitle": "Kaydedilenler",
+  "savedInspirationLoadFailedPrefix": "Yüklenemedi",
+  "savedInspirationEmptyTitle": "Kalp defterin boş",
+  "savedInspirationEmptySubtitle": "Keşfet'te sana dokunan sözü kaydet; burada toplanıp sana dönüş olsun.",
+  "savedInspirationGoExploreAction": "Keşfet'e git",
+  "clockPickerCancelAction": "İptal",
+  "clockPickerConfirmAction": "Tamam",
+  "clockPickerHourLabel": "Saat",
+  "clockPickerMinuteLabel": "Dakika",
+  "salatWeekCelebrationTitle": "Haftayı tamamladın",
+  "salatWeekCelebrationAction": "Elhamdülillah",
+  "adminEmailInviteLabel": "E-posta daveti"
+}

@@ -1,0 +1,201 @@
+name: arin
+description: "Arın - İslami Yaşam, Alışkanlık ve Odaklanma Asistanı"
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.8.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+
+  # State Management
+  flutter_riverpod: ^2.5.1
+  riverpod_annotation: ^2.3.5
+
+  # Navigation
+  go_router: ^13.2.0
+
+  # Local Database
+  hive_flutter: ^1.1.0
+  hive: ^2.2.3
+
+  # Animation
+  lottie: ^3.1.0
+  flutter_animate: ^4.5.0
+
+  # Home Widget
+  home_widget: ^0.6.0
+
+  # Network
+  dio: ^5.4.3
+
+  # Location
+  geolocator: ^14.0.2
+  geocoding: ^3.0.0
+  permission_handler: ^11.4.0
+
+  # Calendar / Heatmap
+  table_calendar: ^3.1.0
+
+  # Persistence
+  shared_preferences: ^2.2.3
+
+  # Fonts & Localization
+  google_fonts: ^6.2.1
+  intl: ^0.20.2
+
+  # Icons
+  cupertino_icons: ^1.0.8
+
+  # Utilities
+  image: ^4.5.4
+  uuid: ^4.3.3
+  audioplayers: ^6.6.0
+  path_provider: ^2.1.5
+  audio_session: ^0.2.3
+  vibration: ^3.1.8
+
+  # Namaz hatırlatıcı (yerel bildirim)
+  # 17.x Android tarafında Gson kullanıyor; Android 16 (API 36) + R8 generic
+  # signature davranışında `ScheduledNotificationReceiver` içinde
+  # `TypeToken must be created with a type argument` fırlatıyor — alarm tam
+  # zamanında tetikleniyor ama bildirim RENDER edilmiyor (ölçüldü: Samsung
+  # Galaxy A34, OneUI 8). 18.x Gson'u kaldırdı; 19.x+ API da değiştirdi —
+  # 18.0.1 minimum stable, migration maliyeti minimum.
+  flutter_local_notifications: ^19.0.0
+  file_picker: ^8.1.7
+  timezone: ^0.10.1
+  firebase_core: ^4.6.0
+  firebase_auth: ^6.3.0
+  # Çökme raporlama: kullanıcıda hata olduğunda Firebase Console'da
+  # stack trace + cihaz/platform bilgisiyle görüyoruz. Spark planıyla
+  # ücretsiz, sınırsız.
+  firebase_crashlytics: ^5.1.0
+  # Ekran/aksiyon istatistikleri: hangi panel kullanılıyor, hangi aksiyon
+  # popüler — Spark planıyla ücretsiz.
+  firebase_analytics: ^12.2.0
+  google_sign_in: ^7.2.0
+  sign_in_with_apple: ^7.0.1
+  crypto: ^3.0.7
+  cloud_firestore: ^6.2.0
+  # 10.x Android 14/15/16'da `ShareResultStatus.unavailable` döndürüyor —
+  # chooser açılsa bile PendingIntent/BroadcastReceiver callback'i timeout
+  # oluyordu. 11.x `SharePlus.instance.share(ShareParams(...))` yeni API'yi
+  # getirdi ve Android 14+ callback davranışını düzeltti. 12.x+ geolocator
+  # 14.x ile win32 çakışması yüzünden çözülmüyor, 11.x sweet spot.
+  share_plus: ^11.0.0
+  flutter_svg: ^2.0.17
+  hijri: ^3.0.0
+  url_launcher: ^6.3.2
+  # Uygulama üstünde "çevrimdışı" şeridi için ağ durumu.
+  # Sadece Android/iOS native; web'de no-op (biz zaten web build almıyoruz).
+  connectivity_plus: ^7.1.1
+  # Play Store değerlendirme penceresi (Android: native InAppReview API,
+  # iOS: SKStoreReviewController). Yıllık 3 kez limit, manuel test için
+  # `inAppReview.openStoreListing()` fallback'i var.
+  in_app_review: ^2.0.9
+  flutter_timezone: ^5.0.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+  build_runner: ^2.4.9
+  hive_generator: ^2.0.1
+  riverpod_generator: ^2.4.0
+  # tool/seamless_loop_wav.dart — MP3 → PCM (Freesound WAV/MP3 işlem hattı)
+  minimp3_dart:
+    git:
+      url: https://github.com/Telosnex/minimp3_dart.git
+      ref: main
+  flutter_launcher_icons: ^0.14.4
+  # Android 12+ SplashScreen API + iOS LaunchScreen hazırlayan CLI.
+  # Config `flutter_native_splash:` bloğu altında; generate için:
+  #   dart run flutter_native_splash:create
+  flutter_native_splash: ^2.4.3
+
+# dependency_overrides block removed — flutter_qiblah and its vector_math
+# override are no longer needed.
+
+# dart run flutter_launcher_icons — master: assets/branding/app_icon_1024.png
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: assets/branding/app_icon_1024.png
+  adaptive_icon_background: "#0d2f32"
+  adaptive_icon_foreground: assets/branding/app_icon_1024.png
+
+# Splash ekranı üretimi — `dart run flutter_native_splash:create`
+# Arka plan rengi adaptif icon arka planıyla aynı (marka bütünlüğü).
+# Android 12+ SplashScreen API: `android_12` bloğu; eski Android/iOS için
+# default PNG tabanlı splash. Icon boyutu Android 12 spec'i gereği logo'nun
+# merkez %66'sı görünür olacak şekilde SCALE edilir.
+flutter_native_splash:
+  color: "#0d2f32"
+  image: assets/branding/app_icon_1024.png
+  android: true
+  ios: true
+  web: false
+  android_12:
+    # Android 12+ API: splash ekranda logo otomatik dairesel maskeye alınır.
+    # Arka plan ile aynı koyu yeşil kalsın ki adaptif icon ile ana ekrana
+    # pürüzsüz geçsin.
+    color: "#0d2f32"
+    image: assets/branding/app_icon_1024.png
+    icon_background_color: "#0d2f32"
+  android_gravity: center
+  ios_content_mode: center
+  # Splash görseli haline gelecek asset'ler `flutter_native_splash:create`
+  # komutuyla drawable/ ve iOS Assets.xcassets altına yazılır; kaynak dosya
+  # assets/branding/app_icon_1024.png zaten launcher icon için kullanılıyor
+  # — tek kaynak, çift iş.
+
+flutter:
+  generate: true
+  uses-material-design: true
+  assets:
+    - assets/branding/
+    - assets/animations/
+    - assets/images/zikir/
+    - assets/data/
+    - assets/data/inspiration/
+    - assets/data/willpower/
+    - assets/inspiration/
+    - assets/sounds/prayer/
+    - assets/sounds/healing/tones/
+    - assets/sounds/healing/ambi/
+    - assets/music/explore/
+    # Diyanet (ezanvakti.emushaf.net) mirror'ından üretilen Türkiye ilçe tablosu.
+    # 869 kayıt / ~48 KB. Koordinatlardan Placemark.subAdministrativeArea
+    # çözülüp bu tablodan `ilceId` bulunur, Diyanet vakit API'sine geçilir.
+    # Güncelleme: `dart run tool/generate_diyanet_districts.dart` (yılda 1).
+    - assets/diyanet_tr_districts.json
+
+  # Bundled fontlar — runtime'da Google Fonts CDN'inden çekmek yerine
+  # APK'nın içinden okunur. İlk açılış hızlanır, offline garanti, daha az
+  # ağ trafiği. Dosyalar: `dart run tool/download_fonts.dart` ile indirilir
+  # (assets/fonts/ altına ttf'ler otomatik yazılır).
+  # OFL lisanslı (SIL Open Font License) — ticari kullanım serbest,
+  # atıf/bildirim opsiyonel.
+  fonts:
+    - family: PlusJakartaSans
+      fonts:
+        # Variable font → tüm weight'ler tek dosyada. Flutter 3.x variable
+        # font'u destekler; paket `GoogleFonts.plusJakartaSans(fontWeight:)`
+        # çağrısı bu asset'i bulup kullanır.
+        - asset: assets/fonts/PlusJakartaSans-Variable.ttf
+        - asset: assets/fonts/PlusJakartaSans-Italic-Variable.ttf
+          style: italic
+    - family: ScheherazadeNew
+      fonts:
+        - asset: assets/fonts/ScheherazadeNew-Regular.ttf
+        - asset: assets/fonts/ScheherazadeNew-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/ScheherazadeNew-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/ScheherazadeNew-Bold.ttf
+          weight: 700

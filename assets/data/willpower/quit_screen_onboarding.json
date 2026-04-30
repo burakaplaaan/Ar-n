@@ -1,0 +1,24 @@
+{
+  "templateId": "quit_screen",
+  "warningTitle": "Dikkat",
+  "warningSubtitle": "Dijital dünya hızlı; kalbin yavaşlamayı hak ediyor",
+  "warningBody": [
+    "Aşırı ekran süresi dikkati dağıtır, uyku düzenini zorlar ve vakit hissini kaybettirir.",
+    "Sınır koymak utanç değil iradedir; küçük kesintiler büyük dinginlik getirir."
+  ],
+  "physicalTitle": "Beden ve zihin",
+  "physicalItems": [
+    { "icon": "psychology", "title": "Dikkat parçalanması", "subtitle": "Sürekli bildirim beyin yorgunluğu yapar" },
+    { "icon": "favorite", "title": "Uyku kalitesi", "subtitle": "Gece ekranı melatonini etkileyebilir" },
+    { "icon": "bolt", "title": "Göz ve duruş", "subtitle": "Uzun bakış kas gerginliği ve baş ağrısı artırabilir" }
+  ],
+  "spiritualTitle": "Manevi boyut",
+  "spiritualItems": [
+    { "icon": "mosque", "title": "Vaktin kıymeti", "subtitle": "Boşa geçen saat, telafi edilmez bir sermayedir" },
+    { "icon": "self_improvement", "title": "Tefekkür", "subtitle": "Sükûtta kalbimiz derinleşir; ekran gürültüsü azalınca işiten olursun" }
+  ],
+  "verse": {
+    "text": "İnsan gerçekten ziyan içindedir — ancak iman edip salih amel işleyenler, birbirlerine hakkı tavsiye eden ve sabrı tavsiye edenler müstesna.",
+    "ref": "Asr 103:1-3 (meal özeti — zaman ve sabır)"
+  }
+}
