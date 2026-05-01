@@ -24,6 +24,12 @@ class UserProfileRepository {
     await _box.put(_profileKey, profile);
   }
 
+  Future<void> updateName(String? name) async {
+    final profile = load();
+    profile.name = name;
+    await save(profile);
+  }
+
   /// Tüm profil verilerini kaydet (Yeni Onboarding V2)
   Future<void> saveProfile({
     String? name,

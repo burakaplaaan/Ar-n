@@ -82,6 +82,9 @@ class QiblaHubPage extends ConsumerStatefulWidget {
 class _QiblaHubPageState extends ConsumerState<QiblaHubPage> {
   _QiblaHubShellSwipeObserver? _shellSwipeObserver;
 
+  _QiblaHubShellSwipeObserver get _observer =>
+      _shellSwipeObserver ??= _QiblaHubShellSwipeObserver(ref);
+
   @override
   void initState() {
     super.initState();
@@ -101,7 +104,7 @@ class _QiblaHubPageState extends ConsumerState<QiblaHubPage> {
   Widget build(BuildContext context) {
     return Navigator(
       key: qiblaHubNavigatorKey,
-      observers: [_shellSwipeObserver!],
+      observers: [_observer],
       initialRoute: QiblaHubRoutes.dashboard,
       onGenerateRoute: (RouteSettings settings) {
         switch (settings.name) {
@@ -110,7 +113,7 @@ class _QiblaHubPageState extends ConsumerState<QiblaHubPage> {
                 ? settings.arguments as Map
                 : const {};
             final fromHome = args['fromHomeShortcut'] == true;
-            return MaterialPageRoute<void>(
+            return _toolRoute(
               settings: settings,
               builder: (context) => QiblaNestedSwipeBack(
                 onBack: fromHome ? () => context.go(AppRoutes.home) : null,
@@ -118,19 +121,19 @@ class _QiblaHubPageState extends ConsumerState<QiblaHubPage> {
               ),
             );
           case QiblaHubRoutes.zikir:
-            return MaterialPageRoute<void>(
+            return _toolRoute(
               settings: settings,
               builder: (_) =>
                   const QiblaNestedSwipeBack(child: ZikirMatikPage()),
             );
           case QiblaHubRoutes.breathing:
-            return MaterialPageRoute<void>(
+            return _toolRoute(
               settings: settings,
               builder: (_) =>
                   const QiblaNestedSwipeBack(child: BreathingExercisePage()),
             );
           case QiblaHubRoutes.healing:
-            return MaterialPageRoute<void>(
+            return _toolRoute(
               settings: settings,
               builder: (_) =>
                   const QiblaNestedSwipeBack(child: HealingFrequenciesPage()),
@@ -142,6 +145,21 @@ class _QiblaHubPageState extends ConsumerState<QiblaHubPage> {
               builder: (_) => const QiblaToolsDashboardPage(),
             );
         }
+      },
+    );
+  }
+
+  PageRoute<void> _toolRoute({
+    required RouteSettings settings,
+    required WidgetBuilder builder,
+  }) {
+    return PageRouteBuilder<void>(
+      settings: settings,
+      transitionDuration: const Duration(milliseconds: 180),
+      reverseTransitionDuration: const Duration(milliseconds: 140),
+      pageBuilder: (context, animation, secondaryAnimation) => builder(context),
+      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+        return FadeTransition(opacity: animation, child: child);
       },
     );
   }

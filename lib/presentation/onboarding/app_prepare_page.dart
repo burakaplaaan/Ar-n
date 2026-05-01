@@ -22,6 +22,17 @@ class AppPreparePage extends ConsumerStatefulWidget {
 
 class _AppPreparePageState extends ConsumerState<AppPreparePage> {
   bool _exiting = false;
+  static const _minimumVisibleDuration = Duration(milliseconds: 1100);
+  static const _warmupTimeout = Duration(milliseconds: 1800);
+
+  Future<void> _bestEffort(Future<void> Function() action) async {
+    try {
+      await action().timeout(_warmupTimeout);
+    } catch (_) {
+      // Hazırlık ekranı navigasyonu bloke etmez; bu veriler uygulama içinde
+      // provider'lar tarafından tekrar yüklenir.
+    }
+  }
 
   @override
   void initState() {
@@ -30,20 +41,20 @@ class _AppPreparePageState extends ConsumerState<AppPreparePage> {
   }
 
   Future<void> _warmPrayerTimes() async {
-    try {
+    await _bestEffort(() async {
       await ref.read(prayerTimesProvider.future);
-    } catch (_) {}
+    });
   }
 
   Future<void> _warmQuotes() async {
-    try {
+    await _bestEffort(() async {
       await ref.read(quotesCloudRepositoryProvider).ensureSyncedToday();
-    } catch (_) {}
+    });
   }
 
   Future<void> _runPrepare() async {
     await Future.wait<void>([
-      Future<void>.delayed(const Duration(milliseconds: 2000)),
+      Future<void>.delayed(_minimumVisibleDuration),
       _warmPrayerTimes(),
       _warmQuotes(),
     ]);
@@ -66,10 +77,7 @@ class _AppPreparePageState extends ConsumerState<AppPreparePage> {
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [
-              Color(0xFF0F2A22),
-              AppColors.emeraldDark,
-            ],
+            colors: [Color(0xFF0F2A22), AppColors.emeraldDark],
           ),
         ),
         child: SafeArea(
@@ -81,10 +89,10 @@ class _AppPreparePageState extends ConsumerState<AppPreparePage> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Icon(
-                  Icons.auto_awesome,
-                  size: 56,
-                  color: AppColors.emeraldLight.withValues(alpha: 0.92),
-                )
+                      Icons.auto_awesome,
+                      size: 56,
+                      color: AppColors.emeraldLight.withValues(alpha: 0.92),
+                    )
                     .animate(onPlay: (c) => c.repeat(reverse: true))
                     .scale(
                       begin: const Offset(0.92, 0.92),

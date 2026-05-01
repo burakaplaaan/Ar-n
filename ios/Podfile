@@ -1,5 +1,5 @@
 # Uncomment this line to define a global platform for your project
-platform :ios, '13.0'
+platform :ios, '15.0'
 
 # CocoaPods analytics sends network stats synchronously affecting flutter build latency.
 ENV['COCOAPODS_DISABLE_STATS'] = 'true'
@@ -36,27 +36,17 @@ target 'Runner' do
   end
 end
 
-# Widget extension (ArinWidgets) — iOS 16+ WidgetKit API'leri için ayrı
-# deployment target gerekiyor. Pod'lar da bu hedefe göre derlenir.
-target 'ArinWidgetsExtension' do
-  use_frameworks!
-end
-
 post_install do |installer|
   installer.pods_project.targets.each do |target|
     flutter_additional_ios_build_settings(target)
 
     target.build_configurations.each do |config|
-      # firebase_auth, cloud_firestore ve diğer Firebase pod'ları minimum
-      # iOS 13 bekliyor; eski Flutter template'inden kalan 11.0/12.0 ayarı
-      # bazen pod'larda pin kalıyor — burada hepsini 13.0'a normalize ediyoruz.
+      # cloud_firestore ve güncel Firebase iOS SDK minimum iOS 15 gerektiriyor.
+      # Pod'larda düşük kalan hedefleri burada normalize ediyoruz.
       current = config.build_settings['IPHONEOS_DEPLOYMENT_TARGET']
-      if current.nil? || current.to_f < 13.0
-        config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '13.0'
+      if current.nil? || current.to_f < 15.0
+        config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '15.0'
       end
-
-      # Widget pod'larının iOS 16 gereksinimini zorunlu tutma — sadece
-      # ArinWidgets hedefi için kendi xcconfig'i devrededir.
 
       # Xcode 15+ için BoringSSL / gRPC gibi pod'larda eksik signing'i önle.
       config.build_settings['CODE_SIGNING_ALLOWED'] = 'NO' if target.name.start_with?('Pods-')

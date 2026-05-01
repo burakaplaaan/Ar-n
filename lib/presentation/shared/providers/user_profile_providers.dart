@@ -36,6 +36,11 @@ class UserProfileNotifier extends StateNotifier<UserProfileModel> {
     state = _repo.load(); // state'i tazele
   }
 
+  Future<void> updateName(String? name) async {
+    await _repo.updateName(name);
+    state = _repo.load();
+  }
+
   Future<void> updateTags({
     required List<String> moodTags,
     required List<String> sectorTags,
@@ -59,8 +64,8 @@ class UserProfileNotifier extends StateNotifier<UserProfileModel> {
 
 final userProfileProvider =
     StateNotifierProvider<UserProfileNotifier, UserProfileModel>(
-  (ref) => UserProfileNotifier(ref.watch(userProfileRepositoryProvider)),
-);
+      (ref) => UserProfileNotifier(ref.watch(userProfileRepositoryProvider)),
+    );
 
 /// Günün sözü: Firestore paketi (günde 1 okuma) + Hive önbellek; yoksa asset havuzu.
 final dailyContentProvider = FutureProvider<MatchedContent>((ref) async {
@@ -73,8 +78,5 @@ final dailyContentProvider = FutureProvider<MatchedContent>((ref) async {
     sectorTags: profile.sectorTags,
     needTags: profile.needTags,
   );
-  return ContentMatcher.todaysContentHybrid(
-    tags,
-    cloudPool: cloud,
-  );
+  return ContentMatcher.todaysContentHybrid(tags, cloudPool: cloud);
 });

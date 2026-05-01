@@ -355,10 +355,15 @@ Future<void> _confirmDeleteHabitHub(
   );
   if (confirmed == true) {
     await HabitCloudSyncService.rememberDeletedHabitId(habitId: habitId);
-    await ref.read(habitSummaryProvider.notifier).deleteHabitPermanently(habitId);
+    await ref
+        .read(habitSummaryProvider.notifier)
+        .deleteHabitPermanently(habitId);
     final uid = ref.read(authUserProvider).asData?.value?.uid;
     if (uid != null && uid.isNotEmpty) {
-      await HabitCloudSyncService.deleteHabitCloudData(uid: uid, habitId: habitId);
+      await HabitCloudSyncService.deleteHabitCloudData(
+        uid: uid,
+        habitId: habitId,
+      );
     }
   }
 }
@@ -550,7 +555,9 @@ class _WillpowerHubPageState extends ConsumerState<WillpowerHubPage>
       ref,
       sliceForMetrics,
       buildTab: _isBuildTab,
-      salatStorageDay: ref.watch(prayerTimesProvider).maybeWhen(
+      salatStorageDay: ref
+          .watch(prayerTimesProvider)
+          .maybeWhen(
             data: (pt) => pt.salatTickCalendarDay(DateTime.now()),
             orElse: () {
               final now = DateTime.now();
@@ -707,7 +714,9 @@ class _WillpowerHubPageState extends ConsumerState<WillpowerHubPage>
                                                   Text(
                                                     active == 0
                                                         ? l10n.willpowerHubNoActiveHabits
-                                                        : l10n.willpowerHubActiveHabits(active),
+                                                        : l10n.willpowerHubActiveHabits(
+                                                            active,
+                                                          ),
                                                     style: AppTextStyles
                                                         .bodySmall
                                                         .copyWith(
@@ -731,7 +740,8 @@ class _WillpowerHubPageState extends ConsumerState<WillpowerHubPage>
                                         ),
                                       ),
                                       Tooltip(
-                                        message: l10n.willpowerHubHabitCalendarTooltip,
+                                        message: l10n
+                                            .willpowerHubHabitCalendarTooltip,
                                         child: Material(
                                           color:
                                               Theme.of(context).brightness ==
@@ -2548,9 +2558,7 @@ class _WillHabitTile extends ConsumerWidget {
     final quitStatusLabel = isFullQuit
         ? (needsSetup
               ? l10n.willpowerHubQuitStatusSetupMissing
-              : (quitClockOn
-                    ? l10n.willpowerHubQuitStatusClockRunning
-                    : l10n.willpowerHubQuitStatusProgramReady))
+              : (quitClockOn ? null : l10n.willpowerHubQuitStatusProgramReady))
         : null;
     final quitStatusColor = needsSetup
         ? Colors.orange.shade300
@@ -2619,9 +2627,7 @@ class _WillHabitTile extends ConsumerWidget {
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
                             color: fullQuitBadgeBg,
-                            border: Border.all(
-                              color: fullQuitBadgeBorder,
-                            ),
+                            border: Border.all(color: fullQuitBadgeBorder),
                           ),
                           child:
                               item.habit.templateId ==
@@ -2747,8 +2753,8 @@ class _WillHabitTile extends ConsumerWidget {
                                     const SizedBox(height: 14),
                                     _HubResetOptionTile(
                                       icon: Icons.history_rounded,
-                                      title:
-                                          l10n.quitProgramRestartKeepHistoryTitle,
+                                      title: l10n
+                                          .quitProgramRestartKeepHistoryTitle,
                                       subtitle: l10n
                                           .quitProgramRestartKeepHistorySubtitle,
                                       color: _kQuitAccent,
@@ -2761,7 +2767,8 @@ class _WillHabitTile extends ConsumerWidget {
                                     _HubResetOptionTile(
                                       icon: Icons.delete_sweep_rounded,
                                       title: l10n.quitProgramRestartWipeTitle,
-                                      subtitle: l10n.quitProgramRestartWipeSubtitle,
+                                      subtitle:
+                                          l10n.quitProgramRestartWipeSubtitle,
                                       color: Colors.redAccent,
                                       onTap: () => Navigator.pop(
                                         ctx,
@@ -2850,9 +2857,7 @@ class _WillHabitTile extends ConsumerWidget {
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           color: fullQuitBadgeBg,
-                          border: Border.all(
-                            color: fullQuitBadgeBorder,
-                          ),
+                          border: Border.all(color: fullQuitBadgeBorder),
                         ),
                         child:
                             item.habit.templateId ==
@@ -2942,16 +2947,15 @@ class _WillHabitTile extends ConsumerWidget {
                                             _QuitHubLiveTimer(
                                               elapsed:
                                                   quitElapsed ?? Duration.zero,
-                                              format:
-                                                  (d) =>
-                                                      _formatQuitHubHmsLocalized(
-                                                        hours: d.inHours,
-                                                        minutes: d.inMinutes
-                                                            .remainder(60),
-                                                        seconds: d.inSeconds
-                                                            .remainder(60),
-                                                        l10n: l10n,
-                                                      ),
+                                              format: (d) =>
+                                                  _formatQuitHubHmsLocalized(
+                                                    hours: d.inHours,
+                                                    minutes: d.inMinutes
+                                                        .remainder(60),
+                                                    seconds: d.inSeconds
+                                                        .remainder(60),
+                                                    l10n: l10n,
+                                                  ),
                                             ),
                                             const SizedBox(height: 4),
                                             Text(

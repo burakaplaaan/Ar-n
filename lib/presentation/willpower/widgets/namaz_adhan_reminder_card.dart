@@ -320,6 +320,26 @@ class _NamazAdhanReminderCardState
     final l10n = AppLocalizations.of(context)!;
     final prefs = ref.watch(sharedPreferencesProvider);
     final displayOn = _effectiveEnabled(prefs);
+    final onLight = Theme.of(context).brightness == Brightness.light;
+    final accent = onLight
+        ? AppColors.accentGreenOnLight
+        : AppColors.accentNeonGreen;
+    final primaryText = onLight ? AppColors.emeraldDark : AppColors.creamBase;
+    final secondaryText = onLight
+        ? AppColors.textSecondary
+        : AppColors.textOnDarkMuted;
+    final subduedIcon = onLight
+        ? AppColors.textSecondary.withValues(alpha: 0.55)
+        : Colors.white.withValues(alpha: 0.35);
+    final tileSurface = onLight
+        ? AppColors.creamSurface.withValues(alpha: 0.92)
+        : Colors.white.withValues(alpha: 0.05);
+    final slotSurface = onLight
+        ? Colors.white.withValues(alpha: 0.7)
+        : Colors.white.withValues(alpha: 0.04);
+    final borderColor = onLight
+        ? AppColors.creamDark.withValues(alpha: 0.75)
+        : AppColors.accentNeonGreen.withValues(alpha: 0.18);
 
     if (widget.compact) {
       return Material(
@@ -335,7 +355,7 @@ class _NamazAdhanReminderCardState
                       ? () => _changeMinutesOnly(prefs)
                       : null,
                   borderRadius: BorderRadius.circular(14),
-                  splashColor: AppColors.accentNeonGreen.withValues(alpha: 0.1),
+                  splashColor: accent.withValues(alpha: 0.1),
                   child: Padding(
                     padding: const EdgeInsets.symmetric(
                       vertical: 8,
@@ -345,9 +365,7 @@ class _NamazAdhanReminderCardState
                       children: [
                         Icon(
                           Icons.notifications_active_outlined,
-                          color: AppColors.accentNeonGreen.withValues(
-                            alpha: 0.88,
-                          ),
+                          color: accent.withValues(alpha: 0.88),
                           size: 22,
                         ),
                         const SizedBox(width: 12),
@@ -358,9 +376,7 @@ class _NamazAdhanReminderCardState
                               Text(
                                 l10n.reminderPrayerNotificationTitle,
                                 style: AppTextStyles.labelLarge.copyWith(
-                                  color: AppColors.creamBase.withValues(
-                                    alpha: 0.95,
-                                  ),
+                                  color: primaryText,
                                   fontWeight: FontWeight.w700,
                                   letterSpacing: -0.2,
                                 ),
@@ -371,7 +387,7 @@ class _NamazAdhanReminderCardState
                                     ? _reminderCardSubtitle(l10n)
                                     : l10n.reminderCardDisabledHint,
                                 style: AppTextStyles.labelSmall.copyWith(
-                                  color: AppColors.textOnDarkMuted,
+                                  color: secondaryText,
                                   height: 1.35,
                                 ),
                               ),
@@ -389,13 +405,13 @@ class _NamazAdhanReminderCardState
                   onPressed: () => _openPrayerSoundPicker(prefs),
                   icon: Icon(
                     Icons.graphic_eq_rounded,
-                    color: AppColors.accentNeonGreen.withValues(alpha: 0.88),
+                    color: accent.withValues(alpha: 0.88),
                     size: 22,
                   ),
                 ),
               Switch.adaptive(
                 value: displayOn,
-                activeThumbColor: AppColors.accentNeonGreen,
+                activeThumbColor: accent,
                 materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                 onChanged: PrayerNotificationScheduler.supported
                     ? _onCompactSwitch
@@ -411,10 +427,10 @@ class _NamazAdhanReminderCardState
           padding: const EdgeInsets.fromLTRB(18, 16, 18, 16),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(20),
-            color: Colors.white.withValues(alpha: 0.045),
-            border: Border.all(
-              color: AppColors.accentNeonGreen.withValues(alpha: 0.18),
-            ),
+            color: onLight
+                ? AppColors.creamSurface.withValues(alpha: 0.94)
+                : Colors.white.withValues(alpha: 0.045),
+            border: Border.all(color: borderColor),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -426,11 +442,11 @@ class _NamazAdhanReminderCardState
                     padding: const EdgeInsets.all(9),
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: AppColors.accentNeonGreen.withValues(alpha: 0.1),
+                      color: accent.withValues(alpha: 0.1),
                     ),
                     child: Icon(
                       Icons.mosque_rounded,
-                      color: AppColors.accentNeonGreen.withValues(alpha: 0.9),
+                      color: accent.withValues(alpha: 0.9),
                       size: 20,
                     ),
                   ),
@@ -442,7 +458,7 @@ class _NamazAdhanReminderCardState
                         Text(
                           l10n.reminderPrayerNotificationTitle,
                           style: AppTextStyles.titleSmall.copyWith(
-                            color: AppColors.creamBase,
+                            color: primaryText,
                             fontWeight: FontWeight.w800,
                             letterSpacing: -0.3,
                           ),
@@ -455,7 +471,7 @@ class _NamazAdhanReminderCardState
               if (PrayerNotificationScheduler.supported) ...[
                 const SizedBox(height: 10),
                 Material(
-                  color: Colors.white.withValues(alpha: 0.05),
+                  color: tileSurface,
                   borderRadius: BorderRadius.circular(14),
                   child: InkWell(
                     borderRadius: BorderRadius.circular(14),
@@ -469,9 +485,7 @@ class _NamazAdhanReminderCardState
                         children: [
                           Icon(
                             Icons.graphic_eq_rounded,
-                            color: AppColors.accentNeonGreen.withValues(
-                              alpha: 0.88,
-                            ),
+                            color: accent.withValues(alpha: 0.88),
                             size: 22,
                           ),
                           const SizedBox(width: 12),
@@ -479,15 +493,12 @@ class _NamazAdhanReminderCardState
                             child: Text(
                               l10n.prayerSoundPickerTitle,
                               style: AppTextStyles.labelLarge.copyWith(
-                                color: AppColors.creamBase,
+                                color: primaryText,
                                 fontWeight: FontWeight.w700,
                               ),
                             ),
                           ),
-                          Icon(
-                            Icons.chevron_right_rounded,
-                            color: Colors.white.withValues(alpha: 0.35),
-                          ),
+                          Icon(Icons.chevron_right_rounded, color: subduedIcon),
                         ],
                       ),
                     ),
@@ -513,7 +524,7 @@ class _NamazAdhanReminderCardState
                         Text(
                           l10n.reminderSectionTitle,
                           style: AppTextStyles.bodyMedium.copyWith(
-                            color: AppColors.creamBase,
+                            color: primaryText,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
@@ -528,13 +539,12 @@ class _NamazAdhanReminderCardState
                               child: Text(
                                 _reminderCardSubtitle(l10n),
                                 style: AppTextStyles.labelSmall.copyWith(
-                                  color: AppColors.accentNeonGreen.withValues(
-                                    alpha: 0.9,
-                                  ),
+                                  color: accent.withValues(alpha: 0.9),
                                   fontWeight: FontWeight.w600,
                                   decoration: TextDecoration.underline,
-                                  decorationColor: AppColors.accentNeonGreen
-                                      .withValues(alpha: 0.45),
+                                  decorationColor: accent.withValues(
+                                    alpha: 0.45,
+                                  ),
                                 ),
                               ),
                             ),
@@ -544,7 +554,7 @@ class _NamazAdhanReminderCardState
                   ),
                   Switch.adaptive(
                     value: displayOn,
-                    activeThumbColor: AppColors.accentNeonGreen,
+                    activeThumbColor: accent,
                     onChanged: PrayerNotificationScheduler.supported
                         ? _onFullSwitch
                         : null,
@@ -556,7 +566,7 @@ class _NamazAdhanReminderCardState
                 Text(
                   l10n.reminderTwoAlertsPerPrayer,
                   style: AppTextStyles.labelSmall.copyWith(
-                    color: AppColors.textOnDarkMuted,
+                    color: secondaryText,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -576,12 +586,8 @@ class _NamazAdhanReminderCardState
                           ),
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(12),
-                            color: Colors.white.withValues(alpha: 0.04),
-                            border: Border.all(
-                              color: AppColors.accentNeonGreen.withValues(
-                                alpha: 0.15,
-                              ),
-                            ),
+                            color: slotSurface,
+                            border: Border.all(color: borderColor),
                           ),
                           child: Row(
                             children: [
@@ -592,7 +598,7 @@ class _NamazAdhanReminderCardState
                                     Text(
                                       _prayerSlotLabel(l10n, i),
                                       style: AppTextStyles.labelLarge.copyWith(
-                                        color: AppColors.creamBase,
+                                        color: primaryText,
                                         fontWeight: FontWeight.w700,
                                       ),
                                     ),
@@ -600,7 +606,7 @@ class _NamazAdhanReminderCardState
                                     Text(
                                       _pairLineForPrayer(prefs, i, l10n),
                                       style: AppTextStyles.labelSmall.copyWith(
-                                        color: AppColors.textOnDarkMuted,
+                                        color: secondaryText,
                                       ),
                                     ),
                                   ],
@@ -608,7 +614,7 @@ class _NamazAdhanReminderCardState
                               ),
                               Icon(
                                 Icons.chevron_right_rounded,
-                                color: Colors.white.withValues(alpha: 0.35),
+                                color: subduedIcon,
                               ),
                             ],
                           ),

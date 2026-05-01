@@ -42,8 +42,7 @@ void setupArinErrorReporting() {
     debugPrint('$_tag PlatformDispatcher: $error');
     debugPrint('$_tag Stack:\n$stack');
     if (_crashlyticsReady) {
-      FirebaseCrashlytics.instance
-          .recordError(error, stack, fatal: true);
+      FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
     }
     return true;
   };
@@ -63,7 +62,10 @@ void setupArinErrorReporting() {
     if (kReleaseMode) {
       return const _ArinFriendlyErrorScreen();
     }
-    return _ArinDebugErrorScreen(message: msg);
+    return _ArinDebugErrorScreen(
+      message: msg,
+      stack: details.stack?.toString(),
+    );
   };
 }
 
@@ -122,9 +124,10 @@ class _ArinFriendlyErrorScreen extends StatelessWidget {
 }
 
 class _ArinDebugErrorScreen extends StatelessWidget {
-  const _ArinDebugErrorScreen({required this.message});
+  const _ArinDebugErrorScreen({required this.message, this.stack});
 
   final String message;
+  final String? stack;
 
   @override
   Widget build(BuildContext context) {
@@ -140,8 +143,11 @@ class _ArinDebugErrorScreen extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    Icon(Icons.bug_report,
-                        color: Colors.red.shade300, size: 28),
+                    Icon(
+                      Icons.bug_report,
+                      color: Colors.red.shade300,
+                      size: 28,
+                    ),
                     const SizedBox(width: 10),
                     const Expanded(
                       child: Text(
@@ -174,7 +180,9 @@ class _ArinDebugErrorScreen extends StatelessWidget {
                     ),
                     child: SingleChildScrollView(
                       child: SelectableText(
-                        message,
+                        stack == null || stack!.trim().isEmpty
+                            ? message
+                            : '$message\n\n$stack',
                         style: const TextStyle(
                           color: Color(0xFFE0E0E0),
                           fontSize: 12,

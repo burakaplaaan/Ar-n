@@ -119,7 +119,7 @@ struct QuoteProvider: TimelineProvider {
       .trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
     let text = rawText.isEmpty ? QuoteWidgetDefaults.text : rawText
     let source = rawSource
-    QuoteEntry(
+    return QuoteEntry(
       date: Date(),
       text: text,
       source: source
@@ -151,11 +151,36 @@ struct QuoteWidgetView: View {
 
   var body: some View {
     switch family {
-    case .accessoryRectangular, .systemSmall:
+    case .accessoryRectangular:
+      quoteAccessory
+    case .systemSmall:
       quoteCompact
     default:
       quoteExpanded
     }
+  }
+
+  private var quoteAccessory: some View {
+    VStack(alignment: .leading, spacing: 2) {
+      if hasSource {
+        Text(entry.source)
+          .font(.system(size: 12, weight: .bold, design: .default))
+          .foregroundColor(primaryTextColor)
+          .lineLimit(1)
+          .minimumScaleFactor(0.72)
+      }
+      Text(entry.text.isEmpty ? "ARIN" : entry.text)
+        .font(.system(size: 13, weight: .regular, design: .serif))
+        .foregroundColor(primaryTextColor)
+        .lineSpacing(-1)
+        .lineLimit(3)
+        .minimumScaleFactor(0.48)
+        .allowsTightening(true)
+        .multilineTextAlignment(.leading)
+    }
+    .padding(.horizontal, 6)
+    .padding(.vertical, 3)
+    .shadow(color: .black.opacity(textShadowOpacity), radius: 2.2, x: 0, y: 1)
   }
 
   /// Kilit ekranı / küçük: üstte kaynak + ay, altta metin (Talak 3 tarzı).
@@ -178,9 +203,10 @@ struct QuoteWidgetView: View {
       Text(entry.text.isEmpty ? "ARIN" : entry.text)
         .font(.system(size: 15, weight: .regular, design: .serif))
         .foregroundColor(primaryTextColor)
-        .lineSpacing(0)
-        .lineLimit(2)
-        .minimumScaleFactor(0.78)
+        .lineSpacing(-1)
+        .lineLimit(4)
+        .minimumScaleFactor(0.50)
+        .allowsTightening(true)
         .multilineTextAlignment(.leading)
     }
     .padding(.horizontal, 11)
@@ -206,9 +232,10 @@ struct QuoteWidgetView: View {
       Text(entry.text.isEmpty ? "ARIN" : entry.text)
         .font(.system(size: 18, weight: .regular, design: .serif))
         .foregroundColor(primaryTextColor)
-        .lineSpacing(1)
-        .lineLimit(2)
-        .minimumScaleFactor(0.82)
+        .lineSpacing(0)
+        .lineLimit(4)
+        .minimumScaleFactor(0.54)
+        .allowsTightening(true)
     }
     .padding(.horizontal, 12)
     .padding(.vertical, 10)
@@ -237,6 +264,7 @@ struct PrayerEntry: TimelineEntry {
   let location: String
   let nextName: String
   let countdown: String
+  let nextDate: Date?
 }
 
 struct PrayerProvider: TimelineProvider {
@@ -245,7 +273,8 @@ struct PrayerProvider: TimelineProvider {
       date: Date(),
       location: "—",
       nextName: localizedWidgetText(tr: "İmsak"),
-      countdown: "0:15:00"
+      countdown: "0:15:00",
+      nextDate: Date().addingTimeInterval(15 * 60)
     )
   }
 
@@ -265,17 +294,24 @@ struct PrayerProvider: TimelineProvider {
     let forceTurkish = !storedWidgetLocaleCode().hasPrefix("tr")
     let rawNextName = u?.string(forKey: "arin_prayer_next_name") ?? ""
     let nextName = forceTurkish ? "İmsak" : turkishPrayerName(rawNextName)
+    let rawLocation = u?.string(forKey: "arin_prayer_location")?
+      .trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+    let location = rawLocation.isEmpty ? PrayerWidgetDefaults.location : rawLocation
     var countdown = sanitizeCountdown(u?.string(forKey: "arin_prayer_countdown") ?? "—")
+    var nextDate: Date? = nil
     if let epochStr = u?.string(forKey: "arin_prayer_next_epoch_ms"),
        let epochMs = Double(epochStr) {
-      let rem = max(0, epochMs / 1000.0 - Date().timeIntervalSince1970)
+      let target = Date(timeIntervalSince1970: epochMs / 1000.0)
+      nextDate = target
+      let rem = max(0, target.timeIntervalSince1970 - Date().timeIntervalSince1970)
       countdown = formatHMS(seconds: rem)
     }
     return PrayerEntry(
       date: Date(),
-      location: "Konum",
+      location: location,
       nextName: nextName,
-      countdown: countdown
+      countdown: countdown,
+      nextDate: nextDate
     )
   }
 
@@ -335,11 +371,7 @@ struct PrayerWidgetView: View {
           .font(.system(size: 15, weight: .semibold))
           .foregroundStyle(secondaryTextColor)
           .symbolRenderingMode(.hierarchical)
-        Text(entry.countdown)
-          .font(.system(size: 21, weight: .semibold, design: .serif))
-          .foregroundStyle(primaryTextColor)
-          .monospacedDigit()
-          .minimumScaleFactor(0.85)
+        countdownText(size: 21, minScale: 0.78)
       }
       Text(entry.location)
         .font(.system(size: 10, weight: .medium, design: .rounded))
@@ -375,10 +407,7 @@ struct PrayerWidgetView: View {
         Image(systemName: "clock.fill")
           .font(.system(size: 18, weight: .semibold))
           .foregroundStyle(secondaryTextColor)
-        Text(entry.countdown)
-          .font(.system(size: 26, weight: .semibold, design: .serif))
-          .foregroundStyle(primaryTextColor)
-          .monospacedDigit()
+        countdownText(size: 26, minScale: 0.78)
       }
       Text(entry.location)
         .font(.system(size: 11, weight: .medium, design: .rounded))
@@ -388,6 +417,23 @@ struct PrayerWidgetView: View {
     }
     .padding(14)
     .shadow(color: .black.opacity(textShadowOpacity), radius: 3.0, x: 0, y: 1)
+  }
+
+  @ViewBuilder
+  private func countdownText(size: CGFloat, minScale: CGFloat) -> some View {
+    if let nextDate = entry.nextDate, nextDate > Date() {
+      Text(timerInterval: Date()...nextDate, countsDown: true)
+        .font(.system(size: size, weight: .semibold, design: .serif))
+        .foregroundStyle(primaryTextColor)
+        .monospacedDigit()
+        .minimumScaleFactor(minScale)
+    } else {
+      Text(entry.countdown)
+        .font(.system(size: size, weight: .semibold, design: .serif))
+        .foregroundStyle(primaryTextColor)
+        .monospacedDigit()
+        .minimumScaleFactor(minScale)
+    }
   }
 }
 

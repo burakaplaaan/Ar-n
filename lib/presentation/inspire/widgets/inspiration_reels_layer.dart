@@ -326,16 +326,12 @@ class InspirationReelsActionRail extends ConsumerWidget {
     required this.lightOnImage,
     this.onRemixBackground,
     this.onShare,
-    this.onShareLongPress,
   });
 
   final InspirationCardModel card;
   final bool lightOnImage;
   final VoidCallback? onRemixBackground;
   final void Function(Rect? shareAnchor)? onShare;
-
-  /// Uzun basınca — Stories derin paylaşımı için BottomSheet açılır.
-  final VoidCallback? onShareLongPress;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -428,13 +424,7 @@ class InspirationReelsActionRail extends ConsumerWidget {
                             }
                             onShare?.call(anchor);
                           },
-                          onLongPress: onShareLongPress == null
-                              ? null
-                              : () {
-                                  HapticFeedback.mediumImpact();
-                                  onShareLongPress!();
-                                },
-                          label: 'Paylaş (uzun bas: Stories)',
+                          label: 'Paylaş',
                         );
                       },
                     ),
@@ -457,7 +447,6 @@ class InspirationReelsLayer extends StatelessWidget {
     this.textAnchor = Alignment.center,
     this.onRemixBackground,
     this.onShare,
-    this.onShareLongPress,
     this.scrollEnabled = true,
   });
 
@@ -466,7 +455,6 @@ class InspirationReelsLayer extends StatelessWidget {
   final Alignment textAnchor;
   final VoidCallback? onRemixBackground;
   final void Function(Rect? shareAnchor)? onShare;
-  final VoidCallback? onShareLongPress;
   final bool scrollEnabled;
 
   @override
@@ -485,7 +473,6 @@ class InspirationReelsLayer extends StatelessWidget {
           lightOnImage: useLightTextOnImage,
           onRemixBackground: onRemixBackground,
           onShare: onShare,
-          onShareLongPress: onShareLongPress,
         ),
       ],
     );
@@ -852,14 +839,12 @@ class _ReelsActionButton extends StatelessWidget {
     required this.onPressed,
     required this.label,
     this.iconColor,
-    this.onLongPress,
   });
 
   final IconData icon;
   final VoidCallback onPressed;
   final String label;
   final Color? iconColor;
-  final VoidCallback? onLongPress;
 
   @override
   Widget build(BuildContext context) {
@@ -871,7 +856,6 @@ class _ReelsActionButton extends StatelessWidget {
         color: Colors.transparent,
         child: InkWell(
           onTap: onPressed,
-          onLongPress: onLongPress,
           customBorder: const CircleBorder(),
           child: Padding(
             padding: const EdgeInsets.all(6),

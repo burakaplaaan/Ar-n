@@ -13,6 +13,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
 import '../../app.dart';
 import '../../core/analytics/arin_analytics.dart';
@@ -343,11 +344,13 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
       _snackFirebase();
       return;
     }
+    final localName = _currentLocalProfileName();
     setState(() => _oauthBusy = true);
     try {
       await ref.read(authServiceProvider).signInWithGoogle();
       unawaited(ArinAnalytics.loginSuccess('google'));
       await _pushHabitsAfterLogin();
+      await _restoreLocalProfileName(localName);
       if (mounted) {
         final l10n = AppLocalizations.of(context)!;
         ScaffoldMessenger.of(context).showSnackBar(
@@ -380,28 +383,88 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
     }
     final svc = ref.read(authServiceProvider);
     if (!svc.appleSignInAvailable) return;
+    final localName = _currentLocalProfileName();
     setState(() => _oauthBusy = true);
     try {
       await svc.signInWithApple();
       unawaited(ArinAnalytics.loginSuccess('apple'));
       await _pushHabitsAfterLogin();
+      await _restoreLocalProfileName(localName);
       if (mounted) {
         final l10n = AppLocalizations.of(context)!;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(l10n.settingsAppleSignInSuccess)),
         );
       }
-    } catch (e) {
-      debugPrint('Apple sign-in failed: $e');
+    } catch (e, st) {
+      debugPrint('Apple sign-in failed: $e\n$st');
       if (mounted) {
         final l10n = AppLocalizations.of(context)!;
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(l10n.settingsAppleSignInFailed)));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(_appleSignInFailureMessage(e, l10n))),
+        );
       }
     } finally {
       if (mounted) setState(() => _oauthBusy = false);
     }
+  }
+
+  String? _currentLocalProfileName() {
+    final name = ref.read(userProfileProvider).name?.trim();
+    if (name == null || name.isEmpty) return null;
+    return name;
+  }
+
+  Future<void> _restoreLocalProfileName(String? name) async {
+    if (name == null || name.isEmpty) return;
+    final current = ref.read(userProfileProvider).name?.trim();
+    if (current == name) return;
+    await ref.read(userProfileProvider.notifier).updateName(name);
+  }
+
+  String _appleSignInFailureMessage(Object error, AppLocalizations l10n) {
+    if (error is SignInWithAppleAuthorizationException) {
+      if (error.code == AuthorizationErrorCode.canceled) {
+        return _trOnlyAppleMessage(l10n, 'Apple girişi iptal edildi.');
+      }
+      if (error.code == AuthorizationErrorCode.failed) {
+        return _trOnlyAppleMessage(
+          l10n,
+          'Apple hesabı yetki vermedi. iPhone Ayarları > Apple Kimliği > Giriş Yapma ve Güvenlik bölümünden Apple ile giriş iznini kontrol edin.',
+        );
+      }
+    }
+    if (error is FirebaseAuthException) {
+      debugPrint(
+        'Apple FirebaseAuthException code=${error.code}, message=${error.message}',
+      );
+      if (error.code == 'operation-not-allowed') {
+        return _trOnlyAppleMessage(
+          l10n,
+          'Firebase konsolunda Apple giriş sağlayıcısı kapalı görünüyor.',
+        );
+      }
+      if (error.code == 'invalid-credential' ||
+          error.code == 'invalid-oauth-credential') {
+        return _trOnlyAppleMessage(
+          l10n,
+          'Apple kimlik doğrulama bilgisi geçersiz geldi. Bundle ID ve Apple Sign In yetkisini Xcode/Firebase tarafında kontrol edin.',
+        );
+      }
+      if (error.code == 'network-request-failed') {
+        return _trOnlyAppleMessage(
+          l10n,
+          'İnternet bağlantısı yüzünden Apple girişi tamamlanamadı.',
+        );
+      }
+    }
+    return l10n.settingsAppleSignInFailed;
+  }
+
+  String _trOnlyAppleMessage(AppLocalizations l10n, String message) {
+    return l10n.localeName.startsWith('tr')
+        ? message
+        : l10n.settingsAppleSignInFailed;
   }
 
   Future<void> _pushHabitsAfterLogin() async {
@@ -449,6 +512,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
     final appLocale = ref.watch(appLocaleProvider);
     final useCream = themeMode == ThemeMode.light;
     final authAsync = ref.watch(authUserProvider);
+    final signedInUser = authAsync.asData?.value;
     // Admin paneli tetikleyicisi Firestore kontrolüne dayanıyor (bkz.
     // isCurrentUserAdminProvider). İlk yüklemede false gelir, Firestore
     // yanıtı dönünce UI otomatik güncellenir — flicker minimal.
@@ -642,18 +706,20 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                         delayMs: 340,
                         onTap: () => context.push(AppRoutes.settingsLanguage),
                       ),
-                      const SizedBox(height: 28),
-                      _SectionLabel(
-                        l10n.settingsSectionSession,
-                        color: muted,
-                      ).animate().fadeIn(delay: 380.ms),
-                      const SizedBox(height: 12),
-                      _SessionActionsPanel(
-                        onDark: onDark,
-                        sessionBusy: _oauthBusy || _accountDeleteBusy,
-                        onSignOut: _signOut,
-                        onDeleteAccount: _deleteAccount,
-                      ).animate().fadeIn(delay: 400.ms),
+                      if (signedInUser != null) ...[
+                        const SizedBox(height: 28),
+                        _SectionLabel(
+                          l10n.settingsSectionSession,
+                          color: muted,
+                        ).animate().fadeIn(delay: 380.ms),
+                        const SizedBox(height: 12),
+                        _SessionActionsPanel(
+                          onDark: onDark,
+                          sessionBusy: _oauthBusy || _accountDeleteBusy,
+                          onSignOut: _signOut,
+                          onDeleteAccount: _deleteAccount,
+                        ).animate().fadeIn(delay: 400.ms),
+                      ],
                       SizedBox(
                         height: MediaQuery.paddingOf(context).bottom + 100,
                       ),

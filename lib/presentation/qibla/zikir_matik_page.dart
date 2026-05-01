@@ -17,7 +17,6 @@ import '../../core/localization/locale_text.dart';
 import '../../core/providers/shared_preferences_provider.dart';
 import '../../data/models/zikir_matik_tur_log.dart';
 import '../../data/repositories/zikir_matik_repository.dart';
-import 'qibla_nested_swipe_back.dart';
 import 'zikir_bilgisi_page.dart';
 import '../shared/widgets/tasbeeh_zikirmatik_device_frame.dart';
 
@@ -51,6 +50,7 @@ abstract final class _ZikirmatikColors {
   static const Color lcdDim = Color(0xFF8FA394);
   static const Color lcdActive = Color(0xFF1A1A1A);
   static const Color labelMuted = Color(0xFFEEF6F6);
+
   /// Diyalog yüzeyi (açık arka planda okunaklı koyu panel).
   static const Color dialogSurface = Color(0xFF3D5050);
 }
@@ -124,6 +124,7 @@ class _ZikirMatikPageState extends ConsumerState<ZikirMatikPage>
     if (t == 'Zikrullah') return '';
     return t;
   }
+
   int _target = 33;
 
   bool _soundTick = false;
@@ -151,9 +152,10 @@ class _ZikirMatikPageState extends ConsumerState<ZikirMatikPage>
       vsync: this,
       duration: const Duration(milliseconds: 2600),
     )..repeat(reverse: true);
-    _phraseScale = Tween<double>(begin: 1.0, end: 1.055).animate(
-      CurvedAnimation(parent: _phraseAnim, curve: Curves.easeInOut),
-    );
+    _phraseScale = Tween<double>(
+      begin: 1.0,
+      end: 1.055,
+    ).animate(CurvedAnimation(parent: _phraseAnim, curve: Curves.easeInOut));
     _cardIntro = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 580),
@@ -293,11 +295,13 @@ class _ZikirMatikPageState extends ConsumerState<ZikirMatikPage>
       _schedulePersist();
     }
     if (roundCompleted && completedTur != null) {
+      final completed = completedTur;
+      if (completed == null) return;
       await _repo?.appendTurLog(
         ZikirMatikTurLog(
           id: _uuid.v4(),
           phrase: _phrase,
-          completedTur: completedTur!,
+          completedTur: completed,
           target: _target,
           totalCountAtEvent: _total,
           recordedAtMillis: DateTime.now().millisecondsSinceEpoch,
@@ -376,7 +380,7 @@ class _ZikirMatikPageState extends ConsumerState<ZikirMatikPage>
                         en: 'Reset counter?',
                         ar: 'إعادة تعيين العداد؟',
                       ),
-                      style: TextStyle(
+                      style: const TextStyle(
                         color: _ZikirmatikColors.labelMuted,
                         fontSize: 19,
                         fontWeight: FontWeight.w800,
@@ -393,8 +397,9 @@ class _ZikirMatikPageState extends ConsumerState<ZikirMatikPage>
                         ar: 'سيتم تصفير العدد الإجمالي ومعلومات الجولة.',
                       ),
                       style: TextStyle(
-                        color: _ZikirmatikColors.labelMuted
-                            .withValues(alpha: 0.72),
+                        color: _ZikirmatikColors.labelMuted.withValues(
+                          alpha: 0.72,
+                        ),
                         fontSize: 14,
                         height: 1.45,
                       ),
@@ -419,7 +424,7 @@ class _ZikirMatikPageState extends ConsumerState<ZikirMatikPage>
                               en: 'Cancel',
                               ar: 'إلغاء',
                             ),
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontWeight: FontWeight.w600,
                               fontSize: 14,
                             ),
@@ -446,7 +451,7 @@ class _ZikirMatikPageState extends ConsumerState<ZikirMatikPage>
                               en: 'Reset',
                               ar: 'تصفير',
                             ),
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontWeight: FontWeight.w700,
                               fontSize: 14,
                             ),
@@ -474,10 +479,13 @@ class _ZikirMatikPageState extends ConsumerState<ZikirMatikPage>
 
   Future<void> _openList() async {
     await Navigator.of(context).push<void>(
-      MaterialPageRoute<void>(
-        builder: (_) => const QiblaNestedSwipeBack(
-          child: ZikirBilgisiPage(),
-        ),
+      PageRouteBuilder<void>(
+        pageBuilder: (_, _, _) => const ZikirBilgisiPage(),
+        transitionDuration: const Duration(milliseconds: 180),
+        reverseTransitionDuration: const Duration(milliseconds: 160),
+        transitionsBuilder: (_, animation, _, child) {
+          return FadeTransition(opacity: animation, child: child);
+        },
       ),
     );
   }
@@ -576,23 +584,17 @@ class _ZikirMatikPageState extends ConsumerState<ZikirMatikPage>
         ),
         content: TextField(
           controller: controller,
-          decoration: const InputDecoration(
-            border: OutlineInputBorder(),
-          ),
+          decoration: const InputDecoration(border: OutlineInputBorder()),
           textCapitalization: TextCapitalization.sentences,
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: Text(
-              _ztr(context, tr: 'Vazgeç', en: 'Cancel', ar: 'إلغاء'),
-            ),
+            child: Text(_ztr(context, tr: 'Vazgeç', en: 'Cancel', ar: 'إلغاء')),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(ctx, true),
-            child: Text(
-              _ztr(context, tr: 'Tamam', en: 'OK', ar: 'حسنًا'),
-            ),
+            child: Text(_ztr(context, tr: 'Tamam', en: 'OK', ar: 'حسنًا')),
           ),
         ],
       ),
@@ -628,7 +630,8 @@ class _ZikirMatikPageState extends ConsumerState<ZikirMatikPage>
         en: 'Dhikr counter',
         ar: 'عداد الذكر',
       ),
-      value: '$_total, ${_ztr(context, tr: 'TUR', en: 'ROUND', ar: 'جولة')} $_tur',
+      value:
+          '$_total, ${_ztr(context, tr: 'TUR', en: 'ROUND', ar: 'جولة')} $_tur',
       child: Scaffold(
         backgroundColor: _ZikirmatikColors.pageBg,
         body: SafeArea(
@@ -641,8 +644,11 @@ class _ZikirMatikPageState extends ConsumerState<ZikirMatikPage>
                   children: [
                     IconButton(
                       onPressed: () => Navigator.of(context).maybePop(),
-                      icon: const Icon(Icons.arrow_back_ios_new_rounded,
-                          color: _ZikirmatikColors.labelMuted, size: 22),
+                      icon: const Icon(
+                        Icons.arrow_back_ios_new_rounded,
+                        color: _ZikirmatikColors.labelMuted,
+                        size: 22,
+                      ),
                     ),
                     const Spacer(),
                     const SizedBox(width: 48),
@@ -680,8 +686,7 @@ class _ZikirMatikPageState extends ConsumerState<ZikirMatikPage>
                       Positioned.fill(
                         child: LayoutBuilder(
                           builder: (context, constraints) {
-                            final screenW =
-                                MediaQuery.sizeOf(context).width;
+                            final screenW = MediaQuery.sizeOf(context).width;
                             final maxOuterW = math.min(
                               constraints.maxWidth,
                               math.min(
@@ -695,7 +700,8 @@ class _ZikirMatikPageState extends ConsumerState<ZikirMatikPage>
                               constraints.maxHeight -
                                   _kZikirTasbeehBottomOverlayReserve,
                             );
-                            final designH = _kZikirTasbeehDesignW /
+                            final designH =
+                                _kZikirTasbeehDesignW /
                                 TasbeehZikirmatikLayout.widthOverHeight;
                             return Align(
                               alignment: const Alignment(0, -0.14),
@@ -714,13 +720,16 @@ class _ZikirMatikPageState extends ConsumerState<ZikirMatikPage>
                                         width: _kZikirTasbeehDesignW,
                                         height: designH,
                                         child: TasbeehZikirmatikDeviceFrame(
-                                          outerColor:
-                                              _ZikirmatikColors.outer,
+                                          outerColor: _ZikirmatikColors.outer,
                                           innerColor:
                                               _ZikirmatikColors.shieldInner,
                                           contentPadding:
                                               const EdgeInsets.fromLTRB(
-                                                  16, 58, 16, 14),
+                                                16,
+                                                58,
+                                                16,
+                                                14,
+                                              ),
                                           child: Column(
                                             children: [
                                               const SizedBox(height: 15),
@@ -731,17 +740,17 @@ class _ZikirMatikPageState extends ConsumerState<ZikirMatikPage>
                                                   child: Container(
                                                     width: double.infinity,
                                                     padding:
-                                                        const EdgeInsets
-                                                            .symmetric(
-                                                      vertical: 9,
-                                                      horizontal: 8,
-                                                    ),
+                                                        const EdgeInsets.symmetric(
+                                                          vertical: 9,
+                                                          horizontal: 8,
+                                                        ),
                                                     decoration: BoxDecoration(
                                                       color: _ZikirmatikColors
                                                           .lcdBg,
                                                       borderRadius:
-                                                          BorderRadius
-                                                              .circular(8),
+                                                          BorderRadius.circular(
+                                                            8,
+                                                          ),
                                                     ),
                                                     child: FittedBox(
                                                       fit: BoxFit.scaleDown,
@@ -749,8 +758,8 @@ class _ZikirMatikPageState extends ConsumerState<ZikirMatikPage>
                                                         textAlign:
                                                             TextAlign.center,
                                                         text: TextSpan(
-                                                            children:
-                                                                _lcdSpans()),
+                                                          children: _lcdSpans(),
+                                                        ),
                                                       ),
                                                     ),
                                                   ),
@@ -760,10 +769,8 @@ class _ZikirMatikPageState extends ConsumerState<ZikirMatikPage>
                                               Text(
                                                 '${_ztr(context, tr: 'BU TUR', en: 'THIS ROUND', ar: 'هذه الجولة')}: $_round / $_target',
                                                 style: TextStyle(
-                                                  color: _ZikirmatikColors
-                                                      .outer
-                                                      .withValues(
-                                                          alpha: 0.92),
+                                                  color: _ZikirmatikColors.outer
+                                                      .withValues(alpha: 0.92),
                                                   fontSize: 12,
                                                   fontWeight: FontWeight.w500,
                                                 ),
@@ -771,10 +778,8 @@ class _ZikirMatikPageState extends ConsumerState<ZikirMatikPage>
                                               Text(
                                                 '${_ztr(context, tr: 'TUR', en: 'ROUND', ar: 'جولة')}: $_tur',
                                                 style: TextStyle(
-                                                  color: _ZikirmatikColors
-                                                      .outer
-                                                      .withValues(
-                                                          alpha: 0.92),
+                                                  color: _ZikirmatikColors.outer
+                                                      .withValues(alpha: 0.92),
                                                   fontSize: 12,
                                                   fontWeight: FontWeight.w500,
                                                 ),
@@ -783,7 +788,8 @@ class _ZikirMatikPageState extends ConsumerState<ZikirMatikPage>
                                               Padding(
                                                 padding:
                                                     const EdgeInsets.symmetric(
-                                                        horizontal: 28),
+                                                      horizontal: 28,
+                                                    ),
                                                 child: Row(
                                                   mainAxisAlignment:
                                                       MainAxisAlignment
@@ -791,8 +797,7 @@ class _ZikirMatikPageState extends ConsumerState<ZikirMatikPage>
                                                   children: [
                                                     _ZikirMatikCircleIconButton(
                                                       onPressed: _reset,
-                                                      icon: Icons
-                                                          .undo_rounded,
+                                                      icon: Icons.undo_rounded,
                                                       tooltip: _ztr(
                                                         context,
                                                         tr: 'Sıfırla',
@@ -875,8 +880,7 @@ class _ZikirMatikPageState extends ConsumerState<ZikirMatikPage>
                               icon: _vibrateTarget
                                   ? Icons.phonelink_ring_rounded
                                   : Icons.mobile_off_rounded,
-                              label:
-                                  _ztr(
+                              label: _ztr(
                                 context,
                                 tr: 'Titreşim',
                                 en: 'Vibration',
@@ -891,9 +895,10 @@ class _ZikirMatikPageState extends ConsumerState<ZikirMatikPage>
                               activeVisual: _vibrateTarget,
                               semanticsToggled: _vibrateTarget,
                               onTap: () async {
-                                setState(() => _vibrateTarget = !_vibrateTarget);
-                                await _repo?.setVibrateOnTarget(
-                                    _vibrateTarget);
+                                setState(
+                                  () => _vibrateTarget = !_vibrateTarget,
+                                );
+                                await _repo?.setVibrateOnTarget(_vibrateTarget);
                               },
                             ),
                             _ZikirmatikRoundToolColumn(
@@ -927,4 +932,3 @@ class _ZikirMatikPageState extends ConsumerState<ZikirMatikPage>
     );
   }
 }
-
