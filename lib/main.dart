@@ -94,38 +94,9 @@ Future<void> _runApp() async {
   await initializeDateFormatting('en_US');
   await initializeDateFormatting('ar_SA');
 
-  if (!kIsWeb) {
-    await PrayerNotificationScheduler.init();
-    await AppLocalNotificationScheduler.init();
-    if (Platform.isIOS) {
-      await HomeWidget.setAppGroupId('group.com.arin.arin');
-    }
-  }
-
   // Diyanet ilçe asset'ini fonda yükle (settings picker + location service
   // anlık erişim bekliyor; uygulama açılırken beklemeyelim).
   unawaited(DiyanetDistrictMatcher.loadOnce());
-
-  // Eski namaz vakti cache'ini BİR KEZ temizle — Aladhan `school=1` (Hanafi)
-  // ile kaydedilmiş ve İkindi'yi 1 saat ileri atan bozuk entry'leri kökten
-  // attırıyoruz. Yeni Diyanet (ezanvakti) path'i farklı key prefix'i
-  // (`diyanet_v1_...`) kullanıyor, eski Aladhan entry'leri
-  // (`yyyy-MM-dd_g_...`, `yyyy-MM-dd_c_...`) miras olarak duruyordu.
-  // `prayer_cache_migration_v2_done` flag'i bir kereye mahsus çalıştırır.
-  await _migratePrayerCacheV2IfNeeded(prefs);
-
-  // Kaldırılan bildirim kanallarını (Günün sözü + Haftalık özet) BİR KEZ
-  // temizle: pref flag'lerini false'a çek, pending pending alarm'ları
-  // cancel et, Android tarafındaki kanal tanımlarını sil. Bu migration
-  // olmadan eski kurulumda toggle false görünmez ve eski planlanmış
-  // bildirimler tetiklenmeye devam ederdi.
-  if (!kIsWeb) {
-    await _migrateNotificationsV1IfNeeded(prefs);
-  }
-
-  // Eski "Günlük" (Journal) kutusunu disk'ten sil — özellik artık yok.
-  // Bir kerelik çalışır, flag ile kilitlenir.
-  await _migrateRemoveLegacyJournalBoxIfNeeded(prefs);
 
   await bootstrapFirebase();
 
@@ -152,9 +123,6 @@ Future<void> _runApp() async {
     await ArinAnalytics.enable();
   }
 
-  // İlk-launch timestamp (review penceresini ilk 2 gün açmamak için).
-  await ArinReviewPrompter.markAppLaunched(prefs);
-
   runApp(
     ProviderScope(
       observers: const [ArinProviderObserver()],
@@ -162,7 +130,62 @@ Future<void> _runApp() async {
       child: const ArinApp(),
     ),
   );
+  WidgetsBinding.instance.addPostFrameCallback((_) {
+    unawaited(_runDeferredStartup(prefs));
+  });
   debugPrint('══ ARIN ══ runApp tamam');
+}
+
+Future<void> _runDeferredStartup(SharedPreferences prefs) async {
+  if (!kIsWeb) {
+    await _bestEffortStartup(
+      'PrayerNotificationScheduler.init',
+      PrayerNotificationScheduler.init(),
+    );
+    await _bestEffortStartup(
+      'AppLocalNotificationScheduler.init',
+      AppLocalNotificationScheduler.init(),
+    );
+    if (Platform.isIOS) {
+      await _bestEffortStartup(
+        'HomeWidget.setAppGroupId',
+        HomeWidget.setAppGroupId('group.com.arin.arin'),
+      );
+    }
+  }
+
+  // Eski namaz vakti cache'ini BİR KEZ temizle — Aladhan `school=1` (Hanafi)
+  // ile kaydedilmiş ve İkindi'yi 1 saat ileri atan bozuk entry'leri kökten
+  // attırıyoruz. Yeni Diyanet (ezanvakti) path'i farklı key prefix'i
+  // (`diyanet_v1_...`) kullanıyor, eski Aladhan entry'leri
+  // (`yyyy-MM-dd_g_...`, `yyyy-MM-dd_c_...`) miras olarak duruyordu.
+  // `prayer_cache_migration_v2_done` flag'i bir kereye mahsus çalıştırır.
+  await _migratePrayerCacheV2IfNeeded(prefs);
+
+  // Kaldırılan bildirim kanallarını (Günün sözü + Haftalık özet) BİR KEZ
+  // temizle: pref flag'lerini false'a çek, pending pending alarm'ları
+  // cancel et, Android tarafındaki kanal tanımlarını sil. Bu migration
+  // olmadan eski kurulumda toggle false görünmez ve eski planlanmış
+  // bildirimler tetiklenmeye devam ederdi.
+  if (!kIsWeb) {
+    await _migrateNotificationsV1IfNeeded(prefs);
+  }
+
+  // Eski "Günlük" (Journal) kutusunu disk'ten sil — özellik artık yok.
+  // Bir kerelik çalışır, flag ile kilitlenir.
+  await _migrateRemoveLegacyJournalBoxIfNeeded(prefs);
+
+  // İlk-launch timestamp (review penceresini ilk 2 gün açmamak için).
+  await ArinReviewPrompter.markAppLaunched(prefs);
+}
+
+Future<void> _bestEffortStartup(String label, Future<void> future) async {
+  try {
+    await future.timeout(const Duration(seconds: 3));
+  } catch (e, st) {
+    debugPrint('══ ARIN ══ startup skipped $label: $e');
+    debugPrint('$st');
+  }
 }
 
 void _registerAdapters() {

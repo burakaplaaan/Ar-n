@@ -14,6 +14,7 @@ import '../../data/models/prayer_times_model.dart';
 import '../../data/services/diyanet_district_matcher.dart';
 import '../../data/services/location_service.dart';
 import '../settings/widgets/district_picker_sheet.dart';
+import '../shared/providers/auth_providers.dart';
 import '../shared/providers/prayer_time_providers.dart';
 import '../shared/providers/user_profile_providers.dart';
 import 'widgets/daily_namaz_wisdom_card.dart';
@@ -104,7 +105,18 @@ class _HeaderSection extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
-    final userName = ref.watch(userProfileProvider).name ?? l10n.homeGuestUser;
+    final profileName = ref.watch(userProfileProvider).name?.trim();
+    final authName = ref
+        .watch(authUserProvider)
+        .asData
+        ?.value
+        ?.displayName
+        ?.trim();
+    final userName = (profileName != null && profileName.isNotEmpty)
+        ? profileName
+        : (authName != null && authName.isNotEmpty)
+            ? authName
+            : l10n.homeGuestUser;
     final remaining = ref.watch(countdownProvider);
     final nextName = ref.watch(nextPrayerNameProvider);
     // "İmsak çıkıyor": fajr ≤ şimdi < sunrise ise true; kartı kırmızımsı

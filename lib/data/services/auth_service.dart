@@ -115,14 +115,18 @@ class AuthService {
     if (idToken == null) {
       throw StateError('Apple identity token alınamadı.');
     }
-    final oauthCredential = OAuthProvider(
-      'apple.com',
-    ).credential(idToken: idToken, rawNonce: rawNonce);
+    _debugLogAppleTokenDiagnostics(idToken: idToken, hashedNonce: nonce);
+    final oauthCredential = _appleCredential(
+      idToken: idToken,
+      rawNonce: rawNonce,
+      givenName: appleCredential.givenName,
+      familyName: appleCredential.familyName,
+    );
 
     final userCredential = await _auth.signInWithCredential(oauthCredential);
 
     // Apple ad/soyad bilgisini YALNIZCA ilk girişte döner; Firebase
-    // OAuthProvider bu alanları otomatik `user.displayName`'e yazmaz.
+    // Apple credential bu alanları otomatik `user.displayName`'e yazmaz.
     // Burada bir kez yakalayıp kalıcı olarak kullanıcı profiline yazıyoruz —
     // aksi halde kullanıcı ayarlar/profil ekranında "Merhaba, …" boş görür.
     await _maybeAttachAppleDisplayName(
@@ -215,9 +219,13 @@ class AuthService {
       if (idToken == null) {
         throw StateError('Apple identity token alınamadı (reauth).');
       }
-      final oauthCredential = OAuthProvider(
-        'apple.com',
-      ).credential(idToken: idToken, rawNonce: rawNonce);
+      _debugLogAppleTokenDiagnostics(idToken: idToken, hashedNonce: nonce);
+      final oauthCredential = _appleCredential(
+        idToken: idToken,
+        rawNonce: rawNonce,
+        givenName: appleCredential.givenName,
+        familyName: appleCredential.familyName,
+      );
       await u.reauthenticateWithCredential(oauthCredential);
       return;
     }
@@ -270,5 +278,45 @@ class AuthService {
     final bytes = utf8.encode(input);
     final digest = sha256.convert(bytes);
     return digest.toString();
+  }
+
+  static OAuthCredential _appleCredential({
+    required String idToken,
+    required String rawNonce,
+    String? givenName,
+    String? familyName,
+  }) {
+    return AppleAuthProvider.credentialWithIDToken(
+      idToken,
+      rawNonce,
+      AppleFullPersonName(givenName: givenName, familyName: familyName),
+    );
+  }
+
+  static void _debugLogAppleTokenDiagnostics({
+    required String idToken,
+    required String hashedNonce,
+  }) {
+    assert(() {
+      try {
+        final parts = idToken.split('.');
+        if (parts.length < 2) return true;
+        final payload = utf8.decode(
+          base64Url.decode(base64Url.normalize(parts[1])),
+        );
+        final claims = jsonDecode(payload);
+        if (claims is! Map<String, dynamic>) return true;
+        final audience = claims['aud'];
+        final nonceClaim = claims['nonce'];
+        debugPrint(
+          'AuthService: Apple token aud=$audience, '
+          'expectedAud=${DefaultFirebaseOptions.ios.iosBundleId}, '
+          'nonceMatch=${nonceClaim == hashedNonce}',
+        );
+      } catch (e) {
+        debugPrint('AuthService: Apple token diagnostics failed: $e');
+      }
+      return true;
+    }());
   }
 }

@@ -21,13 +21,15 @@ class UserProfileModelAdapter extends TypeAdapter<UserProfileModel> {
       needTags: (fields[2] as List).cast<String>(),
       lastSurveyDate: fields[3] as String?,
       onboardingCompleted: fields[4] as bool,
+      name: fields[5] as String?,
+      gender: fields[6] as String?,
     );
   }
 
   @override
   void write(BinaryWriter writer, UserProfileModel obj) {
     writer
-      ..writeByte(5)
+      ..writeByte(7)
       ..writeByte(0)
       ..write(obj.moodTags)
       ..writeByte(1)
@@ -37,7 +39,11 @@ class UserProfileModelAdapter extends TypeAdapter<UserProfileModel> {
       ..writeByte(3)
       ..write(obj.lastSurveyDate)
       ..writeByte(4)
-      ..write(obj.onboardingCompleted);
+      ..write(obj.onboardingCompleted)
+      ..writeByte(5)
+      ..write(obj.name)
+      ..writeByte(6)
+      ..write(obj.gender);
   }
 
   @override
