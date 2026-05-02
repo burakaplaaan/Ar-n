@@ -53,16 +53,19 @@ class _AppPreparePageState extends ConsumerState<AppPreparePage> {
   }
 
   Future<void> _runPrepare() async {
-    await Future.wait<void>([
-      Future<void>.delayed(_minimumVisibleDuration),
-      _warmPrayerTimes(),
-      _warmQuotes(),
-    ]);
-    if (!mounted) return;
-    setState(() => _exiting = true);
-    await Future<void>.delayed(const Duration(milliseconds: 420));
-    if (!mounted) return;
-    context.go(AppRoutes.home);
+    try {
+      await Future.wait<void>([
+        Future<void>.delayed(_minimumVisibleDuration),
+        _warmPrayerTimes(),
+        _warmQuotes(),
+      ]).timeout(_minimumVisibleDuration + _warmupTimeout);
+      if (!mounted) return;
+      setState(() => _exiting = true);
+      await Future<void>.delayed(const Duration(milliseconds: 420));
+    } catch (_) {
+      // Hazırlık ekranı hiçbir koşulda giriş akışını kilitlememeli.
+    }
+    if (mounted) context.go(AppRoutes.home);
   }
 
   @override

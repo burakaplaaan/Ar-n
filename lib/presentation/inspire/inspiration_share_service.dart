@@ -27,7 +27,7 @@ abstract final class InspirationShareService {
       MethodChannel('com.arin.arin/kesfet_share');
 
   /// Share sheet'te metin olarak geçer.
-  static const String _shareText = 'ARINAPP — https://arinapp.com';
+  static const String _shareText = 'ARINAPP — https://arinapp-7b136.web.app';
 
   static bool get _isAndroid =>
       !kIsWeb && defaultTargetPlatform == TargetPlatform.android;

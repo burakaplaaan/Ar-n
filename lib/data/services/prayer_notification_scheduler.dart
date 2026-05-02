@@ -33,6 +33,7 @@ final List<int> _scheduledIds = [];
 bool _initialized = false;
 Future<void>? _initFuture;
 String? _initializedLocaleCode;
+const Duration _initTimeout = Duration(seconds: 3);
 
 /// Arka arkaya gelen [reschedule] çağrılarını susturur.
 /// Yaklaşık bir alarm saatine yakın tekrar-planlama, alarmın kaçırılmasına
@@ -63,7 +64,14 @@ abstract final class PrayerNotificationScheduler {
 
   static List<String> _prayerLabels(String localeCode) {
     if (localeCode == 'en') {
-      return const <String>['Fajr', 'Sunrise', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'];
+      return const <String>[
+        'Fajr',
+        'Sunrise',
+        'Dhuhr',
+        'Asr',
+        'Maghrib',
+        'Isha',
+      ];
     }
     if (localeCode == 'ar') {
       return const <String>[
@@ -100,7 +108,9 @@ abstract final class PrayerNotificationScheduler {
   }
 
   static String _channelDescription(String localeCode) {
-    if (localeCode == 'en') return 'Prayer reminders and selected notification sounds';
+    if (localeCode == 'en') {
+      return 'Prayer reminders and selected notification sounds';
+    }
     if (localeCode == 'ar') return 'تذكيرات الصلاة وصوت الإشعار المختار';
     return 'Vakit hatırlatıcıları ve seçilen bildirim sesi';
   }
@@ -116,8 +126,12 @@ abstract final class PrayerNotificationScheduler {
   }
 
   static String _testUnsupportedMessage(String localeCode) {
-    if (localeCode == 'en') return 'Local notifications are unavailable on this platform.';
-    if (localeCode == 'ar') return 'الإشعارات المحلية غير متاحة على هذه المنصة.';
+    if (localeCode == 'en') {
+      return 'Local notifications are unavailable on this platform.';
+    }
+    if (localeCode == 'ar') {
+      return 'الإشعارات المحلية غير متاحة على هذه المنصة.';
+    }
     return 'Bu platformda yerel bildirim yok.';
   }
 
@@ -148,11 +162,23 @@ abstract final class PrayerNotificationScheduler {
     final inflight = _initFuture;
     if (inflight != null) return inflight;
 
-    final run = _initImpl(localeCode: localeCode);
-    _initFuture = run.whenComplete(() {
+    try {
+      final run = _initImpl(localeCode: localeCode).timeout(_initTimeout);
+      _initFuture = run.whenComplete(() {
+        _initFuture = null;
+      });
+      return _initFuture;
+    } on TimeoutException catch (e, st) {
       _initFuture = null;
-    });
-    return _initFuture;
+      debugPrint('Prayer NTF: init timeout ($e)');
+      debugPrint('$st');
+      rethrow;
+    } catch (e, st) {
+      _initFuture = null;
+      debugPrint('Prayer NTF: init failed ($e)');
+      debugPrint('$st');
+      rethrow;
+    }
   }
 
   static Future<void> _initImpl({required String localeCode}) async {
@@ -741,7 +767,10 @@ abstract final class PrayerNotificationScheduler {
       prefs,
       prayerIndex,
     );
-    return await _notificationDetailsForSoundIndex(catIdx, localeCode: localeCode);
+    return await _notificationDetailsForSoundIndex(
+      catIdx,
+      localeCode: localeCode,
+    );
   }
 
   static Future<NotificationDetails> _userFileNotificationDetails({
@@ -795,9 +824,9 @@ abstract final class PrayerNotificationScheduler {
   }
 
   static Future<NotificationDetails> _notificationDetailsForSoundIndex(
-    int soundIndex,
-    {required String localeCode}
-  ) async {
+    int soundIndex, {
+    required String localeCode,
+  }) async {
     // Android: indeks 0 = telefonun varsayılan bildirimi. URI alınamazsa yine
     // katalog ezanına düşme; kullanıcı açıkça sistem sesini seçmiş demektir.
     if (soundIndex == 0 && Platform.isAndroid) {
@@ -869,7 +898,7 @@ abstract final class PrayerNotificationScheduler {
   static List<int> _uniqueOffsets(int a, int b) {
     final out = <int>[];
     if (a >= 0) out.add(a);
-    if (b > 0 && (a < 0 || b != a)) out.add(b);
+    if (b >= 0 && (a < 0 || b != a)) out.add(b);
     // En erken tetiklenen uyarı (dakika değeri daha büyük) önce planlansın.
     // Android'de alarmClock modu ilk elemana verildiği için bu sıralama önemlidir.
     out.sort((x, y) => y.compareTo(x));
@@ -893,11 +922,7 @@ abstract final class PrayerNotificationScheduler {
       final when = slotStart.subtract(Duration(minutes: m));
       if (when.isBefore(cutoff)) continue;
       final id = idBase + k * 250000;
-      final body = _prayerTimeBody(
-        localeCode,
-        minutesBefore: m,
-        label: label,
-      );
+      final body = _prayerTimeBody(localeCode, minutesBefore: m, label: label);
       final scheduledTime = tz.TZDateTime.from(when, tz.local);
       // Samsung One UI (ve bazı MIUI/HyperOS sürümleri) aynı uygulamadan gelen
       // birden fazla `setAlarmClock()` çağrısında yalnızca en yakın olanı

@@ -1,5 +1,7 @@
 // Günlük namaz — dikkat, kendine söz, mühür (bırakma programlarıyla aynı ritim).
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -33,6 +35,8 @@ class _NamazIbadetOnboardingState extends ConsumerState<NamazIbadetOnboarding> {
   final PageController _page = PageController();
   final TextEditingController _commitment = TextEditingController();
   int _pageIndex = 0;
+  bool _completed = false;
+  bool _closing = false;
 
   double _shellBottomReserve(BuildContext context) {
     return ArinShellLayout.bottomContentPadding(context);
@@ -75,13 +79,19 @@ class _NamazIbadetOnboardingState extends ConsumerState<NamazIbadetOnboarding> {
 
   Future<void> _back() async {
     if (_pageIndex == 0) {
-      widget.onClose();
+      _closeIncomplete();
       return;
     }
     await _page.previousPage(
       duration: const Duration(milliseconds: 320),
       curve: Curves.easeInOutCubic,
     );
+  }
+
+  void _closeIncomplete() {
+    if (_closing || _completed) return;
+    _closing = true;
+    widget.onClose();
   }
 
   @override
@@ -94,150 +104,164 @@ class _NamazIbadetOnboardingState extends ConsumerState<NamazIbadetOnboarding> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    return Scaffold(
-      backgroundColor: AppColors.anthraciteDark,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(
-            Icons.arrow_back_rounded,
-            color: AppColors.creamBase,
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop) return;
+        if (_pageIndex > 0) {
+          unawaited(_back());
+          return;
+        }
+        _closeIncomplete();
+      },
+      child: Scaffold(
+        backgroundColor: AppColors.anthraciteDark,
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          leading: IconButton(
+            icon: const Icon(
+              Icons.arrow_back_rounded,
+              color: AppColors.creamBase,
+            ),
+            onPressed: _back,
           ),
-          onPressed: _back,
+          title: Text(
+            l10n.namazIbadetPrepTitle,
+            style: AppTextStyles.titleMedium.copyWith(
+              color: AppColors.creamBase,
+            ),
+          ),
         ),
-        title: Text(
-          l10n.namazIbadetPrepTitle,
-          style: AppTextStyles.titleMedium.copyWith(color: AppColors.creamBase),
-        ),
-      ),
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
-            child: Row(
-              children: List.generate(3, (i) {
-                final filled = i < _segmentFilled();
-                return Expanded(
-                  child: Padding(
-                    padding: EdgeInsets.only(right: i < 2 ? 6 : 0),
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 300),
-                      height: 3,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(2),
-                        color: filled
-                            ? AppColors.accentNeonGreen
-                            : Colors.white.withValues(alpha: 0.12),
+        body: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
+              child: Row(
+                children: List.generate(3, (i) {
+                  final filled = i < _segmentFilled();
+                  return Expanded(
+                    child: Padding(
+                      padding: EdgeInsets.only(right: i < 2 ? 6 : 0),
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 300),
+                        height: 3,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(2),
+                          color: filled
+                              ? AppColors.accentNeonGreen
+                              : Colors.white.withValues(alpha: 0.12),
+                        ),
                       ),
                     ),
-                  ),
-                );
-              }),
-            ),
-          ),
-          Expanded(
-            child: PageView(
-              controller: _page,
-              physics: const NeverScrollableScrollPhysics(),
-              onPageChanged: (i) => setState(() => _pageIndex = i),
-              children: [
-                _NamazWarningPage(),
-                _NamazCommitmentPage(
-                  controller: _commitment,
-                  chips: namazIbadetCommitmentChipsFor(
-                    localeCode: Localizations.localeOf(context).languageCode,
-                  ),
-                ),
-                Padding(
-                  padding: EdgeInsets.only(
-                    bottom: _shellBottomReserve(context),
-                  ),
-                  child: CommitmentSealWidget(
-                    displayNameSuffix: '',
-                    titlePrefix: l10n.namazIbadetSealTitlePrefix,
-                    infoBannerText: _commitment.text.trim().length > 120
-                        ? '${_commitment.text.trim().substring(0, 120)}…'
-                        : _commitment.text.trim(),
-                    accentColor: AppColors.accentNeonGreen,
-                    progressTrackColor: Colors.white.withValues(alpha: 0.12),
-                    showSkip: false,
-                    holdHint: l10n.namazIbadetSealHoldHint,
-                    successMessage: l10n.namazIbadetSealSuccess,
-                    encourageWhileNotHolding:
-                        l10n.namazIbadetSealEncourageNotHolding,
-                    encourageWhileHolding:
-                        l10n.namazIbadetSealEncourageHolding,
-                    onCompleted: () async {
-                      await ref
-                          .read(habitSummaryProvider.notifier)
-                          .completeQuitOnboarding(
-                            habitId: widget.habitId,
-                            commitmentText: _commitment.text.trim(),
-                          );
-                    },
-                  ),
-                ),
-              ],
-            ),
-          ),
-          if (_pageIndex < 2)
-            SafeArea(
-              top: false,
-              minimum: EdgeInsets.fromLTRB(
-                14,
-                8,
-                14,
-                _actionBottomInset(context),
+                  );
+                }),
               ),
-              child: Container(
-                padding: const EdgeInsets.fromLTRB(10, 10, 10, 8),
-                decoration: BoxDecoration(
-                  color: Colors.black.withValues(alpha: 0.2),
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(
-                    color: Colors.white.withValues(alpha: 0.08),
+            ),
+            Expanded(
+              child: PageView(
+                controller: _page,
+                physics: const NeverScrollableScrollPhysics(),
+                onPageChanged: (i) => setState(() => _pageIndex = i),
+                children: [
+                  _NamazWarningPage(),
+                  _NamazCommitmentPage(
+                    controller: _commitment,
+                    chips: namazIbadetCommitmentChipsFor(
+                      localeCode: Localizations.localeOf(context).languageCode,
+                    ),
                   ),
+                  Padding(
+                    padding: EdgeInsets.only(
+                      bottom: _shellBottomReserve(context),
+                    ),
+                    child: CommitmentSealWidget(
+                      displayNameSuffix: '',
+                      titlePrefix: l10n.namazIbadetSealTitlePrefix,
+                      infoBannerText: _commitment.text.trim().length > 120
+                          ? '${_commitment.text.trim().substring(0, 120)}…'
+                          : _commitment.text.trim(),
+                      accentColor: AppColors.accentNeonGreen,
+                      progressTrackColor: Colors.white.withValues(alpha: 0.12),
+                      showSkip: false,
+                      holdHint: l10n.namazIbadetSealHoldHint,
+                      successMessage: l10n.namazIbadetSealSuccess,
+                      encourageWhileNotHolding:
+                          l10n.namazIbadetSealEncourageNotHolding,
+                      encourageWhileHolding:
+                          l10n.namazIbadetSealEncourageHolding,
+                      onCompleted: () async {
+                        await ref
+                            .read(habitSummaryProvider.notifier)
+                            .completeQuitOnboarding(
+                              habitId: widget.habitId,
+                              commitmentText: _commitment.text.trim(),
+                            );
+                        _completed = true;
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            if (_pageIndex < 2)
+              SafeArea(
+                top: false,
+                minimum: EdgeInsets.fromLTRB(
+                  14,
+                  8,
+                  14,
+                  _actionBottomInset(context),
                 ),
-                child: Row(
-                  children: [
-                    TextButton.icon(
-                      onPressed: _back,
-                      icon: const Icon(
-                        Icons.arrow_back_rounded,
-                        size: 18,
-                        color: AppColors.creamBase,
-                      ),
-                      label: Text(
-                        l10n.surveyBack,
-                        style: AppTextStyles.labelLarge.copyWith(
+                child: Container(
+                  padding: const EdgeInsets.fromLTRB(10, 10, 10, 8),
+                  decoration: BoxDecoration(
+                    color: Colors.black.withValues(alpha: 0.2),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: Colors.white.withValues(alpha: 0.08),
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      TextButton.icon(
+                        onPressed: _back,
+                        icon: const Icon(
+                          Icons.arrow_back_rounded,
+                          size: 18,
                           color: AppColors.creamBase,
-                          fontWeight: FontWeight.w600,
+                        ),
+                        label: Text(
+                          l10n.surveyBack,
+                          style: AppTextStyles.labelLarge.copyWith(
+                            color: AppColors.creamBase,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                       ),
-                    ),
-                    const Spacer(),
-                    FilledButton.icon(
-                      onPressed: _next,
-                      icon: const Icon(Icons.arrow_forward_rounded, size: 18),
-                      style: FilledButton.styleFrom(
-                        backgroundColor: AppColors.accentNeonGreen,
-                        foregroundColor: AppColors.anthraciteDark,
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                          vertical: 13,
+                      const Spacer(),
+                      FilledButton.icon(
+                        onPressed: _next,
+                        icon: const Icon(Icons.arrow_forward_rounded, size: 18),
+                        style: FilledButton.styleFrom(
+                          backgroundColor: AppColors.accentNeonGreen,
+                          foregroundColor: AppColors.anthraciteDark,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 20,
+                            vertical: 13,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(14),
+                          ),
                         ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(14),
-                        ),
+                        label: Text(l10n.surveyNext),
                       ),
-                      label: Text(l10n.surveyNext),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
-            ),
-        ],
+          ],
+        ),
       ),
     );
   }

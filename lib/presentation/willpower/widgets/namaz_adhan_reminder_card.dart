@@ -65,7 +65,8 @@ String _minutePickerLabelEarly(AppLocalizations l10n, int m) {
 }
 
 String _minutePickerLabelSecond(AppLocalizations l10n, int m) {
-  if (m == 0) return l10n.reminderOff;
+  if (m < 0) return l10n.reminderOff;
+  if (m == 0) return l10n.reminderAtExactTime;
   return l10n.reminderMinutesBefore(m);
 }
 
@@ -82,7 +83,7 @@ String _pairLineForPrayer(
   final first = a < 0
       ? l10n.reminderFirstOff
       : l10n.reminderFirstValue(_minutePickerLabelEarly(l10n, a));
-  if (b <= 0) return l10n.reminderPairSecondOff(first);
+  if (b < 0) return l10n.reminderPairSecondOff(first);
   return l10n.reminderPairSecondValue(first, _minutePickerLabelSecond(l10n, b));
 }
 

@@ -83,6 +83,8 @@
 		</array>
 		<key>NSLocationWhenInUseUsageDescription</key>
 		<string>Konumunuz, namaz vakitlerini hesaplamak ve kıble yönünü göstermek için kullanılır.</string>
+		<key>NSAppleMusicUsageDescription</key>
+		<string>Namaz bildirimi için telefonunuzdan seçtiğiniz ses dosyasını kullanmak amacıyla medya arşivinize erişilir.</string>
 		<!-- Keşfet paylaşımı: sosyal uygulamaların URL şemaları.
 	     canOpenURL / share_plus chooser'ı için gerekli. iOS 9+ tüm
 	     şemaları buraya beyan etmezseniz canOpenURL false döner. -->

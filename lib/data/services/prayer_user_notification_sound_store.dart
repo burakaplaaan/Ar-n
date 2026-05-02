@@ -215,26 +215,38 @@ abstract final class PrayerUserNotificationSoundStore {
 
   static Future<bool> importForSlot(SharedPreferences p, int slot) async {
     assert(slot >= 0 && slot < PrayerReminderPrefs.slotCount);
-    final ext = await _pickAndCopy(slot: slot);
-    if (ext == null) return false;
-    await PrayerReminderPrefs.bumpUserSoundChannelForSlot(p, slot);
-    await PrayerReminderPrefs.setUserSoundExtForSlot(p, slot, ext);
-    return true;
+    try {
+      final ext = await _pickAndCopy(slot: slot);
+      if (ext == null) return false;
+      await PrayerReminderPrefs.bumpUserSoundChannelForSlot(p, slot);
+      await PrayerReminderPrefs.setUserSoundExtForSlot(p, slot, ext);
+      return true;
+    } catch (e, st) {
+      debugPrint('Prayer user sound import slot $slot failed: $e');
+      debugPrint('$st');
+      return false;
+    }
   }
 
   static Future<bool> importForAllSlots(SharedPreferences p) async {
     if (kIsWeb) return false;
-    final r = await _pickFilesWithFallback();
-    if (r == null || r.files.isEmpty) return false;
-    final picked = r.files.single;
+    try {
+      final r = await _pickFilesWithFallback();
+      if (r == null || r.files.isEmpty) return false;
+      final picked = r.files.single;
 
-    for (var slot = 0; slot < PrayerReminderPrefs.slotCount; slot++) {
-      final ext = await _copyPickedFileToSlot(picked, slot: slot);
-      if (ext == null) return false;
-      await PrayerReminderPrefs.bumpUserSoundChannelForSlot(p, slot);
-      await PrayerReminderPrefs.setUserSoundExtForSlot(p, slot, ext);
+      for (var slot = 0; slot < PrayerReminderPrefs.slotCount; slot++) {
+        final ext = await _copyPickedFileToSlot(picked, slot: slot);
+        if (ext == null) return false;
+        await PrayerReminderPrefs.bumpUserSoundChannelForSlot(p, slot);
+        await PrayerReminderPrefs.setUserSoundExtForSlot(p, slot, ext);
+      }
+      return true;
+    } catch (e, st) {
+      debugPrint('Prayer user sound import all failed: $e');
+      debugPrint('$st');
+      return false;
     }
-    return true;
   }
 
   static Future<void> clearForSlot(SharedPreferences p, int slot) async {

@@ -22,6 +22,8 @@ abstract final class PrayerReminderPrefs {
   static const _kMinutesBefore = 'prayer_reminder_minutes_before';
   static const _kMinutesBefore2 = 'prayer_reminder_minutes_before_2';
   static const _kSabahFirstOrderDone = 'prayer_reminder_sabah_first_order_done';
+  static const _kSecondExactTimeMigrationDone =
+      'prayer_reminder_second_exact_time_migration_v1';
 
   static const int slotCount = 6;
   static const int _defaultEarlyMinutes = 5;
@@ -43,8 +45,9 @@ abstract final class PrayerReminderPrefs {
     60,
   ];
 
-  /// 2. uyarı: 0 = kapalı, aksi dakika önce (aynı adımlar).
+  /// 2. uyarı: -1 = kapalı, 0 = tam vakitte, aksi dakika önce.
   static const List<int> pickerSecondValues = [
+    -1,
     0,
     1,
     5,
@@ -250,6 +253,16 @@ abstract final class PrayerReminderPrefs {
       await p.setBool(_kMigratedNtfUserFiles, true);
     }
 
+    Future<void> migrateSecondZeroToOffIfNeeded() async {
+      if (p.getBool(_kSecondExactTimeMigrationDone) ?? false) return;
+      for (var i = 0; i < slotCount; i++) {
+        if (p.getInt(_secondKey(i)) == 0) {
+          await p.setInt(_secondKey(i), -1);
+        }
+      }
+      await p.setBool(_kSecondExactTimeMigrationDone, true);
+    }
+
     if (p.getInt(_earlyKey(5)) != null) {
       if (!(p.getBool(_kSabahFirstOrderDone) ?? false)) {
         final e0 = p.getInt(_earlyKey(0));
@@ -266,6 +279,7 @@ abstract final class PrayerReminderPrefs {
         }
         await p.setBool(_kSabahFirstOrderDone, true);
       }
+      await migrateSecondZeroToOffIfNeeded();
       await finishInit();
       return;
     }
@@ -275,15 +289,17 @@ abstract final class PrayerReminderPrefs {
       for (var i = 4; i >= 1; i--) {
         final e = p.getInt(_earlyKey(i));
         final s = p.getInt(_secondKey(i));
-        if (e != null)
+        if (e != null) {
           await p.setInt(_earlyKey(i + 1), _snap(e, pickerEarlyValues));
+        }
         if (s != null) {
           await p.setInt(_secondKey(i + 1), _snap(s, pickerSecondValues));
         }
       }
       await p.setInt(_earlyKey(1), _snap(-1, pickerEarlyValues));
-      await p.setInt(_secondKey(1), _snap(0, pickerSecondValues));
+      await p.setInt(_secondKey(1), _snap(-1, pickerSecondValues));
       await p.setBool(_kSabahFirstOrderDone, true);
+      await migrateSecondZeroToOffIfNeeded();
       await finishInit();
       return;
     }
@@ -294,7 +310,9 @@ abstract final class PrayerReminderPrefs {
     final legacyB = p.getInt(_kMinutesBefore2);
 
     final earlySeed = legacyA ?? _defaultEarlyMinutes;
-    final secondSeed = hadLegacy ? (legacyB ?? 0) : _defaultSecondMinutes;
+    final secondSeed = hadLegacy
+        ? ((legacyB ?? 0) <= 0 ? -1 : legacyB!)
+        : _defaultSecondMinutes;
 
     final e = _snap(earlySeed, pickerEarlyValues);
     final s = _snap(secondSeed, pickerSecondValues);
@@ -302,9 +320,10 @@ abstract final class PrayerReminderPrefs {
     for (var i = 0; i < slotCount; i++) {
       final isSunrise = i == _sunriseSlotIndex;
       await p.setInt(_earlyKey(i), isSunrise ? -1 : e);
-      await p.setInt(_secondKey(i), isSunrise ? 0 : s);
+      await p.setInt(_secondKey(i), isSunrise ? -1 : s);
     }
     await p.setBool(_kSabahFirstOrderDone, true);
+    await migrateSecondZeroToOffIfNeeded();
     await finishInit();
   }
 
@@ -326,8 +345,11 @@ abstract final class PrayerReminderPrefs {
     final v = p.getInt(_secondKey(prayerIndex));
     if (v != null) return _snap(v, pickerSecondValues);
     final legacy = p.getInt(_kMinutesBefore2);
-    if (legacy != null) return _snap(legacy, pickerSecondValues);
-    if (prayerIndex == _sunriseSlotIndex) return 0;
+    if (legacy != null) {
+      if (legacy <= 0) return -1;
+      return _snap(legacy, pickerSecondValues);
+    }
+    if (prayerIndex == _sunriseSlotIndex) return -1;
     return _defaultSecondMinutes;
   }
 

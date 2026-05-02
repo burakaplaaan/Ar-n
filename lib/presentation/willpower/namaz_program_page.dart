@@ -1,5 +1,7 @@
 // Günlük namaz programı — alıntı, beş vakit, hatırlatıcı yönlendirmesi, son günler şeridi.
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -14,6 +16,7 @@ import '../../data/models/habit_model.dart';
 import '../shared/providers/habit_providers.dart';
 import 'namaz_ibadet_onboarding.dart';
 import 'salat_celebration.dart';
+import 'salat_tracking_visibility_provider.dart';
 import 'salat_providers.dart';
 import 'widgets/namaz_adhan_reminder_card.dart';
 import 'widgets/namaz_insight_card.dart';
@@ -72,6 +75,18 @@ class _NamazProgramPageState extends ConsumerState<NamazProgramPage> {
     context.go(AppRoutes.habitsGelisimTab);
   }
 
+  Future<void> _cancelIncompleteSetup(HabitModel habit) async {
+    if (!widget.showHomeVisibilityHint || !_needsIbadetOnboarding(habit)) {
+      _goToGelisimHub();
+      return;
+    }
+    await ref.read(habitRepositoryProvider).deletePermanently(habit.id);
+    ref.read(habitSummaryProvider.notifier).refresh();
+    await ref.read(salatTrackingVisibleOnHomeProvider.notifier).disable();
+    if (!mounted) return;
+    context.go(AppRoutes.home);
+  }
+
   Future<void> _celebrateIfNeeded() async {
     final habit = ref.read(habitRepositoryProvider).getById(widget.habitId);
     if (habit == null || !mounted) return;
@@ -108,8 +123,9 @@ class _NamazProgramPageState extends ConsumerState<NamazProgramPage> {
         body: Center(
           child: Text(
             l10n.willpowerHabitNotFound,
-            style: AppTextStyles.bodyMedium
-                .copyWith(color: AppColors.textOnDarkMuted),
+            style: AppTextStyles.bodyMedium.copyWith(
+              color: AppColors.textOnDarkMuted,
+            ),
           ),
         ),
       );
@@ -118,7 +134,7 @@ class _NamazProgramPageState extends ConsumerState<NamazProgramPage> {
     if (_needsIbadetOnboarding(habit)) {
       return NamazIbadetOnboarding(
         habitId: habit.id,
-        onClose: _goToGelisimHub,
+        onClose: () => unawaited(_cancelIncompleteSetup(habit)),
       );
     }
 
@@ -148,8 +164,10 @@ class _NamazProgramPageState extends ConsumerState<NamazProgramPage> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
                   child: Row(
                     children: [
                       TextButton(
@@ -189,14 +207,16 @@ class _NamazProgramPageState extends ConsumerState<NamazProgramPage> {
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
                             border: Border.all(
-                              color: AppColors.accentNeonGreen
-                                  .withValues(alpha: 0.35),
+                              color: AppColors.accentNeonGreen.withValues(
+                                alpha: 0.35,
+                              ),
                               width: 1.5,
                             ),
                             boxShadow: [
                               BoxShadow(
-                                color: AppColors.accentNeonGreen
-                                    .withValues(alpha: 0.15),
+                                color: AppColors.accentNeonGreen.withValues(
+                                  alpha: 0.15,
+                                ),
                                 blurRadius: 28,
                                 spreadRadius: 2,
                               ),
@@ -258,11 +278,11 @@ class _NamazProgramPageState extends ConsumerState<NamazProgramPage> {
                                     children: [
                                       Text(
                                         l10n.namazProgramTodayPrayersTitle,
-                                        style:
-                                            AppTextStyles.titleSmall.copyWith(
-                                          color: AppColors.creamBase,
-                                          fontWeight: FontWeight.w700,
-                                        ),
+                                        style: AppTextStyles.titleSmall
+                                            .copyWith(
+                                              color: AppColors.creamBase,
+                                              fontWeight: FontWeight.w700,
+                                            ),
                                       ),
                                       const SizedBox(height: 4),
                                       Text(
@@ -284,8 +304,9 @@ class _NamazProgramPageState extends ConsumerState<NamazProgramPage> {
                               child: LinearProgressIndicator(
                                 value: done / 5,
                                 minHeight: 6,
-                                backgroundColor:
-                                    Colors.white.withValues(alpha: 0.08),
+                                backgroundColor: Colors.white.withValues(
+                                  alpha: 0.08,
+                                ),
                                 color: AppColors.accentNeonGreen,
                               ),
                             ),
@@ -315,7 +336,9 @@ class _NamazProgramPageState extends ConsumerState<NamazProgramPage> {
                           label: Text(
                             l10n.namazProgramSystemNotificationSettings,
                             style: AppTextStyles.labelMedium.copyWith(
-                              color: AppColors.creamBase.withValues(alpha: 0.55),
+                              color: AppColors.creamBase.withValues(
+                                alpha: 0.55,
+                              ),
                             ),
                           ),
                         ),

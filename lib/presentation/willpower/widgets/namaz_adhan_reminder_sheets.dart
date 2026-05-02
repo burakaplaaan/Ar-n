@@ -126,58 +126,65 @@ class _PrayerNotificationSoundSheetState
   }
 
   Future<void> _preview(PrayerNtfSoundOption opt) async {
-    await _disposePlayer();
-
-    if (opt.previewAssetRelativePath != null) {
-      _player = AudioPlayer();
-      await _player!.play(AssetSource(opt.previewAssetRelativePath!));
-      _armPreviewStopTimer(alsoStopPlayer: true);
-      return;
-    }
-
-    String? uri;
-    if (Platform.isAndroid) {
-      final played =
-          await PrayerNotificationAndroidUri.playDefaultNotificationSound();
-      if (played) return;
-      uri = await PrayerNotificationAndroidUri.defaultNotificationSoundUri();
-    }
-
-    if (uri == null || uri.isEmpty) {
-      if (!mounted) return;
-      final l10n = AppLocalizations.of(context)!;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            l10n.prayerSoundPreviewSystem,
-            style: TextStyle(
-              color: AppColors.creamBase.withValues(alpha: 0.92),
-            ),
-          ),
-          backgroundColor: AppColors.anthraciteMid,
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
-      return;
-    }
-
-    _player = AudioPlayer();
     try {
-      await _player!.play(UrlSource(uri));
-    } catch (_) {
       await _disposePlayer();
-      return;
+
+      if (opt.previewAssetRelativePath != null) {
+        _player = AudioPlayer();
+        await _player!.play(AssetSource(opt.previewAssetRelativePath!));
+        _armPreviewStopTimer(alsoStopPlayer: true);
+        return;
+      }
+
+      String? uri;
+      if (Platform.isAndroid) {
+        final played =
+            await PrayerNotificationAndroidUri.playDefaultNotificationSound();
+        if (played) return;
+        uri = await PrayerNotificationAndroidUri.defaultNotificationSoundUri();
+      }
+
+      if (uri == null || uri.isEmpty) {
+        if (!mounted) return;
+        final l10n = AppLocalizations.of(context)!;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              l10n.prayerSoundPreviewSystem,
+              style: TextStyle(
+                color: AppColors.creamBase.withValues(alpha: 0.92),
+              ),
+            ),
+            backgroundColor: AppColors.anthraciteMid,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+        return;
+      }
+
+      _player = AudioPlayer();
+      await _player!.play(UrlSource(uri));
+      _armPreviewStopTimer(alsoStopPlayer: true);
+    } catch (e, st) {
+      debugPrint('Prayer sound preview failed: $e');
+      debugPrint('$st');
+      await _disposePlayer();
     }
-    _armPreviewStopTimer(alsoStopPlayer: true);
   }
 
   Future<void> _previewUserFile(Future<String?> Function() pathOf) async {
-    await _disposePlayer();
-    final path = await pathOf();
-    if (path == null || !mounted) return;
-    _player = AudioPlayer();
-    await _player!.play(DeviceFileSource(path));
-    _armPreviewStopTimer(alsoStopPlayer: true);
+    try {
+      await _disposePlayer();
+      final path = await pathOf();
+      if (path == null || !mounted) return;
+      _player = AudioPlayer();
+      await _player!.play(DeviceFileSource(path));
+      _armPreviewStopTimer(alsoStopPlayer: true);
+    } catch (e, st) {
+      debugPrint('Prayer user sound preview failed: $e');
+      debugPrint('$st');
+      await _disposePlayer();
+    }
   }
 
   void _snackImportFailed() {

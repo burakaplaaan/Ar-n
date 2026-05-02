@@ -6,8 +6,8 @@ const _salatTrackingVisibleOnHomeKey = 'salat_tracking_visible_on_home';
 
 final salatTrackingVisibleOnHomeProvider =
     NotifierProvider<SalatTrackingVisibilityNotifier, bool>(
-  SalatTrackingVisibilityNotifier.new,
-);
+      SalatTrackingVisibilityNotifier.new,
+    );
 
 class SalatTrackingVisibilityNotifier extends Notifier<bool> {
   @override
@@ -22,5 +22,13 @@ class SalatTrackingVisibilityNotifier extends Notifier<bool> {
     await ref
         .read(sharedPreferencesProvider)
         .setBool(_salatTrackingVisibleOnHomeKey, true);
+  }
+
+  Future<void> disable() async {
+    if (!state) return;
+    state = false;
+    await ref
+        .read(sharedPreferencesProvider)
+        .setBool(_salatTrackingVisibleOnHomeKey, false);
   }
 }

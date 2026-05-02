@@ -1,5 +1,7 @@
 // lib/presentation/home/home_page.dart
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -20,12 +22,38 @@ import '../shared/providers/user_profile_providers.dart';
 import 'widgets/daily_namaz_wisdom_card.dart';
 import 'widgets/home_namaz_ritual_section.dart';
 
-class HomePage extends ConsumerWidget {
+class HomePage extends ConsumerStatefulWidget {
   const HomePage({super.key});
+
+  @override
+  ConsumerState<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends ConsumerState<HomePage> {
+  late DateTime _now;
+  Timer? _clockTimer;
+
+  @override
+  void initState() {
+    super.initState();
+    _now = DateTime.now();
+    _clockTimer = Timer.periodic(const Duration(minutes: 1), (_) {
+      final next = DateTime.now();
+      if (!mounted) return;
+      if (next.hour == _now.hour && next.minute == _now.minute) return;
+      setState(() => _now = next);
+    });
+  }
+
+  @override
+  void dispose() {
+    _clockTimer?.cancel();
+    super.dispose();
+  }
 
   /// Yerel saate göre selam. Gece yarısı–05:59 [hour < 6] sabah değil, gece sayılır.
   String _greeting(AppLocalizations l10n) {
-    final hour = DateTime.now().hour;
+    final hour = _now.hour;
     if (hour < 6) return l10n.homeGreetingNight;
     if (hour < 12) return l10n.homeGreetingMorning;
     if (hour < 17) return l10n.homeGreetingNoon;
@@ -34,7 +62,7 @@ class HomePage extends ConsumerWidget {
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     // Tek Scaffold ArinShell'de; iç içe Scaffold + extendBody bazı cihazlarda boş gövde verebiliyor.
     final bottomPad = MediaQuery.paddingOf(context).bottom;
@@ -115,8 +143,8 @@ class _HeaderSection extends ConsumerWidget {
     final userName = (profileName != null && profileName.isNotEmpty)
         ? profileName
         : (authName != null && authName.isNotEmpty)
-            ? authName
-            : l10n.homeGuestUser;
+        ? authName
+        : l10n.homeGuestUser;
     final remaining = ref.watch(countdownProvider);
     final nextName = ref.watch(nextPrayerNameProvider);
     // "İmsak çıkıyor": fajr ≤ şimdi < sunrise ise true; kartı kırmızımsı
@@ -868,7 +896,9 @@ class _LocationRow extends ConsumerWidget {
     final l10n = AppLocalizations.of(context)!;
     final diff = DateTime.now().difference(lastSyncAt);
     if (diff.inMinutes < 2) return l10n.homeLocationFreshNow;
-    if (diff.inHours < 1) return l10n.homeLocationFreshMinutesAgo(diff.inMinutes);
+    if (diff.inHours < 1) {
+      return l10n.homeLocationFreshMinutesAgo(diff.inMinutes);
+    }
     if (diff.inHours < 24) return l10n.homeLocationFreshHoursAgo(diff.inHours);
     return l10n.homeLocationFreshDaysAgo(diff.inDays);
   }
