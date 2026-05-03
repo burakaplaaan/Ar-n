@@ -1,6 +1,7 @@
 // Firestore `quote_pools/{poolId}` — Hive önbellek; yenileme aralığı ile okuma sınırı.
 // Okuma: önce Source.server (istemci kalıcı önbelleği eski belge döndürmesin), gerekirse cache.
 
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -44,9 +45,18 @@ class QuotePoolsRepository {
 
   /// Uzak belgeyi (aralık dolmuşsa) çekip Hive'a yazar.
   ///
-  /// Günlük tek kilidi kaldırdık: admin gün içinde güncellediğinde kullanıcılar
-  /// en geç birkaç saat içinde görür. Maliyet: havuz başına sınırlı aralıkta en fazla
-  /// bir okuma (widget havuzu için daha kısa aralık).
+  /// AÇILIŞ STRATEJİSİ — cache-first:
+  ///   - Hive'da cache var ve aralık dolmamışsa: hemen döner, hiç bekleme.
+  ///   - Cache var ama aralık dolmuşsa: cache ile devam eder, server
+  ///     tazelemesini ARKA PLANDA tetikler (caller'ı bloklamaz).
+  ///   - Cache yok: ilk açılış senaryosu — server'ı bekler (timeout 10sn
+  ///     Firestore SDK default), boş dönerse legacy bundle migration
+  ///     denemesi yapılır.
+  ///
+  /// Bu strateji açılış path'inde server timeout'u ana isolate'i
+  /// kasamaz — kötü ağda kullanıcı widget/wisdom için 10 saniye boşa
+  /// beklemez. Maliyet: havuz başına sınırlı aralıkta en fazla bir okuma
+  /// (widget havuzu için daha kısa aralık).
   Future<void> ensureSyncedToday(String poolId) async {
     final now = DateTime.now();
     final isWidgetPool = poolId == QuotePoolIds.widgetQuote;
@@ -55,6 +65,8 @@ class QuotePoolsRepository {
         : _minIntervalBetweenFetches;
     final lastMs = _prefs.getInt(_lastFetchAtKey(poolId));
     final hasHiveData = _box.get(_hiveKey(poolId)) != null;
+
+    // Cache var + aralık DOLMAMIŞ → hemen dön, server'a hiç gitme.
     if (lastMs != null && hasHiveData) {
       final last = DateTime.fromMillisecondsSinceEpoch(lastMs);
       if (now.difference(last) < minGap) {
@@ -65,39 +77,31 @@ class QuotePoolsRepository {
       }
     }
 
-    var loaded = false;
-    if (isFirebaseReady) {
-      try {
-        var snap = await _fetchPoolDoc(poolId);
-
-        if ((!snap.exists || snap.data() == null) &&
-            poolId == QuotePoolIds.personalizedQuotes) {
-          final legacy = await getDocumentServerFirst(
-            FirebaseFirestore.instance
-                .collection('app_public')
-                .doc('quotes_bundle'),
-            debugLabel: 'QuotePoolsRepository quotes_bundle',
-          );
-          if (legacy.exists && legacy.data() != null) {
-            snap = legacy;
-          }
-        }
-
-        if (snap.exists && snap.data() != null) {
-          final encoded = _encodeForHive(snap.data()!);
-          if (encoded != null) {
-            await _box.put(_hiveKey(poolId), encoded);
-            loaded = true;
-          }
-        }
-      } catch (e, st) {
-        debugPrint('QuotePoolsRepository($poolId): $e\n$st');
+    // Cache var ama aralık DOLMUŞ → cache ile devam et, tazelemeyi arka
+    // planda tetikle. Caller bloklanmıyor; sonraki açılışta güncel veri
+    // geliyor.
+    if (hasHiveData) {
+      if (isFirebaseReady) {
+        unawaited(
+          _refreshFromServer(poolId, now).then((loaded) async {
+            if (loaded && isWidgetPool) {
+              await _maybePushWidget();
+            }
+          }),
+        );
       }
+      if (isWidgetPool) {
+        await _maybePushWidget();
+      }
+      return;
     }
 
-    if (loaded) {
-      await _prefs.setInt(_lastFetchAtKey(poolId), now.millisecondsSinceEpoch);
-    }
+    // Cache YOK → ilk açılış (yeni kurulum). Server'ı bekle çünkü cache
+    // ile sunabileceğimiz hiçbir şey yok. Burası kötü ağda yine 10sn
+    // bekleyebilir ama bu sadece ilk launch'ta bir kez olur.
+    final loaded = isFirebaseReady
+        ? await _refreshFromServer(poolId, now)
+        : false;
 
     if (!loaded &&
         poolId == QuotePoolIds.personalizedQuotes &&
@@ -111,6 +115,43 @@ class QuotePoolsRepository {
     if (poolId == QuotePoolIds.widgetQuote) {
       await _maybePushWidget();
     }
+  }
+
+  /// Server'dan tazele, başarılıysa Hive'a yaz + lastFetch markla.
+  /// [ensureSyncedToday] hem fg hem arka plan yolundan çağırır.
+  Future<bool> _refreshFromServer(String poolId, DateTime now) async {
+    var loaded = false;
+    try {
+      var snap = await _fetchPoolDoc(poolId);
+
+      if ((!snap.exists || snap.data() == null) &&
+          poolId == QuotePoolIds.personalizedQuotes) {
+        final legacy = await getDocumentServerFirst(
+          FirebaseFirestore.instance
+              .collection('app_public')
+              .doc('quotes_bundle'),
+          debugLabel: 'QuotePoolsRepository quotes_bundle',
+        );
+        if (legacy.exists && legacy.data() != null) {
+          snap = legacy;
+        }
+      }
+
+      if (snap.exists && snap.data() != null) {
+        final encoded = _encodeForHive(snap.data()!);
+        if (encoded != null) {
+          await _box.put(_hiveKey(poolId), encoded);
+          loaded = true;
+        }
+      }
+    } catch (e, st) {
+      debugPrint('QuotePoolsRepository($poolId): $e\n$st');
+    }
+
+    if (loaded) {
+      await _prefs.setInt(_lastFetchAtKey(poolId), now.millisecondsSinceEpoch);
+    }
+    return loaded;
   }
 
   Future<DocumentSnapshot<Map<String, dynamic>>> _fetchPoolDoc(
@@ -196,65 +237,94 @@ class QuotePoolsRepository {
   Future<void> _maybePushWidget() async {
     if (kIsWeb) return;
     try {
-      final wItems = itemsFromCache(QuotePoolIds.widgetQuote);
-      Map<String, dynamic>? row;
-      if (wItems.isNotEmpty) {
-        final now = DateTime.now();
-        final dayOfYear = DateTime(
-          now.year,
-          now.month,
-          now.day,
-        ).difference(DateTime(now.year, 1, 1)).inDays;
-        final secondHalfOfDay = now.hour >= 12;
-        final slotIndex = dayOfYear * 2 + (secondHalfOfDay ? 1 : 0);
-        row = wItems[slotIndex % wItems.length];
-      } else {
-        final now = DateTime.now();
-        final dayOfYear = DateTime(
-          now.year,
-          now.month,
-          now.day,
-        ).difference(DateTime(now.year, 1, 1)).inDays;
-        final secondHalfOfDay = now.hour >= 12;
-        final slotIndex = dayOfYear * 2 + (secondHalfOfDay ? 1 : 0);
-        if (kWidgetQuoteDefaults.isNotEmpty) {
-          final seeded =
-              kWidgetQuoteDefaults[slotIndex % kWidgetQuoteDefaults.length];
-          row = <String, dynamic>{
-            'text': seeded['text'] ?? '',
-            'source': seeded['source'] ?? '',
-          };
-        } else {
-          final pItems = itemsFromCache(QuotePoolIds.personalizedQuotes);
-          if (pItems.isNotEmpty) row = pItems.first;
-        }
-      }
-      if (row == null) return;
+      final rows = _widgetQuoteRows();
+      if (rows.isEmpty) return;
       const localeCode = 'tr';
-      final text =
-          _widgetTrOnlyField(
-            row,
-            baseKey: 'text',
-            legacyTrKeys: const <String>['turkish'],
-          ) ??
-          (kWidgetQuoteDefaults.isNotEmpty
-              ? (kWidgetQuoteDefaults.first['text'] ?? '')
-              : '');
-      final source =
-          _widgetTrOnlyField(
-            row,
-            baseKey: 'source',
-            legacyTrKeys: const <String>['source_tr'],
-          ) ??
-          '';
-      await ArinWidgetSync.pushQuote(
-        text: text,
-        source: source,
+      final slots = _widgetQuoteSlotStarts(DateTime.now(), days: 30);
+      final schedule = <({DateTime startsAt, String text, String source})>[];
+      for (final slot in slots) {
+        final row = rows[_widgetQuoteSlotIndex(slot) % rows.length];
+        final text =
+            _widgetTrOnlyField(
+              row,
+              baseKey: 'text',
+              legacyTrKeys: const <String>['turkish'],
+            ) ??
+            (kWidgetQuoteDefaults.isNotEmpty
+                ? (kWidgetQuoteDefaults.first['text'] ?? '')
+                : '');
+        final source =
+            _widgetTrOnlyField(
+              row,
+              baseKey: 'source',
+              legacyTrKeys: const <String>['source_tr'],
+            ) ??
+            '';
+        if (text.trim().isEmpty) continue;
+        schedule.add((startsAt: slot, text: text, source: source));
+      }
+      if (schedule.isEmpty) return;
+      await ArinWidgetSync.pushQuoteSchedule(
+        entries: schedule,
         localeCode: localeCode,
       );
     } catch (e) {
       debugPrint('QuotePoolsRepository widget: $e');
     }
+  }
+
+  List<Map<String, dynamic>> _widgetQuoteRows() {
+    final wItems = itemsFromCache(QuotePoolIds.widgetQuote);
+    if (wItems.isNotEmpty) return wItems;
+    if (kWidgetQuoteDefaults.isNotEmpty) {
+      return kWidgetQuoteDefaults
+          .map(
+            (seeded) => <String, dynamic>{
+              'text': seeded['text'] ?? '',
+              'source': seeded['source'] ?? '',
+            },
+          )
+          .toList(growable: false);
+    }
+    return itemsFromCache(QuotePoolIds.personalizedQuotes);
+  }
+
+  List<DateTime> _widgetQuoteSlotStarts(DateTime now, {required int days}) {
+    const slotHours = <int>[0, 6, 9, 12, 15, 18, 21];
+    final today = DateTime(now.year, now.month, now.day);
+    var current = DateTime(today.year, today.month, today.day, slotHours.first);
+    for (final h in slotHours) {
+      final candidate = DateTime(today.year, today.month, today.day, h);
+      if (!candidate.isAfter(now)) {
+        current = candidate;
+      } else {
+        break;
+      }
+    }
+
+    final endExclusive = today.add(Duration(days: days));
+    final out = <DateTime>[];
+    for (var dayOffset = 0; dayOffset <= days; dayOffset++) {
+      final day = today.add(Duration(days: dayOffset));
+      for (final h in slotHours) {
+        final slot = DateTime(day.year, day.month, day.day, h);
+        if (slot.isBefore(current) || !slot.isBefore(endExclusive)) continue;
+        out.add(slot);
+      }
+    }
+    return out;
+  }
+
+  int _widgetQuoteSlotIndex(DateTime slot) {
+    const slotHours = <int>[0, 6, 9, 12, 15, 18, 21];
+    final dayOfYear = DateTime(
+      slot.year,
+      slot.month,
+      slot.day,
+    ).difference(DateTime(slot.year, 1, 1)).inDays;
+    final hourIndex = slotHours.indexOf(slot.hour);
+    final safeHourIndex = hourIndex < 0 ? 0 : hourIndex;
+    return dayOfYear * slotHours.length + safeHourIndex;
   }
 
   String? _widgetTrOnlyField(

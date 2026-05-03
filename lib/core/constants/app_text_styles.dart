@@ -1,16 +1,18 @@
 // lib/core/constants/app_text_styles.dart
 // Uygulamanın tüm tipografi sabitlerini tanımlar.
-// Google Fonts'tan "Plus Jakarta Sans" kullanılır.
+// Ana uygulama fontu lokal bundle edilen "Plus Jakarta Sans" ailesidir.
 
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'app_colors.dart';
 
 /// ARIN tipografi sistemi.
 /// Tüm text stilleri bu sınıf üzerinden erişilmelidir.
 abstract final class AppTextStyles {
   // ─── Temel Font Ailesi ──────────────────────────────────────────────
-  static TextStyle get _base => GoogleFonts.plusJakartaSans(
+  static const String primaryFontFamily = 'PlusJakartaSans';
+
+  static TextStyle get _base => const TextStyle(
+        fontFamily: primaryFontFamily,
         color: AppColors.textPrimary,
         letterSpacing: 0.1,
       );
@@ -106,7 +108,7 @@ abstract final class AppTextStyles {
       );
 
   /// Ayet/hadis metni — yumuşak italic
-  static TextStyle get verseText => GoogleFonts.lora(
+  static TextStyle get verseText => _base.copyWith(
         fontSize: 15,
         fontWeight: FontWeight.w400,
         fontStyle: FontStyle.italic,

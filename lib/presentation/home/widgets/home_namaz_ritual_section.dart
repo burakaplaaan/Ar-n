@@ -33,9 +33,6 @@ class HomeNamazRitualSection extends ConsumerWidget {
     try {
       final repo = ref.read(habitRepositoryProvider);
       await repo.ensureDefaultSalatHabit();
-      await ref
-          .read(salatTrackingVisibleOnHomeProvider.notifier)
-          .enableFromGelisim();
       ref.read(habitSummaryProvider.notifier).refresh();
       final habit = repo.findActiveByTemplateId(WillpowerTemplates.salatDaily);
       if (!context.mounted) return;
@@ -59,7 +56,9 @@ class HomeNamazRitualSection extends ConsumerWidget {
     String? salatId;
     for (final e in summary) {
       if (e.habit.templateId == WillpowerTemplates.salatDaily &&
-          !e.habit.isArchived) {
+          !e.habit.isArchived &&
+          e.habit.onboardingCompleted &&
+          e.habit.commitmentText.trim().isNotEmpty) {
         salatId = e.habit.id;
         break;
       }

@@ -9,6 +9,7 @@ import '../models/zikir_matik_tur_log.dart';
 
 abstract final class ZikirMatikPrefsKeys {
   static const recordsJson = 'zikir_matik_records_json';
+  static const customPhrasesJson = 'zikir_matik_custom_phrases_json';
   static const turLogsJson = 'zikir_matik_tur_logs_json';
   static const sessionTotal = 'zikir_matik_session_total';
   static const sessionRound = 'zikir_matik_session_round';
@@ -23,6 +24,8 @@ class ZikirMatikRepository {
   ZikirMatikRepository(this._prefs);
 
   final SharedPreferences _prefs;
+
+  static const int _maxCustomPhrases = 24;
 
   List<ZikirMatikRecord> loadRecords() {
     final raw = _prefs.getString(ZikirMatikPrefsKeys.recordsJson);
@@ -56,6 +59,55 @@ class ZikirMatikRepository {
   Future<void> deleteRecord(String id) async {
     final all = loadRecords().where((e) => e.id != id).toList();
     await _writeRecords(all);
+  }
+
+  List<String> loadCustomPhrases() {
+    final raw = _prefs.getString(ZikirMatikPrefsKeys.customPhrasesJson);
+    if (raw == null || raw.isEmpty) return [];
+    try {
+      final list = jsonDecode(raw) as List<dynamic>;
+      final out = <String>[];
+      for (final item in list) {
+        if (item is! String) continue;
+        final phrase = item.trim();
+        if (phrase.isEmpty) continue;
+        if (out.any((e) => e.toLowerCase() == phrase.toLowerCase())) continue;
+        out.add(phrase);
+        if (out.length >= _maxCustomPhrases) break;
+      }
+      return out;
+    } catch (_) {
+      return [];
+    }
+  }
+
+  Future<void> _writeCustomPhrases(List<String> items) async {
+    await _prefs.setString(
+      ZikirMatikPrefsKeys.customPhrasesJson,
+      jsonEncode(items),
+    );
+  }
+
+  Future<void> saveCustomPhrase(String rawPhrase) async {
+    final phrase = rawPhrase.trim();
+    if (phrase.isEmpty) return;
+    final all = loadCustomPhrases()
+        .where((e) => e.toLowerCase() != phrase.toLowerCase())
+        .toList();
+    all.insert(0, phrase);
+    while (all.length > _maxCustomPhrases) {
+      all.removeLast();
+    }
+    await _writeCustomPhrases(all);
+  }
+
+  Future<void> deleteCustomPhrase(String rawPhrase) async {
+    final phrase = rawPhrase.trim();
+    if (phrase.isEmpty) return;
+    final all = loadCustomPhrases()
+        .where((e) => e.toLowerCase() != phrase.toLowerCase())
+        .toList();
+    await _writeCustomPhrases(all);
   }
 
   static const int _maxTurLogs = 800;

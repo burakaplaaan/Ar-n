@@ -31,6 +31,7 @@ import '../../data/services/inspiration_asset_discovery.dart';
 import '../../data/services/prayer_reminder_prefs.dart';
 import '../../l10n/app_localizations.dart';
 import '../shared/providers/auth_providers.dart';
+import '../shared/providers/premium_providers.dart';
 import 'admin_dev_tab.dart';
 import 'widgets/admin_diagnostics_tab.dart';
 
@@ -84,11 +85,15 @@ class _AdminContentPageState extends ConsumerState<AdminContentPage>
   String? _adminGrantsError;
   List<_AdminGrantRow> _adminGrants = const [];
   List<_AdminGrantRow> _adminInvites = const [];
+  bool _premiumLoading = false;
+  String? _premiumError;
+  List<_PremiumGrantRow> _premiumEntitlements = const [];
+  List<_PremiumGrantRow> _premiumInvites = const [];
 
   @override
   void initState() {
     super.initState();
-    _tabs = TabController(length: 5, vsync: this);
+    _tabs = TabController(length: 6, vsync: this);
     _tabs.addListener(_onTabChanged);
   }
 
@@ -105,6 +110,12 @@ class _AdminContentPageState extends ConsumerState<AdminContentPage>
     }
     if (_tabs.index == 4 && !_adminGrantsLoading && _adminGrants.isEmpty) {
       _loadAdminGrants();
+    }
+    if (_tabs.index == 5 &&
+        !_premiumLoading &&
+        _premiumEntitlements.isEmpty &&
+        _premiumInvites.isEmpty) {
+      _loadPremiumGrants();
     }
   }
 
@@ -1195,6 +1206,231 @@ class _AdminContentPageState extends ConsumerState<AdminContentPage>
     }
   }
 
+  Future<void> _loadPremiumGrants() async {
+    final role = ref.read(currentAdminRoleProvider).asData?.value;
+    if (role?.canManageAdmins != true) return;
+    setState(() {
+      _premiumLoading = true;
+      _premiumError = null;
+    });
+    try {
+      final entitlementsSnap = await FirebaseFirestore.instance
+          .collection('premium_entitlements')
+          .limit(80)
+          .get(const GetOptions(source: Source.server));
+      final invitesSnap = await FirebaseFirestore.instance
+          .collection('premium_invites')
+          .limit(80)
+          .get(const GetOptions(source: Source.server));
+      final entitlements = entitlementsSnap.docs.map((doc) {
+        final data = doc.data();
+        return _PremiumGrantRow(
+          id: doc.id,
+          label: data['email']?.toString() ?? data['uid']?.toString() ?? doc.id,
+          active: data['active'] == true,
+          expiresAt: _dateFromAdminValue(data['expiresAt']),
+          source: data['source']?.toString() ?? 'admin',
+          isInvite: false,
+        );
+      }).toList()..sort((a, b) => a.label.compareTo(b.label));
+      final invites = invitesSnap.docs.map((doc) {
+        final data = doc.data();
+        return _PremiumGrantRow(
+          id: doc.id,
+          label: data['email']?.toString() ?? doc.id,
+          active: data['active'] == true,
+          expiresAt: _dateFromAdminValue(data['expiresAt']),
+          source: data['source']?.toString() ?? 'admin',
+          isInvite: true,
+        );
+      }).toList()..sort((a, b) => a.label.compareTo(b.label));
+      if (!mounted) return;
+      setState(() {
+        _premiumEntitlements = entitlements;
+        _premiumInvites = invites;
+      });
+    } catch (e) {
+      if (mounted) {
+        setState(() => _premiumError = _friendlyAdminError(
+          e,
+          fallback: 'Premium listesi alınamadı.',
+        ));
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _premiumLoading = false);
+      }
+    }
+  }
+
+  DateTime? _dateFromAdminValue(Object? value) {
+    if (value == null) return null;
+    if (value is Timestamp) return value.toDate();
+    if (value is DateTime) return value;
+    if (value is String) return DateTime.tryParse(value);
+    return null;
+  }
+
+  Future<void> _openPremiumGrantDialog({_PremiumGrantRow? existing}) async {
+    final targetCtrl = TextEditingController(
+      text: existing?.label == existing?.id
+          ? existing?.id ?? ''
+          : existing?.label ?? '',
+    );
+    final daysCtrl = TextEditingController();
+    final result = await showDialog<({String target, int? days})>(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) => AlertDialog(
+        title: Text(existing == null ? 'Premium ver' : 'Premium düzenle'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            TextField(
+              controller: targetCtrl,
+              enabled: existing == null,
+              decoration: const InputDecoration(
+                labelText: 'E-posta veya UID',
+                border: OutlineInputBorder(),
+              ),
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: daysCtrl,
+              keyboardType: TextInputType.number,
+              decoration: const InputDecoration(
+                labelText: 'Süre (gün) - boş bırakırsan süresiz',
+                border: OutlineInputBorder(),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Vazgeç'),
+          ),
+          FilledButton(
+            onPressed: () {
+              final rawDays = int.tryParse(daysCtrl.text.trim());
+              Navigator.pop(ctx, (
+                target: targetCtrl.text,
+                days: rawDays == null || rawDays <= 0 ? null : rawDays,
+              ));
+            },
+            child: const Text('Kaydet'),
+          ),
+        ],
+      ),
+    );
+    targetCtrl.dispose();
+    daysCtrl.dispose();
+    if (result == null) return;
+    await _savePremiumGrant(
+      target: existing?.id ?? result.target,
+      days: result.days,
+      isInvite: existing?.isInvite,
+    );
+  }
+
+  Future<void> _savePremiumGrant({
+    required String target,
+    required int? days,
+    bool? isInvite,
+  }) async {
+    final currentRole = ref.read(currentAdminRoleProvider).asData?.value;
+    if (currentRole?.canManageAdmins != true) {
+      _snack('Premium yönetimi için tam yetki gerekiyor.');
+      return;
+    }
+    final normalized = _normalizeAdminTarget(target);
+    if (normalized.isEmpty) {
+      _snack('E-posta veya UID boş olamaz.');
+      return;
+    }
+    final invite = isInvite ?? _adminTargetIsEmail(normalized);
+    final collection = invite ? 'premium_invites' : 'premium_entitlements';
+    final docRef = FirebaseFirestore.instance
+        .collection(collection)
+        .doc(normalized);
+    final auditRef = FirebaseFirestore.instance.collection('admin_audit').doc();
+    final expiresAt = days == null
+        ? null
+        : Timestamp.fromDate(DateTime.now().add(Duration(days: days)));
+    try {
+      final batch = FirebaseFirestore.instance.batch();
+      batch.set(docRef, {
+        if (invite) 'email': normalized,
+        if (!invite) 'uid': normalized,
+        'active': true,
+        'source': 'admin',
+        'productId': 'admin_grant',
+        'platform': 'firebase_admin_panel',
+        'expiresAt': expiresAt,
+        'updatedAt': FieldValue.serverTimestamp(),
+        'updatedBy': FirebaseAuth.instance.currentUser?.uid,
+      }, SetOptions(merge: true));
+      batch.set(
+        auditRef,
+        _adminAuditPayload(
+          action: 'Premium verildi',
+          targetType: collection,
+          targetId: normalized,
+          details: {'days': days, 'invite': invite},
+        ),
+      );
+      await batch.commit();
+      ref.invalidate(premiumEntitlementProvider);
+      _snack('Premium kaydı güncellendi.');
+      await _loadPremiumGrants();
+    } catch (e) {
+      _snack(_friendlyAdminError(e, fallback: 'Premium kaydedilemedi.'));
+    }
+  }
+
+  Future<void> _revokePremiumGrant(_PremiumGrantRow row) async {
+    final currentRole = ref.read(currentAdminRoleProvider).asData?.value;
+    if (currentRole?.canManageAdmins != true) {
+      _snack('Premium yönetimi için tam yetki gerekiyor.');
+      return;
+    }
+    final confirmed = await _confirmDelete(
+      title: 'Premium geri alınsın mı?',
+      message: '${row.label} için premium erişimi pasife alınacak.',
+      preview: row.id,
+      confirmLabel: 'Geri al',
+    );
+    if (!confirmed) return;
+    final collection = row.isInvite ? 'premium_invites' : 'premium_entitlements';
+    final docRef = FirebaseFirestore.instance.collection(collection).doc(row.id);
+    final auditRef = FirebaseFirestore.instance.collection('admin_audit').doc();
+    try {
+      final batch = FirebaseFirestore.instance.batch();
+      batch.set(docRef, {
+        'active': false,
+        'revokedAt': FieldValue.serverTimestamp(),
+        'updatedAt': FieldValue.serverTimestamp(),
+        'updatedBy': FirebaseAuth.instance.currentUser?.uid,
+      }, SetOptions(merge: true));
+      batch.set(
+        auditRef,
+        _adminAuditPayload(
+          action: 'Premium geri alındı',
+          targetType: collection,
+          targetId: row.id,
+          details: {'source': row.source},
+        ),
+      );
+      await batch.commit();
+      ref.invalidate(premiumEntitlementProvider);
+      _snack('Premium erişimi pasife alındı.');
+      await _loadPremiumGrants();
+    } catch (e) {
+      _snack(_friendlyAdminError(e, fallback: 'Premium geri alınamadı.'));
+    }
+  }
+
   _PoolEditorKind _poolEditorKind(String poolId) {
     switch (poolId) {
       case QuotePoolIds.notificationArinmaBodies:
@@ -1718,6 +1954,10 @@ class _AdminContentPageState extends ConsumerState<AdminContentPage>
               icon: const Icon(Icons.manage_accounts_outlined),
               text: l10n.adminGrantsTab,
             ),
+            const Tab(
+              icon: Icon(Icons.workspace_premium_outlined),
+              text: 'Premium',
+            ),
           ],
         ),
       ),
@@ -1736,6 +1976,7 @@ class _AdminContentPageState extends ConsumerState<AdminContentPage>
                 _buildDiagnosticsTab(role),
                 _buildDeveloperToolsTab(role),
                 _buildAdminGrantsTab(role),
+                _buildPremiumGrantsTab(role),
               ],
             ),
           ),
@@ -2075,6 +2316,141 @@ class _AdminContentPageState extends ConsumerState<AdminContentPage>
       ],
     );
   }
+
+  Widget _buildPremiumGrantsTab(AdminRole role) {
+    if (!role.canManageAdmins) {
+      return _buildAccessDenied(
+        icon: Icons.workspace_premium_outlined,
+        title: 'Premium yönetimi tam yetki ister',
+        subtitle: 'Premium verme/alma işlemleri yalnızca developer rolünde açık.',
+      );
+    }
+    final bottomInset = _shellBodyBottomInset(context);
+    final rows = <_PremiumGrantRow>[
+      ..._premiumInvites,
+      ..._premiumEntitlements,
+    ];
+    return ListView(
+      padding: EdgeInsets.fromLTRB(16, 16, 16, bottomInset + 16),
+      children: [
+        Text(
+          'Premium kayıtları sadece bu sekme açılınca okunur. Kullanıcı tarafı '
+          'da sürekli stream dinlemez; maliyet için tek seferlik entitlement '
+          'kontrolü yapar.',
+          style: TextStyle(color: Colors.white.withValues(alpha: 0.72)),
+        ),
+        const SizedBox(height: 12),
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: [
+            FilledButton.icon(
+              onPressed:
+                  _premiumLoading ? null : () => _openPremiumGrantDialog(),
+              icon: const Icon(Icons.card_giftcard_rounded),
+              label: const Text('Premium ver'),
+            ),
+            OutlinedButton.icon(
+              onPressed: _premiumLoading ? null : _loadPremiumGrants,
+              icon: _premiumLoading
+                  ? const SizedBox(
+                      width: 14,
+                      height: 14,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : const Icon(Icons.refresh_rounded),
+              label: const Text('Yenile'),
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        Card(
+          color: const Color(0xFF0F2419),
+          child: Padding(
+            padding: const EdgeInsets.all(12),
+            child: Text(
+              'UID girersen premium_entitlements/{uid}, e-posta girersen '
+              'premium_invites/{email} yazılır. Kullanıcı giriş yapınca kendi '
+              'UID kaydı, yoksa e-posta daveti kontrol edilir.',
+              style: TextStyle(
+                color: Colors.white.withValues(alpha: 0.68),
+                fontSize: 12,
+                height: 1.35,
+              ),
+            ),
+          ),
+        ),
+        if (_premiumError != null) ...[
+          const SizedBox(height: 8),
+          Text(_premiumError!, style: const TextStyle(color: Colors.redAccent)),
+        ],
+        const SizedBox(height: 12),
+        Text(
+          'Premium kayıtları (${rows.length})',
+          style: TextStyle(
+            color: Colors.white.withValues(alpha: 0.88),
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+        const SizedBox(height: 8),
+        if (rows.isEmpty)
+          Card(
+            color: const Color(0xFF0F2419),
+            child: Padding(
+              padding: const EdgeInsets.all(12),
+              child: Text(
+                _premiumLoading
+                    ? 'Premium kayıtları yükleniyor...'
+                    : 'Henüz premium kaydı yok.',
+                style: TextStyle(color: Colors.white.withValues(alpha: 0.7)),
+              ),
+            ),
+          )
+        else
+          ...rows.map((row) {
+            final expires = row.expiresAt == null
+                ? 'Süresiz'
+                : 'Bitiş: ${_diagTimeText(row.expiresAt!.toIso8601String())}';
+            final active = row.active &&
+                (row.expiresAt == null ||
+                    row.expiresAt!.isAfter(DateTime.now()));
+            return Card(
+              color: const Color(0xFF0F2419),
+              child: ListTile(
+                title: Text(row.label),
+                subtitle: Text(
+                  '${row.isInvite ? 'E-posta daveti' : 'UID'} · ${row.id}\n'
+                  '$expires · kaynak: ${row.source}',
+                  style: TextStyle(color: Colors.white.withValues(alpha: 0.58)),
+                ),
+                isThreeLine: true,
+                trailing: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Chip(
+                      label: Text(active ? 'Aktif' : 'Pasif'),
+                      backgroundColor: active
+                          ? AppColors.accentNeonGreen.withValues(alpha: 0.18)
+                          : Colors.white.withValues(alpha: 0.08),
+                    ),
+                    IconButton(
+                      tooltip: 'Düzenle',
+                      onPressed: () => _openPremiumGrantDialog(existing: row),
+                      icon: const Icon(Icons.edit_outlined),
+                    ),
+                    IconButton(
+                      tooltip: 'Geri al',
+                      onPressed: () => _revokePremiumGrant(row),
+                      icon: const Icon(Icons.remove_circle_outline),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          }),
+      ],
+    );
+  }
 }
 
 class _AdminVersionConflict implements Exception {
@@ -2092,6 +2468,24 @@ class _AdminGrantRow {
   final String id;
   final String label;
   final AdminRole role;
+  final bool isInvite;
+}
+
+class _PremiumGrantRow {
+  const _PremiumGrantRow({
+    required this.id,
+    required this.label,
+    required this.active,
+    required this.expiresAt,
+    required this.source,
+    required this.isInvite,
+  });
+
+  final String id;
+  final String label;
+  final bool active;
+  final DateTime? expiresAt;
+  final String source;
   final bool isInvite;
 }
 

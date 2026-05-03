@@ -186,6 +186,22 @@ class ExploreBgmNotifier extends StateNotifier<ExploreBgmUiState> {
     await _stopAndRequireManualRestart();
   }
 
+  /// Reklam / premium paneli gibi Keşfet içinde geçici overlay açıldığında
+  /// sesi hemen kes. Kullanıcı tercihini prefs'te kapatmaz; panel kapanınca
+  /// müziğin otomatik patlamasını da istemediğimiz için state kapalı kalır.
+  /// Kullanıcı isterse üst bardan tekrar açabilir.
+  Future<void> pauseForAdGate() async {
+    if (_disposed) return;
+    if (!state.userEnabled && !state.isPlaying) return;
+    _playbackEpoch++;
+    _persistTrackIndex(state.trackIndex);
+    _cancelAllTimers();
+    _crossfadeInProgress = false;
+    state = state.copyWith(userEnabled: false, isPlaying: false);
+    await _silenceBoth();
+    AudioSessionCoordinator.release(AudioSessionOwner.exploreBgm);
+  }
+
   Future<void> toggle() async {
     if (_disposed) return;
     if (state.userEnabled) {

@@ -3,10 +3,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:arin/l10n/app_localizations.dart';
 
 import '../../../core/constants/app_colors.dart';
+import '../../../core/constants/app_text_styles.dart';
 import '../../../core/localization/locale_text.dart';
 import '../../../core/theme/arin_shell_background.dart';
 import '../../../data/content/daily_namaz_wisdom.dart';
@@ -122,7 +122,8 @@ class _DailyNamazWisdomBody extends StatelessWidget {
                   ? fallbackText
                   : entry.turkish,
               textAlign: TextAlign.center,
-              style: GoogleFonts.plusJakartaSans(
+              style: TextStyle(
+                fontFamily: AppTextStyles.primaryFontFamily,
                 fontSize: 12,
                 height: 1.34,
                 fontWeight: FontWeight.w500,

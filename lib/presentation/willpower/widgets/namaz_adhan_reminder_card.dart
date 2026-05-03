@@ -12,16 +12,21 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../../core/ads/admob_ids.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_text_styles.dart';
 import '../../../core/providers/shared_preferences_provider.dart';
 import '../../../data/services/arin_local_notifications_plugin.dart';
+import '../../../data/services/ad_gate_service.dart';
 import '../../../data/services/location_service.dart';
 import '../../../data/services/prayer_notification_android_uri.dart';
 import '../../../data/services/prayer_notification_scheduler.dart';
 import '../../../data/services/prayer_notification_sounds.dart';
 import '../../../data/services/prayer_reminder_prefs.dart';
 import '../../../data/services/prayer_user_notification_sound_store.dart';
+import '../../shared/providers/ad_gate_providers.dart';
+import '../../shared/providers/admob_providers.dart';
+import '../../shared/providers/premium_providers.dart';
 import '../../shared/providers/prayer_time_providers.dart';
 
 part 'namaz_adhan_reminder_sheets.dart';
@@ -141,6 +146,7 @@ Future<bool?> _openPerPrayerReminderList(
   required WidgetRef ref,
   required bool isEnablingFlow,
   required Future<void> Function() onBildirimSesi,
+  required Future<bool> Function(int secondValue) onSecondReminderGate,
 }) {
   return showModalBottomSheet<bool>(
     context: context,
@@ -155,6 +161,7 @@ Future<bool?> _openPerPrayerReminderList(
       isEnablingFlow: isEnablingFlow,
       onReschedule: () => _rescheduleNotifications(ref, force: true),
       onBildirimSesi: onBildirimSesi,
+      onSecondReminderGate: onSecondReminderGate,
     ),
   );
 }
@@ -219,10 +226,19 @@ class _NamazAdhanReminderCardState
       ref: ref,
       isEnablingFlow: true,
       onBildirimSesi: () => _openPrayerSoundPicker(prefs),
+      onSecondReminderGate: _ensureSecondReminderAccess,
     );
 
     if (!mounted) return;
     if (confirmed != true) {
+      await PrayerReminderPrefs.setEnabled(prefs, false);
+      setState(() => _enabledOverride = false);
+      return;
+    }
+    final canUseActiveSecondReminders = await _ensureActiveSecondReminderAccess(
+      prefs,
+    );
+    if (!canUseActiveSecondReminders || !mounted) {
       await PrayerReminderPrefs.setEnabled(prefs, false);
       setState(() => _enabledOverride = false);
       return;
@@ -264,6 +280,7 @@ class _NamazAdhanReminderCardState
       ref: ref,
       isEnablingFlow: false,
       onBildirimSesi: () => _openPrayerSoundPicker(prefs),
+      onSecondReminderGate: _ensureSecondReminderAccess,
     );
     if (mounted) setState(() {});
   }
@@ -286,6 +303,8 @@ class _NamazAdhanReminderCardState
       ),
     );
     if (chosen == null || !mounted) return;
+    final canUseSecond = await _ensureSecondReminderAccess(chosen.second);
+    if (!canUseSecond || !mounted) return;
     await PrayerReminderPrefs.setMinutesBeforeForPrayer(prefs, i, chosen.early);
     await PrayerReminderPrefs.setMinutesBeforeSecondaryForPrayer(
       prefs,
@@ -294,6 +313,53 @@ class _NamazAdhanReminderCardState
     );
     await _rescheduleNotifications(ref, force: true);
     if (mounted) setState(() {});
+  }
+
+  Future<bool> _ensureSecondReminderAccess(int secondValue) async {
+    if (secondValue < 0) return true;
+    final entitlement = await ref.read(premiumEntitlementProvider.future);
+    if (!mounted) return false;
+    if (entitlement.isActive) return true;
+    final adGate = ref.read(adGateServiceProvider);
+    final decision = adGate.decisionFor(
+      AdGatePlacement.prayerSecondAlarm,
+      isPremium: false,
+    );
+    if (decision.allowed) return true;
+    final accepted = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('2. alarm premium özelliği'),
+        content: const Text(
+          'Ücretsiz kullanımda 2. ezan alarmını açmak için kısa reklam '
+          'izlenir. Premium kullanıcılar bu kilidi görmez.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Vazgeç'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('Reklam sonrası aç'),
+          ),
+        ],
+      ),
+    );
+    if (accepted != true) return false;
+    final rewarded = await ref
+        .read(adMobServiceProvider)
+        .showRewarded(ArinAdUnit.rewardedUnlock);
+    if (!rewarded || !mounted) return false;
+    await adGate.recordRewardedUnlock(AdGatePlacement.prayerSecondAlarm);
+    return true;
+  }
+
+  Future<bool> _ensureActiveSecondReminderAccess(
+    SharedPreferences prefs,
+  ) async {
+    if (!PrayerReminderPrefs.hasActiveSecondReminder(prefs)) return true;
+    return _ensureSecondReminderAccess(0);
   }
 
   Future<void> _onCompactSwitch(bool value) async {

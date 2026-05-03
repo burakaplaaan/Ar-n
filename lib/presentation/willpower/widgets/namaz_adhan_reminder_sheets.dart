@@ -1031,12 +1031,14 @@ class _PerPrayerReminderListSheet extends StatefulWidget {
     required this.isEnablingFlow,
     required this.onReschedule,
     required this.onBildirimSesi,
+    required this.onSecondReminderGate,
   });
 
   final SharedPreferences prefs;
   final bool isEnablingFlow;
   final Future<void> Function() onReschedule;
   final Future<void> Function() onBildirimSesi;
+  final Future<bool> Function(int secondValue) onSecondReminderGate;
 
   @override
   State<_PerPrayerReminderListSheet> createState() =>
@@ -1059,6 +1061,8 @@ class _PerPrayerReminderListSheetState
       ),
     );
     if (chosen == null || !mounted) return;
+    final canUseSecond = await widget.onSecondReminderGate(chosen.second);
+    if (!canUseSecond || !mounted) return;
     await PrayerReminderPrefs.setMinutesBeforeForPrayer(
       widget.prefs,
       i,

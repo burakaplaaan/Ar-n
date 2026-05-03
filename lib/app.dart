@@ -3,13 +3,18 @@
 import 'dart:async';
 
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'core/firebase/firebase_bootstrap.dart';
+import 'core/analytics/arin_analytics.dart';
+import 'core/debug/arin_error_reporting.dart';
 import 'core/providers/shared_preferences_provider.dart';
 import 'core/providers/app_locale_provider.dart';
 import 'core/router/app_router.dart';
+import 'core/router/app_router_refresh.dart';
 import 'core/theme/app_theme.dart';
 import 'core/constants/quote_pool_ids.dart';
 import 'data/services/audio_session_coordinator.dart';
@@ -26,6 +31,7 @@ import 'presentation/shared/providers/auth_providers.dart';
 import 'presentation/shared/providers/habit_providers.dart';
 import 'presentation/shared/providers/quotes_providers.dart';
 import 'presentation/shared/providers/prayer_time_providers.dart';
+import 'presentation/shared/providers/user_profile_providers.dart';
 import 'presentation/shared/widgets/global_edge_swipe_back.dart';
 import 'presentation/qibla/qibla_hub_navigator_key.dart';
 
@@ -44,6 +50,9 @@ class ArinApp extends ConsumerStatefulWidget {
 }
 
 class _ArinAppState extends ConsumerState<ArinApp> with WidgetsBindingObserver {
+  DateTime? _lastForegroundMaintenance;
+  bool _postOnboardingStartupScheduled = false;
+
   Future<void> _flushHabitDeleteQueueIfSignedIn() async {
     if (!isFirebaseReady) return;
     final user = FirebaseAuth.instance.currentUser;
@@ -110,16 +119,95 @@ class _ArinAppState extends ConsumerState<ArinApp> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      final prefs = ref.read(sharedPreferencesProvider);
-      if (PrayerReminderPrefs.isEnabled(prefs)) {
-        await PrayerNotificationScheduler.promptLocalNotificationPermissions();
-      }
-      await _maybeOneTimeWidgetQuoteRefreshAfterAdminEdit();
-      unawaited(_flushHabitDeleteQueueIfSignedIn());
-      unawaited(_warmupPoolsAndReschedule());
-      unawaited(_bootstrapPrayerNotifications());
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      unawaited(_runForegroundMaintenance(initial: true));
     });
+  }
+
+  Future<void> _runForegroundMaintenance({required bool initial}) async {
+    if (!_isOnboardingCompletedForMaintenance()) {
+      debugPrint(
+        '══ ARIN ══ foreground maintenance: onboarding bitmemiş, atlandı',
+      );
+      return;
+    }
+
+    final now = DateTime.now();
+    final last = _lastForegroundMaintenance;
+    if (!initial &&
+        last != null &&
+        now.difference(last) < const Duration(minutes: 2)) {
+      return;
+    }
+    _lastForegroundMaintenance = now;
+
+    final prefs = ref.read(sharedPreferencesProvider);
+    if (initial) {
+      await Future<void>.delayed(const Duration(seconds: 2));
+    } else {
+      await Future<void>.delayed(const Duration(milliseconds: 700));
+    }
+    if (!mounted) return;
+
+    if (PrayerReminderPrefs.isEnabled(prefs)) {
+      await PrayerNotificationScheduler.promptLocalNotificationPermissions();
+    }
+    await _maybeOneTimeWidgetQuoteRefreshAfterAdminEdit();
+
+    unawaited(_flushHabitDeleteQueueIfSignedIn());
+
+    await Future<void>.delayed(const Duration(seconds: 3));
+    if (!mounted) return;
+    unawaited(_warmupPoolsAndReschedule());
+
+    if (PrayerReminderPrefs.isEnabled(prefs)) {
+      await Future<void>.delayed(const Duration(seconds: 3));
+      if (!mounted) return;
+      unawaited(_bootstrapPrayerNotifications());
+    }
+  }
+
+  Future<void> _runPostOnboardingStartup() async {
+    if (_postOnboardingStartupScheduled) return;
+    _postOnboardingStartupScheduled = true;
+
+    if (!isFirebaseReady) {
+      await bootstrapFirebase();
+    }
+    if (!mounted) return;
+
+    try {
+      await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(
+        !kDebugMode,
+      );
+      enableCrashlyticsIntegration();
+    } catch (e) {
+      debugPrint('══ ARIN ══ post-onboarding Crashlytics init failed: $e');
+    }
+
+    // Firebase hazırlandıktan sonra auth/admin/router provider'ları yeniden
+    // değerlensin. İlk kurulum sırasında Firebase'i bilinçli ertelediğimiz
+    // için bu hook aynı app process içinde home'a geçerken gerekli.
+    ref.invalidate(authUserProvider);
+    ref.invalidate(currentAdminRoleProvider);
+    ref.invalidate(isCurrentUserAdminProvider);
+    ref.invalidate(appRouterProvider);
+    ref.read(appRouterRefreshProvider).notifyAuthOrOnboarding();
+    unawaited(ArinAnalytics.enable());
+
+    unawaited(_runForegroundMaintenance(initial: false));
+  }
+
+  bool _isOnboardingCompletedForMaintenance() {
+    final prefs = ref.read(sharedPreferencesProvider);
+    final flag = prefs.getBool('onboarding_completed');
+    if (flag == false) return false;
+    if (flag == true) return true;
+    try {
+      return ref.read(userProfileRepositoryProvider).isOnboardingCompleted;
+    } catch (_) {
+      return false;
+    }
   }
 
   @override
@@ -140,9 +228,7 @@ class _ArinAppState extends ConsumerState<ArinApp> with WidgetsBindingObserver {
       // uygulamayı tekrar tekrar açarsa yaklaşmakta olan bir alarm iptal edilip
       // yeniden kuyruğa alınarak kaçırılmaz. Ayarlar sayfası toggle'ında
       // `force: true` kullanılır.
-      unawaited(_flushHabitDeleteQueueIfSignedIn());
-      unawaited(_warmupPoolsAndReschedule());
-      unawaited(_bootstrapPrayerNotifications());
+      unawaited(_runForegroundMaintenance(initial: false));
       ref.invalidate(prayerTimesProvider);
     }
   }
@@ -154,12 +240,22 @@ class _ArinAppState extends ConsumerState<ArinApp> with WidgetsBindingObserver {
     final appLocale = ref.watch(appLocaleProvider);
     ref.watch(exploreBgmNotifierProvider);
 
+    ref.listen(userProfileProvider, (previous, next) {
+      final wasDone = previous?.onboardingCompleted == true;
+      if (!wasDone && next.onboardingCompleted) {
+        unawaited(_runPostOnboardingStartup());
+      }
+    });
+
     ref.listen<AsyncValue<User?>>(authUserProvider, (previous, next) {
       next.whenData((user) {
         if (user == null || !isFirebaseReady) return;
         final prefs = ref.read(sharedPreferencesProvider);
         unawaited(
-          HabitCloudSyncService.flushPendingDeletes(uid: user.uid, prefs: prefs),
+          HabitCloudSyncService.flushPendingDeletes(
+            uid: user.uid,
+            prefs: prefs,
+          ),
         );
         final prev = previous?.asData?.value;
         if (prev != null && prev.uid == user.uid) return;

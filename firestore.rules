@@ -12,7 +12,7 @@ service cloud.firestore {
 
     function authEmail() {
       return signedIn() && request.auth.token.email != null
-        ? request.auth.token.email
+        ? request.auth.token.email.lower()
         : null;
     }
 
@@ -104,6 +104,22 @@ service cloud.firestore {
     match /app_public/{docId} {
       allow read: if true;
       allow write: if isAdmin() && docId == 'inspiration_cards';
+    }
+
+    // Premium yetki kayıtları:
+    // - Kullanıcı yalnızca kendi UID kaydını veya kendi e-posta davetini okur.
+    // - Yazma/listeleme sadece developer rolünde; satın alma doğrulaması ileride
+    //   Cloud Function/RevenueCat webhook üzerinden aynı dokümanları günceller.
+    match /premium_entitlements/{uid} {
+      allow get: if signedIn() && (request.auth.uid == uid || isDeveloper());
+      allow list: if isDeveloper();
+      allow write: if isDeveloper();
+    }
+
+    match /premium_invites/{email} {
+      allow get: if signedIn() && (authEmail() == email || isDeveloper());
+      allow list: if isDeveloper();
+      allow write: if isDeveloper();
     }
 
     // Kullanıcı kök belgesi + alt belgeler

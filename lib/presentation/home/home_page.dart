@@ -5,11 +5,13 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:arin/l10n/app_localizations.dart';
 
 import '../../core/constants/app_colors.dart';
+import '../../core/router/app_router.dart';
 import '../../core/theme/arin_shell_background.dart';
 import '../../core/extensions/date_extensions.dart';
 import '../../data/models/prayer_times_model.dart';
@@ -17,6 +19,7 @@ import '../../data/services/diyanet_district_matcher.dart';
 import '../../data/services/location_service.dart';
 import '../settings/widgets/district_picker_sheet.dart';
 import '../shared/providers/auth_providers.dart';
+import '../shared/providers/premium_providers.dart';
 import '../shared/providers/prayer_time_providers.dart';
 import '../shared/providers/user_profile_providers.dart';
 import 'widgets/daily_namaz_wisdom_card.dart';
@@ -147,6 +150,7 @@ class _HeaderSection extends ConsumerWidget {
         : l10n.homeGuestUser;
     final remaining = ref.watch(countdownProvider);
     final nextName = ref.watch(nextPrayerNameProvider);
+    final isPremium = ref.watch(isPremiumProvider);
     // "İmsak çıkıyor": fajr ≤ şimdi < sunrise ise true; kartı kırmızımsı
     // amber vurguyla göstereceğiz, namaz kaçmasın.
     final urgentFajr = ref.watch(nextPrayerUrgentFajrProvider);
@@ -192,34 +196,50 @@ class _HeaderSection extends ConsumerWidget {
         Column(
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-              decoration: BoxDecoration(
-                color: AppColors.accentNeonGreen.withValues(alpha: 0.15),
+            Material(
+              color: Colors.transparent,
+              child: InkWell(
                 borderRadius: BorderRadius.circular(20),
-                border: Border.all(
-                  color: AppColors.accentNeonGreen.withValues(alpha: 0.45),
-                ),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Icon(
-                    Icons.workspace_premium_rounded,
-                    color: AppColors.accentNeonGreen,
-                    size: 16,
-                  ),
-                  const SizedBox(width: 4),
-                  Text(
-                    'ARIN',
-                    style: TextStyle(
-                      color: badgeTextC,
-                      fontSize: 11,
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: 0.5,
+                onTap: () => context.push(AppRoutes.premium),
+                child: Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                  decoration: BoxDecoration(
+                    color: (isPremium
+                            ? AppColors.goldAccent
+                            : AppColors.accentNeonGreen)
+                        .withValues(alpha: 0.15),
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(
+                      color: (isPremium
+                              ? AppColors.goldAccent
+                              : AppColors.accentNeonGreen)
+                          .withValues(alpha: 0.45),
                     ),
                   ),
-                ],
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.workspace_premium_rounded,
+                        color: isPremium
+                            ? AppColors.goldAccent
+                            : AppColors.accentNeonGreen,
+                        size: 16,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        isPremium ? 'PREMIUM' : 'Premium',
+                        style: TextStyle(
+                          color: badgeTextC,
+                          fontSize: 11,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: 0.5,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ),
             ),
             const SizedBox(height: 10),

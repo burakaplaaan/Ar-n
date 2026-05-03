@@ -28,21 +28,19 @@ import 'data/models/habit_model.dart';
 import 'data/models/habit_model.g.dart';
 import 'data/models/habit_log_model.dart';
 import 'data/models/habit_log_model.g.dart';
-import 'data/services/app_local_notification_scheduler.dart';
 import 'data/services/app_notification_channel_prefs.dart';
 import 'data/services/arin_local_notifications_plugin.dart';
+import 'data/services/admob_service.dart';
+import 'data/services/arin_widget_sync.dart';
 import 'data/services/diyanet_district_matcher.dart';
-import 'data/services/prayer_notification_scheduler.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:home_widget/home_widget.dart';
 
 Future<void> main() async {
-  // Keşfet / ilham kartları ve tema birçok Google Font ailesi kullanıyor
-  // (Bodoni Moda, Great Vibes, Inter, Lora, …). `allowRuntimeFetching = false`
-  // yalnızca *tüm* bu ailelerin `pubspec.yaml` + assets/fonts altında tanımlı
-  // olmasıyla güvenli; aksi halde ilk kart açılışında font yükleme hatası ve
-  // Crashlytics gürültüsü oluşuyor. Plus Jakarta / Scheherazade yine pubspec
-  // üzerinden bundle edilir; diğerleri ilk kullanımda indirilip önbelleğe alınır.
+  // Ana açılış/onboarding/home path'i GoogleFonts kullanmaz; lokal
+  // `PlusJakartaSans` fontFamily ile render olur. Runtime fetching'i açık
+  // bırakıyoruz ki yalnızca ileri sayfalardaki dekoratif GoogleFonts çağrıları
+  // eksik asset yüzünden exception fırlatmasın. Böylece ilk kurulum hızlı kalır,
+  // paket boyutu da 100+ font alias'ı ile şişmez.
   GoogleFonts.config.allowRuntimeFetching = true;
 
   await runZonedGuarded(
@@ -54,17 +52,40 @@ Future<void> main() async {
     (Object error, StackTrace stack) {
       debugPrint('══ ARIN ══ runZonedGuarded: $error');
       debugPrint('══ ARIN ══ Stack:\n$stack');
-      if (isFirebaseReady) {
-        // runZonedGuarded yalnızca `_runApp` zamanında oluşan sync/async
-        // hataları yakalıyor — Flutter framework dışı kaçakları. Bunları da
-        // Crashlytics'e fatal olarak raporla.
-        FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
-      }
+      if (!isFirebaseReady) return;
+      // Bilinen sıkıntısız ağ/asset hatalarını fatal raporlamayalım:
+      // GoogleFonts CDN fetch fail, ClientException timeout vb. kullanıcıya
+      // semptom göstermiyor (sistem font fallback'i devreye giriyor) ama
+      // Crashlytics'te "Crash-Free Users" metriğini düşürür ve gerçek
+      // crash'leri arasında gürültü olur. Bunlar non-fatal olarak gitsin.
+      final msg = error.toString();
+      final isTransient =
+          msg.contains('google_fonts') ||
+          msg.contains('Failed to load font') ||
+          msg.contains('ClientException') ||
+          msg.contains('SocketException') ||
+          msg.contains('TimeoutException') ||
+          msg.contains('Connection closed');
+      try {
+        FirebaseCrashlytics.instance.recordError(
+          error,
+          stack,
+          fatal: !isTransient,
+        );
+      } catch (_) {}
     },
   );
 }
 
 Future<void> _runApp() async {
+  runApp(const _BootstrapApp());
+  debugPrint('══ ARIN ══ first Flutter frame requested');
+  WidgetsBinding.instance.addPostFrameCallback((_) {
+    unawaited(_configureSystemUiAfterFirstFrame());
+  });
+}
+
+Future<void> _configureSystemUiAfterFirstFrame() async {
   // ── Durum Çubuğu ve Navigasyon ───────────────────────────────────────
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
@@ -75,84 +96,290 @@ Future<void> _runApp() async {
       systemNavigationBarIconBrightness: Brightness.dark,
     ),
   );
-  await SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
-  await SystemChrome.setPreferredOrientations([
-    DeviceOrientation.portraitUp,
-    DeviceOrientation.portraitDown,
-  ]);
+  try {
+    await SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+    await SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
+  } catch (e, st) {
+    debugPrint('══ ARIN ══ system UI config failed (sessiz): $e');
+    debugPrint('$st');
+  }
+}
 
-  // ── Hive Başlatma + Adapter Kayıtları ────────────────────────────────
-  await Hive.initFlutter();
-  _registerAdapters();
-  await _openHiveBoxes();
+class _BootstrapPayload {
+  const _BootstrapPayload({required this.prefs});
 
-  // ── SharedPreferences ────────────────────────────────────────────────
-  final prefs = await SharedPreferences.getInstance();
+  final SharedPreferences prefs;
+}
 
-  // intl tarih adları: TR kaynak korunur, EN/AR locale geçişi için ek preload.
-  await initializeDateFormatting('tr_TR');
-  await initializeDateFormatting('en_US');
-  await initializeDateFormatting('ar_SA');
+class _BootstrapApp extends StatefulWidget {
+  const _BootstrapApp();
 
-  // Diyanet ilçe asset'ini fonda yükle (settings picker + location service
-  // anlık erişim bekliyor; uygulama açılırken beklemeyelim).
-  unawaited(DiyanetDistrictMatcher.loadOnce());
+  @override
+  State<_BootstrapApp> createState() => _BootstrapAppState();
+}
 
-  await bootstrapFirebase();
+class _BootstrapAppState extends State<_BootstrapApp> {
+  late final Future<_BootstrapPayload> _bootstrapFuture = _bootstrapApp();
+  bool _deferredStartupScheduled = false;
 
-  // Crashlytics: debug build'de toplama kapalı (geliştirme sırasında spam
-  // olmasın). Release build'de otomatik açık; istersen kullanıcı ayarlarından
-  // opt-out ekleyebiliriz. isFirebaseReady false ise (Firebase init başarısız)
-  // yine de çöküyoruz ama Console'a gitmez — bu normal.
-  if (isFirebaseReady) {
-    try {
-      await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(
-        !kDebugMode,
-      );
-      enableCrashlyticsIntegration();
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<_BootstrapPayload>(
+      future: _bootstrapFuture,
+      builder: (context, snapshot) {
+        final payload = snapshot.data;
+        if (payload != null) {
+          if (!_deferredStartupScheduled) {
+            _deferredStartupScheduled = true;
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              unawaited(_runDeferredStartup(payload.prefs));
+            });
+          }
+          return ProviderScope(
+            observers: const [ArinProviderObserver()],
+            overrides: [
+              sharedPreferencesProvider.overrideWithValue(payload.prefs),
+            ],
+            child: const ArinApp(),
+          );
+        }
+
+        if (snapshot.hasError) {
+          return _BootstrapSplash(
+            message: 'Arın hazırlanamadı. Uygulamayı kapatıp tekrar aç.',
+            detail: '${snapshot.error}',
+          );
+        }
+
+        return const _BootstrapSplash(message: 'Arın hazırlanıyor...');
+      },
+    );
+  }
+}
+
+class _BootstrapSplash extends StatelessWidget {
+  const _BootstrapSplash({required this.message, this.detail});
+
+  final String message;
+  final String? detail;
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: Scaffold(
+        body: DecoratedBox(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [Color(0xFF1F4F3F), Color(0xFF071815)],
+            ),
+          ),
+          child: SafeArea(
+            child: Center(
+              child: Padding(
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      width: 76,
+                      height: 76,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: const Color(0xFF9BE7C3).withValues(alpha: 0.12),
+                        border: Border.all(
+                          color: const Color(0xFF9BE7C3).withValues(alpha: 0.45),
+                          width: 1.4,
+                        ),
+                      ),
+                      alignment: Alignment.center,
+                      child: const Text(
+                        'A',
+                        style: TextStyle(
+                          color: Color(0xFFB7F0D2),
+                          fontSize: 34,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: -1,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 18),
+                    const Text(
+                      'Arın',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 24,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: -0.5,
+                      ),
+                    ),
+                    const SizedBox(height: 22),
+                    const SizedBox(
+                      width: 22,
+                      height: 22,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2.2,
+                        color: Color(0xFF9BE7C3),
+                      ),
+                    ),
+                    const SizedBox(height: 14),
+                    Text(
+                      message,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: Colors.white.withValues(alpha: 0.86),
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    if (detail != null) ...[
+                      const SizedBox(height: 10),
+                      Text(
+                        detail!,
+                        textAlign: TextAlign.center,
+                        maxLines: 3,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          color: Colors.white.withValues(alpha: 0.55),
+                          fontSize: 12,
+                          height: 1.35,
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+Future<_BootstrapPayload> _bootstrapApp() async {
+  try {
+    // ── Hive Başlatma + Adapter Kayıtları ──────────────────────────────
+    await Hive.initFlutter();
+    _registerAdapters();
+    await _openHiveBoxes();
+
+    // ── SharedPreferences ──────────────────────────────────────────────
+    final prefs = await SharedPreferences.getInstance();
+
+    // intl tarih adları splash kritik yolunda beklemesin. İlk kurulumda
+    // onboarding ekranlarının tarih formatına ihtiyacı yok; gerekli ekranlar
+    // açılana kadar arka planda hazır olur.
+    unawaited(_preloadDateFormatting());
+
+    // Diyanet ilçe asset'ini fonda yükle (settings picker + location service
+    // anlık erişim bekliyor; uygulama açılırken beklemeyelim).
+    unawaited(DiyanetDistrictMatcher.loadOnce());
+
+    final onboardingCompleted = _isOnboardingCompletedForStartup(prefs);
+    if (onboardingCompleted) {
+      await bootstrapFirebase();
+
+      if (isFirebaseReady && !kDebugMode) {
+        unawaited(_configureFirebaseServicesAfterBootstrap());
+      } else if (isFirebaseReady) {
+        debugPrint(
+          '══ ARIN ══ Crashlytics + Analytics: debug build, network init '
+          'atlandı (TLS retry gürültüsü olmasın diye).',
+        );
+      }
+    } else {
       debugPrint(
-        '══ ARIN ══ Crashlytics: collection ${kDebugMode ? "DISABLED (debug)" : "ENABLED (release)"}',
+        '══ ARIN ══ Firebase bootstrap: onboarding bitmemiş, ertelendi',
       );
-    } catch (e) {
-      debugPrint('══ ARIN ══ Crashlytics init failed (sessiz): $e');
     }
 
-    // Analytics — ekran açılışı + özel olaylar (zikir_complete, arinma_*,
-    // frekans_*, kesfet_*, namaz_tick). Firebase Console → Analytics /
-    // DebugView panelinden izlenir.
-    await ArinAnalytics.enable();
+    debugPrint('══ ARIN ══ bootstrap tamam');
+    return _BootstrapPayload(prefs: prefs);
+  } catch (e, st) {
+    debugPrint('══ ARIN ══ bootstrap failed: $e');
+    debugPrint('$st');
+    if (isFirebaseReady) {
+      try {
+        await FirebaseCrashlytics.instance.recordError(e, st, fatal: true);
+      } catch (_) {}
+    }
+    Error.throwWithStackTrace(e, st);
+  }
+}
+
+Future<void> _preloadDateFormatting() async {
+  try {
+    await initializeDateFormatting('tr_TR');
+    await initializeDateFormatting('en_US');
+    await initializeDateFormatting('ar_SA');
+  } catch (e) {
+    debugPrint('══ ARIN ══ date formatting preload failed (sessiz): $e');
+  }
+}
+
+Future<void> _configureFirebaseServicesAfterBootstrap() async {
+  // Crashlytics: debug build'de toplama kapalı (geliştirme sırasında spam
+  // olmasın). Release build'de otomatik açık; istersen kullanıcı ayarlarından
+  // opt-out ekleyebiliriz.
+  try {
+    await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(
+      !kDebugMode,
+    );
+    enableCrashlyticsIntegration();
+    debugPrint(
+      '══ ARIN ══ Crashlytics: collection ${kDebugMode ? "DISABLED (debug)" : "ENABLED (release)"}',
+    );
+  } catch (e) {
+    debugPrint('══ ARIN ══ Crashlytics init failed (sessiz): $e');
   }
 
-  runApp(
-    ProviderScope(
-      observers: const [ArinProviderObserver()],
-      overrides: [sharedPreferencesProvider.overrideWithValue(prefs)],
-      child: const ArinApp(),
-    ),
-  );
-  WidgetsBinding.instance.addPostFrameCallback((_) {
-    unawaited(_runDeferredStartup(prefs));
-  });
-  debugPrint('══ ARIN ══ runApp tamam');
+  // Analytics — ekran açılışı + özel olaylar (zikir_complete, arinma_*,
+  // frekans_*, kesfet_*, namaz_tick). Firebase Console → Analytics /
+  // DebugView panelinden izlenir.
+  try {
+    await ArinAnalytics.enable();
+  } catch (e) {
+    debugPrint('══ ARIN ══ Analytics init failed (sessiz): $e');
+  }
 }
 
 Future<void> _runDeferredStartup(SharedPreferences prefs) async {
+  final onboardingCompleted = _isOnboardingCompletedForStartup(prefs);
+
+  // İlk kurulum/onboarding sırasında WebKit (AdMob), notification migration
+  // ve legacy cleanup işleri çalışmasın. Kullanıcı daha ismini yazarken
+  // WebContent/Networking process 10+ sn spawn oluyordu; bu da ilk kurulum
+  // kasmasının ana kaynaklarından biri. Onboarding tamamlandıktan sonraki
+  // girişlerde bu işler normal çalışır.
+  if (!onboardingCompleted) {
+    debugPrint(
+      '══ ARIN ══ deferred startup: onboarding bitmemiş, ağır işler atlandı',
+    );
+    return;
+  }
+
   if (!kIsWeb) {
-    await _bestEffortStartup(
-      'PrayerNotificationScheduler.init',
-      PrayerNotificationScheduler.init(),
-    );
-    await _bestEffortStartup(
-      'AppLocalNotificationScheduler.init',
-      AppLocalNotificationScheduler.init(),
-    );
-    if (Platform.isIOS) {
-      await _bestEffortStartup(
-        'HomeWidget.setAppGroupId',
-        HomeWidget.setAppGroupId('group.com.arin.arin'),
+    if (Platform.isAndroid || Platform.isIOS) {
+      unawaited(
+        Future<void>.delayed(
+          const Duration(seconds: 6),
+          AdMobService.initialize,
+        ),
       );
     }
   }
+
+  // iOS App Group hazırlığını paralelde başlat: pool sync veya widget
+  // refresh sırasında bekleme yapmasın diye.
+  ArinWidgetSync.primeAppGroup();
+
+  await Future<void>.delayed(const Duration(seconds: 4));
 
   // Eski namaz vakti cache'ini BİR KEZ temizle — Aladhan `school=1` (Hanafi)
   // ile kaydedilmiş ve İkindi'yi 1 saat ileri atan bozuk entry'leri kökten
@@ -179,12 +406,17 @@ Future<void> _runDeferredStartup(SharedPreferences prefs) async {
   await ArinReviewPrompter.markAppLaunched(prefs);
 }
 
-Future<void> _bestEffortStartup(String label, Future<void> future) async {
+bool _isOnboardingCompletedForStartup(SharedPreferences prefs) {
+  final flag = prefs.getBool('onboarding_completed');
+  if (flag == false) return false;
+  if (flag == true) return true;
   try {
-    await future.timeout(const Duration(seconds: 3));
-  } catch (e, st) {
-    debugPrint('══ ARIN ══ startup skipped $label: $e');
-    debugPrint('$st');
+    final profile = Hive.box<UserProfileModel>(
+      HiveBoxes.userProfile,
+    ).get('profile');
+    return profile?.onboardingCompleted == true;
+  } catch (_) {
+    return false;
   }
 }
 

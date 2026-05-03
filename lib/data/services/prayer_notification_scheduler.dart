@@ -4,6 +4,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -34,6 +35,9 @@ bool _initialized = false;
 Future<void>? _initFuture;
 String? _initializedLocaleCode;
 const Duration _initTimeout = Duration(seconds: 3);
+const MethodChannel _nativePrayerNotifications = MethodChannel(
+  'com.arin.arin/prayer_notifications',
+);
 
 /// Arka arkaya gelen [reschedule] çağrılarını susturur.
 /// Yaklaşık bir alarm saatine yakın tekrar-planlama, alarmın kaçırılmasına
@@ -245,7 +249,17 @@ abstract final class PrayerNotificationScheduler {
 
   static Future<void> cancelAllPrayerNotifications() async {
     if (!supported) return;
-    final idsToCancel = <int>{..._scheduledIds};
+    final idsToCancel = <int>{
+      ..._scheduledIds,
+      ..._knownPrayerNotificationIdsAround(DateTime.now()),
+    };
+    if (Platform.isAndroid) {
+      try {
+        await _nativePrayerNotifications.invokeMethod<void>('cancelAll');
+      } catch (e) {
+        debugPrint('Prayer NTF: native cancelAll failed silently ($e)');
+      }
+    }
     try {
       final pending = await arinLocalNotificationsPlugin
           .pendingNotificationRequests();
@@ -259,6 +273,13 @@ abstract final class PrayerNotificationScheduler {
     }
 
     for (final id in idsToCancel) {
+      if (Platform.isAndroid) {
+        try {
+          await _nativePrayerNotifications.invokeMethod<void>('cancel', id);
+        } catch (e) {
+          debugPrint('Prayer NTF: native cancel($id) failed silently ($e)');
+        }
+      }
       try {
         await arinLocalNotificationsPlugin.cancel(id);
       } catch (e) {
@@ -268,6 +289,28 @@ abstract final class PrayerNotificationScheduler {
       }
     }
     _scheduledIds.clear();
+  }
+
+  static Iterable<int> _knownPrayerNotificationIdsAround(DateTime now) sync* {
+    final today = DateTime(now.year, now.month, now.day);
+    for (var dayOffset = -2; dayOffset <= 35; dayOffset++) {
+      final day = today.add(Duration(days: dayOffset));
+      for (
+        var prayerIndex = 0;
+        prayerIndex < PrayerReminderPrefs.slotCount;
+        prayerIndex++
+      ) {
+        final base = _idFor(day, prayerIndex);
+        yield base;
+        yield base + 250000;
+        // Eski tek-gün fallback yolu yarınki imsak/güneş için ek offset'li ID
+        // kullanıyordu; migration temizliğinde onları da kapsa.
+        yield base + 100;
+        yield base + 250100;
+        yield base + 1100;
+        yield base + 251100;
+      }
+    }
   }
 
   static bool _isPrayerOwnedNotificationId(int id) {
@@ -951,6 +994,8 @@ abstract final class PrayerNotificationScheduler {
         when: scheduledTime,
         details: details,
         preferredMode: preferredMode,
+        slotStart: slotStart,
+        offsetMinutes: m,
       );
       if (!ok) continue;
       _scheduledIds.add(id);
@@ -968,6 +1013,8 @@ abstract final class PrayerNotificationScheduler {
     required tz.TZDateTime when,
     required NotificationDetails details,
     required AndroidScheduleMode preferredMode,
+    required DateTime slotStart,
+    required int offsetMinutes,
   }) async {
     final attempts = <AndroidScheduleMode>[preferredMode];
     if (Platform.isAndroid) {
@@ -982,14 +1029,27 @@ abstract final class PrayerNotificationScheduler {
     Object? lastError;
     for (final m in attempts) {
       try {
-        await arinLocalNotificationsPlugin.zonedSchedule(
-          id,
-          title,
-          body,
-          when,
-          details,
-          androidScheduleMode: m,
-        );
+        if (Platform.isAndroid) {
+          await _scheduleNativeAndroidPrayerNotification(
+            id: id,
+            title: title,
+            body: body,
+            when: when,
+            details: details,
+            scheduleMode: m,
+            slotStart: slotStart,
+            offsetMinutes: offsetMinutes,
+          );
+        } else {
+          await arinLocalNotificationsPlugin.zonedSchedule(
+            id,
+            title,
+            body,
+            when,
+            details,
+            androidScheduleMode: m,
+          );
+        }
         if (m != preferredMode) {
           debugPrint(
             'Prayer NTF: primary ${preferredMode.name} failed, succeeded with ${m.name} (id=$id)',
@@ -1003,6 +1063,68 @@ abstract final class PrayerNotificationScheduler {
     }
     debugPrint('Prayer NTF: all schedule modes failed for id=$id ($lastError)');
     return false;
+  }
+
+  static DateTime _staleCutoffForPrayerReminder({
+    required DateTime scheduledAt,
+    required DateTime slotStart,
+    required int offsetMinutes,
+  }) {
+    if (offsetMinutes <= 0) {
+      return slotStart.add(const Duration(minutes: 10));
+    }
+    final reminderGrace = scheduledAt.add(const Duration(minutes: 2));
+    return reminderGrace.isBefore(slotStart) ? reminderGrace : slotStart;
+  }
+
+  static Future<void> _scheduleNativeAndroidPrayerNotification({
+    required int id,
+    required String title,
+    required String body,
+    required tz.TZDateTime when,
+    required NotificationDetails details,
+    required AndroidScheduleMode scheduleMode,
+    required DateTime slotStart,
+    required int offsetMinutes,
+  }) async {
+    final androidDetails = details.android;
+    final channelId = androidDetails?.channelId;
+    if (channelId == null || channelId.isEmpty) {
+      throw StateError(
+        'Android notification channel missing for prayer id=$id',
+      );
+    }
+    final scheduledAt = DateTime.fromMillisecondsSinceEpoch(
+      when.millisecondsSinceEpoch,
+    );
+    final expiresAt = _staleCutoffForPrayerReminder(
+      scheduledAt: scheduledAt,
+      slotStart: slotStart,
+      offsetMinutes: offsetMinutes,
+    );
+    await _nativePrayerNotifications.invokeMethod<void>('schedule', {
+      'id': id,
+      'title': title,
+      'body': body,
+      'channelId': channelId,
+      'playSound': androidDetails?.playSound ?? true,
+      ..._nativeAndroidSoundPayload(androidDetails?.sound),
+      'scheduledAtMs': scheduledAt.millisecondsSinceEpoch,
+      'expiresAtMs': expiresAt.millisecondsSinceEpoch,
+      'mode': scheduleMode.name,
+    });
+  }
+
+  static Map<String, Object?> _nativeAndroidSoundPayload(
+    AndroidNotificationSound? sound,
+  ) {
+    if (sound is RawResourceAndroidNotificationSound) {
+      return <String, Object?>{'soundType': 'raw', 'sound': sound.sound};
+    }
+    if (sound is UriAndroidNotificationSound) {
+      return <String, Object?>{'soundType': 'uri', 'sound': sound.sound};
+    }
+    return const <String, Object?>{'soundType': 'default'};
   }
 
   static DateTime? _tryAtClock(DateTime day, String hm) {

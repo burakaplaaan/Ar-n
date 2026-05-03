@@ -7,6 +7,8 @@ import SwiftUI
 import WidgetKit
 
 private let kGroupId = "group.com.arin.arin"
+private let kQuoteTimelineFutureLimit = 28
+private let kPrayerTimelineFutureLimit = 36
 
 private func suite() -> UserDefaults? {
   UserDefaults(suiteName: kGroupId)
@@ -75,6 +77,43 @@ private enum PrayerWidgetDefaults {
   }
 }
 
+private struct QuoteSchedulePayload: Decodable {
+  let entries: [QuoteScheduleItem]
+}
+
+private struct QuoteScheduleItem: Decodable {
+  let epochMs: Double
+  let text: String
+  let source: String
+
+  var date: Date {
+    Date(timeIntervalSince1970: epochMs / 1000.0)
+  }
+}
+
+private struct PrayerSchedulePayload: Decodable {
+  let location: String?
+  let entries: [PrayerScheduleItem]
+}
+
+private struct PrayerScheduleItem: Decodable {
+  let epochMs: Double
+  let name: String
+
+  var date: Date {
+    Date(timeIntervalSince1970: epochMs / 1000.0)
+  }
+}
+
+private func decodeWidgetJson<T: Decodable>(_ key: String, as type: T.Type) -> T? {
+  guard let raw = suite()?.string(forKey: key),
+        !raw.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty,
+        let data = raw.data(using: .utf8) else {
+    return nil
+  }
+  return try? JSONDecoder().decode(T.self, from: data)
+}
+
 // MARK: - Shared chrome
 
 private extension View {
@@ -106,6 +145,10 @@ struct QuoteProvider: TimelineProvider {
   }
 
   func getTimeline(in context: Context, completion: @escaping (Timeline<QuoteEntry>) -> Void) {
+    if let timeline = loadScheduledTimeline() {
+      completion(timeline)
+      return
+    }
     let e = loadEntry()
     let next = Calendar.current.date(byAdding: .hour, value: 6, to: Date()) ?? Date().addingTimeInterval(21_600)
     completion(Timeline(entries: [e], policy: .after(next)))
@@ -124,6 +167,47 @@ struct QuoteProvider: TimelineProvider {
       text: text,
       source: source
     )
+  }
+
+  private func loadScheduledTimeline() -> Timeline<QuoteEntry>? {
+    guard let payload = decodeWidgetJson("arin_quote_schedule_json", as: QuoteSchedulePayload.self) else {
+      return nil
+    }
+    let sorted = payload.entries
+      .filter { !$0.text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }
+      .sorted { $0.date < $1.date }
+    guard !sorted.isEmpty else { return nil }
+
+    let now = Date()
+    var current = sorted.first!
+    var future = [QuoteScheduleItem]()
+    for item in sorted {
+      if item.date <= now {
+        current = item
+      } else {
+        future.append(item)
+      }
+    }
+
+    var entries = [
+      QuoteEntry(
+        date: now,
+        text: current.text.trimmingCharacters(in: .whitespacesAndNewlines),
+        source: current.source.trimmingCharacters(in: .whitespacesAndNewlines)
+      )
+    ]
+    let emittedFuture = Array(future.prefix(kQuoteTimelineFutureLimit))
+    entries.append(
+      contentsOf: emittedFuture.map {
+        QuoteEntry(
+          date: $0.date,
+          text: $0.text.trimmingCharacters(in: .whitespacesAndNewlines),
+          source: $0.source.trimmingCharacters(in: .whitespacesAndNewlines)
+        )
+      }
+    )
+    let refresh = emittedFuture.last?.date.addingTimeInterval(1_800) ?? now.addingTimeInterval(21_600)
+    return Timeline(entries: entries, policy: .after(refresh))
   }
 }
 
@@ -283,6 +367,10 @@ struct PrayerProvider: TimelineProvider {
   }
 
   func getTimeline(in context: Context, completion: @escaping (Timeline<PrayerEntry>) -> Void) {
+    if let timeline = loadScheduledTimeline() {
+      completion(timeline)
+      return
+    }
     let e = loadEntry()
     // iOS WidgetKit'te saniyelik zorlamadan kaçın: pil-dostu, dakikalık tazeleme.
     let nextFire = Date().addingTimeInterval(60)
@@ -313,6 +401,55 @@ struct PrayerProvider: TimelineProvider {
       countdown: countdown,
       nextDate: nextDate
     )
+  }
+
+  private func loadScheduledTimeline() -> Timeline<PrayerEntry>? {
+    guard let payload = decodeWidgetJson("arin_prayer_schedule_json", as: PrayerSchedulePayload.self) else {
+      return nil
+    }
+    let sorted = payload.entries.sorted { $0.date < $1.date }
+    guard !sorted.isEmpty else { return nil }
+
+    let now = Date()
+    let locationRaw = payload.location?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+    let location = locationRaw.isEmpty ? PrayerWidgetDefaults.location : locationRaw
+
+    func entry(at date: Date, next item: PrayerScheduleItem) -> PrayerEntry {
+      let remaining = max(0, item.date.timeIntervalSince1970 - date.timeIntervalSince1970)
+      return PrayerEntry(
+        date: date,
+        location: location,
+        nextName: turkishPrayerName(item.name),
+        countdown: formatHMS(seconds: remaining),
+        nextDate: item.date
+      )
+    }
+
+    guard let firstNextIndex = sorted.firstIndex(where: { $0.date > now }) else {
+      let stale = PrayerEntry(
+        date: now,
+        location: location,
+        nextName: localizedWidgetText(tr: "Güncelle"),
+        countdown: localizedWidgetText(tr: "Uygulamayı aç"),
+        nextDate: nil
+      )
+      return Timeline(entries: [stale], policy: .after(now.addingTimeInterval(21_600)))
+    }
+
+    var entries = [entry(at: now, next: sorted[firstNextIndex])]
+    if firstNextIndex + 1 < sorted.count {
+      let endExclusive = min(sorted.count, firstNextIndex + 1 + kPrayerTimelineFutureLimit)
+      for index in (firstNextIndex + 1)..<endExclusive {
+        entries.append(
+          entry(
+            at: sorted[index - 1].date.addingTimeInterval(1),
+            next: sorted[index]
+          )
+        )
+      }
+    }
+    let refresh = entries.last?.date.addingTimeInterval(3600) ?? now.addingTimeInterval(3600)
+    return Timeline(entries: entries, policy: .after(refresh))
   }
 
   private func formatHMS(seconds: Double) -> String {

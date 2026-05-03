@@ -3,6 +3,7 @@ package com.arin.arin
 import android.app.AlarmManager
 import android.app.PendingIntent
 import android.appwidget.AppWidgetManager
+import android.content.BroadcastReceiver
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
@@ -12,6 +13,7 @@ import android.os.SystemClock
 import android.view.View
 import android.widget.RemoteViews
 import es.antonborri.home_widget.HomeWidgetProvider
+import org.json.JSONObject
 
 /**
  * Namaz vakitleri widget: `arin_prayer_*` anahtarları.
@@ -43,26 +45,32 @@ class ArinPrayerWidgetProvider : HomeWidgetProvider() {
         appWidgetIds: IntArray,
         widgetData: SharedPreferences,
     ) {
+        val scheduled = readScheduledPrayer(widgetData, System.currentTimeMillis())
         val loc = widgetData.getString(KEY_LOCATION, null)?.trim().orEmpty()
         val localeCode = widgetData.getString(KEY_LOCALE, null)?.trim()?.lowercase().orEmpty()
         val forceTurkish = !localeCode.startsWith("tr")
-        val displayLocation = loc.ifEmpty {
+        val displayLocation = scheduled?.location ?: loc.ifEmpty {
             "Konum ayarlanmadı"
         }
-        val nextName = widgetData.getString(KEY_NEXT_NAME, null)?.trim().orEmpty()
-        val countdownStatic = widgetData.getString(KEY_COUNTDOWN, null)?.trim().orEmpty()
+        val scheduleExpired = scheduled?.expired == true
+        val nextName = scheduled?.name
+            ?: widgetData.getString(KEY_NEXT_NAME, null)?.trim().orEmpty()
+        val countdownStatic = if (scheduleExpired) {
+            "Uygulamayı aç"
+        } else {
+            widgetData.getString(KEY_COUNTDOWN, null)?.trim().orEmpty()
+        }
 
-        val epochMs = widgetData.getString(KEY_NEXT_EPOCH, null)?.trim()?.toLongOrNull()
+        val epochMs = if (scheduleExpired) {
+            null
+        } else {
+            scheduled?.epochMs
+                ?: widgetData.getString(KEY_NEXT_EPOCH, null)?.trim()?.toLongOrNull()
+        }
         val nowMs = System.currentTimeMillis()
         val rawRemMs = if (epochMs != null && epochMs > 0L) epochMs - nowMs else null
         val remMs = rawRemMs?.coerceAtLeast(0L)
         val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        val exactAlarmCapable =
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                alarmManager.canScheduleExactAlarms()
-            } else {
-                true
-            }
 
         val countdown = if (remMs != null) {
             formatHms(remMs)
@@ -73,8 +81,7 @@ class ArinPrayerWidgetProvider : HomeWidgetProvider() {
         val canUseChronometer =
             Build.VERSION.SDK_INT >= Build.VERSION_CODES.N &&
                 remMs != null &&
-                remMs > DEADLINE_GUARD_MS &&
-                exactAlarmCapable
+                remMs > DEADLINE_GUARD_MS
 
         val openApp = Intent(context, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
@@ -90,8 +97,14 @@ class ArinPrayerWidgetProvider : HomeWidgetProvider() {
 
         for (widgetId in appWidgetIds) {
             val views = RemoteViews(context.packageName, R.layout.arin_prayer_widget)
-            val safeNextName = if (forceTurkish) "İmsak" else toTurkishPrayerName(nextName)
-            val safeLocation = "Konum"
+            val safeNextName = if (scheduleExpired) {
+                "Güncelle"
+            } else if (forceTurkish) {
+                "İmsak"
+            } else {
+                toTurkishPrayerName(nextName)
+            }
+            val safeLocation = displayLocation.ifEmpty { "Konum" }
             views.setTextViewText(R.id.widget_prayer_next_name, safeNextName.ifEmpty { "—" })
             if (canUseChronometer) {
                 val base = SystemClock.elapsedRealtime() + remMs!!
@@ -102,7 +115,7 @@ class ArinPrayerWidgetProvider : HomeWidgetProvider() {
             } else {
                 views.setTextViewText(
                     R.id.widget_prayer_countdown,
-                    countdown.ifEmpty { "0:00:00" },
+                    if (scheduleExpired) "Uygulamayı aç" else countdown.ifEmpty { "0:00:00" },
                 )
             }
             views.setTextViewText(R.id.widget_prayer_location, safeLocation)
@@ -113,9 +126,12 @@ class ArinPrayerWidgetProvider : HomeWidgetProvider() {
         if (canUseChronometer) {
             cancelTickAlarm(context)
             scheduleDeadlineRefresh(context, epochMs!!, alarmManager)
-        } else {
+        } else if (epochMs != null && epochMs > System.currentTimeMillis()) {
             cancelDeadlineRefresh(context)
             scheduleTicks(context)
+        } else {
+            cancelDeadlineRefresh(context)
+            cancelTickAlarm(context)
         }
     }
 
@@ -157,14 +173,14 @@ class ArinPrayerWidgetProvider : HomeWidgetProvider() {
         val triggerAt = SystemClock.elapsedRealtime() + TICK_INTERVAL_MS
         try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                am.setExactAndAllowWhileIdle(
+                am.setAndAllowWhileIdle(
                     AlarmManager.ELAPSED_REALTIME_WAKEUP,
                     triggerAt,
                     pi,
                 )
             } else {
                 @Suppress("DEPRECATION")
-                am.setExact(AlarmManager.ELAPSED_REALTIME_WAKEUP, triggerAt, pi)
+                am.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, triggerAt, pi)
             }
         } catch (_: Exception) {
             @Suppress("DEPRECATION")
@@ -193,7 +209,7 @@ class ArinPrayerWidgetProvider : HomeWidgetProvider() {
     private fun scheduleDeadlineRefresh(context: Context, epochMs: Long, am: AlarmManager) {
         cancelDeadlineRefresh(context)
         val now = System.currentTimeMillis()
-        val triggerAt = (epochMs - DEADLINE_GUARD_MS).coerceAtLeast(now + 200L)
+        val triggerAt = (epochMs + 1_000L).coerceAtLeast(now + 200L)
         val intent = Intent(context, ArinPrayerWidgetProvider::class.java).apply {
             action = ACTION_DEADLINE_REFRESH
         }
@@ -209,11 +225,24 @@ class ArinPrayerWidgetProvider : HomeWidgetProvider() {
                 },
         )
         try {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                am.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerAt, pi)
+            val canExact =
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                    am.canScheduleExactAlarms()
+                } else {
+                    true
+                }
+            if (canExact) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    am.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerAt, pi)
+                } else {
+                    @Suppress("DEPRECATION")
+                    am.setExact(AlarmManager.RTC_WAKEUP, triggerAt, pi)
+                }
+            } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                am.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerAt, pi)
             } else {
                 @Suppress("DEPRECATION")
-                am.setExact(AlarmManager.RTC_WAKEUP, triggerAt, pi)
+                am.set(AlarmManager.RTC_WAKEUP, triggerAt, pi)
             }
         } catch (_: Exception) {
             @Suppress("DEPRECATION")
@@ -255,6 +284,40 @@ class ArinPrayerWidgetProvider : HomeWidgetProvider() {
         return if (hms.matches(noMinus)) noMinus else "0:00:00"
     }
 
+    private fun readScheduledPrayer(
+        widgetData: SharedPreferences,
+        nowMs: Long,
+    ): ScheduledPrayer? {
+        val raw = widgetData.getString(KEY_PRAYER_SCHEDULE, null)?.trim().orEmpty()
+        if (raw.isEmpty()) return null
+        return try {
+            val root = JSONObject(raw)
+            val location = root.optString("location", "").trim()
+            val entries = root.optJSONArray("entries") ?: return null
+            for (i in 0 until entries.length()) {
+                val obj = entries.optJSONObject(i) ?: continue
+                val epoch = obj.optLong("epochMs", 0L)
+                val name = obj.optString("name", "").trim()
+                if (epoch > nowMs && name.isNotEmpty()) {
+                    return ScheduledPrayer(
+                        name = name,
+                        epochMs = epoch,
+                        location = location.ifEmpty { null },
+                        expired = false,
+                    )
+                }
+            }
+            ScheduledPrayer(
+                name = "Güncelle",
+                epochMs = null,
+                location = location.ifEmpty { null },
+                expired = true,
+            )
+        } catch (_: Exception) {
+            null
+        }
+    }
+
     private fun containsArabic(s: String): Boolean = s.any { ch ->
         ch.code in 0x0600..0x06FF
     }
@@ -280,11 +343,19 @@ class ArinPrayerWidgetProvider : HomeWidgetProvider() {
         }
     }
 
+    private data class ScheduledPrayer(
+        val name: String,
+        val epochMs: Long?,
+        val location: String?,
+        val expired: Boolean,
+    )
+
     companion object {
         private const val KEY_LOCATION = "arin_prayer_location"
         private const val KEY_NEXT_NAME = "arin_prayer_next_name"
         private const val KEY_COUNTDOWN = "arin_prayer_countdown"
         private const val KEY_NEXT_EPOCH = "arin_prayer_next_epoch_ms"
+        private const val KEY_PRAYER_SCHEDULE = "arin_prayer_schedule_json"
         private const val KEY_LOCALE = "arin_widget_locale"
 
         private const val ACTION_TICK = "com.arin.arin.action.PRAYER_WIDGET_TICK"
@@ -294,7 +365,37 @@ class ArinPrayerWidgetProvider : HomeWidgetProvider() {
         private const val REQUEST_CODE_DEADLINE_REFRESH = 19022
         /** Kronometreyi sıfır sınırına sokmadan önce statik moda geçiş tamponu. */
         private const val DEADLINE_GUARD_MS = 1500L
-        /** API 23 fallback: 15 sn adımlı güncelleme, pil tüketimini dengeler. */
-        private const val TICK_INTERVAL_MS = 15_000L
+        /** API 23 / chronometer fallback: dakikalık coarse güncelleme. */
+        private const val TICK_INTERVAL_MS = 60_000L
+
+        fun requestUpdate(context: Context) {
+            val awm = AppWidgetManager.getInstance(context)
+            val component = ComponentName(context, ArinPrayerWidgetProvider::class.java)
+            val ids = awm.getAppWidgetIds(component)
+            if (ids.isEmpty()) return
+            val update = Intent(context, ArinPrayerWidgetProvider::class.java).apply {
+                action = AppWidgetManager.ACTION_APPWIDGET_UPDATE
+                putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids)
+            }
+            context.sendBroadcast(update)
+        }
+    }
+}
+
+class ArinWidgetRestoreReceiver : BroadcastReceiver() {
+    override fun onReceive(context: Context, intent: Intent) {
+        val action = intent.action ?: return
+        if (action == Intent.ACTION_BOOT_COMPLETED ||
+            action == Intent.ACTION_MY_PACKAGE_REPLACED ||
+            action == Intent.ACTION_TIME_CHANGED ||
+            action == Intent.ACTION_TIMEZONE_CHANGED ||
+            action == Intent.ACTION_LOCALE_CHANGED ||
+            action == "android.intent.action.QUICKBOOT_POWERON" ||
+            action == "com.htc.intent.action.QUICKBOOT_POWERON"
+        ) {
+            val appContext = context.applicationContext
+            ArinPrayerWidgetProvider.requestUpdate(appContext)
+            ArinQuoteWidgetProvider.requestUpdate(appContext)
+        }
     }
 }

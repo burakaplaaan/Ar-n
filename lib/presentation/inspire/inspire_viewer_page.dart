@@ -5,8 +5,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:arin/l10n/app_localizations.dart';
 
+import '../../core/ads/admob_ids.dart';
 import '../../data/models/inspiration_card_model.dart';
+import '../../data/services/ad_gate_service.dart';
+import '../shared/providers/ad_gate_providers.dart';
+import '../shared/providers/admob_providers.dart';
+import '../shared/providers/premium_providers.dart';
 import '../shared/widgets/arin_skeleton.dart';
+import 'explore_bgm_controller.dart';
 import 'inspiration_catalog_provider.dart';
 import 'inspire_viewer_session_provider.dart';
 import 'widgets/inspiration_slide.dart';
@@ -79,19 +85,21 @@ class _InspireViewerPageState extends ConsumerState<InspireViewerPage> {
   }
 }
 
-class _ViewerBody extends StatefulWidget {
+class _ViewerBody extends ConsumerStatefulWidget {
   const _ViewerBody({required this.cards, required this.initialIndex});
 
   final List<InspirationCardModel> cards;
   final int initialIndex;
 
   @override
-  State<_ViewerBody> createState() => _ViewerBodyState();
+  ConsumerState<_ViewerBody> createState() => _ViewerBodyState();
 }
 
-class _ViewerBodyState extends State<_ViewerBody> {
+class _ViewerBodyState extends ConsumerState<_ViewerBody> {
   PageController? _pc;
   late int _settledPage;
+  int _pagesViewedThisSession = 0;
+  bool _adGateShowing = false;
 
   /// Sol kenar “geri” jesti: sağa doğru sürükleme mesafesi (px).
   double _edgeSwipeDx = 0;
@@ -102,6 +110,9 @@ class _ViewerBodyState extends State<_ViewerBody> {
     final safe = widget.initialIndex.clamp(0, widget.cards.length - 1);
     _settledPage = safe;
     _pc = PageController(initialPage: safe, viewportFraction: 1);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _maybeShowExploreAdGate(countPage: false);
+    });
   }
 
   @override
@@ -147,6 +158,90 @@ class _ViewerBodyState extends State<_ViewerBody> {
     _edgeSwipeDx = 0;
   }
 
+  Future<void> _maybeShowExploreAdGate({bool countPage = true}) async {
+    if (_adGateShowing || !mounted) return;
+    if (countPage) {
+      _pagesViewedThisSession += 1;
+    }
+    final pagesViewed = _pagesViewedThisSession;
+    final adGate = ref.read(adGateServiceProvider);
+    final shouldCheckPremium = adGate.shouldShowExploreAd(
+      isPremium: false,
+      pagesViewedThisSession: pagesViewed,
+    );
+    if (!shouldCheckPremium) return;
+
+    _adGateShowing = true;
+    await adGate.markPending(AdGatePlacement.exploreSwipe);
+    var isPremium = false;
+    try {
+      final entitlement = await ref.read(premiumEntitlementProvider.future);
+      isPremium = entitlement.isActive;
+    } catch (_) {
+      // Entitlement okunamazsa fail-closed: ücretsiz kabul edip kapıyı koru.
+      isPremium = false;
+    }
+    if (!mounted) {
+      _adGateShowing = false;
+      return;
+    }
+    if (isPremium) {
+      await adGate.clearPending(AdGatePlacement.exploreSwipe);
+      _adGateShowing = false;
+      return;
+    }
+    if (!adGate.shouldShowExploreAd(
+      isPremium: isPremium,
+      pagesViewedThisSession: pagesViewed,
+    )) {
+      _adGateShowing = false;
+      return;
+    }
+    if (!mounted) {
+      _adGateShowing = false;
+      return;
+    }
+    await ref
+        .read(exploreBgmNotifierProvider.notifier)
+        .pauseForAdGate();
+    if (!mounted) {
+      _adGateShowing = false;
+      return;
+    }
+    await showModalBottomSheet<void>(
+      context: context,
+      isDismissible: false,
+      enableDrag: false,
+      backgroundColor: const Color(0xFF08130E),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(26)),
+      ),
+      builder: (ctx) => _ExploreAdGateSheet(
+        onContinue: () async {
+          final shown = await ref
+              .read(adMobServiceProvider)
+              .showInterstitial(ArinAdUnit.exploreInterstitial);
+          if (!shown || !mounted) return false;
+          await adGate.recordRewardedUnlock(AdGatePlacement.exploreSwipe);
+          return true;
+        },
+        onPremium: () {
+          Navigator.pop(ctx);
+          context.go('/premium');
+        },
+        onExit: () {
+          Navigator.pop(ctx);
+          if (context.canPop()) {
+            context.pop();
+          } else {
+            context.go('/home');
+          }
+        },
+      ),
+    );
+    _adGateShowing = false;
+  }
+
   @override
   Widget build(BuildContext context) {
     final cards = widget.cards;
@@ -167,6 +262,7 @@ class _ViewerBodyState extends State<_ViewerBody> {
           onPageChanged: (page) {
             _settledPage = page;
             _precacheNeighbors(page);
+            _maybeShowExploreAdGate();
           },
           itemBuilder: (context, i) {
             return InspirationSlide(
@@ -289,6 +385,125 @@ class _InstagramLikePageScrollPhysics extends PageScrollPhysics {
     return (targetPage * viewport).clamp(
       position.minScrollExtent,
       position.maxScrollExtent,
+    );
+  }
+}
+
+class _ExploreAdGateSheet extends StatefulWidget {
+  const _ExploreAdGateSheet({
+    required this.onContinue,
+    required this.onPremium,
+    required this.onExit,
+  });
+
+  final Future<bool> Function() onContinue;
+  final VoidCallback onPremium;
+  final VoidCallback onExit;
+
+  @override
+  State<_ExploreAdGateSheet> createState() => _ExploreAdGateSheetState();
+}
+
+class _ExploreAdGateSheetState extends State<_ExploreAdGateSheet> {
+  bool _loading = false;
+  String? _error;
+
+  Future<void> _continueAfterAd() async {
+    if (_loading) return;
+    setState(() {
+      _loading = true;
+      _error = null;
+    });
+    final shown = await widget.onContinue();
+    if (!mounted) return;
+    if (shown) {
+      Navigator.pop(context);
+      return;
+    }
+    setState(() {
+      _loading = false;
+      _error =
+          'Reklam şu an yüklenemedi. AdMob hesabı onaylanana kadar gerçek '
+          'reklamlar dönmeyebilir; birkaç saniye sonra tekrar deneyebilirsin.';
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return PopScope(
+      canPop: false,
+      child: Padding(
+        padding: EdgeInsets.fromLTRB(
+          20,
+          20,
+          20,
+          MediaQuery.paddingOf(context).bottom + 20,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            const Icon(
+              Icons.play_circle_outline_rounded,
+              color: Color(0xFF4ADE80),
+              size: 42,
+            ),
+            const SizedBox(height: 12),
+            const Text(
+              'Kısa reklam arası',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 20,
+                fontWeight: FontWeight.w900,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Premium kullanıcılar Keşfet akışını reklamsız kullanır. '
+              'Ücretsiz kullanımda birkaç kaydırmadan sonra kısa reklam gösterilir.',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: Colors.white.withValues(alpha: 0.7),
+                height: 1.35,
+              ),
+            ),
+            if (_error != null) ...[
+              const SizedBox(height: 12),
+              Text(
+                _error!,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  color: Color(0xFFFFD166),
+                  fontSize: 13,
+                  height: 1.35,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+            const SizedBox(height: 16),
+            FilledButton(
+              onPressed: _loading ? null : _continueAfterAd,
+              child: _loading
+                  ? const SizedBox(
+                      width: 18,
+                      height: 18,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : const Text('Reklam sonrası devam et'),
+            ),
+            TextButton(
+              onPressed: _loading ? null : widget.onPremium,
+              child: const Text('Premium ile reklamsız kullan'),
+            ),
+            if (_error != null)
+              TextButton(
+                onPressed: _loading ? null : widget.onExit,
+                child: const Text('Keşfetten çık'),
+              ),
+          ],
+        ),
+      ),
     );
   }
 }

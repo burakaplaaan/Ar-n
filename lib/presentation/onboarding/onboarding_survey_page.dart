@@ -41,7 +41,6 @@ class _OnboardingSurveyPageState extends ConsumerState<OnboardingSurveyPage> {
 
   final TextEditingController _nameController = TextEditingController();
   final FocusNode _nameFocus = FocusNode();
-  bool _nameFocused = false;
 
   String? _selectedGender;
   final Set<String> _selectedMoods = {};
@@ -94,12 +93,6 @@ class _OnboardingSurveyPageState extends ConsumerState<OnboardingSurveyPage> {
   @override
   void initState() {
     super.initState();
-    _nameFocus.addListener(() {
-      if (mounted) setState(() => _nameFocused = _nameFocus.hasFocus);
-    });
-    _nameController.addListener(() {
-      if (mounted) setState(() {});
-    });
     unawaited(_bootstrapSurvey());
   }
 
@@ -185,9 +178,7 @@ class _OnboardingSurveyPageState extends ConsumerState<OnboardingSurveyPage> {
         // sonradan açabileceğini bilsin.
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(
-              l10n.onboardingNotificationPermissionDenied,
-            ),
+            content: Text(l10n.onboardingNotificationPermissionDenied),
             duration: const Duration(seconds: 4),
           ),
         );
@@ -203,7 +194,9 @@ class _OnboardingSurveyPageState extends ConsumerState<OnboardingSurveyPage> {
     if (_finishing) return;
     setState(() => _finishing = true);
     try {
-      await ref.read(userProfileProvider.notifier).saveProfile(
+      await ref
+          .read(userProfileProvider.notifier)
+          .saveProfile(
             name: _nameController.text.trim().isNotEmpty
                 ? _nameController.text.trim()
                 : null,
@@ -232,32 +225,47 @@ class _OnboardingSurveyPageState extends ConsumerState<OnboardingSurveyPage> {
     }
   }
 
-  List<Widget> _buildPages() {
+  /// PageView.builder için: index → sayfa. Sırasıyla:
+  /// 0 isim, 1 cinsiyet, 2 mood, 3 sector, 4 needs,
+  /// (varsa) 5 bildirim, son: özet. `_pageCount` zaten doğru toplamı
+  /// veriyor. Lazy build sayesinde animasyon/text yükü tek seferde
+  /// inşa edilmiyor; sayfa geçişinde kasma azalıyor.
+  Widget _buildPageAt(int index) {
     final l10n = AppLocalizations.of(context)!;
-    return [
-      _buildNameStep(),
-      _buildGenderStep(),
-      _buildSelectionStep(
-        title: l10n.surveyMoodTitle,
-        subtitle: l10n.surveyMoodSubtitle,
-        options: _moodOptions(context),
-        selected: _selectedMoods,
-      ),
-      _buildSelectionStep(
-        title: l10n.surveyDailyRhythmTitle,
-        subtitle: l10n.surveyDailyRhythmSubtitle,
-        options: _sectorOptions(context),
-        selected: _selectedSectors,
-      ),
-      _buildSelectionStep(
-        title: l10n.surveyInnerThemesTitle,
-        subtitle: l10n.surveyInnerThemesSubtitle,
-        options: _innerThemeOptions(context),
-        selected: _selectedNeeds,
-      ),
-      if (_includeNotificationStep) _buildNotificationStep(),
-      _buildSummaryStep(),
-    ];
+    switch (index) {
+      case 0:
+        return _buildNameStep();
+      case 1:
+        return _buildGenderStep();
+      case 2:
+        return _buildSelectionStep(
+          title: l10n.surveyMoodTitle,
+          subtitle: l10n.surveyMoodSubtitle,
+          options: _moodOptions(context),
+          selected: _selectedMoods,
+        );
+      case 3:
+        return _buildSelectionStep(
+          title: l10n.surveyDailyRhythmTitle,
+          subtitle: l10n.surveyDailyRhythmSubtitle,
+          options: _sectorOptions(context),
+          selected: _selectedSectors,
+        );
+      case 4:
+        return _buildSelectionStep(
+          title: l10n.surveyInnerThemesTitle,
+          subtitle: l10n.surveyInnerThemesSubtitle,
+          options: _innerThemeOptions(context),
+          selected: _selectedNeeds,
+        );
+      case 5:
+        if (_includeNotificationStep) return _buildNotificationStep();
+        return _buildSummaryStep();
+      case 6:
+        return _buildSummaryStep();
+      default:
+        return const SizedBox.shrink();
+    }
   }
 
   @override
@@ -308,22 +316,20 @@ class _OnboardingSurveyPageState extends ConsumerState<OnboardingSurveyPage> {
             children: [
               _buildHeader(),
               Expanded(
-                child: PageView(
+                child: PageView.builder(
                   controller: _pageController,
                   physics: const NeverScrollableScrollPhysics(),
+                  itemCount: _pageCount,
                   onPageChanged: (idx) {
                     setState(() => _currentIndex = idx);
                     // Onboarding funnel telemetrisi: hangi adımda drop
                     // olduğunu Firebase Console → Analytics → Funnel'da
-                    // inceleyebilirsin. Adım ismi yok çünkü sıra
-                    // _buildPages() içinde kodla belirleniyor; index
-                    // yeterli sinyal.
-                    unawaited(ArinAnalytics.log(
-                      'onboarding_step',
-                      {'step': idx},
-                    ));
+                    // inceleyebilirsin.
+                    unawaited(
+                      ArinAnalytics.log('onboarding_step', {'step': idx}),
+                    );
                   },
-                  children: _buildPages(),
+                  itemBuilder: (context, index) => _buildPageAt(index),
                 ),
               ),
             ],
@@ -381,100 +387,81 @@ class _OnboardingSurveyPageState extends ConsumerState<OnboardingSurveyPage> {
 
   Widget _buildNameStep() {
     final l10n = AppLocalizations.of(context)!;
-    final name = _nameController.text.trim();
     return Padding(
       padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
       child: Column(
         children: [
           Expanded(
             child: Center(
-              child: AnimatedSlide(
-                duration: const Duration(milliseconds: 420),
-                curve: Curves.easeOutCubic,
-                offset: _nameFocused ? const Offset(0, -0.14) : Offset.zero,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Text(
-                      l10n.surveyNameTitle,
-                      style: AppTextStyles.headlineMedium.copyWith(
-                        color: Colors.white,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Text(
+                    l10n.surveyNameTitle,
+                    style: AppTextStyles.headlineMedium.copyWith(
+                      color: Colors.white,
+                    ),
+                  ).animate().fadeIn(duration: 280.ms),
+                  ValueListenableBuilder<TextEditingValue>(
+                    valueListenable: _nameController,
+                    builder: (context, value, _) {
+                      final name = value.text.trim();
+                      if (name.isEmpty) return const SizedBox.shrink();
+                      return Padding(
+                        padding: const EdgeInsets.only(top: 12),
+                        child: Text(
+                          '${l10n.surveyNameGreetingPrefix}, $name',
+                          style: AppTextStyles.titleMedium.copyWith(
+                            color: AppColors.emeraldLight,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                  const SizedBox(height: 28),
+                  TextField(
+                    controller: _nameController,
+                    focusNode: _nameFocus,
+                    textInputAction: TextInputAction.next,
+                    autocorrect: false,
+                    enableSuggestions: false,
+                    smartDashesType: SmartDashesType.disabled,
+                    smartQuotesType: SmartQuotesType.disabled,
+                    textCapitalization: TextCapitalization.words,
+                    style: const TextStyle(
+                      fontFamily: AppTextStyles.primaryFontFamily,
+                      color: Colors.white,
+                      fontSize: 18,
+                    ),
+                    decoration: InputDecoration(
+                      hintText: l10n.surveyNameHint,
+                      hintStyle: TextStyle(
+                        color: Colors.white.withValues(alpha: 0.4),
                       ),
-                    ).animate().fadeIn(duration: 450.ms).slideY(begin: 0.06),
-                    if (name.isNotEmpty) ...[
-                      const SizedBox(height: 12),
-                      Text(
-                        '${l10n.surveyNameGreetingPrefix}, $name',
-                        style: AppTextStyles.titleMedium.copyWith(
+                      filled: true,
+                      fillColor: Colors.white.withValues(alpha: 0.07),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(20),
+                        borderSide: BorderSide.none,
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(20),
+                        borderSide: BorderSide(
+                          color: Colors.white.withValues(alpha: 0.1),
+                        ),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(20),
+                        borderSide: const BorderSide(
                           color: AppColors.emeraldLight,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      )
-                          .animate(key: ValueKey(name))
-                          .fadeIn()
-                          .slideX(begin: -0.03),
-                    ],
-                    const SizedBox(height: 28),
-                    AnimatedScale(
-                      scale: _nameFocused ? 1.03 : 1.0,
-                      duration: const Duration(milliseconds: 280),
-                      curve: Curves.easeOutCubic,
-                      child: AnimatedContainer(
-                        duration: const Duration(milliseconds: 280),
-                        curve: Curves.easeOutCubic,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(20),
-                          boxShadow: _nameFocused
-                              ? [
-                                  BoxShadow(
-                                    color: AppColors.emeraldLight
-                                        .withValues(alpha: 0.22),
-                                    blurRadius: 20,
-                                    spreadRadius: 0,
-                                    offset: const Offset(0, 8),
-                                  ),
-                                ]
-                              : [],
-                        ),
-                        child: TextField(
-                          controller: _nameController,
-                          focusNode: _nameFocus,
-                          textCapitalization: TextCapitalization.words,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 18,
-                          ),
-                          decoration: InputDecoration(
-                            hintText: l10n.surveyNameHint,
-                            hintStyle: TextStyle(
-                              color: Colors.white.withValues(alpha: 0.4),
-                            ),
-                            filled: true,
-                            fillColor: Colors.white.withValues(alpha: 0.07),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(20),
-                              borderSide: BorderSide.none,
-                            ),
-                            enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(20),
-                              borderSide: BorderSide(
-                                color: Colors.white.withValues(alpha: 0.1),
-                              ),
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(20),
-                              borderSide: const BorderSide(
-                                color: AppColors.emeraldLight,
-                                width: 2,
-                              ),
-                            ),
-                          ),
+                          width: 2,
                         ),
                       ),
-                    ).animate().fadeIn(delay: 120.ms).slideY(begin: 0.05),
-                  ],
-                ),
+                    ),
+                  ).animate().fadeIn(delay: 80.ms),
+                ],
               ),
             ),
           ),
@@ -555,45 +542,47 @@ class _OnboardingSurveyPageState extends ConsumerState<OnboardingSurveyPage> {
     required int animDelay,
   }) {
     return GestureDetector(
-      onTap: onTap,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 220),
-        padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.06),
-          borderRadius: BorderRadius.circular(18),
-          border: Border.all(
-            color: isSelected ? _surveyAccent : Colors.transparent,
-            width: 2,
-          ),
-          boxShadow: isSelected
-              ? [
-                  BoxShadow(
-                    color: _surveyAccent.withValues(alpha: 0.25),
-                    blurRadius: 12,
-                    spreadRadius: 0,
+          onTap: onTap,
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 220),
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.06),
+              borderRadius: BorderRadius.circular(18),
+              border: Border.all(
+                color: isSelected ? _surveyAccent : Colors.transparent,
+                width: 2,
+              ),
+              boxShadow: isSelected
+                  ? [
+                      BoxShadow(
+                        color: _surveyAccent.withValues(alpha: 0.25),
+                        blurRadius: 12,
+                        spreadRadius: 0,
+                      ),
+                    ]
+                  : null,
+            ),
+            child: Row(
+              children: [
+                Icon(
+                  icon,
+                  color: isSelected ? AppColors.emeraldLight : Colors.white70,
+                ),
+                const SizedBox(width: 16),
+                Text(
+                  label,
+                  style: AppTextStyles.titleMedium.copyWith(
+                    color: Colors.white,
                   ),
-                ]
-              : null,
-        ),
-        child: Row(
-          children: [
-            Icon(
-              icon,
-              color: isSelected ? AppColors.emeraldLight : Colors.white70,
+                ),
+                const Spacer(),
+                if (isSelected)
+                  const Icon(Icons.check_circle, color: AppColors.emeraldLight),
+              ],
             ),
-            const SizedBox(width: 16),
-            Text(
-              label,
-              style: AppTextStyles.titleMedium.copyWith(color: Colors.white),
-            ),
-            const Spacer(),
-            if (isSelected)
-              const Icon(Icons.check_circle, color: AppColors.emeraldLight),
-          ],
-        ),
-      ),
-    )
+          ),
+        )
         .animate()
         .fadeIn(delay: animDelay.ms)
         .slideX(begin: -0.04, curve: Curves.easeOutCubic);
@@ -611,24 +600,24 @@ class _OnboardingSurveyPageState extends ConsumerState<OnboardingSurveyPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            title,
-            style: AppTextStyles.headlineMedium.copyWith(
-              color: Colors.white,
-              height: 1.2,
-            ),
-          )
+                title,
+                style: AppTextStyles.headlineMedium.copyWith(
+                  color: Colors.white,
+                  height: 1.2,
+                ),
+              )
               .animate(key: ValueKey(title))
               .fadeIn(duration: 400.ms)
               .slideY(begin: 0.06, curve: Curves.easeOutCubic),
           const SizedBox(height: 10),
           Text(
-            subtitle,
-            style: TextStyle(
-              color: Colors.white.withValues(alpha: 0.52),
-              height: 1.45,
-              fontSize: 14.5,
-            ),
-          )
+                subtitle,
+                style: TextStyle(
+                  color: Colors.white.withValues(alpha: 0.52),
+                  height: 1.45,
+                  fontSize: 14.5,
+                ),
+              )
               .animate(key: ValueKey('$title-sub'))
               .fadeIn(delay: 70.ms, duration: 400.ms)
               .slideY(begin: 0.04),
@@ -672,125 +661,128 @@ class _OnboardingSurveyPageState extends ConsumerState<OnboardingSurveyPage> {
     required VoidCallback onTap,
   }) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 11),
-      child: GestureDetector(
-        onTap: onTap,
-        behavior: HitTestBehavior.opaque,
-        child: AnimatedScale(
-          scale: isSelected ? 1.02 : 1.0,
-          duration: const Duration(milliseconds: 240),
-          curve: Curves.easeOutCubic,
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 260),
-            curve: Curves.easeOutCubic,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(22),
-              border: Border.all(
-                width: isSelected ? 1.5 : 1,
-                color: isSelected
-                    ? AppColors.emeraldLight.withValues(alpha: 0.75)
-                    : Colors.white.withValues(alpha: 0.12),
-              ),
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: isSelected
-                    ? [
-                        AppColors.emeraldBase.withValues(alpha: 0.55),
-                        AppColors.emeraldDark.withValues(alpha: 0.42),
-                      ]
-                    : [
-                        Colors.white.withValues(alpha: 0.09),
-                        Colors.white.withValues(alpha: 0.04),
-                      ],
-              ),
-              boxShadow: isSelected
-                  ? [
-                      BoxShadow(
-                        color: AppColors.emeraldLight.withValues(alpha: 0.18),
-                        blurRadius: 18,
-                        offset: const Offset(0, 8),
+          padding: const EdgeInsets.only(bottom: 11),
+          child: GestureDetector(
+            onTap: onTap,
+            behavior: HitTestBehavior.opaque,
+            child: AnimatedScale(
+              scale: isSelected ? 1.02 : 1.0,
+              duration: const Duration(milliseconds: 240),
+              curve: Curves.easeOutCubic,
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 260),
+                curve: Curves.easeOutCubic,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(22),
+                  border: Border.all(
+                    width: isSelected ? 1.5 : 1,
+                    color: isSelected
+                        ? AppColors.emeraldLight.withValues(alpha: 0.75)
+                        : Colors.white.withValues(alpha: 0.12),
+                  ),
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: isSelected
+                        ? [
+                            AppColors.emeraldBase.withValues(alpha: 0.55),
+                            AppColors.emeraldDark.withValues(alpha: 0.42),
+                          ]
+                        : [
+                            Colors.white.withValues(alpha: 0.09),
+                            Colors.white.withValues(alpha: 0.04),
+                          ],
+                  ),
+                  boxShadow: isSelected
+                      ? [
+                          BoxShadow(
+                            color: AppColors.emeraldLight.withValues(
+                              alpha: 0.18,
+                            ),
+                            blurRadius: 18,
+                            offset: const Offset(0, 8),
+                          ),
+                        ]
+                      : [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.25),
+                            blurRadius: 8,
+                            offset: const Offset(0, 3),
+                          ),
+                        ],
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(21),
+                  child: Stack(
+                    children: [
+                      AnimatedPositioned(
+                        duration: const Duration(milliseconds: 260),
+                        curve: Curves.easeOutCubic,
+                        left: 0,
+                        top: 0,
+                        bottom: 0,
+                        width: isSelected ? 5 : 0,
+                        child: const ColoredBox(color: AppColors.emeraldLight),
                       ),
-                    ]
-                  : [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.25),
-                        blurRadius: 8,
-                        offset: const Offset(0, 3),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 18,
+                          vertical: 16,
+                        ),
+                        child: Row(
+                          children: [
+                            AnimatedContainer(
+                              duration: const Duration(milliseconds: 220),
+                              width: 26,
+                              height: 26,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                  color: isSelected
+                                      ? AppColors.emeraldLight
+                                      : Colors.white.withValues(alpha: 0.35),
+                                  width: 2,
+                                ),
+                                color: isSelected
+                                    ? AppColors.emeraldLight.withValues(
+                                        alpha: 0.25,
+                                      )
+                                    : Colors.transparent,
+                              ),
+                              child: isSelected
+                                  ? const Icon(
+                                      Icons.check_rounded,
+                                      size: 16,
+                                      color: Colors.white,
+                                    )
+                                  : null,
+                            ),
+                            const SizedBox(width: 14),
+                            Expanded(
+                              child: Text(
+                                label,
+                                style: TextStyle(
+                                  color: Colors.white.withValues(
+                                    alpha: isSelected ? 1 : 0.9,
+                                  ),
+                                  fontWeight: isSelected
+                                      ? FontWeight.w600
+                                      : FontWeight.w500,
+                                  fontSize: 15,
+                                  height: 1.25,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ],
-            ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(21),
-              child: Stack(
-                children: [
-                  AnimatedPositioned(
-                    duration: const Duration(milliseconds: 260),
-                    curve: Curves.easeOutCubic,
-                    left: 0,
-                    top: 0,
-                    bottom: 0,
-                    width: isSelected ? 5 : 0,
-                    child: const ColoredBox(
-                      color: AppColors.emeraldLight,
-                    ),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 18,
-                      vertical: 16,
-                    ),
-                    child: Row(
-                      children: [
-                        AnimatedContainer(
-                          duration: const Duration(milliseconds: 220),
-                          width: 26,
-                          height: 26,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            border: Border.all(
-                              color: isSelected
-                                  ? AppColors.emeraldLight
-                                  : Colors.white.withValues(alpha: 0.35),
-                              width: 2,
-                            ),
-                            color: isSelected
-                                ? AppColors.emeraldLight.withValues(alpha: 0.25)
-                                : Colors.transparent,
-                          ),
-                          child: isSelected
-                              ? const Icon(
-                                  Icons.check_rounded,
-                                  size: 16,
-                                  color: Colors.white,
-                                )
-                              : null,
-                        ),
-                        const SizedBox(width: 14),
-                        Expanded(
-                          child: Text(
-                            label,
-                            style: TextStyle(
-                              color: Colors.white.withValues(
-                                alpha: isSelected ? 1 : 0.9,
-                              ),
-                              fontWeight:
-                                  isSelected ? FontWeight.w600 : FontWeight.w500,
-                              fontSize: 15,
-                              height: 1.25,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
+                ),
               ),
             ),
           ),
-        ),
-      ),
-    )
+        )
         .animate()
         .fadeIn(
           delay: (90 + index * 58).ms,
@@ -934,43 +926,43 @@ class _OnboardingSurveyPageState extends ConsumerState<OnboardingSurveyPage> {
     required int index,
   }) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 10),
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(14),
-        color: Colors.white.withValues(alpha: 0.06),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
-      ),
-      child: Row(
-        children: [
-          Icon(
-            icon,
-            size: 18,
-            color: AppColors.emeraldLight.withValues(alpha: 0.95),
+          margin: const EdgeInsets.only(bottom: 10),
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(14),
+            color: Colors.white.withValues(alpha: 0.06),
+            border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
           ),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Text(
-              label,
-              style: TextStyle(
-                color: Colors.white.withValues(alpha: 0.78),
-                fontSize: 13,
-                fontWeight: FontWeight.w500,
+          child: Row(
+            children: [
+              Icon(
+                icon,
+                size: 18,
+                color: AppColors.emeraldLight.withValues(alpha: 0.95),
               ),
-            ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  label,
+                  style: TextStyle(
+                    color: Colors.white.withValues(alpha: 0.78),
+                    fontSize: 13,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Text(
+                value,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ],
           ),
-          const SizedBox(width: 8),
-          Text(
-            value,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 13,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-        ],
-      ),
-    )
+        )
         .animate()
         .fadeIn(delay: (120 + index * 70).ms, duration: 350.ms)
         .slideY(begin: 0.08, curve: Curves.easeOutCubic);
@@ -979,8 +971,7 @@ class _OnboardingSurveyPageState extends ConsumerState<OnboardingSurveyPage> {
   Widget _buildSummaryStep() {
     final l10n = AppLocalizations.of(context)!;
     final name = _nameController.text.trim();
-    final displayName =
-        name.isEmpty ? l10n.surveySummaryNotProvided : name;
+    final displayName = name.isEmpty ? l10n.surveySummaryNotProvided : name;
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(24, 12, 24, 24),
@@ -988,31 +979,34 @@ class _OnboardingSurveyPageState extends ConsumerState<OnboardingSurveyPage> {
         children: [
           const SizedBox(height: 14),
           Container(
-            width: 92,
-            height: 92,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: AppColors.emeraldLight.withValues(alpha: 0.12),
-              border: Border.all(
-                color: AppColors.emeraldLight.withValues(alpha: 0.45),
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: AppColors.emeraldLight.withValues(alpha: 0.2),
-                  blurRadius: 28,
-                  spreadRadius: 2,
+                width: 92,
+                height: 92,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: AppColors.emeraldLight.withValues(alpha: 0.12),
+                  border: Border.all(
+                    color: AppColors.emeraldLight.withValues(alpha: 0.45),
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.emeraldLight.withValues(alpha: 0.2),
+                      blurRadius: 28,
+                      spreadRadius: 2,
+                    ),
+                  ],
                 ),
-              ],
-            ),
-            child: const Icon(
-              Icons.auto_awesome_rounded,
-              size: 44,
-              color: AppColors.emeraldLight,
-            ),
-          )
+                child: const Icon(
+                  Icons.auto_awesome_rounded,
+                  size: 44,
+                  color: AppColors.emeraldLight,
+                ),
+              )
               .animate()
               .fadeIn(duration: 420.ms)
-              .scale(begin: const Offset(0.86, 0.86), curve: Curves.easeOutBack),
+              .scale(
+                begin: const Offset(0.86, 0.86),
+                curve: Curves.easeOutBack,
+              ),
           const SizedBox(height: 22),
           Text(
             l10n.surveySummaryTitle,
@@ -1033,72 +1027,79 @@ class _OnboardingSurveyPageState extends ConsumerState<OnboardingSurveyPage> {
           ).animate().fadeIn(delay: 140.ms),
           const SizedBox(height: 20),
           Expanded(
-            child: Container(
-              width: double.infinity,
-              padding: const EdgeInsets.fromLTRB(16, 16, 16, 10),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(20),
-                color: Colors.white.withValues(alpha: 0.05),
-                border: Border.all(
-                  color: AppColors.emeraldLight.withValues(alpha: 0.2),
-                ),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    l10n.surveySummaryCardTitle,
-                    style: AppTextStyles.titleMedium.copyWith(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ).animate().fadeIn(delay: 180.ms),
-                  const SizedBox(height: 12),
-                  Expanded(
-                    child: ListView(
-                      physics: const BouncingScrollPhysics(),
-                      children: [
-                        _buildSummaryItem(
-                          icon: Icons.person_outline_rounded,
-                          label: l10n.surveySummaryItemName,
-                          value: displayName,
-                          index: 0,
+            child:
+                Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.fromLTRB(16, 16, 16, 10),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(20),
+                        color: Colors.white.withValues(alpha: 0.05),
+                        border: Border.all(
+                          color: AppColors.emeraldLight.withValues(alpha: 0.2),
                         ),
-                        _buildSummaryItem(
-                          icon: Icons.favorite_border_rounded,
-                          label: l10n.surveySummaryItemMood,
-                          value: _selectionCountLabel(_selectedMoods.length),
-                          index: 1,
-                        ),
-                        _buildSummaryItem(
-                          icon: Icons.timeline_rounded,
-                          label: l10n.surveySummaryItemRhythm,
-                          value: _selectionCountLabel(_selectedSectors.length),
-                          index: 2,
-                        ),
-                        _buildSummaryItem(
-                          icon: Icons.lightbulb_outline_rounded,
-                          label: l10n.surveySummaryItemThemes,
-                          value: _selectionCountLabel(_selectedNeeds.length),
-                          index: 3,
-                        ),
-                        _buildSummaryItem(
-                          icon: Icons.notifications_none_rounded,
-                          label: l10n.surveyNotificationTitle,
-                          value: _notificationPermissionEnabled
-                              ? l10n.surveySummaryItemNotificationOn
-                              : l10n.surveySummaryItemNotificationOff,
-                          index: 4,
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            )
-                .animate()
-                .fadeIn(delay: 120.ms, duration: 380.ms)
-                .slideY(begin: 0.04),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            l10n.surveySummaryCardTitle,
+                            style: AppTextStyles.titleMedium.copyWith(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ).animate().fadeIn(delay: 180.ms),
+                          const SizedBox(height: 12),
+                          Expanded(
+                            child: ListView(
+                              physics: const BouncingScrollPhysics(),
+                              children: [
+                                _buildSummaryItem(
+                                  icon: Icons.person_outline_rounded,
+                                  label: l10n.surveySummaryItemName,
+                                  value: displayName,
+                                  index: 0,
+                                ),
+                                _buildSummaryItem(
+                                  icon: Icons.favorite_border_rounded,
+                                  label: l10n.surveySummaryItemMood,
+                                  value: _selectionCountLabel(
+                                    _selectedMoods.length,
+                                  ),
+                                  index: 1,
+                                ),
+                                _buildSummaryItem(
+                                  icon: Icons.timeline_rounded,
+                                  label: l10n.surveySummaryItemRhythm,
+                                  value: _selectionCountLabel(
+                                    _selectedSectors.length,
+                                  ),
+                                  index: 2,
+                                ),
+                                _buildSummaryItem(
+                                  icon: Icons.lightbulb_outline_rounded,
+                                  label: l10n.surveySummaryItemThemes,
+                                  value: _selectionCountLabel(
+                                    _selectedNeeds.length,
+                                  ),
+                                  index: 3,
+                                ),
+                                _buildSummaryItem(
+                                  icon: Icons.notifications_none_rounded,
+                                  label: l10n.surveyNotificationTitle,
+                                  value: _notificationPermissionEnabled
+                                      ? l10n.surveySummaryItemNotificationOn
+                                      : l10n.surveySummaryItemNotificationOff,
+                                  index: 4,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
+                    .animate()
+                    .fadeIn(delay: 120.ms, duration: 380.ms)
+                    .slideY(begin: 0.04),
           ),
           const SizedBox(height: 18),
           SizedBox(

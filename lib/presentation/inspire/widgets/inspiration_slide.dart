@@ -115,7 +115,7 @@ class _InspirationSlideState extends ConsumerState<InspirationSlide> {
 
   Widget _watermark(bool lightTxt) {
     return Positioned(
-      top: 114,
+      top: 132,
       left: 0,
       right: 0,
       child: IgnorePointer(

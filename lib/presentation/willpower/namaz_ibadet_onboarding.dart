@@ -13,6 +13,7 @@ import '../../core/willpower/quit_commitment_chips.dart';
 import '../shared/providers/habit_providers.dart';
 import '../shared/widgets/arin_shell_layout.dart';
 import '../shared/widgets/commitment_seal_widget.dart';
+import 'salat_tracking_visibility_provider.dart';
 import 'widgets/commitment_example_chips.dart';
 import 'widgets/commitment_input_tokens.dart';
 
@@ -197,6 +198,9 @@ class _NamazIbadetOnboardingState extends ConsumerState<NamazIbadetOnboarding> {
                               habitId: widget.habitId,
                               commitmentText: _commitment.text.trim(),
                             );
+                        await ref
+                            .read(salatTrackingVisibleOnHomeProvider.notifier)
+                            .enableFromGelisim();
                         _completed = true;
                       },
                     ),

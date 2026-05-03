@@ -35,6 +35,7 @@ import '../../presentation/settings/language_settings_page.dart';
 import '../../presentation/settings/about_arin_page.dart';
 import '../../presentation/settings/contact_support_page.dart';
 import '../../presentation/settings/privacy_policy_page.dart';
+import '../../presentation/settings/support_arin_page.dart';
 import '../../presentation/settings/notifications_settings_page.dart';
 import '../../presentation/settings/prayer_notifications_detail_page.dart';
 import '../../presentation/inspire/saved_inspiration_page.dart';
@@ -42,6 +43,7 @@ import '../../presentation/inspire/inspire_explore_page.dart';
 import '../../presentation/inspire/inspiration_search.dart';
 import '../../presentation/inspire/inspire_viewer_page.dart';
 import '../../presentation/inspire/inspire_viewer_session_provider.dart';
+import '../../presentation/premium/premium_page.dart';
 import '../../presentation/shared/providers/auth_providers.dart';
 import '../../presentation/shared/providers/willpower_hub_nav_provider.dart';
 import '../../presentation/shared/widgets/arin_shell.dart';
@@ -51,6 +53,7 @@ abstract final class AppRoutes {
   static const String onboardingSurvey = '/onboarding/survey';
   static const String appPrepare = '/app-prepare';
   static const String home = '/home';
+  static const String premium = '/premium';
   static const String qibla = '/qibla';
   static const String habits = '/habits';
 
@@ -76,8 +79,7 @@ abstract final class AppRoutes {
   static String willQuitOnboarding(String habitId) =>
       '/habits/will/quit/$habitId/onboarding';
 
-  static String willQuitHome(String habitId) =>
-      '/habits/will/quit/$habitId';
+  static String willQuitHome(String habitId) => '/habits/will/quit/$habitId';
 
   /// [programId] isteğe bağlı sorgu parametresi.
   static String willBreathing([String? programId]) {
@@ -87,10 +89,7 @@ abstract final class AppRoutes {
     return '/habits/will/breathing?programId=$programId';
   }
 
-  static String willNamaz(
-    String habitId, {
-    bool fromGelisimSetup = false,
-  }) {
+  static String willNamaz(String habitId, {bool fromGelisimSetup = false}) {
     if (!fromGelisimSetup) return '/habits/will/namaz/$habitId';
     return '/habits/will/namaz/$habitId?from=gelisim_setup';
   }
@@ -121,6 +120,9 @@ abstract final class AppRoutes {
 
   /// Ayarlar → Bize ulaşın.
   static const String settingsContact = '/settings/contact';
+
+  /// Ayarlar → Tek seferlik destek paketleri.
+  static const String settingsSupport = '/settings/support';
 
   /// Bildirimler → Namaz vakit ve ses (tek kaynak kart).
   static const String settingsNotificationsPrayer =
@@ -158,8 +160,9 @@ bool _onboardingDone(SharedPreferences prefs, Ref ref) {
   final flag = prefs.getBool('onboarding_completed');
   if (flag == false) return false;
   try {
-    final hiveDone =
-        ref.read(userProfileRepositoryProvider).isOnboardingCompleted;
+    final hiveDone = ref
+        .read(userProfileRepositoryProvider)
+        .isOnboardingCompleted;
     if (flag == true) return hiveDone;
     return hiveDone;
   } catch (_) {
@@ -181,7 +184,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
 
   // Analytics: Firebase hazırsa her route değişiminde otomatik screen_view
   // yazar. Firebase yoksa observer null → listeye eklenmez, davranış değişmez.
-  final analyticsObserver = ArinAnalytics.observer;
+  final analyticsObserver = ArinAnalytics.observerIfAvailable();
 
   return GoRouter(
     initialLocation: onboardingDone ? AppRoutes.home : AppRoutes.onboarding,
@@ -197,8 +200,8 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         if (path == AppRoutes.appPrepare) {
           return AppRoutes.onboarding;
         }
-        final allowed = path == AppRoutes.onboarding ||
-            path == AppRoutes.onboardingSurvey;
+        final allowed =
+            path == AppRoutes.onboarding || path == AppRoutes.onboardingSurvey;
         if (!allowed) {
           return AppRoutes.onboarding;
         }
@@ -226,8 +229,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
     routes: [
       GoRoute(
         path: AppRoutes.onboarding,
-        pageBuilder: (context, state) =>
-            _page(state, const OnboardingPage()),
+        pageBuilder: (context, state) => _page(state, const OnboardingPage()),
       ),
       GoRoute(
         path: AppRoutes.onboardingSurvey,
@@ -236,21 +238,22 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: AppRoutes.appPrepare,
-        pageBuilder: (context, state) =>
-            _page(state, const AppPreparePage()),
+        pageBuilder: (context, state) => _page(state, const AppPreparePage()),
+      ),
+      GoRoute(
+        path: AppRoutes.premium,
+        pageBuilder: (context, state) => _page(state, const PremiumPage()),
       ),
       ShellRoute(
         builder: (context, state, child) => ArinShell(child: child),
         routes: [
           GoRoute(
             path: AppRoutes.home,
-            pageBuilder: (context, state) =>
-                _page(state, const HomePage()),
+            pageBuilder: (context, state) => _page(state, const HomePage()),
           ),
           GoRoute(
             path: AppRoutes.qibla,
-            pageBuilder: (context, state) =>
-                _page(state, const QiblaHubPage()),
+            pageBuilder: (context, state) => _page(state, const QiblaHubPage()),
           ),
           GoRoute(
             path: AppRoutes.habits,
@@ -266,10 +269,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                 path: 'custom/:habitId',
                 pageBuilder: (context, state) {
                   final id = state.pathParameters['habitId']!;
-                  return _page(
-                    state,
-                    CustomHabitDetailPage(habitId: id),
-                  );
+                  return _page(state, CustomHabitDetailPage(habitId: id));
                 },
               ),
               GoRoute(
@@ -298,20 +298,14 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                 path: 'will/build/setup/:templateId',
                 pageBuilder: (context, state) {
                   final id = state.pathParameters['templateId']!;
-                  return _page(
-                    state,
-                    BuildProgramSetupPage(templateId: id),
-                  );
+                  return _page(state, BuildProgramSetupPage(templateId: id));
                 },
               ),
               GoRoute(
                 path: 'will/build/:habitId',
                 pageBuilder: (context, state) {
                   final id = state.pathParameters['habitId']!;
-                  return _page(
-                    state,
-                    BuildProgramDetailPage(habitId: id),
-                  );
+                  return _page(state, BuildProgramDetailPage(habitId: id));
                 },
               ),
               GoRoute(
@@ -323,30 +317,21 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                 path: 'will/quit/:habitId/onboarding',
                 pageBuilder: (context, state) {
                   final id = state.pathParameters['habitId']!;
-                  return _page(
-                    state,
-                    QuitOnboardingFlowPage(habitId: id),
-                  );
+                  return _page(state, QuitOnboardingFlowPage(habitId: id));
                 },
               ),
               GoRoute(
                 path: 'will/quit/:habitId',
                 pageBuilder: (context, state) {
                   final id = state.pathParameters['habitId']!;
-                  return _page(
-                    state,
-                    QuitProgramHomePage(habitId: id),
-                  );
+                  return _page(state, QuitProgramHomePage(habitId: id));
                 },
               ),
               GoRoute(
                 path: 'will/breathing',
                 pageBuilder: (context, state) {
                   final q = state.uri.queryParameters['programId'];
-                  return _page(
-                    state,
-                    BreathingExercisePage(programId: q),
-                  );
+                  return _page(state, BreathingExercisePage(programId: q));
                 },
               ),
               GoRoute(
@@ -377,25 +362,25 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                   final raw = state.pathParameters['index'] ?? '0';
                   final pathIdx = int.tryParse(raw) ?? 0;
                   final extra = state.extra;
-                  final fromExtra = extra is InspireViewerDeckExtra &&
-                          extra.cards.isNotEmpty
+                  final fromExtra =
+                      extra is InspireViewerDeckExtra && extra.cards.isNotEmpty
                       ? extra
                       : null;
-                  final fromSession =
-                      ref.read(inspireViewerDeckSessionProvider);
-                  final sessionOk = fromSession != null &&
-                      fromSession.cards.isNotEmpty;
-                  final deck = fromExtra ??
-                      (sessionOk ? fromSession : null);
+                  final fromSession = ref.read(
+                    inspireViewerDeckSessionProvider,
+                  );
+                  final sessionOk =
+                      fromSession != null && fromSession.cards.isNotEmpty;
+                  final deck = fromExtra ?? (sessionOk ? fromSession : null);
                   if (deck != null) {
-                    final safe =
-                        deck.initialIndex.clamp(0, deck.cards.length - 1);
+                    final safe = deck.initialIndex.clamp(
+                      0,
+                      deck.cards.length - 1,
+                    );
                     return _page(
                       state,
                       InspireViewerPage(
-                        key: ValueKey<String>(
-                          'inspire_deck_${state.uri}',
-                        ),
+                        key: ValueKey<String>('inspire_deck_${state.uri}'),
                         initialIndex: safe,
                         deckOverride: deck.cards,
                       ),
@@ -414,8 +399,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           ),
           GoRoute(
             path: AppRoutes.settings,
-            pageBuilder: (context, state) =>
-                _page(state, const SettingsPage()),
+            pageBuilder: (context, state) => _page(state, const SettingsPage()),
             routes: [
               GoRoute(
                 path: 'admin',
@@ -436,22 +420,22 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                   reverseTransitionDuration: const Duration(milliseconds: 280),
                   transitionsBuilder:
                       (context, animation, secondaryAnimation, child) {
-                    final curved = CurvedAnimation(
-                      parent: animation,
-                      curve: Curves.easeOutCubic,
-                      reverseCurve: Curves.easeInCubic,
-                    );
-                    return FadeTransition(
-                      opacity: curved,
-                      child: SlideTransition(
-                        position: Tween<Offset>(
-                          begin: const Offset(0, 0.035),
-                          end: Offset.zero,
-                        ).animate(curved),
-                        child: child,
-                      ),
-                    );
-                  },
+                        final curved = CurvedAnimation(
+                          parent: animation,
+                          curve: Curves.easeOutCubic,
+                          reverseCurve: Curves.easeInCubic,
+                        );
+                        return FadeTransition(
+                          opacity: curved,
+                          child: SlideTransition(
+                            position: Tween<Offset>(
+                              begin: const Offset(0, 0.035),
+                              end: Offset.zero,
+                            ).animate(curved),
+                            child: child,
+                          ),
+                        );
+                      },
                 ),
               ),
               GoRoute(
@@ -468,22 +452,22 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                   reverseTransitionDuration: const Duration(milliseconds: 260),
                   transitionsBuilder:
                       (context, animation, secondaryAnimation, child) {
-                    final curved = CurvedAnimation(
-                      parent: animation,
-                      curve: Curves.easeOutCubic,
-                      reverseCurve: Curves.easeInCubic,
-                    );
-                    return FadeTransition(
-                      opacity: curved,
-                      child: SlideTransition(
-                        position: Tween<Offset>(
-                          begin: const Offset(0, 0.03),
-                          end: Offset.zero,
-                        ).animate(curved),
-                        child: child,
-                      ),
-                    );
-                  },
+                        final curved = CurvedAnimation(
+                          parent: animation,
+                          curve: Curves.easeOutCubic,
+                          reverseCurve: Curves.easeInCubic,
+                        );
+                        return FadeTransition(
+                          opacity: curved,
+                          child: SlideTransition(
+                            position: Tween<Offset>(
+                              begin: const Offset(0, 0.03),
+                              end: Offset.zero,
+                            ).animate(curved),
+                            child: child,
+                          ),
+                        );
+                      },
                 ),
                 routes: [
                   GoRoute(
@@ -502,6 +486,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                 path: 'contact',
                 pageBuilder: (context, state) =>
                     _page(state, const ContactSupportPage()),
+              ),
+              GoRoute(
+                path: 'support',
+                pageBuilder: (context, state) =>
+                    _page(state, const SupportArinPage()),
               ),
             ],
           ),

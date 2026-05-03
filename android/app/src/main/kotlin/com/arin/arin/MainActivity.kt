@@ -88,6 +88,45 @@ class MainActivity : FlutterActivity() {
                 }
             }
 
+        MethodChannel(messenger, "com.arin.arin/prayer_notifications")
+            .setMethodCallHandler { call, result ->
+                when (call.method) {
+                    "schedule" -> {
+                        @Suppress("UNCHECKED_CAST")
+                        val args = call.arguments as? Map<*, *>
+                        if (args == null) {
+                            result.error("bad_args", "arguments missing", null)
+                            return@setMethodCallHandler
+                        }
+                        try {
+                            ArinPrayerNotificationScheduler.schedule(
+                                applicationContext,
+                                args
+                            )
+                            result.success(true)
+                        } catch (e: SecurityException) {
+                            result.error("security", e.message, null)
+                        } catch (e: Exception) {
+                            result.error("error", e.message, null)
+                        }
+                    }
+                    "cancel" -> {
+                        val id = (call.arguments as? Number)?.toInt()
+                        if (id == null) {
+                            result.error("bad_args", "id missing", null)
+                            return@setMethodCallHandler
+                        }
+                        ArinPrayerNotificationScheduler.cancel(applicationContext, id)
+                        result.success(true)
+                    }
+                    "cancelAll" -> {
+                        ArinPrayerNotificationScheduler.cancelAll(applicationContext)
+                        result.success(true)
+                    }
+                    else -> result.notImplemented()
+                }
+            }
+
         // ─────────────────────────────────────────────────────────────────
         // Keşfet PNG derin paylaşım kanalı.
         //

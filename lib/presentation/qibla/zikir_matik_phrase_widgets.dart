@@ -51,8 +51,7 @@ class _ZikirmatikRoundToolColumn extends StatelessWidget {
                     icon,
                     color: activeVisual
                         ? Colors.white
-                        : _ZikirmatikColors.labelMuted
-                            .withValues(alpha: 0.95),
+                        : _ZikirmatikColors.labelMuted.withValues(alpha: 0.95),
                     size: (diameter * 0.44).clamp(22.0, 30.0),
                   ),
                 ),
@@ -188,16 +187,18 @@ class _ZikirPhraseConcreteCard extends StatelessWidget {
                           fontSize: 14,
                           fontWeight: FontWeight.w500,
                           height: 1.25,
-                          color: _ZikirmatikColors.labelMuted
-                              .withValues(alpha: 0.72),
+                          color: _ZikirmatikColors.labelMuted.withValues(
+                            alpha: 0.72,
+                          ),
                         ),
                       ),
                       const SizedBox(height: 6),
                       Icon(
                         Icons.keyboard_arrow_down_rounded,
                         size: 22,
-                        color: _ZikirmatikColors.labelMuted
-                            .withValues(alpha: 0.55),
+                        color: _ZikirmatikColors.labelMuted.withValues(
+                          alpha: 0.55,
+                        ),
                       ),
                     ] else ...[
                       const SizedBox(height: 14),
@@ -206,17 +207,23 @@ class _ZikirPhraseConcreteCard extends StatelessWidget {
                         children: [
                           Expanded(
                             child: AnimatedBuilder(
-                              animation: Listenable.merge(
-                                  <Listenable>[phraseAnim, phraseScale]),
+                              animation: Listenable.merge(<Listenable>[
+                                phraseAnim,
+                                phraseScale,
+                              ]),
                               builder: (context, _) {
-                                final glow = 0.08 +
+                                final glow =
+                                    0.08 +
                                     0.16 *
-                                        Curves.easeInOut
-                                            .transform(phraseAnim.value);
-                                final blur = 10 +
+                                        Curves.easeInOut.transform(
+                                          phraseAnim.value,
+                                        );
+                                final blur =
+                                    10 +
                                     14 *
-                                        Curves.easeInOut
-                                            .transform(phraseAnim.value);
+                                        Curves.easeInOut.transform(
+                                          phraseAnim.value,
+                                        );
                                 return Transform.scale(
                                   scale: phraseScale.value,
                                   alignment: Alignment.center,
@@ -224,23 +231,26 @@ class _ZikirPhraseConcreteCard extends StatelessWidget {
                                     duration: const Duration(milliseconds: 420),
                                     switchInCurve: Curves.easeOutCubic,
                                     switchOutCurve: Curves.easeInCubic,
-                                    transitionBuilder: (Widget child,
-                                        Animation<double> anim) {
-                                      final slide = Tween<Offset>(
-                                        begin: const Offset(0, 0.07),
-                                        end: Offset.zero,
-                                      ).animate(CurvedAnimation(
-                                        parent: anim,
-                                        curve: Curves.easeOutCubic,
-                                      ));
-                                      return FadeTransition(
-                                        opacity: anim,
-                                        child: SlideTransition(
-                                          position: slide,
-                                          child: child,
-                                        ),
-                                      );
-                                    },
+                                    transitionBuilder:
+                                        (Widget child, Animation<double> anim) {
+                                          final slide =
+                                              Tween<Offset>(
+                                                begin: const Offset(0, 0.07),
+                                                end: Offset.zero,
+                                              ).animate(
+                                                CurvedAnimation(
+                                                  parent: anim,
+                                                  curve: Curves.easeOutCubic,
+                                                ),
+                                              );
+                                          return FadeTransition(
+                                            opacity: anim,
+                                            child: SlideTransition(
+                                              position: slide,
+                                              child: child,
+                                            ),
+                                          );
+                                        },
                                     child: Text(
                                       phrase,
                                       key: ValueKey<String>(phrase),
@@ -260,8 +270,9 @@ class _ZikirPhraseConcreteCard extends StatelessWidget {
                                             blurRadius: blur,
                                           ),
                                           Shadow(
-                                            color: Colors.black
-                                                .withValues(alpha: 0.35),
+                                            color: Colors.black.withValues(
+                                              alpha: 0.35,
+                                            ),
                                             blurRadius: 0,
                                             offset: const Offset(0, 1.2),
                                           ),
@@ -277,8 +288,9 @@ class _ZikirPhraseConcreteCard extends StatelessWidget {
                           AnimatedBuilder(
                             animation: phraseAnim,
                             builder: (context, _) {
-                              final t = Curves.easeInOut
-                                  .transform(phraseAnim.value);
+                              final t = Curves.easeInOut.transform(
+                                phraseAnim.value,
+                              );
                               return Padding(
                                 padding: const EdgeInsets.only(top: 4),
                                 child: Transform.rotate(
@@ -311,12 +323,16 @@ class _ZikirPhraseConcreteCard extends StatelessWidget {
 class _ZikirPhrasePickerPanel extends StatelessWidget {
   const _ZikirPhrasePickerPanel({
     required this.entrance,
+    required this.customPhrases,
     required this.onPick,
+    required this.onDeleteCustom,
     required this.onCustom,
   });
 
   final Animation<double> entrance;
+  final List<String> customPhrases;
   final void Function(String phrase) onPick;
+  final Future<void> Function(String phrase) onDeleteCustom;
   final VoidCallback onCustom;
 
   static const _betonTop = Color(0xFF4A5C66);
@@ -422,8 +438,9 @@ class _ZikirPhrasePickerPanel extends StatelessWidget {
                           visualDensity: VisualDensity.compact,
                           icon: Icon(
                             Icons.close_rounded,
-                            color: _ZikirmatikColors.labelMuted
-                                .withValues(alpha: 0.85),
+                            color: _ZikirmatikColors.labelMuted.withValues(
+                              alpha: 0.85,
+                            ),
                             size: 26,
                           ),
                           tooltip: _ztr(
@@ -462,6 +479,49 @@ class _ZikirPhrasePickerPanel extends StatelessWidget {
                     ],
                   ),
                 ),
+                if (customPhrases.isNotEmpty) ...[
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(18, 8, 18, 0),
+                    child: _stagger(
+                      _ZikirPickerSectionLabel(
+                        label: _ztr(
+                          context,
+                          tr: 'KAYDETTİKLERİM',
+                          en: 'SAVED',
+                          ar: 'المحفوظة',
+                        ),
+                      ),
+                      0.28,
+                      0.58,
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(18, 10, 18, 6),
+                    child: Wrap(
+                      alignment: WrapAlignment.center,
+                      spacing: 10,
+                      runSpacing: 10,
+                      children: [
+                        for (var i = 0; i < customPhrases.length; i++)
+                          _stagger(
+                            _ZikirSavedPhraseChip(
+                              label: customPhrases[i],
+                              onTap: () {
+                                HapticFeedback.selectionClick();
+                                onPick(customPhrases[i]);
+                              },
+                              onDelete: () {
+                                HapticFeedback.lightImpact();
+                                onDeleteCustom(customPhrases[i]);
+                              },
+                            ),
+                            0.32 + i * 0.03,
+                            0.32 + i * 0.03 + 0.28,
+                          ),
+                      ],
+                    ),
+                  ),
+                ],
                 Padding(
                   padding: const EdgeInsets.fromLTRB(18, 10, 18, 20),
                   child: _stagger(
@@ -479,11 +539,29 @@ class _ZikirPhrasePickerPanel extends StatelessWidget {
   }
 }
 
+class _ZikirPickerSectionLabel extends StatelessWidget {
+  const _ZikirPickerSectionLabel({required this.label});
+
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      label,
+      textAlign: TextAlign.center,
+      style: GoogleFonts.outfit(
+        color: _ZikirmatikColors.outer.withValues(alpha: 0.88),
+        fontWeight: FontWeight.w700,
+        fontSize: 11,
+        letterSpacing: 1.8,
+        height: 1.1,
+      ),
+    );
+  }
+}
+
 class _ZikirPresetPhraseChip extends StatelessWidget {
-  const _ZikirPresetPhraseChip({
-    required this.label,
-    required this.onTap,
-  });
+  const _ZikirPresetPhraseChip({required this.label, required this.onTap});
 
   final String label;
   final VoidCallback onTap;
@@ -510,9 +588,7 @@ class _ZikirPresetPhraseChip extends StatelessWidget {
                 const Color(0xFF283238).withValues(alpha: 0.98),
               ],
             ),
-            border: Border.all(
-              color: Colors.white.withValues(alpha: 0.11),
-            ),
+            border: Border.all(color: Colors.white.withValues(alpha: 0.11)),
           ),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -525,6 +601,94 @@ class _ZikirPresetPhraseChip extends StatelessWidget {
                 fontSize: 14.5,
                 height: 1.2,
               ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _ZikirSavedPhraseChip extends StatelessWidget {
+  const _ZikirSavedPhraseChip({
+    required this.label,
+    required this.onTap,
+    required this.onDelete,
+  });
+
+  final String label;
+  final VoidCallback onTap;
+  final VoidCallback onDelete;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      borderRadius: BorderRadius.circular(18),
+      clipBehavior: Clip.antiAlias,
+      child: Ink(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(18),
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              _ZikirmatikColors.outer.withValues(alpha: 0.42),
+              const Color(0xFF263137).withValues(alpha: 0.98),
+            ],
+          ),
+          border: Border.all(
+            color: _ZikirmatikColors.lcdBg.withValues(alpha: 0.18),
+          ),
+        ),
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(18),
+          splashColor: _ZikirmatikColors.lcdBg.withValues(alpha: 0.2),
+          highlightColor: Colors.white.withValues(alpha: 0.05),
+          child: Padding(
+            padding: const EdgeInsetsDirectional.only(
+              start: 15,
+              top: 9,
+              bottom: 9,
+              end: 6,
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 210),
+                  child: Text(
+                    label,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: GoogleFonts.outfit(
+                      color: _ZikirmatikColors.labelMuted,
+                      fontWeight: FontWeight.w600,
+                      fontSize: 14.5,
+                      height: 1.2,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 6),
+                Tooltip(
+                  message: _ztr(context, tr: 'Sil', en: 'Delete', ar: 'حذف'),
+                  child: InkResponse(
+                    onTap: onDelete,
+                    radius: 18,
+                    child: Padding(
+                      padding: const EdgeInsets.all(5),
+                      child: Icon(
+                        Icons.close_rounded,
+                        size: 17,
+                        color: _ZikirmatikColors.labelMuted.withValues(
+                          alpha: 0.72,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
         ),

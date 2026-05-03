@@ -12,6 +12,7 @@ import '../../../data/models/prayer_times_model.dart';
 import '../../../data/services/arin_widget_sync.dart';
 import '../../../data/services/location_service.dart';
 import '../../../data/services/prayer_notification_scheduler.dart';
+import '../../../data/services/prayer_service_resolver.dart';
 import '../providers/prayer_time_providers.dart';
 
 /// Ana kabukta tutulmalı (yalnızca HomePage değil); aksi halde widget donuk kalır.
@@ -26,6 +27,8 @@ class PrayerScheduleListener extends ConsumerStatefulWidget {
 class _PrayerScheduleListenerState
     extends ConsumerState<PrayerScheduleListener> {
   Timer? _widgetPushTimer;
+  bool _widgetPushInFlight = false;
+  bool _widgetPushQueued = false;
 
   @override
   void initState() {
@@ -33,8 +36,9 @@ class _PrayerScheduleListenerState
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _pushPrayerWidgetIfReady();
     });
-    // Uygulama açıkken SharedPreferences + epoch ile uyumlu kalsın (pil: 30 sn).
-    _widgetPushTimer = Timer.periodic(const Duration(seconds: 30), (_) {
+    // Native widget uzun planla kendi ilerler; açık kalan oturumda planı
+    // seyrekçe uzatmak yeterli.
+    _widgetPushTimer = Timer.periodic(const Duration(hours: 6), (_) {
       _pushPrayerWidgetIfReady();
     });
   }
@@ -46,35 +50,71 @@ class _PrayerScheduleListenerState
   }
 
   void _pushPrayerWidgetIfReady() {
+    if (_widgetPushInFlight) return;
     final next = ref.read(prayerTimesProvider);
     final localeCode = ref.read(appLocaleProvider).languageCode;
     next.whenData((pt) {
-      unawaited(
-        ArinWidgetSync.refreshPrayer(
-          model: pt,
-          location: ref.read(locationServiceProvider),
-          localeCode: localeCode,
-        ),
-      );
+      unawaited(_pushPrayerWidgetSchedule(seed: pt, localeCode: localeCode));
     });
+  }
+
+  Future<void> _pushPrayerWidgetSchedule({
+    required PrayerTimesModel seed,
+    required String localeCode,
+  }) async {
+    if (_widgetPushInFlight) {
+      _widgetPushQueued = true;
+      return;
+    }
+    _widgetPushInFlight = true;
+    final location = ref.read(locationServiceProvider);
+    try {
+      final resolver = ref.read(prayerServiceResolverProvider);
+      final upcoming = await resolver.fetchUpcomingDays(days: 14);
+      final models = upcoming.isEmpty ? <PrayerTimesModel>[seed] : upcoming;
+      await ArinWidgetSync.refreshPrayerSchedule(
+        models: models,
+        location: location,
+        localeCode: localeCode,
+      );
+    } catch (_) {
+      await ArinWidgetSync.refreshPrayer(
+        model: seed,
+        location: location,
+        localeCode: localeCode,
+      );
+    } finally {
+      _widgetPushInFlight = false;
+      if (_widgetPushQueued && mounted) {
+        _widgetPushQueued = false;
+        _pushPrayerWidgetIfReady();
+      }
+    }
+  }
+
+  Future<void> _reschedulePrayerNotifications() async {
+    try {
+      await PrayerNotificationScheduler.ensurePrayerNotificationsIfEnabled(
+        prefs: ref.read(sharedPreferencesProvider),
+        aladhan: ref.read(aladhanServiceProvider),
+        location: ref.read(locationServiceProvider),
+        force: true,
+      );
+    } catch (e) {
+      debugPrint('PrayerScheduleListener notification reschedule skipped: $e');
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     ref.listen<AsyncValue<PrayerTimesModel>>(prayerTimesProvider, (_, next) {
       next.whenData((pt) {
-        final prefs = ref.read(sharedPreferencesProvider);
+        unawaited(_reschedulePrayerNotifications());
         unawaited(
-          PrayerNotificationScheduler.ensurePrayerNotificationsIfEnabled(
-            prefs: prefs,
-            aladhan: ref.read(aladhanServiceProvider),
-            location: ref.read(locationServiceProvider),
+          _pushPrayerWidgetSchedule(
+            seed: pt,
+            localeCode: ref.read(appLocaleProvider).languageCode,
           ),
-        );
-        ArinWidgetSync.refreshPrayer(
-          model: pt,
-          location: ref.read(locationServiceProvider),
-          localeCode: ref.read(appLocaleProvider).languageCode,
         );
       });
     });

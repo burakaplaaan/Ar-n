@@ -28,6 +28,20 @@
 		<string>746942620456-0u7n7mp8ue37dbnr5asv05c5ngo11qap.apps.googleusercontent.com</string>
 		<key>GIDServerClientID</key>
 		<string>746942620456-lm0rg914v26s3u2io9pif08vu24jfor0.apps.googleusercontent.com</string>
+		<key>GADApplicationIdentifier</key>
+		<string>$(GAD_APPLICATION_IDENTIFIER)</string>
+		<!-- Firebase collection native startup'ta kapalı başlar.
+		     Dart tarafında onboarding tamamlandıktan / mevcut kullanıcıda
+		     bootstrap bittikten sonra ArinAnalytics.enable() ve Crashlytics
+		     collection enable edilir. Bu sayede ilk kurulumda native SDK
+		     Crashlytics settings / Analytics config network istekleriyle
+		     yeşil splash'ı uzatmaz. Reversible anahtarlar kullanıyoruz. -->
+		<key>FIREBASE_ANALYTICS_COLLECTION_ENABLED</key>
+		<string>$(FIREBASE_ANALYTICS_COLLECTION_ENABLED)</string>
+		<key>FirebaseAutomaticScreenReportingEnabled</key>
+		<false/>
+		<key>FirebaseCrashlyticsCollectionEnabled</key>
+		<false/>
 		<key>CFBundleURLTypes</key>
 		<array>
 			<dict>

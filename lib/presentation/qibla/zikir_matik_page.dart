@@ -94,6 +94,8 @@ List<String> _zikirPresetPhrases(BuildContext context) {
   ];
 }
 
+enum _ZikirCustomPhraseAction { use, saveAndUse }
+
 class ZikirMatikPage extends ConsumerStatefulWidget {
   const ZikirMatikPage({super.key});
 
@@ -116,6 +118,7 @@ class _ZikirMatikPageState extends ConsumerState<ZikirMatikPage>
   int _round = 0;
   int _tur = 1;
   String _phrase = '';
+  List<String> _customPhrases = [];
 
   static String _normalizeStoredPhrase(String raw) {
     final t = raw.trim();
@@ -191,6 +194,7 @@ class _ZikirMatikPageState extends ConsumerState<ZikirMatikPage>
       _round = s.round;
       _tur = s.tur;
       _phrase = _normalizeStoredPhrase(s.phrase);
+      _customPhrases = repo.loadCustomPhrases();
       // Kalıcılığa 3'ün altına kazara düşmüş eski kayıtları da toparla.
       _target = s.target < 3 ? 33 : s.target;
       _soundTick = repo.soundTickEnabled;
@@ -215,6 +219,14 @@ class _ZikirMatikPageState extends ConsumerState<ZikirMatikPage>
       phrase: _phrase,
       target: _target,
     );
+  }
+
+  void _reloadCustomPhrases() {
+    final r = _repo;
+    if (r == null || !mounted) return;
+    setState(() {
+      _customPhrases = r.loadCustomPhrases();
+    });
   }
 
   String _sixDigits() {
@@ -523,6 +535,7 @@ class _ZikirMatikPageState extends ConsumerState<ZikirMatikPage>
       barrierColor: Colors.black.withValues(alpha: 0.52),
       transitionDuration: const Duration(milliseconds: 420),
       pageBuilder: (dialogCtx, animation, secondaryAnimation) {
+        var dialogCustomPhrases = List<String>.of(_customPhrases);
         void closePicker() {
           final nav = Navigator.of(dialogCtx);
           if (nav.canPop()) {
@@ -530,27 +543,44 @@ class _ZikirMatikPageState extends ConsumerState<ZikirMatikPage>
           }
         }
 
-        return SafeArea(
-          child: Center(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-              child: _ZikirPhrasePickerPanel(
-                entrance: animation,
-                onPick: (p) {
-                  closePicker();
-                  if (!mounted) return;
-                  setState(() => _phrase = p);
-                  _persist();
-                },
-                onCustom: () {
-                  closePicker();
-                  if (mounted) {
-                    _editPhrase();
-                  }
-                },
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            return SafeArea(
+              child: Center(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 12,
+                  ),
+                  child: _ZikirPhrasePickerPanel(
+                    entrance: animation,
+                    customPhrases: dialogCustomPhrases,
+                    onPick: (p) {
+                      closePicker();
+                      if (!mounted) return;
+                      setState(() => _phrase = p);
+                      _persist();
+                    },
+                    onDeleteCustom: (p) async {
+                      setDialogState(() {
+                        dialogCustomPhrases = dialogCustomPhrases
+                            .where((e) => e.toLowerCase() != p.toLowerCase())
+                            .toList();
+                      });
+                      await _repo?.deleteCustomPhrase(p);
+                      _reloadCustomPhrases();
+                    },
+                    onCustom: () {
+                      closePicker();
+                      if (mounted) {
+                        _editPhrase();
+                      }
+                    },
+                  ),
+                ),
               ),
-            ),
-          ),
+            );
+          },
         );
       },
       transitionBuilder: (dialogCtx, animation, secondaryAnimation, child) {
@@ -571,7 +601,7 @@ class _ZikirMatikPageState extends ConsumerState<ZikirMatikPage>
 
   Future<void> _editPhrase() async {
     final controller = TextEditingController(text: _phrase);
-    final ok = await showDialog<bool>(
+    final action = await showDialog<_ZikirCustomPhraseAction>(
       context: context,
       builder: (ctx) => AlertDialog(
         title: Text(
@@ -585,25 +615,44 @@ class _ZikirMatikPageState extends ConsumerState<ZikirMatikPage>
         content: TextField(
           controller: controller,
           decoration: const InputDecoration(border: OutlineInputBorder()),
+          maxLength: 80,
           textCapitalization: TextCapitalization.sentences,
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(ctx, false),
+            onPressed: () => Navigator.pop(ctx),
             child: Text(_ztr(context, tr: 'Vazgeç', en: 'Cancel', ar: 'إلغاء')),
           ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, _ZikirCustomPhraseAction.use),
+            child: Text(_ztr(context, tr: 'Kullan', en: 'Use', ar: 'استخدم')),
+          ),
           FilledButton(
-            onPressed: () => Navigator.pop(ctx, true),
-            child: Text(_ztr(context, tr: 'Tamam', en: 'OK', ar: 'حسنًا')),
+            onPressed: () =>
+                Navigator.pop(ctx, _ZikirCustomPhraseAction.saveAndUse),
+            child: Text(
+              _ztr(
+                context,
+                tr: 'Kaydet ve Kullan',
+                en: 'Save & Use',
+                ar: 'احفظ واستخدم',
+              ),
+            ),
           ),
         ],
       ),
     );
-    if (ok == true) {
+    if (action != null) {
       final t = controller.text.trim();
+      if (action == _ZikirCustomPhraseAction.saveAndUse && t.isNotEmpty) {
+        await _repo?.saveCustomPhrase(t);
+      }
       setState(() {
         _phrase = t.isEmpty ? '' : t;
       });
+      if (action == _ZikirCustomPhraseAction.saveAndUse) {
+        _reloadCustomPhrases();
+      }
       await _persist();
     }
     controller.dispose();

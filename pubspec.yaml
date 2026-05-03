@@ -99,6 +99,7 @@ dependencies:
   # `inAppReview.openStoreListing()` fallback'i var.
   in_app_review: ^2.0.9
   flutter_timezone: ^5.0.2
+  google_mobile_ads: ^8.0.0
 
 dev_dependencies:
   flutter_test:

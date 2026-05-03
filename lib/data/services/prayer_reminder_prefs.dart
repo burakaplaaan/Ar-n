@@ -27,7 +27,7 @@ abstract final class PrayerReminderPrefs {
 
   static const int slotCount = 6;
   static const int _defaultEarlyMinutes = 5;
-  static const int _defaultSecondMinutes = 1;
+  static const int _defaultSecondMinutes = -1;
   static const int _sunriseSlotIndex = 1;
 
   /// 1. uyarı: -1 = kapalı, 0 = tam vakitte, sonra dakika önce.
@@ -351,6 +351,13 @@ abstract final class PrayerReminderPrefs {
     }
     if (prayerIndex == _sunriseSlotIndex) return -1;
     return _defaultSecondMinutes;
+  }
+
+  static bool hasActiveSecondReminder(SharedPreferences p) {
+    for (var i = 0; i < slotCount; i++) {
+      if (minutesBeforeSecondaryForPrayer(p, i) >= 0) return true;
+    }
+    return false;
   }
 
   static Future<void> setMinutesBeforeForPrayer(

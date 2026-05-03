@@ -32,6 +32,17 @@ abstract final class ArinAnalytics {
   /// döner → app.dart içinde [observer] null ise observer listesine eklenmez.
   static FirebaseAnalyticsObserver? get observer => _observer;
 
+  static FirebaseAnalyticsObserver? observerIfAvailable() {
+    if (!isFirebaseReady) return null;
+    try {
+      final analytics = _instance ??= FirebaseAnalytics.instance;
+      return _observer ??= FirebaseAnalyticsObserver(analytics: analytics);
+    } catch (e) {
+      debugPrint('══ ARIN ══ Analytics observer unavailable: $e');
+      return null;
+    }
+  }
+
   /// [bootstrapFirebase] başarıyla tamamlandıktan sonra çağrılır.
   static Future<void> enable() async {
     if (!isFirebaseReady) {
@@ -39,8 +50,8 @@ abstract final class ArinAnalytics {
       return;
     }
     try {
-      _instance = FirebaseAnalytics.instance;
-      _observer = FirebaseAnalyticsObserver(analytics: _instance!);
+      _instance ??= FirebaseAnalytics.instance;
+      _observer ??= FirebaseAnalyticsObserver(analytics: _instance!);
       _enabled = true;
       debugPrint('══ ARIN ══ Analytics: enabled.');
     } catch (e) {
@@ -60,13 +71,13 @@ abstract final class ArinAnalytics {
 
   /// Ekran açılışı — go_router observer da otomatik yazıyor, ama ek manuel
   /// logger (örn: sekme geçişleri) için kullanılabilir.
-  static Future<void> logScreen(String name, {Map<String, Object>? params}) async {
+  static Future<void> logScreen(
+    String name, {
+    Map<String, Object>? params,
+  }) async {
     if (!_enabled) return;
     try {
-      await _instance?.logScreenView(
-        screenName: name,
-        parameters: params,
-      );
+      await _instance?.logScreenView(screenName: name, parameters: params);
     } catch (_) {}
   }
 

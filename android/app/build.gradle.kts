@@ -51,6 +51,9 @@ android {
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+        manifestPlaceholders["adMobAppId"] = "ca-app-pub-3940256099942544~3347511713"
+        manifestPlaceholders["firebaseAnalyticsEnabled"] = "false"
+        manifestPlaceholders["firebaseCrashlyticsEnabled"] = "false"
     }
 
     signingConfigs {
@@ -85,6 +88,9 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            manifestPlaceholders["adMobAppId"] = "ca-app-pub-1679454938492660~5175629616"
+            manifestPlaceholders["firebaseAnalyticsEnabled"] = "false"
+            manifestPlaceholders["firebaseCrashlyticsEnabled"] = "false"
         }
         debug {
             // Debug'da minify kapalı (hızlı iteration). DEBUGGABLE flag'ı
@@ -101,6 +107,12 @@ android {
                 getDefaultProguardFile("proguard-android.txt"),
                 "proguard-rules.pro"
             )
+            manifestPlaceholders["adMobAppId"] = "ca-app-pub-3940256099942544~3347511713"
+            // Debug build'de Firebase Analytics/Crashlytics native collection
+            // kapalı. Release/Profile'da da app açılışında kapalı başlıyor;
+            // Dart tarafı onboarding sonrası gerekli servisleri açıyor.
+            manifestPlaceholders["firebaseAnalyticsEnabled"] = "false"
+            manifestPlaceholders["firebaseCrashlyticsEnabled"] = "false"
         }
     }
 }

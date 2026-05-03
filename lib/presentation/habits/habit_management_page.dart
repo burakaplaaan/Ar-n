@@ -14,7 +14,6 @@ import '../../core/router/app_router.dart';
 import '../../data/models/habit_model.dart';
 import '../kaza/kaza_tracking_provider.dart';
 import '../shared/providers/habit_providers.dart';
-import '../willpower/salat_tracking_visibility_provider.dart';
 
 class HabitManagementPage extends ConsumerStatefulWidget {
   const HabitManagementPage({super.key});
@@ -57,10 +56,6 @@ class _HabitManagementPageState extends ConsumerState<HabitManagementPage> {
                 emoji: '🕌',
                 onboardingCompleted: false,
               );
-      if (!context.mounted) return;
-      await ref
-          .read(salatTrackingVisibleOnHomeProvider.notifier)
-          .enableFromGelisim();
       if (!context.mounted) return;
       context.push(
         AppRoutes.willNamaz(h.id, fromGelisimSetup: true),
