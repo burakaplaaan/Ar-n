@@ -27,6 +27,331 @@ String _localizedPoolLabel(AppLocalizations l10n, String poolId) {
   }
 }
 
+({String surface, String cadence, String format, Duration delay})
+_poolUsageInfo(String poolId) {
+  switch (poolId) {
+    case QuotePoolIds.homeNamazWisdom:
+      return (
+        surface:
+            'Ana sayfa namaz kartında ve bildirim hazırlığında kullanılır.',
+        cadence: 'Kullanıcı cihazları bu havuzu en fazla 6 saatte bir yeniler.',
+        format: 'Türkçe + tür zorunlu; Arapça ve kaynak isteğe bağlıdır.',
+        delay: const Duration(hours: 6),
+      );
+    case QuotePoolIds.personalizedQuotes:
+      return (
+        surface:
+            'Kişiselleştirilmiş söz eşleşmeleri ve bazı widget yedekleri için kullanılır.',
+        cadence: 'Kullanıcı cihazları bu havuzu en fazla 6 saatte bir yeniler.',
+        format:
+            'Kısa Türkçe metin, isteğe bağlı Arapça/kaynak ve etiketler uygundur.',
+        delay: const Duration(hours: 6),
+      );
+    case QuotePoolIds.widgetQuote:
+      return (
+        surface: 'Ana ekran widget sözleri için kullanılır.',
+        cadence:
+            'Widget havuzu yaklaşık 1 saatte bir kontrol edilir; gösterim slotları 00/06/09/12/15/18/21.',
+        format:
+            'Kısa metin ve isteğe bağlı kaynak önerilir; uzun metin widgetta kesilebilir.',
+        delay: const Duration(hours: 1),
+      );
+    case QuotePoolIds.zikirDailyReflections:
+      return (
+        surface: 'Namaz vakti/zikir yansıması kartlarında kullanılır.',
+        cadence: 'Kullanıcı cihazları bu havuzu en fazla 6 saatte bir yeniler.',
+        format: 'Tek, kısa ve doğrudan metin beklenir.',
+        delay: const Duration(hours: 6),
+      );
+    case QuotePoolIds.healingComfort:
+      return (
+        surface:
+            'İyileşme frekansları ve teselli akışındaki günlük rahatlatıcı içerikte kullanılır.',
+        cadence: 'Kullanıcı cihazları bu havuzu en fazla 6 saatte bir yeniler.',
+        format: 'Türkçe + Arapça + referans zorunlu tutulur.',
+        delay: const Duration(hours: 6),
+      );
+    case QuotePoolIds.hubGelisimIslamic:
+      return (
+        surface: 'Gelişim ekranındaki günlük manevi bilgi kartıdır.',
+        cadence: 'Kullanıcı cihazları bu havuzu en fazla 6 saatte bir yeniler.',
+        format: 'Başlık + metin + isteğe bağlı kaynak beklenir.',
+        delay: const Duration(hours: 6),
+      );
+    case QuotePoolIds.hubGelisimMedical:
+      return (
+        surface: 'Gelişim ekranındaki günlük sağlık/bilimsel destek kartıdır.',
+        cadence: 'Kullanıcı cihazları bu havuzu en fazla 6 saatte bir yeniler.',
+        format: 'Başlık + metin + isteğe bağlı kaynak beklenir.',
+        delay: const Duration(hours: 6),
+      );
+    case QuotePoolIds.hubArinmaIslamic:
+      return (
+        surface: 'Arınma/bırakma ekranındaki günlük manevi destek kartıdır.',
+        cadence: 'Kullanıcı cihazları bu havuzu en fazla 6 saatte bir yeniler.',
+        format: 'Başlık + metin + isteğe bağlı kaynak beklenir.',
+        delay: const Duration(hours: 6),
+      );
+    case QuotePoolIds.hubArinmaMedical:
+      return (
+        surface:
+            'Arınma/bırakma ekranındaki günlük sağlık/bilimsel destek kartıdır.',
+        cadence: 'Kullanıcı cihazları bu havuzu en fazla 6 saatte bir yeniler.',
+        format: 'Başlık + metin + isteğe bağlı kaynak beklenir.',
+        delay: const Duration(hours: 6),
+      );
+    case QuotePoolIds.notificationArinmaBodies:
+      return (
+        surface:
+            'Otomatik arınma bildirimlerinin gövde metinlerinde kullanılır.',
+        cadence:
+            'Kullanıcı cihazları bu havuzu en fazla 6 saatte bir yeniler; bildirim planı yeniden kurulunca görünür.',
+        format: 'Kısa bildirim metni beklenir; çok uzun metin kesilebilir.',
+        delay: const Duration(hours: 6),
+      );
+    default:
+      return (
+        surface: 'Bu havuz uygulama içi içerik kaynağı olarak kullanılır.',
+        cadence: 'Kullanıcı cihazları bu havuzu en fazla 6 saatte bir yeniler.',
+        format: 'Kısa ve temiz metin önerilir.',
+        delay: const Duration(hours: 6),
+      );
+  }
+}
+
+DateTime? _adminDateFromValue(Object? value) {
+  if (value is Timestamp) return value.toDate();
+  if (value is DateTime) return value;
+  if (value is num) return DateTime.fromMillisecondsSinceEpoch(value.toInt());
+  if (value is String) return DateTime.tryParse(value);
+  return null;
+}
+
+String _shortDateTime(DateTime value) {
+  final local = value.toLocal();
+  String two(int n) => n.toString().padLeft(2, '0');
+  return '${two(local.day)}.${two(local.month)} ${two(local.hour)}:${two(local.minute)}';
+}
+
+String _durationText(Duration d) {
+  if (d.isNegative || d == Duration.zero) return '0 dk';
+  final h = d.inHours;
+  final m = d.inMinutes.remainder(60);
+  if (h > 0 && m > 0) return '${h}s ${m}dk';
+  if (h > 0) return '${h}s';
+  return '${m}dk';
+}
+
+List<String> _poolQualityWarnings(
+  String poolId,
+  List<Map<String, dynamic>> items,
+) {
+  final warnings = <String>[];
+  if (items.isEmpty) {
+    warnings.add(
+      'Havuz boş; kullanıcı tarafı asset/yerleşik yedeğe düşebilir.',
+    );
+    return warnings;
+  }
+  var emptyRequired = 0;
+  var longNotification = 0;
+  final seen = <String>{};
+  var duplicates = 0;
+  for (final m in items) {
+    final title = m['title']?.toString().trim() ?? '';
+    final body = m['body']?.toString().trim() ?? '';
+    final text = m['text']?.toString().trim() ?? '';
+    final turkish = m['turkish']?.toString().trim() ?? '';
+    final arabic = m['arabic']?.toString().trim() ?? '';
+    final ref = m['ref']?.toString().trim() ?? '';
+    final key =
+        (title.isNotEmpty
+                ? '$title|$body'
+                : text.isNotEmpty
+                ? text
+                : turkish)
+            .toLowerCase();
+    if (key.isNotEmpty && !seen.add(key)) duplicates++;
+
+    if (poolId.startsWith('hub_')) {
+      if (title.isEmpty || body.isEmpty) emptyRequired++;
+    } else if (poolId == QuotePoolIds.homeNamazWisdom) {
+      if (turkish.isEmpty) emptyRequired++;
+    } else if (poolId == QuotePoolIds.healingComfort) {
+      if (turkish.isEmpty || arabic.isEmpty) emptyRequired++;
+      if (poolId == QuotePoolIds.healingComfort && ref.isEmpty) emptyRequired++;
+    } else {
+      if (text.isEmpty && turkish.isEmpty) emptyRequired++;
+    }
+    if (poolId == QuotePoolIds.notificationArinmaBodies &&
+        (text.length > 140 || turkish.length > 140)) {
+      longNotification++;
+    }
+  }
+  if (emptyRequired > 0) {
+    warnings.add('$emptyRequired kayıtta zorunlu alan eksik görünüyor.');
+  }
+  if (duplicates > 0) warnings.add('$duplicates olası tekrar kayıt var.');
+  if (longNotification > 0) {
+    warnings.add('$longNotification bildirim metni uzun; cihazda kesilebilir.');
+  }
+  return warnings;
+}
+
+Widget _adminStatusPill({
+  required Color color,
+  required String label,
+  IconData icon = Icons.circle,
+}) {
+  return Container(
+    padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
+    decoration: BoxDecoration(
+      color: color.withValues(alpha: 0.14),
+      borderRadius: BorderRadius.circular(999),
+      border: Border.all(color: color.withValues(alpha: 0.55)),
+    ),
+    child: Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(icon, size: 12, color: color),
+        const SizedBox(width: 6),
+        Text(
+          label,
+          style: TextStyle(
+            color: color.withValues(alpha: 0.95),
+            fontSize: 11,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+      ],
+    ),
+  );
+}
+
+Widget _buildPoolUsageCard({
+  required String poolId,
+  required Map<String, dynamic>? poolDoc,
+  required String? poolError,
+  required List<Map<String, dynamic>> items,
+}) {
+  final info = _poolUsageInfo(poolId);
+  final updatedAt = _adminDateFromValue(poolDoc?['updatedAt']);
+  final liveAt = updatedAt?.add(info.delay);
+  final now = DateTime.now();
+  final warnings = _poolQualityWarnings(poolId, items);
+  final hasError = poolError != null;
+  final isPropagating = liveAt != null && liveAt.isAfter(now);
+  final color = hasError
+      ? Colors.redAccent
+      : warnings.isNotEmpty
+      ? Colors.amber
+      : isPropagating
+      ? Colors.amber
+      : AppColors.accentNeonGreen;
+  final label = hasError
+      ? 'Dikkat'
+      : warnings.isNotEmpty
+      ? 'Kontrol et'
+      : isPropagating
+      ? 'Yayılıyor'
+      : 'Yayında';
+  final eta = liveAt == null
+      ? 'Son kayıt zamanı yok'
+      : isPropagating
+      ? 'Tahmini canlı: ${_shortDateTime(liveAt)} · kalan ${_durationText(liveAt.difference(now))}'
+      : 'Cache süresi geçti · son kayıt ${_shortDateTime(updatedAt!)}';
+
+  return Padding(
+    padding: const EdgeInsets.fromLTRB(16, 4, 16, 0),
+    child: Card(
+      color: const Color(0xFF0F2419),
+      child: ExpansionTile(
+        initiallyExpanded: false,
+        tilePadding: const EdgeInsets.fromLTRB(12, 4, 12, 4),
+        childrenPadding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
+        iconColor: Colors.white70,
+        collapsedIconColor: Colors.white70,
+        title: Row(
+          children: [
+            Expanded(
+              child: Text(
+                'Bu havuz nerede görünür?',
+                style: TextStyle(
+                  color: Colors.white.withValues(alpha: 0.9),
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ),
+            _adminStatusPill(color: color, label: label),
+          ],
+        ),
+        subtitle: Padding(
+          padding: const EdgeInsets.only(top: 6),
+          child: Text(
+            eta,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              color: color.withValues(alpha: 0.95),
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+        children: [
+          Align(alignment: Alignment.centerLeft, child: Text(info.surface)),
+          const SizedBox(height: 6),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: Text(
+              info.cadence,
+              style: TextStyle(color: Colors.white.withValues(alpha: 0.68)),
+            ),
+          ),
+          const SizedBox(height: 6),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: Text(
+              info.format,
+              style: TextStyle(color: Colors.white.withValues(alpha: 0.68)),
+            ),
+          ),
+          if (warnings.isNotEmpty) ...[
+            const SizedBox(height: 8),
+            ...warnings
+                .take(3)
+                .map(
+                  (w) => Padding(
+                    padding: const EdgeInsets.only(top: 3),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Icon(
+                          Icons.warning_amber_rounded,
+                          size: 15,
+                          color: Colors.amber,
+                        ),
+                        const SizedBox(width: 6),
+                        Expanded(
+                          child: Text(
+                            w,
+                            style: const TextStyle(
+                              color: Colors.amber,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+          ],
+        ],
+      ),
+    ),
+  );
+}
+
 Widget _buildAdminPoolsTab({
   required BuildContext context,
   required double bottomInset,
@@ -130,6 +455,12 @@ Widget _buildAdminPoolsTab({
             style: const TextStyle(color: Colors.redAccent),
           ),
         ),
+      _buildPoolUsageCard(
+        poolId: poolId,
+        poolDoc: poolDoc,
+        poolError: poolError,
+        items: allItems,
+      ),
       Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16),
         child: Column(

@@ -10,6 +10,7 @@ class _InspireFormRow {
     required this.design,
     required this.contentKind,
     required this.showInMainFeed,
+    required this.savedFingerprint,
   });
 
   final TextEditingController tr;
@@ -19,6 +20,7 @@ class _InspireFormRow {
   Map<String, dynamic> design;
   InspirationContentKind contentKind;
   bool showInMainFeed;
+  String savedFingerprint;
 
   void dispose() {
     tr.dispose();
@@ -79,7 +81,7 @@ class _InspireFormRow {
     } else {
       showMain = kind == InspirationContentKind.quote;
     }
-    return _InspireFormRow(
+    final row = _InspireFormRow(
       tr: TextEditingController(text: m['tr']?.toString() ?? ''),
       ar: TextEditingController(text: m['ar']?.toString() ?? ''),
       source: TextEditingController(text: m['source']?.toString() ?? ''),
@@ -89,7 +91,10 @@ class _InspireFormRow {
       design: _sanitizeDesign(m, imageIndices, rng),
       contentKind: kind,
       showInMainFeed: showMain,
+      savedFingerprint: '',
     );
+    row.savedFingerprint = row.fingerprint;
+    return row;
   }
 
   factory _InspireFormRow.empty(List<int> imageIndices, Random rng) {
@@ -102,6 +107,7 @@ class _InspireFormRow {
       design: d,
       contentKind: InspirationContentKind.quote,
       showInMainFeed: true,
+      savedFingerprint: '',
     );
   }
 
@@ -126,6 +132,10 @@ class _InspireFormRow {
     out['showInMainFeed'] = showInMainFeed;
     return out;
   }
+
+  bool get hasUnsavedChanges => savedFingerprint != fingerprint;
+
+  String get fingerprint => jsonEncode(toFirestoreMap());
 
   void rerollDesign(Random rng, List<int> imageIndices) {
     design = _sanitizeDesign(<String, dynamic>{}, imageIndices, rng);

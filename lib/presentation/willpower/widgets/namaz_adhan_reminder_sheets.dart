@@ -1047,6 +1047,42 @@ class _PerPrayerReminderListSheet extends StatefulWidget {
 
 class _PerPrayerReminderListSheetState
     extends State<_PerPrayerReminderListSheet> {
+  Future<void> _applyDurationsToAllPrayers() async {
+    await PrayerReminderPrefs.ensurePerPrayerPrefsReady(widget.prefs);
+    if (!mounted || !context.mounted) return;
+    final l10n = AppLocalizations.of(context)!;
+    final chosen = await _openDualReminderSheet(
+      context,
+      prayerTitle: l10n.reminderAllPrayersDurationTarget,
+      initialEarly: PrayerReminderPrefs.minutesBeforeForPrayer(widget.prefs, 0),
+      initialSecond: PrayerReminderPrefs.minutesBeforeSecondaryForPrayer(
+        widget.prefs,
+        0,
+      ),
+    );
+    if (chosen == null || !mounted) return;
+    final canUseSecond = await widget.onSecondReminderGate(chosen.second);
+    if (!canUseSecond || !mounted) return;
+    await PrayerReminderPrefs.setMinutesBefore(widget.prefs, chosen.early);
+    await PrayerReminderPrefs.setMinutesBeforeSecondary(
+      widget.prefs,
+      chosen.second,
+    );
+    await widget.onReschedule();
+    setState(() {});
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          l10n.reminderDurationsAppliedAllSuccess,
+          style: TextStyle(color: AppColors.creamBase.withValues(alpha: 0.92)),
+        ),
+        backgroundColor: AppColors.anthraciteMid,
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
+  }
+
   Future<void> _openEditor(int i) async {
     await PrayerReminderPrefs.ensurePerPrayerPrefsReady(widget.prefs);
     if (!mounted || !context.mounted) return;
@@ -1206,6 +1242,46 @@ class _PerPrayerReminderListSheetState
                 ),
               ),
               const SizedBox(height: 12),
+              Material(
+                color: Colors.white.withValues(alpha: 0.06),
+                borderRadius: BorderRadius.circular(14),
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(14),
+                  onTap: _applyDurationsToAllPrayers,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 14,
+                      vertical: 14,
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.done_all_rounded,
+                          color: AppColors.accentNeonGreen.withValues(
+                            alpha: 0.88,
+                          ),
+                          size: 22,
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Text(
+                            l10n.reminderApplyDurationsAllButton,
+                            style: AppTextStyles.labelLarge.copyWith(
+                              color: AppColors.creamBase,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        ),
+                        Icon(
+                          Icons.chevron_right_rounded,
+                          color: Colors.white.withValues(alpha: 0.35),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 8),
               Material(
                 color: Colors.white.withValues(alpha: 0.06),
                 borderRadius: BorderRadius.circular(14),

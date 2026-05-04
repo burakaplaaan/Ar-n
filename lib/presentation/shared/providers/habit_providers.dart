@@ -1,9 +1,15 @@
 // lib/presentation/shared/providers/habit_providers.dart
 // Riverpod provider'ları — Alışkanlık ve Streak yönetimi.
 
+import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../../data/models/habit_model.dart';
 import '../../../data/repositories/habit_repository.dart';
+import '../../../data/repositories/salat_log_repository.dart';
+import '../../../data/services/tracking_widget_service.dart';
+import '../../../core/providers/shared_preferences_provider.dart';
 
 final habitRepositoryProvider = Provider<HabitRepository>(
   (_) => HabitRepository(),
@@ -11,15 +17,27 @@ final habitRepositoryProvider = Provider<HabitRepository>(
 
 /// Alışkanlık özeti (habit + streak + completedToday) state notifier'ı
 class HabitSummaryNotifier
-    extends StateNotifier<List<({HabitModel habit, int streak, bool completedToday})>> {
+    extends
+        StateNotifier<
+          List<({HabitModel habit, int streak, bool completedToday})>
+        > {
   final HabitRepository _repo;
+  final SharedPreferences _prefs;
+  final SalatLogRepository _salatRepo;
 
-  HabitSummaryNotifier(this._repo) : super([]) {
+  HabitSummaryNotifier(this._repo, this._prefs, this._salatRepo) : super([]) {
     _reload();
   }
 
   void _reload() {
     state = _repo.getSummary();
+    unawaited(
+      TrackingWidgetService.refreshSelected(
+        prefs: _prefs,
+        habitRepo: _repo,
+        salatRepo: _salatRepo,
+      ),
+    );
   }
 
   Future<void> addHabit({
@@ -131,10 +149,7 @@ class HabitSummaryNotifier
     String habitId, {
     bool preserveHistory = false,
   }) async {
-    await _repo.restartQuitProgram(
-      habitId,
-      preserveHistory: preserveHistory,
-    );
+    await _repo.restartQuitProgram(habitId, preserveHistory: preserveHistory);
     _reload();
   }
 
@@ -146,7 +161,14 @@ class HabitSummaryNotifier
   void refresh() => _reload();
 }
 
-final habitSummaryProvider = StateNotifierProvider<HabitSummaryNotifier,
-    List<({HabitModel habit, int streak, bool completedToday})>>(
-  (ref) => HabitSummaryNotifier(ref.watch(habitRepositoryProvider)),
-);
+final habitSummaryProvider =
+    StateNotifierProvider<
+      HabitSummaryNotifier,
+      List<({HabitModel habit, int streak, bool completedToday})>
+    >(
+      (ref) => HabitSummaryNotifier(
+        ref.watch(habitRepositoryProvider),
+        ref.watch(sharedPreferencesProvider),
+        SalatLogRepository(),
+      ),
+    );

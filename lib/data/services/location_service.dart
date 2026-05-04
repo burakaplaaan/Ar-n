@@ -40,6 +40,39 @@ class LocationService {
     return DateTime.fromMillisecondsSinceEpoch(ms);
   }
 
+  Map<String, dynamic> exportBackupJson() => {
+    'city': savedCity,
+    'country': savedCountry,
+    if (savedLat != null) 'lat': savedLat,
+    if (savedLon != null) 'lon': savedLon,
+    if (savedDistrictId != null) 'districtId': savedDistrictId,
+  };
+
+  Future<void> importBackupJson(Map<String, dynamic> json) async {
+    final city = (json['city'] as String?)?.trim();
+    final country = (json['country'] as String?)?.trim();
+    if (city != null && city.isNotEmpty) {
+      await _prefs.put(_cityKey, city);
+      await _prefs.put(
+        _countryKey,
+        country == null || country.isEmpty ? 'Turkey' : country,
+      );
+    }
+
+    final lat = (json['lat'] as num?)?.toDouble();
+    final lon = (json['lon'] as num?)?.toDouble();
+    if (lat != null && lon != null) {
+      await _prefs.put(_latKey, lat);
+      await _prefs.put(_lonKey, lon);
+    } else {
+      await _prefs.delete(_latKey);
+      await _prefs.delete(_lonKey);
+    }
+
+    final districtId = (json['districtId'] as num?)?.toInt();
+    await saveDistrictId(districtId);
+  }
+
   Future<void> saveCity(String city, String country) async {
     await _prefs.put(_cityKey, city);
     await _prefs.put(_countryKey, country);

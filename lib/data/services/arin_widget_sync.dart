@@ -22,6 +22,21 @@ abstract final class ArinWidgetKeys {
   static const prayerCountdown = 'arin_prayer_countdown';
   static const prayerNextEpochMs = 'arin_prayer_next_epoch_ms';
   static const prayerScheduleJson = 'arin_prayer_schedule_json';
+
+  static const trackingEnabled = 'arin_tracking_enabled';
+  static const trackingTitle = 'arin_tracking_title';
+  static const trackingValue = 'arin_tracking_value';
+  static const trackingNote = 'arin_tracking_note';
+  static const trackingQuotesJson = 'arin_tracking_quotes_json';
+  static const trackingMode = 'arin_tracking_mode';
+  static const trackingStartEpochMs = 'arin_tracking_start_epoch_ms';
+  static const trackingDayPrefix = 'arin_tracking_day_prefix';
+
+  static const widgetGateQuoteLocked = 'arin_widget_gate_quote_locked';
+  static const widgetGatePrayerLocked = 'arin_widget_gate_prayer_locked';
+  static const widgetGateComboLocked = 'arin_widget_gate_combo_locked';
+  static const widgetGateTrackingLocked = 'arin_widget_gate_tracking_locked';
+  static const widgetGatePremium = 'arin_widget_gate_premium';
 }
 
 abstract final class ArinWidgetSync {
@@ -44,11 +59,19 @@ abstract final class ArinWidgetSync {
       'com.arin.arin.ArinQuoteWidgetProvider';
   static const androidPrayerProviderClass =
       'com.arin.arin.ArinPrayerWidgetProvider';
+  static const androidComboProviderClass =
+      'com.arin.arin.ArinComboWidgetProvider';
+  static const androidTrackingProviderClass =
+      'com.arin.arin.ArinTrackingWidgetProvider';
   static const iOSQuoteWidgetName = 'ArinQuoteWidget';
   static const iOSPrayerWidgetName = 'ArinPrayerWidget';
+  static const iOSComboWidgetName = 'ArinComboWidget';
+  static const iOSTrackingWidgetName = 'ArinTrackingWidget';
 
   static const _androidQuote = androidQuoteProviderClass;
   static const _androidPrayer = androidPrayerProviderClass;
+  static const _androidCombo = androidComboProviderClass;
+  static const _androidTracking = androidTrackingProviderClass;
 
   static String _widgetQuotePreferredLineBreaks(String t) => t;
 
@@ -73,8 +96,33 @@ abstract final class ArinWidgetSync {
         qualifiedAndroidName: _androidQuote,
         iOSName: 'ArinQuoteWidget',
       );
+      await HomeWidget.updateWidget(
+        qualifiedAndroidName: _androidCombo,
+        iOSName: iOSComboWidgetName,
+      );
     } catch (e, st) {
       debugPrint('ArinWidgetSync.pushQuote: $e\n$st');
+    }
+  }
+
+  /// Admin override: mevcut zaman çizelgesini geçici olarak devre dışı bırakır
+  /// ve widget'a tek bir mesaj basar. Override kapanınca havuz schedule'ı tekrar
+  /// yazılmalıdır.
+  static Future<void> pushQuoteOverride({
+    required String text,
+    required String source,
+    String localeCode = 'tr',
+  }) async {
+    if (kIsWeb) return;
+    try {
+      if (!await _ensureAppGroupReady()) return;
+      await HomeWidget.saveWidgetData<String>(
+        ArinWidgetKeys.quoteScheduleJson,
+        '',
+      );
+      await pushQuote(text: text, source: source, localeCode: localeCode);
+    } catch (e, st) {
+      debugPrint('ArinWidgetSync.pushQuoteOverride: $e\n$st');
     }
   }
 
@@ -125,8 +173,151 @@ abstract final class ArinWidgetSync {
         qualifiedAndroidName: _androidQuote,
         iOSName: iOSQuoteWidgetName,
       );
+      await HomeWidget.updateWidget(
+        qualifiedAndroidName: _androidCombo,
+        iOSName: iOSComboWidgetName,
+      );
     } catch (e, st) {
       debugPrint('ArinWidgetSync.pushQuoteSchedule: $e\n$st');
+    }
+  }
+
+  /// Gelişim/Arınma takip widget'ı: tek seçili takip, kısa sayaç ve motivasyon.
+  static Future<void> pushTracking({
+    required String title,
+    required String value,
+    required String note,
+    required String quotesJson,
+    String mode = 'static',
+    int? startEpochMs,
+    String dayPrefix = '',
+  }) async {
+    if (kIsWeb) return;
+    try {
+      if (!await _ensureAppGroupReady()) return;
+      await HomeWidget.saveWidgetData<String>(
+        ArinWidgetKeys.trackingEnabled,
+        '1',
+      );
+      await HomeWidget.saveWidgetData<String>(
+        ArinWidgetKeys.trackingTitle,
+        title.trim(),
+      );
+      await HomeWidget.saveWidgetData<String>(
+        ArinWidgetKeys.trackingValue,
+        value.trim(),
+      );
+      await HomeWidget.saveWidgetData<String>(
+        ArinWidgetKeys.trackingNote,
+        note.trim(),
+      );
+      await HomeWidget.saveWidgetData<String>(
+        ArinWidgetKeys.trackingQuotesJson,
+        quotesJson,
+      );
+      await HomeWidget.saveWidgetData<String>(
+        ArinWidgetKeys.trackingMode,
+        mode,
+      );
+      await HomeWidget.saveWidgetData<String>(
+        ArinWidgetKeys.trackingStartEpochMs,
+        startEpochMs == null ? '' : '$startEpochMs',
+      );
+      await HomeWidget.saveWidgetData<String>(
+        ArinWidgetKeys.trackingDayPrefix,
+        dayPrefix.trim(),
+      );
+      await HomeWidget.updateWidget(
+        qualifiedAndroidName: _androidTracking,
+        iOSName: iOSTrackingWidgetName,
+      );
+    } catch (e, st) {
+      debugPrint('ArinWidgetSync.pushTracking: $e\n$st');
+    }
+  }
+
+  static Future<void> clearTracking() async {
+    if (kIsWeb) return;
+    try {
+      if (!await _ensureAppGroupReady()) return;
+      for (final k in const <String>[
+        ArinWidgetKeys.trackingEnabled,
+        ArinWidgetKeys.trackingTitle,
+        ArinWidgetKeys.trackingValue,
+        ArinWidgetKeys.trackingNote,
+        ArinWidgetKeys.trackingQuotesJson,
+        ArinWidgetKeys.trackingMode,
+        ArinWidgetKeys.trackingStartEpochMs,
+        ArinWidgetKeys.trackingDayPrefix,
+      ]) {
+        await HomeWidget.saveWidgetData<String>(k, '');
+      }
+      await HomeWidget.updateWidget(
+        qualifiedAndroidName: _androidTracking,
+        iOSName: iOSTrackingWidgetName,
+      );
+    } catch (e, st) {
+      debugPrint('ArinWidgetSync.clearTracking: $e\n$st');
+    }
+  }
+
+  static Future<void> pushWidgetGateStates({
+    required Map<String, bool> lockedByKind,
+    required Map<String, DateTime?> trialUntilByKind,
+    required Map<String, DateTime?> unlockUntilByKind,
+    required bool isPremium,
+  }) async {
+    if (kIsWeb) return;
+    try {
+      if (!await _ensureAppGroupReady()) return;
+      Future<void> save(String key, String kind) {
+        return HomeWidget.saveWidgetData<String>(
+          key,
+          lockedByKind[kind] == true ? '1' : '0',
+        );
+      }
+
+      await save(ArinWidgetKeys.widgetGateQuoteLocked, 'quote');
+      await save(ArinWidgetKeys.widgetGatePrayerLocked, 'prayer');
+      await save(ArinWidgetKeys.widgetGateComboLocked, 'combo');
+      await save(ArinWidgetKeys.widgetGateTrackingLocked, 'tracking');
+      await HomeWidget.saveWidgetData<String>(
+        ArinWidgetKeys.widgetGatePremium,
+        isPremium ? '1' : '0',
+      );
+      for (final kind in const <String>[
+        'quote',
+        'prayer',
+        'combo',
+        'tracking',
+      ]) {
+        await HomeWidget.saveWidgetData<String>(
+          'arin_widget_gate_${kind}_trial_until_ms',
+          '${trialUntilByKind[kind]?.millisecondsSinceEpoch ?? 0}',
+        );
+        await HomeWidget.saveWidgetData<String>(
+          'arin_widget_gate_${kind}_unlock_until_ms',
+          '${unlockUntilByKind[kind]?.millisecondsSinceEpoch ?? 0}',
+        );
+      }
+      await HomeWidget.updateWidget(
+        qualifiedAndroidName: _androidQuote,
+        iOSName: iOSQuoteWidgetName,
+      );
+      await HomeWidget.updateWidget(
+        qualifiedAndroidName: _androidPrayer,
+        iOSName: iOSPrayerWidgetName,
+      );
+      await HomeWidget.updateWidget(
+        qualifiedAndroidName: _androidCombo,
+        iOSName: iOSComboWidgetName,
+      );
+      await HomeWidget.updateWidget(
+        qualifiedAndroidName: _androidTracking,
+        iOSName: iOSTrackingWidgetName,
+      );
+    } catch (e, st) {
+      debugPrint('ArinWidgetSync.pushWidgetGateStates: $e\n$st');
     }
   }
 
@@ -197,6 +388,10 @@ abstract final class ArinWidgetSync {
       await HomeWidget.updateWidget(
         qualifiedAndroidName: _androidPrayer,
         iOSName: 'ArinPrayerWidget',
+      );
+      await HomeWidget.updateWidget(
+        qualifiedAndroidName: _androidCombo,
+        iOSName: iOSComboWidgetName,
       );
     } catch (e, st) {
       debugPrint('ArinWidgetSync.refreshPrayer: $e\n$st');
@@ -281,6 +476,10 @@ abstract final class ArinWidgetSync {
       await HomeWidget.updateWidget(
         qualifiedAndroidName: _androidPrayer,
         iOSName: iOSPrayerWidgetName,
+      );
+      await HomeWidget.updateWidget(
+        qualifiedAndroidName: _androidCombo,
+        iOSName: iOSComboWidgetName,
       );
     } catch (e, st) {
       debugPrint('ArinWidgetSync.refreshPrayerSchedule: $e\n$st');
@@ -378,6 +577,19 @@ abstract final class ArinWidgetSync {
         ArinWidgetKeys.prayerCountdown,
         ArinWidgetKeys.prayerNextEpochMs,
         ArinWidgetKeys.prayerScheduleJson,
+        ArinWidgetKeys.trackingEnabled,
+        ArinWidgetKeys.trackingTitle,
+        ArinWidgetKeys.trackingValue,
+        ArinWidgetKeys.trackingNote,
+        ArinWidgetKeys.trackingQuotesJson,
+        ArinWidgetKeys.trackingMode,
+        ArinWidgetKeys.trackingStartEpochMs,
+        ArinWidgetKeys.trackingDayPrefix,
+        ArinWidgetKeys.widgetGateQuoteLocked,
+        ArinWidgetKeys.widgetGatePrayerLocked,
+        ArinWidgetKeys.widgetGateComboLocked,
+        ArinWidgetKeys.widgetGateTrackingLocked,
+        ArinWidgetKeys.widgetGatePremium,
       ]) {
         await HomeWidget.saveWidgetData<String>(k, '');
       }
@@ -388,6 +600,14 @@ abstract final class ArinWidgetSync {
       await HomeWidget.updateWidget(
         qualifiedAndroidName: _androidPrayer,
         iOSName: iOSPrayerWidgetName,
+      );
+      await HomeWidget.updateWidget(
+        qualifiedAndroidName: _androidCombo,
+        iOSName: iOSComboWidgetName,
+      );
+      await HomeWidget.updateWidget(
+        qualifiedAndroidName: _androidTracking,
+        iOSName: iOSTrackingWidgetName,
       );
     } catch (e, st) {
       debugPrint('ArinWidgetSync.clearAll: $e\n$st');

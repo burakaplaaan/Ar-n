@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- API 24+: Karma widget sayacı Chronometer ile sistem içinde akar. Arka plan şeffaf. -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/widget_combo_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/transparent"
+    android:clipChildren="false"
+    android:clipToPadding="false"
+    android:paddingStart="8dp"
+    android:paddingTop="2dp"
+    android:paddingEnd="8dp"
+    android:paddingBottom="6dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|center_horizontal"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="15dp"
+                android:layout_height="15dp"
+                android:contentDescription="@null"
+                android:padding="2dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/ic_widget_crescent"
+                android:tint="@color/widget_quote_text_white" />
+
+            <TextView
+                android:id="@+id/widget_combo_prayer_title"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:layout_weight="1"
+                android:ellipsize="end"
+                android:fontFamily="sans-serif-black"
+                android:maxLines="1"
+                android:shadowColor="#44000000"
+                android:shadowDx="0"
+                android:shadowDy="1"
+                android:shadowRadius="2"
+                android:textColor="@color/widget_quote_text_white"
+                android:textSize="13sp"
+                android:textStyle="bold"
+                tools:text="Akşam'a kalan" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="1dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:contentDescription="@null"
+                android:padding="1dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/ic_widget_access_time"
+                android:tint="@color/widget_quote_text_white" />
+
+            <Chronometer
+                android:id="@+id/widget_combo_countdown"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:layout_weight="1"
+                android:countDown="true"
+                android:fontFamily="sans-serif-medium"
+                android:format="%s"
+                android:gravity="start|center_vertical"
+                android:shadowColor="#99000000"
+                android:shadowDx="0"
+                android:shadowDy="1"
+                android:shadowRadius="3"
+                android:textColor="@color/widget_quote_text_white"
+                android:textSize="21sp"
+                android:textStyle="bold"
+                tools:text="1:24:10" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/widget_combo_quote_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:breakStrategy="simple"
+            android:ellipsize="end"
+            android:fontFamily="serif"
+            android:includeFontPadding="false"
+            android:letterSpacing="0.01"
+            android:lineSpacingExtra="0dp"
+            android:lineSpacingMultiplier="1.02"
+            android:maxLines="3"
+            android:shadowColor="#66000000"
+            android:shadowDx="0"
+            android:shadowDy="1"
+            android:shadowRadius="3"
+            android:textColor="@color/widget_quote_text_white"
+            android:textSize="28sp"
+            tools:text="Her zorlukla beraber bir kolaylık vardır." />
+
+        <TextView
+            android:id="@+id/widget_combo_quote_source"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:ellipsize="end"
+            android:fontFamily="sans-serif-black"
+            android:includeFontPadding="false"
+            android:maxLines="1"
+            android:shadowColor="#44000000"
+            android:shadowDx="0"
+            android:shadowDy="1"
+            android:shadowRadius="2"
+            android:textColor="@color/widget_text_muted"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            tools:text="İnşirah, 5" />
+    </LinearLayout>
+</FrameLayout>

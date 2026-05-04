@@ -1,0 +1,546 @@
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
+
+import '../../core/constants/app_colors.dart';
+import '../../core/providers/shared_preferences_provider.dart';
+import '../../core/theme/arin_shell_background.dart';
+import '../../data/repositories/salat_log_repository.dart';
+import '../../data/services/tracking_widget_service.dart';
+import '../kaza/kaza_tracking_provider.dart';
+import '../shared/providers/habit_providers.dart';
+import '../shared/widgets/arin_shell_layout.dart';
+
+class WidgetCenterPage extends ConsumerStatefulWidget {
+  const WidgetCenterPage({super.key});
+
+  @override
+  ConsumerState<WidgetCenterPage> createState() => _WidgetCenterPageState();
+}
+
+class _WidgetCenterPageState extends ConsumerState<WidgetCenterPage> {
+  bool _saving = false;
+
+  Future<List<TrackingWidgetOption>> _loadOptions() {
+    return TrackingWidgetService.availableOptions(
+      prefs: ref.read(sharedPreferencesProvider),
+      habitRepo: ref.read(habitRepositoryProvider),
+      salatRepo: SalatLogRepository(),
+    );
+  }
+
+  Future<void> _select(String? targetId) async {
+    setState(() => _saving = true);
+    HapticFeedback.selectionClick();
+    try {
+      await TrackingWidgetService.selectTarget(
+        prefs: ref.read(sharedPreferencesProvider),
+        habitRepo: ref.read(habitRepositoryProvider),
+        salatRepo: SalatLogRepository(),
+        targetId: targetId,
+      );
+      if (!mounted) return;
+      setState(() {});
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            targetId == null
+                ? 'Takip widgetı kapatıldı.'
+                : 'Takip widgetı güncellendi.',
+          ),
+        ),
+      );
+    } finally {
+      if (mounted) setState(() => _saving = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    ref.watch(habitSummaryProvider);
+    ref.watch(kazaTrackingProvider);
+
+    final onDark = Theme.of(context).brightness == Brightness.dark;
+    final titleColor = onDark
+        ? Colors.white.withValues(alpha: 0.96)
+        : AppColors.emeraldDark;
+    final muted = onDark ? AppColors.textOnDarkMuted : AppColors.textSecondary;
+    final prefs = ref.watch(sharedPreferencesProvider);
+    final selectedId = TrackingWidgetService.selectedTarget(prefs);
+
+    return Scaffold(
+      backgroundColor: Colors.transparent,
+      body: Stack(
+        fit: StackFit.expand,
+        children: [
+          DecoratedBox(decoration: ArinShellBackground.decoration(context)),
+          ArinShellBackground.bubbleLayer(context),
+          CustomScrollView(
+            physics: const BouncingScrollPhysics(),
+            slivers: [
+              SliverAppBar(
+                pinned: true,
+                elevation: 0,
+                backgroundColor: onDark
+                    ? Colors.black.withValues(alpha: 0.25)
+                    : Colors.white.withValues(alpha: 0.55),
+                leading: IconButton(
+                  onPressed: () => context.pop(),
+                  icon: Icon(
+                    Icons.arrow_back_ios_new_rounded,
+                    color: titleColor.withValues(alpha: 0.88),
+                    size: 20,
+                  ),
+                ),
+                title: Text(
+                  'Widget Merkezi',
+                  style: GoogleFonts.plusJakartaSans(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w700,
+                    color: titleColor,
+                    letterSpacing: -0.3,
+                  ),
+                ),
+              ),
+              SliverPadding(
+                padding: EdgeInsets.fromLTRB(
+                  22,
+                  18,
+                  22,
+                  ArinShellLayout.bottomContentPadding(context),
+                ),
+                sliver: SliverList(
+                  delegate: SliverChildListDelegate([
+                    _HeroCard(onDark: onDark)
+                        .animate()
+                        .fadeIn(duration: 360.ms)
+                        .slideY(begin: 0.05, end: 0),
+                    const SizedBox(height: 22),
+                    _SectionTitle('Mevcut widgetlar', muted: muted),
+                    const SizedBox(height: 10),
+                    _InfoTile(
+                      onDark: onDark,
+                      icon: Icons.format_quote_rounded,
+                      title: 'Günlük Söz Widgetı',
+                      subtitle:
+                          'Ana ekrana veya kilit ekranına eklenir. Sözler otomatik yenilenir.',
+                    ),
+                    const SizedBox(height: 10),
+                    _InfoTile(
+                      onDark: onDark,
+                      icon: Icons.access_time_rounded,
+                      title: 'Namaz Vakti Widgetı',
+                      subtitle:
+                          'Konumuna göre sıradaki vakti gösterir. Konum değişirse uygulamayı açman yeterli.',
+                    ),
+                    const SizedBox(height: 10),
+                    _InfoTile(
+                      onDark: onDark,
+                      icon: Icons.widgets_outlined,
+                      title: 'Söz + Namaz Widgetı',
+                      subtitle:
+                          'Günlük söz ve sıradaki namaz vaktini aynı küçük alanda gösterir.',
+                    ),
+                    const SizedBox(height: 24),
+                    _SectionTitle('Takip widgetı', muted: muted),
+                    const SizedBox(height: 10),
+                    Text(
+                      'Kilit ekranında tek bir takip gösterilir. Kurmadığın takipler burada görünmez. Hassas takiplerde başlık nötr tutulur.',
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 13,
+                        height: 1.45,
+                        color: muted,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    FutureBuilder<List<TrackingWidgetOption>>(
+                      future: _loadOptions(),
+                      builder: (context, snap) {
+                        final options = snap.data ?? const [];
+                        if (!snap.hasData) {
+                          return _LoadingCard(onDark: onDark);
+                        }
+                        return Column(
+                          children: [
+                            _TrackingChoiceTile(
+                              onDark: onDark,
+                              selected: selectedId == null,
+                              title: 'Gösterme',
+                              subtitle: 'Takip widgetını boş bırak.',
+                              icon: Icons.visibility_off_outlined,
+                              saving: _saving,
+                              onTap: () => _select(null),
+                            ),
+                            const SizedBox(height: 10),
+                            if (options.isEmpty)
+                              _EmptyTrackingCard(onDark: onDark)
+                            else
+                              for (final option in options) ...[
+                                _TrackingChoiceTile(
+                                  onDark: onDark,
+                                  selected: selectedId == option.id,
+                                  title: option.title,
+                                  subtitle: option.snapshot.value,
+                                  footnote: option.subtitle,
+                                  icon: _iconForOption(option),
+                                  saving: _saving,
+                                  onTap: () => _select(option.id),
+                                ),
+                                const SizedBox(height: 10),
+                              ],
+                          ],
+                        );
+                      },
+                    ),
+                  ]),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  IconData _iconForOption(TrackingWidgetOption option) {
+    final text = '${option.title} ${option.subtitle}'.toLowerCase();
+    if (text.contains('namaz')) return Icons.mosque_outlined;
+    if (text.contains('sigara')) return Icons.air_rounded;
+    if (text.contains('alkol')) return Icons.water_drop_outlined;
+    if (text.contains('kaza')) return Icons.task_alt_rounded;
+    if (text.contains('ekran')) return Icons.center_focus_strong_outlined;
+    return Icons.track_changes_rounded;
+  }
+}
+
+class _HeroCard extends StatelessWidget {
+  const _HeroCard({required this.onDark});
+
+  final bool onDark;
+
+  @override
+  Widget build(BuildContext context) {
+    final titleColor = onDark
+        ? Colors.white.withValues(alpha: 0.96)
+        : AppColors.emeraldDark;
+    final muted = onDark ? AppColors.textOnDarkMuted : AppColors.textSecondary;
+    return Container(
+      padding: const EdgeInsets.fromLTRB(18, 18, 18, 16),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(24),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: onDark
+              ? [
+                  AppColors.cardSurface.withValues(alpha: 0.68),
+                  AppColors.emeraldDark.withValues(alpha: 0.22),
+                ]
+              : [
+                  Colors.white.withValues(alpha: 0.82),
+                  AppColors.emeraldFaint.withValues(alpha: 0.42),
+                ],
+        ),
+        border: Border.all(
+          color: AppColors.accentNeonGreen.withValues(
+            alpha: onDark ? 0.18 : 0.3,
+          ),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.accentGlowGreen.withValues(
+              alpha: onDark ? 0.1 : 0.08,
+            ),
+            blurRadius: 26,
+            offset: const Offset(0, 14),
+          ),
+        ],
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 48,
+            height: 48,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: AppColors.accentNeonGreen.withValues(alpha: 0.14),
+              border: Border.all(
+                color: AppColors.accentNeonGreen.withValues(alpha: 0.28),
+              ),
+            ),
+            child: Icon(
+              Icons.lock_clock_rounded,
+              color: AppColors.accentNeonGreen.withValues(alpha: 0.95),
+            ),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Kilit ekranında sade takip',
+                  style: GoogleFonts.plusJakartaSans(
+                    fontSize: 17,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: -0.4,
+                    color: titleColor,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  'Söz ve vakit widgetları otomatik çalışır. Burada sadece gelişim veya arınma takibinin kilit ekranında görünüp görünmeyeceğini seçersin.',
+                  style: GoogleFonts.plusJakartaSans(
+                    fontSize: 13,
+                    height: 1.42,
+                    color: muted,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _SectionTitle extends StatelessWidget {
+  const _SectionTitle(this.text, {required this.muted});
+
+  final String text;
+  final Color muted;
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      text,
+      style: GoogleFonts.plusJakartaSans(
+        fontSize: 12,
+        fontWeight: FontWeight.w800,
+        letterSpacing: 1.2,
+        color: muted.withValues(alpha: 0.88),
+      ),
+    );
+  }
+}
+
+class _InfoTile extends StatelessWidget {
+  const _InfoTile({
+    required this.onDark,
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+  });
+
+  final bool onDark;
+  final IconData icon;
+  final String title;
+  final String subtitle;
+
+  @override
+  Widget build(BuildContext context) {
+    return _BaseTile(
+      onDark: onDark,
+      icon: icon,
+      title: title,
+      subtitle: subtitle,
+      trailing: const Icon(Icons.info_outline_rounded, size: 18),
+    );
+  }
+}
+
+class _TrackingChoiceTile extends StatelessWidget {
+  const _TrackingChoiceTile({
+    required this.onDark,
+    required this.selected,
+    required this.title,
+    required this.subtitle,
+    required this.icon,
+    required this.saving,
+    required this.onTap,
+    this.footnote,
+  });
+
+  final bool onDark;
+  final bool selected;
+  final String title;
+  final String subtitle;
+  final String? footnote;
+  final IconData icon;
+  final bool saving;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return _BaseTile(
+      onDark: onDark,
+      icon: icon,
+      title: title,
+      subtitle: footnote == null ? subtitle : '$subtitle\n$footnote',
+      onTap: saving ? null : onTap,
+      selected: selected,
+      trailing: AnimatedSwitcher(
+        duration: const Duration(milliseconds: 180),
+        child: selected
+            ? Icon(
+                Icons.check_circle_rounded,
+                key: const ValueKey('on'),
+                color: AppColors.accentNeonGreen.withValues(alpha: 0.95),
+              )
+            : Icon(
+                Icons.radio_button_unchecked_rounded,
+                key: const ValueKey('off'),
+                color: onDark
+                    ? Colors.white.withValues(alpha: 0.22)
+                    : AppColors.textMuted.withValues(alpha: 0.75),
+              ),
+      ),
+    );
+  }
+}
+
+class _BaseTile extends StatelessWidget {
+  const _BaseTile({
+    required this.onDark,
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+    this.trailing,
+    this.onTap,
+    this.selected = false,
+  });
+
+  final bool onDark;
+  final IconData icon;
+  final String title;
+  final String subtitle;
+  final Widget? trailing;
+  final VoidCallback? onTap;
+  final bool selected;
+
+  @override
+  Widget build(BuildContext context) {
+    final titleColor = onDark
+        ? Colors.white.withValues(alpha: 0.94)
+        : AppColors.emeraldDark;
+    final muted = onDark ? AppColors.textOnDarkMuted : AppColors.textSecondary;
+    final fill = selected
+        ? AppColors.accentNeonGreen.withValues(alpha: onDark ? 0.11 : 0.16)
+        : (onDark
+              ? AppColors.cardSurface.withValues(alpha: 0.45)
+              : Colors.white.withValues(alpha: 0.68));
+    final border = selected
+        ? AppColors.accentNeonGreen.withValues(alpha: onDark ? 0.34 : 0.42)
+        : (onDark
+              ? Colors.white.withValues(alpha: 0.07)
+              : AppColors.creamDark.withValues(alpha: 0.45));
+
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(18),
+        child: Ink(
+          padding: const EdgeInsets.fromLTRB(15, 14, 13, 14),
+          decoration: BoxDecoration(
+            color: fill,
+            borderRadius: BorderRadius.circular(18),
+            border: Border.all(color: border),
+          ),
+          child: Row(
+            children: [
+              Container(
+                width: 42,
+                height: 42,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: AppColors.accentNeonGreen.withValues(
+                    alpha: selected ? 0.18 : 0.1,
+                  ),
+                ),
+                child: Icon(icon, size: 22, color: AppColors.accentNeonGreen),
+              ),
+              const SizedBox(width: 13),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w700,
+                        color: titleColor,
+                      ),
+                    ),
+                    const SizedBox(height: 3),
+                    Text(
+                      subtitle,
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 12,
+                        height: 1.35,
+                        fontWeight: FontWeight.w500,
+                        color: muted,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 10),
+              if (trailing != null)
+                IconTheme.merge(
+                  data: IconThemeData(color: muted),
+                  child: trailing!,
+                ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _LoadingCard extends StatelessWidget {
+  const _LoadingCard({required this.onDark});
+
+  final bool onDark;
+
+  @override
+  Widget build(BuildContext context) {
+    return _BaseTile(
+      onDark: onDark,
+      icon: Icons.hourglass_empty_rounded,
+      title: 'Takipler hazırlanıyor',
+      subtitle: 'Kurulu takiplerin kontrol ediliyor.',
+      trailing: const SizedBox(
+        width: 18,
+        height: 18,
+        child: CircularProgressIndicator(strokeWidth: 2),
+      ),
+    );
+  }
+}
+
+class _EmptyTrackingCard extends StatelessWidget {
+  const _EmptyTrackingCard({required this.onDark});
+
+  final bool onDark;
+
+  @override
+  Widget build(BuildContext context) {
+    return _BaseTile(
+      onDark: onDark,
+      icon: Icons.add_task_rounded,
+      title: 'Henüz takip yok',
+      subtitle:
+          'Arınma veya Gelişim bölümünde bir takip kurunca burada seçilebilir olacak.',
+    );
+  }
+}

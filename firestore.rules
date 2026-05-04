@@ -52,10 +52,15 @@ service cloud.firestore {
     function adminRole() {
       return !signedIn()
         ? null
-        : isFullAccessEmail()
+        : signedInAdminRole();
+    }
+
+    function signedInAdminRole() {
+      let userRole = adminUserRole();
+      return isFullAccessEmail()
           ? 'developer'
-          : adminUserRole() != null
-            ? adminUserRole()
+          : userRole != null
+            ? userRole
             : adminInviteRole();
     }
 
@@ -100,10 +105,11 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
-    // Genel app_public belgeleri (quotes_bundle vb.)
+    // Genel app_public belgeleri (quotes_bundle, widget_override vb.)
     match /app_public/{docId} {
       allow read: if true;
-      allow write: if isAdmin() && docId == 'inspiration_cards';
+      allow write: if isAdmin()
+        && docId in ['inspiration_cards', 'widget_override'];
     }
 
     // Premium yetki kayıtları:
@@ -122,12 +128,58 @@ service cloud.firestore {
       allow write: if isDeveloper();
     }
 
-    // Kullanıcı kök belgesi + alt belgeler
+    // Kullanıcı kök belgesi + bilinen alt koleksiyonlar.
+    // Recursive serbest yazma yok: yeni user-scoped koleksiyon eklenirse burada
+    // açıkça tanımlanmalı.
     match /users/{userId} {
       allow read, write: if request.auth != null && request.auth.uid == userId;
     }
-    match /users/{userId}/{document=**} {
+    match /users/{userId}/habits/{habitId} {
       allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+    match /users/{userId}/habit_logs/{logKey} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+    match /users/{userId}/zikir_matik/{docId} {
+      allow read, delete: if request.auth != null
+        && request.auth.uid == userId
+        && docId == 'state';
+      allow create, update: if request.auth != null
+        && request.auth.uid == userId
+        && docId == 'state'
+        && request.resource.data.schemaVersion == 1
+        && request.resource.data.keys().hasOnly([
+          'schemaVersion',
+          'updatedAtMs',
+          'syncedAt',
+          'session',
+          'customPhrases',
+          'records',
+          'turLogs',
+          'settings',
+        ]);
+    }
+    match /users/{userId}/user_backup/{docId} {
+      allow read, delete: if request.auth != null
+        && request.auth.uid == userId
+        && docId == 'state';
+      allow create, update: if request.auth != null
+        && request.auth.uid == userId
+        && docId == 'state'
+        && request.resource.data.schemaVersion == 1
+        && request.resource.data.keys().hasOnly([
+          'schemaVersion',
+          'updatedAtMs',
+          'syncedAt',
+          'salatLogs',
+          'location',
+          'notifications',
+          'appPrefs',
+          'kaza',
+        ]);
+    }
+    match /users/{userId}/{document=**} {
+      allow read, write: if false;
     }
   }
 }

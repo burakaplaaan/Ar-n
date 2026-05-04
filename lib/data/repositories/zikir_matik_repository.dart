@@ -50,6 +50,12 @@ class ZikirMatikRepository {
     );
   }
 
+  Future<void> replaceRecords(List<ZikirMatikRecord> items) async {
+    final sorted = [...items]
+      ..sort((a, b) => b.savedAtMillis.compareTo(a.savedAtMillis));
+    await _writeRecords(sorted);
+  }
+
   Future<void> addRecord(ZikirMatikRecord r) async {
     final all = loadRecords();
     all.insert(0, r);
@@ -86,6 +92,18 @@ class ZikirMatikRepository {
       ZikirMatikPrefsKeys.customPhrasesJson,
       jsonEncode(items),
     );
+  }
+
+  Future<void> replaceCustomPhrases(List<String> items) async {
+    final out = <String>[];
+    for (final item in items) {
+      final phrase = item.trim();
+      if (phrase.isEmpty) continue;
+      if (out.any((e) => e.toLowerCase() == phrase.toLowerCase())) continue;
+      out.add(phrase);
+      if (out.length >= _maxCustomPhrases) break;
+    }
+    await _writeCustomPhrases(out);
   }
 
   Future<void> saveCustomPhrase(String rawPhrase) async {
@@ -133,6 +151,13 @@ class ZikirMatikRepository {
       ZikirMatikPrefsKeys.turLogsJson,
       jsonEncode(items.map((e) => e.toJson()).toList()),
     );
+  }
+
+  Future<void> replaceTurLogs(List<ZikirMatikTurLog> items) async {
+    final sorted = [...items]
+      ..sort((a, b) => b.recordedAtMillis.compareTo(a.recordedAtMillis));
+    final limited = sorted.take(_maxTurLogs).toList(growable: false);
+    await _writeTurLogs(limited);
   }
 
   Future<void> appendTurLog(ZikirMatikTurLog log) async {

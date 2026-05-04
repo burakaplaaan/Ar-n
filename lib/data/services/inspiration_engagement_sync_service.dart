@@ -1,5 +1,7 @@
 // Keşfet kayıtlı / beğenilen ID'leri Firestore `users/{uid}` ile senkron.
 
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
@@ -10,6 +12,11 @@ import '../../core/firebase/firebase_bootstrap.dart';
 abstract final class InspirationEngagementSyncService {
   static const _kSaved = 'inspire_saved_ids';
   static const _kLiked = 'inspire_liked_ids';
+  static const _pushDebounce = Duration(milliseconds: 800);
+
+  static Timer? _debounceTimer;
+  static SharedPreferences? _pendingPrefs;
+  static Future<void>? _drainFuture;
 
   static List<String> _asStringList(dynamic v) {
     if (v is! List) return [];
@@ -29,8 +36,7 @@ abstract final class InspirationEngagementSyncService {
   }) async {
     if (!isFirebaseReady) return;
     Map<String, dynamic>? data;
-    final docRef =
-        FirebaseFirestore.instance.collection('users').doc(uid);
+    final docRef = FirebaseFirestore.instance.collection('users').doc(uid);
     try {
       final snap = await docRef.get(const GetOptions(source: Source.server));
       data = snap.data();
@@ -75,20 +81,75 @@ abstract final class InspirationEngagementSyncService {
     return out;
   }
 
-  static Future<void> pushFromPrefs(SharedPreferences prefs) async {
+  static Future<void> pushFromPrefs(
+    SharedPreferences prefs, {
+    bool immediate = false,
+  }) async {
+    if (immediate) {
+      await _pushNow(prefs);
+      return;
+    }
+    _pendingPrefs = prefs;
+    _debounceTimer?.cancel();
+    _debounceTimer = Timer(_pushDebounce, () {
+      final latest = _pendingPrefs;
+      _pendingPrefs = null;
+      if (latest != null) {
+        unawaited(_pushNow(latest));
+      }
+    });
+  }
+
+  static Future<void> flushPendingPush() async {
+    _debounceTimer?.cancel();
+    _debounceTimer = null;
+    final latest = _pendingPrefs;
+    _pendingPrefs = null;
+    if (latest != null) {
+      await _pushNow(latest);
+      return;
+    }
+    final drain = _drainFuture;
+    if (drain != null) {
+      await drain;
+    }
+  }
+
+  static Future<void> _pushNow(SharedPreferences prefs) async {
+    _pendingPrefs = prefs;
+    final currentDrain = _drainFuture;
+    if (currentDrain != null) {
+      await currentDrain;
+      return;
+    }
+    final drain = _drainPendingWrites();
+    _drainFuture = drain;
+    try {
+      await drain;
+    } finally {
+      _drainFuture = null;
+    }
+  }
+
+  static Future<void> _drainPendingWrites() async {
+    while (_pendingPrefs != null) {
+      final prefs = _pendingPrefs!;
+      _pendingPrefs = null;
+      await _writeCurrentPrefs(prefs);
+    }
+  }
+
+  static Future<void> _writeCurrentPrefs(SharedPreferences prefs) async {
     final user = FirebaseAuth.instance.currentUser;
     if (user == null || !isFirebaseReady) return;
     try {
       final saved = prefs.getStringList(_kSaved) ?? [];
       final liked = prefs.getStringList(_kLiked) ?? [];
-      await FirebaseFirestore.instance.collection('users').doc(user.uid).set(
-        {
-          'inspirationSavedIds': saved,
-          'inspirationLikedIds': liked,
-          'engagementUpdatedAt': FieldValue.serverTimestamp(),
-        },
-        SetOptions(merge: true),
-      );
+      await FirebaseFirestore.instance.collection('users').doc(user.uid).set({
+        'inspirationSavedIds': saved,
+        'inspirationLikedIds': liked,
+        'engagementUpdatedAt': FieldValue.serverTimestamp(),
+      }, SetOptions(merge: true));
     } catch (e, st) {
       debugPrint('InspirationEngagementSyncService push: $e\n$st');
     }

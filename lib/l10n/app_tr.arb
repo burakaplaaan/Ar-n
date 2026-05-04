@@ -23,6 +23,8 @@
   "settingsMenuAdminSubtitle": "Söz havuzları ve Keşfet",
   "settingsMenuContactTitle": "Bize ulaşın",
   "settingsMenuContactSubtitle": "Destek ve geri bildirim",
+  "settingsMenuSupportTitle": "Arın’a Destek Ol",
+  "settingsMenuSupportSubtitle": "Tek seferlik destek paketleri",
   "settingsMenuComingSoon": "E-posta ile direkt yaz",
   "settingsContactPageTitle": "Bize ulaşın",
   "settingsContactSubtitle": "Öneri, hata bildirimi veya destek talebini doğrudan bize e-posta ile iletebilirsin.",
@@ -244,6 +246,9 @@
   "reminderEnableNotificationsAction": "Bildirimleri aç",
   "reminderDurationsPerPrayerTitle": "Her vakit için süreler",
   "reminderDurationsPerPrayerSubtitle": "Satıra dokun; 1. ve 2. uyarıyı ayrı seç.",
+  "reminderApplyDurationsAllButton": "Seçtiğim süreleri tüm vakitlere uygula",
+  "reminderAllPrayersDurationTarget": "Tüm vakitler",
+  "reminderDurationsAppliedAllSuccess": "Süreler tüm vakitlere uygulandı.",
   "reminderDualAlertTitle": "İki uyarı — {prayerTitle}",
   "@reminderDualAlertTitle": {
     "placeholders": {

@@ -78,6 +78,12 @@ class AppLocalizationsTr extends AppLocalizations {
   String get settingsMenuContactSubtitle => 'Destek ve geri bildirim';
 
   @override
+  String get settingsMenuSupportTitle => 'Arın’a Destek Ol';
+
+  @override
+  String get settingsMenuSupportSubtitle => 'Tek seferlik destek paketleri';
+
+  @override
   String get settingsMenuComingSoon => 'E-posta ile direkt yaz';
 
   @override
@@ -494,6 +500,17 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String get reminderDurationsPerPrayerSubtitle =>
       'Satıra dokun; 1. ve 2. uyarıyı ayrı seç.';
+
+  @override
+  String get reminderApplyDurationsAllButton =>
+      'Seçtiğim süreleri tüm vakitlere uygula';
+
+  @override
+  String get reminderAllPrayersDurationTarget => 'Tüm vakitler';
+
+  @override
+  String get reminderDurationsAppliedAllSuccess =>
+      'Süreler tüm vakitlere uygulandı.';
 
   @override
   String reminderDualAlertTitle(Object prayerTitle) {

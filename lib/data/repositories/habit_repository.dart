@@ -5,6 +5,7 @@ import 'package:hive/hive.dart';
 import 'package:uuid/uuid.dart';
 import '../models/habit_model.dart';
 import '../models/habit_log_model.dart';
+import '../services/habit_cloud_sync_queue.dart';
 import '../../core/constants/willpower_templates.dart';
 import '../../core/utils/hive_boxes.dart';
 import '../../domain/algorithms/streak_calculator.dart';
@@ -191,6 +192,7 @@ class HabitRepository {
     if (newestArchived != null) {
       newestArchived.isArchived = false;
       await _habitsBox.put(newestArchived.id, newestArchived);
+      await HabitCloudSyncQueue.markHabitDirty(newestArchived.id);
       return;
     }
 
@@ -221,6 +223,7 @@ class HabitRepository {
       onboardingCompleted: true,
     );
     await _habitsBox.put(model.id, model);
+    await HabitCloudSyncQueue.markHabitDirty(model.id);
     return model;
   }
 
@@ -256,6 +259,7 @@ class HabitRepository {
       customRepeatCycle: customRepeatCycle.clamp(0, 2),
     );
     await _habitsBox.put(model.id, model);
+    await HabitCloudSyncQueue.markHabitDirty(model.id);
     return model;
   }
 
@@ -292,6 +296,7 @@ class HabitRepository {
         progressValue: next,
       ),
     );
+    await HabitCloudSyncQueue.markLogDirty(key);
   }
 
   Future<void> fillProgressToday(String habitId) async {
@@ -309,6 +314,7 @@ class HabitRepository {
         progressValue: cap,
       ),
     );
+    await HabitCloudSyncQueue.markLogDirty(key);
   }
 
   Future<void> updateHabitNote(String habitId, String note) async {
@@ -316,6 +322,7 @@ class HabitRepository {
     if (h == null) return;
     h.note = note.trim();
     await h.save();
+    await HabitCloudSyncQueue.markHabitDirty(habitId);
   }
 
   /// İrade şablonundan program
@@ -344,25 +351,37 @@ class HabitRepository {
       onboardingCompleted: onboardingCompleted,
     );
     await _habitsBox.put(model.id, model);
+    await HabitCloudSyncQueue.markHabitDirty(model.id);
     return model;
   }
 
   Future<void> save(HabitModel habit) async {
+    await _habitsBox.put(habit.id, habit);
+    await HabitCloudSyncQueue.markHabitDirty(habit.id);
+  }
+
+  Future<void> saveFromCloud(HabitModel habit) async {
     await _habitsBox.put(habit.id, habit);
   }
 
   /// Firestore geri yükleme — log anahtarı `habitId_yyyy-MM-dd`.
   Future<void> upsertLog(HabitLogModel log) async {
     await _logsBox.put(log.logKey, log);
+    await HabitCloudSyncQueue.markLogDirty(log.logKey);
+  }
+
+  Future<void> upsertLogFromCloud(HabitLogModel log) async {
+    await _logsBox.put(log.logKey, log);
   }
 
   /// Buluttan namaz alışkanlığı geldiğinde yerelde otomatik oluşan yineleneni arşivler.
-  Future<void> dedupeActiveSalatPreferringCloudIds(Set<String> cloudHabitIds) async {
+  Future<void> dedupeActiveSalatPreferringCloudIds(
+    Set<String> cloudHabitIds,
+  ) async {
     final candidates = _habitsBox.values
         .whereType<HabitModel>()
         .where(
-          (h) =>
-              h.templateId == WillpowerTemplates.salatDaily && !h.isArchived,
+          (h) => h.templateId == WillpowerTemplates.salatDaily && !h.isArchived,
         )
         .toList();
     if (candidates.length <= 1) return;
@@ -381,6 +400,7 @@ class HabitRepository {
       if (h.id == keepId) continue;
       h.isArchived = true;
       await h.save();
+      await HabitCloudSyncQueue.markHabitDirty(h.id);
     }
   }
 
@@ -395,6 +415,7 @@ class HabitRepository {
     h.onboardingCompleted = true;
     if (quitMethod != null) h.quitMethod = quitMethod;
     await h.save();
+    await HabitCloudSyncQueue.markHabitDirty(habitId);
   }
 
   Future<void> archive(String id) async {
@@ -402,11 +423,11 @@ class HabitRepository {
     if (habit == null) return;
     habit.isArchived = true;
     await habit.save();
+    await HabitCloudSyncQueue.markHabitDirty(id);
   }
 
   /// Alışkanlığı ve ona bağlı tüm günlük logları kalıcı olarak siler.
   Future<void> deletePermanently(String id) async {
-    await _habitsBox.delete(id);
     final prefix = '${id}_';
     final logKeys = _logsBox.keys
         .where((k) => k.toString().startsWith(prefix))
@@ -414,6 +435,8 @@ class HabitRepository {
     for (final k in logKeys) {
       await _logsBox.delete(k);
     }
+    await _habitsBox.delete(id);
+    await HabitCloudSyncQueue.markHabitDeleted(id);
   }
 
   /// Belirli gün için tamamlandı bayrağı (namaz 5/5 senkronu vb.)
@@ -445,6 +468,7 @@ class HabitRepository {
         ),
       );
     }
+    await HabitCloudSyncQueue.markLogDirty(key);
   }
 
   Future<bool> toggleToday(String habitId) async {
@@ -455,6 +479,7 @@ class HabitRepository {
       final done = isCompletedToday(habitId);
       if (done) {
         await _logsBox.delete(key);
+        await HabitCloudSyncQueue.markLogDeleted(key);
         return false;
       }
       final cap = h.effectiveDailyTarget;
@@ -467,6 +492,7 @@ class HabitRepository {
           progressValue: cap,
         ),
       );
+      await HabitCloudSyncQueue.markLogDirty(key);
       return true;
     }
 
@@ -476,6 +502,7 @@ class HabitRepository {
     if (existing != null) {
       existing.isCompleted = !existing.isCompleted;
       await existing.save();
+      await HabitCloudSyncQueue.markLogDirty(key);
       return existing.isCompleted;
     } else {
       final log = HabitLogModel(
@@ -484,8 +511,13 @@ class HabitRepository {
         isCompleted: true,
       );
       await _logsBox.put(key, log);
+      await HabitCloudSyncQueue.markLogDirty(key);
       return true;
     }
+  }
+
+  HabitLogModel? logByKey(String logKey) {
+    return _logsBox.get(logKey);
   }
 
   List<HabitLogModel> getLogs(String habitId) {
@@ -542,6 +574,7 @@ class HabitRepository {
     if (h == null) return;
     h.quitClockStartedAtIso = (when ?? DateTime.now()).toIso8601String();
     await h.save();
+    await HabitCloudSyncQueue.markHabitDirty(habitId);
   }
 
   /// Kriz anında kullanıcının onboarding'i tamamlamadan sayacı başlatabilmesi
@@ -554,6 +587,7 @@ class HabitRepository {
     if (h == null) return;
     h.quitClockStartedAtIso ??= DateTime.now().toIso8601String();
     await h.save();
+    await HabitCloudSyncQueue.markHabitDirty(habitId);
   }
 
   /// Sayaç + tüm günlük logları sıfırla (yeniden başla).
@@ -570,12 +604,14 @@ class HabitRepository {
     if (h == null) return;
     h.quitClockStartedAtIso = null;
     await h.save();
+    await HabitCloudSyncQueue.markHabitDirty(habitId);
     if (preserveHistory) return;
     final keys = _logsBox.keys
         .where((k) => k.toString().startsWith('${habitId}_'))
         .toList();
     for (final k in keys) {
       await _logsBox.delete(k);
+      await HabitCloudSyncQueue.markLogDeleted(k.toString());
     }
   }
 
@@ -649,10 +685,14 @@ class HabitRepository {
   }
 
   List<({HabitModel habit, int streak, bool completedToday})> getSummary() {
-    return getAll().map((h) => (
-          habit: h,
-          streak: getStreak(h.id),
-          completedToday: isCompletedToday(h.id),
-        )).toList();
+    return getAll()
+        .map(
+          (h) => (
+            habit: h,
+            streak: getStreak(h.id),
+            completedToday: isCompletedToday(h.id),
+          ),
+        )
+        .toList();
   }
 }

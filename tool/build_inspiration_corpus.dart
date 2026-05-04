@@ -157,11 +157,19 @@ void _validateHadithCorpus(List<Map<String, dynamic>> items) {
     'Güçlü kimse, öfke anında kendine hakim olandır.',
     'Sabır, ilk sarsıntı anında gösterilendir.',
     'Allah, yumuşak huylu ve güler yüzlü kimseyi sever.',
-    'Şüphesiz her zorlukla beraber bir kolaylık vardır.',
     'Sabır aydınlıktır, sadaka burhandır.',
     'Kalpler ancak Allah’ı anmakla huzur bulur.',
     'İman, sabır ve hoşgörüdür.',
     'Güzel söz sadakadır.',
+  ];
+  const expectedIds = <String>[
+    'h_1',
+    'h_2',
+    'h_3',
+    'h_5',
+    'h_6',
+    'h_7',
+    'h_8',
   ];
   if (items.length != expectedTexts.length) {
     throw StateError(
@@ -173,12 +181,16 @@ void _validateHadithCorpus(List<Map<String, dynamic>> items) {
     final id = m['id']?.toString();
     final kind = m['kind']?.toString();
     final tr = m['tr']?.toString();
-    final expectedId = 'h_${i + 1}';
+    final expectedId = expectedIds[i];
     if (id != expectedId) {
-      throw StateError('Hadith item at index $i must have id $expectedId; got $id.');
+      throw StateError(
+        'Hadith item at index $i must have id $expectedId; got $id.',
+      );
     }
     if (kind != 'hadith') {
-      throw StateError('Hadith item $expectedId must have kind=hadith; got $kind.');
+      throw StateError(
+        'Hadith item $expectedId must have kind=hadith; got $kind.',
+      );
     }
     if (tr != expectedTexts[i]) {
       throw StateError('Hadith item $expectedId text mismatch.');
@@ -188,7 +200,7 @@ void _validateHadithCorpus(List<Map<String, dynamic>> items) {
 
 void _validateVerseCorpus(List<Map<String, dynamic>> items) {
   final quranRef = RegExp(
-    r'^[A-Za-zÇĞİÖŞÜâîûçğıöşü\'`\- ]+\s+\d+$',
+    r"^[A-Za-zÇĞİÖŞÜâîûçğıöşü'`\- ]+\s+\d+$",
     caseSensitive: false,
   );
   for (final m in items) {

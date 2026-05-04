@@ -5,7 +5,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/providers/shared_preferences_provider.dart';
 import '../../data/models/kaza_tracking_state.dart';
 import '../../data/repositories/kaza_tracking_repository.dart';
+import '../../data/repositories/salat_log_repository.dart';
 import '../../data/services/kaza_calculator.dart';
+import '../../data/services/tracking_widget_service.dart';
+import '../shared/providers/habit_providers.dart';
 
 final kazaTrackingRepositoryProvider = Provider<KazaTrackingRepository>((ref) {
   return KazaTrackingRepository(ref.watch(sharedPreferencesProvider));
@@ -13,8 +16,8 @@ final kazaTrackingRepositoryProvider = Provider<KazaTrackingRepository>((ref) {
 
 final kazaTrackingProvider =
     NotifierProvider<KazaTrackingNotifier, KazaTrackingState>(
-  KazaTrackingNotifier.new,
-);
+      KazaTrackingNotifier.new,
+    );
 
 class KazaTrackingNotifier extends Notifier<KazaTrackingState> {
   @override
@@ -27,6 +30,11 @@ class KazaTrackingNotifier extends Notifier<KazaTrackingState> {
   Future<void> _persist(KazaTrackingState s) async {
     state = s;
     await _repo.save(s);
+    await TrackingWidgetService.refreshSelected(
+      prefs: ref.read(sharedPreferencesProvider),
+      habitRepo: ref.read(habitRepositoryProvider),
+      salatRepo: SalatLogRepository(),
+    );
   }
 
   /// Form alanları + dağıtılmış sayaçları tek yazımda kalıcıya alır (Hesapla).

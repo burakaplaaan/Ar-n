@@ -77,9 +77,7 @@ class _AdminDevTabState extends ConsumerState<AdminDevTab> {
       force: true,
     );
     if (!mounted) return;
-    messenger.showSnackBar(
-      SnackBar(content: Text(l10n.adminDevOffsetReset)),
-    );
+    messenger.showSnackBar(SnackBar(content: Text(l10n.adminDevOffsetReset)));
   }
 
   @override
@@ -89,12 +87,39 @@ class _AdminDevTabState extends ConsumerState<AdminDevTab> {
     final label = _offsetSlider == 0
         ? l10n.adminDevOffsetDisabled
         : _offsetSlider < 0
-            ? l10n.adminDevOffsetForwardMinutes((-_offsetSlider).round())
-            : l10n.adminDevOffsetBackwardMinutes(_offsetSlider.round());
+        ? l10n.adminDevOffsetForwardMinutes((-_offsetSlider).round())
+        : l10n.adminDevOffsetBackwardMinutes(_offsetSlider.round());
 
     return ListView(
       padding: EdgeInsets.fromLTRB(16, 16, 16, bottom + 8),
       children: [
+        Card(
+          color: const Color(0xFF0F2419),
+          child: Padding(
+            padding: const EdgeInsets.all(12),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Icon(
+                  Icons.admin_panel_settings_outlined,
+                  color: AppColors.accentNeonGreen.withValues(alpha: 0.9),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    'Bu sekme içerik yönetimi değil, teknik test alanıdır. Offset sadece bu cihazı etkiler; Crashlytics ve fatal crash butonları gerçek test sinyali üretir.',
+                    style: TextStyle(
+                      color: Colors.white.withValues(alpha: 0.72),
+                      fontSize: 12,
+                      height: 1.35,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        const SizedBox(height: 12),
         const _DiagnosticsCard(),
         const SizedBox(height: 20),
         Text(
@@ -167,14 +192,14 @@ class _AdminDevTabState extends ConsumerState<AdminDevTab> {
           onPressed: () async {
             final messenger = ScaffoldMessenger.of(context);
             final prefs = ref.read(sharedPreferencesProvider);
-            final err = await PrayerNotificationScheduler
-                .showImmediateTestPrayerNotification(prefs);
+            final err =
+                await PrayerNotificationScheduler.showImmediateTestPrayerNotification(
+                  prefs,
+                );
             if (!mounted) return;
             messenger.showSnackBar(
               SnackBar(
-                content: Text(
-                  err ?? l10n.adminDevPrayerNotificationSent,
-                ),
+                content: Text(err ?? l10n.adminDevPrayerNotificationSent),
               ),
             );
           },
@@ -188,16 +213,43 @@ class _AdminDevTabState extends ConsumerState<AdminDevTab> {
                 await AppLocalNotificationScheduler.showImmediateTestAppNotification();
             if (!mounted) return;
             messenger.showSnackBar(
-              SnackBar(
-                content: Text(
-                  err ?? l10n.adminDevAppNotificationSent,
-                ),
-              ),
+              SnackBar(content: Text(err ?? l10n.adminDevAppNotificationSent)),
             );
           },
           child: Text(l10n.adminDevAppNotificationNowAction),
         ),
         const SizedBox(height: 28),
+        Card(
+          color: Colors.redAccent.withValues(alpha: 0.08),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+            side: BorderSide(color: Colors.redAccent.withValues(alpha: 0.28)),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(12),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Icon(
+                  Icons.warning_amber_rounded,
+                  color: Colors.redAccent,
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    'Aşağıdaki Crashlytics işlemleri production gözlemleme araçlarına test verisi gönderir. Fatal crash uygulamayı bilerek kapatır.',
+                    style: TextStyle(
+                      color: Colors.white.withValues(alpha: 0.78),
+                      fontSize: 12,
+                      height: 1.35,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        const SizedBox(height: 12),
         Text(
           l10n.adminDevCrashlyticsTestTitle,
           style: TextStyle(
@@ -235,14 +287,14 @@ class _AdminDevTabState extends ConsumerState<AdminDevTab> {
               );
               if (!mounted) return;
               messenger.showSnackBar(
-                SnackBar(
-                  content: Text(l10n.adminDevCrashlyticsNonFatalSent),
-                ),
+                SnackBar(content: Text(l10n.adminDevCrashlyticsNonFatalSent)),
               );
             } catch (e) {
               if (!mounted) return;
               messenger.showSnackBar(
-                SnackBar(content: Text(l10n.adminErrorWithReason(e.toString()))),
+                SnackBar(
+                  content: Text(l10n.adminErrorWithReason(e.toString())),
+                ),
               );
             }
           },
@@ -260,9 +312,7 @@ class _AdminDevTabState extends ConsumerState<AdminDevTab> {
               barrierDismissible: false,
               builder: (ctx) => AlertDialog(
                 title: Text(l10n.adminDevCrashDialogTitle),
-                content: Text(
-                  l10n.adminDevCrashDialogBody,
-                ),
+                content: Text(l10n.adminDevCrashDialogBody),
                 actions: [
                   TextButton(
                     onPressed: () => Navigator.pop(ctx, false),
@@ -312,7 +362,8 @@ class _DiagnosticsCardState extends State<_DiagnosticsCard> {
   Future<void> _refresh() async {
     setState(() => _loading = true);
     try {
-      final list = await arinLocalNotificationsPlugin.pendingNotificationRequests();
+      final list = await arinLocalNotificationsPlugin
+          .pendingNotificationRequests();
       if (mounted) setState(() => _pending = list.length);
     } catch (_) {
       if (mounted) setState(() => _pending = -1);
@@ -390,7 +441,10 @@ class _DiagnosticsCardState extends State<_DiagnosticsCard> {
             label: l10n.adminDevPlatformLabel,
             value: _platform(l10n),
           ),
-          _DiagnosticRow(label: l10n.adminDevBuildLabel, value: _buildMode(l10n)),
+          _DiagnosticRow(
+            label: l10n.adminDevBuildLabel,
+            value: _buildMode(l10n),
+          ),
           _DiagnosticRow(
             label: l10n.adminDevUidLabel,
             value: uid == null ? '—' : '${uid.substring(0, 8)}…',
@@ -400,8 +454,8 @@ class _DiagnosticsCardState extends State<_DiagnosticsCard> {
             value: _pending == null
                 ? l10n.adminDevTapToRefresh
                 : _pending == -1
-                    ? l10n.adminDiagnosticsError
-                    : '$_pending',
+                ? l10n.adminDiagnosticsError
+                : '$_pending',
           ),
         ],
       ),

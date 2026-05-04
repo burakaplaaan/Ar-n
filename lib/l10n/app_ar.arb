@@ -23,6 +23,8 @@
   "settingsMenuAdminSubtitle": "مخازن الأقوال والاستكشاف",
   "settingsMenuContactTitle": "تواصل معنا",
   "settingsMenuContactSubtitle": "الدعم والملاحظات",
+  "settingsMenuSupportTitle": "ادعم Arin",
+  "settingsMenuSupportSubtitle": "حزم دعم لمرة واحدة",
   "settingsMenuComingSoon": "راسلنا عبر البريد",
   "settingsContactPageTitle": "تواصل معنا",
   "settingsContactSubtitle": "يمكنك إرسال الاقتراحات أو بلاغات الأعطال أو طلبات الدعم مباشرة عبر البريد الإلكتروني.",
@@ -244,6 +246,9 @@
   "reminderEnableNotificationsAction": "تفعيل الإشعارات",
   "reminderDurationsPerPrayerTitle": "المدد لكل صلاة",
   "reminderDurationsPerPrayerSubtitle": "اضغط السطر لاختيار التنبيه الأول والثاني بشكل منفصل.",
+  "reminderApplyDurationsAllButton": "تطبيق المدد المختارة على كل الصلوات",
+  "reminderAllPrayersDurationTarget": "كل الصلوات",
+  "reminderDurationsAppliedAllSuccess": "تم تطبيق المدد على كل الصلوات.",
   "reminderDualAlertTitle": "تنبيهان — {prayerTitle}",
   "@reminderDualAlertTitle": {
     "placeholders": {

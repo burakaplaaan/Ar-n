@@ -9,45 +9,48 @@ import '../../core/firebase/firebase_bootstrap.dart';
 import '../models/habit_log_model.dart';
 import '../models/habit_model.dart';
 import '../repositories/habit_repository.dart';
+import 'habit_cloud_sync_queue.dart';
 
 /// `users/{uid}/habits/{habitId}` ve `users/{uid}/habit_logs/{logKey}`
 abstract final class HabitCloudSyncService {
   static const _batchSize = 400;
   static const _prefsLastPushMs = 'arin_habit_cloud_last_push_ms';
-  static const _prefsDeletedHabitIds = 'arin_habit_cloud_deleted_habit_ids';
+  static const _prefsDeletedHabitIds = HabitCloudSyncQueue.deletedHabitIdsKey;
+  static const _prefsLastForcePushMs = 'arin_habit_cloud_last_force_push_ms';
   static const _throttle = Duration(hours: 2);
+  static const _forceCooldown = Duration(minutes: 3);
 
   static Map<String, dynamic> _habitMap(HabitModel h) => {
-        'id': h.id,
-        'title': h.title,
-        'type': h.type.name,
-        'emoji': h.emoji,
-        'createdAt': h.createdAt,
-        'isArchived': h.isArchived,
-        'templateId': h.templateId,
-        'startedAtIso': h.startedAtIso,
-        'commitmentText': h.commitmentText,
-        'quitSubtype': h.quitSubtype,
-        'quitMethod': h.quitMethod,
-        'onboardingCompleted': h.onboardingCompleted,
-        'quitClockStartedAtIso': h.quitClockStartedAtIso,
-        'note': h.note,
-        'customTarget': h.customTarget,
-        'customUnit': h.customUnit,
-        'customTrackingKind': h.customTrackingKind,
-        'customFlexible': h.customFlexible,
-        'customMinTarget': h.customMinTarget,
-        'customRepeatCycle': h.customRepeatCycle,
-        'syncedAt': FieldValue.serverTimestamp(),
-      };
+    'id': h.id,
+    'title': h.title,
+    'type': h.type.name,
+    'emoji': h.emoji,
+    'createdAt': h.createdAt,
+    'isArchived': h.isArchived,
+    'templateId': h.templateId,
+    'startedAtIso': h.startedAtIso,
+    'commitmentText': h.commitmentText,
+    'quitSubtype': h.quitSubtype,
+    'quitMethod': h.quitMethod,
+    'onboardingCompleted': h.onboardingCompleted,
+    'quitClockStartedAtIso': h.quitClockStartedAtIso,
+    'note': h.note,
+    'customTarget': h.customTarget,
+    'customUnit': h.customUnit,
+    'customTrackingKind': h.customTrackingKind,
+    'customFlexible': h.customFlexible,
+    'customMinTarget': h.customMinTarget,
+    'customRepeatCycle': h.customRepeatCycle,
+    'syncedAt': FieldValue.serverTimestamp(),
+  };
 
   static Map<String, dynamic> _logMap(HabitLogModel l) => {
-        'habitId': l.habitId,
-        'date': l.date,
-        'isCompleted': l.isCompleted,
-        'progressValue': l.progressValue,
-        'syncedAt': FieldValue.serverTimestamp(),
-      };
+    'habitId': l.habitId,
+    'date': l.date,
+    'isCompleted': l.isCompleted,
+    'progressValue': l.progressValue,
+    'syncedAt': FieldValue.serverTimestamp(),
+  };
 
   static Future<void> _deleteHabitLogsFromCloud({
     required FirebaseFirestore fs,
@@ -55,7 +58,9 @@ abstract final class HabitCloudSyncService {
     required String habitId,
   }) async {
     final base = fs.collection('users').doc(uid);
-    final q = base.collection('habit_logs').where('habitId', isEqualTo: habitId);
+    final q = base
+        .collection('habit_logs')
+        .where('habitId', isEqualTo: habitId);
     while (true) {
       final snap = await q.limit(_batchSize).get();
       if (snap.docs.isEmpty) break;
@@ -126,8 +131,9 @@ abstract final class HabitCloudSyncService {
     String documentId,
   ) {
     final idField = (raw['id'] as String?)?.trim();
-    final resolvedId =
-        (idField != null && idField.isNotEmpty) ? idField : documentId;
+    final resolvedId = (idField != null && idField.isNotEmpty)
+        ? idField
+        : documentId;
     if (resolvedId.isEmpty) return null;
 
     final typeStr = raw['type'] as String? ?? 'good';
@@ -135,8 +141,8 @@ abstract final class HabitCloudSyncService {
 
     final title = raw['title'] as String? ?? 'Alışkanlık';
     final emoji = raw['emoji'] as String? ?? '✨';
-    final createdAt = raw['createdAt'] as String? ??
-        DateTime.now().toIso8601String();
+    final createdAt =
+        raw['createdAt'] as String? ?? DateTime.now().toIso8601String();
     final startedAtIso = raw['startedAtIso'] as String? ?? createdAt;
     final isArchived = raw['isArchived'] as bool? ?? false;
     final templateId = raw['templateId'] as String? ?? '';
@@ -148,7 +154,8 @@ abstract final class HabitCloudSyncService {
     final note = raw['note'] as String? ?? '';
     final customTarget = (raw['customTarget'] as num?)?.toInt() ?? 1;
     final customUnit = raw['customUnit'] as String? ?? 'kez';
-    final customTrackingKind = (raw['customTrackingKind'] as num?)?.toInt() ?? 0;
+    final customTrackingKind =
+        (raw['customTrackingKind'] as num?)?.toInt() ?? 0;
     final customFlexible = raw['customFlexible'] as bool? ?? false;
     final customMinTarget = (raw['customMinTarget'] as num?)?.toInt() ?? 0;
     final customRepeatCycle = (raw['customRepeatCycle'] as num?)?.toInt() ?? 0;
@@ -193,17 +200,26 @@ abstract final class HabitCloudSyncService {
 
   /// Firestore `users/{uid}/habits` + `habit_logs` → Hive. Namaz vakit tikleri dahil değil.
   /// Yerelde aynı id varsa bulut sürümüyle üzerine yazılır.
-  static Future<void> pullToLocal({
+  static Future<bool> pullToLocal({
     required String uid,
     required HabitRepository repo,
     SharedPreferences? prefs,
   }) async {
-    if (!isFirebaseReady || uid.isEmpty) return;
+    if (!isFirebaseReady || uid.isEmpty) return false;
 
     try {
       final fs = FirebaseFirestore.instance;
       final base = fs.collection('users').doc(uid);
       final deletedHabitIds = await _readDeletedHabitIds(prefs);
+      final dirtyHabitIds = prefs == null
+          ? <String>{}
+          : HabitCloudSyncQueue.readDirtyHabitIds(prefs);
+      final dirtyLogKeys = prefs == null
+          ? <String>{}
+          : HabitCloudSyncQueue.readDirtyLogKeys(prefs);
+      final deletedLogKeys = prefs == null
+          ? <String>{}
+          : HabitCloudSyncQueue.readDeletedLogKeys(prefs);
 
       final habitsSnap = await base.collection('habits').get();
       final cloudHabitIds = <String>{};
@@ -215,7 +231,11 @@ abstract final class HabitCloudSyncService {
         if (deletedHabitIds.contains(h.id)) {
           continue;
         }
-        await repo.save(h);
+        if (dirtyHabitIds.contains(h.id)) {
+          cloudHabitIds.add(h.id);
+          continue;
+        }
+        await repo.saveFromCloud(h);
         cloudHabitIds.add(h.id);
       }
 
@@ -228,8 +248,12 @@ abstract final class HabitCloudSyncService {
         final data = doc.data();
         final log = _logFromFirestore(data);
         if (log == null) continue;
+        final logKey = log.logKey;
         if (deletedHabitIds.contains(log.habitId)) continue;
-        await repo.upsertLog(log);
+        if (deletedLogKeys.contains(logKey) || dirtyLogKeys.contains(logKey)) {
+          continue;
+        }
+        await repo.upsertLogFromCloud(log);
       }
 
       if (cloudHabitIds.isNotEmpty) {
@@ -237,11 +261,7 @@ abstract final class HabitCloudSyncService {
       }
 
       for (final deletedId in deletedHabitIds) {
-        await deleteHabitCloudData(
-          uid: uid,
-          habitId: deletedId,
-          prefs: prefs,
-        );
+        await deleteHabitCloudData(uid: uid, habitId: deletedId, prefs: prefs);
       }
 
       if (habitsSnap.docs.isNotEmpty || logsSnap.docs.isNotEmpty) {
@@ -250,30 +270,79 @@ abstract final class HabitCloudSyncService {
           '(${habitsSnap.docs.length} alışkanlık, ${logsSnap.docs.length} log)',
         );
       }
+      return true;
     } catch (e, st) {
       debugPrint('HabitCloudSyncService pull: $e\n$st');
+      return false;
     }
   }
 
   /// Misafir veya Firebase yoksa no-op.
-  /// [force]: ayarlardan giriş sonrası; throttle'ı atlar.
+  /// [force]: manuel senkron isteği; kısa cooldown dışında full push yapar.
   static Future<void> pushFromLocal({
     required String uid,
     required HabitRepository repo,
     SharedPreferences? prefs,
     bool force = false,
+    bool bypassForceCooldown = false,
   }) async {
     if (!isFirebaseReady || uid.isEmpty) return;
 
-    if (!force && prefs != null) {
-      final last = prefs.getInt(_prefsLastPushMs) ?? 0;
-      final now = DateTime.now().millisecondsSinceEpoch;
-      if (now - last < _throttle.inMilliseconds) {
-        debugPrint('HabitCloudSyncService: throttle (2 saat) atlandı');
+    final resolvedPrefs = await _resolvePrefs(prefs);
+    final nowMs = DateTime.now().millisecondsSinceEpoch;
+
+    if (force && !bypassForceCooldown) {
+      final lastForce = resolvedPrefs.getInt(_prefsLastForcePushMs) ?? 0;
+      if (nowMs - lastForce < _forceCooldown.inMilliseconds) {
+        debugPrint('HabitCloudSyncService: force cooldown (3 dk) atlandı');
         return;
       }
     }
 
+    final dirtyHabitIds = HabitCloudSyncQueue.readDirtyHabitIds(resolvedPrefs);
+    final dirtyLogKeys = HabitCloudSyncQueue.readDirtyLogKeys(resolvedPrefs);
+    final deletedLogKeys = HabitCloudSyncQueue.readDeletedLogKeys(
+      resolvedPrefs,
+    );
+    final deletedHabitIds = await _readDeletedHabitIds(resolvedPrefs);
+    final hasQueuedDeltas =
+        dirtyHabitIds.isNotEmpty ||
+        dirtyLogKeys.isNotEmpty ||
+        deletedLogKeys.isNotEmpty ||
+        deletedHabitIds.isNotEmpty;
+    final hasCompletedPush = resolvedPrefs.getInt(_prefsLastPushMs) != null;
+    final shouldFullPush = force || !hasCompletedPush;
+
+    if (!shouldFullPush && !hasQueuedDeltas) {
+      final last = resolvedPrefs.getInt(_prefsLastPushMs) ?? 0;
+      if (nowMs - last < _throttle.inMilliseconds) {
+        debugPrint('HabitCloudSyncService: temiz kuyruk, throttle atlandı');
+        return;
+      }
+      debugPrint('HabitCloudSyncService: temiz kuyruk, push gerekmedi');
+      await resolvedPrefs.setInt(_prefsLastPushMs, nowMs);
+      return;
+    }
+
+    if (shouldFullPush) {
+      await _pushFullFromLocal(
+        uid: uid,
+        repo: repo,
+        prefs: resolvedPrefs,
+        markForce: force,
+      );
+      return;
+    }
+
+    await _pushQueuedDeltas(uid: uid, repo: repo, prefs: resolvedPrefs);
+  }
+
+  static Future<void> _pushFullFromLocal({
+    required String uid,
+    required HabitRepository repo,
+    required SharedPreferences prefs,
+    required bool markForce,
+  }) async {
     final fs = FirebaseFirestore.instance;
     final habits = repo.getAllIncludingArchived();
 
@@ -291,14 +360,17 @@ abstract final class HabitCloudSyncService {
     try {
       final deletedHabitIds = await _readDeletedHabitIds(prefs);
       for (final deletedId in deletedHabitIds) {
-        await deleteHabitCloudData(
-          uid: uid,
-          habitId: deletedId,
-          prefs: prefs,
-        );
+        await deleteHabitCloudData(uid: uid, habitId: deletedId, prefs: prefs);
       }
 
       final base = fs.collection('users').doc(uid);
+      final deletedLogKeys = HabitCloudSyncQueue.readDeletedLogKeys(prefs);
+      for (final key in deletedLogKeys) {
+        batch.delete(base.collection('habit_logs').doc(key));
+        n++;
+        await commitIfNeeded();
+      }
+
       final localHabitIds = habits.map((h) => h.id).toSet();
       final cloudHabitsSnap = await base.collection('habits').get();
       for (final doc in cloudHabitsSnap.docs) {
@@ -310,7 +382,7 @@ abstract final class HabitCloudSyncService {
       }
 
       for (final h in habits) {
-        final ref = fs.collection('users').doc(uid).collection('habits').doc(h.id);
+        final ref = base.collection('habits').doc(h.id);
         batch.set(ref, _habitMap(h), SetOptions(merge: true));
         n++;
         await commitIfNeeded();
@@ -318,11 +390,7 @@ abstract final class HabitCloudSyncService {
 
       for (final h in habits) {
         for (final log in repo.getLogs(h.id)) {
-          final ref = fs
-              .collection('users')
-              .doc(uid)
-              .collection('habit_logs')
-              .doc(log.logKey);
+          final ref = base.collection('habit_logs').doc(log.logKey);
           batch.set(ref, _logMap(log), SetOptions(merge: true));
           n++;
           await commitIfNeeded();
@@ -331,25 +399,108 @@ abstract final class HabitCloudSyncService {
 
       await commitIfNeeded(force: true);
 
-      await fs.collection('users').doc(uid).set(
-        {
+      await base.set({
+        'habitsMeta': {
+          'lastPushAt': FieldValue.serverTimestamp(),
+          'habitCount': habits.length,
+        },
+      }, SetOptions(merge: true));
+
+      debugPrint('HabitCloudSyncService: full push tamam uid=$uid');
+      final nowMs = DateTime.now().millisecondsSinceEpoch;
+      await prefs.setInt(_prefsLastPushMs, nowMs);
+      if (markForce) {
+        await prefs.setInt(_prefsLastForcePushMs, nowMs);
+      }
+      await HabitCloudSyncQueue.forgetAllHabitDeltas(prefs);
+    } catch (e, st) {
+      debugPrint('HabitCloudSyncService full: $e\n$st');
+    }
+  }
+
+  static Future<void> _pushQueuedDeltas({
+    required String uid,
+    required HabitRepository repo,
+    required SharedPreferences prefs,
+  }) async {
+    final fs = FirebaseFirestore.instance;
+    final base = fs.collection('users').doc(uid);
+    final dirtyHabitIds = HabitCloudSyncQueue.readDirtyHabitIds(prefs);
+    final dirtyLogKeys = HabitCloudSyncQueue.readDirtyLogKeys(prefs);
+    final deletedLogKeys = HabitCloudSyncQueue.readDeletedLogKeys(prefs);
+
+    var batch = fs.batch();
+    var n = 0;
+
+    Future<void> commitIfNeeded({bool force = false}) async {
+      if (n >= _batchSize || (force && n > 0)) {
+        await batch.commit();
+        batch = fs.batch();
+        n = 0;
+      }
+    }
+
+    try {
+      final deletedHabitIds = await _readDeletedHabitIds(prefs);
+      for (final deletedId in deletedHabitIds) {
+        await deleteHabitCloudData(uid: uid, habitId: deletedId, prefs: prefs);
+      }
+
+      for (final id in dirtyHabitIds) {
+        final habit = repo.getById(id);
+        if (habit == null) continue;
+        batch.set(
+          base.collection('habits').doc(id),
+          _habitMap(habit),
+          SetOptions(merge: true),
+        );
+        n++;
+        await commitIfNeeded();
+      }
+
+      for (final key in deletedLogKeys) {
+        batch.delete(base.collection('habit_logs').doc(key));
+        n++;
+        await commitIfNeeded();
+      }
+
+      for (final key in dirtyLogKeys) {
+        final log = repo.logByKey(key);
+        final ref = base.collection('habit_logs').doc(key);
+        if (log == null) {
+          batch.delete(ref);
+        } else {
+          batch.set(ref, _logMap(log), SetOptions(merge: true));
+        }
+        n++;
+        await commitIfNeeded();
+      }
+
+      if (n > 0) {
+        batch.set(base, {
           'habitsMeta': {
             'lastPushAt': FieldValue.serverTimestamp(),
-            'habitCount': habits.length,
+            'habitCount': repo.getAllIncludingArchived().length,
           },
-        },
-        SetOptions(merge: true),
-      );
-
-      debugPrint('HabitCloudSyncService: push tamam uid=$uid');
-      if (prefs != null) {
-        await prefs.setInt(
-          _prefsLastPushMs,
-          DateTime.now().millisecondsSinceEpoch,
-        );
+        }, SetOptions(merge: true));
+        n++;
       }
+      await commitIfNeeded(force: true);
+
+      await HabitCloudSyncQueue.forgetDirtyHabitIds(prefs, dirtyHabitIds);
+      await HabitCloudSyncQueue.forgetDirtyLogKeys(prefs, dirtyLogKeys);
+      await HabitCloudSyncQueue.forgetDeletedLogKeys(prefs, deletedLogKeys);
+      await prefs.setInt(
+        _prefsLastPushMs,
+        DateTime.now().millisecondsSinceEpoch,
+      );
+      debugPrint(
+        'HabitCloudSyncService: delta push tamam '
+        'h=${dirtyHabitIds.length}, l=${dirtyLogKeys.length}, '
+        'dl=${deletedLogKeys.length}',
+      );
     } catch (e, st) {
-      debugPrint('HabitCloudSyncService: $e\n$st');
+      debugPrint('HabitCloudSyncService delta: $e\n$st');
     }
   }
 
@@ -384,6 +535,8 @@ abstract final class HabitCloudSyncService {
 
     await deleteCollection(userRef.collection('habits'));
     await deleteCollection(userRef.collection('habit_logs'));
+    await userRef.collection('zikir_matik').doc('state').delete();
+    await userRef.collection('user_backup').doc('state').delete();
     await userRef.delete();
   }
 
@@ -395,7 +548,11 @@ abstract final class HabitCloudSyncService {
   }) async {
     if (!isFirebaseReady || uid.isEmpty || habitId.isEmpty) return false;
     final fs = FirebaseFirestore.instance;
-    final habitRef = fs.collection('users').doc(uid).collection('habits').doc(habitId);
+    final habitRef = fs
+        .collection('users')
+        .doc(uid)
+        .collection('habits')
+        .doc(habitId);
     try {
       await _deleteHabitLogsFromCloud(fs: fs, uid: uid, habitId: habitId);
       await habitRef.delete();

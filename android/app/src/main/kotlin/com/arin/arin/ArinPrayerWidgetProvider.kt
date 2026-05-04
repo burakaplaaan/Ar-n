@@ -45,6 +45,7 @@ class ArinPrayerWidgetProvider : HomeWidgetProvider() {
         appWidgetIds: IntArray,
         widgetData: SharedPreferences,
     ) {
+        val locked = isWidgetLocked(widgetData, "prayer")
         val scheduled = readScheduledPrayer(widgetData, System.currentTimeMillis())
         val loc = widgetData.getString(KEY_LOCATION, null)?.trim().orEmpty()
         val localeCode = widgetData.getString(KEY_LOCALE, null)?.trim()?.lowercase().orEmpty()
@@ -85,6 +86,7 @@ class ArinPrayerWidgetProvider : HomeWidgetProvider() {
 
         val openApp = Intent(context, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+            putExtra(MainActivity.EXTRA_WIDGET_KIND, "prayer")
         }
         val piFlags =
             PendingIntent.FLAG_UPDATE_CURRENT or
@@ -97,6 +99,14 @@ class ArinPrayerWidgetProvider : HomeWidgetProvider() {
 
         for (widgetId in appWidgetIds) {
             val views = RemoteViews(context.packageName, R.layout.arin_prayer_widget)
+            if (locked) {
+                views.setTextViewText(R.id.widget_prayer_next_name, "🔒 Widget kilitli")
+                views.setTextViewText(R.id.widget_prayer_countdown, "Açmak için dokun")
+                views.setTextViewText(R.id.widget_prayer_location, "Premium veya reklam")
+                views.setOnClickPendingIntent(R.id.widget_prayer_root, contentPi)
+                appWidgetManager.updateAppWidget(widgetId, views)
+                continue
+            }
             val safeNextName = if (scheduleExpired) {
                 "Güncelle"
             } else if (forceTurkish) {
@@ -123,12 +133,27 @@ class ArinPrayerWidgetProvider : HomeWidgetProvider() {
             appWidgetManager.updateAppWidget(widgetId, views)
         }
 
+        val gateRefresh = gateRefreshMs(widgetData, "prayer")
         if (canUseChronometer) {
             cancelTickAlarm(context)
-            scheduleDeadlineRefresh(context, epochMs!!, alarmManager)
+            val prayerRefresh = epochMs!! + 1_000L
+            scheduleDeadlineRefresh(
+                context,
+                listOfNotNull(prayerRefresh, gateRefresh).minOrNull() ?: prayerRefresh,
+                alarmManager,
+                alreadyOffset = true,
+            )
         } else if (epochMs != null && epochMs > System.currentTimeMillis()) {
             cancelDeadlineRefresh(context)
-            scheduleTicks(context)
+            if (gateRefresh != null && gateRefresh < System.currentTimeMillis() + TICK_INTERVAL_MS) {
+                cancelTickAlarm(context)
+                scheduleDeadlineRefresh(context, gateRefresh, alarmManager, alreadyOffset = true)
+            } else {
+                scheduleTicks(context)
+            }
+        } else if (gateRefresh != null) {
+            cancelTickAlarm(context)
+            scheduleDeadlineRefresh(context, gateRefresh, alarmManager, alreadyOffset = true)
         } else {
             cancelDeadlineRefresh(context)
             cancelTickAlarm(context)
@@ -206,10 +231,16 @@ class ArinPrayerWidgetProvider : HomeWidgetProvider() {
         (context.getSystemService(Context.ALARM_SERVICE) as AlarmManager).cancel(pi)
     }
 
-    private fun scheduleDeadlineRefresh(context: Context, epochMs: Long, am: AlarmManager) {
+    private fun scheduleDeadlineRefresh(
+        context: Context,
+        epochMs: Long,
+        am: AlarmManager,
+        alreadyOffset: Boolean = false,
+    ) {
         cancelDeadlineRefresh(context)
         val now = System.currentTimeMillis()
-        val triggerAt = (epochMs + 1_000L).coerceAtLeast(now + 200L)
+        val triggerAt = (if (alreadyOffset) epochMs else epochMs + 1_000L)
+            .coerceAtLeast(now + 200L)
         val intent = Intent(context, ArinPrayerWidgetProvider::class.java).apply {
             action = ACTION_DEADLINE_REFRESH
         }
@@ -282,6 +313,29 @@ class ArinPrayerWidgetProvider : HomeWidgetProvider() {
         val noMinus = if (t.startsWith("-")) t.removePrefix("-") else t
         val hms = Regex("""^\d+:\d{2}:\d{2}$""")
         return if (hms.matches(noMinus)) noMinus else "0:00:00"
+    }
+
+    private fun isWidgetLocked(widgetData: SharedPreferences, kind: String): Boolean {
+        if (widgetData.getString(KEY_GATE_PREMIUM, null) == "1") return false
+        if (widgetData.getString(KEY_GATE_LOCKED, null) == "1") return true
+        val now = System.currentTimeMillis()
+        val trialUntil = widgetData.getString("arin_widget_gate_${kind}_trial_until_ms", null)
+            ?.toLongOrNull() ?: 0L
+        val unlockUntil = widgetData.getString("arin_widget_gate_${kind}_unlock_until_ms", null)
+            ?.toLongOrNull() ?: 0L
+        if (trialUntil <= 0L) return false
+        return now >= trialUntil && now >= unlockUntil
+    }
+
+    private fun gateRefreshMs(widgetData: SharedPreferences, kind: String): Long? {
+        if (widgetData.getString(KEY_GATE_PREMIUM, null) == "1") return null
+        val now = System.currentTimeMillis()
+        return listOf(
+            widgetData.getString("arin_widget_gate_${kind}_trial_until_ms", null)
+                ?.toLongOrNull() ?: 0L,
+            widgetData.getString("arin_widget_gate_${kind}_unlock_until_ms", null)
+                ?.toLongOrNull() ?: 0L,
+        ).filter { it > now }.minOrNull()?.plus(1_000L)
     }
 
     private fun readScheduledPrayer(
@@ -357,6 +411,8 @@ class ArinPrayerWidgetProvider : HomeWidgetProvider() {
         private const val KEY_NEXT_EPOCH = "arin_prayer_next_epoch_ms"
         private const val KEY_PRAYER_SCHEDULE = "arin_prayer_schedule_json"
         private const val KEY_LOCALE = "arin_widget_locale"
+        private const val KEY_GATE_LOCKED = "arin_widget_gate_prayer_locked"
+        private const val KEY_GATE_PREMIUM = "arin_widget_gate_premium"
 
         private const val ACTION_TICK = "com.arin.arin.action.PRAYER_WIDGET_TICK"
         private const val ACTION_DEADLINE_REFRESH =
@@ -396,6 +452,8 @@ class ArinWidgetRestoreReceiver : BroadcastReceiver() {
             val appContext = context.applicationContext
             ArinPrayerWidgetProvider.requestUpdate(appContext)
             ArinQuoteWidgetProvider.requestUpdate(appContext)
+            ArinComboWidgetProvider.requestUpdate(appContext)
+            ArinTrackingWidgetProvider.requestUpdate(appContext)
         }
     }
 }

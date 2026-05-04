@@ -36,6 +36,7 @@ import '../../presentation/settings/about_arin_page.dart';
 import '../../presentation/settings/contact_support_page.dart';
 import '../../presentation/settings/privacy_policy_page.dart';
 import '../../presentation/settings/support_arin_page.dart';
+import '../../presentation/settings/widget_center_page.dart';
 import '../../presentation/settings/notifications_settings_page.dart';
 import '../../presentation/settings/prayer_notifications_detail_page.dart';
 import '../../presentation/inspire/saved_inspiration_page.dart';
@@ -105,6 +106,9 @@ abstract final class AppRoutes {
 
   /// Ayarlar → Hakkında.
   static const String settingsAbout = '/settings/about';
+
+  /// Ayarlar → Widget Merkezi.
+  static const String settingsWidgets = '/settings/widgets';
 
   /// Ayarlar → Gizlilik politikası.
   static const String settingsPrivacyPolicy = '/settings/privacy';
@@ -430,6 +434,33 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                           child: SlideTransition(
                             position: Tween<Offset>(
                               begin: const Offset(0, 0.035),
+                              end: Offset.zero,
+                            ).animate(curved),
+                            child: child,
+                          ),
+                        );
+                      },
+                ),
+              ),
+              GoRoute(
+                path: 'widgets',
+                pageBuilder: (context, state) => CustomTransitionPage<void>(
+                  key: state.pageKey,
+                  child: const WidgetCenterPage(),
+                  transitionDuration: const Duration(milliseconds: 320),
+                  reverseTransitionDuration: const Duration(milliseconds: 260),
+                  transitionsBuilder:
+                      (context, animation, secondaryAnimation, child) {
+                        final curved = CurvedAnimation(
+                          parent: animation,
+                          curve: Curves.easeOutCubic,
+                          reverseCurve: Curves.easeInCubic,
+                        );
+                        return FadeTransition(
+                          opacity: curved,
+                          child: SlideTransition(
+                            position: Tween<Offset>(
+                              begin: const Offset(0, 0.03),
                               end: Offset.zero,
                             ).animate(curved),
                             child: child,

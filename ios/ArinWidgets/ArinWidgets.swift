@@ -1,5 +1,5 @@
 //
-//  ARIN — iki widget (söz + namaz). Veri: App Group UserDefaults (home_widget / Flutter).
+//  ARIN — söz, namaz ve karma widget. Veri: App Group UserDefaults (home_widget / Flutter).
 //  Kilit ekranı: accessoryRectangular — iOS önizlemesine yakın kompakt düzen.
 //
 
@@ -114,6 +114,30 @@ private func decodeWidgetJson<T: Decodable>(_ key: String, as type: T.Type) -> T
   return try? JSONDecoder().decode(T.self, from: data)
 }
 
+private func widgetLocked(_ kind: String) -> Bool {
+  let u = suite()
+  if u?.string(forKey: "arin_widget_gate_premium") == "1" { return false }
+  if u?.string(forKey: "arin_widget_gate_\(kind)_locked") == "1" { return true }
+  let trialUntilMs = Double(u?.string(forKey: "arin_widget_gate_\(kind)_trial_until_ms") ?? "") ?? 0
+  let unlockUntilMs = Double(u?.string(forKey: "arin_widget_gate_\(kind)_unlock_until_ms") ?? "") ?? 0
+  if trialUntilMs <= 0 { return false }
+  let nowMs = Date().timeIntervalSince1970 * 1000.0
+  return nowMs >= trialUntilMs && nowMs >= unlockUntilMs
+}
+
+private func widgetGateRefreshDate(_ kind: String) -> Date? {
+  let u = suite()
+  if u?.string(forKey: "arin_widget_gate_premium") == "1" { return nil }
+  let nowMs = Date().timeIntervalSince1970 * 1000.0
+  let raw = [
+    Double(u?.string(forKey: "arin_widget_gate_\(kind)_trial_until_ms") ?? "") ?? 0,
+    Double(u?.string(forKey: "arin_widget_gate_\(kind)_unlock_until_ms") ?? "") ?? 0
+  ]
+  let next = raw.filter { $0 > nowMs }.min()
+  guard let next else { return nil }
+  return Date(timeIntervalSince1970: next / 1000.0).addingTimeInterval(1)
+}
+
 // MARK: - Shared chrome
 
 private extension View {
@@ -145,16 +169,40 @@ struct QuoteProvider: TimelineProvider {
   }
 
   func getTimeline(in context: Context, completion: @escaping (Timeline<QuoteEntry>) -> Void) {
+    if widgetLocked("quote") {
+      let next = widgetGateRefreshDate("quote") ?? Date().addingTimeInterval(3600)
+      completion(
+        Timeline(
+          entries: [
+            QuoteEntry(
+              date: Date(),
+              text: "Açmak için dokun",
+              source: "🔒 Widget kilitli"
+            )
+          ],
+          policy: .after(next)
+        )
+      )
+      return
+    }
     if let timeline = loadScheduledTimeline() {
       completion(timeline)
       return
     }
     let e = loadEntry()
-    let next = Calendar.current.date(byAdding: .hour, value: 6, to: Date()) ?? Date().addingTimeInterval(21_600)
+    let contentNext = Calendar.current.date(byAdding: .hour, value: 6, to: Date()) ?? Date().addingTimeInterval(21_600)
+    let next = [contentNext, widgetGateRefreshDate("quote")].compactMap { $0 }.min() ?? contentNext
     completion(Timeline(entries: [e], policy: .after(next)))
   }
 
   private func loadEntry() -> QuoteEntry {
+    if widgetLocked("quote") {
+      return QuoteEntry(
+        date: Date(),
+        text: "Açmak için dokun",
+        source: "🔒 Widget kilitli"
+      )
+    }
     let u = suite()
     let rawText = u?.string(forKey: "arin_quote_text")?
       .trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
@@ -196,7 +244,14 @@ struct QuoteProvider: TimelineProvider {
         source: current.source.trimmingCharacters(in: .whitespacesAndNewlines)
       )
     ]
-    let emittedFuture = Array(future.prefix(kQuoteTimelineFutureLimit))
+    let gateDate = widgetGateRefreshDate("quote")
+    let gatedFuture: [QuoteScheduleItem]
+    if let gateDate = gateDate {
+      gatedFuture = future.filter { $0.date < gateDate }
+    } else {
+      gatedFuture = future
+    }
+    let emittedFuture = Array(gatedFuture.prefix(kQuoteTimelineFutureLimit))
     entries.append(
       contentsOf: emittedFuture.map {
         QuoteEntry(
@@ -206,7 +261,8 @@ struct QuoteProvider: TimelineProvider {
         )
       }
     )
-    let refresh = emittedFuture.last?.date.addingTimeInterval(1_800) ?? now.addingTimeInterval(21_600)
+    let contentRefresh = emittedFuture.last?.date.addingTimeInterval(1_800) ?? now.addingTimeInterval(21_600)
+    let refresh = [contentRefresh, gateDate].compactMap { $0 }.min() ?? contentRefresh
     return Timeline(entries: entries, policy: .after(refresh))
   }
 }
@@ -334,6 +390,7 @@ struct ArinQuoteWidget: Widget {
     StaticConfiguration(kind: kind, provider: QuoteProvider()) { entry in
       QuoteWidgetView(entry: entry)
         .arinTransparentWidgetSurface()
+        .widgetURL(URL(string: "arin://widget/quote"))
     }
     .configurationDisplayName(localizedWidgetText(tr: "ARIN — Söz"))
     .description(localizedWidgetText(tr: "Günlük söz ve kaynak."))
@@ -367,17 +424,45 @@ struct PrayerProvider: TimelineProvider {
   }
 
   func getTimeline(in context: Context, completion: @escaping (Timeline<PrayerEntry>) -> Void) {
+    if widgetLocked("prayer") {
+      let next = widgetGateRefreshDate("prayer") ?? Date().addingTimeInterval(3600)
+      completion(
+        Timeline(
+          entries: [
+            PrayerEntry(
+              date: Date(),
+              location: "Premium veya reklam",
+              nextName: "🔒 Widget kilitli",
+              countdown: "Açmak için dokun",
+              nextDate: nil
+            )
+          ],
+          policy: .after(next)
+        )
+      )
+      return
+    }
     if let timeline = loadScheduledTimeline() {
       completion(timeline)
       return
     }
     let e = loadEntry()
     // iOS WidgetKit'te saniyelik zorlamadan kaçın: pil-dostu, dakikalık tazeleme.
-    let nextFire = Date().addingTimeInterval(60)
+    let contentNext = Date().addingTimeInterval(60)
+    let nextFire = [contentNext, widgetGateRefreshDate("prayer")].compactMap { $0 }.min() ?? contentNext
     completion(Timeline(entries: [e], policy: .after(nextFire)))
   }
 
   private func loadEntry() -> PrayerEntry {
+    if widgetLocked("prayer") {
+      return PrayerEntry(
+        date: Date(),
+        location: "Premium veya reklam",
+        nextName: "🔒 Widget kilitli",
+        countdown: "Açmak için dokun",
+        nextDate: nil
+      )
+    }
     let u = suite()
     let forceTurkish = !storedWidgetLocaleCode().hasPrefix("tr")
     let rawNextName = u?.string(forKey: "arin_prayer_next_name") ?? ""
@@ -433,13 +518,20 @@ struct PrayerProvider: TimelineProvider {
         countdown: localizedWidgetText(tr: "Uygulamayı aç"),
         nextDate: nil
       )
-      return Timeline(entries: [stale], policy: .after(now.addingTimeInterval(21_600)))
+      let contentRefresh = now.addingTimeInterval(21_600)
+      let refresh = [contentRefresh, widgetGateRefreshDate("prayer")].compactMap { $0 }.min() ?? contentRefresh
+      return Timeline(entries: [stale], policy: .after(refresh))
     }
 
     var entries = [entry(at: now, next: sorted[firstNextIndex])]
+    let gateDate = widgetGateRefreshDate("prayer")
     if firstNextIndex + 1 < sorted.count {
       let endExclusive = min(sorted.count, firstNextIndex + 1 + kPrayerTimelineFutureLimit)
       for index in (firstNextIndex + 1)..<endExclusive {
+        if let gateDate = gateDate,
+           sorted[index - 1].date.addingTimeInterval(1) >= gateDate {
+          break
+        }
         entries.append(
           entry(
             at: sorted[index - 1].date.addingTimeInterval(1),
@@ -448,7 +540,8 @@ struct PrayerProvider: TimelineProvider {
         )
       }
     }
-    let refresh = entries.last?.date.addingTimeInterval(3600) ?? now.addingTimeInterval(3600)
+    let contentRefresh = entries.last?.date.addingTimeInterval(3600) ?? now.addingTimeInterval(3600)
+    let refresh = [contentRefresh, gateDate].compactMap { $0 }.min() ?? contentRefresh
     return Timeline(entries: entries, policy: .after(refresh))
   }
 
@@ -581,9 +674,516 @@ struct ArinPrayerWidget: Widget {
     StaticConfiguration(kind: kind, provider: PrayerProvider()) { entry in
       PrayerWidgetView(entry: entry)
         .arinTransparentWidgetSurface()
+        .widgetURL(URL(string: "arin://widget/prayer"))
     }
     .configurationDisplayName(localizedWidgetText(tr: "ARIN — Namaz"))
     .description(localizedWidgetText(tr: "Sıradaki vakit ve geri sayım."))
+    .supportedFamilies([.systemSmall, .systemMedium, .accessoryRectangular])
+  }
+}
+
+// MARK: - Combo
+
+struct ComboEntry: TimelineEntry {
+  let date: Date
+  let nextName: String
+  let countdown: String
+  let nextDate: Date?
+  let quoteText: String
+  let quoteSource: String
+}
+
+struct ComboProvider: TimelineProvider {
+  func placeholder(in context: Context) -> ComboEntry {
+    ComboEntry(
+      date: Date(),
+      nextName: localizedWidgetText(tr: "Akşam"),
+      countdown: "1:24:10",
+      nextDate: Date().addingTimeInterval(84 * 60),
+      quoteText: QuoteWidgetDefaults.text,
+      quoteSource: QuoteWidgetDefaults.source
+    )
+  }
+
+  func getSnapshot(in context: Context, completion: @escaping (ComboEntry) -> Void) {
+    completion(loadEntry())
+  }
+
+  func getTimeline(in context: Context, completion: @escaping (Timeline<ComboEntry>) -> Void) {
+    let now = Date()
+    if widgetLocked("combo") {
+      let next = widgetGateRefreshDate("combo") ?? now.addingTimeInterval(3600)
+      completion(
+        Timeline(
+          entries: [
+            ComboEntry(
+              date: Date(),
+              nextName: "🔒 Widget kilitli",
+              countdown: "Açmak için dokun",
+              nextDate: nil,
+              quoteText: "Premium veya reklam",
+              quoteSource: "ARIN"
+            )
+          ],
+          policy: .after(next)
+        )
+      )
+      return
+    }
+    let loaded = loadEntry(at: now)
+    let candidates = [loaded.prayerRefreshDate, loaded.quoteRefreshDate]
+      .compactMap { $0 }
+      .filter { $0 > now }
+    let refresh = candidates.min()
+      ?? Calendar.current.date(byAdding: .hour, value: 1, to: now)
+      ?? now.addingTimeInterval(3600)
+    let next = [refresh, widgetGateRefreshDate("combo")].compactMap { $0 }.min() ?? refresh
+    completion(Timeline(entries: [loaded.entry], policy: .after(next)))
+  }
+
+  private func loadEntry() -> ComboEntry {
+    if widgetLocked("combo") {
+      return ComboEntry(
+        date: Date(),
+        nextName: "🔒 Widget kilitli",
+        countdown: "Açmak için dokun",
+        nextDate: nil,
+        quoteText: "Premium veya reklam",
+        quoteSource: "ARIN"
+      )
+    }
+    return loadEntry(at: Date()).entry
+  }
+
+  private func loadEntry(at now: Date) -> (
+    entry: ComboEntry,
+    prayerRefreshDate: Date?,
+    quoteRefreshDate: Date?
+  ) {
+    let prayer = loadPrayer(now: now)
+    let quote = loadQuote(now: now)
+    return (
+      entry: ComboEntry(
+        date: now,
+        nextName: prayer.nextName,
+        countdown: prayer.countdown,
+        nextDate: prayer.nextDate,
+        quoteText: quote.text,
+        quoteSource: quote.source
+      ),
+      prayerRefreshDate: prayer.refreshDate,
+      quoteRefreshDate: quote.refreshDate
+    )
+  }
+
+  private func loadQuote(now: Date) -> (
+    text: String,
+    source: String,
+    refreshDate: Date?
+  ) {
+    if let payload = decodeWidgetJson("arin_quote_schedule_json", as: QuoteSchedulePayload.self) {
+      let sorted = payload.entries
+        .filter { !$0.text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }
+        .sorted { $0.date < $1.date }
+      if !sorted.isEmpty {
+        var current = sorted.first!
+        var nextDate: Date? = nil
+        for item in sorted {
+          if item.date <= now {
+            current = item
+          } else {
+            nextDate = item.date
+            break
+          }
+        }
+        return (
+          text: current.text.trimmingCharacters(in: .whitespacesAndNewlines),
+          source: current.source.trimmingCharacters(in: .whitespacesAndNewlines),
+          refreshDate: nextDate
+        )
+      }
+    }
+
+    let u = suite()
+    let rawText = u?.string(forKey: "arin_quote_text")?
+      .trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+    let rawSource = u?.string(forKey: "arin_quote_source")?
+      .trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+    return (
+      text: rawText.isEmpty ? QuoteWidgetDefaults.text : rawText,
+      source: rawSource,
+      refreshDate: nil
+    )
+  }
+
+  private func loadPrayer(now: Date) -> (
+    nextName: String,
+    countdown: String,
+    nextDate: Date?,
+    refreshDate: Date?
+  ) {
+    if let payload = decodeWidgetJson("arin_prayer_schedule_json", as: PrayerSchedulePayload.self) {
+      let sorted = payload.entries.sorted { $0.date < $1.date }
+      if let next = sorted.first(where: { $0.date > now }) {
+        let remaining = max(0, next.date.timeIntervalSince1970 - now.timeIntervalSince1970)
+        let nextDate = next.date
+        return (
+          nextName: turkishPrayerName(next.name),
+          countdown: formatHMS(seconds: remaining),
+          nextDate: nextDate,
+          refreshDate: nextDate.addingTimeInterval(1)
+        )
+      }
+      return (
+        nextName: localizedWidgetText(tr: "Güncelle"),
+        countdown: localizedWidgetText(tr: "Uygulamayı aç"),
+        nextDate: nil,
+        refreshDate: now.addingTimeInterval(21_600)
+      )
+    }
+
+    let u = suite()
+    let forceTurkish = !storedWidgetLocaleCode().hasPrefix("tr")
+    let rawNextName = u?.string(forKey: "arin_prayer_next_name") ?? ""
+    let nextName = forceTurkish ? "İmsak" : turkishPrayerName(rawNextName)
+    var countdown = sanitizeCountdown(u?.string(forKey: "arin_prayer_countdown") ?? "—")
+    var nextDate: Date? = nil
+    if let epochStr = u?.string(forKey: "arin_prayer_next_epoch_ms"),
+       let epochMs = Double(epochStr) {
+      let target = Date(timeIntervalSince1970: epochMs / 1000.0)
+      nextDate = target
+      let rem = max(0, target.timeIntervalSince1970 - now.timeIntervalSince1970)
+      countdown = formatHMS(seconds: rem)
+    }
+    return (
+      nextName: nextName,
+      countdown: countdown,
+      nextDate: nextDate,
+      refreshDate: nextDate?.addingTimeInterval(1)
+    )
+  }
+
+  private func formatHMS(seconds: Double) -> String {
+    let s = max(0, Int(seconds))
+    let h = s / 3600
+    let m = (s % 3600) / 60
+    let sec = s % 60
+    return String(format: "%d:%02d:%02d", h, m, sec)
+  }
+}
+
+struct ComboWidgetView: View {
+  var entry: ComboProvider.Entry
+  @Environment(\.widgetFamily) private var family
+  @Environment(\.colorScheme) private var colorScheme
+
+  private var primaryTextColor: Color {
+    colorScheme == .dark ? Color(red: 0.88, green: 0.90, blue: 0.93) : .white
+  }
+
+  private var secondaryTextColor: Color {
+    primaryTextColor.opacity(0.82)
+  }
+
+  private var textShadowOpacity: Double {
+    colorScheme == .dark ? 0.34 : 0.52
+  }
+
+  private var hasSource: Bool {
+    !displayQuoteSource.isEmpty
+  }
+
+  private var displayQuoteSource: String {
+    let source = entry.quoteSource.trimmingCharacters(in: .whitespacesAndNewlines)
+    return source.isEmpty ? "ARIN" : source
+  }
+
+  private var title: String {
+    let n = entry.nextName.trimmingCharacters(in: .whitespacesAndNewlines)
+    if n == localizedWidgetText(tr: "Güncelle") { return n }
+    let base = n.isEmpty ? localizedWidgetText(tr: "Vakit") : n
+    return "\(base)'\(remainingSuffix(for: base)) kalan"
+  }
+
+  var body: some View {
+    if family == .accessoryRectangular {
+      accessoryLayout
+    } else {
+      expandedLayout
+    }
+  }
+
+  private var expandedLayout: some View {
+    VStack(alignment: .leading, spacing: family == .accessoryRectangular ? 3 : 5) {
+      prayerBlock
+      quoteBlock
+    }
+    .frame(maxWidth: .infinity, alignment: .leading)
+    .padding(.horizontal, family == .accessoryRectangular ? 4 : 9)
+    .padding(.vertical, family == .accessoryRectangular ? 3 : 7)
+    .shadow(color: .black.opacity(textShadowOpacity), radius: 2.8, x: 0, y: 1)
+  }
+
+  private var accessoryLayout: some View {
+    VStack(alignment: .leading, spacing: 2) {
+      HStack(alignment: .firstTextBaseline, spacing: 5) {
+        Text(title)
+          .font(.system(size: 11, weight: .bold))
+          .foregroundStyle(primaryTextColor)
+          .lineLimit(1)
+          .minimumScaleFactor(0.58)
+        Spacer(minLength: 2)
+        countdownText(size: 13)
+      }
+      Text(entry.quoteText.isEmpty ? "ARIN" : entry.quoteText)
+        .font(.system(size: 15, weight: .regular, design: .serif))
+        .foregroundStyle(primaryTextColor)
+        .lineLimit(1)
+        .minimumScaleFactor(0.50)
+        .allowsTightening(true)
+      Text(displayQuoteSource)
+        .font(.system(size: 9, weight: .bold))
+        .foregroundStyle(secondaryTextColor)
+        .lineLimit(1)
+        .minimumScaleFactor(0.60)
+    }
+    .frame(maxWidth: .infinity, alignment: .leading)
+    .padding(.horizontal, 4)
+    .padding(.vertical, 3)
+    .shadow(color: .black.opacity(textShadowOpacity), radius: 2.4, x: 0, y: 1)
+  }
+
+  private var prayerBlock: some View {
+    VStack(alignment: .leading, spacing: 3) {
+      HStack(spacing: 5) {
+        Image(systemName: "moon.stars.fill")
+          .font(.system(size: family == .accessoryRectangular ? 11 : 13, weight: .semibold))
+          .foregroundStyle(secondaryTextColor)
+        Text(title)
+          .font(.system(size: family == .accessoryRectangular ? 12 : 14, weight: .bold))
+          .foregroundStyle(primaryTextColor)
+          .lineLimit(1)
+          .minimumScaleFactor(0.62)
+      }
+      HStack(alignment: .firstTextBaseline, spacing: 6) {
+        Image(systemName: "clock.fill")
+          .font(.system(size: family == .accessoryRectangular ? 12 : 15, weight: .semibold))
+          .foregroundStyle(secondaryTextColor)
+        countdownText(size: family == .accessoryRectangular ? 16 : 21)
+      }
+    }
+    .frame(maxWidth: .infinity, alignment: .leading)
+  }
+
+  private var quoteBlock: some View {
+    VStack(alignment: .leading, spacing: 3) {
+      Text(entry.quoteText.isEmpty ? "ARIN" : entry.quoteText)
+        .font(.system(size: family == .accessoryRectangular ? 15 : 27, weight: .regular, design: .serif))
+        .foregroundStyle(primaryTextColor)
+        .lineSpacing(-3)
+        .lineLimit(family == .accessoryRectangular ? 2 : 2)
+        .minimumScaleFactor(0.48)
+        .allowsTightening(true)
+      if hasSource {
+        Text(displayQuoteSource)
+          .font(.system(size: family == .accessoryRectangular ? 11 : 15, weight: .bold))
+          .foregroundStyle(secondaryTextColor)
+          .lineLimit(1)
+          .minimumScaleFactor(0.62)
+      }
+    }
+    .frame(maxWidth: .infinity, alignment: .leading)
+  }
+
+  @ViewBuilder
+  private func countdownText(size: CGFloat) -> some View {
+    if let nextDate = entry.nextDate, nextDate > Date() {
+      Text(timerInterval: Date()...nextDate, countsDown: true)
+        .font(.system(size: size, weight: .semibold, design: .serif))
+        .foregroundStyle(primaryTextColor)
+        .monospacedDigit()
+        .minimumScaleFactor(0.62)
+    } else {
+      Text(entry.countdown)
+        .font(.system(size: size, weight: .semibold, design: .serif))
+        .foregroundStyle(primaryTextColor)
+        .monospacedDigit()
+        .minimumScaleFactor(0.62)
+    }
+  }
+
+  private func remainingSuffix(for raw: String) -> String {
+    switch raw {
+    case "Öğle", "İkindi": return "ye"
+    case "Güneş", "Vakit": return "e"
+    case "Yatsı": return "ya"
+    default: return "a"
+    }
+  }
+}
+
+struct ArinComboWidget: Widget {
+  let kind: String = "ArinComboWidget"
+
+  var body: some WidgetConfiguration {
+    StaticConfiguration(kind: kind, provider: ComboProvider()) { entry in
+      ComboWidgetView(entry: entry)
+        .arinTransparentWidgetSurface()
+        .widgetURL(URL(string: "arin://widget/combo"))
+    }
+    .configurationDisplayName(localizedWidgetText(tr: "ARIN — Karma"))
+    .description(localizedWidgetText(tr: "Sıradaki vakit ve günlük söz."))
+    .supportedFamilies([.systemSmall, .systemMedium, .accessoryRectangular])
+  }
+}
+
+// MARK: - Tracking
+
+struct TrackingEntry: TimelineEntry {
+  let date: Date
+  let title: String
+  let value: String
+  let note: String
+}
+
+struct TrackingProvider: TimelineProvider {
+  func placeholder(in context: Context) -> TrackingEntry {
+    TrackingEntry(
+      date: Date(),
+      title: "Sigarasız gün sayacı",
+      value: "Sigarasız 18. gün",
+      note: "Kriz geçer, kararın kalır."
+    )
+  }
+
+  func getSnapshot(in context: Context, completion: @escaping (TrackingEntry) -> Void) {
+    completion(loadEntry())
+  }
+
+  func getTimeline(in context: Context, completion: @escaping (Timeline<TrackingEntry>) -> Void) {
+    let entry = loadEntry()
+    let now = Date()
+    let nextDay = Calendar.current.startOfDay(for: now).addingTimeInterval(86_400)
+    let next = [nextDay, widgetGateRefreshDate("tracking")].compactMap { $0 }.min() ?? nextDay
+    completion(Timeline(entries: [entry], policy: .after(next)))
+  }
+
+  private func loadEntry() -> TrackingEntry {
+    if widgetLocked("tracking") {
+      return TrackingEntry(
+        date: Date(),
+        title: "🔒 Widget kilitli",
+        value: "Açmak için dokun",
+        note: "Premium veya reklam"
+      )
+    }
+    let u = suite()
+    let enabled = u?.string(forKey: "arin_tracking_enabled") == "1"
+    if !enabled {
+      return TrackingEntry(
+        date: Date(),
+        title: "Takip seçilmedi",
+        value: "",
+        note: "Ayarlar > Widget Merkezi"
+      )
+    }
+
+    let rawTitle = u?.string(forKey: "arin_tracking_title")?
+      .trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+    let mode = u?.string(forKey: "arin_tracking_mode")?
+      .trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+    let value: String
+    if mode == "quit_days",
+       let rawEpoch = u?.string(forKey: "arin_tracking_start_epoch_ms"),
+       let epochMs = Double(rawEpoch),
+       let prefix = u?.string(forKey: "arin_tracking_day_prefix")?
+        .trimmingCharacters(in: .whitespacesAndNewlines),
+       !prefix.isEmpty {
+      let start = Date(timeIntervalSince1970: epochMs / 1000.0)
+      let days = max(0, Calendar.current.dateComponents([.day], from: start, to: Date()).day ?? 0)
+      value = "\(prefix) \(days). gün"
+    } else {
+      value = u?.string(forKey: "arin_tracking_value")?
+        .trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+    }
+    let note = dailyQuote(from: u?.string(forKey: "arin_tracking_quotes_json"))
+      ?? u?.string(forKey: "arin_tracking_note")?
+        .trimmingCharacters(in: .whitespacesAndNewlines)
+      ?? ""
+
+    return TrackingEntry(
+      date: Date(),
+      title: rawTitle.isEmpty ? "ARIN Takip" : rawTitle,
+      value: value,
+      note: note.isEmpty ? "Bugün küçük bir adım yeter." : note
+    )
+  }
+
+  private func dailyQuote(from raw: String?) -> String? {
+    guard let raw,
+          let data = raw.data(using: .utf8),
+          let items = try? JSONDecoder().decode([String].self, from: data),
+          !items.isEmpty else {
+      return nil
+    }
+    let day = Calendar.current.ordinality(of: .day, in: .year, for: Date()) ?? 1
+    let text = items[max(0, day - 1) % items.count].trimmingCharacters(in: .whitespacesAndNewlines)
+    return text.isEmpty ? nil : text
+  }
+}
+
+struct TrackingWidgetView: View {
+  var entry: TrackingProvider.Entry
+  @Environment(\.widgetFamily) private var family
+  @Environment(\.colorScheme) private var colorScheme
+
+  private var primaryTextColor: Color {
+    colorScheme == .dark ? Color(red: 0.88, green: 0.90, blue: 0.93) : .white
+  }
+
+  private var secondaryTextColor: Color {
+    primaryTextColor.opacity(0.86)
+  }
+
+  var body: some View {
+    VStack(alignment: .leading, spacing: family == .accessoryRectangular ? 2 : 4) {
+      Text(entry.title)
+        .font(.system(size: family == .accessoryRectangular ? 11 : 13, weight: .bold))
+        .foregroundStyle(secondaryTextColor)
+        .lineLimit(1)
+        .minimumScaleFactor(0.62)
+      if !entry.value.isEmpty {
+        Text(entry.value)
+          .font(.system(size: family == .accessoryRectangular ? 15 : 20, weight: .bold, design: .serif))
+          .foregroundStyle(primaryTextColor)
+          .lineLimit(1)
+          .minimumScaleFactor(0.58)
+      }
+      Text(entry.note)
+        .font(.system(size: family == .accessoryRectangular ? 12 : 15, weight: .regular, design: .serif))
+        .foregroundStyle(primaryTextColor)
+        .lineLimit(family == .accessoryRectangular ? 2 : 3)
+        .minimumScaleFactor(0.50)
+        .allowsTightening(true)
+    }
+    .frame(maxWidth: .infinity, alignment: .leading)
+    .padding(.horizontal, family == .accessoryRectangular ? 5 : 10)
+    .padding(.vertical, family == .accessoryRectangular ? 3 : 8)
+    .shadow(color: .black.opacity(colorScheme == .dark ? 0.34 : 0.52), radius: 2.6, x: 0, y: 1)
+  }
+}
+
+struct ArinTrackingWidget: Widget {
+  let kind: String = "ArinTrackingWidget"
+
+  var body: some WidgetConfiguration {
+    StaticConfiguration(kind: kind, provider: TrackingProvider()) { entry in
+      TrackingWidgetView(entry: entry)
+        .arinTransparentWidgetSurface()
+        .widgetURL(URL(string: "arin://widget/tracking"))
+    }
+    .configurationDisplayName(localizedWidgetText(tr: "ARIN — Takip"))
+    .description(localizedWidgetText(tr: "Seçili gelişim veya arınma takibi."))
     .supportedFamilies([.systemSmall, .systemMedium, .accessoryRectangular])
   }
 }
@@ -593,5 +1193,7 @@ struct ArinWidgetsBundle: WidgetBundle {
   var body: some Widget {
     ArinQuoteWidget()
     ArinPrayerWidget()
+    ArinComboWidget()
+    ArinTrackingWidget()
   }
 }

@@ -1,12 +1,16 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:arin/l10n/app_localizations.dart';
 
 import '../../core/constants/app_colors.dart';
+import '../../core/providers/shared_preferences_provider.dart';
 import '../../core/router/app_router.dart';
 import '../../data/models/inspiration_card_model.dart';
 import '../../data/models/inspiration_content_kind.dart';
+import '../../data/repositories/inspiration_firestore_repository.dart';
 import '../shared/widgets/arin_skeleton.dart';
 import 'explore_content_filter_provider.dart';
 import 'inspiration_catalog_provider.dart';
@@ -27,19 +31,6 @@ class _InspireExplorePageState extends ConsumerState<InspireExplorePage> {
   final _searchController = TextEditingController();
   String _query = '';
 
-  int _mixedRandomCardIndex({
-    required int position,
-    required int poolSize,
-    required int seed,
-  }) {
-    if (poolSize <= 1) return 0;
-    var x = (position + 1) * 1103515245;
-    x ^= (seed * 12345);
-    x ^= (x >> 16);
-    final positive = x & 0x7fffffff;
-    return positive % poolSize;
-  }
-
   @override
   void initState() {
     super.initState();
@@ -55,6 +46,9 @@ class _InspireExplorePageState extends ConsumerState<InspireExplorePage> {
   }
 
   Future<void> _onRefresh() async {
+    await InspirationFirestoreRepository.resetFetchThrottle(
+      ref.read(sharedPreferencesProvider),
+    );
     ref.read(exploreGridShuffleSeedProvider.notifier).state =
         DateTime.now().millisecondsSinceEpoch;
     ref.invalidate(inspirationCatalogProvider);
@@ -69,10 +63,9 @@ class _InspireExplorePageState extends ConsumerState<InspireExplorePage> {
       if (!inspirationCardMatchesQuery(c, _query)) return false;
       switch (filter) {
         case ExploreContentFilter.mixed:
-          // Öz akış: söz + âyet + hadis birlikte.
+          // Öz akış: sözler varsayılan, âyet/hadis sadece admin işaretlerse.
           return c.contentKind == InspirationContentKind.quote ||
-              c.contentKind == InspirationContentKind.verse ||
-              c.contentKind == InspirationContentKind.hadith;
+              c.showInMainFeed;
         case ExploreContentFilter.soz:
           return c.contentKind == InspirationContentKind.quote;
         case ExploreContentFilter.ayet:
@@ -93,12 +86,33 @@ class _InspireExplorePageState extends ConsumerState<InspireExplorePage> {
     return list;
   }
 
+  List<InspirationCardModel> _mixedViewerCards(
+    List<InspirationCardModel> filtered,
+    int pickedIndex,
+    int openNonce,
+  ) {
+    if (filtered.isEmpty) return const [];
+    if (filtered.length == 1) return [filtered.first];
+
+    final picked = filtered[pickedIndex % filtered.length];
+    final rest = <InspirationCardModel>[
+      for (var i = 0; i < filtered.length; i++)
+        if (i != pickedIndex) filtered[i],
+    ]..shuffle(Random(openNonce));
+
+    final cycle = <InspirationCardModel>[picked, ...rest];
+    return List<InspirationCardModel>.generate(
+      2000,
+      (i) => cycle[i % cycle.length],
+      growable: false,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final async = ref.watch(inspirationShuffledGridProvider);
     final filter = ref.watch(exploreContentFilterProvider);
-    final shuffleSeed = ref.watch(exploreGridShuffleSeedProvider);
     final canPop = context.canPop();
     final onLight = Theme.of(context).brightness == Brightness.light;
 
@@ -109,14 +123,8 @@ class _InspireExplorePageState extends ConsumerState<InspireExplorePage> {
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: onLight
-                ? [
-                    AppColors.creamMist,
-                    AppColors.creamShellDeep,
-                  ]
-                : [
-                    AppColors.homeGradientTop,
-                    AppColors.homeGradientBottom,
-                  ],
+                ? [AppColors.creamMist, AppColors.creamShellDeep]
+                : [AppColors.homeGradientTop, AppColors.homeGradientBottom],
             stops: const [0.0, 0.65],
           ),
         ),
@@ -125,18 +133,15 @@ class _InspireExplorePageState extends ConsumerState<InspireExplorePage> {
             if (cards.isEmpty) {
               return RefreshIndicator(
                 color: AppColors.accentNeonGreen,
-                backgroundColor:
-                    onLight ? AppColors.creamSurface : AppColors.homeGradientTop,
+                backgroundColor: onLight
+                    ? AppColors.creamSurface
+                    : AppColors.homeGradientTop,
                 onRefresh: _onRefresh,
                 child: ListView(
                   physics: const AlwaysScrollableScrollPhysics(),
                   children: [
-                    SizedBox(
-                      height: MediaQuery.sizeOf(context).height * 0.25,
-                    ),
-                    _ExploreEmpty(
-                      onClose: canPop ? () => context.pop() : null,
-                    ),
+                    SizedBox(height: MediaQuery.sizeOf(context).height * 0.25),
+                    _ExploreEmpty(onClose: canPop ? () => context.pop() : null),
                   ],
                 ),
               );
@@ -145,8 +150,9 @@ class _InspireExplorePageState extends ConsumerState<InspireExplorePage> {
             final searchActive = _query.trim().isNotEmpty;
             return RefreshIndicator(
               color: AppColors.accentNeonGreen,
-              backgroundColor:
-                  onLight ? AppColors.creamSurface : AppColors.homeGradientTop,
+              backgroundColor: onLight
+                  ? AppColors.creamSurface
+                  : AppColors.homeGradientTop,
               onRefresh: _onRefresh,
               child: CustomScrollView(
                 physics: const BouncingScrollPhysics(
@@ -236,9 +242,10 @@ class _InspireExplorePageState extends ConsumerState<InspireExplorePage> {
                                             Icons.close_rounded,
                                             color: onLight
                                                 ? AppColors.textSecondary
-                                                    .withValues(alpha: 0.8)
-                                                : Colors.white
-                                                    .withValues(alpha: 0.5),
+                                                      .withValues(alpha: 0.8)
+                                                : Colors.white.withValues(
+                                                    alpha: 0.5,
+                                                  ),
                                           ),
                                           onPressed: () {
                                             _searchController.clear();
@@ -267,19 +274,23 @@ class _InspireExplorePageState extends ConsumerState<InspireExplorePage> {
                               icon: Icon(
                                 Icons.more_horiz_rounded,
                                 color: onLight
-                                    ? AppColors.emeraldDark.withValues(alpha: 0.7)
+                                    ? AppColors.emeraldDark.withValues(
+                                        alpha: 0.7,
+                                      )
                                     : Colors.white.withValues(alpha: 0.55),
                               ),
                               onSelected: (v) {
                                 ref
-                                    .read(exploreContentFilterProvider.notifier)
-                                    .state = v;
+                                        .read(
+                                          exploreContentFilterProvider.notifier,
+                                        )
+                                        .state =
+                                    v;
                               },
                               itemBuilder: (context) => [
                                 CheckedPopupMenuItem(
                                   value: ExploreContentFilter.mixed,
-                                  checked:
-                                      filter == ExploreContentFilter.mixed,
+                                  checked: filter == ExploreContentFilter.mixed,
                                   child: Text(l10n.inspireFilterMainFeed),
                                 ),
                                 CheckedPopupMenuItem(
@@ -330,56 +341,44 @@ class _InspireExplorePageState extends ConsumerState<InspireExplorePage> {
                       sliver: SliverGrid(
                         gridDelegate:
                             const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 3,
-                          mainAxisSpacing: 0,
-                          crossAxisSpacing: 0,
-                          childAspectRatio: 0.75,
-                        ),
+                              crossAxisCount: 3,
+                              mainAxisSpacing: 0,
+                              crossAxisSpacing: 0,
+                              childAspectRatio: 0.75,
+                            ),
                         delegate: SliverChildBuilderDelegate(
                           (context, index) {
                             final pickedIndex = searchActive
                                 ? index
-                                : (filter == ExploreContentFilter.mixed
-                                    ? _mixedRandomCardIndex(
-                                        position: index,
-                                        poolSize: filtered.length,
-                                        seed: shuffleSeed,
-                                      )
-                                    : index % filtered.length);
+                                : index % filtered.length;
                             final card = filtered[pickedIndex];
                             return InspirationGridTile(
                               card: card,
                               onTap: () {
                                 final openNonce =
                                     DateTime.now().microsecondsSinceEpoch;
-                                final viewerCards = filter ==
-                                        ExploreContentFilter.mixed
-                                    ? <InspirationCardModel>[
-                                        card,
-                                        ...List<InspirationCardModel>.generate(
-                                          1999,
-                                          (deckPos) {
-                                            final idx = _mixedRandomCardIndex(
-                                              position: deckPos + 1,
-                                              poolSize: filtered.length,
-                                              seed: openNonce,
-                                            );
-                                            return filtered[idx];
-                                          },
-                                        ),
-                                      ]
+                                final viewerCards =
+                                    filter == ExploreContentFilter.mixed
+                                    ? _mixedViewerCards(
+                                        filtered,
+                                        pickedIndex,
+                                        openNonce,
+                                      )
                                     : filtered;
                                 final deck = InspireViewerDeckExtra(
                                   cards: viewerCards,
-                                  initialIndex: filter ==
-                                          ExploreContentFilter.mixed
+                                  initialIndex:
+                                      filter == ExploreContentFilter.mixed
                                       ? 0
                                       : pickedIndex,
                                 );
                                 ref
-                                    .read(inspireViewerDeckSessionProvider
-                                        .notifier)
-                                    .state = deck;
+                                        .read(
+                                          inspireViewerDeckSessionProvider
+                                              .notifier,
+                                        )
+                                        .state =
+                                    deck;
                                 context.push(
                                   AppRoutes.inspireView(
                                     filter == ExploreContentFilter.mixed
@@ -413,22 +412,19 @@ class _InspireExplorePageState extends ConsumerState<InspireExplorePage> {
               childAspectRatio: 0.78,
             ),
             itemCount: 6,
-            itemBuilder: (_, __) => const ArinSkeleton(
-              height: double.infinity,
-              borderRadius: 16,
-            ),
+            itemBuilder: (_, __) =>
+                const ArinSkeleton(height: double.infinity, borderRadius: 16),
           ),
           error: (e, _) => RefreshIndicator(
             color: AppColors.accentNeonGreen,
-            backgroundColor:
-                onLight ? AppColors.creamSurface : AppColors.homeGradientTop,
+            backgroundColor: onLight
+                ? AppColors.creamSurface
+                : AppColors.homeGradientTop,
             onRefresh: _onRefresh,
             child: ListView(
               physics: const AlwaysScrollableScrollPhysics(),
               children: [
-                SizedBox(
-                  height: MediaQuery.sizeOf(context).height * 0.2,
-                ),
+                SizedBox(height: MediaQuery.sizeOf(context).height * 0.2),
                 _ExploreError(
                   message: '$e',
                   onClose: canPop ? () => context.pop() : null,

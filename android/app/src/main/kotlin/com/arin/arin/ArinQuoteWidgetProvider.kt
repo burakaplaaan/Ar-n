@@ -47,8 +47,10 @@ class ArinQuoteWidgetProvider : HomeWidgetProvider() {
             rawText = widgetData.getString(KEY_QUOTE_TEXT, null),
             rawSource = widgetData.getString(KEY_QUOTE_SOURCE, null),
         )
+        val locked = isWidgetLocked(widgetData, "quote")
         val openApp = Intent(context, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+            putExtra(MainActivity.EXTRA_WIDGET_KIND, "quote")
         }
         val piFlags =
             PendingIntent.FLAG_UPDATE_CURRENT or
@@ -61,11 +63,17 @@ class ArinQuoteWidgetProvider : HomeWidgetProvider() {
 
         for (widgetId in appWidgetIds) {
             val views = RemoteViews(context.packageName, R.layout.arin_quote_widget)
-            views.setTextViewText(R.id.widget_quote_text, quote.text)
-            views.setTextViewText(R.id.widget_quote_source, quote.source)
+            views.setTextViewText(
+                R.id.widget_quote_text,
+                if (locked) "Açmak için dokun" else quote.text,
+            )
+            views.setTextViewText(
+                R.id.widget_quote_source,
+                if (locked) "🔒 Widget kilitli" else quote.source,
+            )
             views.setViewVisibility(
                 R.id.widget_quote_header_row,
-                if (quote.showSource) {
+                if (locked || quote.showSource) {
                     View.VISIBLE
                 } else {
                     View.GONE
@@ -75,7 +83,9 @@ class ArinQuoteWidgetProvider : HomeWidgetProvider() {
             appWidgetManager.updateAppWidget(widgetId, views)
         }
 
-        scheduled?.nextEpochMs?.let { scheduleRefresh(context, it) } ?: cancelRefresh(context)
+        val gateRefresh = gateRefreshMs(widgetData, "quote")
+        val nextRefresh = listOfNotNull(scheduled?.nextEpochMs, gateRefresh).minOrNull()
+        nextRefresh?.let { scheduleRefresh(context, it) } ?: cancelRefresh(context)
     }
 
     override fun onDisabled(context: Context) {
@@ -189,6 +199,29 @@ class ArinQuoteWidgetProvider : HomeWidgetProvider() {
         return DisplayQuote(text = text, source = "", showSource = false)
     }
 
+    private fun isWidgetLocked(widgetData: SharedPreferences, kind: String): Boolean {
+        if (widgetData.getString(KEY_GATE_PREMIUM, null) == "1") return false
+        if (widgetData.getString(KEY_GATE_LOCKED, null) == "1") return true
+        val now = System.currentTimeMillis()
+        val trialUntil = widgetData.getString("arin_widget_gate_${kind}_trial_until_ms", null)
+            ?.toLongOrNull() ?: 0L
+        val unlockUntil = widgetData.getString("arin_widget_gate_${kind}_unlock_until_ms", null)
+            ?.toLongOrNull() ?: 0L
+        if (trialUntil <= 0L) return false
+        return now >= trialUntil && now >= unlockUntil
+    }
+
+    private fun gateRefreshMs(widgetData: SharedPreferences, kind: String): Long? {
+        if (widgetData.getString(KEY_GATE_PREMIUM, null) == "1") return null
+        val now = System.currentTimeMillis()
+        return listOf(
+            widgetData.getString("arin_widget_gate_${kind}_trial_until_ms", null)
+                ?.toLongOrNull() ?: 0L,
+            widgetData.getString("arin_widget_gate_${kind}_unlock_until_ms", null)
+                ?.toLongOrNull() ?: 0L,
+        ).filter { it > now }.minOrNull()?.plus(1_000L)
+    }
+
     private data class DisplayQuote(
         val text: String,
         val source: String,
@@ -207,6 +240,8 @@ class ArinQuoteWidgetProvider : HomeWidgetProvider() {
         private const val KEY_QUOTE_TEXT = "arin_quote_text"
         private const val KEY_QUOTE_SOURCE = "arin_quote_source"
         private const val KEY_QUOTE_SCHEDULE = "arin_quote_schedule_json"
+        private const val KEY_GATE_LOCKED = "arin_widget_gate_quote_locked"
+        private const val KEY_GATE_PREMIUM = "arin_widget_gate_premium"
         private const val ACTION_REFRESH = "com.arin.arin.action.QUOTE_WIDGET_REFRESH"
         private const val REQUEST_CODE_REFRESH = 19011
 

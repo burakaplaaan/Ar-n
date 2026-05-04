@@ -1,6 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/constants/willpower_templates.dart';
 import '../../core/providers/shared_preferences_provider.dart';
+import '../shared/providers/habit_providers.dart';
 
 const _salatTrackingVisibleOnHomeKey = 'salat_tracking_visible_on_home';
 
@@ -13,7 +15,25 @@ class SalatTrackingVisibilityNotifier extends Notifier<bool> {
   @override
   bool build() {
     final prefs = ref.read(sharedPreferencesProvider);
-    return prefs.getBool(_salatTrackingVisibleOnHomeKey) ?? false;
+    if (prefs.containsKey(_salatTrackingVisibleOnHomeKey)) {
+      return prefs.getBool(_salatTrackingVisibleOnHomeKey) ?? false;
+    }
+    // Tek seferlik migrasyon: bayrak hiç set edilmemişse ve kullanıcının
+    // tamamlanmış aktif bir günlük namaz alışkanlığı varsa varsayılanı true
+    // yap. Bu, eski sürümden gelen "Gelişim'de kurulu ama ana sayfada hâlâ
+    // 'Kurun' görünüyor" tutarsızlığını giderir.
+    final habitRepo = ref.read(habitRepositoryProvider);
+    final habit = habitRepo.findActiveByTemplateId(
+      WillpowerTemplates.salatDaily,
+    );
+    final initial =
+        habit != null &&
+        habit.onboardingCompleted &&
+        habit.commitmentText.trim().isNotEmpty;
+    Future.microtask(() async {
+      await prefs.setBool(_salatTrackingVisibleOnHomeKey, initial);
+    });
+    return initial;
   }
 
   Future<void> enableFromGelisim() async {

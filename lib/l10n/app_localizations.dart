@@ -238,6 +238,18 @@ abstract class AppLocalizations {
   /// **'Destek ve geri bildirim'**
   String get settingsMenuContactSubtitle;
 
+  /// No description provided for @settingsMenuSupportTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Arın’a Destek Ol'**
+  String get settingsMenuSupportTitle;
+
+  /// No description provided for @settingsMenuSupportSubtitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Tek seferlik destek paketleri'**
+  String get settingsMenuSupportSubtitle;
+
   /// No description provided for @settingsMenuComingSoon.
   ///
   /// In tr, this message translates to:
@@ -939,6 +951,24 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'Satıra dokun; 1. ve 2. uyarıyı ayrı seç.'**
   String get reminderDurationsPerPrayerSubtitle;
+
+  /// No description provided for @reminderApplyDurationsAllButton.
+  ///
+  /// In tr, this message translates to:
+  /// **'Seçtiğim süreleri tüm vakitlere uygula'**
+  String get reminderApplyDurationsAllButton;
+
+  /// No description provided for @reminderAllPrayersDurationTarget.
+  ///
+  /// In tr, this message translates to:
+  /// **'Tüm vakitler'**
+  String get reminderAllPrayersDurationTarget;
+
+  /// No description provided for @reminderDurationsAppliedAllSuccess.
+  ///
+  /// In tr, this message translates to:
+  /// **'Süreler tüm vakitlere uygulandı.'**
+  String get reminderDurationsAppliedAllSuccess;
 
   /// No description provided for @reminderDualAlertTitle.
   ///

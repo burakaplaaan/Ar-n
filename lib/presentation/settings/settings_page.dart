@@ -29,6 +29,7 @@ import '../../core/providers/shared_preferences_provider.dart';
 import '../../data/services/habit_cloud_sync_service.dart';
 import '../../data/services/local_data_wipe_service.dart';
 import '../../data/services/location_service.dart';
+import '../../data/services/user_cloud_backup_service.dart';
 import '../settings/widgets/district_picker_sheet.dart';
 import '../shared/providers/auth_providers.dart';
 import '../shared/providers/habit_providers.dart';
@@ -148,15 +149,30 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
     );
     if (ok != true || !mounted) return;
 
+    final prefs = ref.read(sharedPreferencesProvider);
     if (isFirebaseReady) {
       try {
+        final user = FirebaseAuth.instance.currentUser;
+        if (user != null) {
+          await HabitCloudSyncService.pushFromLocal(
+            uid: user.uid,
+            repo: ref.read(habitRepositoryProvider),
+            prefs: prefs,
+            force: true,
+            bypassForceCooldown: true,
+          );
+          await UserCloudBackupService.pushFromLocal(
+            uid: user.uid,
+            prefs: prefs,
+            force: true,
+          );
+        }
         await ref.read(authServiceProvider).signOut();
       } catch (e) {
         debugPrint('signOut: $e');
       }
     }
 
-    final prefs = ref.read(sharedPreferencesProvider);
     await LocalDataWipeService.wipeAll(prefs);
     _invalidateAfterWipe();
     ref.read(appRouterRefreshProvider).notifyAuthOrOnboarding();
@@ -264,28 +280,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
     }
 
     try {
-      await HabitCloudSyncService.deleteAllUserCloudData(uid);
-    } catch (e) {
-      if (loaderPushed && mounted) {
-        rootNav.pop();
-      }
-      if (mounted) {
-        setState(() => _accountDeleteBusy = false);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(l10n.settingsCloudDeleteFailedMessage)),
-        );
-      }
-      return;
-    }
-
-    try {
-      // AuthService.deleteAccount requires-recent-login hatasında kullanıcıyı
-      // şeffaf biçimde Google/Apple sheet'ine yönlendirip tekrar dener.
-      // Kullanıcı reauth'u iptal ederse StateError atılır → aşağıda yakalanır.
-      await ref.read(authServiceProvider).deleteAccount();
-      // Silme başarılı → analytics user ID'sini de temizle ve olayı yolla.
-      unawaited(ArinAnalytics.accountDelete());
-      unawaited(ArinAnalytics.resetUser());
+      await ref.read(authServiceProvider).reauthenticateCurrentUser();
     } on FirebaseAuthException catch (e) {
       if (loaderPushed && mounted) {
         rootNav.pop();
@@ -309,6 +304,53 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
         ScaffoldMessenger.of(
           context,
         ).showSnackBar(SnackBar(content: Text(e.message)));
+      }
+      return;
+    } catch (e) {
+      debugPrint('Account reauth failed: $e');
+      if (loaderPushed && mounted) {
+        rootNav.pop();
+      }
+      if (mounted) {
+        setState(() => _accountDeleteBusy = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(l10n.settingsAccountDeleteRetryMessage)),
+        );
+      }
+      return;
+    }
+
+    try {
+      await HabitCloudSyncService.deleteAllUserCloudData(uid);
+    } catch (e) {
+      if (loaderPushed && mounted) {
+        rootNav.pop();
+      }
+      if (mounted) {
+        setState(() => _accountDeleteBusy = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(l10n.settingsCloudDeleteFailedMessage)),
+        );
+      }
+      return;
+    }
+
+    try {
+      await ref.read(authServiceProvider).deleteAccount();
+      // Silme başarılı → analytics user ID'sini de temizle ve olayı yolla.
+      unawaited(ArinAnalytics.accountDelete());
+      unawaited(ArinAnalytics.resetUser());
+    } on FirebaseAuthException catch (e) {
+      if (loaderPushed && mounted) {
+        rootNav.pop();
+      }
+      if (mounted) {
+        setState(() => _accountDeleteBusy = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(e.message ?? l10n.settingsAccountDeleteFailedMessage),
+          ),
+        );
       }
       return;
     } catch (e) {
@@ -349,7 +391,6 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
     try {
       await ref.read(authServiceProvider).signInWithGoogle();
       unawaited(ArinAnalytics.loginSuccess('google'));
-      await _pushHabitsAfterLogin();
       await _restoreLocalProfileName(localName);
       if (mounted) {
         final l10n = AppLocalizations.of(context)!;
@@ -388,7 +429,6 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
     try {
       await svc.signInWithApple();
       unawaited(ArinAnalytics.loginSuccess('apple'));
-      await _pushHabitsAfterLogin();
       await _restoreLocalProfileName(localName);
       if (mounted) {
         final l10n = AppLocalizations.of(context)!;
@@ -465,25 +505,6 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
     return l10n.localeName.startsWith('tr')
         ? message
         : l10n.settingsAppleSignInFailed;
-  }
-
-  Future<void> _pushHabitsAfterLogin() async {
-    final u = FirebaseAuth.instance.currentUser;
-    if (u == null || !isFirebaseReady) return;
-    final repo = ref.read(habitRepositoryProvider);
-    final prefs = ref.read(sharedPreferencesProvider);
-    await HabitCloudSyncService.pullToLocal(
-      uid: u.uid,
-      repo: repo,
-      prefs: prefs,
-    );
-    await HabitCloudSyncService.pushFromLocal(
-      uid: u.uid,
-      repo: repo,
-      prefs: prefs,
-      force: true,
-    );
-    ref.read(habitSummaryProvider.notifier).refresh();
   }
 
   void _snackFirebase() {
@@ -664,6 +685,19 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                       const SizedBox(height: 10),
                       _SettingsMenuTile(
                         onDark: onDark,
+                        icon: Icons.widgets_outlined,
+                        iconColor: AppColors.accentNeonGreen,
+                        iconBgColor: AppColors.accentNeonGreen.withValues(
+                          alpha: onDark ? 0.12 : 0.18,
+                        ),
+                        title: 'Widget Merkezi',
+                        subtitle: 'Kullanım bilgileri ve takip widgetı',
+                        delayMs: 285,
+                        onTap: () => context.push(AppRoutes.settingsWidgets),
+                      ),
+                      const SizedBox(height: 10),
+                      _SettingsMenuTile(
+                        onDark: onDark,
                         icon: Icons.privacy_tip_outlined,
                         iconColor: _settingsMenuIconTint(onDark),
                         iconBgColor: _settingsMenuIconCircle(onDark),
@@ -719,6 +753,17 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                         delayMs: 340,
                         onTap: () => context.push(AppRoutes.settingsLanguage),
                       ),
+                      const SizedBox(height: 10),
+                      _SettingsMenuTile(
+                        onDark: onDark,
+                        icon: Icons.volunteer_activism_outlined,
+                        iconColor: _settingsMenuIconTint(onDark),
+                        iconBgColor: _settingsMenuIconCircle(onDark),
+                        title: l10n.settingsMenuSupportTitle,
+                        subtitle: l10n.settingsMenuSupportSubtitle,
+                        delayMs: 360,
+                        onTap: () => context.push(AppRoutes.settingsSupport),
+                      ),
                       if (signedInUser != null) ...[
                         const SizedBox(height: 28),
                         _SectionLabel(
@@ -733,17 +778,6 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                           onDeleteAccount: _deleteAccount,
                         ).animate().fadeIn(delay: 400.ms),
                       ],
-                      const SizedBox(height: 10),
-                      _SettingsMenuTile(
-                        onDark: onDark,
-                        icon: Icons.volunteer_activism_outlined,
-                        iconColor: _settingsMenuIconTint(onDark),
-                        iconBgColor: _settingsMenuIconCircle(onDark),
-                        title: 'Arın’a Destek Ol',
-                        subtitle: 'Tek seferlik destek paketleri',
-                        delayMs: 420,
-                        onTap: () => context.push(AppRoutes.settingsSupport),
-                      ),
                       SizedBox(
                         height: MediaQuery.paddingOf(context).bottom + 100,
                       ),

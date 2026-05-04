@@ -52,6 +52,14 @@
 					<string>com.googleusercontent.apps.746942620456-0u7n7mp8ue37dbnr5asv05c5ngo11qap</string>
 				</array>
 			</dict>
+			<dict>
+				<key>CFBundleTypeRole</key>
+				<string>Editor</string>
+				<key>CFBundleURLSchemes</key>
+				<array>
+					<string>arin</string>
+				</array>
+			</dict>
 		</array>
 		<key>LSRequiresIPhoneOS</key>
 		<true/>

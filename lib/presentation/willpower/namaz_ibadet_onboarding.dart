@@ -105,6 +105,24 @@ class _NamazIbadetOnboardingState extends ConsumerState<NamazIbadetOnboarding> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final scaffoldBg =
+        isDark ? AppColors.anthraciteDark : AppColors.creamMist;
+    final appBarFg = isDark ? AppColors.creamBase : AppColors.emeraldDark;
+    final trackInactiveColor = isDark
+        ? Colors.white.withValues(alpha: 0.12)
+        : AppColors.creamDark;
+    final actionBarBg = isDark
+        ? Colors.black.withValues(alpha: 0.2)
+        : AppColors.creamSurface;
+    final actionBarBorder = isDark
+        ? Colors.white.withValues(alpha: 0.08)
+        : AppColors.creamDark;
+    final backBtnColor = isDark ? AppColors.creamBase : AppColors.emeraldDark;
+    final sealTrackColor = isDark
+        ? Colors.white.withValues(alpha: 0.12)
+        : AppColors.creamDark;
+
     return PopScope(
       canPop: false,
       onPopInvokedWithResult: (didPop, result) {
@@ -116,22 +134,17 @@ class _NamazIbadetOnboardingState extends ConsumerState<NamazIbadetOnboarding> {
         _closeIncomplete();
       },
       child: Scaffold(
-        backgroundColor: AppColors.anthraciteDark,
+        backgroundColor: scaffoldBg,
         appBar: AppBar(
           backgroundColor: Colors.transparent,
           elevation: 0,
           leading: IconButton(
-            icon: const Icon(
-              Icons.arrow_back_rounded,
-              color: AppColors.creamBase,
-            ),
+            icon: Icon(Icons.arrow_back_rounded, color: appBarFg),
             onPressed: _back,
           ),
           title: Text(
             l10n.namazIbadetPrepTitle,
-            style: AppTextStyles.titleMedium.copyWith(
-              color: AppColors.creamBase,
-            ),
+            style: AppTextStyles.titleMedium.copyWith(color: appBarFg),
           ),
         ),
         body: Column(
@@ -151,7 +164,7 @@ class _NamazIbadetOnboardingState extends ConsumerState<NamazIbadetOnboarding> {
                           borderRadius: BorderRadius.circular(2),
                           color: filled
                               ? AppColors.accentNeonGreen
-                              : Colors.white.withValues(alpha: 0.12),
+                              : trackInactiveColor,
                         ),
                       ),
                     ),
@@ -165,8 +178,9 @@ class _NamazIbadetOnboardingState extends ConsumerState<NamazIbadetOnboarding> {
                 physics: const NeverScrollableScrollPhysics(),
                 onPageChanged: (i) => setState(() => _pageIndex = i),
                 children: [
-                  _NamazWarningPage(),
+                  _NamazWarningPage(isDark: isDark),
                   _NamazCommitmentPage(
+                    isDark: isDark,
                     controller: _commitment,
                     chips: namazIbadetCommitmentChipsFor(
                       localeCode: Localizations.localeOf(context).languageCode,
@@ -183,7 +197,7 @@ class _NamazIbadetOnboardingState extends ConsumerState<NamazIbadetOnboarding> {
                           ? '${_commitment.text.trim().substring(0, 120)}…'
                           : _commitment.text.trim(),
                       accentColor: AppColors.accentNeonGreen,
-                      progressTrackColor: Colors.white.withValues(alpha: 0.12),
+                      progressTrackColor: sealTrackColor,
                       showSkip: false,
                       holdHint: l10n.namazIbadetSealHoldHint,
                       successMessage: l10n.namazIbadetSealSuccess,
@@ -220,25 +234,23 @@ class _NamazIbadetOnboardingState extends ConsumerState<NamazIbadetOnboarding> {
                 child: Container(
                   padding: const EdgeInsets.fromLTRB(10, 10, 10, 8),
                   decoration: BoxDecoration(
-                    color: Colors.black.withValues(alpha: 0.2),
+                    color: actionBarBg,
                     borderRadius: BorderRadius.circular(16),
-                    border: Border.all(
-                      color: Colors.white.withValues(alpha: 0.08),
-                    ),
+                    border: Border.all(color: actionBarBorder),
                   ),
                   child: Row(
                     children: [
                       TextButton.icon(
                         onPressed: _back,
-                        icon: const Icon(
+                        icon: Icon(
                           Icons.arrow_back_rounded,
                           size: 18,
-                          color: AppColors.creamBase,
+                          color: backBtnColor,
                         ),
                         label: Text(
                           l10n.surveyBack,
                           style: AppTextStyles.labelLarge.copyWith(
-                            color: AppColors.creamBase,
+                            color: backBtnColor,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
@@ -272,13 +284,26 @@ class _NamazIbadetOnboardingState extends ConsumerState<NamazIbadetOnboarding> {
 }
 
 class _NamazWarningPage extends StatelessWidget {
+  const _NamazWarningPage({required this.isDark});
+
+  final bool isDark;
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final titleColor = isDark ? AppColors.creamBase : AppColors.textPrimary;
+    final subtitleColor =
+        isDark ? AppColors.textOnDarkMuted : AppColors.textSecondary;
+    final bulletColor = isDark
+        ? AppColors.creamBase.withValues(alpha: 0.9)
+        : AppColors.textPrimary;
+    final iconColor = isDark
+        ? AppColors.accentNeonGreen.withValues(alpha: 0.9)
+        : AppColors.accentGreenOnLight;
     final icon = Icon(
       Icons.warning_amber_rounded,
       size: 56,
-      color: AppColors.accentNeonGreen.withValues(alpha: 0.9),
+      color: iconColor,
     );
     final bullets = [
       l10n.namazIbadetWarningBullet1,
@@ -294,7 +319,7 @@ class _NamazWarningPage extends StatelessWidget {
           l10n.namazIbadetWarningTitle,
           textAlign: TextAlign.center,
           style: AppTextStyles.headlineSmall.copyWith(
-            color: AppColors.creamBase,
+            color: titleColor,
             fontWeight: FontWeight.w800,
           ),
         ),
@@ -302,9 +327,7 @@ class _NamazWarningPage extends StatelessWidget {
         Text(
           l10n.namazIbadetWarningSubtitle,
           textAlign: TextAlign.center,
-          style: AppTextStyles.bodySmall.copyWith(
-            color: AppColors.textOnDarkMuted,
-          ),
+          style: AppTextStyles.bodySmall.copyWith(color: subtitleColor),
         ),
         const SizedBox(height: 24),
         ...bullets.asMap().entries.map(
@@ -313,7 +336,7 @@ class _NamazWarningPage extends StatelessWidget {
             child: Text(
               '• ${e.value}',
               style: AppTextStyles.bodyMedium.copyWith(
-                color: AppColors.creamBase.withValues(alpha: 0.9),
+                color: bulletColor,
                 height: 1.45,
               ),
             ).animate().fadeIn(delay: (80 * e.key).ms),
@@ -325,29 +348,53 @@ class _NamazWarningPage extends StatelessWidget {
 }
 
 class _NamazCommitmentPage extends StatelessWidget {
-  const _NamazCommitmentPage({required this.controller, required this.chips});
+  const _NamazCommitmentPage({
+    required this.isDark,
+    required this.controller,
+    required this.chips,
+  });
 
+  final bool isDark;
   final TextEditingController controller;
   final Map<String, String> chips;
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final titleColor = isDark ? AppColors.creamBase : AppColors.textPrimary;
+    final subtitleColor =
+        isDark ? AppColors.textOnDarkMuted : AppColors.textSecondary;
+    final iconColor = isDark
+        ? AppColors.accentNeonGreen.withValues(alpha: 0.9)
+        : AppColors.accentGreenOnLight;
+    final inputTextColor = isDark ? AppColors.creamBase : AppColors.textPrimary;
+    final containerBorderColor = isDark
+        ? Colors.white.withValues(alpha: 0.09)
+        : AppColors.creamDark;
+    final containerGradientColors = isDark
+        ? [
+            Colors.white.withValues(alpha: 0.05),
+            Colors.white.withValues(alpha: 0.02),
+          ]
+        : [AppColors.creamSurface, AppColors.creamSurface];
+    final fillColor = isDark
+        ? Colors.white.withValues(alpha: 0.03)
+        : AppColors.creamSurface;
+    final enabledBorderColor = isDark
+        ? Colors.white.withValues(alpha: 0.1)
+        : AppColors.creamDark;
+
     return ListView(
       padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
       children: [
         Row(
           children: [
-            Icon(
-              Icons.auto_awesome_rounded,
-              size: 20,
-              color: AppColors.accentNeonGreen.withValues(alpha: 0.9),
-            ),
+            Icon(Icons.auto_awesome_rounded, size: 20, color: iconColor),
             const SizedBox(width: 8),
             Text(
               l10n.namazIbadetCommitmentTitle,
               style: AppTextStyles.titleLarge.copyWith(
-                color: AppColors.creamBase,
+                color: titleColor,
                 fontWeight: FontWeight.w700,
               ),
             ),
@@ -357,7 +404,7 @@ class _NamazCommitmentPage extends StatelessWidget {
         Text(
           l10n.namazIbadetCommitmentHint,
           style: AppTextStyles.bodySmall.copyWith(
-            color: AppColors.textOnDarkMuted,
+            color: subtitleColor,
             height: 1.4,
           ),
         ),
@@ -369,12 +416,9 @@ class _NamazCommitmentPage extends StatelessWidget {
             gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
-              colors: [
-                Colors.white.withValues(alpha: 0.05),
-                Colors.white.withValues(alpha: 0.02),
-              ],
+              colors: containerGradientColors,
             ),
-            border: Border.all(color: Colors.white.withValues(alpha: 0.09)),
+            border: Border.all(color: containerBorderColor),
             boxShadow: [
               BoxShadow(
                 color: AppColors.accentNeonGreen.withValues(alpha: 0.08),
@@ -387,24 +431,20 @@ class _NamazCommitmentPage extends StatelessWidget {
             controller: controller,
             maxLines: 4,
             cursorColor: AppColors.accentNeonGreen,
-            style: commitmentInputTextStyle(color: AppColors.creamBase),
+            style: commitmentInputTextStyle(color: inputTextColor),
             decoration: InputDecoration(
               hintText: l10n.namazIbadetCommitmentFieldHint,
               hintStyle: commitmentInputHintStyle(),
               filled: true,
-              fillColor: Colors.white.withValues(alpha: 0.03),
+              fillColor: fillColor,
               contentPadding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(16),
-                borderSide: BorderSide(
-                  color: Colors.white.withValues(alpha: 0.1),
-                ),
+                borderSide: BorderSide(color: enabledBorderColor),
               ),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(16),
-                borderSide: BorderSide(
-                  color: Colors.white.withValues(alpha: 0.1),
-                ),
+                borderSide: BorderSide(color: enabledBorderColor),
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(16),

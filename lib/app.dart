@@ -22,17 +22,24 @@ import 'data/services/app_local_notification_scheduler.dart';
 import 'data/services/location_service.dart';
 import 'data/services/prayer_notification_scheduler.dart';
 import 'data/services/prayer_reminder_prefs.dart';
+import 'data/services/widget_quote_override_service.dart';
 import 'l10n/app_localizations.dart';
 import 'data/services/habit_cloud_sync_service.dart';
 import 'data/services/inspiration_engagement_sync_service.dart';
+import 'data/services/tracking_widget_service.dart';
+import 'data/services/user_cloud_backup_service.dart';
+import 'data/services/widget_access_service.dart';
+import 'data/repositories/salat_log_repository.dart';
 import 'presentation/inspire/explore_bgm_controller.dart';
 import 'presentation/inspire/inspiration_engagement_provider.dart';
 import 'presentation/shared/providers/auth_providers.dart';
 import 'presentation/shared/providers/habit_providers.dart';
 import 'presentation/shared/providers/quotes_providers.dart';
 import 'presentation/shared/providers/prayer_time_providers.dart';
+import 'presentation/shared/providers/premium_providers.dart';
 import 'presentation/shared/providers/user_profile_providers.dart';
 import 'presentation/shared/widgets/global_edge_swipe_back.dart';
+import 'presentation/shared/widgets/widget_launch_gate_listener.dart';
 import 'presentation/qibla/qibla_hub_navigator_key.dart';
 
 final themeModeProvider = StateProvider<ThemeMode>((ref) => ThemeMode.dark);
@@ -67,8 +74,20 @@ class _ArinAppState extends ConsumerState<ArinApp> with WidgetsBindingObserver {
   Future<void> _warmupPoolsAndReschedule() async {
     final prefs = ref.read(sharedPreferencesProvider);
     final pools = ref.read(quotePoolsRepositoryProvider);
+    var skipWidgetQuoteSync = false;
     try {
-      await pools.ensureSyncedToday(QuotePoolIds.widgetQuote);
+      final override = await WidgetQuoteOverrideService.applyIfDue(prefs);
+      skipWidgetQuoteSync = override.activeApplied;
+      if (override.shouldResumeNormal) {
+        await pools.clearCacheForPool(QuotePoolIds.widgetQuote);
+      }
+    } catch (e) {
+      debugPrint('Widget override sync failed: $e');
+    }
+    try {
+      if (!skipWidgetQuoteSync) {
+        await pools.ensureSyncedToday(QuotePoolIds.widgetQuote);
+      }
     } catch (e) {
       debugPrint('Pool sync widgetQuote failed: $e');
     }
@@ -109,6 +128,17 @@ class _ArinAppState extends ConsumerState<ArinApp> with WidgetsBindingObserver {
   }
 
   Future<void> _pauseLongAudioForBackground() async {
+    if (isFirebaseReady) {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        await UserCloudBackupService.pushFromLocal(
+          uid: user.uid,
+          prefs: ref.read(sharedPreferencesProvider),
+          force: true,
+        );
+      }
+    }
+    await InspirationEngagementSyncService.flushPendingPush();
     await ref
         .read(exploreBgmNotifierProvider.notifier)
         .pauseForVisibilityLoss();
@@ -153,8 +183,30 @@ class _ArinAppState extends ConsumerState<ArinApp> with WidgetsBindingObserver {
       await PrayerNotificationScheduler.promptLocalNotificationPermissions();
     }
     await _maybeOneTimeWidgetQuoteRefreshAfterAdminEdit();
+    try {
+      final premium = await ref.read(premiumEntitlementProvider.future);
+      await WidgetAccessService(prefs).syncAll(isPremium: premium.isActive);
+    } catch (e) {
+      debugPrint('Widget access sync failed: $e');
+      await WidgetAccessService(prefs).syncAll(isPremium: false);
+    }
+    unawaited(
+      TrackingWidgetService.refreshSelected(
+        prefs: prefs,
+        habitRepo: ref.read(habitRepositoryProvider),
+        salatRepo: SalatLogRepository(),
+      ),
+    );
 
     unawaited(_flushHabitDeleteQueueIfSignedIn());
+    if (isFirebaseReady) {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        unawaited(
+          UserCloudBackupService.pushFromLocal(uid: user.uid, prefs: prefs),
+        );
+      }
+    }
 
     await Future<void>.delayed(const Duration(seconds: 3));
     if (!mounted) return;
@@ -263,27 +315,44 @@ class _ArinAppState extends ConsumerState<ArinApp> with WidgetsBindingObserver {
         final uid = user.uid;
         Future<void> run() async {
           final repo = ref.read(habitRepositoryProvider);
-          await HabitCloudSyncService.pullToLocal(
+          final habitPullOk = await HabitCloudSyncService.pullToLocal(
             uid: uid,
             repo: repo,
             prefs: prefs,
           );
+          if (!habitPullOk) return;
           await HabitCloudSyncService.pushFromLocal(
             uid: uid,
             repo: repo,
             prefs: prefs,
           );
+          await UserCloudBackupService.syncAfterSignIn(uid: uid, prefs: prefs);
           await InspirationEngagementSyncService.pullMergeLocal(
             uid: uid,
             prefs: prefs,
           );
           await InspirationEngagementSyncService.pushFromPrefs(prefs);
+          await InspirationEngagementSyncService.flushPendingPush();
           ref.invalidate(inspirationSavedIdsProvider);
           ref.invalidate(inspirationLikedIdsProvider);
           ref.read(habitSummaryProvider.notifier).refresh();
+          unawaited(_warmupPoolsAndReschedule());
+          if (PrayerReminderPrefs.isEnabled(prefs)) {
+            unawaited(_bootstrapPrayerNotifications());
+          }
         }
 
         Future.microtask(run);
+      });
+    });
+
+    ref.listen(premiumEntitlementProvider, (previous, next) {
+      next.whenData((entitlement) {
+        unawaited(
+          WidgetAccessService(
+            ref.read(sharedPreferencesProvider),
+          ).syncAll(isPremium: entitlement.isActive),
+        );
       });
     });
 
@@ -337,7 +406,7 @@ class _ArinAppState extends ConsumerState<ArinApp> with WidgetsBindingObserver {
                 }
                 return false;
               },
-              child: child,
+              child: WidgetLaunchGateListener(child: child),
             ),
           ),
         );

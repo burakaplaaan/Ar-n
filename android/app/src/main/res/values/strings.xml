@@ -8,8 +8,12 @@
     <string name="widget_description">Günlük söz ve kaynak — Arın</string>
     <string name="widget_quote_description">Arın — günlük söz</string>
     <string name="widget_prayer_description">Arın — namaz vakitleri</string>
+    <string name="widget_combo_description">Arın — namaz vakti ve günlük söz</string>
+    <string name="widget_tracking_description">Arın — seçili takip ve motivasyon</string>
     <string name="widget_quote_title">Arın · Söz</string>
     <string name="widget_prayer_title">Arın · Namaz</string>
+    <string name="widget_combo_title">Arın · Karma</string>
+    <string name="widget_tracking_title">Arın · Takip</string>
     <string name="widget_brand_label">Arın</string>
     <string name="widget_placeholder_quote_source">TALAK 3</string>
     <string name="widget_placeholder_quote">Kim Allah\'a tevekkül\nederse, O ona yeter.</string>

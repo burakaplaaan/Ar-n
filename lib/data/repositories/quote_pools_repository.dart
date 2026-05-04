@@ -26,6 +26,7 @@ class QuotePoolsRepository {
 
   final SharedPreferences _prefs;
   final Box<String> _box;
+  final Map<String, Future<bool>> _refreshInFlight = {};
 
   static const _legacyHiveBundle = 'bundle_json';
 
@@ -83,7 +84,7 @@ class QuotePoolsRepository {
     if (hasHiveData) {
       if (isFirebaseReady) {
         unawaited(
-          _refreshFromServer(poolId, now).then((loaded) async {
+          _refreshFromServerDeduped(poolId, now).then((loaded) async {
             if (loaded && isWidgetPool) {
               await _maybePushWidget();
             }
@@ -100,7 +101,7 @@ class QuotePoolsRepository {
     // ile sunabileceğimiz hiçbir şey yok. Burası kötü ağda yine 10sn
     // bekleyebilir ama bu sadece ilk launch'ta bir kez olur.
     final loaded = isFirebaseReady
-        ? await _refreshFromServer(poolId, now)
+        ? await _refreshFromServerDeduped(poolId, now)
         : false;
 
     if (!loaded &&
@@ -119,6 +120,15 @@ class QuotePoolsRepository {
 
   /// Server'dan tazele, başarılıysa Hive'a yaz + lastFetch markla.
   /// [ensureSyncedToday] hem fg hem arka plan yolundan çağırır.
+  Future<bool> _refreshFromServerDeduped(String poolId, DateTime now) {
+    final current = _refreshInFlight[poolId];
+    if (current != null) return current;
+    final future = _refreshFromServer(poolId, now);
+    _refreshInFlight[poolId] = future;
+    future.whenComplete(() => _refreshInFlight.remove(poolId));
+    return future;
+  }
+
   Future<bool> _refreshFromServer(String poolId, DateTime now) async {
     var loaded = false;
     try {

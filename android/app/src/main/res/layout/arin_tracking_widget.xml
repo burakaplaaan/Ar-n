@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/widget_tracking_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/transparent"
+    android:paddingStart="24dp"
+    android:paddingTop="7dp"
+    android:paddingEnd="22dp"
+    android:paddingBottom="7dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/widget_tracking_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:fontFamily="sans-serif-black"
+            android:includeFontPadding="false"
+            android:maxLines="1"
+            android:shadowColor="#44000000"
+            android:shadowDx="0"
+            android:shadowDy="1"
+            android:shadowRadius="2"
+            android:textColor="@color/widget_quote_text_white"
+            android:textSize="13sp"
+            android:textStyle="bold"
+            tools:text="Sigarasız gün sayacı" />
+
+        <TextView
+            android:id="@+id/widget_tracking_value"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:ellipsize="end"
+            android:fontFamily="serif"
+            android:includeFontPadding="false"
+            android:maxLines="1"
+            android:shadowColor="#66000000"
+            android:shadowDx="0"
+            android:shadowDy="1"
+            android:shadowRadius="3"
+            android:textColor="@color/widget_quote_text_white"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            tools:text="Sigarasız 18. gün" />
+
+        <TextView
+            android:id="@+id/widget_tracking_note"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="3dp"
+            android:ellipsize="end"
+            android:fontFamily="serif"
+            android:includeFontPadding="false"
+            android:lineSpacingExtra="0dp"
+            android:maxLines="2"
+            android:shadowColor="#66000000"
+            android:shadowDx="0"
+            android:shadowDy="1"
+            android:shadowRadius="3"
+            android:textColor="@color/widget_quote_text_white"
+            android:textSize="14sp"
+            tools:text="Kriz geçer, kararın kalır." />
+    </LinearLayout>
+</FrameLayout>

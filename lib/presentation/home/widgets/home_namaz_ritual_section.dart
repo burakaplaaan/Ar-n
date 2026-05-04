@@ -37,6 +37,20 @@ class HomeNamazRitualSection extends ConsumerWidget {
       final habit = repo.findActiveByTemplateId(WillpowerTemplates.salatDaily);
       if (!context.mounted) return;
       if (habit != null) {
+        final alreadyComplete =
+            habit.onboardingCompleted &&
+            habit.commitmentText.trim().isNotEmpty;
+        if (alreadyComplete) {
+          // Kurulum daha önce tamamlanmış: ana sayfa görünürlük bayrağını
+          // aç ve doğrudan asıl takip sayfasını göster. Onboarding atlanır,
+          // kurulum hint snackbar'ı tetiklenmez.
+          await ref
+              .read(salatTrackingVisibleOnHomeProvider.notifier)
+              .enableFromGelisim();
+          if (!context.mounted) return;
+          context.push(AppRoutes.willNamaz(habit.id));
+          return;
+        }
         context.push(AppRoutes.willNamaz(habit.id, fromGelisimSetup: true));
         return;
       }

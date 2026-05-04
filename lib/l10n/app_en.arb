@@ -23,6 +23,8 @@
   "settingsMenuAdminSubtitle": "Quote pools and Explore",
   "settingsMenuContactTitle": "Contact us",
   "settingsMenuContactSubtitle": "Support and feedback",
+  "settingsMenuSupportTitle": "Support Arin",
+  "settingsMenuSupportSubtitle": "One-time support packs",
   "settingsMenuComingSoon": "Write to us by email",
   "settingsContactPageTitle": "Contact us",
   "settingsContactSubtitle": "You can send suggestions, bug reports, or support requests directly by email.",
@@ -244,6 +246,9 @@
   "reminderEnableNotificationsAction": "Enable notifications",
   "reminderDurationsPerPrayerTitle": "Durations for each prayer",
   "reminderDurationsPerPrayerSubtitle": "Tap a row to choose the 1st and 2nd alerts separately.",
+  "reminderApplyDurationsAllButton": "Apply selected durations to all prayers",
+  "reminderAllPrayersDurationTarget": "All prayers",
+  "reminderDurationsAppliedAllSuccess": "Durations applied to all prayers.",
   "reminderDualAlertTitle": "Two alerts — {prayerTitle}",
   "@reminderDualAlertTitle": {
     "placeholders": {

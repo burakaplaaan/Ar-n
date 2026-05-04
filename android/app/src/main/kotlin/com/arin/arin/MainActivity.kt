@@ -2,6 +2,7 @@ package com.arin.arin
 
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.os.Bundle
 import android.hardware.GeomagneticField
 import android.media.RingtoneManager
 import androidx.core.content.FileProvider
@@ -12,9 +13,34 @@ import io.flutter.plugin.common.MethodChannel
 import java.io.File
 
 class MainActivity : FlutterActivity() {
+    private var pendingWidgetLaunchKind: String? = null
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        pendingWidgetLaunchKind = intent?.getStringExtra(EXTRA_WIDGET_KIND)
+        super.onCreate(savedInstanceState)
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        pendingWidgetLaunchKind = intent.getStringExtra(EXTRA_WIDGET_KIND)
+    }
+
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
         val messenger = flutterEngine.dartExecutor.binaryMessenger
+
+        MethodChannel(messenger, "com.arin.arin/widget_launch")
+            .setMethodCallHandler { call, result ->
+                when (call.method) {
+                    "consumeWidgetLaunch" -> {
+                        val kind = pendingWidgetLaunchKind
+                        pendingWidgetLaunchKind = null
+                        result.success(kind)
+                    }
+                    else -> result.notImplemented()
+                }
+            }
 
         MethodChannel(messenger, "com.arin.arin/notification_sound_uri")
             .setMethodCallHandler { call, result ->
@@ -210,6 +236,10 @@ class MainActivity : FlutterActivity() {
                     else -> result.notImplemented()
                 }
             }
+    }
+
+    companion object {
+        const val EXTRA_WIDGET_KIND = "arin_widget_kind"
     }
 
     // ─────────────────────────────────────────────────────────────────────

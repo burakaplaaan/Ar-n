@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -98,8 +100,8 @@ class _ViewerBody extends ConsumerStatefulWidget {
 class _ViewerBodyState extends ConsumerState<_ViewerBody> {
   PageController? _pc;
   late int _settledPage;
-  int _pagesViewedThisSession = 0;
   bool _adGateShowing = false;
+  int _pendingExploreAdGateViews = 0;
 
   /// Sol kenar “geri” jesti: sağa doğru sürükleme mesafesi (px).
   double _edgeSwipeDx = 0;
@@ -111,7 +113,7 @@ class _ViewerBodyState extends ConsumerState<_ViewerBody> {
     _settledPage = safe;
     _pc = PageController(initialPage: safe, viewportFraction: 1);
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _maybeShowExploreAdGate(countPage: false);
+      _maybeShowExploreAdGate();
     });
   }
 
@@ -158,88 +160,84 @@ class _ViewerBodyState extends ConsumerState<_ViewerBody> {
     _edgeSwipeDx = 0;
   }
 
-  Future<void> _maybeShowExploreAdGate({bool countPage = true}) async {
-    if (_adGateShowing || !mounted) return;
-    if (countPage) {
-      _pagesViewedThisSession += 1;
-    }
-    final pagesViewed = _pagesViewedThisSession;
-    final adGate = ref.read(adGateServiceProvider);
-    final shouldCheckPremium = adGate.shouldShowExploreAd(
-      isPremium: false,
-      pagesViewedThisSession: pagesViewed,
-    );
-    if (!shouldCheckPremium) return;
+  void _maybeShowExploreAdGate() {
+    if (!mounted) return;
+    _pendingExploreAdGateViews += 1;
+    if (_adGateShowing) return;
+    unawaited(_drainExploreAdGateViews());
+  }
 
+  Future<void> _drainExploreAdGateViews() async {
+    if (_adGateShowing || !mounted) return;
     _adGateShowing = true;
-    await adGate.markPending(AdGatePlacement.exploreSwipe);
-    var isPremium = false;
     try {
-      final entitlement = await ref.read(premiumEntitlementProvider.future);
-      isPremium = entitlement.isActive;
-    } catch (_) {
-      // Entitlement okunamazsa fail-closed: ücretsiz kabul edip kapıyı koru.
-      isPremium = false;
-    }
-    if (!mounted) {
+      final adGate = ref.read(adGateServiceProvider);
+      while (mounted && _pendingExploreAdGateViews > 0) {
+        _pendingExploreAdGateViews -= 1;
+        final shouldCheckPremium = await adGate
+            .recordExploreViewAndShouldShowAd(isPremium: false);
+        if (!mounted) return;
+        if (!shouldCheckPremium) continue;
+
+        await adGate.markPending(AdGatePlacement.exploreSwipe);
+        if (!mounted) return;
+        var isPremium = false;
+        try {
+          final entitlement = await ref.read(premiumEntitlementProvider.future);
+          isPremium = entitlement.isActive;
+        } catch (_) {
+          // Entitlement okunamazsa fail-closed: ücretsiz kabul edip kapıyı koru.
+          isPremium = false;
+        }
+        if (!mounted) return;
+        if (isPremium) {
+          await adGate.clearPending(AdGatePlacement.exploreSwipe);
+          _pendingExploreAdGateViews = 0;
+          return;
+        }
+        if (!adGate.isPending(AdGatePlacement.exploreSwipe)) continue;
+        if (!mounted) return;
+        await ref.read(exploreBgmNotifierProvider.notifier).pauseForAdGate();
+        if (!mounted) return;
+        await showModalBottomSheet<void>(
+          context: context,
+          isDismissible: false,
+          enableDrag: false,
+          backgroundColor: const Color(0xFF08130E),
+          shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.vertical(top: Radius.circular(26)),
+          ),
+          builder: (ctx) => _ExploreAdGateSheet(
+            onContinue: () async {
+              final shown = await ref
+                  .read(adMobServiceProvider)
+                  .showInterstitial(ArinAdUnit.exploreInterstitial);
+              if (!shown || !mounted) return false;
+              await adGate.recordRewardedUnlock(AdGatePlacement.exploreSwipe);
+              return true;
+            },
+            onPremium: () {
+              Navigator.pop(ctx);
+              context.go('/premium');
+            },
+            onExit: () {
+              Navigator.pop(ctx);
+              if (context.canPop()) {
+                context.pop();
+              } else {
+                context.go('/home');
+              }
+            },
+          ),
+        );
+        return;
+      }
+    } finally {
       _adGateShowing = false;
-      return;
+      if (mounted && _pendingExploreAdGateViews > 0) {
+        unawaited(_drainExploreAdGateViews());
+      }
     }
-    if (isPremium) {
-      await adGate.clearPending(AdGatePlacement.exploreSwipe);
-      _adGateShowing = false;
-      return;
-    }
-    if (!adGate.shouldShowExploreAd(
-      isPremium: isPremium,
-      pagesViewedThisSession: pagesViewed,
-    )) {
-      _adGateShowing = false;
-      return;
-    }
-    if (!mounted) {
-      _adGateShowing = false;
-      return;
-    }
-    await ref
-        .read(exploreBgmNotifierProvider.notifier)
-        .pauseForAdGate();
-    if (!mounted) {
-      _adGateShowing = false;
-      return;
-    }
-    await showModalBottomSheet<void>(
-      context: context,
-      isDismissible: false,
-      enableDrag: false,
-      backgroundColor: const Color(0xFF08130E),
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(26)),
-      ),
-      builder: (ctx) => _ExploreAdGateSheet(
-        onContinue: () async {
-          final shown = await ref
-              .read(adMobServiceProvider)
-              .showInterstitial(ArinAdUnit.exploreInterstitial);
-          if (!shown || !mounted) return false;
-          await adGate.recordRewardedUnlock(AdGatePlacement.exploreSwipe);
-          return true;
-        },
-        onPremium: () {
-          Navigator.pop(ctx);
-          context.go('/premium');
-        },
-        onExit: () {
-          Navigator.pop(ctx);
-          if (context.canPop()) {
-            context.pop();
-          } else {
-            context.go('/home');
-          }
-        },
-      ),
-    );
-    _adGateShowing = false;
   }
 
   @override

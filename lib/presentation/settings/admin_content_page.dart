@@ -10,6 +10,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:path_provider/path_provider.dart';
@@ -29,14 +30,17 @@ import '../../data/services/app_local_notification_scheduler.dart';
 import '../../data/services/app_notification_channel_prefs.dart';
 import '../../data/services/inspiration_asset_discovery.dart';
 import '../../data/services/prayer_reminder_prefs.dart';
+import '../../data/services/widget_quote_override_service.dart';
 import '../../l10n/app_localizations.dart';
 import '../shared/providers/auth_providers.dart';
 import '../shared/providers/premium_providers.dart';
+import '../shared/providers/quotes_providers.dart';
 import 'admin_dev_tab.dart';
 import 'widgets/admin_diagnostics_tab.dart';
 
 part 'admin_content_inspire_form_row.dart';
 part 'admin_content_pools_tab.dart';
+part 'admin_content_widget_override_tab.dart';
 part 'admin_content_inspire_tab.dart';
 part 'admin_content_identity_strip.dart';
 
@@ -68,9 +72,20 @@ class _AdminContentPageState extends ConsumerState<AdminContentPage>
   String? _poolError;
   String? _inspireError;
   bool _inspireLoadStarted = false;
+  static const Duration _inspirePublishDelay = Duration(hours: 16);
 
   /// Pool havuzunda öğe aramak için. Case-insensitive prefix/contains.
   String _poolSearch = '';
+  String _inspireSearch = '';
+  final TextEditingController _inspireSearchController =
+      TextEditingController();
+  final TextEditingController _widgetOverrideTextController =
+      TextEditingController();
+  final TextEditingController _widgetOverrideSourceController =
+      TextEditingController(text: 'Arın');
+  final TextEditingController _widgetOverrideHoursController =
+      TextEditingController(text: '24');
+  InspirationContentKind _inspireKindFilter = InspirationContentKind.quote;
 
   Map<String, dynamic>? _inspireDoc;
   final List<_InspireFormRow> _inspireRows = [];
@@ -85,15 +100,25 @@ class _AdminContentPageState extends ConsumerState<AdminContentPage>
   String? _adminGrantsError;
   List<_AdminGrantRow> _adminGrants = const [];
   List<_AdminGrantRow> _adminInvites = const [];
+  bool _widgetOverrideLoading = false;
+  bool _widgetOverrideSaving = false;
+  bool _widgetOverrideLoaded = false;
+  String? _widgetOverrideError;
+  Map<String, dynamic>? _widgetOverrideDoc;
   bool _premiumLoading = false;
   String? _premiumError;
   List<_PremiumGrantRow> _premiumEntitlements = const [];
   List<_PremiumGrantRow> _premiumInvites = const [];
+  _PremiumFilter _premiumFilter = _PremiumFilter.all;
+  bool _auditLoading = false;
+  bool _auditLoaded = false;
+  String? _auditError;
+  List<_AdminAuditRow> _auditRows = const [];
 
   @override
   void initState() {
     super.initState();
-    _tabs = TabController(length: 6, vsync: this);
+    _tabs = TabController(length: 8, vsync: this);
     _tabs.addListener(_onTabChanged);
   }
 
@@ -101,21 +126,27 @@ class _AdminContentPageState extends ConsumerState<AdminContentPage>
     if (!mounted) return;
     // indexIsChanging sırasında return etmeyin: ilk Keşfet geçişinde yükleme hiç
     // tetiklenmeyebiliyor (animasyon bitene kadar listener tekrar gelmeyebilir).
-    if (_tabs.index == 1 && !_inspireLoadStarted) {
+    if (_tabs.index == 1 && !_widgetOverrideLoaded && !_widgetOverrideLoading) {
+      _loadWidgetOverride();
+    }
+    if (_tabs.index == 2 && !_inspireLoadStarted) {
       _inspireLoadStarted = true;
       _loadInspire();
     }
-    if (_tabs.index == 2 && _diagLogs.isEmpty && !_diagLoading) {
+    if (_tabs.index == 3 && _diagLogs.isEmpty && !_diagLoading) {
       _loadDiagnostics();
     }
-    if (_tabs.index == 4 && !_adminGrantsLoading && _adminGrants.isEmpty) {
+    if (_tabs.index == 5 && !_adminGrantsLoading && _adminGrants.isEmpty) {
       _loadAdminGrants();
     }
-    if (_tabs.index == 5 &&
+    if (_tabs.index == 6 &&
         !_premiumLoading &&
         _premiumEntitlements.isEmpty &&
         _premiumInvites.isEmpty) {
       _loadPremiumGrants();
+    }
+    if (_tabs.index == 7 && !_auditLoading && !_auditLoaded) {
+      _loadAuditRows();
     }
   }
 
@@ -126,6 +157,10 @@ class _AdminContentPageState extends ConsumerState<AdminContentPage>
     for (final r in _inspireRows) {
       r.dispose();
     }
+    _inspireSearchController.dispose();
+    _widgetOverrideTextController.dispose();
+    _widgetOverrideSourceController.dispose();
+    _widgetOverrideHoursController.dispose();
     super.dispose();
   }
 
@@ -152,6 +187,121 @@ class _AdminContentPageState extends ConsumerState<AdminContentPage>
     }
     if (mounted) {
       setState(() => _poolLoading = false);
+    }
+  }
+
+  Future<void> _loadWidgetOverride() async {
+    if (!isFirebaseReady || !_isAdminVerified) return;
+    setState(() {
+      _widgetOverrideLoading = true;
+      _widgetOverrideError = null;
+    });
+    try {
+      final snap = await getDocumentServerFirst(
+        FirebaseFirestore.instance
+            .collection(WidgetQuoteOverrideService.collection)
+            .doc(WidgetQuoteOverrideService.documentId),
+        debugLabel: 'AdminContentPage widget_override',
+      );
+      final data = snap.data();
+      _widgetOverrideDoc = data;
+      _widgetOverrideTextController.text = data?['text']?.toString() ?? '';
+      final source = data?['source']?.toString().trim();
+      _widgetOverrideSourceController.text = source == null || source.isEmpty
+          ? 'Arın'
+          : source;
+      final expiresAt = _adminDateFromValue(data?['expiresAt']);
+      if (expiresAt != null && expiresAt.isAfter(DateTime.now())) {
+        final hours = expiresAt
+            .difference(DateTime.now())
+            .inHours
+            .clamp(1, 720);
+        _widgetOverrideHoursController.text = '$hours';
+      } else if (_widgetOverrideHoursController.text.trim().isEmpty) {
+        _widgetOverrideHoursController.text = '24';
+      }
+      _widgetOverrideLoaded = true;
+    } catch (e) {
+      _widgetOverrideError = _friendlyAdminError(
+        e,
+        fallback: 'Widget mesajı alınamadı.',
+      );
+    } finally {
+      if (mounted) {
+        setState(() => _widgetOverrideLoading = false);
+      }
+    }
+  }
+
+  Future<void> _saveWidgetOverride({required bool active}) async {
+    if (!isFirebaseReady || !_isAdminVerified) return;
+    if (_widgetOverrideSaving) return;
+    final text = _widgetOverrideTextController.text.trim();
+    final source = _widgetOverrideSourceController.text.trim();
+    final hours =
+        int.tryParse(_widgetOverrideHoursController.text.trim()) ?? 24;
+    if (active && text.isEmpty) {
+      _snack('Widget mesajı boş olamaz.');
+      return;
+    }
+    setState(() {
+      _widgetOverrideSaving = true;
+      _widgetOverrideError = null;
+    });
+    final docRef = FirebaseFirestore.instance
+        .collection(WidgetQuoteOverrideService.collection)
+        .doc(WidgetQuoteOverrideService.documentId);
+    final expiresAt = active
+        ? Timestamp.fromDate(
+            DateTime.now().add(Duration(hours: hours.clamp(1, 720))),
+          )
+        : null;
+    try {
+      await docRef.set({
+        'active': active,
+        'text': text,
+        'source': source,
+        'expiresAt': expiresAt,
+        'updatedAt': FieldValue.serverTimestamp(),
+        'updatedBy': FirebaseAuth.instance.currentUser?.uid,
+      }, SetOptions(merge: true));
+      await _writeAdminAudit(
+        action: active
+            ? 'Widget override aktif edildi'
+            : 'Widget override kapatıldı',
+        targetType: 'app_public',
+        targetId: WidgetQuoteOverrideService.documentId,
+        details: {
+          'active': active,
+          'expiresHours': active ? hours.clamp(1, 720) : null,
+        },
+      );
+      final prefs = ref.read(sharedPreferencesProvider);
+      final pools = ref.read(quotePoolsRepositoryProvider);
+      if (active) {
+        await WidgetQuoteOverrideService.applyIfDue(prefs, force: true);
+      } else {
+        await WidgetQuoteOverrideService.applyIfDue(prefs, force: true);
+        await pools.clearCacheForPool(QuotePoolIds.widgetQuote);
+        await pools.ensureSyncedToday(QuotePoolIds.widgetQuote);
+      }
+      _snack(
+        active ? 'Widget mesajı yayına alındı.' : 'Widget normal akışa döndü.',
+      );
+      await _loadWidgetOverride();
+    } catch (e) {
+      final msg = _friendlyAdminError(
+        e,
+        fallback: 'Widget mesajı kaydedilemedi.',
+      );
+      if (mounted) {
+        setState(() => _widgetOverrideError = msg);
+      }
+      _snack(msg);
+    } finally {
+      if (mounted) {
+        setState(() => _widgetOverrideSaving = false);
+      }
     }
   }
 
@@ -292,9 +442,7 @@ class _AdminContentPageState extends ConsumerState<AdminContentPage>
       );
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(l10n.adminBackupCreationFailed(e.toString()))),
       );
     }
@@ -418,10 +566,7 @@ class _AdminContentPageState extends ConsumerState<AdminContentPage>
         mergeOnly: mergeOnly,
       );
     } catch (e) {
-      final msg = _friendlyAdminError(
-        e,
-        fallback: l10n.adminBulkPreviewFailed,
-      );
+      final msg = _friendlyAdminError(e, fallback: l10n.adminBulkPreviewFailed);
       if (mounted) {
         setState(() {
           _poolError = msg;
@@ -445,9 +590,7 @@ class _AdminContentPageState extends ConsumerState<AdminContentPage>
       barrierDismissible: false,
       builder: (ctx) => AlertDialog(
         title: Text(
-          mergeOnly
-              ? l10n.adminAddMissingRecords
-              : l10n.adminSeedAllPoolsTitle,
+          mergeOnly ? l10n.adminAddMissingRecords : l10n.adminSeedAllPoolsTitle,
         ),
         content: Text(
           mergeOnly
@@ -568,6 +711,11 @@ class _AdminContentPageState extends ConsumerState<AdminContentPage>
           _inspireRows.add(_InspireFormRow.fromMap(m, useIdx, _rng));
         }
       }
+      final bundledSeedVersion =
+          (_inspireDoc?['bundledSeedVersion'] as num?)?.toInt() ?? 0;
+      if (bundledSeedVersion < 1) {
+        await _mergeBundledInspireRows(useIdx);
+      }
     } catch (e) {
       _inspireError = _friendlyAdminError(
         e,
@@ -577,6 +725,68 @@ class _AdminContentPageState extends ConsumerState<AdminContentPage>
     if (mounted) {
       setState(() => _inspireLoading = false);
     }
+  }
+
+  Future<void> _mergeBundledInspireRows(List<int> imageIndices) async {
+    final existingIds = <String>{
+      for (final row in _inspireRows)
+        if (row.design['id']?.toString().trim().isNotEmpty == true)
+          row.design['id'].toString().trim(),
+    };
+    final bundled = await _loadBundledInspireItems();
+    for (final item in bundled) {
+      final id = item['id']?.toString().trim();
+      if (id == null || id.isEmpty || existingIds.contains(id)) continue;
+      final row = _InspireFormRow.fromMap(item, imageIndices, _rng)
+        ..savedFingerprint = '';
+      _inspireRows.add(row);
+      existingIds.add(id);
+    }
+  }
+
+  Future<List<Map<String, dynamic>>> _loadBundledInspireItems() async {
+    const assets = <String>[
+      'assets/data/inspiration/quotes.json',
+      'assets/data/inspiration/verses.json',
+      'assets/data/inspiration/hadiths.json',
+    ];
+    final out = <Map<String, dynamic>>[];
+    for (final asset in assets) {
+      try {
+        final raw = await rootBundle.loadString(asset);
+        final decoded = jsonDecode(raw);
+        final rows = decoded is List
+            ? decoded
+            : decoded is Map<String, dynamic> && decoded['items'] is List
+            ? decoded['items'] as List
+            : const [];
+        for (final row in rows) {
+          if (row is! Map) continue;
+          final m = Map<String, dynamic>.from(row);
+          final kind =
+              parseInspirationContentKind(
+                (m['contentKind'] ?? m['kind'])?.toString(),
+              ) ??
+              _kindForBundledInspireAsset(asset);
+          m['contentKind'] = kind.wireName;
+          m['showInMainFeed'] =
+              m['showInMainFeed'] ?? (kind == InspirationContentKind.quote);
+          m['useLightTextOnImage'] = m['useLightTextOnImage'] ?? true;
+          out.add(m);
+        }
+      } catch (e, st) {
+        debugPrint(
+          'AdminContentPage bundled inspire load failed: $asset $e\n$st',
+        );
+      }
+    }
+    return out;
+  }
+
+  InspirationContentKind _kindForBundledInspireAsset(String asset) {
+    if (asset.contains('verses')) return InspirationContentKind.verse;
+    if (asset.contains('hadiths')) return InspirationContentKind.hadith;
+    return InspirationContentKind.quote;
   }
 
   Future<void> _loadDiagnostics() async {
@@ -686,6 +896,7 @@ class _AdminContentPageState extends ConsumerState<AdminContentPage>
         final nextDoc = <String, dynamic>{
           if (fresh.data() != null) ...fresh.data()!,
           'version': v + 1,
+          'bundledSeedVersion': 1,
           'items': list,
           'updatedAt': FieldValue.serverTimestamp(),
         };
@@ -725,8 +936,11 @@ class _AdminContentPageState extends ConsumerState<AdminContentPage>
     final useIdx = _inspireImageIndices.isNotEmpty
         ? _inspireImageIndices
         : <int>[1];
+    final row = _InspireFormRow.empty(useIdx, _rng)
+      ..contentKind = _inspireKindFilter
+      ..showInMainFeed = _inspireKindFilter == InspirationContentKind.quote;
     setState(() {
-      _inspireRows.add(_InspireFormRow.empty(useIdx, _rng));
+      _inspireRows.add(row);
     });
   }
 
@@ -817,6 +1031,7 @@ class _AdminContentPageState extends ConsumerState<AdminContentPage>
       ),
       contentKind: src.contentKind,
       showInMainFeed: src.showInMainFeed,
+      savedFingerprint: '',
     );
     setState(() {
       _inspireRows.insert(i + 1, clone);
@@ -1015,7 +1230,10 @@ class _AdminContentPageState extends ConsumerState<AdminContentPage>
         _adminInvites = invites;
       });
     } catch (e) {
-      final msg = _friendlyAdminError(e, fallback: l10n.adminGrantsListFetchFailed);
+      final msg = _friendlyAdminError(
+        e,
+        fallback: l10n.adminGrantsListFetchFailed,
+      );
       if (mounted) {
         setState(() => _adminGrantsError = msg);
       }
@@ -1041,7 +1259,9 @@ class _AdminContentPageState extends ConsumerState<AdminContentPage>
       builder: (ctx) => StatefulBuilder(
         builder: (ctx, setLocal) => AlertDialog(
           title: Text(
-            existing == null ? l10n.adminGrantAccessAction : l10n.adminEditGrantAction,
+            existing == null
+                ? l10n.adminGrantAccessAction
+                : l10n.adminEditGrantAction,
           ),
           content: Column(
             mainAxisSize: MainAxisSize.min,
@@ -1251,14 +1471,63 @@ class _AdminContentPageState extends ConsumerState<AdminContentPage>
       });
     } catch (e) {
       if (mounted) {
-        setState(() => _premiumError = _friendlyAdminError(
-          e,
-          fallback: 'Premium listesi alınamadı.',
-        ));
+        setState(
+          () => _premiumError = _friendlyAdminError(
+            e,
+            fallback: 'Premium listesi alınamadı.',
+          ),
+        );
       }
     } finally {
       if (mounted) {
         setState(() => _premiumLoading = false);
+      }
+    }
+  }
+
+  Future<void> _loadAuditRows() async {
+    final role = ref.read(currentAdminRoleProvider).asData?.value;
+    if (role?.canManageAdmins != true) return;
+    setState(() {
+      _auditLoading = true;
+      _auditError = null;
+    });
+    try {
+      final snap = await FirebaseFirestore.instance
+          .collection('admin_audit')
+          .orderBy('createdAt', descending: true)
+          .limit(50)
+          .get(const GetOptions(source: Source.server));
+      final rows = snap.docs.map((doc) {
+        final data = doc.data();
+        return _AdminAuditRow(
+          id: doc.id,
+          action: data['action']?.toString() ?? 'İşlem',
+          targetType: data['targetType']?.toString() ?? '-',
+          targetId: data['targetId']?.toString() ?? '-',
+          email: data['email']?.toString(),
+          role: data['role']?.toString(),
+          createdAt: _dateFromAdminValue(data['createdAt']),
+          beforeCount: (data['beforeCount'] as num?)?.toInt(),
+          afterCount: (data['afterCount'] as num?)?.toInt(),
+        );
+      }).toList();
+      if (!mounted) return;
+      setState(() {
+        _auditRows = rows;
+        _auditLoaded = true;
+      });
+    } catch (e) {
+      if (!mounted) return;
+      setState(
+        () => _auditError = _friendlyAdminError(
+          e,
+          fallback: 'İşlem geçmişi alınamadı.',
+        ),
+      );
+    } finally {
+      if (mounted) {
+        setState(() => _auditLoading = false);
       }
     }
   }
@@ -1402,8 +1671,12 @@ class _AdminContentPageState extends ConsumerState<AdminContentPage>
       confirmLabel: 'Geri al',
     );
     if (!confirmed) return;
-    final collection = row.isInvite ? 'premium_invites' : 'premium_entitlements';
-    final docRef = FirebaseFirestore.instance.collection(collection).doc(row.id);
+    final collection = row.isInvite
+        ? 'premium_invites'
+        : 'premium_entitlements';
+    final docRef = FirebaseFirestore.instance
+        .collection(collection)
+        .doc(row.id);
     final auditRef = FirebaseFirestore.instance.collection('admin_audit').doc();
     try {
       final batch = FirebaseFirestore.instance.batch();
@@ -1575,7 +1848,7 @@ class _AdminContentPageState extends ConsumerState<AdminContentPage>
                           controller: arabicCtrl,
                           maxLines: 3,
                           decoration: InputDecoration(
-                            labelText: l10n.adminArabicLabel,
+                            labelText: l10n.adminOptionalArabicLabel,
                             border: const OutlineInputBorder(),
                           ),
                         ),
@@ -1730,8 +2003,8 @@ class _AdminContentPageState extends ConsumerState<AdminContentPage>
           break;
         case _PoolEditorKind.namazWisdom:
           final t = textCtrl.text.trim();
-          if (t.isEmpty || arabicCtrl.text.trim().isEmpty) {
-            _snack(l10n.adminTurkishAndArabicRequired);
+          if (t.isEmpty) {
+            _snack(l10n.adminTurkishTextCannotBeEmpty);
             return;
           }
           built = {
@@ -1900,10 +2173,7 @@ class _AdminContentPageState extends ConsumerState<AdminContentPage>
               children: [
                 const Icon(Icons.lock_outline_rounded, size: 42),
                 const SizedBox(height: 12),
-                Text(
-                  l10n.adminPageForAdminsOnly,
-                  textAlign: TextAlign.center,
-                ),
+                Text(l10n.adminPageForAdminsOnly, textAlign: TextAlign.center),
                 const SizedBox(height: 10),
                 TextButton(
                   onPressed: () => context.go('/settings'),
@@ -1939,17 +2209,22 @@ class _AdminContentPageState extends ConsumerState<AdminContentPage>
         iconTheme: const IconThemeData(color: Colors.white),
         bottom: TabBar(
           controller: _tabs,
+          isScrollable: true,
           tabs: [
-            Tab(icon: const Icon(Icons.inventory_2_outlined), text: l10n.adminPoolsTab),
+            Tab(
+              icon: const Icon(Icons.inventory_2_outlined),
+              text: l10n.adminPoolsTab,
+            ),
+            const Tab(icon: Icon(Icons.widgets_outlined), text: 'Widget'),
             Tab(
               icon: const Icon(Icons.photo_library_outlined),
               text: l10n.adminInspireCardsTab,
             ),
-            Tab(
-              icon: const Icon(Icons.monitor_heart_outlined),
-              text: l10n.adminDiagnosticsTab,
+            const Tab(
+              icon: Icon(Icons.monitor_heart_outlined),
+              text: 'Bildirim Tanı',
             ),
-            Tab(icon: const Icon(Icons.build_outlined), text: l10n.adminDeveloperTab),
+            const Tab(icon: Icon(Icons.build_outlined), text: 'Teknik'),
             Tab(
               icon: const Icon(Icons.manage_accounts_outlined),
               text: l10n.adminGrantsTab,
@@ -1958,6 +2233,7 @@ class _AdminContentPageState extends ConsumerState<AdminContentPage>
               icon: Icon(Icons.workspace_premium_outlined),
               text: 'Premium',
             ),
+            const Tab(icon: Icon(Icons.history_rounded), text: 'Geçmiş'),
           ],
         ),
       ),
@@ -1972,11 +2248,13 @@ class _AdminContentPageState extends ConsumerState<AdminContentPage>
               controller: _tabs,
               children: [
                 _buildPoolsTab(),
+                _buildWidgetOverrideTab(role),
                 _buildInspireTab(),
                 _buildDiagnosticsTab(role),
                 _buildDeveloperToolsTab(role),
                 _buildAdminGrantsTab(role),
                 _buildPremiumGrantsTab(role),
+                _buildAuditTab(role),
               ],
             ),
           ),
@@ -2093,20 +2371,80 @@ class _AdminContentPageState extends ConsumerState<AdminContentPage>
     );
   }
 
+  Widget _buildWidgetOverrideTab(AdminRole role) {
+    if (!role.canEditContent) {
+      return _buildAccessDenied(
+        icon: Icons.widgets_outlined,
+        title: 'Widget mesajı için admin yetkisi gerekiyor',
+        subtitle:
+            'Bu bölüm yalnızca içerik yöneticileri tarafından kullanılır.',
+      );
+    }
+    return _buildAdminWidgetOverrideTab(
+      context: context,
+      bottomInset: _shellBodyBottomInset(context),
+      loading: _widgetOverrideLoading,
+      saving: _widgetOverrideSaving,
+      error: _widgetOverrideError,
+      doc: _widgetOverrideDoc,
+      textController: _widgetOverrideTextController,
+      sourceController: _widgetOverrideSourceController,
+      hoursController: _widgetOverrideHoursController,
+      onRefresh: _loadWidgetOverride,
+      onActivate: () => _saveWidgetOverride(active: true),
+      onDisable: () => _saveWidgetOverride(active: false),
+    );
+  }
+
   Widget _buildInspireTab() {
     final bottomInset = _shellBodyBottomInset(context);
     final useIdx = _inspireImageIndices.isNotEmpty
         ? _inspireImageIndices
         : <int>[1];
+    final q = _inspireSearch.trim().toLowerCase();
+    final rowIndices = <int>[];
+    for (var i = 0; i < _inspireRows.length; i++) {
+      final row = _inspireRows[i];
+      if (row.contentKind != _inspireKindFilter) continue;
+      if (q.isNotEmpty &&
+          !row.tr.text.toLowerCase().contains(q) &&
+          !row.ar.text.toLowerCase().contains(q) &&
+          !row.source.text.toLowerCase().contains(q) &&
+          !row.verseRef.text.toLowerCase().contains(q)) {
+        continue;
+      }
+      rowIndices.add(i);
+    }
+    final rows = <_InspireFormRow>[
+      for (final idx in rowIndices) _inspireRows[idx],
+    ];
 
     return _buildAdminInspireTab(
       context: context,
       bottomInset: bottomInset,
       inspireLoading: _inspireLoading,
       inspireError: _inspireError,
-      inspireRows: _inspireRows,
+      allRowCount: _inspireRows.length,
+      inspireRows: rows,
+      rowIndices: rowIndices,
       inspireDoc: _inspireDoc,
+      selectedKind: _inspireKindFilter,
+      inspireSearch: _inspireSearch,
+      inspireSearchController: _inspireSearchController,
+      publishDelay: _inspirePublishDelay,
+      lastSavedAt: _inspireLastSavedAt(),
       imageIndices: useIdx,
+      onKindFilterChanged: (kind) {
+        setState(() => _inspireKindFilter = kind);
+      },
+      onSearchChanged: (v) => setState(() => _inspireSearch = v),
+      onClearSearch: () {
+        _inspireSearchController.clear();
+        setState(() => _inspireSearch = '');
+      },
+      onDraftChanged: () {
+        if (mounted) setState(() {});
+      },
       onAddCard: _addInspireCard,
       onRefreshFromServer: () {
         _inspireLoadStarted = false;
@@ -2140,6 +2478,14 @@ class _AdminContentPageState extends ConsumerState<AdminContentPage>
       },
       onSaveAll: _saveInspire,
     );
+  }
+
+  DateTime? _inspireLastSavedAt() {
+    final raw = _inspireDoc?['updatedAt'];
+    if (raw is Timestamp) return raw.toDate();
+    final ms = _inspireDoc?['updatedAtMs'];
+    if (ms is num) return DateTime.fromMillisecondsSinceEpoch(ms.toInt());
+    return null;
   }
 
   String _diagTimeText(String iso) {
@@ -2215,6 +2561,31 @@ class _AdminContentPageState extends ConsumerState<AdminContentPage>
         Text(
           l10n.adminGrantHint,
           style: TextStyle(color: Colors.white.withValues(alpha: 0.72)),
+        ),
+        const SizedBox(height: 12),
+        Card(
+          color: const Color(0xFF0F2419),
+          child: Padding(
+            padding: const EdgeInsets.all(12),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Rol özeti',
+                  style: TextStyle(fontWeight: FontWeight.w700),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'İçerik: havuz ve Keşfet düzenler. Manager: içerik + tanılama + eksik tohum ekleme. Developer: tüm yetkiler, premium, admin yönetimi ve teknik araçlar.',
+                  style: TextStyle(
+                    color: Colors.white.withValues(alpha: 0.68),
+                    fontSize: 12,
+                    height: 1.35,
+                  ),
+                ),
+              ],
+            ),
+          ),
         ),
         const SizedBox(height: 12),
         Wrap(
@@ -2322,14 +2693,48 @@ class _AdminContentPageState extends ConsumerState<AdminContentPage>
       return _buildAccessDenied(
         icon: Icons.workspace_premium_outlined,
         title: 'Premium yönetimi tam yetki ister',
-        subtitle: 'Premium verme/alma işlemleri yalnızca developer rolünde açık.',
+        subtitle:
+            'Premium verme/alma işlemleri yalnızca developer rolünde açık.',
       );
     }
     final bottomInset = _shellBodyBottomInset(context);
-    final rows = <_PremiumGrantRow>[
+    final allRows = <_PremiumGrantRow>[
       ..._premiumInvites,
       ..._premiumEntitlements,
     ];
+    final now = DateTime.now();
+    final rows = allRows.where((row) {
+      final effectiveActive =
+          row.active && (row.expiresAt == null || row.expiresAt!.isAfter(now));
+      switch (_premiumFilter) {
+        case _PremiumFilter.all:
+          return true;
+        case _PremiumFilter.active:
+          return effectiveActive;
+        case _PremiumFilter.expiring:
+          return effectiveActive &&
+              row.expiresAt != null &&
+              row.expiresAt!.difference(now) <= const Duration(days: 7);
+        case _PremiumFilter.inactive:
+          return !effectiveActive;
+      }
+    }).toList();
+    final activeCount = allRows
+        .where(
+          (row) =>
+              row.active &&
+              (row.expiresAt == null || row.expiresAt!.isAfter(now)),
+        )
+        .length;
+    final expiringCount = allRows
+        .where(
+          (row) =>
+              row.active &&
+              row.expiresAt != null &&
+              row.expiresAt!.isAfter(now) &&
+              row.expiresAt!.difference(now) <= const Duration(days: 7),
+        )
+        .length;
     return ListView(
       padding: EdgeInsets.fromLTRB(16, 16, 16, bottomInset + 16),
       children: [
@@ -2345,8 +2750,9 @@ class _AdminContentPageState extends ConsumerState<AdminContentPage>
           runSpacing: 8,
           children: [
             FilledButton.icon(
-              onPressed:
-                  _premiumLoading ? null : () => _openPremiumGrantDialog(),
+              onPressed: _premiumLoading
+                  ? null
+                  : () => _openPremiumGrantDialog(),
               icon: const Icon(Icons.card_giftcard_rounded),
               label: const Text('Premium ver'),
             ),
@@ -2368,17 +2774,81 @@ class _AdminContentPageState extends ConsumerState<AdminContentPage>
           color: const Color(0xFF0F2419),
           child: Padding(
             padding: const EdgeInsets.all(12),
-            child: Text(
-              'UID girersen premium_entitlements/{uid}, e-posta girersen '
-              'premium_invites/{email} yazılır. Kullanıcı giriş yapınca kendi '
-              'UID kaydı, yoksa e-posta daveti kontrol edilir.',
-              style: TextStyle(
-                color: Colors.white.withValues(alpha: 0.68),
-                fontSize: 12,
-                height: 1.35,
-              ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        'Premium sağlık özeti',
+                        style: TextStyle(
+                          color: Colors.white.withValues(alpha: 0.9),
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
+                    _adminStatusPill(
+                      color: expiringCount > 0
+                          ? Colors.amber
+                          : AppColors.accentNeonGreen,
+                      label: expiringCount > 0 ? 'Yakında biten var' : 'Stabil',
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Aktif: $activeCount · 7 gün içinde bitecek: $expiringCount · Toplam kayıt: ${allRows.length}',
+                  style: TextStyle(
+                    color: Colors.white.withValues(alpha: 0.78),
+                    fontSize: 12,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'UID girersen premium_entitlements/{uid}, e-posta girersen '
+                  'premium_invites/{email} yazılır. Kullanıcı tarafı stream dinlemez; '
+                  'entitlement kontrolü gerektiğinde tek seferlik yapılır.',
+                  style: TextStyle(
+                    color: Colors.white.withValues(alpha: 0.68),
+                    fontSize: 12,
+                    height: 1.35,
+                  ),
+                ),
+              ],
             ),
           ),
+        ),
+        const SizedBox(height: 12),
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: [
+            ChoiceChip(
+              label: const Text('Tümü'),
+              selected: _premiumFilter == _PremiumFilter.all,
+              onSelected: (_) =>
+                  setState(() => _premiumFilter = _PremiumFilter.all),
+            ),
+            ChoiceChip(
+              label: const Text('Aktif'),
+              selected: _premiumFilter == _PremiumFilter.active,
+              onSelected: (_) =>
+                  setState(() => _premiumFilter = _PremiumFilter.active),
+            ),
+            ChoiceChip(
+              label: const Text('Yakında bitecek'),
+              selected: _premiumFilter == _PremiumFilter.expiring,
+              onSelected: (_) =>
+                  setState(() => _premiumFilter = _PremiumFilter.expiring),
+            ),
+            ChoiceChip(
+              label: const Text('Pasif'),
+              selected: _premiumFilter == _PremiumFilter.inactive,
+              onSelected: (_) =>
+                  setState(() => _premiumFilter = _PremiumFilter.inactive),
+            ),
+          ],
         ),
         if (_premiumError != null) ...[
           const SizedBox(height: 8),
@@ -2386,7 +2856,7 @@ class _AdminContentPageState extends ConsumerState<AdminContentPage>
         ],
         const SizedBox(height: 12),
         Text(
-          'Premium kayıtları (${rows.length})',
+          'Premium kayıtları (${rows.length}/${allRows.length})',
           style: TextStyle(
             color: Colors.white.withValues(alpha: 0.88),
             fontWeight: FontWeight.w700,
@@ -2411,7 +2881,13 @@ class _AdminContentPageState extends ConsumerState<AdminContentPage>
             final expires = row.expiresAt == null
                 ? 'Süresiz'
                 : 'Bitiş: ${_diagTimeText(row.expiresAt!.toIso8601String())}';
-            final active = row.active &&
+            final remaining = row.expiresAt == null
+                ? 'Süresiz'
+                : row.expiresAt!.isAfter(DateTime.now())
+                ? '${row.expiresAt!.difference(DateTime.now()).inDays} gün kaldı'
+                : 'Süresi doldu';
+            final active =
+                row.active &&
                 (row.expiresAt == null ||
                     row.expiresAt!.isAfter(DateTime.now()));
             return Card(
@@ -2420,7 +2896,7 @@ class _AdminContentPageState extends ConsumerState<AdminContentPage>
                 title: Text(row.label),
                 subtitle: Text(
                   '${row.isInvite ? 'E-posta daveti' : 'UID'} · ${row.id}\n'
-                  '$expires · kaynak: ${row.source}',
+                  '$expires · $remaining · kaynak: ${row.source}',
                   style: TextStyle(color: Colors.white.withValues(alpha: 0.58)),
                 ),
                 isThreeLine: true,
@@ -2445,6 +2921,119 @@ class _AdminContentPageState extends ConsumerState<AdminContentPage>
                     ),
                   ],
                 ),
+              ),
+            );
+          }),
+      ],
+    );
+  }
+
+  Widget _buildAuditTab(AdminRole role) {
+    if (!role.canManageAdmins) {
+      return _buildAccessDenied(
+        icon: Icons.history_rounded,
+        title: 'İşlem geçmişi developer yetkisi ister',
+        subtitle:
+            'Geçmiş ekranı admin_audit koleksiyonundan son 50 işlemi okur.',
+      );
+    }
+    final bottomInset = _shellBodyBottomInset(context);
+    return ListView(
+      padding: EdgeInsets.fromLTRB(16, 16, 16, bottomInset + 16),
+      children: [
+        Card(
+          color: const Color(0xFF0F2419),
+          child: Padding(
+            padding: const EdgeInsets.all(12),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        'İşlem geçmişi',
+                        style: TextStyle(
+                          color: Colors.white.withValues(alpha: 0.9),
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
+                    _adminStatusPill(
+                      color: AppColors.accentNeonGreen,
+                      label: 'Limit 50',
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Maliyet için stream yok. Bu sekme açılınca veya Yenile dediğinde sadece son 50 admin_audit kaydı okunur.',
+                  style: TextStyle(
+                    color: Colors.white.withValues(alpha: 0.68),
+                    fontSize: 12,
+                    height: 1.35,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        const SizedBox(height: 12),
+        Wrap(
+          spacing: 8,
+          children: [
+            OutlinedButton.icon(
+              onPressed: _auditLoading ? null : _loadAuditRows,
+              icon: _auditLoading
+                  ? const SizedBox(
+                      width: 14,
+                      height: 14,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : const Icon(Icons.refresh_rounded),
+              label: const Text('Yenile'),
+            ),
+          ],
+        ),
+        if (_auditError != null) ...[
+          const SizedBox(height: 8),
+          Text(_auditError!, style: const TextStyle(color: Colors.redAccent)),
+        ],
+        const SizedBox(height: 12),
+        if (_auditRows.isEmpty)
+          Card(
+            color: const Color(0xFF0F2419),
+            child: Padding(
+              padding: const EdgeInsets.all(12),
+              child: Text(
+                _auditLoading
+                    ? 'İşlem geçmişi yükleniyor...'
+                    : 'Henüz işlem geçmişi yok.',
+                style: TextStyle(color: Colors.white.withValues(alpha: 0.7)),
+              ),
+            ),
+          )
+        else
+          ..._auditRows.map((row) {
+            final actor = row.email?.isNotEmpty == true
+                ? row.email!
+                : 'Bilinmeyen admin';
+            final countText = row.beforeCount == null && row.afterCount == null
+                ? ''
+                : '\nKayıt: ${row.beforeCount ?? '-'} -> ${row.afterCount ?? '-'}';
+            return Card(
+              color: const Color(0xFF0F2419),
+              child: ListTile(
+                leading: const Icon(Icons.history_rounded),
+                title: Text(row.action),
+                subtitle: Text(
+                  '$actor · ${row.role ?? '-'}\n'
+                  '${row.targetType}/${row.targetId} · '
+                  '${row.createdAt == null ? '-' : _diagTimeText(row.createdAt!.toIso8601String())}'
+                  '$countText',
+                  style: TextStyle(color: Colors.white.withValues(alpha: 0.62)),
+                ),
+                isThreeLine: true,
               ),
             );
           }),
@@ -2488,6 +3077,32 @@ class _PremiumGrantRow {
   final String source;
   final bool isInvite;
 }
+
+class _AdminAuditRow {
+  const _AdminAuditRow({
+    required this.id,
+    required this.action,
+    required this.targetType,
+    required this.targetId,
+    required this.email,
+    required this.role,
+    required this.createdAt,
+    required this.beforeCount,
+    required this.afterCount,
+  });
+
+  final String id;
+  final String action;
+  final String targetType;
+  final String targetId;
+  final String? email;
+  final String? role;
+  final DateTime? createdAt;
+  final int? beforeCount;
+  final int? afterCount;
+}
+
+enum _PremiumFilter { all, active, expiring, inactive }
 
 enum _PoolEditorKind {
   textOnly,

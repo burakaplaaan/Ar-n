@@ -78,6 +78,12 @@ class AppLocalizationsAr extends AppLocalizations {
   String get settingsMenuContactSubtitle => 'الدعم والملاحظات';
 
   @override
+  String get settingsMenuSupportTitle => 'ادعم Arin';
+
+  @override
+  String get settingsMenuSupportSubtitle => 'حزم دعم لمرة واحدة';
+
+  @override
   String get settingsMenuComingSoon => 'راسلنا عبر البريد';
 
   @override
@@ -491,6 +497,17 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get reminderDurationsPerPrayerSubtitle =>
       'اضغط السطر لاختيار التنبيه الأول والثاني بشكل منفصل.';
+
+  @override
+  String get reminderApplyDurationsAllButton =>
+      'تطبيق المدد المختارة على كل الصلوات';
+
+  @override
+  String get reminderAllPrayersDurationTarget => 'كل الصلوات';
+
+  @override
+  String get reminderDurationsAppliedAllSuccess =>
+      'تم تطبيق المدد على كل الصلوات.';
 
   @override
   String reminderDualAlertTitle(Object prayerTitle) {

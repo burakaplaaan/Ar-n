@@ -3089,23 +3089,22 @@ class _WillHabitTile extends ConsumerWidget {
                       ),
                       const SizedBox(width: 6),
                     ],
-                    if (!isCustom)
-                      IconButton(
-                        tooltip: l10n.willpowerHubArchiveAction,
-                        onPressed: onDelete,
-                        icon: Icon(
-                          Icons.delete_outline_rounded,
-                          color: (isFullQuit || isSalat)
-                              ? (onLight
-                                    ? AppColors.textSecondary
-                                    : AppColors.creamBase.withValues(
-                                        alpha: 0.32,
-                                      ))
-                              : AppColors.error,
-                          size: 22,
-                        ),
-                        visualDensity: VisualDensity.compact,
+                    IconButton(
+                      tooltip: l10n.willpowerHubArchiveAction,
+                      onPressed: onDelete,
+                      icon: Icon(
+                        Icons.delete_outline_rounded,
+                        color: (isFullQuit || isSalat)
+                            ? (onLight
+                                  ? AppColors.textSecondary
+                                  : AppColors.creamBase.withValues(
+                                      alpha: 0.32,
+                                    ))
+                            : AppColors.error,
+                        size: 22,
                       ),
+                      visualDensity: VisualDensity.compact,
+                    ),
                   ],
                 ),
         ),

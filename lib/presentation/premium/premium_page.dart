@@ -31,8 +31,6 @@ class _PremiumPageState extends ConsumerState<PremiumPage> {
 
     setState(() => _busyProductId = productId);
     try {
-      // RevenueCat / StoreKit / Play Billing buraya bağlanacak. Premium
-      // entitlement satın alma doğrulamasından sonra Firebase'den okunur.
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
@@ -47,11 +45,13 @@ class _PremiumPageState extends ConsumerState<PremiumPage> {
   }
 
   Future<bool?> _showSignInSheet() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     var authBusy = false;
     return showModalBottomSheet<bool>(
       context: context,
       isScrollControlled: true,
-      backgroundColor: const Color(0xFF08130E),
+      backgroundColor:
+          isDark ? const Color(0xFF08130E) : AppColors.creamSurface,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(26)),
       ),
@@ -107,11 +107,22 @@ class _PremiumPageState extends ConsumerState<PremiumPage> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final premiumAsync = ref.watch(premiumEntitlementProvider);
     final isPremium = premiumAsync.asData?.value.isActive ?? false;
     final signedIn = ref.watch(authUserProvider).asData?.value != null;
+
+    final titleTextColor = isDark ? Colors.white : AppColors.textPrimary;
+    final subtitleTextColor = isDark
+        ? Colors.white.withValues(alpha: 0.74)
+        : AppColors.textSecondary;
+    final footerTextColor = isDark
+        ? Colors.white.withValues(alpha: 0.52)
+        : AppColors.textMuted;
+
     return Scaffold(
-      backgroundColor: AppColors.backgroundNavy,
+      backgroundColor:
+          isDark ? AppColors.backgroundNavy : AppColors.creamMist,
       body: Stack(
         children: [
           const _PremiumBackground(),
@@ -135,7 +146,7 @@ class _PremiumPageState extends ConsumerState<PremiumPage> {
                                 context.go(AppRoutes.home);
                               },
                               icon: const Icon(Icons.close_rounded),
-                              color: Colors.white,
+                              color: isDark ? Colors.white : AppColors.emeraldDark,
                             ),
                             const Spacer(),
                             TextButton(
@@ -143,9 +154,7 @@ class _PremiumPageState extends ConsumerState<PremiumPage> {
                                 ref.invalidate(premiumEntitlementProvider);
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(
-                                    content: Text(
-                                      'Satın alımlar yenilendi.',
-                                    ),
+                                    content: Text('Satın alımlar yenilendi.'),
                                   ),
                                 );
                               },
@@ -157,12 +166,10 @@ class _PremiumPageState extends ConsumerState<PremiumPage> {
                         const _LaunchBadge(),
                         const SizedBox(height: 18),
                         Text(
-                          isPremium
-                              ? 'ARIN Premium aktif'
-                              : 'ARIN Premium',
+                          isPremium ? 'ARIN Premium aktif' : 'ARIN Premium',
                           textAlign: TextAlign.center,
-                          style: const TextStyle(
-                            color: Colors.white,
+                          style: TextStyle(
+                            color: titleTextColor,
                             fontSize: 34,
                             fontWeight: FontWeight.w900,
                             letterSpacing: -1.1,
@@ -175,7 +182,7 @@ class _PremiumPageState extends ConsumerState<PremiumPage> {
                               : 'Reklamsız, kesintisiz ve kilitsiz manevi rutin.',
                           textAlign: TextAlign.center,
                           style: TextStyle(
-                            color: Colors.white.withValues(alpha: 0.74),
+                            color: subtitleTextColor,
                             fontSize: 15,
                             height: 1.35,
                           ),
@@ -222,7 +229,7 @@ class _PremiumPageState extends ConsumerState<PremiumPage> {
                           'istediğin zaman iptal edilebilir.',
                           textAlign: TextAlign.center,
                           style: TextStyle(
-                            color: Colors.white.withValues(alpha: 0.52),
+                            color: footerTextColor,
                             fontSize: 12,
                             height: 1.4,
                           ),
@@ -245,31 +252,46 @@ class _PremiumBackground extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Stack(
       children: [
-        const DecoratedBox(
+        DecoratedBox(
           decoration: BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
-              colors: [
-                Color(0xFF020604),
-                Color(0xFF0C1F17),
-                Color(0xFF050806),
-              ],
+              colors: isDark
+                  ? const [
+                      Color(0xFF020604),
+                      Color(0xFF0C1F17),
+                      Color(0xFF050806),
+                    ]
+                  : [
+                      AppColors.creamMist,
+                      AppColors.creamBase,
+                      AppColors.creamShellDeep,
+                    ],
             ),
           ),
-          child: SizedBox.expand(),
+          child: const SizedBox.expand(),
         ),
         Positioned(
           top: -90,
           right: -80,
-          child: _Glow(color: AppColors.goldAccent.withValues(alpha: 0.28)),
+          child: _Glow(
+            color: AppColors.goldAccent.withValues(
+              alpha: isDark ? 0.28 : 0.18,
+            ),
+          ),
         ),
         Positioned(
           bottom: 80,
           left: -110,
-          child: _Glow(color: AppColors.accentNeonGreen.withValues(alpha: 0.2)),
+          child: _Glow(
+            color: AppColors.emeraldMid.withValues(
+              alpha: isDark ? 0.2 : 0.12,
+            ),
+          ),
         ),
       ],
     );
@@ -328,12 +350,23 @@ class _CountdownLikeNotice extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final bgColor = isDark
+        ? Colors.white.withValues(alpha: 0.08)
+        : AppColors.creamSurface;
+    final borderColor = isDark
+        ? Colors.white.withValues(alpha: 0.12)
+        : AppColors.creamDark;
+    final textColor = isDark
+        ? Colors.white.withValues(alpha: 0.82)
+        : AppColors.textSecondary;
+
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.08),
+        color: bgColor,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
+        border: Border.all(color: borderColor),
       ),
       child: Row(
         children: [
@@ -344,7 +377,7 @@ class _CountdownLikeNotice extends StatelessWidget {
               'Bu fiyat sınırlı süre geçerli. Lansman bitmeden premiumu '
               'en avantajlı fiyatla aç.',
               style: TextStyle(
-                color: Colors.white.withValues(alpha: 0.82),
+                color: textColor,
                 height: 1.35,
                 fontWeight: FontWeight.w600,
               ),
@@ -369,6 +402,11 @@ class _PremiumBenefits extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final textColor = isDark
+        ? Colors.white.withValues(alpha: 0.88)
+        : AppColors.textPrimary;
+
     return Column(
       children: [
         for (final item in _items)
@@ -385,7 +423,9 @@ class _PremiumBenefits extends StatelessWidget {
                   ),
                   child: Icon(
                     item.$1,
-                    color: AppColors.accentNeonGreen,
+                    color: isDark
+                        ? AppColors.accentNeonGreen
+                        : AppColors.accentGreenOnLight,
                     size: 18,
                   ),
                 ),
@@ -394,7 +434,7 @@ class _PremiumBenefits extends StatelessWidget {
                   child: Text(
                     item.$2,
                     style: TextStyle(
-                      color: Colors.white.withValues(alpha: 0.88),
+                      color: textColor,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -412,6 +452,11 @@ class _SignInRequiredNotice extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final textColor = isDark
+        ? Colors.white.withValues(alpha: 0.78)
+        : AppColors.textSecondary;
+
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
@@ -423,9 +468,11 @@ class _SignInRequiredNotice extends StatelessWidget {
       ),
       child: Row(
         children: [
-          const Icon(
+          Icon(
             Icons.account_circle_outlined,
-            color: AppColors.accentNeonGreen,
+            color: isDark
+                ? AppColors.accentNeonGreen
+                : AppColors.accentGreenOnLight,
           ),
           const SizedBox(width: 10),
           Expanded(
@@ -433,7 +480,7 @@ class _SignInRequiredNotice extends StatelessWidget {
               'Fiyatları inceleyebilirsin. Satın almadan önce premiumu '
               'hesabına bağlamak için Google veya Apple ile giriş isteyeceğiz.',
               style: TextStyle(
-                color: Colors.white.withValues(alpha: 0.78),
+                color: textColor,
                 height: 1.35,
                 fontWeight: FontWeight.w600,
               ),
@@ -462,6 +509,17 @@ class _PremiumSignInSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final titleColor = isDark ? Colors.white : AppColors.textPrimary;
+    final subtitleColor = isDark
+        ? Colors.white.withValues(alpha: 0.7)
+        : AppColors.textSecondary;
+    final appleButtonColor =
+        isDark ? Colors.white : AppColors.textPrimary;
+    final appleBorderColor = isDark
+        ? Colors.white.withValues(alpha: 0.24)
+        : AppColors.creamDark;
+
     return SafeArea(
       child: Padding(
         padding: EdgeInsets.fromLTRB(
@@ -480,11 +538,11 @@ class _PremiumSignInSheet extends StatelessWidget {
               size: 42,
             ),
             const SizedBox(height: 12),
-            const Text(
+            Text(
               'Premium için hesabını bağla',
               textAlign: TextAlign.center,
               style: TextStyle(
-                color: Colors.white,
+                color: titleColor,
                 fontSize: 22,
                 fontWeight: FontWeight.w900,
               ),
@@ -494,10 +552,7 @@ class _PremiumSignInSheet extends StatelessWidget {
               'Satın aldığın premium cihaz değiştirince kaybolmasın diye '
               'önce hesabına bağlanır. Fiyatları görmek için giriş gerekmez.',
               textAlign: TextAlign.center,
-              style: TextStyle(
-                color: Colors.white.withValues(alpha: 0.7),
-                height: 1.35,
-              ),
+              style: TextStyle(color: subtitleColor, height: 1.35),
             ),
             const SizedBox(height: 18),
             FilledButton.icon(
@@ -523,10 +578,8 @@ class _PremiumSignInSheet extends StatelessWidget {
                 icon: const Icon(Icons.apple_rounded),
                 label: const Text('Apple ile devam et'),
                 style: OutlinedButton.styleFrom(
-                  foregroundColor: Colors.white,
-                  side: BorderSide(
-                    color: Colors.white.withValues(alpha: 0.24),
-                  ),
+                  foregroundColor: appleButtonColor,
+                  side: BorderSide(color: appleBorderColor),
                   padding: const EdgeInsets.symmetric(vertical: 14),
                 ),
               ),
@@ -570,14 +623,29 @@ class _PlanCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final borderColor =
-        highlighted ? AppColors.goldAccent : Colors.white.withValues(alpha: 0.14);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    final titleTextColor = isDark ? Colors.white : AppColors.textPrimary;
+    final oldPriceColor = isDark
+        ? Colors.white.withValues(alpha: 0.45)
+        : AppColors.textMuted;
+    final priceTextColor = isDark ? Colors.white : AppColors.textPrimary;
+
+    final borderColor = highlighted
+        ? AppColors.goldAccent
+        : (isDark
+              ? Colors.white.withValues(alpha: 0.14)
+              : AppColors.creamDark);
+    final containerColor = highlighted
+        ? AppColors.goldAccent.withValues(alpha: 0.12)
+        : (isDark
+              ? Colors.white.withValues(alpha: 0.07)
+              : AppColors.creamSurface.withValues(alpha: 0.85));
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: highlighted
-            ? AppColors.goldAccent.withValues(alpha: 0.12)
-            : Colors.white.withValues(alpha: 0.07),
+        color: containerColor,
         borderRadius: BorderRadius.circular(24),
         border: Border.all(color: borderColor, width: highlighted ? 1.4 : 1),
         boxShadow: highlighted
@@ -598,8 +666,8 @@ class _PlanCard extends StatelessWidget {
               Expanded(
                 child: Text(
                   title,
-                  style: const TextStyle(
-                    color: Colors.white,
+                  style: TextStyle(
+                    color: titleTextColor,
                     fontSize: 18,
                     fontWeight: FontWeight.w900,
                   ),
@@ -630,19 +698,19 @@ class _PlanCard extends StatelessWidget {
           Text(
             oldPrice,
             style: TextStyle(
-              color: Colors.white.withValues(alpha: 0.45),
+              color: oldPriceColor,
               fontSize: 15,
               fontWeight: FontWeight.w700,
               decoration: TextDecoration.lineThrough,
-              decorationColor: Colors.white.withValues(alpha: 0.55),
+              decorationColor: oldPriceColor,
               decorationThickness: 2,
             ),
           ),
           const SizedBox(height: 4),
           Text(
             price,
-            style: const TextStyle(
-              color: Colors.white,
+            style: TextStyle(
+              color: priceTextColor,
               fontSize: 28,
               fontWeight: FontWeight.w900,
               letterSpacing: -0.8,
@@ -654,7 +722,9 @@ class _PlanCard extends StatelessWidget {
             style: TextStyle(
               color: highlighted
                   ? AppColors.goldAccent
-                  : AppColors.accentNeonGreen,
+                  : (isDark
+                        ? AppColors.accentNeonGreen
+                        : AppColors.accentGreenOnLight),
               fontWeight: FontWeight.w800,
             ),
           ),
@@ -664,8 +734,9 @@ class _PlanCard extends StatelessWidget {
             child: FilledButton(
               onPressed: enabled && !busy ? onPressed : null,
               style: FilledButton.styleFrom(
-                backgroundColor:
-                    highlighted ? AppColors.goldAccent : AppColors.accentNeonGreen,
+                backgroundColor: highlighted
+                    ? AppColors.goldAccent
+                    : AppColors.accentNeonGreen,
                 foregroundColor: const Color(0xFF07110B),
                 padding: const EdgeInsets.symmetric(vertical: 14),
               ),
@@ -679,7 +750,7 @@ class _PlanCard extends StatelessWidget {
                       enabled ? 'Lansman Fiyatıyla Başla' : 'Premium aktif',
                       style: const TextStyle(fontWeight: FontWeight.w900),
                     ),
-              ),
+            ),
           ),
         ],
       ),

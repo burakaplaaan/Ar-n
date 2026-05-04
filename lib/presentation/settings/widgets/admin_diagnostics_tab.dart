@@ -24,6 +24,99 @@ IconData _outcomeIcon(String outcome) {
   return Icons.help_outline_rounded;
 }
 
+Widget _diagnosticPill({
+  required Color color,
+  required String label,
+  IconData icon = Icons.circle,
+}) {
+  return Container(
+    padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
+    decoration: BoxDecoration(
+      color: color.withValues(alpha: 0.14),
+      borderRadius: BorderRadius.circular(999),
+      border: Border.all(color: color.withValues(alpha: 0.55)),
+    ),
+    child: Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(icon, size: 12, color: color),
+        const SizedBox(width: 6),
+        Text(
+          label,
+          style: TextStyle(
+            color: color.withValues(alpha: 0.95),
+            fontSize: 11,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+      ],
+    ),
+  );
+}
+
+({Color color, String label, String detail}) _diagnosticHealth({
+  required bool prayerOn,
+  required bool appDaily,
+  required bool appMilestone,
+  required bool appTask,
+  required bool appZikir,
+  required int pendingCount,
+  required List<NotificationDiagnosticsEntry> logs,
+}) {
+  final last = logs.isEmpty ? null : logs.first;
+  if (last?.outcome == 'error') {
+    return (
+      color: Colors.redAccent,
+      label: 'Hata',
+      detail:
+          'Son bildirim olayı hata döndürmüş: ${last!.source} · ${last.action}',
+    );
+  }
+  final anyChannelOn =
+      prayerOn || appDaily || appMilestone || appTask || appZikir;
+  if (!anyChannelOn) {
+    return (
+      color: Colors.amber,
+      label: 'Kapalı',
+      detail:
+          'Tüm bildirim kanalları kapalı görünüyor; pending sayısı düşük olabilir.',
+    );
+  }
+  if (pendingCount <= 0) {
+    return (
+      color: Colors.amber,
+      label: 'Kontrol et',
+      detail: 'Bildirim kanalı açık ama cihazda bekleyen planlama görünmüyor.',
+    );
+  }
+  if (last != null && _isSkipLikeOutcome(last.outcome)) {
+    return (
+      color: Colors.lightBlueAccent,
+      label: 'Atlandı',
+      detail: 'Son olay bilinçli skip: ${last.source} · ${last.action}.',
+    );
+  }
+  return (
+    color: Colors.greenAccent,
+    label: 'Sağlıklı',
+    detail: 'Kanallar açık, pending bildirim var ve son hata görünmüyor.',
+  );
+}
+
+Widget _channelTile(String label, bool enabled) {
+  final color = enabled ? Colors.greenAccent : Colors.white54;
+  return Chip(
+    avatar: Icon(
+      enabled ? Icons.check_circle_outline : Icons.remove_circle_outline,
+      color: color,
+      size: 16,
+    ),
+    label: Text(label),
+    backgroundColor: color.withValues(alpha: enabled ? 0.14 : 0.08),
+    side: BorderSide(color: color.withValues(alpha: 0.35)),
+  );
+}
+
 String _outcomeLabel(AppLocalizations l10n, String outcome) {
   switch (outcome) {
     case 'ok':
@@ -78,6 +171,15 @@ class AdminDiagnosticsTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final health = _diagnosticHealth(
+      prayerOn: prayerOn,
+      appDaily: appDaily,
+      appMilestone: appMilestone,
+      appTask: appTask,
+      appZikir: appZikir,
+      pendingCount: pendingCount,
+      logs: logs,
+    );
     return CustomScrollView(
       slivers: [
         SliverPadding(
@@ -102,6 +204,44 @@ class AdminDiagnosticsTab extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            'Bildirim sağlık durumu',
+                            style: TextStyle(
+                              color: Colors.white.withValues(alpha: 0.9),
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        ),
+                        _diagnosticPill(
+                          color: health.color,
+                          label: health.label,
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      health.detail,
+                      style: TextStyle(
+                        color: Colors.white.withValues(alpha: 0.72),
+                        fontSize: 12,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: [
+                        _channelTile('Namaz', prayerOn),
+                        _channelTile('Günlük', appDaily),
+                        _channelTile('Milestone', appMilestone),
+                        _channelTile('Görev', appTask),
+                        _channelTile('Zikir', appZikir),
+                      ],
+                    ),
+                    const SizedBox(height: 14),
                     Text(
                       l10n.adminDiagnosticsStatusSummaryTitle,
                       style: TextStyle(
@@ -211,7 +351,9 @@ class AdminDiagnosticsTab extends StatelessWidget {
                   padding: const EdgeInsets.all(12),
                   child: Text(
                     l10n.adminDiagnosticsNoLogsHint,
-                    style: TextStyle(color: Colors.white.withValues(alpha: 0.7)),
+                    style: TextStyle(
+                      color: Colors.white.withValues(alpha: 0.7),
+                    ),
                   ),
                 ),
               ),
@@ -230,14 +372,13 @@ class AdminDiagnosticsTab extends StatelessWidget {
                   color: const Color(0xFF0F2419),
                   child: ListTile(
                     dense: true,
-                    leading: Icon(
-                      outcomeIcon,
-                      color: outcomeColor,
-                    ),
+                    leading: Icon(outcomeIcon, color: outcomeColor),
                     title: Text('${entry.source} · ${entry.action}'),
                     subtitle: Text(
                       '${formatTime(entry.atIso)}\n${entry.detailsText()}',
-                      style: TextStyle(color: Colors.white.withValues(alpha: 0.72)),
+                      style: TextStyle(
+                        color: Colors.white.withValues(alpha: 0.72),
+                      ),
                     ),
                     isThreeLine: true,
                     trailing: Text(
