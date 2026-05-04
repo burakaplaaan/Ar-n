@@ -894,8 +894,7 @@ struct ComboWidgetView: View {
   }
 
   private var displayQuoteSource: String {
-    let source = entry.quoteSource.trimmingCharacters(in: .whitespacesAndNewlines)
-    return source.isEmpty ? "ARIN" : source
+    entry.quoteSource.trimmingCharacters(in: .whitespacesAndNewlines)
   }
 
   private var title: String {
@@ -925,31 +924,29 @@ struct ComboWidgetView: View {
   }
 
   private var accessoryLayout: some View {
-    VStack(alignment: .leading, spacing: 2) {
-      HStack(alignment: .firstTextBaseline, spacing: 5) {
+    VStack(alignment: .leading, spacing: 1) {
+      HStack(alignment: .firstTextBaseline, spacing: 4) {
         Text(title)
-          .font(.system(size: 11, weight: .bold))
+          .font(.system(size: 10, weight: .bold))
           .foregroundStyle(primaryTextColor)
           .lineLimit(1)
           .minimumScaleFactor(0.58)
         Spacer(minLength: 2)
-        countdownText(size: 13)
+        countdownText(size: 12)
       }
-      Text(entry.quoteText.isEmpty ? "ARIN" : entry.quoteText)
-        .font(.system(size: 15, weight: .regular, design: .serif))
-        .foregroundStyle(primaryTextColor)
-        .lineLimit(1)
-        .minimumScaleFactor(0.50)
-        .allowsTightening(true)
-      Text(displayQuoteSource)
-        .font(.system(size: 9, weight: .bold))
-        .foregroundStyle(secondaryTextColor)
-        .lineLimit(1)
-        .minimumScaleFactor(0.60)
+      if !entry.quoteText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+        Text(entry.quoteText)
+          .font(.system(size: 15, weight: .regular, design: .serif))
+          .foregroundStyle(primaryTextColor)
+          .lineLimit(2)
+          .minimumScaleFactor(0.38)
+          .allowsTightening(true)
+          .fixedSize(horizontal: false, vertical: false)
+      }
     }
     .frame(maxWidth: .infinity, alignment: .leading)
     .padding(.horizontal, 4)
-    .padding(.vertical, 3)
+    .padding(.vertical, 2)
     .shadow(color: .black.opacity(textShadowOpacity), radius: 2.4, x: 0, y: 1)
   }
 
