@@ -55,9 +55,10 @@ class _AdminContentPageState extends ConsumerState<AdminContentPage>
     with SingleTickerProviderStateMixin {
   AppLocalizations get l10n => AppLocalizations.of(context)!;
 
-  /// [ArinShell] `extendBody: true` — alt gezinme çubuğu üstüne içerik binmesin.
+  /// AdminContentPage kendi tam ekran Scaffold'ına sahip; ArinShell nav bar
+  /// bu route'da görünmez — sadece sistem home-indicator inset'i yeterli.
   static double _shellBodyBottomInset(BuildContext context) {
-    return MediaQuery.paddingOf(context).bottom + 80;
+    return MediaQuery.paddingOf(context).bottom;
   }
 
   late final TabController _tabs;

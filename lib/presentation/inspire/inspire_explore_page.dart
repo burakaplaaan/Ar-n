@@ -63,9 +63,7 @@ class _InspireExplorePageState extends ConsumerState<InspireExplorePage> {
       if (!inspirationCardMatchesQuery(c, _query)) return false;
       switch (filter) {
         case ExploreContentFilter.mixed:
-          // Öz akış: sözler varsayılan, âyet/hadis sadece admin işaretlerse.
-          return c.contentKind == InspirationContentKind.quote ||
-              c.showInMainFeed;
+          return true;
         case ExploreContentFilter.soz:
           return c.contentKind == InspirationContentKind.quote;
         case ExploreContentFilter.ayet:

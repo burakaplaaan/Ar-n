@@ -8,7 +8,6 @@ import 'package:flutter/services.dart';
 import '../../core/constants/quote_pool_ids.dart';
 import '../willpower/insight_quote_pools.dart';
 import 'quote_pool_defaults.dart';
-import 'widget_quote_defaults.dart';
 
 class QuotePoolSeedPreview {
   const QuotePoolSeedPreview({
@@ -158,12 +157,8 @@ abstract final class QuotePoolBulkSeeder {
   static Future<Map<String, List<Map<String, dynamic>>>>
   _defaultsByPool() async {
     final personalized = await _personalizedFromAsset();
-    final widgetItems = kWidgetQuoteDefaults
-        .map((e) => <String, dynamic>{'text': e['text'], 'source': e['source']})
-        .toList();
-
     final hub = _hubMapsFromEmbedded();
-    final out = <String, List<Map<String, dynamic>>>{
+    return <String, List<Map<String, dynamic>>>{
       QuotePoolIds.homeNamazWisdom: QuotePoolDefaults.homeNamazWisdom(),
       QuotePoolIds.notificationArinmaBodies:
           QuotePoolDefaults.notificationArinmaBodies(),
@@ -176,10 +171,6 @@ abstract final class QuotePoolBulkSeeder {
       QuotePoolIds.hubArinmaMedical: hub.medical,
       QuotePoolIds.personalizedQuotes: personalized,
     };
-    if (widgetItems.isNotEmpty) {
-      out[QuotePoolIds.widgetQuote] = widgetItems;
-    }
-    return out;
   }
 
   /// Merge duplicate tespit anahtarı — id → text → title sırasına göre

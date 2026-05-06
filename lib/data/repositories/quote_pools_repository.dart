@@ -13,7 +13,6 @@ import '../../core/constants/quote_pool_ids.dart';
 import '../../core/firebase/firebase_bootstrap.dart';
 import '../../core/firebase/firestore_server_first.dart';
 import '../../domain/entities/matched_content.dart';
-import '../quote_pools/widget_quote_defaults.dart';
 import '../services/arin_widget_sync.dart';
 
 /// Belge: `{ "version": int, "items": [ { ... } ] }`
@@ -260,9 +259,7 @@ class QuotePoolsRepository {
               baseKey: 'text',
               legacyTrKeys: const <String>['turkish'],
             ) ??
-            (kWidgetQuoteDefaults.isNotEmpty
-                ? (kWidgetQuoteDefaults.first['text'] ?? '')
-                : '');
+            '';
         final source =
             _widgetTrOnlyField(
               row,
@@ -286,16 +283,6 @@ class QuotePoolsRepository {
   List<Map<String, dynamic>> _widgetQuoteRows() {
     final wItems = itemsFromCache(QuotePoolIds.widgetQuote);
     if (wItems.isNotEmpty) return wItems;
-    if (kWidgetQuoteDefaults.isNotEmpty) {
-      return kWidgetQuoteDefaults
-          .map(
-            (seeded) => <String, dynamic>{
-              'text': seeded['text'] ?? '',
-              'source': seeded['source'] ?? '',
-            },
-          )
-          .toList(growable: false);
-    }
     return itemsFromCache(QuotePoolIds.personalizedQuotes);
   }
 

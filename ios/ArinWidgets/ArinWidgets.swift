@@ -730,6 +730,10 @@ struct ComboProvider: TimelineProvider {
       )
       return
     }
+    if let scheduled = loadScheduledTimeline(now: now) {
+      completion(scheduled)
+      return
+    }
     let loaded = loadEntry(at: now)
     let candidates = [loaded.prayerRefreshDate, loaded.quoteRefreshDate]
       .compactMap { $0 }
@@ -739,6 +743,55 @@ struct ComboProvider: TimelineProvider {
       ?? now.addingTimeInterval(3600)
     let next = [refresh, widgetGateRefreshDate("combo")].compactMap { $0 }.min() ?? refresh
     completion(Timeline(entries: [loaded.entry], policy: .after(next)))
+  }
+
+  // Generates a multi-entry timeline from the prayer schedule JSON so WidgetKit
+  // transitions between entries deterministically — avoiding the stuck-at-0:00 bug
+  // that occurs when a single-entry timeline waits on a budget-throttled refresh.
+  private func loadScheduledTimeline(now: Date) -> Timeline<ComboEntry>? {
+    guard let payload = decodeWidgetJson("arin_prayer_schedule_json", as: PrayerSchedulePayload.self) else {
+      return nil
+    }
+    let sorted = payload.entries.sorted { $0.date < $1.date }
+    guard let firstNextIndex = sorted.firstIndex(where: { $0.date > now }) else {
+      return nil
+    }
+
+    let gateDate = widgetGateRefreshDate("combo")
+
+    func makeEntry(at date: Date, next item: PrayerScheduleItem) -> ComboEntry {
+      let remaining = max(0, item.date.timeIntervalSince1970 - date.timeIntervalSince1970)
+      let quote = loadQuote(now: date)
+      return ComboEntry(
+        date: date,
+        nextName: turkishPrayerName(item.name),
+        countdown: formatHMS(seconds: remaining),
+        nextDate: item.date,
+        quoteText: quote.text,
+        quoteSource: quote.source
+      )
+    }
+
+    var entries = [makeEntry(at: now, next: sorted[firstNextIndex])]
+    if firstNextIndex + 1 < sorted.count {
+      let endExclusive = min(sorted.count, firstNextIndex + 1 + kPrayerTimelineFutureLimit)
+      for index in (firstNextIndex + 1)..<endExclusive {
+        if let gateDate = gateDate,
+           sorted[index - 1].date.addingTimeInterval(1) >= gateDate {
+          break
+        }
+        entries.append(
+          makeEntry(
+            at: sorted[index - 1].date.addingTimeInterval(1),
+            next: sorted[index]
+          )
+        )
+      }
+    }
+
+    let contentRefresh = entries.last?.date.addingTimeInterval(3600) ?? now.addingTimeInterval(3600)
+    let refresh = [contentRefresh, gateDate].compactMap { $0 }.min() ?? contentRefresh
+    return Timeline(entries: entries, policy: .after(refresh))
   }
 
   private func loadEntry() -> ComboEntry {

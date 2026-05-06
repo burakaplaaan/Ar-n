@@ -43,7 +43,10 @@ Widget _buildAdminInspireTab({
     qualityWarningCount: quality.length,
   );
 
-  return Column(
+  return GestureDetector(
+    onTap: () => FocusScope.of(context).unfocus(),
+    behavior: HitTestBehavior.translucent,
+    child: Column(
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: [
           if (inspireError != null)
@@ -370,8 +373,8 @@ Widget _buildAdminInspireTab({
                             const SizedBox(height: 8),
                             TextField(
                               controller: row.tr,
-                              minLines: 10,
-                              maxLines: 16,
+                              minLines: 3,
+                              maxLines: 12,
                               keyboardType: TextInputType.multiline,
                               onChanged: (_) => onDraftChanged(),
                               decoration: InputDecoration(
@@ -384,8 +387,8 @@ Widget _buildAdminInspireTab({
                             const SizedBox(height: 8),
                             TextField(
                               controller: row.ar,
-                              minLines: 4,
-                              maxLines: 7,
+                              minLines: 2,
+                              maxLines: 5,
                               keyboardType: TextInputType.multiline,
                               onChanged: (_) => onDraftChanged(),
                               decoration: InputDecoration(
@@ -433,13 +436,14 @@ Widget _buildAdminInspireTab({
       ),
       SafeArea(
         top: false,
-        minimum: EdgeInsets.fromLTRB(16, 8, 16, 16 + bottomInset),
+        minimum: const EdgeInsets.fromLTRB(16, 8, 16, 16),
         child: FilledButton(
           onPressed: inspireLoading ? null : onSaveAll,
           child: Text(l10n.adminInspireSaveAllChanges),
         ),
       ),
     ],
+    ),
   );
 }
 
