@@ -101,7 +101,12 @@ class _ArinAppState extends ConsumerState<ArinApp> with WidgetsBindingObserver {
     } catch (e) {
       debugPrint('Pool sync notificationArinmaBodies failed: $e');
     }
-    await AppLocalNotificationScheduler.rescheduleAll(prefs, pools: pools);
+    final prayerTimes = ref.read(prayerTimesProvider).valueOrNull;
+    await AppLocalNotificationScheduler.rescheduleAll(
+      prefs,
+      pools: pools,
+      prayerTimes: prayerTimes,
+    );
   }
 
   Future<void> _maybeOneTimeWidgetQuoteRefreshAfterAdminEdit() async {

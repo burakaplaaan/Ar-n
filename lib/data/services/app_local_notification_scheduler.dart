@@ -18,6 +18,7 @@ import '../content/daily_namaz_wisdom.dart';
 import '../quote_pools/quote_pool_defaults.dart';
 import '../quote_pools/localized_pool_fields.dart';
 import '../quote_pools/quote_pool_parsers.dart';
+import '../models/prayer_times_model.dart';
 import '../repositories/quote_pools_repository.dart';
 import '../repositories/zikir_matik_repository.dart';
 import 'admin_notification_diagnostics_log.dart';
@@ -147,6 +148,7 @@ abstract final class AppLocalNotificationScheduler {
   static Future<void> rescheduleAll(
     SharedPreferences prefs, {
     QuotePoolsRepository? pools,
+    PrayerTimesModel? prayerTimes,
     bool force = false,
   }) {
     final now = DateTime.now();
@@ -164,7 +166,12 @@ abstract final class AppLocalNotificationScheduler {
     }
     _lastRescheduleAt = now;
     final run = _rescheduleTail.then(
-      (_) => _rescheduleBody(prefs, pools: pools, force: force),
+      (_) => _rescheduleBody(
+        prefs,
+        pools: pools,
+        prayerTimes: prayerTimes,
+        force: force,
+      ),
     );
     _rescheduleTail = run.catchError((Object _, StackTrace __) {});
     return run;
@@ -173,6 +180,7 @@ abstract final class AppLocalNotificationScheduler {
   static Future<void> _rescheduleBody(
     SharedPreferences prefs, {
     QuotePoolsRepository? pools,
+    PrayerTimesModel? prayerTimes,
     required bool force,
   }) async {
     if (!supported) return;
@@ -261,9 +269,10 @@ abstract final class AppLocalNotificationScheduler {
           : AppLocalNotificationIds.rollingWeeklySlotCount;
 
       // Günlük hatırlatıcı — gün başına 2 slot:
-      //   slot 0: home_namaz_wisdom havuzundan söz/hadis (keşfet içeriği)
+      //   slot 0: home_namaz_wisdom havuzundan namaz sözü/hadisi — öğle vaktinden
+      //           15 dakika önce gelir; prayerTimes null ise 09:00–18:00 rastgele.
       //   slot 1: arınma havuzundan kısa motivasyon, +3.5 saat sonra
-      // Pencere 09:00–18:00 → slot 1 en geç 21:30 olur, gece rahatsız etmez.
+      // Slot 0 saati 09:00–18:00 bandına clamp'lenir → slot 1 en geç 21:30 olur.
       if (AppNotificationChannelPrefs.arinmaDailyEnabled(prefs)) {
         for (var d = 0; d < arinmaWindowDays; d++) {
           final day = DateTime(
@@ -272,8 +281,9 @@ abstract final class AppLocalNotificationScheduler {
             now.day,
           ).add(Duration(days: d));
 
-          // Slot 0 (söz) — deterministik rastgele, 09:00–18:00
-          final slot0Min = randomMinutesInWindow(
+          // Slot 0 (namaz sözü) — öğle vakti - 15 dk; offline fallback rastgele.
+          final slot0Min = _namazSlot0Minutes(
+            prayerTimes: prayerTimes,
             dayLocal: day,
             salt: 11,
             startMin: start,
@@ -300,7 +310,7 @@ abstract final class AppLocalNotificationScheduler {
               AppLocalNotificationIds.arinmaWeekStart +
               d * AppLocalNotificationIds.arinmaSlotsPerDay;
 
-          // Slot 0: söz (Günün sözü yerine — keşfet havuzundan rastgele)
+          // Slot 0: namaz sözü/hadisi — home_namaz_wisdom havuzundan
           if (when0.isAfter(now)) {
             final noon = DateTime(day.year, day.month, day.day, 12);
             final entry = pools != null
@@ -314,9 +324,9 @@ abstract final class AppLocalNotificationScheduler {
                 ? '${entry.kind} · ${entry.source}'
                 : _lt(
                     localeCode,
-                    tr: 'Günün sözü',
-                    en: 'Daily wisdom',
-                    ar: 'حكمة اليوم',
+                    tr: 'Namaz',
+                    en: 'Prayer',
+                    ar: 'الصلاة',
                   );
             final body = _prepareNotificationBody(
               _dailyWisdomBodyForLocale(entry, localeCode),
@@ -858,6 +868,39 @@ abstract final class AppLocalNotificationScheduler {
       return 'Open Arin to view today\'s wisdom.';
     }
     return text;
+  }
+
+  /// Slot 0 (namaz sözü) için hedef dakikayı hesaplar.
+  ///
+  /// [prayerTimes] mevcutsa öğle vakti (dhuhr) - 15 dakikayı kullanır;
+  /// böylece bildirim namazdan hemen önce gelir ve hatırlatma etkisi artar.
+  /// Hesaplanan değer her zaman [startMin]–[endMin] bandına clamp'lenir
+  /// (gece yarısı veya çok erken/geç öğle saatlerine karşı güvenli).
+  /// [prayerTimes] null ise (offline, ilk açılış) deterministik rastgele saat.
+  static int _namazSlot0Minutes({
+    required PrayerTimesModel? prayerTimes,
+    required DateTime dayLocal,
+    required int salt,
+    required int startMin,
+    required int endMin,
+  }) {
+    if (prayerTimes != null) {
+      final parts = prayerTimes.dhuhr.split(':');
+      if (parts.length >= 2) {
+        final h = int.tryParse(parts[0]);
+        final m = int.tryParse(parts[1]);
+        if (h != null && m != null) {
+          final target = h * 60 + m - 15;
+          return target.clamp(startMin, endMin);
+        }
+      }
+    }
+    return randomMinutesInWindow(
+      dayLocal: dayLocal,
+      salt: salt,
+      startMin: startMin,
+      endMin: endMin,
+    );
   }
 
   /// [matchDateTimeComponents] yerine: her gün için ayrı tek seferlik alarm (Android OEM uyumu).

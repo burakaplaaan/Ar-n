@@ -19,6 +19,7 @@ import '../../data/services/app_notification_channel_prefs.dart';
 import '../../data/services/arin_local_notifications_plugin.dart';
 import '../../data/services/local_notification_permission_gate.dart';
 import '../../data/services/prayer_reminder_prefs.dart';
+import '../shared/providers/prayer_time_providers.dart';
 import '../shared/providers/quotes_providers.dart';
 import '../shared/widgets/arin_clock_time_sheet.dart';
 import 'widgets/permission_gate_card.dart';
@@ -153,9 +154,11 @@ class _NotificationsSettingsPageState
   /// yolda yalnız `rescheduleAll` bırakılır; force ile soğutma by-pass.
   Future<void> _syncAppNotifications(SharedPreferences prefs) async {
     final pools = ref.read(quotePoolsRepositoryProvider);
+    final prayerTimes = ref.read(prayerTimesProvider).valueOrNull;
     await AppLocalNotificationScheduler.rescheduleAll(
       prefs,
       pools: pools,
+      prayerTimes: prayerTimes,
       force: true,
     );
   }
