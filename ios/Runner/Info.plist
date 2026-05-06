@@ -105,6 +105,10 @@
 		</array>
 		<key>NSLocationWhenInUseUsageDescription</key>
 		<string>Konumunuz, namaz vakitlerini hesaplamak ve kıble yönünü göstermek için kullanılır.</string>
+		<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+		<string>Konumunuz, namaz vakitlerini hesaplamak ve kıble yönünü göstermek için kullanılır.</string>
+		<key>NSPhotoLibraryUsageDescription</key>
+		<string>Profil veya paylaşım için seçtiğiniz görselleri kullanmak amacıyla fotoğraf arşivinize erişilir.</string>
 		<key>NSAppleMusicUsageDescription</key>
 		<string>Namaz bildirimi için telefonunuzdan seçtiğiniz ses dosyasını kullanmak amacıyla medya arşivinize erişilir.</string>
 		<!-- Keşfet paylaşımı: sosyal uygulamaların URL şemaları.
