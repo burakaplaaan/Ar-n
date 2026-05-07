@@ -213,16 +213,70 @@ bool _isArinmaReadyForHub(HabitModel h) {
 }
 
 /// Sigara kartı — her saniye canlı, belirgin geçiş + hafif “vuruş” ölçeği.
-class _QuitHubLiveTimer extends StatelessWidget {
-  const _QuitHubLiveTimer({required this.elapsed, required this.format});
+/// Sayaç görüntüsü — kendi Timer'ını taşır; ana sayfa saniyede bir rebuild edilmez.
+/// `clockStartedAt` null ise timer çalışmaz.
+class _QuitHubLiveTimer extends StatefulWidget {
+  const _QuitHubLiveTimer({
+    required this.clockStartedAt,
+    required this.format,
+  });
 
-  final Duration elapsed;
+  final DateTime? clockStartedAt;
   final String Function(Duration) format;
 
   @override
+  State<_QuitHubLiveTimer> createState() => _QuitHubLiveTimerState();
+}
+
+class _QuitHubLiveTimerState extends State<_QuitHubLiveTimer> {
+  Timer? _timer;
+  Duration _elapsed = Duration.zero;
+
+  @override
+  void initState() {
+    super.initState();
+    _updateElapsed();
+    if (widget.clockStartedAt != null) {
+      _timer = Timer.periodic(const Duration(seconds: 1), (_) {
+        if (mounted) setState(_updateElapsed);
+      });
+    }
+  }
+
+  @override
+  void didUpdateWidget(covariant _QuitHubLiveTimer old) {
+    super.didUpdateWidget(old);
+    if (old.clockStartedAt != widget.clockStartedAt) {
+      _timer?.cancel();
+      _updateElapsed();
+      if (widget.clockStartedAt != null) {
+        _timer = Timer.periodic(const Duration(seconds: 1), (_) {
+          if (mounted) setState(_updateElapsed);
+        });
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  void _updateElapsed() {
+    final start = widget.clockStartedAt;
+    if (start == null) {
+      _elapsed = Duration.zero;
+      return;
+    }
+    final d = DateTime.now().difference(start);
+    _elapsed = d.isNegative ? Duration.zero : d;
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final sec = elapsed.inSeconds;
-    final label = format(elapsed);
+    final sec = _elapsed.inSeconds;
+    final label = widget.format(_elapsed);
     return AnimatedSwitcher(
       duration: const Duration(milliseconds: 360),
       switchInCurve: Curves.easeOutCubic,
@@ -249,32 +303,31 @@ class _QuitHubLiveTimer extends StatelessWidget {
           ),
         );
       },
-      child:
-          Text(
-                label,
-                key: ValueKey<int>(sec),
-                style: AppTextStyles.labelLarge.copyWith(
-                  color: _kQuitHubTimerElite,
-                  fontWeight: FontWeight.w700,
-                  height: 1.15,
-                  letterSpacing: 0.55,
-                  fontSize: 15,
-                  fontFeatures: const [FontFeature.tabularFigures()],
-                  shadows: [
-                    Shadow(
-                      color: _kQuitHubTimerElite.withValues(alpha: 0.35),
-                      blurRadius: 10,
-                      offset: const Offset(0, 0),
-                    ),
-                  ],
-                ),
-              )
-              .animate(key: ValueKey<int>(sec))
-              .scale(
-                duration: 320.ms,
-                begin: const Offset(1.1, 1.1),
-                curve: Curves.easeOutBack,
-              ),
+      child: Text(
+        label,
+        key: ValueKey<int>(sec),
+        style: AppTextStyles.labelLarge.copyWith(
+          color: _kQuitHubTimerElite,
+          fontWeight: FontWeight.w700,
+          height: 1.15,
+          letterSpacing: 0.55,
+          fontSize: 15,
+          fontFeatures: const [FontFeature.tabularFigures()],
+          shadows: [
+            Shadow(
+              color: _kQuitHubTimerElite.withValues(alpha: 0.35),
+              blurRadius: 10,
+              offset: const Offset(0, 0),
+            ),
+          ],
+        ),
+      )
+          .animate(key: ValueKey<int>(sec))
+          .scale(
+            duration: 320.ms,
+            begin: const Offset(1.1, 1.1),
+            curve: Curves.easeOutBack,
+          ),
     );
   }
 }
@@ -378,7 +431,6 @@ class WillpowerHubPage extends ConsumerStatefulWidget {
 class _WillpowerHubPageState extends ConsumerState<WillpowerHubPage>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
-  Timer? _arinmaLiveTick;
   String? _willHubUriSynced;
 
   @override
@@ -388,7 +440,6 @@ class _WillpowerHubPageState extends ConsumerState<WillpowerHubPage>
     _tabController.addListener(_onTabTick);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _trySalatWeekCelebrate();
-      if (mounted) _syncArinmaLiveTick();
     });
   }
 
@@ -413,7 +464,6 @@ class _WillpowerHubPageState extends ConsumerState<WillpowerHubPage>
       ref.read(willpowerHubReturnToArinmaProvider.notifier).state = false;
     }
     _syncHubQueryWithTab();
-    _syncArinmaLiveTick();
     setState(() {});
   }
 
@@ -430,17 +480,8 @@ class _WillpowerHubPageState extends ConsumerState<WillpowerHubPage>
     context.go(target);
   }
 
-  void _syncArinmaLiveTick() {
-    _arinmaLiveTick?.cancel();
-    if (_tabController.index != 1) return;
-    _arinmaLiveTick = Timer.periodic(const Duration(seconds: 1), (_) {
-      if (mounted) setState(() {});
-    });
-  }
-
   @override
   void dispose() {
-    _arinmaLiveTick?.cancel();
     _tabController.removeListener(_onTabTick);
     _tabController.dispose();
     super.dispose();
@@ -2517,8 +2558,10 @@ class _WillHabitTile extends ConsumerWidget {
         : 0;
     final customTarget = isCustom ? item.habit.effectiveDailyTarget : 1;
     final quitClockOn = isFullQuit && quitClockStarted;
-    final quitElapsed = quitClockOn
-        ? (repo.quitElapsedSinceClock(item.habit.id) ?? Duration.zero)
+    // quitElapsed artık _QuitHubLiveTimer içinde hesaplanıyor; burada yalnızca
+    // başlangıç zamanını geçiyoruz, sayfa 1 Hz rebuild edilmiyor.
+    final quitClockStartedAt = quitClockOn
+        ? DateTime.tryParse(item.habit.quitClockStartedAtIso ?? '')
         : null;
 
     final useRichCard = (isFullQuit || isCustom) && !onLight;
@@ -2680,7 +2723,7 @@ class _WillHabitTile extends ConsumerWidget {
                               ),
                               const SizedBox(height: 6),
                               _QuitHubLiveTimer(
-                                elapsed: quitElapsed ?? Duration.zero,
+                                clockStartedAt: quitClockStartedAt,
                                 format: (d) => _formatQuitHubHmsLocalized(
                                   hours: d.inHours,
                                   minutes: d.inMinutes.remainder(60),
@@ -2945,8 +2988,7 @@ class _WillHabitTile extends ConsumerWidget {
                                               CrossAxisAlignment.start,
                                           children: [
                                             _QuitHubLiveTimer(
-                                              elapsed:
-                                                  quitElapsed ?? Duration.zero,
+                                              clockStartedAt: quitClockStartedAt,
                                               format: (d) =>
                                                   _formatQuitHubHmsLocalized(
                                                     hours: d.inHours,

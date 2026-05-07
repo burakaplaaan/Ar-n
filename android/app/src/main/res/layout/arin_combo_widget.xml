@@ -13,10 +13,43 @@
     android:paddingEnd="8dp"
     android:paddingBottom="6dp">
 
+    <!-- Kilit overlay -->
+    <LinearLayout
+        android:id="@+id/widget_lock_overlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:background="@drawable/widget_lock_overlay_bg"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:padding="8dp"
+        android:visibility="gone">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif"
+            android:text="🔒"
+            android:textSize="22sp" />
+
+        <TextView
+            android:id="@+id/widget_lock_note"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:ellipsize="end"
+            android:fontFamily="sans-serif-medium"
+            android:gravity="center"
+            android:maxLines="2"
+            android:text="Tıkla, aç"
+            android:textColor="#CC1A1A1A"
+            android:textSize="11sp" />
+
+    </LinearLayout>
+
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="top|center_horizontal"
+        android:layout_height="match_parent"
         android:orientation="vertical">
 
         <LinearLayout
@@ -92,16 +125,16 @@
         <TextView
             android:id="@+id/widget_combo_quote_text"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="0dp"
+            android:layout_weight="1"
             android:layout_marginTop="8dp"
             android:breakStrategy="simple"
-            android:ellipsize="end"
             android:fontFamily="serif"
+            android:gravity="start|top"
             android:includeFontPadding="false"
             android:letterSpacing="0.01"
             android:lineSpacingExtra="0dp"
             android:lineSpacingMultiplier="1.02"
-            android:maxLines="3"
             android:shadowColor="#66000000"
             android:shadowDx="0"
             android:shadowDy="1"

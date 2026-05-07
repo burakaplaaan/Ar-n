@@ -61,24 +61,23 @@ class ArinQuoteWidgetProvider : HomeWidgetProvider() {
                 }
         val contentPi = PendingIntent.getActivity(context, 0, openApp, piFlags)
 
+        val lockNote = widgetData.getString(KEY_LOCK_NOTE, null)
+            ?.trim().orEmpty().ifEmpty { "Tıkla, aç" }
+
         for (widgetId in appWidgetIds) {
             val views = RemoteViews(context.packageName, R.layout.arin_quote_widget)
-            views.setTextViewText(
-                R.id.widget_quote_text,
-                if (locked) "Açmak için dokun" else quote.text,
-            )
-            views.setTextViewText(
-                R.id.widget_quote_source,
-                if (locked) "🔒 Widget kilitli" else quote.source,
-            )
-            views.setViewVisibility(
-                R.id.widget_quote_header_row,
-                if (locked || quote.showSource) {
-                    View.VISIBLE
-                } else {
-                    View.GONE
-                },
-            )
+            if (locked) {
+                views.setViewVisibility(R.id.widget_lock_overlay, View.VISIBLE)
+                views.setTextViewText(R.id.widget_lock_note, lockNote)
+            } else {
+                views.setViewVisibility(R.id.widget_lock_overlay, View.GONE)
+                views.setTextViewText(R.id.widget_quote_text, quote.text)
+                views.setTextViewText(R.id.widget_quote_source, quote.source)
+                views.setViewVisibility(
+                    R.id.widget_quote_header_row,
+                    if (quote.showSource) View.VISIBLE else View.GONE,
+                )
+            }
             views.setOnClickPendingIntent(R.id.widget_root, contentPi)
             appWidgetManager.updateAppWidget(widgetId, views)
         }
@@ -242,6 +241,7 @@ class ArinQuoteWidgetProvider : HomeWidgetProvider() {
         private const val KEY_QUOTE_SCHEDULE = "arin_quote_schedule_json"
         private const val KEY_GATE_LOCKED = "arin_widget_gate_quote_locked"
         private const val KEY_GATE_PREMIUM = "arin_widget_gate_premium"
+        private const val KEY_LOCK_NOTE = "arin_widget_gate_lock_note"
         private const val ACTION_REFRESH = "com.arin.arin.action.QUOTE_WIDGET_REFRESH"
         private const val REQUEST_CODE_REFRESH = 19011
 

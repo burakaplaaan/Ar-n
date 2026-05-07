@@ -1,3 +1,5 @@
+﻿import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -117,6 +119,11 @@ class _WidgetCenterPageState extends ConsumerState<WidgetCenterPage> {
                     _HeroCard(onDark: onDark)
                         .animate()
                         .fadeIn(duration: 360.ms)
+                        .slideY(begin: 0.05, end: 0),
+                    const SizedBox(height: 12),
+                    _HowToAddBanner(onDark: onDark)
+                        .animate()
+                        .fadeIn(duration: 420.ms, delay: 80.ms)
                         .slideY(begin: 0.05, end: 0),
                     const SizedBox(height: 22),
                     _SectionTitle('Mevcut widgetlar', muted: muted),
@@ -544,3 +551,606 @@ class _EmptyTrackingCard extends StatelessWidget {
     );
   }
 }
+
+// ─── How-to banner ──────────────────────────────────────────────────────────
+
+class _HowToAddBanner extends StatelessWidget {
+  const _HowToAddBanner({required this.onDark});
+
+  final bool onDark;
+
+  void _open(BuildContext context) {
+    HapticFeedback.selectionClick();
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => _HowToSheet(onDark: onDark),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final titleColor = onDark
+        ? Colors.white.withValues(alpha: 0.9)
+        : AppColors.emeraldDark;
+    final muted = onDark ? AppColors.textOnDarkMuted : AppColors.textSecondary;
+    final fill = onDark
+        ? AppColors.cardSurface.withValues(alpha: 0.38)
+        : Colors.white.withValues(alpha: 0.62);
+    final border = onDark
+        ? Colors.white.withValues(alpha: 0.07)
+        : AppColors.creamDark.withValues(alpha: 0.45);
+
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: () => _open(context),
+        borderRadius: BorderRadius.circular(16),
+        child: Ink(
+          padding: const EdgeInsets.fromLTRB(15, 13, 13, 13),
+          decoration: BoxDecoration(
+            color: fill,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: border),
+          ),
+          child: Row(
+            children: [
+              Container(
+                width: 36,
+                height: 36,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: AppColors.accentNeonGreen.withValues(alpha: 0.12),
+                ),
+                child: Icon(
+                  Icons.lock_clock_rounded,
+                  size: 20,
+                  color: AppColors.accentNeonGreen.withValues(alpha: 0.9),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Kilit ekranına nasıl eklenir?',
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                        color: titleColor,
+                        letterSpacing: -0.2,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      'Arın widgetını kilit ekranına yerleştirme',
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                        color: muted,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Icon(
+                Icons.chevron_right_rounded,
+                color: muted.withValues(alpha: 0.6),
+                size: 22,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ─── How-to bottom sheet ────────────────────────────────────────────────────
+
+class _HowToSheet extends StatefulWidget {
+  const _HowToSheet({required this.onDark});
+
+  final bool onDark;
+
+  @override
+  State<_HowToSheet> createState() => _HowToSheetState();
+}
+
+class _HowToSheetState extends State<_HowToSheet>
+    with SingleTickerProviderStateMixin {
+  late final TabController _tabs;
+
+  @override
+  void initState() {
+    super.initState();
+    _tabs = TabController(
+      length: 2,
+      vsync: this,
+      initialIndex: Platform.isIOS ? 0 : 1,
+    );
+  }
+
+  @override
+  void dispose() {
+    _tabs.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final onDark = widget.onDark;
+    final bg = onDark ? const Color(0xFF111714) : const Color(0xFFF5F3EF);
+    final handle = onDark
+        ? Colors.white.withValues(alpha: 0.14)
+        : Colors.black.withValues(alpha: 0.12);
+    final titleColor = onDark
+        ? Colors.white.withValues(alpha: 0.96)
+        : AppColors.emeraldDark;
+
+    return DraggableScrollableSheet(
+      initialChildSize: 0.58,
+      minChildSize: 0.38,
+      maxChildSize: 0.88,
+      expand: false,
+      builder: (_, controller) => Container(
+        decoration: BoxDecoration(
+          color: bg,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+        ),
+        child: Column(
+          children: [
+            const SizedBox(height: 12),
+            Center(
+              child: Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: handle,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+            ),
+            const SizedBox(height: 18),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 22),
+              child: Row(
+                children: [
+                  Container(
+                    width: 38,
+                    height: 38,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: AppColors.accentNeonGreen.withValues(alpha: 0.14),
+                    ),
+                    child: const Icon(
+                      Icons.widgets_rounded,
+                      size: 20,
+                      color: AppColors.accentNeonGreen,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Text(
+                    'Kilit ekranı widget rehberi',
+                    style: GoogleFonts.plusJakartaSans(
+                      fontSize: 17,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: -0.4,
+                      color: titleColor,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 16),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 22),
+              child: _PlatformTabBar(
+                controller: _tabs,
+                onDark: onDark,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Expanded(
+              child: TabBarView(
+                controller: _tabs,
+                children: [
+                  _StepList(
+                    controller: controller,
+                    onDark: onDark,
+                    sections: _iosLockScreenSteps,
+                  ),
+                  _StepList(
+                    controller: controller,
+                    onDark: onDark,
+                    sections: _androidLockScreenSteps,
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ─── Platform tab bar ────────────────────────────────────────────────────────
+
+class _PlatformTabBar extends StatelessWidget {
+  const _PlatformTabBar({
+    required this.controller,
+    required this.onDark,
+  });
+
+  final TabController controller;
+  final bool onDark;
+
+  @override
+  Widget build(BuildContext context) {
+    final bg = onDark
+        ? Colors.white.withValues(alpha: 0.07)
+        : Colors.black.withValues(alpha: 0.06);
+    final selectedBg = onDark
+        ? AppColors.cardSurface.withValues(alpha: 0.9)
+        : Colors.white.withValues(alpha: 0.95);
+    final selectedColor = onDark
+        ? Colors.white.withValues(alpha: 0.96)
+        : AppColors.emeraldDark;
+    final unselectedColor = onDark
+        ? Colors.white.withValues(alpha: 0.38)
+        : AppColors.textSecondary.withValues(alpha: 0.6);
+
+    return Container(
+      height: 40,
+      decoration: BoxDecoration(
+        color: bg,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: TabBar(
+        controller: controller,
+        indicator: BoxDecoration(
+          color: selectedBg,
+          borderRadius: BorderRadius.circular(10),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: onDark ? 0.25 : 0.08),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        indicatorSize: TabBarIndicatorSize.tab,
+        dividerColor: Colors.transparent,
+        labelColor: selectedColor,
+        unselectedLabelColor: unselectedColor,
+        labelStyle: GoogleFonts.plusJakartaSans(
+          fontSize: 13,
+          fontWeight: FontWeight.w700,
+        ),
+        unselectedLabelStyle: GoogleFonts.plusJakartaSans(
+          fontSize: 13,
+          fontWeight: FontWeight.w600,
+        ),
+        tabs: const [
+          Tab(text: 'iOS'),
+          Tab(text: 'Android'),
+        ],
+      ),
+    );
+  }
+}
+
+// ─── Step list ────────────────────────────────────────────────────────────────
+
+class _StepList extends StatelessWidget {
+  const _StepList({
+    required this.controller,
+    required this.onDark,
+    required this.sections,
+  });
+
+  final ScrollController controller;
+  final bool onDark;
+  final List<_StepSection> sections;
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView(
+      controller: controller,
+      padding: EdgeInsets.fromLTRB(
+        22,
+        16,
+        22,
+        MediaQuery.of(context).padding.bottom + 28,
+      ),
+      children: [
+        for (final section in sections) ...[
+          _SectionLabel(text: section.label, onDark: onDark),
+          const SizedBox(height: 10),
+          for (int i = 0; i < section.steps.length; i++) ...[
+            _StepCard(
+              index: i + 1,
+              step: section.steps[i],
+              onDark: onDark,
+              isLast: i == section.steps.length - 1,
+            ),
+          ],
+          const SizedBox(height: 20),
+        ],
+      ],
+    );
+  }
+}
+
+class _SectionLabel extends StatelessWidget {
+  const _SectionLabel({required this.text, required this.onDark});
+
+  final String text;
+  final bool onDark;
+
+  @override
+  Widget build(BuildContext context) {
+    final color = onDark ? AppColors.textOnDarkMuted : AppColors.textSecondary;
+    return Text(
+      text.toUpperCase(),
+      style: GoogleFonts.plusJakartaSans(
+        fontSize: 11,
+        fontWeight: FontWeight.w800,
+        letterSpacing: 1.1,
+        color: color.withValues(alpha: 0.75),
+      ),
+    );
+  }
+}
+
+class _StepCard extends StatelessWidget {
+  const _StepCard({
+    required this.index,
+    required this.step,
+    required this.onDark,
+    required this.isLast,
+  });
+
+  final int index;
+  final _Step step;
+  final bool onDark;
+  final bool isLast;
+
+  @override
+  Widget build(BuildContext context) {
+    final titleColor = onDark
+        ? Colors.white.withValues(alpha: 0.94)
+        : AppColors.emeraldDark;
+    final muted = onDark ? AppColors.textOnDarkMuted : AppColors.textSecondary;
+    final cardBg = onDark
+        ? AppColors.cardSurface.withValues(alpha: 0.42)
+        : Colors.white.withValues(alpha: 0.72);
+    final cardBorder = onDark
+        ? Colors.white.withValues(alpha: 0.07)
+        : AppColors.creamDark.withValues(alpha: 0.4);
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Column(
+          children: [
+            Container(
+              width: 30,
+              height: 30,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: AppColors.accentNeonGreen.withValues(alpha: 0.14),
+                border: Border.all(
+                  color: AppColors.accentNeonGreen.withValues(alpha: 0.3),
+                ),
+              ),
+              child: Center(
+                child: Text(
+                  '$index',
+                  style: GoogleFonts.plusJakartaSans(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w800,
+                    color: AppColors.accentNeonGreen,
+                  ),
+                ),
+              ),
+            ),
+            if (!isLast)
+              Container(
+                width: 1.5,
+                height: step.imagePath != null ? 12 : 12,
+                margin: const EdgeInsets.symmetric(vertical: 3),
+                color: AppColors.accentNeonGreen.withValues(alpha: 0.2),
+              ),
+          ],
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Container(
+            margin: EdgeInsets.only(bottom: isLast ? 0 : 8),
+            decoration: BoxDecoration(
+              color: cardBg,
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(color: cardBorder),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (step.imagePath != null)
+                  ClipRRect(
+                    borderRadius: const BorderRadius.vertical(
+                      top: Radius.circular(13),
+                    ),
+                    child: Image.asset(
+                      step.imagePath!,
+                      width: double.infinity,
+                      fit: BoxFit.fitWidth,
+                    ),
+                  ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(13, 11, 13, 11),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Icon(
+                        step.icon,
+                        size: 22,
+                        color: AppColors.accentNeonGreen,
+                      ),
+                      const SizedBox(width: 11),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              step.title,
+                              style: GoogleFonts.plusJakartaSans(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w700,
+                                color: titleColor,
+                                height: 1.2,
+                              ),
+                            ),
+                            if (step.subtitle != null) ...[
+                              const SizedBox(height: 3),
+                              Text(
+                                step.subtitle!,
+                                style: GoogleFonts.plusJakartaSans(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w500,
+                                  color: muted,
+                                  height: 1.35,
+                                ),
+                              ),
+                            ],
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+// ─── Step data ────────────────────────────────────────────────────────────────
+
+class _Step {
+  const _Step({
+    required this.icon,
+    required this.title,
+    this.subtitle,
+    this.imagePath,
+  });
+
+  final IconData icon;
+  final String title;
+  final String? subtitle;
+  final String? imagePath;
+}
+
+class _StepSection {
+  const _StepSection({required this.label, required this.steps});
+
+  final String label;
+  final List<_Step> steps;
+}
+
+const _iosLockScreenSteps = [
+  _StepSection(
+    label: 'iPhone — kilit ekranı',
+    steps: [
+      _Step(
+        icon: Icons.lock_outline_rounded,
+        title: 'Kilit ekranında duvar kağıdına veya saate uzun bas',
+        subtitle: '"Özelleştir" seçeneği görününceye kadar basılı tut.',
+        imagePath: 'assets/images/widget_guide/ios_lock_1.png',
+      ),
+      _Step(
+        icon: Icons.tune_rounded,
+        title: '"Özelleştir"e dokun',
+        subtitle: 'Kilit ekranı düzenleme moduna girersin.',
+        imagePath: 'assets/images/widget_guide/ios_lock_2.png',
+      ),
+      _Step(
+        icon: Icons.add_rounded,
+        title: 'Widget alanına dokun ya da "+" işaretine bas',
+        subtitle:
+            'Üst veya alt şeritteki boş alanı seç; "Araç Takımı Ekleyin" listesi açılır.',
+        imagePath: 'assets/images/widget_guide/ios_lock_3.png',
+      ),
+      _Step(
+        icon: Icons.widgets_outlined,
+        title: 'Listeden Arın\'ı seç',
+        subtitle:
+            'Söz, namaz vakti veya karma widgetından birini seç; önizlemeyi kaydırarak boyutu değiştirebilirsin.',
+        imagePath: 'assets/images/widget_guide/ios_lock_4.png',
+      ),
+      _Step(
+        icon: Icons.touch_app_rounded,
+        title: 'Widgeta dokun veya sürükle',
+        subtitle:
+            'Yerleştirdikten sonra "Bitti" ile çık. Takip için hangi içeriğin görüneceğini Widget Merkezi\'nden seç.',
+        imagePath: 'assets/images/widget_guide/ios_lock_5.png',
+      ),
+      _Step(
+        icon: Icons.check_circle_outline_rounded,
+        title: 'Kilit ekranında widgetlar görünür',
+        subtitle:
+            'Arın widgetları saatin hemen altında yan yana yerleşir. İstediğin zaman yeniden düzenleyebilirsin.',
+        imagePath: 'assets/images/widget_guide/ios_lock_6.png',
+      ),
+    ],
+  ),
+];
+
+const _androidLockScreenSteps = [
+  _StepSection(
+    label: 'Android — kilit ekranı',
+    steps: [
+      _Step(
+        icon: Icons.info_outline_rounded,
+        title: 'Kilit ekranı menüsü markaya göre değişir',
+        subtitle:
+            'Pixel, Samsung ve Xiaomi kilit ekranı araç takımı ekleme yolu farklı olabilir.',
+        imagePath: 'assets/images/widget_guide/android_lock_1.png',
+      ),
+      _Step(
+        icon: Icons.lock_outline_rounded,
+        title: 'Kilit ekranına uzun bas, "Özelleştir"e dokun',
+        subtitle:
+            'Genelde kilit ekranında uzun basıp Düzenle veya benzeri seçeneği kullanırsın.',
+        imagePath: 'assets/images/widget_guide/android_lock_2.png',
+      ),
+      _Step(
+        icon: Icons.widgets_outlined,
+        title: "Listeden Arın'ı seç ve ekle",
+        subtitle:
+            "Listeden Arın uygulamasını bul; söz, namaz veya takip widgetını seçip konumunu ayarla.",
+        imagePath: 'assets/images/widget_guide/android_lock_3.png',
+      ),
+      _Step(
+        icon: Icons.touch_app_rounded,
+        title: 'Widget önizlemesine dokun veya Ekle',
+        subtitle:
+            "Widget kartını seç, önizlemeyi kaydırarak boyutu değiştir, ardından Ekle butonuna bas.",
+        imagePath: 'assets/images/widget_guide/android_lock_3b.png',
+      ),
+      _Step(
+        icon: Icons.center_focus_strong_outlined,
+        title: 'Widget kilit ekranında görünür',
+        subtitle:
+            "Kilitte hangi takibin çıkacağını bu sayfadaki 'Takip widgetı' bölümünden seç.",
+        imagePath: 'assets/images/widget_guide/android_lock_4.png',
+      ),
+    ],
+  ),
+];

@@ -101,17 +101,19 @@ class ArinComboWidgetProvider : HomeWidgetProvider() {
                 }
         val contentPi = PendingIntent.getActivity(context, 2, openApp, piFlags)
 
+        val lockNote = widgetData.getString(KEY_LOCK_NOTE, null)
+            ?.trim().orEmpty().ifEmpty { "Tıkla, aç" }
+
         for (widgetId in appWidgetIds) {
             val views = RemoteViews(context.packageName, R.layout.arin_combo_widget)
             if (locked) {
-                views.setTextViewText(R.id.widget_combo_prayer_title, "🔒 Widget kilitli")
-                views.setTextViewText(R.id.widget_combo_countdown, "Açmak için dokun")
-                views.setTextViewText(R.id.widget_combo_quote_text, "Premium veya reklam")
-                views.setViewVisibility(R.id.widget_combo_quote_source, View.GONE)
+                views.setViewVisibility(R.id.widget_lock_overlay, View.VISIBLE)
+                views.setTextViewText(R.id.widget_lock_note, lockNote)
                 views.setOnClickPendingIntent(R.id.widget_combo_root, contentPi)
                 appWidgetManager.updateAppWidget(widgetId, views)
                 continue
             }
+            views.setViewVisibility(R.id.widget_lock_overlay, View.GONE)
             val safeNextName = if (scheduleExpired) {
                 "Güncelle"
             } else if (forceTurkish) {
@@ -427,10 +429,12 @@ class ArinComboWidgetProvider : HomeWidgetProvider() {
         val minHeightDp = options.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_HEIGHT, 0)
             .takeIf { it > 0 } ?: DEFAULT_WIDGET_MIN_HEIGHT_DP
 
+        // Namaz bölümü (~65dp) hesaba katılarak kalan yükseklik hesaplanır
+        val quoteHeightDp = (minHeightDp - PRAYER_SECTION_HEIGHT_DP).coerceAtLeast(0)
         val maxLinesByHeight = when {
-            minHeightDp >= 170 -> 3
-            minHeightDp >= 140 -> 2
-            else -> 1
+            quoteHeightDp >= 100 -> 3
+            quoteHeightDp >= 60  -> 2
+            else                 -> 1
         }
 
         val metrics = context.resources.displayMetrics
@@ -439,7 +443,7 @@ class ArinComboWidgetProvider : HomeWidgetProvider() {
         if (availableWidthPx <= 0) return QuotePresentation(show = false, textSizeSp = 0f)
 
         val textPaint = TextPaint(TextPaint.ANTI_ALIAS_FLAG)
-        val candidateSizes = listOf(28f, 26f, 24f)
+        val candidateSizes = listOf(28f, 26f, 24f, 22f, 20f, 18f)
         for (sizeSp in candidateSizes) {
             textPaint.textSize = TypedValue.applyDimension(
                 TypedValue.COMPLEX_UNIT_SP,
@@ -460,7 +464,8 @@ class ArinComboWidgetProvider : HomeWidgetProvider() {
                 return QuotePresentation(show = true, textSizeSp = sizeSp)
             }
         }
-        return QuotePresentation(show = false, textSizeSp = 0f)
+        // Hiçbir boyut sığmasa bile en küçük boyutla göster; taşma ellipsize ile kesilir
+        return QuotePresentation(show = true, textSizeSp = 18f)
     }
 
     private fun dpToPx(dp: Float, metrics: android.util.DisplayMetrics): Int {
@@ -579,6 +584,7 @@ class ArinComboWidgetProvider : HomeWidgetProvider() {
         private const val KEY_LOCALE = "arin_widget_locale"
         private const val KEY_GATE_LOCKED = "arin_widget_gate_combo_locked"
         private const val KEY_GATE_PREMIUM = "arin_widget_gate_premium"
+        private const val KEY_LOCK_NOTE = "arin_widget_gate_lock_note"
 
         private const val ACTION_TICK = "com.arin.arin.action.COMBO_WIDGET_TICK"
         private const val ACTION_REFRESH = "com.arin.arin.action.COMBO_WIDGET_REFRESH"
@@ -587,7 +593,8 @@ class ArinComboWidgetProvider : HomeWidgetProvider() {
         private const val DEADLINE_GUARD_MS = 1500L
         private const val TICK_INTERVAL_MS = 60_000L
         private const val DEFAULT_WIDGET_MIN_WIDTH_DP = 220
-        private const val DEFAULT_WIDGET_MIN_HEIGHT_DP = 128
+        private const val DEFAULT_WIDGET_MIN_HEIGHT_DP = 140
+        private const val PRAYER_SECTION_HEIGHT_DP = 65
 
         fun requestUpdate(context: Context) {
             val awm = AppWidgetManager.getInstance(context)

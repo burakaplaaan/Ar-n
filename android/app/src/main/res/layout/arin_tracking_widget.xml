@@ -10,6 +10,40 @@
     android:paddingEnd="22dp"
     android:paddingBottom="7dp">
 
+    <!-- Kilit overlay -->
+    <LinearLayout
+        android:id="@+id/widget_lock_overlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:background="@drawable/widget_lock_overlay_bg"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:padding="8dp"
+        android:visibility="gone">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif"
+            android:text="🔒"
+            android:textSize="22sp" />
+
+        <TextView
+            android:id="@+id/widget_lock_note"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:ellipsize="end"
+            android:fontFamily="sans-serif-medium"
+            android:gravity="center"
+            android:maxLines="2"
+            android:text="Tıkla, aç"
+            android:textColor="#CC1A1A1A"
+            android:textSize="11sp" />
+
+    </LinearLayout>
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

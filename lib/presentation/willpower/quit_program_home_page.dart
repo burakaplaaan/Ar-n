@@ -40,6 +40,9 @@ class _QuitProgramHomePageState extends ConsumerState<QuitProgramHomePage>
   bool _loadingTips = true;
   Timer? _liveClock;
   String? _homeLoadScheduledForKey;
+  /// Canlı geçen süre — yalnızca sayacı gösteren widget bunu dinler;
+  /// sayfa yeniden build edilmez.
+  final ValueNotifier<Duration?> _elapsedLiveNotifier = ValueNotifier(null);
 
   /// Son kutlama kontrolünün yapıldığı tam gün.
   /// Her saniye tetiklemeyi engeller, ancak gün değişince yeniden kontrol eder.
@@ -70,15 +73,19 @@ class _QuitProgramHomePageState extends ConsumerState<QuitProgramHomePage>
   @override
   void initState() {
     super.initState();
-    _liveClock = Timer.periodic(const Duration(seconds: 1), (_) {
-      if (mounted) setState(() {});
-    });
     _tabs = TabController(length: 2, vsync: this);
+    _liveClock = Timer.periodic(const Duration(seconds: 1), (_) {
+      if (!mounted) return;
+      // Yalnızca ValueNotifier güncellenir; sayfanın tamamı rebuild edilmez.
+      final repo = ref.read(habitRepositoryProvider);
+      _elapsedLiveNotifier.value = repo.quitElapsedSinceClock(widget.habitId);
+    });
   }
 
   @override
   void dispose() {
     _liveClock?.cancel();
+    _elapsedLiveNotifier.dispose();
     _tabs.dispose();
     super.dispose();
   }
@@ -170,7 +177,6 @@ class _QuitProgramHomePageState extends ConsumerState<QuitProgramHomePage>
     final elapsed = repo.elapsedQuitDays(widget.habitId);
     final clockOn = habit.quitClockStartedAtIso != null &&
         habit.quitClockStartedAtIso!.isNotEmpty;
-    final elapsedLive = repo.quitElapsedSinceClock(widget.habitId);
 
     // Kutlama: onboarding tamam + sayaç açıkken her yeni tam günde bir kez kontrol et.
     if (clockOn &&
@@ -321,7 +327,7 @@ class _QuitProgramHomePageState extends ConsumerState<QuitProgramHomePage>
                       metricRows: metricRows,
                       elapsedDays: elapsed,
                       clockStarted: clockOn,
-                      elapsedLive: elapsedLive,
+                      elapsedLiveNotifier: _elapsedLiveNotifier,
                       motivationText: motivation,
                       commitmentPreview: habit.commitmentText,
                       onStartClock: () => ref
@@ -1037,7 +1043,7 @@ class _TerakkiTab extends StatelessWidget {
     required this.metricRows,
     required this.elapsedDays,
     required this.clockStarted,
-    required this.elapsedLive,
+    required this.elapsedLiveNotifier,
     required this.commitmentPreview,
     required this.onStartClock,
     required this.onRestart,
@@ -1051,7 +1057,8 @@ class _TerakkiTab extends StatelessWidget {
   final List<QuitMetricRowUi> metricRows;
   final int elapsedDays;
   final bool clockStarted;
-  final Duration? elapsedLive;
+  /// Saniyede güncellenen süre — yalnızca bağlı widget'lar rebuild edilir.
+  final ValueNotifier<Duration?> elapsedLiveNotifier;
   final String commitmentPreview;
   final VoidCallback onStartClock;
   final VoidCallback onRestart;
@@ -1116,17 +1123,24 @@ class _TerakkiTab extends StatelessWidget {
                     color: Colors.white.withValues(alpha: 0.7),
                   ),
                 ),
-                if (clockStarted && elapsedLive != null) ...[
-                  const SizedBox(height: 10),
-                  Text(
-                    _formatQuitHms(elapsedLive!, l10n),
-                    style: AppTextStyles.labelMedium.copyWith(
-                      color: Colors.white.withValues(alpha: 0.85),
-                      fontWeight: FontWeight.w600,
-                      letterSpacing: 0.5,
-                    ),
+                if (clockStarted)
+                  ValueListenableBuilder<Duration?>(
+                    valueListenable: elapsedLiveNotifier,
+                    builder: (_, elapsed, __) {
+                      if (elapsed == null) return const SizedBox.shrink();
+                      return Padding(
+                        padding: const EdgeInsets.only(top: 10),
+                        child: Text(
+                          _formatQuitHms(elapsed, l10n),
+                          style: AppTextStyles.labelMedium.copyWith(
+                            color: Colors.white.withValues(alpha: 0.85),
+                            fontWeight: FontWeight.w600,
+                            letterSpacing: 0.5,
+                          ),
+                        ),
+                      );
+                    },
                   ),
-                ],
               ],
             ),
           ),
@@ -1193,14 +1207,17 @@ class _TerakkiTab extends StatelessWidget {
             ),
             const SizedBox(width: 12),
             Expanded(
-              child: _StatCard(
-                icon: Icons.schedule_rounded,
-                value: elapsedLive != null
-                    ? _formatQuitHms(elapsedLive!, l10n)
-                    : l10n.quitProgramDash,
-                label: l10n.quitProgramStatTimer,
-                borderColor: AppColors.accentNeonGreen,
-                smallValue: true,
+              child: ValueListenableBuilder<Duration?>(
+                valueListenable: elapsedLiveNotifier,
+                builder: (_, elapsed, __) => _StatCard(
+                  icon: Icons.schedule_rounded,
+                  value: elapsed != null
+                      ? _formatQuitHms(elapsed, l10n)
+                      : l10n.quitProgramDash,
+                  label: l10n.quitProgramStatTimer,
+                  borderColor: AppColors.accentNeonGreen,
+                  smallValue: true,
+                ),
               ),
             ),
           ],

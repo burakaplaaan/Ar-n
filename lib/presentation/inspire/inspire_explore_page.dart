@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
@@ -29,18 +30,32 @@ class InspireExplorePage extends ConsumerStatefulWidget {
 
 class _InspireExplorePageState extends ConsumerState<InspireExplorePage> {
   final _searchController = TextEditingController();
+  Timer? _searchDebounce;
   String _query = '';
+
+  // _filtered önbelleği — input değişmediğinde tekrar hesaplama yapmaz.
+  List<InspirationCardModel>? _filteredCache;
+  List<InspirationCardModel>? _filteredCacheCards;
+  ExploreContentFilter? _filteredCacheFilter;
+  String? _filteredCacheQuery;
 
   @override
   void initState() {
     super.initState();
-    _searchController.addListener(() {
-      setState(() => _query = _searchController.text);
+    _searchController.addListener(_onSearchChanged);
+  }
+
+  void _onSearchChanged() {
+    _searchDebounce?.cancel();
+    _searchDebounce = Timer(const Duration(milliseconds: 280), () {
+      if (mounted) setState(() => _query = _searchController.text);
     });
   }
 
   @override
   void dispose() {
+    _searchDebounce?.cancel();
+    _searchController.removeListener(_onSearchChanged);
     _searchController.dispose();
     super.dispose();
   }
@@ -59,6 +74,14 @@ class _InspireExplorePageState extends ConsumerState<InspireExplorePage> {
     List<InspirationCardModel> cards,
     ExploreContentFilter filter,
   ) {
+    // Giriş değişmediyse önbellekten döndür — build başına O(n log n) sort kalkıyor.
+    if (identical(_filteredCacheCards, cards) &&
+        _filteredCacheFilter == filter &&
+        _filteredCacheQuery == _query &&
+        _filteredCache != null) {
+      return _filteredCache!;
+    }
+
     final list = cards.where((c) {
       if (!inspirationCardMatchesQuery(c, _query)) return false;
       switch (filter) {
@@ -81,6 +104,11 @@ class _InspireExplorePageState extends ConsumerState<InspireExplorePage> {
         return sb.compareTo(sa);
       });
     }
+
+    _filteredCacheCards = cards;
+    _filteredCacheFilter = filter;
+    _filteredCacheQuery = _query;
+    _filteredCache = list;
     return list;
   }
 
@@ -390,10 +418,11 @@ class _InspireExplorePageState extends ConsumerState<InspireExplorePage> {
                             );
                           },
                           // Arama açıkken sonuçlar tekrarsız listelenir.
-                          // Arama yokken keşfet akışı pratikte sonsuz döngü gibi hissetsin.
+                          // Arama yokken keşfet akışı sonsuz gibi hissettirsin;
+                          // 10_000 × katalog scroll metrics / float hassasiyetini korur.
                           childCount: searchActive
                               ? filtered.length
-                              : filtered.length * 1000000,
+                              : filtered.length * 10000,
                         ),
                       ),
                     ),

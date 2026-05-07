@@ -22,6 +22,7 @@ import 'data/services/app_local_notification_scheduler.dart';
 import 'data/services/location_service.dart';
 import 'data/services/prayer_notification_scheduler.dart';
 import 'data/services/prayer_reminder_prefs.dart';
+import 'data/services/global_widget_lock_service.dart';
 import 'data/services/widget_quote_override_service.dart';
 import 'l10n/app_localizations.dart';
 import 'data/services/habit_cloud_sync_service.dart';
@@ -188,6 +189,11 @@ class _ArinAppState extends ConsumerState<ArinApp> with WidgetsBindingObserver {
       await PrayerNotificationScheduler.promptLocalNotificationPermissions();
     }
     await _maybeOneTimeWidgetQuoteRefreshAfterAdminEdit();
+    try {
+      await GlobalWidgetLockService.applyIfDue(prefs);
+    } catch (e) {
+      debugPrint('Global widget lock sync failed: $e');
+    }
     try {
       final premium = await ref.read(premiumEntitlementProvider.future);
       await WidgetAccessService(prefs).syncAll(isPremium: premium.isActive);

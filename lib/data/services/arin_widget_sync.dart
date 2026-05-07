@@ -37,6 +37,7 @@ abstract final class ArinWidgetKeys {
   static const widgetGateComboLocked = 'arin_widget_gate_combo_locked';
   static const widgetGateTrackingLocked = 'arin_widget_gate_tracking_locked';
   static const widgetGatePremium = 'arin_widget_gate_premium';
+  static const widgetGateLockNote = 'arin_widget_gate_lock_note';
 }
 
 abstract final class ArinWidgetSync {
@@ -266,6 +267,7 @@ abstract final class ArinWidgetSync {
     required Map<String, DateTime?> trialUntilByKind,
     required Map<String, DateTime?> unlockUntilByKind,
     required bool isPremium,
+    String lockNote = '',
   }) async {
     if (kIsWeb) return;
     try {
@@ -284,6 +286,10 @@ abstract final class ArinWidgetSync {
       await HomeWidget.saveWidgetData<String>(
         ArinWidgetKeys.widgetGatePremium,
         isPremium ? '1' : '0',
+      );
+      await HomeWidget.saveWidgetData<String>(
+        ArinWidgetKeys.widgetGateLockNote,
+        lockNote,
       );
       for (final kind in const <String>[
         'quote',

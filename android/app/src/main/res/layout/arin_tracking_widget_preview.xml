@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Takip widget önizleme: statik içerik, widget seçici için. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center_vertical"
+    android:paddingStart="14dp"
+    android:paddingTop="12dp"
+    android:paddingEnd="14dp"
+    android:paddingBottom="12dp"
+    android:background="@drawable/widget_card_bg">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Arın · Takip"
+        android:textColor="@color/widget_text_muted"
+        android:textSize="9sp"
+        android:fontFamily="sans-serif-black"
+        android:letterSpacing="0.08"
+        android:maxLines="1"
+        android:includeFontPadding="false" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:text="Sigarasız gün sayacı"
+        android:textColor="@color/widget_quote_text_white"
+        android:textSize="11sp"
+        android:textStyle="bold"
+        android:fontFamily="sans-serif-black"
+        android:maxLines="1"
+        android:ellipsize="end"
+        android:includeFontPadding="false" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="3dp"
+        android:text="Sigarasız 18. gün"
+        android:textColor="@color/widget_quote_text_white"
+        android:textSize="16sp"
+        android:fontFamily="serif"
+        android:maxLines="1"
+        android:ellipsize="end"
+        android:includeFontPadding="false" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:text="Kriz geçer, kararın kalır."
+        android:textColor="@color/widget_text_muted"
+        android:textSize="9sp"
+        android:fontFamily="serif"
+        android:maxLines="1"
+        android:ellipsize="end"
+        android:includeFontPadding="false" />
+
+</LinearLayout>

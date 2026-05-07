@@ -30,6 +30,8 @@ import '../../data/services/app_local_notification_scheduler.dart';
 import '../../data/services/app_notification_channel_prefs.dart';
 import '../../data/services/inspiration_asset_discovery.dart';
 import '../../data/services/prayer_reminder_prefs.dart';
+import '../../data/services/global_widget_lock_service.dart';
+import '../../data/services/widget_access_service.dart';
 import '../../data/services/widget_quote_override_service.dart';
 import '../../l10n/app_localizations.dart';
 import '../shared/providers/auth_providers.dart';
@@ -106,6 +108,14 @@ class _AdminContentPageState extends ConsumerState<AdminContentPage>
   bool _widgetOverrideLoaded = false;
   String? _widgetOverrideError;
   Map<String, dynamic>? _widgetOverrideDoc;
+
+  bool _globalLockLoading = false;
+  bool _globalLockSaving = false;
+  bool _globalLockLoaded = false;
+  String? _globalLockError;
+  Map<String, dynamic>? _globalLockDoc;
+  final TextEditingController _globalLockNoteController =
+      TextEditingController();
   bool _premiumLoading = false;
   String? _premiumError;
   List<_PremiumGrantRow> _premiumEntitlements = const [];
@@ -129,6 +139,9 @@ class _AdminContentPageState extends ConsumerState<AdminContentPage>
     // tetiklenmeyebiliyor (animasyon bitene kadar listener tekrar gelmeyebilir).
     if (_tabs.index == 1 && !_widgetOverrideLoaded && !_widgetOverrideLoading) {
       _loadWidgetOverride();
+    }
+    if (_tabs.index == 1 && !_globalLockLoaded && !_globalLockLoading) {
+      _loadGlobalLock();
     }
     if (_tabs.index == 2 && !_inspireLoadStarted) {
       _inspireLoadStarted = true;
@@ -162,6 +175,7 @@ class _AdminContentPageState extends ConsumerState<AdminContentPage>
     _widgetOverrideTextController.dispose();
     _widgetOverrideSourceController.dispose();
     _widgetOverrideHoursController.dispose();
+    _globalLockNoteController.dispose();
     super.dispose();
   }
 
@@ -303,6 +317,86 @@ class _AdminContentPageState extends ConsumerState<AdminContentPage>
       if (mounted) {
         setState(() => _widgetOverrideSaving = false);
       }
+    }
+  }
+
+  Future<void> _loadGlobalLock() async {
+    if (!isFirebaseReady || !_isAdminVerified) return;
+    setState(() {
+      _globalLockLoading = true;
+      _globalLockError = null;
+    });
+    try {
+      final snap = await FirebaseFirestore.instance
+          .collection(GlobalWidgetLockService.collection)
+          .doc(GlobalWidgetLockService.documentId)
+          .get(const GetOptions(source: Source.server));
+      final data = snap.data();
+      _globalLockDoc = data;
+      _globalLockNoteController.text = data?['note']?.toString() ?? '';
+      _globalLockLoaded = true;
+    } catch (e) {
+      _globalLockError = _friendlyAdminError(
+        e,
+        fallback: 'Global kilit durumu alınamadı.',
+      );
+    } finally {
+      if (mounted) setState(() => _globalLockLoading = false);
+    }
+  }
+
+  Future<void> _saveGlobalLock({required bool locked}) async {
+    if (!isFirebaseReady || !_isAdminVerified) return;
+    if (_globalLockSaving) return;
+    setState(() {
+      _globalLockSaving = true;
+      _globalLockError = null;
+    });
+    try {
+      final note = _globalLockNoteController.text.trim();
+      final docRef = FirebaseFirestore.instance
+          .collection(GlobalWidgetLockService.collection)
+          .doc(GlobalWidgetLockService.documentId);
+      await docRef.set({
+        'locked': locked,
+        'lockedAt': locked ? FieldValue.serverTimestamp() : null,
+        'unlockedAt': locked ? null : FieldValue.serverTimestamp(),
+        'lockedBy': FirebaseAuth.instance.currentUser?.uid,
+        'note': note,
+        'updatedAt': FieldValue.serverTimestamp(),
+      }, SetOptions(merge: true));
+      await _writeAdminAudit(
+        action: locked
+            ? 'Global widget kilidi aktif edildi'
+            : 'Global widget kilidi kaldırıldı',
+        targetType: 'app_public',
+        targetId: GlobalWidgetLockService.documentId,
+        details: {'locked': locked, 'note': note.isEmpty ? null : note},
+      );
+      // Yerel önbelleği ve native widget'ları anında güncelle
+      final prefs = ref.read(sharedPreferencesProvider);
+      await GlobalWidgetLockService.applyIfDue(prefs, force: true);
+      try {
+        final entitlement = await ref.read(premiumEntitlementProvider.future);
+        await WidgetAccessService(prefs).syncAll(isPremium: entitlement.isActive);
+      } catch (_) {
+        await WidgetAccessService(prefs).syncAll(isPremium: false);
+      }
+      _snack(
+        locked
+            ? 'Tüm widget\'lar kilitlendi (premium hariç).'
+            : 'Widget kilidi kaldırıldı.',
+      );
+      await _loadGlobalLock();
+    } catch (e) {
+      final msg = _friendlyAdminError(
+        e,
+        fallback: 'Global kilit kaydedilemedi.',
+      );
+      if (mounted) setState(() => _globalLockError = msg);
+      _snack(msg);
+    } finally {
+      if (mounted) setState(() => _globalLockSaving = false);
     }
   }
 
@@ -933,15 +1027,136 @@ class _AdminContentPageState extends ConsumerState<AdminContentPage>
     }
   }
 
-  void _addInspireCard() {
+  Future<void> _addInspireCard() async {
     final useIdx = _inspireImageIndices.isNotEmpty
         ? _inspireImageIndices
         : <int>[1];
+
+    var kindValue = _inspireKindFilter;
+    var mainFeed = kindValue == InspirationContentKind.quote;
+    final trCtrl = TextEditingController();
+    final arCtrl = TextEditingController();
+    final sourceCtrl = TextEditingController();
+
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setLocal) => AlertDialog(
+          title: const Text('Yeni kart ekle'),
+          content: SingleChildScrollView(
+            child: SizedBox(
+              width: 400,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  DropdownButtonFormField<InspirationContentKind>(
+                    initialValue: kindValue,
+                    decoration: InputDecoration(
+                      labelText: l10n.adminInspireContentKindLabel,
+                      border: const OutlineInputBorder(),
+                    ),
+                    items: [
+                      DropdownMenuItem(
+                        value: InspirationContentKind.quote,
+                        child: Text(l10n.adminInspireContentKindQuote),
+                      ),
+                      DropdownMenuItem(
+                        value: InspirationContentKind.verse,
+                        child: Text(l10n.adminInspireContentKindVerse),
+                      ),
+                      DropdownMenuItem(
+                        value: InspirationContentKind.hadith,
+                        child: Text(l10n.adminInspireContentKindHadith),
+                      ),
+                    ],
+                    onChanged: (v) {
+                      if (v == null) return;
+                      setLocal(() {
+                        kindValue = v;
+                        mainFeed = v == InspirationContentKind.quote;
+                      });
+                    },
+                  ),
+                  const SizedBox(height: 12),
+                  TextField(
+                    controller: trCtrl,
+                    minLines: 3,
+                    maxLines: 8,
+                    keyboardType: TextInputType.multiline,
+                    autofocus: true,
+                    decoration: InputDecoration(
+                      labelText: l10n.adminInspireTurkishTextLabel,
+                      border: const OutlineInputBorder(),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  TextField(
+                    controller: arCtrl,
+                    minLines: 2,
+                    maxLines: 4,
+                    keyboardType: TextInputType.multiline,
+                    decoration: InputDecoration(
+                      labelText: l10n.adminOptionalArabicLabel,
+                      border: const OutlineInputBorder(),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  TextField(
+                    controller: sourceCtrl,
+                    maxLines: 2,
+                    decoration: InputDecoration(
+                      labelText: l10n.adminOptionalSourceLabel,
+                      border: const OutlineInputBorder(),
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  SwitchListTile(
+                    contentPadding: EdgeInsets.zero,
+                    title: Text(l10n.adminInspireShowInMainFeedTitle),
+                    value: mainFeed,
+                    onChanged: (v) => setLocal(() => mainFeed = v),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx, false),
+              child: Text(l10n.commonCancel),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.pop(ctx, true),
+              child: Text(l10n.adminInspireAddNewCard),
+            ),
+          ],
+        ),
+      ),
+    );
+
+    final trText = trCtrl.text.trim();
+    final arText = arCtrl.text.trim();
+    final sourceText = sourceCtrl.text.trim();
+    trCtrl.dispose();
+    arCtrl.dispose();
+    sourceCtrl.dispose();
+
+    if (ok != true || !mounted) return;
+    if (trText.isEmpty) {
+      _snack(l10n.adminTurkishTextCannotBeEmpty);
+      return;
+    }
+
     final row = _InspireFormRow.empty(useIdx, _rng)
-      ..contentKind = _inspireKindFilter
-      ..showInMainFeed = _inspireKindFilter == InspirationContentKind.quote;
+      ..contentKind = kindValue
+      ..showInMainFeed = mainFeed;
+    row.tr.text = trText;
+    row.ar.text = arText;
+    row.source.text = sourceText;
+
     setState(() {
-      _inspireRows.add(row);
+      _inspireRows.insert(0, row);
     });
   }
 
@@ -2050,7 +2265,7 @@ class _AdminContentPageState extends ConsumerState<AdminContentPage>
       if (index >= 0) {
         next[index] = built;
       } else {
-        next.add(built);
+        next.insert(0, built);
       }
       await _savePool(
         next,
@@ -2394,6 +2609,14 @@ class _AdminContentPageState extends ConsumerState<AdminContentPage>
       onRefresh: _loadWidgetOverride,
       onActivate: () => _saveWidgetOverride(active: true),
       onDisable: () => _saveWidgetOverride(active: false),
+      globalLockLoading: _globalLockLoading,
+      globalLockSaving: _globalLockSaving,
+      globalLockError: _globalLockError,
+      globalLockDoc: _globalLockDoc,
+      globalLockNoteController: _globalLockNoteController,
+      onGlobalLockRefresh: _loadGlobalLock,
+      onGlobalLock: () => _saveGlobalLock(locked: true),
+      onGlobalUnlock: () => _saveGlobalLock(locked: false),
     );
   }
 

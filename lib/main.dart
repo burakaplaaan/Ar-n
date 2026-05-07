@@ -36,12 +36,10 @@ import 'data/services/diyanet_district_matcher.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 Future<void> main() async {
-  // Ana açılış/onboarding/home path'i GoogleFonts kullanmaz; lokal
-  // `PlusJakartaSans` fontFamily ile render olur. Runtime fetching'i açık
-  // bırakıyoruz ki yalnızca ileri sayfalardaki dekoratif GoogleFonts çağrıları
-  // eksik asset yüzünden exception fırlatmasın. Böylece ilk kurulum hızlı kalır,
-  // paket boyutu da 100+ font alias'ı ile şişmez.
-  GoogleFonts.config.allowRuntimeFetching = true;
+  // Runtime fetch kapalı: CDN gecikmesi ve TLS bağlantısı ilk frame'i bloklamasın.
+  // Dekoratif fontlar (Reels, zikir) ilk açılışta sisteme düşer; CDN erişimi
+  // yoksa sistem fontu devreye girer — kullanıcı fark etmez.
+  GoogleFonts.config.allowRuntimeFetching = false;
 
   await runZonedGuarded(
     () async {

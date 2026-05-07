@@ -109,7 +109,7 @@ service cloud.firestore {
     match /app_public/{docId} {
       allow read: if true;
       allow write: if isAdmin()
-        && docId in ['inspiration_cards', 'widget_override'];
+        && docId in ['inspiration_cards', 'widget_override', 'widget_global_lock'];
     }
 
     // Premium yetki kayıtları:

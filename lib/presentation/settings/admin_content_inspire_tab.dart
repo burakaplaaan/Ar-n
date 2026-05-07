@@ -539,83 +539,91 @@ Widget _buildInspireAdminSummaryCard({
       ? 'Son kayıt zamanı yok.'
       : liveAt.isAfter(now)
       ? 'Kalan süre: ${_durationText(liveAt.difference(now))}'
-      : 'Yayın cache süresi geçmiş.';
+      : 'Cache süresi geçmiş.';
   return Padding(
     padding: const EdgeInsets.fromLTRB(16, 6, 16, 0),
     child: Card(
       color: const Color(0xFF0F2419),
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(10, 9, 10, 8),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+      child: ExpansionTile(
+        initiallyExpanded: false,
+        tilePadding: const EdgeInsets.fromLTRB(12, 4, 12, 4),
+        childrenPadding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
+        iconColor: Colors.white70,
+        collapsedIconColor: Colors.white70,
+        title: Row(
           children: [
-            Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    'Keşfet yayın durumu',
-                    style: TextStyle(
-                      color: Colors.white.withValues(alpha: 0.9),
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
+            Expanded(
+              child: Text(
+                'Keşfet yayın durumu',
+                style: TextStyle(
+                  color: Colors.white.withValues(alpha: 0.9),
+                  fontWeight: FontWeight.w700,
                 ),
-                _adminStatusPill(color: status.color, label: status.label),
-              ],
-            ),
-            const SizedBox(height: 4),
-            Text(status.detail),
-            const SizedBox(height: 4),
-            Text(
-              '$eta · Görünüm: ${selectedKind.wireName} ($visibleCount/$allRowCount) · Ana akış: $mainFeedCount · Kaydedilmemiş: $unsavedCount',
-              style: TextStyle(
-                color: Colors.white.withValues(alpha: 0.68),
-                fontSize: 11.5,
               ),
             ),
-            if (qualityWarnings.isNotEmpty) ...[
-              const SizedBox(height: 6),
-              ...qualityWarnings
-                  .take(1)
-                  .map(
-                    (w) => Padding(
-                      padding: const EdgeInsets.only(top: 2),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Icon(
-                            Icons.warning_amber_rounded,
-                            size: 15,
-                            color: Colors.amber,
-                          ),
-                          const SizedBox(width: 6),
-                          Expanded(
-                            child: Text(
-                              w,
-                              style: const TextStyle(
-                                color: Colors.amber,
-                                fontSize: 11,
-                              ),
+            _adminStatusPill(color: status.color, label: status.label),
+          ],
+        ),
+        subtitle: Padding(
+          padding: const EdgeInsets.only(top: 4),
+          child: Text(
+            '$eta · ${selectedKind.wireName} ($visibleCount/$allRowCount) · Akış: $mainFeedCount · Kaydedilmemiş: $unsavedCount',
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              color: status.color.withValues(alpha: 0.85),
+              fontSize: 11.5,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+        children: [
+          Align(
+            alignment: Alignment.centerLeft,
+            child: Text(status.detail),
+          ),
+          if (qualityWarnings.isNotEmpty) ...[
+            const SizedBox(height: 6),
+            ...qualityWarnings
+                .take(3)
+                .map(
+                  (w) => Padding(
+                    padding: const EdgeInsets.only(top: 2),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Icon(
+                          Icons.warning_amber_rounded,
+                          size: 15,
+                          color: Colors.amber,
+                        ),
+                        const SizedBox(width: 6),
+                        Expanded(
+                          child: Text(
+                            w,
+                            style: const TextStyle(
+                              color: Colors.amber,
+                              fontSize: 11,
                             ),
                           ),
-                        ],
-                      ),
-                    ),
-                  ),
-              if (qualityWarnings.length > 1)
-                Padding(
-                  padding: const EdgeInsets.only(top: 2),
-                  child: Text(
-                    '+${qualityWarnings.length - 1} ek uyarı',
-                    style: TextStyle(
-                      color: Colors.white.withValues(alpha: 0.58),
-                      fontSize: 11,
+                        ),
+                      ],
                     ),
                   ),
                 ),
-            ],
+            if (qualityWarnings.length > 3)
+              Padding(
+                padding: const EdgeInsets.only(top: 2),
+                child: Text(
+                  '+${qualityWarnings.length - 3} ek uyarı',
+                  style: TextStyle(
+                    color: Colors.white.withValues(alpha: 0.58),
+                    fontSize: 11,
+                  ),
+                ),
+              ),
           ],
-        ),
+        ],
       ),
     ),
   );

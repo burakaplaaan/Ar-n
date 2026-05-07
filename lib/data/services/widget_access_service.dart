@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'ad_gate_service.dart';
 import 'arin_widget_sync.dart';
+import 'global_widget_lock_service.dart';
 
 enum ArinWidgetAccessKind {
   quote,
@@ -53,15 +54,35 @@ class WidgetAccessService {
   Future<Map<ArinWidgetAccessKind, WidgetGateState>> syncAll({
     required bool isPremium,
   }) async {
+    final globallyLocked =
+        !isPremium && GlobalWidgetLockService.isGloballyLocked(_prefs);
+
     final adGate = AdGateService(_prefs);
     final states = <ArinWidgetAccessKind, WidgetGateState>{};
     for (final kind in ArinWidgetAccessKind.values) {
-      final state = await adGate.widgetStateFor(
+      final adState = await adGate.widgetStateFor(
         kind.placement,
         isPremium: isPremium,
       );
-      states[kind] = state;
+      if (globallyLocked) {
+        // Global kilit aktifken reklam unlock'u geçerliyse erişime izin ver.
+        // Trial süresi ise global kilide takılır — reklam izlenmeden açılmaz.
+        final rewardedStillValid =
+            adState.unlockUntil != null &&
+            adState.unlockUntil!.isAfter(DateTime.now());
+        states[kind] = WidgetGateState(
+          allowed: rewardedStillValid,
+          inTrial: false,
+          unlockUntil: rewardedStillValid ? adState.unlockUntil : null,
+          trialUntil: null,
+        );
+      } else {
+        states[kind] = adState;
+      }
     }
+    final lockNote = globallyLocked
+        ? GlobalWidgetLockService.lockedNote(_prefs)
+        : '';
     await ArinWidgetSync.pushWidgetGateStates(
       lockedByKind: {
         for (final entry in states.entries) entry.key.id: !entry.value.allowed,
@@ -75,6 +96,7 @@ class WidgetAccessService {
           entry.key.id: entry.value.unlockUntil,
       },
       isPremium: isPremium,
+      lockNote: lockNote,
     );
     return states;
   }
@@ -82,10 +104,28 @@ class WidgetAccessService {
   Future<WidgetGateState> stateFor(
     ArinWidgetAccessKind kind, {
     required bool isPremium,
-  }) {
-    return AdGateService(
-      _prefs,
-    ).widgetStateFor(kind.placement, isPremium: isPremium);
+  }) async {
+    final adGate = AdGateService(_prefs);
+    final adState = await adGate.widgetStateFor(
+      kind.placement,
+      isPremium: isPremium,
+    );
+    // Premium veya normal akış zaten allowed ise global kilidi sorgulamaya gerek yok.
+    if (adState.allowed && isPremium) return adState;
+
+    final globallyLocked = GlobalWidgetLockService.isGloballyLocked(_prefs);
+    if (!globallyLocked) return adState;
+
+    // Global kilit var: reklam unlock'u geçerliyse erişime izin ver.
+    final rewardedStillValid =
+        adState.unlockUntil != null &&
+        adState.unlockUntil!.isAfter(DateTime.now());
+    return WidgetGateState(
+      allowed: rewardedStillValid,
+      inTrial: false,
+      unlockUntil: rewardedStillValid ? adState.unlockUntil : null,
+      trialUntil: null,
+    );
   }
 
   Future<void> recordRewardedUnlock(ArinWidgetAccessKind kind) async {

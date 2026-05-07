@@ -54,12 +54,17 @@ class _Thumb extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final dpr = MediaQuery.devicePixelRatioOf(context);
+    final screenW = MediaQuery.sizeOf(context).width;
+    // 3 kolonlu grid; fiziksel piksel cinsinden hücre genişliği.
+    final cellPx = (screenW / 3 * dpr).ceil();
     return Image.asset(
       card.resolvedImageAssetPath,
       fit: BoxFit.cover,
       alignment: Alignment.center,
       gaplessPlayback: true,
       filterQuality: FilterQuality.medium,
+      cacheWidth: cellPx,
       errorBuilder: (_, __, ___) => _Fallback(card: card),
     );
   }

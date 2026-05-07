@@ -34,16 +34,9 @@ class ArinTrackingWidgetProvider : HomeWidgetProvider() {
         widgetData: SharedPreferences,
     ) {
         val locked = isWidgetLocked(widgetData, "tracking")
-        val entry = if (locked) {
-            TrackingEntry(
-                enabled = true,
-                title = "🔒 Widget kilitli",
-                value = "Açmak için dokun",
-                note = "Premium veya reklam",
-            )
-        } else {
-            loadEntry(widgetData)
-        }
+        val lockNote = widgetData.getString(KEY_LOCK_NOTE, null)
+            ?.trim().orEmpty().ifEmpty { "Tıkla, aç" }
+        val entry = if (locked) null else loadEntry(widgetData)
         val openApp = Intent(context, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
             putExtra(MainActivity.EXTRA_WIDGET_KIND, "tracking")
@@ -59,18 +52,25 @@ class ArinTrackingWidgetProvider : HomeWidgetProvider() {
 
         for (widgetId in appWidgetIds) {
             val views = RemoteViews(context.packageName, R.layout.arin_tracking_widget)
-            views.setTextViewText(R.id.widget_tracking_title, entry.title)
-            views.setTextViewText(R.id.widget_tracking_value, entry.value)
-            views.setTextViewText(R.id.widget_tracking_note, entry.note)
-            views.setViewVisibility(
-                R.id.widget_tracking_value,
-                if (entry.value.isEmpty()) View.GONE else View.VISIBLE,
-            )
+            if (locked) {
+                views.setViewVisibility(R.id.widget_lock_overlay, View.VISIBLE)
+                views.setTextViewText(R.id.widget_lock_note, lockNote)
+            } else {
+                views.setViewVisibility(R.id.widget_lock_overlay, View.GONE)
+                val e = entry!!
+                views.setTextViewText(R.id.widget_tracking_title, e.title)
+                views.setTextViewText(R.id.widget_tracking_value, e.value)
+                views.setTextViewText(R.id.widget_tracking_note, e.note)
+                views.setViewVisibility(
+                    R.id.widget_tracking_value,
+                    if (e.value.isEmpty()) View.GONE else View.VISIBLE,
+                )
+            }
             views.setOnClickPendingIntent(R.id.widget_tracking_root, contentPi)
             appWidgetManager.updateAppWidget(widgetId, views)
         }
 
-        if (entry.enabled) {
+        if (locked || entry?.enabled == true) {
             scheduleNextRefresh(context, widgetData)
         } else {
             cancelRefresh(context)
@@ -224,6 +224,7 @@ class ArinTrackingWidgetProvider : HomeWidgetProvider() {
         private const val KEY_DAY_PREFIX = "arin_tracking_day_prefix"
         private const val KEY_GATE_LOCKED = "arin_widget_gate_tracking_locked"
         private const val KEY_GATE_PREMIUM = "arin_widget_gate_premium"
+        private const val KEY_LOCK_NOTE = "arin_widget_gate_lock_note"
         private const val ACTION_REFRESH = "com.arin.arin.action.TRACKING_WIDGET_REFRESH"
         private const val REQUEST_CODE_REFRESH = 19041
 

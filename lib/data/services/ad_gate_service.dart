@@ -82,7 +82,7 @@ class AdGateService {
   final SharedPreferences _prefs;
 
   static const int exploreSwipeFreeCount = 5;
-  static const Duration widgetTrialDuration = Duration(hours: 48);
+  static const Duration widgetTrialDuration = Duration(hours: 24);
   static const Duration widgetUnlockDuration = Duration(hours: 24);
   static const Duration secondAlarmUnlockDuration = Duration(days: 7);
   static const Duration sessionAdCooldown = Duration(hours: 12);

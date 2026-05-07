@@ -1,3 +1,6 @@
+import 'dart:typed_data';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:image/image.dart' as img;
@@ -16,7 +19,9 @@ class InspirationLuminanceService {
     return r.lightText;
   }
 
-  /// Tek decode ile parlaklık + en “düz” yatay şeride hizalama.
+  /// Tek decode ile parlaklık + en "düz" yatay şeride hizalama.
+  /// Bayt yükleme main thread'de yapılır (rootBundle gereksinimi); decode + analiz
+  /// `compute()` ile ayrı isolate'e taşınır → UI thread bloklanmaz.
   static Future<({bool lightText, Alignment textAnchor})> analyzeForReels(
     String assetPath,
   ) async {
@@ -26,31 +31,18 @@ class InspirationLuminanceService {
     try {
       final data = await rootBundle.load(assetPath);
       final bytes = data.buffer.asUint8List();
-      final image = img.decodeImage(bytes);
-      if (image == null) {
-        const r = (lightText: true, textAnchor: Alignment.center);
-        _fullCache[assetPath] = r;
-        _lightTextCache[assetPath] = true;
-        _anchorCache[assetPath] = Alignment.center;
-        return r;
-      }
 
-      final w = image.width;
-      final h = image.height;
-      if (w < 8 || h < 8) {
-        const r = (lightText: true, textAnchor: Alignment.center);
-        _fullCache[assetPath] = r;
-        return r;
-      }
+      // Decode + analiz main thread'i bloklamasın.
+      // Alignment isolate'ler arası gönderilemediğinden primitif record döndürülür.
+      final raw = await compute(_luminanceAnalyzeInIsolate, bytes);
 
-      final luma = _centerRegionLumaFromImage(image);
-      final darkCenter = luma < 0.48;
-      final anchor = _lowestVarianceBandAlignment(image);
-
-      final r = (lightText: darkCenter, textAnchor: anchor);
+      final r = (
+        lightText: raw.$1,
+        textAnchor: Alignment(raw.$2, raw.$3),
+      );
       _fullCache[assetPath] = r;
-      _lightTextCache[assetPath] = darkCenter;
-      _anchorCache[assetPath] = anchor;
+      _lightTextCache[assetPath] = r.lightText;
+      _anchorCache[assetPath] = r.textAnchor;
       return r;
     } catch (_) {
       const r = (lightText: true, textAnchor: Alignment.center);
@@ -84,7 +76,8 @@ class InspirationLuminanceService {
   }
 
   /// Yatay şeritlerde luma varyansı; en düşük varyanslı şeride metni yaklaştır.
-  static Alignment _lowestVarianceBandAlignment(img.Image image) {
+  /// (anchorX, anchorY) olarak döndürür — isolate-safe primitifler.
+  static (double, double) _lowestVarianceBandAlignmentXY(img.Image image) {
     final w = image.width;
     final h = image.height;
     final x0 = (w * 0.2).toInt().clamp(0, w - 1);
@@ -106,7 +99,7 @@ class InspirationLuminanceService {
 
     final t = (bestBand + 0.5) / bandCount;
     final ay = ((t - 0.5) * 2.0 * 0.55).clamp(-0.58, 0.58);
-    return Alignment(0, ay);
+    return (0.0, ay);
   }
 
   static double _regionLumaVariance(
@@ -122,8 +115,7 @@ class InspirationLuminanceService {
     for (var y = y0; y < y1; y += stepY) {
       for (var x = x0; x < x1; x += stepX) {
         final p = image.getPixel(x, y);
-        final l =
-            (0.299 * p.r + 0.587 * p.g + 0.114 * p.b) / 255.0;
+        final l = (0.299 * p.r + 0.587 * p.g + 0.114 * p.b) / 255.0;
         lumas.add(l);
       }
     }
@@ -135,5 +127,25 @@ class InspirationLuminanceService {
       s += d * d;
     }
     return s / lumas.length;
+  }
+}
+
+/// Ayrı isolate'de çalışan saf fonksiyon — top-level olmalı, Flutter binding kullanamaz.
+/// Döndürür: (lightText, anchorX, anchorY).
+(bool, double, double) _luminanceAnalyzeInIsolate(Uint8List bytes) {
+  try {
+    final image = img.decodeImage(bytes);
+    if (image == null) return (true, 0.0, 0.0);
+
+    final w = image.width;
+    final h = image.height;
+    if (w < 8 || h < 8) return (true, 0.0, 0.0);
+
+    final luma = InspirationLuminanceService._centerRegionLumaFromImage(image);
+    final darkCenter = luma < 0.48;
+    final anchor = InspirationLuminanceService._lowestVarianceBandAlignmentXY(image);
+    return (darkCenter, anchor.$1, anchor.$2);
+  } catch (_) {
+    return (true, 0.0, 0.0);
   }
 }

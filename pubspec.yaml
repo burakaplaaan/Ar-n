@@ -162,6 +162,7 @@ flutter:
     - assets/branding/
     - assets/animations/
     - assets/images/zikir/
+    - assets/images/widget_guide/
     - assets/data/
     - assets/data/inspiration/
     - assets/data/willpower/

@@ -1,4 +1,4 @@
-// lib/presentation/shared/widgets/arin_shell.dart
+﻿// lib/presentation/shared/widgets/arin_shell.dart
 
 import 'dart:async';
 import 'dart:math' as math;
@@ -23,6 +23,37 @@ import '../../willpower/willpower_hub_page.dart';
 import 'offline_banner.dart';
 import 'prayer_schedule_listener.dart';
 
+/// Shell sekme sayfaları — sabit liste; PageView.builder bunu index ile çağırır.
+const List<Widget> _kShellPages = [
+  HomePage(),
+  QiblaHubPage(),
+  WillpowerHubPage(),
+  InspireExplorePage(),
+  SettingsPage(),
+];
+
+/// Bir sekme sayfasını lazy build ederken state'ini korur.
+/// PageView.builder ile kullanılır; ziyaret edilmemiş sekmeler hiç build edilmez,
+/// daha önce açılmış sekmeler AutomaticKeepAlive sayesinde ağaçta kalır.
+class _KeepAlivePage extends StatefulWidget {
+  const _KeepAlivePage({required this.child});
+  final Widget child;
+  @override
+  State<_KeepAlivePage> createState() => _KeepAlivePageState();
+}
+
+class _KeepAlivePageState extends State<_KeepAlivePage>
+    with AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true;
+
+  @override
+  Widget build(BuildContext context) {
+    super.build(context);
+    return widget.child;
+  }
+}
+
 class ArinShell extends StatefulWidget {
   const ArinShell({super.key, required this.child});
 
@@ -40,8 +71,8 @@ class _ArinShellState extends State<ArinShell> {
   DateTime? _lastExitBackPressAt;
   static const Duration _exitConfirmWindow = Duration(seconds: 2);
 
-  /// 1.0 = tam opak; dikey kaydırıldıkça düşer (alt bar „şeffaflaşır”).
-  double _navBarSolidity = 1.0;
+  /// 1.0 = tam opak; kayd' ile ValueNotifier -- sadece _ArinBottomNav rebuild edilir.
+  final ValueNotifier<double> _navBarSolidity = ValueNotifier(1.0);
   String? _lastPathForNavSolidity;
   String? _lastPathForAudioVisibility;
 
@@ -100,12 +131,13 @@ class _ArinShellState extends State<ArinShell> {
     if (notification is ScrollUpdateNotification) {
       final p = m.pixels.clamp(0.0, 260.0);
       final solid = 1.0 - (p / 260.0) * 0.78;
-      if ((solid - _navBarSolidity).abs() > 0.02) {
-        setState(() => _navBarSolidity = solid.clamp(0.18, 1.0));
+      if ((solid - _navBarSolidity.value).abs() > 0.02) {
+        // Yalnızca ValueNotifier güncellenir; shell tree rebuild edilmez.
+        _navBarSolidity.value = solid.clamp(0.18, 1.0);
       }
     } else if (notification is ScrollEndNotification) {
       if (m.pixels < 24) {
-        setState(() => _navBarSolidity = 1.0);
+        _navBarSolidity.value = 1.0;
       }
     }
     return false;
@@ -213,6 +245,7 @@ class _ArinShellState extends State<ArinShell> {
   @override
   void dispose() {
     _pageController?.dispose();
+    _navBarSolidity.dispose();
     super.dispose();
   }
 
@@ -238,7 +271,7 @@ class _ArinShellState extends State<ArinShell> {
         ref.watch(themeModeProvider);
         if (_lastPathForNavSolidity != path) {
           _lastPathForNavSolidity = path;
-          _navBarSolidity = 1.0;
+          _navBarSolidity.value = 1.0;
         }
         final blockShellSwipeOnQibla = ref.watch(
           qiblaHubBlocksShellSwipeProvider,
@@ -259,24 +292,21 @@ class _ArinShellState extends State<ArinShell> {
             : const BouncingScrollPhysics();
 
         final innerBody = swipeRoot
-            ? PageView(
+            ? PageView.builder(
                 controller: _pageController!,
                 physics: pagePhysics,
+                itemCount: 5,
                 onPageChanged: (i) {
                   HapticFeedback.selectionClick();
-                  setState(() => _navBarSolidity = 1.0);
+                  _navBarSolidity.value = 1.0;
                   final next = _shellPathForIndex(i);
                   if (path != next) {
                     context.go(next);
                   }
                 },
-                children: const [
-                  HomePage(),
-                  QiblaHubPage(),
-                  WillpowerHubPage(),
-                  InspireExplorePage(),
-                  SettingsPage(),
-                ],
+                itemBuilder: (context, index) {
+                  return _KeepAlivePage(child: _kShellPages[index]);
+                },
               )
             : SizedBox.expand(child: widget.child);
 
@@ -337,14 +367,22 @@ class _ArinShellState extends State<ArinShell> {
                   : Directionality(
                       // Keep shell chrome stable in Arabic: don't mirror bottom bar.
                       textDirection: TextDirection.ltr,
-                      child: _ArinBottomNav(
-                        currentIndex: currentIndex,
-                        isLightShell: light,
-                        navBarSolidity: _navBarSolidity,
-                        onTap: (i) {
-                          setState(() => _navBarSolidity = 1.0);
-                          _onTabTap(context, i);
-                        },
+                      child: Transform.translate(
+                        offset: const Offset(0, 8),
+                        // ValueListenableBuilder: scroll olayları yalnızca
+                        // _ArinBottomNav'ı rebuild eder, shell gövdesi dokunulmaz.
+                        child: ValueListenableBuilder<double>(
+                          valueListenable: _navBarSolidity,
+                          builder: (_, solidity, __) => _ArinBottomNav(
+                            currentIndex: currentIndex,
+                            isLightShell: light,
+                            navBarSolidity: solidity,
+                            onTap: (i) {
+                              _navBarSolidity.value = 1.0;
+                              _onTabTap(context, i);
+                            },
+                          ),
+                        ),
                       ),
                     ),
             ),

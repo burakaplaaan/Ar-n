@@ -326,9 +326,9 @@ class _InstagramLikePageScrollPhysics extends PageScrollPhysics {
 
   final int Function() settledPage;
 
-  static const double _commitFraction = 0.045;
-  static const double _flickCommitFraction = 0.018;
-  static const double _flickVelocity = 70;
+  static const double _commitFraction = 0.02;
+  static const double _flickCommitFraction = 0.008;
+  static const double _flickVelocity = 40;
 
   @override
   _InstagramLikePageScrollPhysics applyTo(ScrollPhysics? ancestor) {
