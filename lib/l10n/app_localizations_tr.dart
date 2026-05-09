@@ -1494,7 +1494,7 @@ class AppLocalizationsTr extends AppLocalizations {
       'Gün içinde 2 defa rastgele bir söz ya da kısa motivasyon.';
 
   @override
-  String get notificationsMilestoneTitle => 'Milestone bildirimleri';
+  String get notificationsMilestoneTitle => 'Alışkanlık bildirimleri';
 
   @override
   String get notificationsMilestoneSubtitle =>

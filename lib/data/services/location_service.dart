@@ -13,6 +13,36 @@ import 'package:hive/hive.dart';
 import '../../core/utils/hive_boxes.dart';
 import 'diyanet_district_matcher.dart';
 
+/// GPS ile tespit edilen şehir, kaydedilen şehirden farklıysa döner.
+/// `applyLocationChange` ile kalıcı hale getirilir.
+class LocationChangeResult {
+  final String newCity;
+  final String newCountry;
+  final int? newDistrictId;
+  final double lat;
+  final double lon;
+
+  const LocationChangeResult({
+    required this.newCity,
+    required this.newCountry,
+    required this.newDistrictId,
+    required this.lat,
+    required this.lon,
+  });
+}
+
+/// Konum güncelleme tercihi sabitleri (Hive key: `location_auto_update_pref`).
+abstract final class LocationUpdatePref {
+  /// Her şehir değişiminde sor (varsayılan).
+  static const String ask = 'ask';
+
+  /// Sessizce güncelle, bir daha sorma.
+  static const String alwaysUpdate = 'always_update';
+
+  /// Hiç otomatik güncelleme, sadece manuel.
+  static const String neverUpdate = 'never_update';
+}
+
 class LocationService {
   static const _cityKey = 'user_city';
   static const _countryKey = 'user_country';
@@ -23,6 +53,7 @@ class LocationService {
   /// Diyanet (ezanvakti) ilçe kimliği. TR ve ancak match başarılıysa
   /// dolu olur; değilse `null` kalıp resolver Aladhan'a düşer.
   static const _districtIdKey = 'prayer_district_id';
+  static const _locationUpdatePrefKey = 'location_auto_update_pref';
 
   /// İlk namaz vakitleri yüklemesinde (oturum başına bir kez) GPS ile güncel şehir.
   bool _sessionAutoGpsPending = true;
@@ -34,6 +65,15 @@ class LocationService {
   double? get savedLat => _prefs.get(_latKey) as double?;
   double? get savedLon => _prefs.get(_lonKey) as double?;
   int? get savedDistrictId => _prefs.get(_districtIdKey) as int?;
+
+  /// Konum güncelleme tercihi. Olası değerler: [LocationUpdatePref].
+  String get locationUpdatePref =>
+      (_prefs.get(_locationUpdatePrefKey) as String?) ?? LocationUpdatePref.ask;
+
+  Future<void> setLocationUpdatePref(String pref) async {
+    await _prefs.put(_locationUpdatePrefKey, pref);
+  }
+
   DateTime? get lastPrayerSyncAt {
     final ms = _prefs.get(_lastPrayerLocSyncMs) as int?;
     if (ms == null) return null;
@@ -116,6 +156,22 @@ class LocationService {
   /// [forceRefresh]: true ise süre sınırı yok (yenileme hareketi).
   /// Oturumda ilk çağrıda bir kez GPS denenir (şehir değişimi / uygulamaya yeniden giriş).
   Future<void> syncPrayerLocation({bool forceRefresh = false}) async {
+    // Manuel yenileme (forceRefresh) her zaman çalışır. Otomatik çalışmada:
+    //  • neverUpdate → kullanıcı sadece manuel değiştirmek istiyor; GPS'e dokunma.
+    //  • ask         → şehir değişimi diyalog akışı (LocationChangeListener) üstlenir;
+    //                  burada sessizce kaydetme, sadece koordinatları taze tut.
+    if (!forceRefresh) {
+      final pref = locationUpdatePref;
+      if (pref == LocationUpdatePref.neverUpdate) {
+        _sessionAutoGpsPending = false;
+        return;
+      }
+      if (pref == LocationUpdatePref.ask) {
+        _sessionAutoGpsPending = false;
+        return;
+      }
+    }
+
     final sessionFirst = _sessionAutoGpsPending;
     if (_sessionAutoGpsPending) _sessionAutoGpsPending = false;
     final force = forceRefresh || sessionFirst;
@@ -161,6 +217,80 @@ class LocationService {
     }
   }
 
+  /// GPS ile güncel konumu alır, kayıtlı şehirden farklıysa [LocationChangeResult]
+  /// döndürür. Hiçbir şey kaydetmez — kullanıcı onayından sonra [applyLocationChange]
+  /// çağrılmalıdır. İzin yoksa, GPS alınamazsa veya şehir aynıysa `null` döner.
+  Future<LocationChangeResult?> detectLocationChange() async {
+    // Koordinatları Hive'a yazmadan konum al — kayıt yalnızca applyLocationChange'de.
+    final pos = await _getCurrentPositionNoSave();
+    if (pos == null) return null;
+
+    try {
+      final marks = await placemarkFromCoordinates(pos.lat, pos.lon);
+      if (marks.isEmpty) return null;
+      final p = marks.first;
+
+      final newCity = _pickCityName(p);
+      if (newCity == null || newCity.isEmpty) return null;
+
+      if (_isSameCity(newCity, savedCity)) return null;
+
+      final newCountry = _countryForAladhan(p);
+      int? newDistrictId;
+      if ((p.isoCountryCode?.toUpperCase() ?? '') == 'TR') {
+        await DiyanetDistrictMatcher.loadOnce();
+        final ilceAdi = p.subAdministrativeArea?.trim().isNotEmpty == true
+            ? p.subAdministrativeArea
+            : p.locality;
+        final match = DiyanetDistrictMatcher.match(
+          ilAdi: p.administrativeArea,
+          ilceAdi: ilceAdi,
+        );
+        newDistrictId = match?.id;
+      }
+
+      return LocationChangeResult(
+        newCity: newCity,
+        newCountry: newCountry,
+        newDistrictId: newDistrictId,
+        lat: pos.lat,
+        lon: pos.lon,
+      );
+    } catch (_) {
+      return null;
+    }
+  }
+
+  /// [detectLocationChange]'in sonucunu Hive'a kalıcı olarak yazar.
+  Future<void> applyLocationChange(LocationChangeResult result) async {
+    await saveCity(result.newCity, result.newCountry);
+    await saveDistrictId(result.newDistrictId);
+    await _prefs.put(_latKey, result.lat);
+    await _prefs.put(_lonKey, result.lon);
+    await _prefs.put(
+      _lastPrayerLocSyncMs,
+      DateTime.now().millisecondsSinceEpoch,
+    );
+    _sessionAutoGpsPending = false;
+  }
+
+  static bool _isSameCity(String a, String b) {
+    String fold(String s) => s.trim().toLowerCase()
+        .replaceAll('ı', 'i')
+        .replaceAll('ğ', 'g')
+        .replaceAll('ü', 'u')
+        .replaceAll('ş', 's')
+        .replaceAll('ö', 'o')
+        .replaceAll('ç', 'c')
+        .replaceAll('İ', 'i')
+        .replaceAll('Ğ', 'g')
+        .replaceAll('Ü', 'u')
+        .replaceAll('Ş', 's')
+        .replaceAll('Ö', 'o')
+        .replaceAll('Ç', 'c');
+    return fold(a) == fold(b);
+  }
+
   Future<void> _resolveDistrictIdFromPlacemark(Placemark p) async {
     try {
       await DiyanetDistrictMatcher.loadOnce();
@@ -200,6 +330,32 @@ class LocationService {
     final name = p.country?.trim();
     if (name != null && name.isNotEmpty) return name;
     return 'Turkey';
+  }
+
+  /// Konum iznini kontrol eder ve GPS'ten pozisyon alır — **Hive'a yazmaz**.
+  /// Yalnızca [detectLocationChange] tarafından kullanılır; kayıt işlemi
+  /// kullanıcı onayından sonra [applyLocationChange] üstlenir.
+  Future<({double lat, double lon})?> _getCurrentPositionNoSave() async {
+    var permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied ||
+          permission == LocationPermission.deniedForever) {
+        return null;
+      }
+    }
+    if (permission == LocationPermission.deniedForever) return null;
+    try {
+      final pos = await Geolocator.getCurrentPosition(
+        locationSettings: const LocationSettings(
+          accuracy: LocationAccuracy.low,
+          timeLimit: Duration(seconds: 12),
+        ),
+      );
+      return (lat: pos.latitude, lon: pos.longitude);
+    } catch (_) {
+      return null;
+    }
   }
 
   Future<({double lat, double lon})?> requestCurrentPosition() async {

@@ -40,6 +40,7 @@ import 'presentation/shared/providers/prayer_time_providers.dart';
 import 'presentation/shared/providers/premium_providers.dart';
 import 'presentation/shared/providers/user_profile_providers.dart';
 import 'presentation/shared/widgets/global_edge_swipe_back.dart';
+import 'presentation/shared/widgets/location_change_listener.dart';
 import 'presentation/shared/widgets/widget_launch_gate_listener.dart';
 import 'presentation/qibla/qibla_hub_navigator_key.dart';
 
@@ -397,28 +398,30 @@ class _ArinAppState extends ConsumerState<ArinApp> with WidgetsBindingObserver {
                 maxScaleFactor: 1.3,
               ),
             ),
-            child: GlobalEdgeSwipeBack(
-              onBackRequested: () async {
-                final currentPath =
-                    router.routeInformationProvider.value.uri.path;
-                final onQiblaStack =
-                    currentPath == AppRoutes.qibla ||
-                    currentPath.startsWith('${AppRoutes.qibla}/');
-                if (onQiblaStack) {
-                  final qiblaNav = qiblaHubNavigatorKey.currentState;
-                  if (qiblaNav != null && qiblaNav.canPop()) {
-                    qiblaNav.pop();
-                    return true;
+              child: GlobalEdgeSwipeBack(
+                onBackRequested: () async {
+                  final currentPath =
+                      router.routeInformationProvider.value.uri.path;
+                  final onQiblaStack =
+                      currentPath == AppRoutes.qibla ||
+                      currentPath.startsWith('${AppRoutes.qibla}/');
+                  if (onQiblaStack) {
+                    final qiblaNav = qiblaHubNavigatorKey.currentState;
+                    if (qiblaNav != null && qiblaNav.canPop()) {
+                      qiblaNav.pop();
+                      return true;
+                    }
                   }
-                }
-                final rootNav = router.routerDelegate.navigatorKey.currentState;
-                if (rootNav != null && rootNav.canPop()) {
-                  return rootNav.maybePop();
-                }
-                return false;
-              },
-              child: WidgetLaunchGateListener(child: child),
-            ),
+                  final rootNav = router.routerDelegate.navigatorKey.currentState;
+                  if (rootNav != null && rootNav.canPop()) {
+                    return rootNav.maybePop();
+                  }
+                  return false;
+                },
+                child: WidgetLaunchGateListener(
+                  child: LocationChangeListener(child: child),
+                ),
+              ),
           ),
         );
       },

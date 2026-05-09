@@ -176,8 +176,8 @@ struct QuoteProvider: TimelineProvider {
           entries: [
             QuoteEntry(
               date: Date(),
-              text: "Açmak için dokun",
-              source: "🔒 Widget kilitli"
+              text: "🔒",
+              source: ""
             )
           ],
           policy: .after(next)
@@ -199,8 +199,8 @@ struct QuoteProvider: TimelineProvider {
     if widgetLocked("quote") {
       return QuoteEntry(
         date: Date(),
-        text: "Açmak için dokun",
-        source: "🔒 Widget kilitli"
+        text: "🔒",
+        source: ""
       )
     }
     let u = suite()
@@ -431,9 +431,9 @@ struct PrayerProvider: TimelineProvider {
           entries: [
             PrayerEntry(
               date: Date(),
-              location: "Premium veya reklam",
-              nextName: "🔒 Widget kilitli",
-              countdown: "Açmak için dokun",
+              location: "",
+              nextName: "🔒",
+              countdown: "—",
               nextDate: nil
             )
           ],
@@ -457,9 +457,9 @@ struct PrayerProvider: TimelineProvider {
     if widgetLocked("prayer") {
       return PrayerEntry(
         date: Date(),
-        location: "Premium veya reklam",
-        nextName: "🔒 Widget kilitli",
-        countdown: "Açmak için dokun",
+        location: "",
+        nextName: "🔒",
+        countdown: "—",
         nextDate: nil
       )
     }
@@ -603,11 +603,13 @@ struct PrayerWidgetView: View {
           .symbolRenderingMode(.hierarchical)
         countdownText(size: 21, minScale: 0.78)
       }
-      Text(entry.location)
-        .font(.system(size: 10, weight: .medium, design: .rounded))
-        .foregroundStyle(secondaryTextColor)
-        .lineLimit(1)
-        .minimumScaleFactor(0.8)
+      if !entry.location.isEmpty {
+        Text(entry.location)
+          .font(.system(size: 10, weight: .medium, design: .rounded))
+          .foregroundStyle(secondaryTextColor)
+          .lineLimit(1)
+          .minimumScaleFactor(0.8)
+      }
     }
     .padding(.horizontal, 11)
     .padding(.vertical, 10)
@@ -639,11 +641,13 @@ struct PrayerWidgetView: View {
           .foregroundStyle(secondaryTextColor)
         countdownText(size: 26, minScale: 0.78)
       }
-      Text(entry.location)
-        .font(.system(size: 11, weight: .medium, design: .rounded))
-        .foregroundStyle(secondaryTextColor)
-        .lineLimit(1)
-        .minimumScaleFactor(0.82)
+      if !entry.location.isEmpty {
+        Text(entry.location)
+          .font(.system(size: 11, weight: .medium, design: .rounded))
+          .foregroundStyle(secondaryTextColor)
+          .lineLimit(1)
+          .minimumScaleFactor(0.82)
+      }
     }
     .padding(14)
     .shadow(color: .black.opacity(textShadowOpacity), radius: 3.0, x: 0, y: 1)
@@ -718,11 +722,11 @@ struct ComboProvider: TimelineProvider {
           entries: [
             ComboEntry(
               date: Date(),
-              nextName: "🔒 Widget kilitli",
-              countdown: "Açmak için dokun",
+              nextName: "🔒",
+              countdown: "—",
               nextDate: nil,
-              quoteText: "Premium veya reklam",
-              quoteSource: "ARIN"
+              quoteText: "",
+              quoteSource: ""
             )
           ],
           policy: .after(next)
@@ -798,11 +802,11 @@ struct ComboProvider: TimelineProvider {
     if widgetLocked("combo") {
       return ComboEntry(
         date: Date(),
-        nextName: "🔒 Widget kilitli",
-        countdown: "Açmak için dokun",
+        nextName: "🔒",
+        countdown: "—",
         nextDate: nil,
-        quoteText: "Premium veya reklam",
-        quoteSource: "ARIN"
+        quoteText: "",
+        quoteSource: ""
       )
     }
     return loadEntry(at: Date()).entry
@@ -1027,13 +1031,15 @@ struct ComboWidgetView: View {
 
   private var quoteBlock: some View {
     VStack(alignment: .leading, spacing: 3) {
-      Text(entry.quoteText.isEmpty ? "ARIN" : entry.quoteText)
-        .font(.system(size: family == .accessoryRectangular ? 15 : 27, weight: .regular, design: .serif))
-        .foregroundStyle(primaryTextColor)
-        .lineSpacing(-3)
-        .lineLimit(family == .accessoryRectangular ? 2 : 2)
-        .minimumScaleFactor(0.48)
-        .allowsTightening(true)
+      if !entry.quoteText.isEmpty {
+        Text(entry.quoteText)
+          .font(.system(size: family == .accessoryRectangular ? 15 : 27, weight: .regular, design: .serif))
+          .foregroundStyle(primaryTextColor)
+          .lineSpacing(-3)
+          .lineLimit(family == .accessoryRectangular ? 2 : 2)
+          .minimumScaleFactor(0.48)
+          .allowsTightening(true)
+      }
       if hasSource {
         Text(displayQuoteSource)
           .font(.system(size: family == .accessoryRectangular ? 11 : 15, weight: .bold))
@@ -1122,9 +1128,9 @@ struct TrackingProvider: TimelineProvider {
     if widgetLocked("tracking") {
       return TrackingEntry(
         date: Date(),
-        title: "🔒 Widget kilitli",
-        value: "Açmak için dokun",
-        note: "Premium veya reklam"
+        title: "🔒",
+        value: "",
+        note: ""
       )
     }
     let u = suite()
@@ -1209,12 +1215,14 @@ struct TrackingWidgetView: View {
           .lineLimit(1)
           .minimumScaleFactor(0.58)
       }
-      Text(entry.note)
-        .font(.system(size: family == .accessoryRectangular ? 12 : 15, weight: .regular, design: .serif))
-        .foregroundStyle(primaryTextColor)
-        .lineLimit(family == .accessoryRectangular ? 2 : 3)
-        .minimumScaleFactor(0.50)
-        .allowsTightening(true)
+      if !entry.note.isEmpty {
+        Text(entry.note)
+          .font(.system(size: family == .accessoryRectangular ? 12 : 15, weight: .regular, design: .serif))
+          .foregroundStyle(primaryTextColor)
+          .lineLimit(family == .accessoryRectangular ? 2 : 3)
+          .minimumScaleFactor(0.50)
+          .allowsTightening(true)
+      }
     }
     .frame(maxWidth: .infinity, alignment: .leading)
     .padding(.horizontal, family == .accessoryRectangular ? 5 : 10)

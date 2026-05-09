@@ -33,6 +33,7 @@ import 'data/services/arin_local_notifications_plugin.dart';
 import 'data/services/admob_service.dart';
 import 'data/services/arin_widget_sync.dart';
 import 'data/services/diyanet_district_matcher.dart';
+import 'data/services/fcm_token_service.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 Future<void> main() async {
@@ -376,6 +377,13 @@ Future<void> _runDeferredStartup(SharedPreferences prefs) async {
   // iOS App Group hazırlığını paralelde başlat: pool sync veya widget
   // refresh sırasında bekleme yapmasın diye.
   ArinWidgetSync.primeAppGroup();
+
+  // FCM topic kaydı — kullanıcı bildirim iznini henüz vermediyse sistem
+  // izin diyaloğu açar. 4 saniyelik gecikme sonrası çalışır ki uygulama
+  // tam yüklendikten sonra diyalog gösterilsin.
+  if (isFirebaseReady) {
+    unawaited(FcmTokenService.initIfNeeded());
+  }
 
   await Future<void>.delayed(const Duration(seconds: 4));
 

@@ -97,14 +97,10 @@ class ArinPrayerWidgetProvider : HomeWidgetProvider() {
                 }
         val contentPi = PendingIntent.getActivity(context, 1, openApp, piFlags)
 
-        val lockNote = widgetData.getString(KEY_LOCK_NOTE, null)
-            ?.trim().orEmpty().ifEmpty { "Tıkla, aç" }
-
         for (widgetId in appWidgetIds) {
             val views = RemoteViews(context.packageName, R.layout.arin_prayer_widget)
             if (locked) {
                 views.setViewVisibility(R.id.widget_lock_overlay, View.VISIBLE)
-                views.setTextViewText(R.id.widget_lock_note, lockNote)
                 views.setOnClickPendingIntent(R.id.widget_prayer_root, contentPi)
                 appWidgetManager.updateAppWidget(widgetId, views)
                 continue
@@ -416,7 +412,6 @@ class ArinPrayerWidgetProvider : HomeWidgetProvider() {
         private const val KEY_LOCALE = "arin_widget_locale"
         private const val KEY_GATE_LOCKED = "arin_widget_gate_prayer_locked"
         private const val KEY_GATE_PREMIUM = "arin_widget_gate_premium"
-        private const val KEY_LOCK_NOTE = "arin_widget_gate_lock_note"
 
         private const val ACTION_TICK = "com.arin.arin.action.PRAYER_WIDGET_TICK"
         private const val ACTION_DEADLINE_REFRESH =

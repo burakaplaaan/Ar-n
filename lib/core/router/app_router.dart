@@ -30,7 +30,10 @@ import '../../presentation/kaza/kaza_calculator_page.dart';
 import '../../presentation/kaza/kaza_tracker_page.dart';
 import '../../presentation/qibla/qibla_hub_page.dart';
 import '../../presentation/settings/admin_content_page.dart';
+import '../../presentation/settings/admin_notifications_page.dart';
 import '../../presentation/settings/settings_page.dart';
+import '../../presentation/settings/widget_unlock_page.dart';
+import '../../data/services/widget_access_service.dart';
 import '../../presentation/settings/language_settings_page.dart';
 import '../../presentation/settings/about_arin_page.dart';
 import '../../presentation/settings/contact_support_page.dart';
@@ -116,6 +119,10 @@ abstract final class AppRoutes {
   /// Ayarlar → İçerik yönetimi (yalnızca admin e-postaları).
   static const String settingsAdmin = '/settings/admin';
 
+  /// Admin → Bildirim yönetimi (havuz + otomatik + manuel yayınlar).
+  static const String settingsAdminNotifications =
+      '/settings/admin/notifications';
+
   /// Ayarlar → Bildirimler.
   static const String settingsNotifications = '/settings/notifications';
 
@@ -131,6 +138,9 @@ abstract final class AppRoutes {
   /// Bildirimler → Namaz vakit ve ses (tek kaynak kart).
   static const String settingsNotificationsPrayer =
       '/settings/notifications/vakit';
+
+  /// Widget kilidi açma sayfası — shell dışında, tam ekran.
+  static String widgetUnlock(String kindId) => '/widget-unlock/$kindId';
 
   /// Keşfet ızgarası — shell içinde; alt bar görünür.
   static const String inspire = '/inspire';
@@ -247,6 +257,15 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: AppRoutes.premium,
         pageBuilder: (context, state) => _page(state, const PremiumPage()),
+      ),
+      GoRoute(
+        path: '/widget-unlock/:kind',
+        pageBuilder: (context, state) {
+          final kindId = state.pathParameters['kind'] ?? '';
+          final kind =
+              ArinWidgetAccessKind.fromId(kindId) ?? ArinWidgetAccessKind.quote;
+          return _page(state, WidgetUnlockPage(kind: kind));
+        },
       ),
       ShellRoute(
         builder: (context, state, child) => ArinShell(child: child),
@@ -409,6 +428,13 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                 path: 'admin',
                 pageBuilder: (context, state) =>
                     _page(state, const AdminContentPage()),
+                routes: [
+                  GoRoute(
+                    path: 'notifications',
+                    pageBuilder: (context, state) =>
+                        _page(state, const AdminNotificationsPage()),
+                  ),
+                ],
               ),
               GoRoute(
                 path: 'saved',
@@ -528,36 +554,34 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         ],
       ),
     ],
-    errorBuilder: (context, state) => Scaffold(
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Icon(Icons.search_off_rounded, size: 44),
-              const SizedBox(height: 12),
-              const Text(
-                'Aradigin sayfayi bulamadik.',
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 8),
-              const Text(
-                'Ana sayfaya donup tekrar deneyebilirsin.',
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 18),
-              FilledButton(
-                onPressed: () => context.go(AppRoutes.home),
-                child: const Text('Ana sayfaya don'),
-              ),
-            ],
-          ),
-        ),
-      ),
-    ),
+    errorBuilder: (context, state) => const _ErrorRedirectHome(),
   );
 });
 
 MaterialPage<void> _page(GoRouterState state, Widget child) =>
     MaterialPage<void>(key: state.pageKey, child: child);
+
+/// Bilinmeyen bir rota ile karşılaşıldığında (genellikle widget tıklaması
+/// nedeniyle home_widget URI'si GoRouter'a ulaştığında) kullanıcıyı sessizce
+/// ana sayfaya yönlendirir. WidgetLaunchGateListener kilidi tespit eder.
+class _ErrorRedirectHome extends StatefulWidget {
+  const _ErrorRedirectHome();
+
+  @override
+  State<_ErrorRedirectHome> createState() => _ErrorRedirectHomeState();
+}
+
+class _ErrorRedirectHomeState extends State<_ErrorRedirectHome> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) context.go(AppRoutes.home);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) => const Scaffold(
+        backgroundColor: Color(0xFF071815),
+      );
+}

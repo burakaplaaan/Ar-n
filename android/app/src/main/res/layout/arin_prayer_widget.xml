@@ -39,10 +39,11 @@
             android:ellipsize="end"
             android:fontFamily="sans-serif-medium"
             android:gravity="center"
-            android:maxLines="2"
-            android:text="Tıkla, aç"
+            android:maxLines="1"
+            android:text=""
             android:textColor="#CC1A1A1A"
-            android:textSize="10sp" />
+            android:textSize="10sp"
+            android:visibility="gone" />
 
     </LinearLayout>
 

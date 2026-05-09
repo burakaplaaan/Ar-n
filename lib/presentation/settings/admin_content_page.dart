@@ -19,6 +19,7 @@ import 'package:share_plus/share_plus.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/admin_allowlist.dart';
 import '../../core/constants/quote_pool_ids.dart';
+import '../../core/router/app_router.dart';
 import '../../core/firebase/firebase_bootstrap.dart';
 import '../../core/firebase/firestore_server_first.dart';
 import '../../core/providers/shared_preferences_provider.dart';
@@ -2423,6 +2424,13 @@ class _AdminContentPageState extends ConsumerState<AdminContentPage>
         backgroundColor: AppColors.emeraldDark,
         foregroundColor: Colors.white,
         iconTheme: const IconThemeData(color: Colors.white),
+        actions: [
+          IconButton(
+            tooltip: 'Bildirim Yönetimi',
+            icon: const Icon(Icons.notifications_active_rounded),
+            onPressed: () => context.push(AppRoutes.settingsAdminNotifications),
+          ),
+        ],
         bottom: TabBar(
           controller: _tabs,
           isScrollable: true,

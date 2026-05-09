@@ -1,0 +1,22 @@
+{
+  "indexes": [
+    {
+      "collectionGroup": "admin_ntf_pool",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "hour", "order": "ASCENDING" },
+        { "fieldPath": "minute", "order": "ASCENDING" },
+        { "fieldPath": "enabled", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "admin_ntf_pool",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "hour", "order": "ASCENDING" },
+        { "fieldPath": "minute", "order": "ASCENDING" }
+      ]
+    }
+  ],
+  "fieldOverrides": []
+}

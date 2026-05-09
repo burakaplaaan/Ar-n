@@ -2691,7 +2691,7 @@ abstract class AppLocalizations {
   /// No description provided for @notificationsMilestoneTitle.
   ///
   /// In tr, this message translates to:
-  /// **'Milestone bildirimleri'**
+  /// **'Alışkanlık bildirimleri'**
   String get notificationsMilestoneTitle;
 
   /// No description provided for @notificationsMilestoneSubtitle.

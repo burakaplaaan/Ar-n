@@ -105,6 +105,26 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
+    // Bildirim havuzu — admin panelden yönetilir; okuma yalnızca admin.
+    match /admin_ntf_pool/{docId} {
+      allow read, write: if isAdmin();
+    }
+
+    // Bildirim otomatik gönderim yapılandırması (tek doküman: pool).
+    match /admin_ntf_config/{docId} {
+      allow read, write: if isAdmin();
+    }
+
+    // Manuel zamanlanmış yayın bildirimleri — admin yazar/okur/iptal eder;
+    // Cloud Function (admin SDK) status güncellemelerini kural dışı yapar.
+    match /admin_scheduled_notifications/{docId} {
+      allow read: if isAdmin();
+      allow create: if isAdmin();
+      allow update: if isAdmin()
+        && request.resource.data.status == 'cancelled';
+      allow delete: if isDeveloper();
+    }
+
     // Genel app_public belgeleri (quotes_bundle, widget_override vb.)
     match /app_public/{docId} {
       allow read: if true;

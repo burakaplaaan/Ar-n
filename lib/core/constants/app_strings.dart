@@ -537,7 +537,7 @@ abstract final class AppStrings {
   static const String notificationsArinmaDailyTitle = 'Günlük hatırlatıcı';
   static const String notificationsArinmaDailySubtitle =
       'Gün içinde 2 defa rastgele bir söz ya da kısa motivasyon.';
-  static const String notificationsMilestoneTitle = 'Milestone bildirimleri';
+  static const String notificationsMilestoneTitle = 'Alışkanlık bildirimleri';
   static const String notificationsMilestoneSubtitle =
       'Örn. bırakma yolculuğunda 24 saat, 1 hafta gibi seyrek mesajlar.';
   static const String notificationsTaskTitle = 'Görev hatırlatıcısı';

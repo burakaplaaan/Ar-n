@@ -34,8 +34,6 @@ class ArinTrackingWidgetProvider : HomeWidgetProvider() {
         widgetData: SharedPreferences,
     ) {
         val locked = isWidgetLocked(widgetData, "tracking")
-        val lockNote = widgetData.getString(KEY_LOCK_NOTE, null)
-            ?.trim().orEmpty().ifEmpty { "Tıkla, aç" }
         val entry = if (locked) null else loadEntry(widgetData)
         val openApp = Intent(context, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
@@ -54,7 +52,6 @@ class ArinTrackingWidgetProvider : HomeWidgetProvider() {
             val views = RemoteViews(context.packageName, R.layout.arin_tracking_widget)
             if (locked) {
                 views.setViewVisibility(R.id.widget_lock_overlay, View.VISIBLE)
-                views.setTextViewText(R.id.widget_lock_note, lockNote)
             } else {
                 views.setViewVisibility(R.id.widget_lock_overlay, View.GONE)
                 val e = entry!!
@@ -224,7 +221,6 @@ class ArinTrackingWidgetProvider : HomeWidgetProvider() {
         private const val KEY_DAY_PREFIX = "arin_tracking_day_prefix"
         private const val KEY_GATE_LOCKED = "arin_widget_gate_tracking_locked"
         private const val KEY_GATE_PREMIUM = "arin_widget_gate_premium"
-        private const val KEY_LOCK_NOTE = "arin_widget_gate_lock_note"
         private const val ACTION_REFRESH = "com.arin.arin.action.TRACKING_WIDGET_REFRESH"
         private const val REQUEST_CODE_REFRESH = 19041
 
