@@ -557,7 +557,7 @@ abstract final class ArinWidgetSync {
     if (first.isNotEmpty && !_arabicChars.hasMatch(first)) return first;
     final second = fallback.trim();
     if (second.isNotEmpty && !_arabicChars.hasMatch(second)) return second;
-    return 'Konum';
+    return '';
   }
 
   /// Hesap silme / çıkış akışında widget verilerini sıfırlar. home_widget

@@ -37,10 +37,13 @@ import 'data/services/fcm_token_service.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 Future<void> main() async {
-  // Runtime fetch kapalı: CDN gecikmesi ve TLS bağlantısı ilk frame'i bloklamasın.
-  // Dekoratif fontlar (Reels, zikir) ilk açılışta sisteme düşer; CDN erişimi
-  // yoksa sistem fontu devreye girer — kullanıcı fark etmez.
-  GoogleFonts.config.allowRuntimeFetching = false;
+  // Runtime fetch AÇIK: pubspec'te yalnızca Variable font bundle edilmiş.
+  // Paket farklı weight dosyaları (Bold, ExtraBold, vb.) bekliyor — bunlar
+  // bundle'da yok. Runtime fetch açıkken paket ilk açılışta CDN'den indirip
+  // cache'liyor; sonraki açılışlarda cache'den okuyor. Bu çağrı async,
+  // ilk frame'i bloklamıyor. Crashlytics urgent-mode spam'ı da bu nedenle
+  // gerçekleşiyordu (her TextStyle çağrısında exception fırlıyordu).
+  GoogleFonts.config.allowRuntimeFetching = true;
 
   await runZonedGuarded(
     () async {

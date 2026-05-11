@@ -60,15 +60,16 @@ class LocationService {
 
   Box<dynamic> get _prefs => Hive.box<dynamic>(HiveBoxes.preferences);
 
-  String get savedCity => (_prefs.get(_cityKey) as String?) ?? 'Istanbul';
-  String get savedCountry => (_prefs.get(_countryKey) as String?) ?? 'Turkey';
+  String get savedCity => (_prefs.get(_cityKey) as String?) ?? '';
+  String get savedCountry => (_prefs.get(_countryKey) as String?) ?? '';
   double? get savedLat => _prefs.get(_latKey) as double?;
   double? get savedLon => _prefs.get(_lonKey) as double?;
   int? get savedDistrictId => _prefs.get(_districtIdKey) as int?;
 
   /// Konum güncelleme tercihi. Olası değerler: [LocationUpdatePref].
   String get locationUpdatePref =>
-      (_prefs.get(_locationUpdatePrefKey) as String?) ?? LocationUpdatePref.ask;
+      (_prefs.get(_locationUpdatePrefKey) as String?) ??
+      LocationUpdatePref.alwaysUpdate;
 
   Future<void> setLocationUpdatePref(String pref) async {
     await _prefs.put(_locationUpdatePrefKey, pref);

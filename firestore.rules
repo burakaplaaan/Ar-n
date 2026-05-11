@@ -110,9 +110,12 @@ service cloud.firestore {
       allow read, write: if isAdmin();
     }
 
-    // Bildirim otomatik gönderim yapılandırması (tek doküman: pool).
+    // Bildirim otomatik gönderim yapılandırması.
+    // current_moment: Cloud Function'ın yazdığı anlık ayet verisi;
+    // tüm kullanıcılar okuyabilir (bildirim tıklamasından açılan ekran için).
     match /admin_ntf_config/{docId} {
-      allow read, write: if isAdmin();
+      allow read: if isAdmin() || docId == 'current_moment';
+      allow write: if isAdmin();
     }
 
     // Manuel zamanlanmış yayın bildirimleri — admin yazar/okur/iptal eder;

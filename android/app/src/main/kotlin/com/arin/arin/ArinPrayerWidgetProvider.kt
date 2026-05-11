@@ -45,6 +45,7 @@ class ArinPrayerWidgetProvider : HomeWidgetProvider() {
         appWidgetIds: IntArray,
         widgetData: SharedPreferences,
     ) {
+        recordFirstUse(widgetData, "prayer")
         val locked = isWidgetLocked(widgetData, "prayer")
         val scheduled = readScheduledPrayer(widgetData, System.currentTimeMillis())
         val loc = widgetData.getString(KEY_LOCATION, null)?.trim().orEmpty()
@@ -314,27 +315,38 @@ class ArinPrayerWidgetProvider : HomeWidgetProvider() {
         return if (hms.matches(noMinus)) noMinus else "0:00:00"
     }
 
+    private fun recordFirstUse(widgetData: SharedPreferences, kind: String) {
+        val key = "arin_widget_first_use_ms_$kind"
+        val existing = widgetData.getString(key, null)?.toLongOrNull() ?: 0L
+        if (existing > 0L) return
+        widgetData.edit().putString(key, System.currentTimeMillis().toString()).apply()
+    }
+
+    private fun firstUseMs(widgetData: SharedPreferences, kind: String): Long {
+        return widgetData.getString("arin_widget_first_use_ms_$kind", null)
+            ?.toLongOrNull() ?: 0L
+    }
+
     private fun isWidgetLocked(widgetData: SharedPreferences, kind: String): Boolean {
         if (widgetData.getString(KEY_GATE_PREMIUM, null) == "1") return false
         if (widgetData.getString(KEY_GATE_LOCKED, null) == "1") return true
-        val now = System.currentTimeMillis()
-        val trialUntil = widgetData.getString("arin_widget_gate_${kind}_trial_until_ms", null)
-            ?.toLongOrNull() ?: 0L
+        val firstUse = firstUseMs(widgetData, kind)
+        if (firstUse <= 0L) return false
+        val trialEnd = firstUse + WIDGET_TRIAL_DURATION_MS
         val unlockUntil = widgetData.getString("arin_widget_gate_${kind}_unlock_until_ms", null)
             ?.toLongOrNull() ?: 0L
-        if (trialUntil <= 0L) return false
-        return now >= trialUntil && now >= unlockUntil
+        val now = System.currentTimeMillis()
+        return now >= trialEnd && now >= unlockUntil
     }
 
     private fun gateRefreshMs(widgetData: SharedPreferences, kind: String): Long? {
         if (widgetData.getString(KEY_GATE_PREMIUM, null) == "1") return null
         val now = System.currentTimeMillis()
-        return listOf(
-            widgetData.getString("arin_widget_gate_${kind}_trial_until_ms", null)
-                ?.toLongOrNull() ?: 0L,
-            widgetData.getString("arin_widget_gate_${kind}_unlock_until_ms", null)
-                ?.toLongOrNull() ?: 0L,
-        ).filter { it > now }.minOrNull()?.plus(1_000L)
+        val firstUse = firstUseMs(widgetData, kind)
+        val trialEnd = if (firstUse > 0L) firstUse + WIDGET_TRIAL_DURATION_MS else 0L
+        val unlockUntil = widgetData.getString("arin_widget_gate_${kind}_unlock_until_ms", null)
+            ?.toLongOrNull() ?: 0L
+        return listOf(trialEnd, unlockUntil).filter { it > now }.minOrNull()?.plus(1_000L)
     }
 
     private fun readScheduledPrayer(
@@ -412,6 +424,7 @@ class ArinPrayerWidgetProvider : HomeWidgetProvider() {
         private const val KEY_LOCALE = "arin_widget_locale"
         private const val KEY_GATE_LOCKED = "arin_widget_gate_prayer_locked"
         private const val KEY_GATE_PREMIUM = "arin_widget_gate_premium"
+        private const val WIDGET_TRIAL_DURATION_MS = 24L * 60L * 60L * 1000L
 
         private const val ACTION_TICK = "com.arin.arin.action.PRAYER_WIDGET_TICK"
         private const val ACTION_DEADLINE_REFRESH =

@@ -47,6 +47,7 @@ import '../../presentation/inspire/inspire_explore_page.dart';
 import '../../presentation/inspire/inspiration_search.dart';
 import '../../presentation/inspire/inspire_viewer_page.dart';
 import '../../presentation/inspire/inspire_viewer_session_provider.dart';
+import '../../presentation/moment_verse/moment_verse_page.dart';
 import '../../presentation/premium/premium_page.dart';
 import '../../presentation/shared/providers/auth_providers.dart';
 import '../../presentation/shared/providers/willpower_hub_nav_provider.dart';
@@ -138,6 +139,10 @@ abstract final class AppRoutes {
   /// Bildirimler → Namaz vakit ve ses (tek kaynak kart).
   static const String settingsNotificationsPrayer =
       '/settings/notifications/vakit';
+
+  /// Anın Ayeti — FCM bildirim tıklamasından açılan özel tam ekran sayfa.
+  /// Shell dışında (alt nav bar yok); 5 dakikalık geçerlilik penceresi.
+  static const String momentVerse = '/moment-verse';
 
   /// Widget kilidi açma sayfası — shell dışında, tam ekran.
   static String widgetUnlock(String kindId) => '/widget-unlock/$kindId';
@@ -266,6 +271,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
               ArinWidgetAccessKind.fromId(kindId) ?? ArinWidgetAccessKind.quote;
           return _page(state, WidgetUnlockPage(kind: kind));
         },
+      ),
+      GoRoute(
+        path: AppRoutes.momentVerse,
+        pageBuilder: (context, state) =>
+            _page(state, const MomentVersePage()),
       ),
       ShellRoute(
         builder: (context, state, child) => ArinShell(child: child),

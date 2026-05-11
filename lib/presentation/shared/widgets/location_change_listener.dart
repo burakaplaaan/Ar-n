@@ -29,35 +29,69 @@ class LocationChangeListener extends ConsumerStatefulWidget {
       _LocationChangeListenerState();
 }
 
-class _LocationChangeListenerState
-    extends ConsumerState<LocationChangeListener> {
+class _LocationChangeListenerState extends ConsumerState<LocationChangeListener>
+    with WidgetsBindingObserver {
+  /// Oturum içi son kontrol zamanı — resume throttle için.
+  DateTime? _lastCheck;
+
+  /// Resume'lar arasındaki minimum GPS kontrol aralığı.
+  static const _resumeThrottle = Duration(minutes: 15);
+
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      unawaited(_maybeDetectAndPrompt());
+      unawaited(_checkLocation());
     });
   }
 
-  Future<void> _maybeDetectAndPrompt() async {
-    // Onboarding bitmemişse konum diyaloğunu gösterme.
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state != AppLifecycleState.resumed) return;
+    final now = DateTime.now();
+    final last = _lastCheck;
+    if (last == null || now.difference(last) >= _resumeThrottle) {
+      unawaited(_checkLocation());
+    }
+  }
+
+  Future<void> _checkLocation() async {
     final prefs = ref.read(sharedPreferencesProvider);
     final onboardingDone = prefs.getBool('onboarding_completed') ?? false;
     if (!onboardingDone) return;
 
     final location = ref.read(locationServiceProvider);
-    if (location.locationUpdatePref != LocationUpdatePref.ask) return;
+    final pref = location.locationUpdatePref;
+    if (pref == LocationUpdatePref.neverUpdate) return;
+
+    _lastCheck = DateTime.now();
 
     // GPS + reverse geocoding (arka planda — UI'ı bloklamaz).
     final change = await location.detectLocationChange();
     if (change == null || !mounted) return;
 
+    // İlk açılışta (savedCity boş) veya alwaysUpdate: diyalogsuz sessiz güncelle.
+    final isFirstTime = location.savedCity.isEmpty;
+    if (isFirstTime || pref == LocationUpdatePref.alwaysUpdate) {
+      await location.applyLocationChange(change);
+      if (mounted) ref.invalidate(prayerTimesProvider);
+      return;
+    }
+
+    // ask: kullanıcıya onay diyaloğu göster.
+    if (!mounted) return;
     final oldCity =
         matchTurkeyProvinceExact(location.savedCity) ?? location.savedCity;
     final newCity =
         matchTurkeyProvinceExact(change.newCity) ?? change.newCity;
 
-    if (!mounted) return;
     await showDialog<void>(
       context: context,
       barrierDismissible: false,

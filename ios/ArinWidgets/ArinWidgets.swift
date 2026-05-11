@@ -114,26 +114,50 @@ private func decodeWidgetJson<T: Decodable>(_ key: String, as type: T.Type) -> T
   return try? JSONDecoder().decode(T.self, from: data)
 }
 
+/// Trial süresi (24 saat). Bu sabit `AdGateService.widgetTrialDuration` ile
+/// aynı tutulmalıdır; her iki taraf da aynı first-use zamanından itibaren
+/// aynı sona ulaşsın diye senkron.
+private let kWidgetTrialDurationMs: Double = 24 * 60 * 60 * 1000.0
+
+/// Bir widget'ın home ekranda ilk render'ı yapıldığında, ilgili kind için
+/// "kullanım başlangıcı" zaman damgasını App Group UserDefaults'a yazar.
+/// Aynı kind için tekrar çağrı no-op'tur (idempotent). Bu, her widget'ın
+/// trial sayacını yalnızca o widget kullanıma alındığında başlatır;
+/// kullanılmayan widget'lar trial'a girmez.
+private func recordWidgetFirstUse(_ kind: String) {
+  let u = suite()
+  let key = "arin_widget_first_use_ms_\(kind)"
+  let existing = Double(u?.string(forKey: key) ?? "") ?? 0
+  if existing > 0 { return }
+  let nowMs = Date().timeIntervalSince1970 * 1000.0
+  u?.set(String(nowMs), forKey: key)
+}
+
+private func widgetFirstUseMs(_ kind: String) -> Double {
+  let u = suite()
+  return Double(u?.string(forKey: "arin_widget_first_use_ms_\(kind)") ?? "") ?? 0
+}
+
 private func widgetLocked(_ kind: String) -> Bool {
   let u = suite()
   if u?.string(forKey: "arin_widget_gate_premium") == "1" { return false }
   if u?.string(forKey: "arin_widget_gate_\(kind)_locked") == "1" { return true }
-  let trialUntilMs = Double(u?.string(forKey: "arin_widget_gate_\(kind)_trial_until_ms") ?? "") ?? 0
+  let firstUseMs = widgetFirstUseMs(kind)
+  if firstUseMs <= 0 { return false }
+  let trialEndMs = firstUseMs + kWidgetTrialDurationMs
   let unlockUntilMs = Double(u?.string(forKey: "arin_widget_gate_\(kind)_unlock_until_ms") ?? "") ?? 0
-  if trialUntilMs <= 0 { return false }
   let nowMs = Date().timeIntervalSince1970 * 1000.0
-  return nowMs >= trialUntilMs && nowMs >= unlockUntilMs
+  return nowMs >= trialEndMs && nowMs >= unlockUntilMs
 }
 
 private func widgetGateRefreshDate(_ kind: String) -> Date? {
   let u = suite()
   if u?.string(forKey: "arin_widget_gate_premium") == "1" { return nil }
   let nowMs = Date().timeIntervalSince1970 * 1000.0
-  let raw = [
-    Double(u?.string(forKey: "arin_widget_gate_\(kind)_trial_until_ms") ?? "") ?? 0,
-    Double(u?.string(forKey: "arin_widget_gate_\(kind)_unlock_until_ms") ?? "") ?? 0
-  ]
-  let next = raw.filter { $0 > nowMs }.min()
+  let firstUseMs = widgetFirstUseMs(kind)
+  let trialEndMs = firstUseMs > 0 ? firstUseMs + kWidgetTrialDurationMs : 0
+  let unlockUntilMs = Double(u?.string(forKey: "arin_widget_gate_\(kind)_unlock_until_ms") ?? "") ?? 0
+  let next = [trialEndMs, unlockUntilMs].filter { $0 > nowMs }.min()
   guard let next else { return nil }
   return Date(timeIntervalSince1970: next / 1000.0).addingTimeInterval(1)
 }
@@ -151,6 +175,84 @@ private extension View {
   }
 }
 
+/// Tüm widget'larda kilitli durumda gösterilen ortak görsel.
+/// `accessoryRectangular` (kilit ekranı): tek satır, kilit ikonu + kısa metin.
+/// `systemSmall`/`systemMedium`: dikey, daha büyük kilit + altında metin.
+///
+/// `kindId`: kalan parametre — şu an sadece dökümantasyon amaçlı tutuluyor.
+/// Tıklama URL'si (`arin://widget/<kindId>?homeWidget=true[&lock=1]`) widget'ın
+/// `WidgetConfiguration` body'sinde, entry lock state'ine göre conditional
+/// olarak set edilir. iOS `widgetURL` modifier'ını yalnızca configuration
+/// düzeyinde tutarlı uygular; alt view'da set etmek override etmez. Ayrıca
+/// `home_widget` plugin'i URL'i widget URL'i olarak kabul edebilmek için
+/// query'de `homeWidget` parametresinin varlığını şart koştuğundan, tüm
+/// widget URL'leri bu parametreyi taşımak zorundadır — yoksa Flutter tarafı
+/// hiçbir tıklama olayını almaz.
+struct LockedWidgetView: View {
+  let family: WidgetFamily
+  let kindId: String
+  @Environment(\.colorScheme) private var colorScheme
+
+  private var primaryTextColor: Color {
+    colorScheme == .dark ? Color(red: 0.88, green: 0.90, blue: 0.93) : .white
+  }
+
+  private var textShadowOpacity: Double {
+    colorScheme == .dark ? 0.34 : 0.52
+  }
+
+  var body: some View {
+    Group {
+      if family == .accessoryRectangular {
+        compactLayout
+      } else {
+        expandedLayout
+      }
+    }
+  }
+
+  /// Kilit ekranı — küçük rectangular: yan yana kompakt.
+  /// SF Symbol kullanmıyoruz çünkü emoji sembol hizalama kilit-ekran widget'larında
+  /// iOS'a göre aşağı kayıyordu; sade lock.fill daha tutarlı.
+  private var compactLayout: some View {
+    HStack(spacing: 6) {
+      Image(systemName: "lock.fill")
+        .font(.system(size: 13, weight: .semibold))
+        .foregroundStyle(primaryTextColor)
+      Text("Açmak için dokunun")
+        .font(.system(size: 12, weight: .semibold))
+        .foregroundStyle(primaryTextColor)
+        .lineLimit(2)
+        .minimumScaleFactor(0.55)
+        .multilineTextAlignment(.leading)
+        .allowsTightening(true)
+        .fixedSize(horizontal: false, vertical: true)
+    }
+    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
+    .padding(.horizontal, 6)
+    .shadow(color: .black.opacity(textShadowOpacity), radius: 2.0, x: 0, y: 1)
+  }
+
+  /// systemSmall / systemMedium: ortalanmış kilit + altında çağrı.
+  private var expandedLayout: some View {
+    VStack(spacing: 8) {
+      Image(systemName: "lock.fill")
+        .font(.system(size: family == .systemSmall ? 28 : 26, weight: .semibold))
+        .foregroundStyle(primaryTextColor)
+      Text("Açmak için dokunun")
+        .font(.system(size: family == .systemSmall ? 14 : 13, weight: .semibold))
+        .foregroundStyle(primaryTextColor)
+        .lineLimit(2)
+        .minimumScaleFactor(0.6)
+        .multilineTextAlignment(.center)
+        .allowsTightening(true)
+    }
+    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
+    .padding(.horizontal, 10)
+    .shadow(color: .black.opacity(textShadowOpacity), radius: 2.4, x: 0, y: 1)
+  }
+}
+
 // MARK: - Quote
 
 struct QuoteEntry: TimelineEntry {
@@ -165,10 +267,25 @@ struct QuoteProvider: TimelineProvider {
   }
 
   func getSnapshot(in context: Context, completion: @escaping (QuoteEntry) -> Void) {
+    // Widget galerisi / Smart Stack önerisi: kilit göstermeden örnek içerik dön.
+    // `context.isPreview` true iken WidgetKit gerçek timeline'a değil sadece
+    // tanıtıma ihtiyaç duyar; trial sayacı henüz başlamamış olsa bile
+    // Flutter'ın yazdığı `arin_widget_gate_*_locked` flag'i preview'a sızmasın.
+    if context.isPreview {
+      completion(
+        QuoteEntry(
+          date: Date(),
+          text: QuoteWidgetDefaults.text,
+          source: QuoteWidgetDefaults.source
+        )
+      )
+      return
+    }
     completion(loadEntry())
   }
 
   func getTimeline(in context: Context, completion: @escaping (Timeline<QuoteEntry>) -> Void) {
+    recordWidgetFirstUse("quote")
     if widgetLocked("quote") {
       let next = widgetGateRefreshDate("quote") ?? Date().addingTimeInterval(3600)
       completion(
@@ -289,14 +406,23 @@ struct QuoteWidgetView: View {
     !entry.source.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
   }
 
+  /// Lock state: provider entry text'i 🔒 ise kilit görselini göster.
+  private var isLocked: Bool {
+    entry.text == "🔒"
+  }
+
   var body: some View {
-    switch family {
-    case .accessoryRectangular:
-      quoteAccessory
-    case .systemSmall:
-      quoteCompact
-    default:
-      quoteExpanded
+    if isLocked {
+      LockedWidgetView(family: family, kindId: "quote")
+    } else {
+      switch family {
+      case .accessoryRectangular:
+        quoteAccessory
+      case .systemSmall:
+        quoteCompact
+      default:
+        quoteExpanded
+      }
     }
   }
 
@@ -390,7 +516,9 @@ struct ArinQuoteWidget: Widget {
     StaticConfiguration(kind: kind, provider: QuoteProvider()) { entry in
       QuoteWidgetView(entry: entry)
         .arinTransparentWidgetSurface()
-        .widgetURL(URL(string: "arin://widget/quote"))
+        .widgetURL(URL(string: entry.text == "🔒"
+          ? "arin://widget/quote?homeWidget=true&lock=1"
+          : "arin://widget/quote?homeWidget=true"))
     }
     .configurationDisplayName(localizedWidgetText(tr: "ARIN — Söz"))
     .description(localizedWidgetText(tr: "Günlük söz ve kaynak."))
@@ -420,10 +548,24 @@ struct PrayerProvider: TimelineProvider {
   }
 
   func getSnapshot(in context: Context, completion: @escaping (PrayerEntry) -> Void) {
+    // Galeri / Smart Stack önerisi: kilitsiz örnek geri sayım göster.
+    if context.isPreview {
+      completion(
+        PrayerEntry(
+          date: Date(),
+          location: PrayerWidgetDefaults.location,
+          nextName: localizedWidgetText(tr: "İmsak"),
+          countdown: "0:15:00",
+          nextDate: Date().addingTimeInterval(15 * 60)
+        )
+      )
+      return
+    }
     completion(loadEntry())
   }
 
   func getTimeline(in context: Context, completion: @escaping (Timeline<PrayerEntry>) -> Void) {
+    recordWidgetFirstUse("prayer")
     if widgetLocked("prayer") {
       let next = widgetGateRefreshDate("prayer") ?? Date().addingTimeInterval(3600)
       completion(
@@ -572,12 +714,21 @@ struct PrayerWidgetView: View {
     colorScheme == .dark ? 0.34 : 0.52
   }
 
+  /// Lock state: provider entry nextName'i 🔒 ise kilit görselini göster.
+  private var isLocked: Bool {
+    entry.nextName == "🔒"
+  }
+
   var body: some View {
-    switch family {
-    case .accessoryRectangular, .systemSmall:
-      prayerCompact
-    default:
-      prayerExpanded
+    if isLocked {
+      LockedWidgetView(family: family, kindId: "prayer")
+    } else {
+      switch family {
+      case .accessoryRectangular, .systemSmall:
+        prayerCompact
+      default:
+        prayerExpanded
+      }
     }
   }
 
@@ -678,7 +829,9 @@ struct ArinPrayerWidget: Widget {
     StaticConfiguration(kind: kind, provider: PrayerProvider()) { entry in
       PrayerWidgetView(entry: entry)
         .arinTransparentWidgetSurface()
-        .widgetURL(URL(string: "arin://widget/prayer"))
+        .widgetURL(URL(string: entry.nextName == "🔒"
+          ? "arin://widget/prayer?homeWidget=true&lock=1"
+          : "arin://widget/prayer?homeWidget=true"))
     }
     .configurationDisplayName(localizedWidgetText(tr: "ARIN — Namaz"))
     .description(localizedWidgetText(tr: "Sıradaki vakit ve geri sayım."))
@@ -710,10 +863,25 @@ struct ComboProvider: TimelineProvider {
   }
 
   func getSnapshot(in context: Context, completion: @escaping (ComboEntry) -> Void) {
+    // Galeri / Smart Stack önerisi: kilitsiz örnek karma içerik göster.
+    if context.isPreview {
+      completion(
+        ComboEntry(
+          date: Date(),
+          nextName: localizedWidgetText(tr: "Akşam"),
+          countdown: "1:24:10",
+          nextDate: Date().addingTimeInterval(84 * 60),
+          quoteText: QuoteWidgetDefaults.text,
+          quoteSource: QuoteWidgetDefaults.source
+        )
+      )
+      return
+    }
     completion(loadEntry())
   }
 
   func getTimeline(in context: Context, completion: @escaping (Timeline<ComboEntry>) -> Void) {
+    recordWidgetFirstUse("combo")
     let now = Date()
     if widgetLocked("combo") {
       let next = widgetGateRefreshDate("combo") ?? now.addingTimeInterval(3600)
@@ -961,8 +1129,15 @@ struct ComboWidgetView: View {
     return "\(base)'\(remainingSuffix(for: base)) kalan"
   }
 
+  /// Lock state: combo entry nextName'i 🔒 ise kilit görselini göster.
+  private var isLocked: Bool {
+    entry.nextName == "🔒"
+  }
+
   var body: some View {
-    if family == .accessoryRectangular {
+    if isLocked {
+      LockedWidgetView(family: family, kindId: "combo")
+    } else if family == .accessoryRectangular {
       accessoryLayout
     } else {
       expandedLayout
@@ -1085,7 +1260,9 @@ struct ArinComboWidget: Widget {
     StaticConfiguration(kind: kind, provider: ComboProvider()) { entry in
       ComboWidgetView(entry: entry)
         .arinTransparentWidgetSurface()
-        .widgetURL(URL(string: "arin://widget/combo"))
+        .widgetURL(URL(string: entry.nextName == "🔒"
+          ? "arin://widget/combo?homeWidget=true&lock=1"
+          : "arin://widget/combo?homeWidget=true"))
     }
     .configurationDisplayName(localizedWidgetText(tr: "ARIN — Karma"))
     .description(localizedWidgetText(tr: "Sıradaki vakit ve günlük söz."))
@@ -1113,10 +1290,23 @@ struct TrackingProvider: TimelineProvider {
   }
 
   func getSnapshot(in context: Context, completion: @escaping (TrackingEntry) -> Void) {
+    // Galeri / Smart Stack önerisi: kilitsiz örnek takip içeriği göster.
+    if context.isPreview {
+      completion(
+        TrackingEntry(
+          date: Date(),
+          title: "Sigarasız gün sayacı",
+          value: "Sigarasız 18. gün",
+          note: "Kriz geçer, kararın kalır."
+        )
+      )
+      return
+    }
     completion(loadEntry())
   }
 
   func getTimeline(in context: Context, completion: @escaping (Timeline<TrackingEntry>) -> Void) {
+    recordWidgetFirstUse("tracking")
     let entry = loadEntry()
     let now = Date()
     let nextDay = Calendar.current.startOfDay(for: now).addingTimeInterval(86_400)
@@ -1201,33 +1391,42 @@ struct TrackingWidgetView: View {
     primaryTextColor.opacity(0.86)
   }
 
+  /// Lock state: tracking entry title'ı 🔒 ise kilit görselini göster.
+  private var isLocked: Bool {
+    entry.title == "🔒"
+  }
+
   var body: some View {
-    VStack(alignment: .leading, spacing: family == .accessoryRectangular ? 2 : 4) {
-      Text(entry.title)
-        .font(.system(size: family == .accessoryRectangular ? 11 : 13, weight: .bold))
-        .foregroundStyle(secondaryTextColor)
-        .lineLimit(1)
-        .minimumScaleFactor(0.62)
-      if !entry.value.isEmpty {
-        Text(entry.value)
-          .font(.system(size: family == .accessoryRectangular ? 15 : 20, weight: .bold, design: .serif))
-          .foregroundStyle(primaryTextColor)
+    if isLocked {
+      LockedWidgetView(family: family, kindId: "tracking")
+    } else {
+      VStack(alignment: .leading, spacing: family == .accessoryRectangular ? 2 : 4) {
+        Text(entry.title)
+          .font(.system(size: family == .accessoryRectangular ? 11 : 13, weight: .bold))
+          .foregroundStyle(secondaryTextColor)
           .lineLimit(1)
-          .minimumScaleFactor(0.58)
+          .minimumScaleFactor(0.62)
+        if !entry.value.isEmpty {
+          Text(entry.value)
+            .font(.system(size: family == .accessoryRectangular ? 15 : 20, weight: .bold, design: .serif))
+            .foregroundStyle(primaryTextColor)
+            .lineLimit(1)
+            .minimumScaleFactor(0.58)
+        }
+        if !entry.note.isEmpty {
+          Text(entry.note)
+            .font(.system(size: family == .accessoryRectangular ? 12 : 15, weight: .regular, design: .serif))
+            .foregroundStyle(primaryTextColor)
+            .lineLimit(family == .accessoryRectangular ? 2 : 3)
+            .minimumScaleFactor(0.50)
+            .allowsTightening(true)
+        }
       }
-      if !entry.note.isEmpty {
-        Text(entry.note)
-          .font(.system(size: family == .accessoryRectangular ? 12 : 15, weight: .regular, design: .serif))
-          .foregroundStyle(primaryTextColor)
-          .lineLimit(family == .accessoryRectangular ? 2 : 3)
-          .minimumScaleFactor(0.50)
-          .allowsTightening(true)
-      }
+      .frame(maxWidth: .infinity, alignment: .leading)
+      .padding(.horizontal, family == .accessoryRectangular ? 5 : 10)
+      .padding(.vertical, family == .accessoryRectangular ? 3 : 8)
+      .shadow(color: .black.opacity(colorScheme == .dark ? 0.34 : 0.52), radius: 2.6, x: 0, y: 1)
     }
-    .frame(maxWidth: .infinity, alignment: .leading)
-    .padding(.horizontal, family == .accessoryRectangular ? 5 : 10)
-    .padding(.vertical, family == .accessoryRectangular ? 3 : 8)
-    .shadow(color: .black.opacity(colorScheme == .dark ? 0.34 : 0.52), radius: 2.6, x: 0, y: 1)
   }
 }
 
@@ -1238,7 +1437,9 @@ struct ArinTrackingWidget: Widget {
     StaticConfiguration(kind: kind, provider: TrackingProvider()) { entry in
       TrackingWidgetView(entry: entry)
         .arinTransparentWidgetSurface()
-        .widgetURL(URL(string: "arin://widget/tracking"))
+        .widgetURL(URL(string: entry.title == "🔒"
+          ? "arin://widget/tracking?homeWidget=true&lock=1"
+          : "arin://widget/tracking?homeWidget=true"))
     }
     .configurationDisplayName(localizedWidgetText(tr: "ARIN — Takip"))
     .description(localizedWidgetText(tr: "Seçili gelişim veya arınma takibi."))

@@ -40,10 +40,9 @@
             android:fontFamily="sans-serif-medium"
             android:gravity="center"
             android:maxLines="1"
-            android:text=""
+            android:text="Açmak için dokunun"
             android:textColor="#CC1A1A1A"
-            android:textSize="10sp"
-            android:visibility="gone" />
+            android:textSize="10sp" />
 
     </LinearLayout>
 

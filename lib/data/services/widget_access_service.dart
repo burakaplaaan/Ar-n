@@ -2,6 +2,7 @@ import 'dart:io' show Platform;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
+import 'package:home_widget/home_widget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'ad_gate_service.dart';
@@ -60,9 +61,11 @@ class WidgetAccessService {
     final adGate = AdGateService(_prefs);
     final states = <ArinWidgetAccessKind, WidgetGateState>{};
     for (final kind in ArinWidgetAccessKind.values) {
+      final firstSeen = await _readWidgetFirstUse(kind);
       final adState = await adGate.widgetStateFor(
         kind.placement,
         isPremium: isPremium,
+        firstSeen: firstSeen,
       );
       if (globallyLocked) {
         // Global kilit aktifken reklam unlock'u geçerliyse erişime izin ver.
@@ -106,9 +109,11 @@ class WidgetAccessService {
     required bool isPremium,
   }) async {
     final adGate = AdGateService(_prefs);
+    final firstSeen = await _readWidgetFirstUse(kind);
     final adState = await adGate.widgetStateFor(
       kind.placement,
       isPremium: isPremium,
+      firstSeen: firstSeen,
     );
     // Premium veya normal akış zaten allowed ise global kilidi sorgulamaya gerek yok.
     if (adState.allowed && isPremium) return adState;
@@ -139,6 +144,30 @@ class WidgetAccessService {
       return ArinWidgetAccessKind.fromId(raw);
     } catch (e) {
       debugPrint('WidgetAccessService.consumeLaunchedWidgetKind: $e');
+      return null;
+    }
+  }
+
+  /// Native widget provider'ın (iOS `getTimeline`, Android `onUpdate`) ilk
+  /// render'da App Group'a / `HomeWidgetPreferences`'a yazdığı ilk-kullanım
+  /// zaman damgasını okur. Anahtar her iki platformda da
+  /// `arin_widget_first_use_ms_<kind>` (epoch ms, String). Yoksa `null`.
+  ///
+  /// Bu kanal, trial sayacının yalnızca widget gerçekten home ekrana
+  /// eklendiğinde başlamasını sağlar; uygulamanın açılışında otomatik trial
+  /// başlatma davranışı (eski sürüm) kaldırıldı.
+  Future<DateTime?> _readWidgetFirstUse(ArinWidgetAccessKind kind) async {
+    if (kIsWeb) return null;
+    try {
+      final raw = await HomeWidget.getWidgetData<String>(
+        'arin_widget_first_use_ms_${kind.id}',
+      );
+      if (raw == null || raw.isEmpty) return null;
+      final ms = int.tryParse(raw) ?? double.tryParse(raw)?.toInt();
+      if (ms == null || ms <= 0) return null;
+      return DateTime.fromMillisecondsSinceEpoch(ms);
+    } catch (e) {
+      debugPrint('WidgetAccessService._readWidgetFirstUse(${kind.id}): $e');
       return null;
     }
   }

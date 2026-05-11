@@ -114,9 +114,18 @@ class AdGateService {
     }
   }
 
+  /// Bir widget'ın trial/unlock durumunu döndürür.
+  ///
+  /// `firstSeen` parametresi, ilgili widget'ın **home ekrana eklendiği**
+  /// (yani native provider'ın ilk kez render ettiği) andır. App Group / shared
+  /// SharedPreferences'tan native taraf okunarak [WidgetAccessService]
+  /// tarafından sağlanır. Null gelirse widget henüz home ekrana eklenmemiş
+  /// demektir; bu durumda trial başlatılmaz ve erişime izin verilir — böylece
+  /// kullanıcı eklemediği widget'ların trial'ı boşa yanmaz.
   Future<WidgetGateState> widgetStateFor(
     AdGatePlacement placement, {
     required bool isPremium,
+    DateTime? firstSeen,
   }) async {
     assert(_isWidgetPlacement(placement));
     if (isPremium) {
@@ -127,7 +136,15 @@ class AdGateService {
         trialUntil: null,
       );
     }
-    final firstSeen = await _ensureWidgetFirstSeen(placement);
+    if (firstSeen == null) {
+      // Widget henüz native tarafça render edilmemiş; trial sayacı başlamasın.
+      return const WidgetGateState(
+        allowed: true,
+        inTrial: false,
+        unlockUntil: null,
+        trialUntil: null,
+      );
+    }
     final trialUntil = firstSeen.add(widgetTrialDuration);
     final now = DateTime.now();
     final unlock = unlockUntil(placement);
@@ -218,16 +235,6 @@ class AdGateService {
 
   bool _cooldownActive(AdGatePlacement placement) => _isUnlocked(placement);
 
-  Future<DateTime> _ensureWidgetFirstSeen(AdGatePlacement placement) async {
-    final key = _widgetFirstSeenKey(placement);
-    final raw = _prefs.getString(key);
-    final parsed = raw == null ? null : DateTime.tryParse(raw);
-    if (parsed != null) return parsed;
-    final now = DateTime.now();
-    await _prefs.setString(key, now.toIso8601String());
-    return now;
-  }
-
   bool _isWidgetPlacement(AdGatePlacement placement) {
     return placement == AdGatePlacement.widgetQuote ||
         placement == AdGatePlacement.widgetPrayer ||
@@ -241,7 +248,4 @@ class AdGateService {
 
   String _pendingKey(AdGatePlacement placement) =>
       'ad_gate_${placement.key}_pending';
-
-  String _widgetFirstSeenKey(AdGatePlacement placement) =>
-      'ad_gate_${placement.key}_first_seen';
 }

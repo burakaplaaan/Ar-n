@@ -70,7 +70,18 @@ class _WidgetLaunchGateListenerState
     if (uri.scheme != 'arin' || uri.host != 'widget') return;
     final segment = uri.pathSegments.isEmpty ? '' : uri.pathSegments.first;
     final kind = ArinWidgetAccessKind.fromId(segment);
-    if (kind != null) await _handleKind(kind);
+    if (kind == null) return;
+
+    // Native widget kilit overlay'inde "Açmak için dokunun"a tıklama: native
+    // tarafça URL'ye `?lock=1` flag'i eklenir. State servisindeki olası
+    // çelişkilere (premium/trial mismatch) güvenmeden doğrudan unlock akışına
+    // gidilir; aksi halde kullanıcı kilit gördüğü halde ana sayfaya düşerdi.
+    if (uri.queryParameters['lock'] == '1') {
+      await _openUnlockPage(kind);
+      return;
+    }
+
+    await _handleKind(kind);
   }
 
   Future<void> _handleKind(ArinWidgetAccessKind kind) async {
@@ -79,9 +90,19 @@ class _WidgetLaunchGateListenerState
     final premium = await ref.read(premiumEntitlementProvider.future);
     final state = await service.stateFor(kind, isPremium: premium.isActive);
     if (!mounted || state.allowed) return;
+    await _openUnlockPage(kind);
+  }
+
+  Future<void> _openUnlockPage(ArinWidgetAccessKind kind) async {
+    if (!mounted || _gatePageOpen) return;
     _gatePageOpen = true;
     try {
-      await context.push(AppRoutes.widgetUnlock(kind.id));
+      // `WidgetLaunchGateListener`, `MaterialApp.router`'ın `builder` callback'i
+      // içinde yer aldığından local `context` GoRouter ancestor'ını göremez;
+      // `GoRouter.of(context)` null patlatır. Bu yüzden router instance'ını
+      // doğrudan Riverpod provider'dan okuyup `push` ediyoruz.
+      final router = ref.read(appRouterProvider);
+      await router.push(AppRoutes.widgetUnlock(kind.id));
     } finally {
       _gatePageOpen = false;
     }

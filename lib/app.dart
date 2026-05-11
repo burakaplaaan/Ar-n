@@ -19,6 +19,7 @@ import 'core/theme/app_theme.dart';
 import 'core/constants/quote_pool_ids.dart';
 import 'data/services/audio_session_coordinator.dart';
 import 'data/services/app_local_notification_scheduler.dart';
+import 'data/services/fcm_token_service.dart';
 import 'data/services/location_service.dart';
 import 'data/services/prayer_notification_scheduler.dart';
 import 'data/services/prayer_reminder_prefs.dart';
@@ -157,6 +158,12 @@ class _ArinAppState extends ConsumerState<ArinApp> with WidgetsBindingObserver {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      // FCM bildirim tıklaması yönlendirmesi: router hazır olduktan hemen
+      // sonra callback enjekte edilir; initIfNeeded henüz çağrılmamışsa
+      // _pendingNavigationRoute mekanizması yarış durumunu yakalar.
+      final router = ref.read(appRouterProvider);
+      FcmTokenService.setNavigationCallback((route) => router.go(route));
+
       unawaited(_runForegroundMaintenance(initial: true));
     });
   }
