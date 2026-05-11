@@ -27,14 +27,14 @@ function daysBetween(a, b) {
 // admin panelinden yönetilir; aşağıdaki sabit yalnızca o döküman boş/hatalı
 // olduğunda fallback olarak devreye girer.
 const _defaultTeaserTexts = [
-  "Bu vaktin sende bırakacağı izi merak ediyor musun? 🌙",
-  "Bu an sana ne söylüyor? Az sonra kayboluyor 🌿",
-  "Bu vakit senin için indi. 5 dakikan var 🌙",
-  "Şu an tam seni arıyor. 5 dakikan kaldı 🌿",
-  "Bu vaktin senin üzerindeki etkisini merak ediyor musun? 🌙",
-  "Bu anın sende bırakacağı iz... Şimdi aç 🌿",
-  "Bu an geçmeden bir bak. 5 dakikan var 🌙",
-  "Seninle buluşmak için 5 dakikan kaldı 🌿",
+  "Bu vaktin sende bırakacağı izi merak ediyor musun?",
+  "Bu an sana ne söylüyor? Az sonra kayboluyor",
+  "Bu vakit senin için indi",
+  "Şu an tam seni arıyor",
+  "Bu vaktin senin üzerindeki etkisini merak ediyor musun?",
+  "Bu anın sende bırakacağı iz... Şimdi aç",
+  "Bu an geçmeden bir bak",
+  "Seninle buluşmak için bir an var",
 ];
 
 /**
@@ -213,12 +213,12 @@ exports.sendScheduledNotifications = onSchedule(
       // Bildirim başlığı: saat ve ayet koordinatı yan yana — aynı rakamların
       // iki kez görünmesi "saat = ayet" mantığını kullanıcıya görsel olarak
       // anlatır. Ek bir açıklama metni gerekmez.
-      //   Örn: "🌙 21:05 · Kur'an 21:5"
+      //   Örn: "21:05 · Kur'an 21:5"
       const clockStr = `${String(istHour).padStart(2, "0")}:${String(istMin).padStart(2, "0")}`;
       const hasSurahData =
         data.surahNumber != null && data.verseNumber != null;
       const ntfTitle = hasSurahData
-        ? `🌙 ${clockStr} · Kur'an ${data.surahNumber}:${data.verseNumber}`
+        ? `${clockStr} · Kur'an ${data.surahNumber}:${data.verseNumber}`
         : (data.title || "Arın");
 
       // Gövde önceliği:
@@ -353,8 +353,8 @@ exports.sendMomentVerseNow = onCall(
       data.surahNumber != null && data.verseNumber != null;
     const ntfTitle = hasSurahData
       ? (clockStr
-          ? `🌙 ${clockStr} · Kur'an ${data.surahNumber}:${data.verseNumber}`
-          : `🌙 Kur'an ${data.surahNumber}:${data.verseNumber}`)
+          ? `${clockStr} · Kur'an ${data.surahNumber}:${data.verseNumber}`
+          : `Kur'an ${data.surahNumber}:${data.verseNumber}`)
       : (data.title || "Arın");
 
     // Manuel gönderimde de aynı öncelik: önce item.notificationBody, yoksa
@@ -520,18 +520,25 @@ exports.sendTestNotification = onCall(
       verseNumber = 5;
       verseText = "Bu bir test ayetidir. Bildirim akışı çalışıyor.";
       ref = "TEST";
-      clockStr = "TEST";
     }
 
-    // Test başlığı: gerçek bildirim ile aynı format (saat · Kur'an X:Y),
-    // başına "TEST · " eklenir ki admin gerçek bildirimden ayırt edebilsin.
-    const ntfTitle = clockStr && clockStr !== "TEST"
-      ? (surahNumber != null && verseNumber != null
-          ? `TEST · 🌙 ${clockStr} · Kur'an ${surahNumber}:${verseNumber}`
-          : `TEST · 🌙 ${clockStr}`)
-      : (surahNumber != null && verseNumber != null
-          ? `TEST · 🌙 Kur'an ${surahNumber}:${verseNumber}`
-          : "TEST · 🌙 Arın");
+    // clockStr boşsa (pool item yok veya item'da saat tanımlı değil), cihazın
+    // şu anki İstanbul saatini koy. Böylece test bildirimi başlığı her zaman
+    // gerçek bildirim formatıyla aynı görünür: "🌙 21:25 · Kur'an 21:5".
+    if (!clockStr) {
+      const istNowForClock = new Date(
+        new Date(nowMs).toLocaleString("en-US", { timeZone: "Europe/Istanbul" }),
+      );
+      const hh = String(istNowForClock.getHours()).padStart(2, "0");
+      const mm = String(istNowForClock.getMinutes()).padStart(2, "0");
+      clockStr = `${hh}:${mm}`;
+    }
+
+    // Test başlığı: gerçek bildirim ile aynı format. "TEST · " prefix'i
+    // admin'in gerçek bildirimden ayırt etmesi için.
+    const ntfTitle = surahNumber != null && verseNumber != null
+      ? `TEST · ${clockStr} · Kur'an ${surahNumber}:${verseNumber}`
+      : `TEST · ${clockStr}`;
 
     // Gövde önceliği: item.notificationBody > teaser havuzu > sabit metin
     let ntfBody = bodyFromItem;
