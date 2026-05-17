@@ -2622,6 +2622,30 @@ abstract class AppLocalizations {
   /// **'Pil optimizasyonunu muaf tut'**
   String get notificationsGateRequestBattery;
 
+  /// No description provided for @notificationsBatteryRationaleTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Pil muafiyeti neden gerekli?'**
+  String get notificationsBatteryRationaleTitle;
+
+  /// No description provided for @notificationsBatteryRationaleBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'Namaz vakti ve arınma bildirimleri, telefon uyku (Doze) modundayken bile tam saatinde gelebilmesi için pil optimizasyonundan muaf tutulmalıdır. Bu izin yalnızca zamanlanmış bildirimleri etkiler; arka planda sürekli çalışmaz.'**
+  String get notificationsBatteryRationaleBody;
+
+  /// No description provided for @notificationsBatteryRationaleConfirm.
+  ///
+  /// In tr, this message translates to:
+  /// **'İzin ver'**
+  String get notificationsBatteryRationaleConfirm;
+
+  /// No description provided for @notificationsBatteryRationaleCancel.
+  ///
+  /// In tr, this message translates to:
+  /// **'Şimdi değil'**
+  String get notificationsBatteryRationaleCancel;
+
   /// No description provided for @notificationsDiagnosticsQueuedLabel.
   ///
   /// In tr, this message translates to:
@@ -2967,6 +2991,18 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'Arınma bildirimi metinleri'**
   String get adminPoolLabelNotificationArinmaBodies;
+
+  /// No description provided for @adminPoolLabelNotificationNamazWisdom.
+  ///
+  /// In tr, this message translates to:
+  /// **'Namaz bildirimi sözleri'**
+  String get adminPoolLabelNotificationNamazWisdom;
+
+  /// No description provided for @adminPoolLabelNotificationDailyNamazReminder.
+  ///
+  /// In tr, this message translates to:
+  /// **'Günlük namaz hatırlatıcı metinleri'**
+  String get adminPoolLabelNotificationDailyNamazReminder;
 
   /// No description provided for @adminSearchResultsCount.
   ///

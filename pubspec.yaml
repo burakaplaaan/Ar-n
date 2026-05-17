@@ -114,7 +114,7 @@ dev_dependencies:
   minimp3_dart:
     git:
       url: https://github.com/Telosnex/minimp3_dart.git
-      ref: main
+      ref: aa7d15582363c63f9a101b87ca5bab6b68b3e6e9
   flutter_launcher_icons: ^0.14.4
   # Android 12+ SplashScreen API + iOS LaunchScreen hazırlayan CLI.
   # Config `flutter_native_splash:` bloğu altında; generate için:

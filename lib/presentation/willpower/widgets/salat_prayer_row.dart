@@ -79,8 +79,9 @@ class SalatPrayerRow extends ConsumerWidget {
 
     final prayers = salat.getPrayers(habitId, storageDay);
 
-    /// Sadece ana ekran / hub satırında vakit penceresi; geçmiş gün seçiminde serbest.
-    final bool applyVakitWindow = day == null;
+    // Vakit penceresi kısıtlaması şimdilik devre dışı: kullanıcı günün
+    // herhangi bir vaktinde geçmiş/gelecek namazları işaretleyebilir.
+    const bool applyVakitWindow = false;
 
     final triSize = compact ? 12.0 : 20.0;
 

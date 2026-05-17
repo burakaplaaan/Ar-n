@@ -16,6 +16,8 @@
 // Provider zinciri `prayerTimesProvider`'a bağlanır; consumer kod
 // (UI, scheduler) değişmez — sadece veri kaynağı yeri değişir.
 
+import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../models/prayer_times_model.dart';
@@ -49,13 +51,65 @@ class PrayerServiceResolver {
         _aladhan = aladhan,
         _location = location;
 
+  // Bellek içi kısa süreli önbellek — aynı günün verisini tekrar tekrar
+  // Hive/GPS/ağdan çekmekten kaçınır. PrayerServiceResolver bir Provider
+  // singleton'ı olduğu için proses yaşam süresi boyunca canlı kalır.
+  PrayerFetchResult? _memCache;
+  DateTime? _memCacheAt;
+
+  // Önbellekteki sonucun hangi konum parmak izi ile çekildiği.
+  // Format: "{ilceId ?? 'nil'}|{city.lower}" — konum değişince otomatik miss.
+  String? _memCacheLocationKey;
+
+  static const _memCacheTtl = Duration(minutes: 30);
+
+  String _locationKey() {
+    final id = _location.savedDistrictId;
+    final city = _location.savedCity.trim().toLowerCase();
+    return '${id ?? 'nil'}|$city';
+  }
+
   /// Taze (bugünün) namaz vakitlerini getirir. İç sıralama:
-  ///   1. TR + districtId varsa Diyanet → başarıysa bitti
-  ///   2. Aladhan (koordinat veya şehir)
-  ///   3. Her ikisi de düşerse: Diyanet/Aladhan cache'lerinden eski kayıt
-  ///   4. Hiçbiri yoksa `unavailable`
+  ///   1. Bellek içi önbellek (30 dk, aynı gün) → anında döner
+  ///   2. TR + districtId varsa Diyanet → başarıysa bitti
+  ///   3. Aladhan (koordinat veya şehir)
+  ///   4. Her ikisi de düşerse: Diyanet/Aladhan cache'lerinden eski kayıt
+  ///   5. Hiçbiri yoksa `unavailable`
+  ///
+  /// Konum senkronizasyonu (`syncPrayerLocation`) arka planda çalışır;
+  /// mevcut oturumun kayıtlı konum verisi anında kullanılır. Bu sayede
+  /// GPS beklenmesinden kaynaklanan ilk yüklenme gecikmesi ortadan kalkar.
   Future<PrayerFetchResult> fetchToday() async {
-    await _location.syncPrayerLocation();
+    final now = DateTime.now();
+
+    // 1) Bellek içi önbellek kontrolü — aynı takvim günü + aynı konum +
+    //    30 dk içinde ise anında dön; arka planda konumu tazele (GPS bloklamaz).
+    final cached = _memCache;
+    final cachedAt = _memCacheAt;
+    if (cached != null && cached.hasData && cachedAt != null) {
+      final sameDay = cachedAt.year == now.year &&
+          cachedAt.month == now.month &&
+          cachedAt.day == now.day;
+      final sameLocation = _memCacheLocationKey == _locationKey();
+      if (sameDay && sameLocation && now.difference(cachedAt) < _memCacheTtl) {
+        // Konum senkronizasyonu arka planda; bu çağrıyı bloklamaz.
+        unawaited(_location.syncPrayerLocation());
+        return cached;
+      }
+    }
+
+    // 2) Mevcut konum parmak izini GPS arka plana geçmeden önce yakala.
+    //    Dart tek iş parçacıklı olduğundan unawaited çağrısı ilk await'e
+    //    kadar senkron ilerler; o noktada savedDistrictId henüz değişmemiştir.
+    //    Yine de ilerleyen await'lerde GPS yazabilir; önbelleği fetch
+    //    başlangıcındaki konum bilgisiyle etiketlemek doğru davranış.
+    final fetchLocationKey = _locationKey();
+
+    // 3) Konum senkronizasyonunu arka planda başlat; kayıtlı konum
+    //    verileri (savedDistrictId, savedCity, savedLat/Lon) anında okunur.
+    //    GPS tamamlandığında Hive güncellenir — bir sonraki fetchToday
+    //    artık taze konumu kullanır.
+    unawaited(_location.syncPrayerLocation());
 
     final isTR = _isTurkey(_location.savedCountry);
     final ilceId = _location.savedDistrictId;
@@ -65,7 +119,13 @@ class PrayerServiceResolver {
         ilceId: ilceId,
         cityLabel: _location.savedCity,
       );
-      if (m != null) return PrayerFetchResult(m, PrayerSource.diyanet);
+      if (m != null) {
+        final result = PrayerFetchResult(m, PrayerSource.diyanet);
+        _memCache = result;
+        _memCacheAt = now;
+        _memCacheLocationKey = fetchLocationKey;
+        return result;
+      }
     }
 
     final lat = _location.savedLat;
@@ -81,7 +141,11 @@ class PrayerServiceResolver {
               city: _location.savedCity,
               country: _location.savedCountry,
             );
-      return PrayerFetchResult(m, PrayerSource.aladhan);
+      final result = PrayerFetchResult(m, PrayerSource.aladhan);
+      _memCache = result;
+      _memCacheAt = now;
+      _memCacheLocationKey = fetchLocationKey;
+      return result;
     } catch (_) {
       // Ağ düştü → cache zincirine bak.
     }
@@ -92,10 +156,22 @@ class PrayerServiceResolver {
         ilceId: ilceId,
         cityLabel: _location.savedCity,
       );
-      if (m != null) return PrayerFetchResult(m, PrayerSource.cacheOnly);
+      if (m != null) {
+        final result = PrayerFetchResult(m, PrayerSource.cacheOnly);
+        _memCache = result;
+        _memCacheAt = now;
+        _memCacheLocationKey = fetchLocationKey;
+        return result;
+      }
     }
     final anyScope = _aladhan.tryLoadTodayCachedAnyScope();
-    if (anyScope != null) return PrayerFetchResult(anyScope, PrayerSource.cacheOnly);
+    if (anyScope != null) {
+      final result = PrayerFetchResult(anyScope, PrayerSource.cacheOnly);
+      _memCache = result;
+      _memCacheAt = now;
+      _memCacheLocationKey = fetchLocationKey;
+      return result;
+    }
 
     return const PrayerFetchResult(null, PrayerSource.unavailable);
   }

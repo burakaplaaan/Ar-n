@@ -694,6 +694,10 @@
   "notificationsGateMissing": "Bir veya daha fazla izin eksik — zamanlanan bildirimler gecikebilir ya da hiç gelmeyebilir.",
   "notificationsGateRequestExact": "Tam zamanlayıcı iznini aç",
   "notificationsGateRequestBattery": "Pil optimizasyonunu muaf tut",
+  "notificationsBatteryRationaleTitle": "Pil muafiyeti neden gerekli?",
+  "notificationsBatteryRationaleBody": "Namaz vakti ve arınma bildirimleri, telefon uyku (Doze) modundayken bile tam saatinde gelebilmesi için pil optimizasyonundan muaf tutulmalıdır. Bu izin yalnızca zamanlanmış bildirimleri etkiler; arka planda sürekli çalışmaz.",
+  "notificationsBatteryRationaleConfirm": "İzin ver",
+  "notificationsBatteryRationaleCancel": "Şimdi değil",
   "notificationsDiagnosticsQueuedLabel": "Kuyruğa alınan zamanlı hatırlatıcı",
   "notificationsSectionGeneral": "Genel",
   "notificationsSectionPrayer": "Namaz vakitleri",
@@ -806,6 +810,8 @@
   "adminPoolLabelHubArinmaIslamic": "Arınma — İslami kart",
   "adminPoolLabelHubArinmaMedical": "Arınma — sağlık kartı",
   "adminPoolLabelNotificationArinmaBodies": "Arınma bildirimi metinleri",
+  "adminPoolLabelNotificationNamazWisdom": "Namaz bildirimi sözleri",
+  "adminPoolLabelNotificationDailyNamazReminder": "Günlük namaz hatırlatıcı metinleri",
   "adminSearchResultsCount": "{count} sonuç",
   "@adminSearchResultsCount": {
     "placeholders": {

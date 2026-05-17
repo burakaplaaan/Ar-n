@@ -77,7 +77,8 @@ class UserProfileRepository {
   bool get isWeeklySurveyDue {
     final profile = load();
     if (profile.lastSurveyDate == null) return true;
-    final last = DateTime.parse(profile.lastSurveyDate!);
+    final last = DateTime.tryParse(profile.lastSurveyDate!);
+    if (last == null) return true;
     return DateTime.now().difference(last).inDays >= 7;
   }
 }

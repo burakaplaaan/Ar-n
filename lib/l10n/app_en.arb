@@ -709,6 +709,8 @@
   "adminPoolLabelHubArinmaIslamic": "Purification — Islamic card",
   "adminPoolLabelHubArinmaMedical": "Purification — health card",
   "adminPoolLabelNotificationArinmaBodies": "Purification notification texts",
+  "adminPoolLabelNotificationNamazWisdom": "Prayer notification quotes",
+  "adminPoolLabelNotificationDailyNamazReminder": "Daily prayer reminder texts",
   "adminSearchResultsCount": "{count} results",
   "@adminSearchResultsCount": {
     "placeholders": {
@@ -1034,6 +1036,10 @@
   "notificationsGateMissing": "One or more permissions are missing — scheduled notifications may be delayed or never arrive.",
   "notificationsGateRequestExact": "Enable exact alarm permission",
   "notificationsGateRequestBattery": "Ignore battery optimization",
+  "notificationsBatteryRationaleTitle": "Why is battery exemption needed?",
+  "notificationsBatteryRationaleBody": "Prayer time and purification reminders need to be exempt from battery optimisation so they can arrive at the exact scheduled time, even when the phone is in sleep (Doze) mode. This permission only affects scheduled notifications and does not run in the background continuously.",
+  "notificationsBatteryRationaleConfirm": "Allow",
+  "notificationsBatteryRationaleCancel": "Not now",
   "notificationsDiagnosticsQueuedLabel": "Queued scheduled reminders",
   "notificationsSectionGeneral": "General",
   "notificationsSectionPrayer": "Prayer times",

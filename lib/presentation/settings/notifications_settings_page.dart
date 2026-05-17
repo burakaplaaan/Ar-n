@@ -14,11 +14,13 @@ import '../../core/constants/app_colors.dart';
 import '../../core/providers/shared_preferences_provider.dart';
 import '../../core/router/app_router.dart';
 import '../../core/theme/arin_shell_background.dart';
+import '../../data/models/prayer_times_model.dart';
 import '../../data/services/app_local_notification_scheduler.dart';
 import '../../data/services/app_notification_channel_prefs.dart';
 import '../../data/services/arin_local_notifications_plugin.dart';
 import '../../data/services/local_notification_permission_gate.dart';
 import '../../data/services/prayer_reminder_prefs.dart';
+import '../../data/services/prayer_service_resolver.dart';
 import '../shared/providers/prayer_time_providers.dart';
 import '../shared/providers/quotes_providers.dart';
 import '../shared/widgets/arin_clock_time_sheet.dart';
@@ -91,6 +93,26 @@ class _NotificationsSettingsPageState
 
   Future<void> _requestBatteryExemption() async {
     HapticFeedback.selectionClick();
+    if (!mounted) return;
+    final l10n = AppLocalizations.of(context)!;
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(l10n.notificationsBatteryRationaleTitle),
+        content: Text(l10n.notificationsBatteryRationaleBody),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: Text(l10n.notificationsBatteryRationaleCancel),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: Text(l10n.notificationsBatteryRationaleConfirm),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
     await requestIgnoreBatteryOptimizations();
     if (mounted) await _refreshDiagnostics();
   }
@@ -155,10 +177,19 @@ class _NotificationsSettingsPageState
   Future<void> _syncAppNotifications(SharedPreferences prefs) async {
     final pools = ref.read(quotePoolsRepositoryProvider);
     final prayerTimes = ref.read(prayerTimesProvider).valueOrNull;
+    List<PrayerTimesModel>? upcomingDays;
+    try {
+      final resolver = ref.read(prayerServiceResolverProvider);
+      final list = await resolver.fetchUpcomingDays(days: 7);
+      if (list.isNotEmpty) upcomingDays = list;
+    } catch (e) {
+      debugPrint('_syncAppNotifications upcoming fetch failed: $e');
+    }
     await AppLocalNotificationScheduler.rescheduleAll(
       prefs,
       pools: pools,
-      prayerTimes: prayerTimes,
+      prayerTimes: (upcomingDays != null && upcomingDays.isNotEmpty) ? upcomingDays.first : prayerTimes,
+      upcomingDays: upcomingDays,
       force: true,
     );
   }

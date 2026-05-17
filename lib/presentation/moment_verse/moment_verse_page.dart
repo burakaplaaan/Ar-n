@@ -512,7 +512,9 @@ class _MomentVersePageState extends State<MomentVersePage>
               ),
             ),
 
-            // Countdown + alt buton
+            // Sıralama: not (ayetin altında ek anlam) → geri sayım barı
+            // (zaman baskısı, butonun hemen üstü) → ana sayfa butonu.
+            _buildMomentNote(moment),
             _buildCountdownBar(),
             _homeButton(),
             const SizedBox(height: 24),
@@ -583,6 +585,52 @@ class _MomentVersePageState extends State<MomentVersePage>
     );
   }
 
+  Widget _buildMomentNote(_MomentData moment) {
+    final hasTime = moment.clockStr.isNotEmpty;
+    if (!hasTime) return const SizedBox.shrink();
+
+    // Adres bölümü esnek: surahNumber/verseNumber yoksa ref string'ine düş;
+    // o da yoksa "bir ayete" şeklinde generic dile dön. Eski pool item'larında
+    // bu alanlar boş olabilir — not yine de gösterilsin, mantık ayakta kalsın.
+    String address;
+    if (moment.surahNumber != null && moment.verseNumber != null) {
+      address = 'Sure ${moment.surahNumber}, ${moment.verseNumber}. ayet';
+    } else if (moment.ref.isNotEmpty) {
+      address = moment.ref;
+    } else {
+      address = 'bir ayet';
+    }
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(28, 8, 28, 18),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Container(
+            width: 32,
+            height: 1,
+            color: Colors.white.withValues(alpha: 0.10),
+          ),
+          const SizedBox(height: 14),
+          Text(
+            'Saat ${moment.clockStr} — $address. '
+            'Bu tesadüf değil; zamanın rakamları Kur\'an\'da bir adrese dönüşür. '
+            'Bu bildirimi tam vaktinde açman ve bu ayetin önüne geçmen de öyle.',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 12.5,
+              height: 1.6,
+              color: Colors.white.withValues(alpha: 0.55),
+              fontStyle: FontStyle.italic,
+              letterSpacing: 0.15,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ── Geri sayım barı ───────────────────────────────────────────────────
   Widget _buildCountdownBar() {
     final total = const Duration(minutes: 5).inSeconds;
     final elapsed = total - _remaining.inSeconds;

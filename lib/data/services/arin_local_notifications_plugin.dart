@@ -2,6 +2,7 @@
 // Tek [FlutterLocalNotificationsPlugin] — iki ayrı örnek + iki kez [initialize]
 // zamanlanmış bildirimlerin cihazda sessizce kaybolmasına yol açabiliyor.
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 bool _arinLocalNotificationsPluginInitialized = false;
@@ -10,6 +11,32 @@ bool _arinLocalNotificationsPluginInitialized = false;
 /// kanalı kullanır.
 final FlutterLocalNotificationsPlugin arinLocalNotificationsPlugin =
     FlutterLocalNotificationsPlugin();
+
+/// Yerel bildirim tıklamalarında payload'a göre dispatch edilen handler'lar.
+/// Servisler `registerLocalNotificationTapHandler` ile kendi payload'larını
+/// dinler (ör. FCM foreground notification için `moment_verse`).
+final Map<String, void Function(String payload)> _localTapHandlers = {};
+
+/// [payload] eşleşirse [handler] çağrılır. Aynı anahtar üzerine yazılır.
+void registerLocalNotificationTapHandler(
+  String payload,
+  void Function(String payload) handler,
+) {
+  _localTapHandlers[payload] = handler;
+}
+
+void _dispatchLocalNotificationTap(NotificationResponse response) {
+  final payload = response.payload;
+  if (payload == null || payload.isEmpty) return;
+  final handler = _localTapHandlers[payload];
+  if (handler == null) {
+    debugPrint(
+      '══ ARIN LocalNtf ══ payload="$payload" için handler yok; atlanıyor',
+    );
+    return;
+  }
+  handler(payload);
+}
 
 /// İdempotent: birden fazla çağrıda yalnızca bir kez [initialize] edilir.
 Future<void> initializeArinLocalNotificationsPlugin() async {
@@ -25,6 +52,7 @@ Future<void> initializeArinLocalNotificationsPlugin() async {
       android: androidInit,
       iOS: iosInit,
     ),
+    onDidReceiveNotificationResponse: _dispatchLocalNotificationTap,
   );
   _arinLocalNotificationsPluginInitialized = true;
 }

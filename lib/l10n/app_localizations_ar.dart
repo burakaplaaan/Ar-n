@@ -1452,6 +1452,20 @@ class AppLocalizationsAr extends AppLocalizations {
   String get notificationsGateRequestBattery => 'تجاهل تحسين البطارية';
 
   @override
+  String get notificationsBatteryRationaleTitle =>
+      'لماذا نحتاج إعفاء البطارية؟';
+
+  @override
+  String get notificationsBatteryRationaleBody =>
+      'تحتاج تذكيرات مواقيت الصلاة والتزكية إلى إعفاء من تحسين البطارية حتى تصل في الوقت المحدد بالضبط، حتى عندما يكون الهاتف في وضع السكون (Doze). يؤثر هذا الإذن فقط على الإشعارات المجدولة ولا يعمل في الخلفية باستمرار.';
+
+  @override
+  String get notificationsBatteryRationaleConfirm => 'السماح';
+
+  @override
+  String get notificationsBatteryRationaleCancel => 'ليس الآن';
+
+  @override
   String get notificationsDiagnosticsQueuedLabel =>
       'التذكيرات المجدولة في الطابور';
 
@@ -1657,6 +1671,13 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get adminPoolLabelNotificationArinmaBodies => 'نصوص إشعار التزكية';
+
+  @override
+  String get adminPoolLabelNotificationNamazWisdom => 'اقتباسات إشعار الصلاة';
+
+  @override
+  String get adminPoolLabelNotificationDailyNamazReminder =>
+      'نصوص تذكير الصلاة اليومي';
 
   @override
   String adminSearchResultsCount(int count) {

@@ -1,9 +1,11 @@
 // Arın — Cloud Functions
-// Her dakika çalışır (Avrupa/İstanbul):
-//   1. Bekleyen manuel bildirimleri (admin_scheduled_notifications) gönderir.
-//      Manuel bildirim gönderilince havuz timer'ı sıfırlanır.
-//   2. admin_ntf_pool'dan o dakikaya uyan bir öğeyi rastgele seçerek gönderir.
-//      Gönderim sıklığı ve tekrar süresi admin_ntf_config/schedule'dan okunur.
+// Her dakika çalışır (Avrupa/İstanbul).
+// İki aşamalı havuz bildirimi:
+//   1. Gün değişince pool'dan rastgele uygun bir ayet seçilir ve o ayetin
+//      kendi hour:minute değeri bugünün gönderim saati olarak planlanır
+//      (admin_ntf_config/today_plan). Böylece her gün farklı bir ayet farklı
+//      bir saatte gelir — aynı item hep 06:12'de gelmez.
+//   2. Planlanan dakikaya gelinince bildirim gönderilir. Saat = ayet referansı.
 //      Seçilen ayet bilgisi admin_ntf_config/current_moment'a yazılır;
 //      kullanıcı bildirimi tıklayarak 5 dakika içinde ayeti görebilir.
 
@@ -125,10 +127,8 @@ exports.sendScheduledNotifications = onSchedule(
     const messaging = getMessaging();
     const nowMs = Date.now();
 
-    // İstanbul saatini hesapla
-    const nowDate = new Date(nowMs);
     const istNow = new Date(
-      nowDate.toLocaleString("en-US", { timeZone: "Europe/Istanbul" })
+      new Date(nowMs).toLocaleString("en-US", { timeZone: "Europe/Istanbul" })
     );
     const istHour = istNow.getHours();
     const istMin = istNow.getMinutes();
@@ -136,20 +136,25 @@ exports.sendScheduledNotifications = onSchedule(
     const month = String(istNow.getMonth() + 1).padStart(2, "0");
     const day = String(istNow.getDate()).padStart(2, "0");
     const todayStr = `${year}-${month}-${day}`;
+    const currentMinuteOfDay = istHour * 60 + istMin;
 
-    // ── Havuz bildirimleri (sıklık + tekrar kontrolü) ────────────────────────
-    // Not: Eski "admin_scheduled_notifications" manuel yayın bloğu, yeni admin
-    // panelinde özellik kaldırıldığı için silindi (gereksiz Firestore index
-    // hatası üretiyordu). Manuel gönderim artık `sendMomentVerseNow` callable
-    // üzerinden yapılır.
+    // İki aşamalı planlama:
+    //   1. Gün değişince (veya ilk uygun anda) pool'dan rastgele uygun bir ayet
+    //      seçilir ve o ayetin kendi hour:minute'i o günün gönderim zamanı olur.
+    //      Seçim admin_ntf_config/today_plan dokümanına yazılır.
+    //   2. Her dakika: today_plan'daki saat gelince bildirim gönderilir.
+    //
+    // Böylece her gün farklı item seçilir (06:12 ile 12:10 sırayla gelir)
+    // ve seçilen item tam kendi saatinde (06:12 → 06:12'de) ateşlenir.
+
     try {
-      // Config'i oku
+      // ── 1. Config ──────────────────────────────────────────────────────────
       const configSnap = await db
         .collection("admin_ntf_config")
         .doc("schedule")
         .get();
       const config = configSnap.exists ? configSnap.data() : {};
-      const autoEnabled = config.autoEnabled !== false; // default: true
+      const autoEnabled = config.autoEnabled !== false;
       const sendEveryNDays = config.sendEveryNDays ?? 3;
       const minRepeatDays = config.minRepeatDays ?? 60;
       const lastAutoSentDate = config.lastAutoSentDate ?? null;
@@ -159,7 +164,7 @@ exports.sendScheduledNotifications = onSchedule(
         return;
       }
 
-      // Yeterince gün geçti mi?
+      // ── 2. Global cooldown ─────────────────────────────────────────────────
       const daysSinceLast = lastAutoSentDate
         ? daysBetween(lastAutoSentDate, todayStr)
         : 9999;
@@ -171,69 +176,135 @@ exports.sendScheduledNotifications = onSchedule(
         return;
       }
 
-      // O dakikaya uyan, etkin öğeleri al
-      const poolSnap = await db
+      // ── 3. Bugünün planını oku ─────────────────────────────────────────────
+      const planRef = db.collection("admin_ntf_config").doc("today_plan");
+      const planSnap = await planRef.get();
+      const plan = planSnap.exists ? planSnap.data() : null;
+
+      // Bugün için plan zaten kapatıldı mı? (gönderildi veya pencere geçti)
+      if (plan && plan.date === todayStr && plan.sent === true) {
+        console.log(
+          plan.missedAt
+            ? "[Havuz] Bugünün gönderim penceresi geçmişti (missed)."
+            : "[Havuz] Bugün zaten gönderildi."
+        );
+        return;
+      }
+
+      // ── 4. Plan yoksa yeni plan oluştur ────────────────────────────────────
+      // Her item kendi hour:minute'iyle gelir; sadece saati henüz geçmemiş
+      // ve minRepeatDays koşulunu sağlayan item'lar adaydır.
+      if (!plan || plan.date !== todayStr) {
+        const poolSnap = await db
+          .collection("admin_ntf_pool")
+          .where("enabled", "==", true)
+          .get();
+
+        if (poolSnap.empty) {
+          console.log("[Havuz] Pool boş. Plan oluşturulamadı.");
+          return;
+        }
+
+        const eligible = poolSnap.docs.filter((doc) => {
+          const d = doc.data();
+          const itemH = Number(d.hour);
+          const itemM = Number(d.minute);
+          if (!Number.isFinite(itemH) || !Number.isFinite(itemM)) return false;
+          // Saati bugün için geçmemiş olmalı (en az 1 dk ileri)
+          if (itemH * 60 + itemM <= currentMinuteOfDay) return false;
+          // minRepeatDays kontrolü
+          if (!d.lastSentDate) return true;
+          const itemMinRepeat = Number.isFinite(d.minRepeatDays)
+            ? Number(d.minRepeatDays)
+            : minRepeatDays;
+          return daysBetween(d.lastSentDate, todayStr) >= itemMinRepeat;
+        });
+
+        if (eligible.length === 0) {
+          console.log(
+            "[Havuz] Bugün için uygun öğe yok (tümü geçti veya cooldown). Yarın denenecek."
+          );
+          return;
+        }
+
+        const chosen = eligible[Math.floor(Math.random() * eligible.length)];
+        const chosenData = chosen.data();
+        const sendAtHour = Number(chosenData.hour);
+        const sendAtMin = Number(chosenData.minute);
+        const sendAtMinuteOfDay = sendAtHour * 60 + sendAtMin;
+
+        await planRef.set({
+          date: todayStr,
+          itemId: chosen.id,
+          sendAtHour,
+          sendAtMin,
+          sendAtMinuteOfDay,
+          sent: false,
+          createdAtMinuteOfDay: currentMinuteOfDay,
+          createdAt: FieldValue.serverTimestamp(),
+        });
+
+        const ph = String(sendAtHour).padStart(2, "0");
+        const pm = String(sendAtMin).padStart(2, "0");
+        console.log(
+          `[Havuz] Plan oluşturuldu: itemId=${chosen.id}, gönderim=${ph}:${pm}`
+        );
+        return;
+      }
+
+      // ── 5. Plan var — saat geldi mi? ───────────────────────────────────────
+      // sendAtMinuteOfDay alanı yeni plan formatında; eski planlar için fallback.
+      const planMinuteOfDay =
+        typeof plan.sendAtMinuteOfDay === "number"
+          ? plan.sendAtMinuteOfDay
+          : (Number(plan.sendAtHour) * 60 + Number(plan.sendAtMin));
+      const gracePeriod = 3; // dakika toleransı — gecikmiş tetikler için
+
+      if (currentMinuteOfDay < planMinuteOfDay) {
+        console.log(
+          `[Havuz] Bekleniyor. Plan: ${planMinuteOfDay} dk, şu an: ${currentMinuteOfDay} dk.`
+        );
+        return;
+      }
+
+      if (currentMinuteOfDay > planMinuteOfDay + gracePeriod) {
+        await planRef.set(
+          { sent: true, missedAt: FieldValue.serverTimestamp() },
+          { merge: true }
+        );
+        console.log(
+          `[Havuz] Gönderim penceresi geçti (plan=${planMinuteOfDay}, şu an=${currentMinuteOfDay}). Plan kapatıldı.`
+        );
+        return;
+      }
+
+      // ── 6. Gönder ──────────────────────────────────────────────────────────
+      const itemSnap = await db
         .collection("admin_ntf_pool")
-        .where("hour", "==", istHour)
-        .where("minute", "==", istMin)
-        .where("enabled", "==", true)
+        .doc(plan.itemId)
         .get();
 
-      if (poolSnap.empty) {
-        console.log(
-          `[Havuz] ${istHour}:${String(istMin).padStart(2, "0")} için eşleşen öğe yok.`
-        );
+      if (!itemSnap.exists) {
+        console.error("[Havuz] Planlanan item bulunamadı:", plan.itemId);
+        await planRef.set({ sent: true }, { merge: true });
         return;
       }
 
-      // minRepeatDays filtresi — her öğe kendi `minRepeatDays`'i ile (yoksa
-      // global ayar ile) cooldown'a tabi tutulur. Böylece bir ayet 7 günde
-      // bir, diğeri 60 günde bir gelebilir.
-      const eligible = poolSnap.docs.filter((doc) => {
-        const d = doc.data();
-        const lastSentDate = d.lastSentDate;
-        if (!lastSentDate) return true;
-        const itemMinRepeat = Number.isFinite(d.minRepeatDays)
-          ? Number(d.minRepeatDays)
-          : minRepeatDays;
-        return daysBetween(lastSentDate, todayStr) >= itemMinRepeat;
-      });
+      const data = itemSnap.data();
 
-      if (eligible.length === 0) {
-        console.log(
-          `[Havuz] Tüm eşleşen öğeler kendi tekrar penceresi içinde. Atlandı.`
-        );
-        return;
-      }
+      // clockStr: plan'a kaydedilen saat (= item'ın hour:minute = surah:ayet).
+      // Gerçek gönderim saatiyle örtüşür — "ayet dönüşüm" konsepti korunur.
+      const clockStr = `${String(plan.sendAtHour).padStart(2, "0")}:${String(plan.sendAtMin).padStart(2, "0")}`;
 
-      // Rastgele seç
-      const chosen = eligible[Math.floor(Math.random() * eligible.length)];
-      const data = chosen.data();
+      const hasSurahData = data.surahNumber != null && data.verseNumber != null;
+      const ntfTitle = `Saat ${clockStr}`;
 
-      // Bildirim başlığı: saat ve ayet koordinatı yan yana — aynı rakamların
-      // iki kez görünmesi "saat = ayet" mantığını kullanıcıya görsel olarak
-      // anlatır. Ek bir açıklama metni gerekmez.
-      //   Örn: "21:05 · Kur'an 21:5"
-      const clockStr = `${String(istHour).padStart(2, "0")}:${String(istMin).padStart(2, "0")}`;
-      const hasSurahData =
-        data.surahNumber != null && data.verseNumber != null;
-      const ntfTitle = hasSurahData
-        ? `${clockStr} · Kur'an ${data.surahNumber}:${data.verseNumber}`
-        : (data.title || "Arın");
-
-      // Gövde önceliği:
-      //   1) Ayetin kendi `notificationBody` alanı (admin manuel yazdıysa)
-      //   2) Aksi halde hazır metin havuzundan rastgele bir teaser
-      // Havuz da boşsa, `loadTeaserTexts` zaten fallback sabit listeye düşer.
       let ntfBody = (data.notificationBody || "").toString().trim();
       if (!ntfBody) {
         const teaserTexts = await loadTeaserTexts(db);
-        ntfBody =
-          teaserTexts[Math.floor(Math.random() * teaserTexts.length)];
+        ntfBody = teaserTexts[Math.floor(Math.random() * teaserTexts.length)];
       }
 
-      // Ayetin 5 dakikalık geçerlilik penceresini Firestore'a yaz.
-      // Uygulama tıklandığında bu dökümanı okuyarak süre kontrolü yapar.
       const expiresAtMs = nowMs + 5 * 60 * 1000;
       try {
         await db
@@ -245,9 +316,9 @@ exports.sendScheduledNotifications = onSchedule(
             verseNumber: data.verseNumber ?? null,
             verseText: data.text ?? "",
             ref: data.ref ?? "",
-            clockStr: clockStr,
+            clockStr,
             sentAtMs: nowMs,
-            expiresAtMs: expiresAtMs,
+            expiresAtMs,
           });
       } catch (err) {
         console.error("[Havuz] current_moment yazılamadı:", err);
@@ -255,10 +326,7 @@ exports.sendScheduledNotifications = onSchedule(
 
       await messaging.send({
         topic: "broadcast_all",
-        notification: {
-          title: ntfTitle,
-          body: ntfBody,
-        },
+        notification: { title: ntfTitle, body: ntfBody },
         data: {
           type: "moment_verse",
           sentAtMs: String(nowMs),
@@ -275,8 +343,14 @@ exports.sendScheduledNotifications = onSchedule(
         },
       });
 
-      // Öğenin son gönderim tarihini güncelle
-      await chosen.ref.update({
+      // Planı kapat
+      await planRef.set(
+        { sent: true, sentAtMs: nowMs },
+        { merge: true }
+      );
+
+      // Item'ın son gönderim tarihini güncelle
+      await itemSnap.ref.update({
         lastSentDate: todayStr,
         lastSentAt: FieldValue.serverTimestamp(),
       });
@@ -351,10 +425,8 @@ exports.sendMomentVerseNow = onCall(
 
     const hasSurahData =
       data.surahNumber != null && data.verseNumber != null;
-    const ntfTitle = hasSurahData
-      ? (clockStr
-          ? `${clockStr} · Kur'an ${data.surahNumber}:${data.verseNumber}`
-          : `Kur'an ${data.surahNumber}:${data.verseNumber}`)
+    const ntfTitle = clockStr
+      ? `Saat ${clockStr}`
       : (data.title || "Arın");
 
     // Manuel gönderimde de aynı öncelik: önce item.notificationBody, yoksa
@@ -536,9 +608,9 @@ exports.sendTestNotification = onCall(
 
     // Test başlığı: gerçek bildirim ile aynı format. "TEST · " prefix'i
     // admin'in gerçek bildirimden ayırt etmesi için.
-    const ntfTitle = surahNumber != null && verseNumber != null
-      ? `TEST · ${clockStr} · Kur'an ${surahNumber}:${verseNumber}`
-      : `TEST · ${clockStr}`;
+    const ntfTitle = clockStr
+      ? `TEST · Saat ${clockStr}`
+      : "TEST · Arın";
 
     // Gövde önceliği: item.notificationBody > teaser havuzu > sabit metin
     let ntfBody = bodyFromItem;

@@ -58,3 +58,23 @@
 # ---- Kotlin reflection ----
 -dontwarn kotlin.reflect.jvm.internal.**
 -keepclassmembers class kotlin.Metadata { public <methods>; }
+
+# ---- Firebase Messaging (FCM) ----
+# R8 release build'de FirebaseMessagingService ve internal callback class'larını
+# silebiliyor; sonuç olarak push'lar Android'e ulaşmıyor (Android 8+'da kanal
+# tanımlı olsa bile native service çağrılmazsa intent dispatch edilmez).
+# google-services plugin manifest merger ile servisi ekliyor, ama R8'in tutması
+# için explicit keep gerekli.
+-keep class com.google.firebase.** { *; }
+-keep interface com.google.firebase.** { *; }
+-keep class com.google.android.gms.** { *; }
+-keep interface com.google.android.gms.** { *; }
+-keep class io.flutter.plugins.firebase.** { *; }
+-keep class io.flutter.plugins.firebasemessaging.** { *; }
+-keep class * extends com.google.firebase.messaging.FirebaseMessagingService { *; }
+-keepclassmembers class * extends com.google.firebase.messaging.FirebaseMessagingService {
+    public <init>(...);
+    public *;
+}
+-dontwarn com.google.firebase.**
+-dontwarn com.google.android.gms.**

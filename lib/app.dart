@@ -17,8 +17,10 @@ import 'core/router/app_router.dart';
 import 'core/router/app_router_refresh.dart';
 import 'core/theme/app_theme.dart';
 import 'core/constants/quote_pool_ids.dart';
+import 'data/models/prayer_times_model.dart';
 import 'data/services/audio_session_coordinator.dart';
 import 'data/services/app_local_notification_scheduler.dart';
+import 'data/services/prayer_service_resolver.dart';
 import 'data/services/fcm_token_service.dart';
 import 'data/services/location_service.dart';
 import 'data/services/prayer_notification_scheduler.dart';
@@ -105,10 +107,19 @@ class _ArinAppState extends ConsumerState<ArinApp> with WidgetsBindingObserver {
       debugPrint('Pool sync notificationArinmaBodies failed: $e');
     }
     final prayerTimes = ref.read(prayerTimesProvider).valueOrNull;
+    List<PrayerTimesModel>? upcomingDays;
+    try {
+      final resolver = ref.read(prayerServiceResolverProvider);
+      final list = await resolver.fetchUpcomingDays(days: 7);
+      if (list.isNotEmpty) upcomingDays = list;
+    } catch (e) {
+      debugPrint('rescheduleAll upcoming fetch failed: $e');
+    }
     await AppLocalNotificationScheduler.rescheduleAll(
       prefs,
       pools: pools,
-      prayerTimes: prayerTimes,
+      prayerTimes: (upcomingDays != null && upcomingDays.isNotEmpty) ? upcomingDays.first : prayerTimes,
+      upcomingDays: upcomingDays,
     );
   }
 

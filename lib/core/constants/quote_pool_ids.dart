@@ -11,6 +11,9 @@ abstract final class QuotePoolIds {
   static const String hubArinmaIslamic = 'hub_arinma_islamic';
   static const String hubArinmaMedical = 'hub_arinma_medical';
   static const String notificationArinmaBodies = 'notification_arinma_bodies';
+  static const String notificationNamazWisdom = 'notification_namaz_wisdom';
+  static const String notificationDailyNamazReminder =
+      'notification_daily_namaz_reminder';
 
   static const List<String> all = [
     homeNamazWisdom,
@@ -23,6 +26,8 @@ abstract final class QuotePoolIds {
     hubArinmaIslamic,
     hubArinmaMedical,
     notificationArinmaBodies,
+    notificationNamazWisdom,
+    notificationDailyNamazReminder,
   ];
 
   /// Ayarlar → İçerik yönetimi açılır listesi için Türkçe ad (teknik kimlik ayrı gösterilir).
@@ -48,6 +53,10 @@ abstract final class QuotePoolIds {
         return 'Arınma — sağlık kartı';
       case notificationArinmaBodies:
         return 'Arınma bildirimi metinleri';
+      case notificationNamazWisdom:
+        return 'Namaz bildirimi sözleri';
+      case notificationDailyNamazReminder:
+        return 'Günlük namaz hatırlatıcı metinleri';
       default:
         return poolId;
     }

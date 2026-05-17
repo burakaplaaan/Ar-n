@@ -1,6 +1,8 @@
 // lib/data/services/aladhan_service.dart
 // Aladhan API + Hive önbellek (konum kapsamına göre anahtar).
 
+import 'dart:async';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:hive/hive.dart';
@@ -110,27 +112,53 @@ class AladhanService {
   /// key'leri kabul eder. Aksi halde `school=1` (Hanafi) ile yapılmış eski
   /// bozuk kayıtlar bildirim zamanlayıcısı tarafından "offline fallback"
   /// olarak okunup ikindi'yi 1 saat ileri atıyordu.
+  ///
+  /// Eski günlük key'leri (bugüne ait olmayan) otomatik temizler; böylece
+  /// Hive box sınırsız büyümez ve bu döngünün O(n) maliyeti kontrol altında
+  /// kalır.
   PrayerTimesModel? tryLoadTodayCachedAnyScope() {
-    final prefix = '${_dateKey()}_';
+    final todayPrefix = '${_dateKey()}_';
     final requiredTag =
         '_${_paramsTag(method: _method, school: _defaultSchool)}_';
+
+    // Günlük key'ler `{yyyy-MM-dd}_...` formatındadır. Aylık takvim key'leri
+    // `{yyyy-MM}_calm...` formatındadır — tarih regex'i ile ayırt edilir.
+    final dailyKeyPattern = RegExp(r'^\d{4}-\d{2}-\d{2}_');
+
+    // Silinecek eski günlük key'leri topla (silme işlemi döngü içinde değil).
+    final toDelete = <dynamic>[];
+
+    PrayerTimesModel? found;
     for (final key in _cache.keys) {
-      if (key is! String || !key.startsWith(prefix)) continue;
+      if (key is! String) continue;
+
+      // Eski günlük key temizliği: bugüne ait değil + aylık key değil.
+      if (dailyKeyPattern.hasMatch(key) && !key.startsWith(todayPrefix)) {
+        toDelete.add(key);
+        continue;
+      }
+
+      if (!key.startsWith(todayPrefix)) continue;
       if (!key.contains(requiredTag)) continue;
+
+      if (found != null) continue; // ilk geçerli sonuç yeterli
+
       final raw = _cache.get(key);
       if (raw is Map) {
         try {
-          return PrayerTimesModel.fromMap(raw);
+          found = PrayerTimesModel.fromMap(raw);
         } catch (e) {
-          // Cache'deki bir kayıt parse edilemedi — Aladhan şeması değişmiş
-          // ya da Hive kayıt bozulmuş olabilir. Sessizce atladığımızda bu
-          // cache slot sonsuza kadar kullanılamaz kalır; log ile farkına
-          // varalım. Kullanıcı akışı bozulmuyor (diğer key'ler deneniyor).
           debugPrint('AladhanService: cache parse skip key=$key err=$e');
         }
       }
     }
-    return null;
+
+    // Eski key'leri toplu sil — Hive box büyümesini önler.
+    if (toDelete.isNotEmpty) {
+      unawaited(_cache.deleteAll(toDelete));
+    }
+
+    return found;
   }
 
   Future<void> _saveToCache(PrayerTimesModel model, String scope) async {

@@ -97,6 +97,10 @@ class _AdminNotificationsPageState
   bool _scheduleSaving = false;
   bool _scheduleLoaded = false;
 
+  // Bugünün planı (today_plan dokümanı)
+  Map<String, dynamic>? _todayPlan;
+  bool _todayPlanLoading = false;
+
   // Hazır metin havuzu
   List<String> _teasers = const [];
   bool _teasersSaving = false;
@@ -119,6 +123,7 @@ class _AdminNotificationsPageState
     _loadSchedule();
     _loadTeasers();
     _loadPool();
+    _loadTodayPlan();
   }
 
   @override
@@ -147,6 +152,22 @@ class _AdminNotificationsPageState
       if (mounted) setState(() {});
     } catch (_) {
       // sessiz hata — varsayılanlar kalır
+    }
+  }
+
+  Future<void> _loadTodayPlan() async {
+    if (!isFirebaseReady) return;
+    setState(() => _todayPlanLoading = true);
+    try {
+      final snap = await FirebaseFirestore.instance
+          .collection(_Col.config)
+          .doc('today_plan')
+          .get(const GetOptions(source: Source.server));
+      _todayPlan = snap.exists ? snap.data() : null;
+    } catch (_) {
+      _todayPlan = null;
+    } finally {
+      if (mounted) setState(() => _todayPlanLoading = false);
     }
   }
 
@@ -335,15 +356,15 @@ class _AdminNotificationsPageState
         'ref': res.ref.trim(),
         'notificationBody': res.notificationBody.trim(),
         'enabled': res.enabled,
-        // Tekrar süresi override (null ise global ayar kullanılır).
-        if (res.minRepeatDaysOverride != null)
-          'minRepeatDays': res.minRepeatDaysOverride
-        else
-          'minRepeatDays': FieldValue.delete(),
       };
       if (docId != null) {
         await col.doc(docId).update({
           ...payload,
+          // Güncelleme: null ise alanı sil (FieldValue.delete yalnızca update/merge ile çalışır).
+          if (res.minRepeatDaysOverride != null)
+            'minRepeatDays': res.minRepeatDaysOverride
+          else
+            'minRepeatDays': FieldValue.delete(),
           'updatedAt': FieldValue.serverTimestamp(),
           'updatedBy': email,
         });
@@ -351,6 +372,9 @@ class _AdminNotificationsPageState
       } else {
         await col.add({
           ...payload,
+          // Ekleme: null ise alanı hiç gönderme; FieldValue.delete() add() ile kullanılamaz.
+          if (res.minRepeatDaysOverride != null)
+            'minRepeatDays': res.minRepeatDaysOverride,
           'addedAt': FieldValue.serverTimestamp(),
           'addedBy': email,
         });
@@ -616,6 +640,109 @@ class _AdminNotificationsPageState
     );
   }
 
+  // ── Bugünün plan durumu ───────────────────────────────────────────────────
+
+  Widget _buildTodayPlanRow() {
+    if (_todayPlanLoading) {
+      return const SizedBox(
+        height: 20,
+        child: Center(
+          child: SizedBox(
+            width: 14,
+            height: 14,
+            child: CircularProgressIndicator(strokeWidth: 2),
+          ),
+        ),
+      );
+    }
+    final plan = _todayPlan;
+    if (plan == null) {
+      return _planChip(
+        icon: Icons.schedule_rounded,
+        label: 'Bugün için henüz plan yok',
+        color: Colors.white38,
+      );
+    }
+    final planDate = plan['date']?.toString() ?? '';
+    final now = DateTime.now();
+    final todayStr =
+        '${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';
+
+    if (planDate != todayStr) {
+      return _planChip(
+        icon: Icons.schedule_rounded,
+        label: 'Bugün için henüz plan yok (son: $planDate)',
+        color: Colors.white38,
+      );
+    }
+    final sent = plan['sent'] as bool? ?? false;
+    final missed = plan['missedAt'] != null;
+    final sendAtHour = (plan['sendAtHour'] as num?)?.toInt();
+    final sendAtMin = (plan['sendAtMin'] as num?)?.toInt();
+    final timeStr = (sendAtHour != null && sendAtMin != null)
+        ? '${_pad2(sendAtHour)}:${_pad2(sendAtMin)}'
+        : '?';
+
+    if (sent && missed) {
+      return _planChip(
+        icon: Icons.warning_amber_rounded,
+        label: 'Bugün pencere geçti — $timeStr için planlanmıştı',
+        color: Colors.orangeAccent,
+        onRefresh: _loadTodayPlan,
+      );
+    }
+    if (sent) {
+      return _planChip(
+        icon: Icons.check_circle_outline_rounded,
+        label: 'Bugün gönderildi ($timeStr)',
+        color: AppColors.accentNeonGreen,
+        onRefresh: _loadTodayPlan,
+      );
+    }
+    return _planChip(
+      icon: Icons.timer_outlined,
+      label: 'Bugün $timeStr\'de gönderilecek',
+      color: Colors.white70,
+      onRefresh: _loadTodayPlan,
+    );
+  }
+
+  Widget _planChip({
+    required IconData icon,
+    required String label,
+    required Color color,
+    VoidCallback? onRefresh,
+  }) {
+    return Row(
+      children: [
+        Icon(icon, size: 13, color: color),
+        const SizedBox(width: 6),
+        Expanded(
+          child: Text(
+            label,
+            style: TextStyle(
+              fontSize: 11,
+              color: color,
+            ),
+          ),
+        ),
+        if (onRefresh != null)
+          InkWell(
+            onTap: onRefresh,
+            borderRadius: BorderRadius.circular(6),
+            child: Padding(
+              padding: const EdgeInsets.all(4),
+              child: Icon(
+                Icons.refresh_rounded,
+                size: 14,
+                color: Colors.white38,
+              ),
+            ),
+          ),
+      ],
+    );
+  }
+
   // ── Kart: Genel ayarlar ──────────────────────────────────────────────────
 
   Widget _buildSchedulePanel() {
@@ -712,6 +839,10 @@ class _AdminNotificationsPageState
               max: 365,
               onChanged: (v) => setState(() => _defaultMinRepeatDays = v),
             ),
+            const SizedBox(height: 12),
+
+            // Bugünün planı
+            _buildTodayPlanRow(),
 
             const SizedBox(height: 12),
             Row(

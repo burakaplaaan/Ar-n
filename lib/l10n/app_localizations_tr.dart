@@ -1456,6 +1456,20 @@ class AppLocalizationsTr extends AppLocalizations {
   String get notificationsGateRequestBattery => 'Pil optimizasyonunu muaf tut';
 
   @override
+  String get notificationsBatteryRationaleTitle =>
+      'Pil muafiyeti neden gerekli?';
+
+  @override
+  String get notificationsBatteryRationaleBody =>
+      'Namaz vakti ve arınma bildirimleri, telefon uyku (Doze) modundayken bile tam saatinde gelebilmesi için pil optimizasyonundan muaf tutulmalıdır. Bu izin yalnızca zamanlanmış bildirimleri etkiler; arka planda sürekli çalışmaz.';
+
+  @override
+  String get notificationsBatteryRationaleConfirm => 'İzin ver';
+
+  @override
+  String get notificationsBatteryRationaleCancel => 'Şimdi değil';
+
+  @override
   String get notificationsDiagnosticsQueuedLabel =>
       'Kuyruğa alınan zamanlı hatırlatıcı';
 
@@ -1662,6 +1676,13 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String get adminPoolLabelNotificationArinmaBodies =>
       'Arınma bildirimi metinleri';
+
+  @override
+  String get adminPoolLabelNotificationNamazWisdom => 'Namaz bildirimi sözleri';
+
+  @override
+  String get adminPoolLabelNotificationDailyNamazReminder =>
+      'Günlük namaz hatırlatıcı metinleri';
 
   @override
   String adminSearchResultsCount(int count) {

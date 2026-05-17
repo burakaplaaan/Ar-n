@@ -160,8 +160,12 @@ abstract final class QuotePoolBulkSeeder {
     final hub = _hubMapsFromEmbedded();
     return <String, List<Map<String, dynamic>>>{
       QuotePoolIds.homeNamazWisdom: QuotePoolDefaults.homeNamazWisdom(),
+      QuotePoolIds.notificationNamazWisdom:
+          QuotePoolDefaults.notificationNamazWisdom(),
       QuotePoolIds.notificationArinmaBodies:
           QuotePoolDefaults.notificationArinmaBodies(),
+      QuotePoolIds.notificationDailyNamazReminder:
+          QuotePoolDefaults.notificationDailyNamazReminder(),
       QuotePoolIds.zikirDailyReflections:
           QuotePoolDefaults.zikirDailyReflections(),
       QuotePoolIds.healingComfort: QuotePoolDefaults.healingComfort(),

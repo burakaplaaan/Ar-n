@@ -1461,6 +1461,20 @@ class AppLocalizationsEn extends AppLocalizations {
   String get notificationsGateRequestBattery => 'Ignore battery optimization';
 
   @override
+  String get notificationsBatteryRationaleTitle =>
+      'Why is battery exemption needed?';
+
+  @override
+  String get notificationsBatteryRationaleBody =>
+      'Prayer time and purification reminders need to be exempt from battery optimisation so they can arrive at the exact scheduled time, even when the phone is in sleep (Doze) mode. This permission only affects scheduled notifications and does not run in the background continuously.';
+
+  @override
+  String get notificationsBatteryRationaleConfirm => 'Allow';
+
+  @override
+  String get notificationsBatteryRationaleCancel => 'Not now';
+
+  @override
   String get notificationsDiagnosticsQueuedLabel =>
       'Queued scheduled reminders';
 
@@ -1667,6 +1681,14 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get adminPoolLabelNotificationArinmaBodies =>
       'Purification notification texts';
+
+  @override
+  String get adminPoolLabelNotificationNamazWisdom =>
+      'Prayer notification quotes';
+
+  @override
+  String get adminPoolLabelNotificationDailyNamazReminder =>
+      'Daily prayer reminder texts';
 
   @override
   String adminSearchResultsCount(int count) {

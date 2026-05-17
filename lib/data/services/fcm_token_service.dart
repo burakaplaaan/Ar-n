@@ -11,8 +11,11 @@
 
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 import '../../core/router/app_router.dart';
+import 'arin_local_notifications_plugin.dart';
 
 /// Uygulama arka planda iken gelen FCM mesajlarını işler.
 /// Top-level fonksiyon olması zorunlu (Flutter embedding kuralı).
@@ -58,6 +61,18 @@ abstract final class FcmTokenService {
     if (_initialized) return;
     _initialized = true;
     try {
+      // Android 8.0+'da FCM bildirimleri channelId'si tanımlı bir kanala
+      // ihtiyaç duyar; kanal yoksa bildirim sessizce düşer.
+      await _ensureAndroidBroadcastChannel();
+
+      // Foreground'da manuel olarak gösterdiğimiz local notification'a
+      // (payload: "moment_verse") tıklanınca uygulama içi navigate edilsin.
+      // Background/closed durumunda zaten FCM `onMessageOpenedApp` ve
+      // `getInitialMessage` üzerinden yönlendirme yapılıyor.
+      registerLocalNotificationTapHandler('moment_verse', (_) {
+        _navigate(AppRoutes.momentVerse);
+      });
+
       FirebaseMessaging.onBackgroundMessage(_onBackgroundMessage);
 
       // ── Uygulama kapalıyken bildirime tıklanmış mı? ──────────────────
@@ -97,16 +112,66 @@ abstract final class FcmTokenService {
       await FirebaseMessaging.instance.subscribeToTopic('broadcast_all');
       debugPrint('══ ARIN FCM ══ broadcast_all topic\'ine kayıt tamam');
 
-      // Uygulama açıkken gelen mesajlar (sistem bildirimi göstermez;
-      // isteğe bağlı olarak Flutter tarafında snackbar/dialog gösterilebilir).
-      FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      // Uygulama ön plandayken Android sistem bildirimi otomatik göstermez;
+      // manuel olarak `arin_ntf_broadcast` kanalına yerel bildirim atıyoruz.
+      // iOS tarafı `setForegroundNotificationPresentationOptions` ile zaten
+      // banner gösteriyor, burada Android'i hizalıyoruz.
+      FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
+        final ntf = message.notification;
         debugPrint(
-          '══ ARIN FCM ══ ön plan mesajı: ${message.notification?.title}',
+          '══ ARIN FCM ══ ön plan mesajı: ${ntf?.title} / data=${message.data}',
         );
+        if (ntf == null) return;
+        if (defaultTargetPlatform != TargetPlatform.android) return;
+        try {
+          await arinLocalNotificationsPlugin.show(
+            DateTime.now().millisecondsSinceEpoch.remainder(1 << 31),
+            ntf.title,
+            ntf.body,
+            const NotificationDetails(
+              android: AndroidNotificationDetails(
+                'arin_ntf_broadcast',
+                'Ayet Bildirimleri',
+                channelDescription: 'Günlük ayet ve anlık bildirimler',
+                importance: Importance.high,
+                priority: Priority.high,
+                playSound: true,
+              ),
+            ),
+            payload: message.data['type']?.toString(),
+          );
+        } catch (e) {
+          debugPrint('══ ARIN FCM ══ foreground show hatası: $e');
+        }
       });
     } catch (e) {
       // FCM başlatma başarısız olsa da uygulama çalışmaya devam etmeli.
       debugPrint('══ ARIN FCM ══ başlatma başarısız (sessiz): $e');
+    }
+  }
+
+  /// Android 8.0+'da FCM push'larının düşmemesi için `arin_ntf_broadcast`
+  /// kanalını oluşturur. İdempotent: kanal zaten varsa Android sessizce geçer.
+  static Future<void> _ensureAndroidBroadcastChannel() async {
+    try {
+      // Plugin initialize edilmemiş olabilir; burada güvenli şekilde başlat.
+      await initializeArinLocalNotificationsPlugin();
+      final android = arinLocalNotificationsPlugin
+          .resolvePlatformSpecificImplementation<
+              AndroidFlutterLocalNotificationsPlugin>();
+      if (android == null) return;
+      await android.createNotificationChannel(
+        const AndroidNotificationChannel(
+          'arin_ntf_broadcast',
+          'Ayet Bildirimleri',
+          description: 'Günlük ayet ve anlık bildirimler',
+          importance: Importance.high,
+          playSound: true,
+        ),
+      );
+      debugPrint('══ ARIN FCM ══ arin_ntf_broadcast kanalı hazır');
+    } on PlatformException catch (e) {
+      debugPrint('══ ARIN FCM ══ broadcast kanalı oluşturulamadı: $e');
     }
   }
 }

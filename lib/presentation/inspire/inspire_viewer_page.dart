@@ -174,10 +174,10 @@ class _ViewerBodyState extends ConsumerState<_ViewerBody> {
       final adGate = ref.read(adGateServiceProvider);
       while (mounted && _pendingExploreAdGateViews > 0) {
         _pendingExploreAdGateViews -= 1;
-        final shouldCheckPremium = await adGate
+        final shouldShow = await adGate
             .recordExploreViewAndShouldShowAd(isPremium: false);
         if (!mounted) return;
-        if (!shouldCheckPremium) continue;
+        if (!shouldShow) continue;
 
         await adGate.markPending(AdGatePlacement.exploreSwipe);
         if (!mounted) return;
@@ -186,7 +186,6 @@ class _ViewerBodyState extends ConsumerState<_ViewerBody> {
           final entitlement = await ref.read(premiumEntitlementProvider.future);
           isPremium = entitlement.isActive;
         } catch (_) {
-          // Entitlement okunamazsa fail-closed: ücretsiz kabul edip kapıyı koru.
           isPremium = false;
         }
         if (!mounted) return;
@@ -199,37 +198,15 @@ class _ViewerBodyState extends ConsumerState<_ViewerBody> {
         if (!mounted) return;
         await ref.read(exploreBgmNotifierProvider.notifier).pauseForAdGate();
         if (!mounted) return;
-        await showModalBottomSheet<void>(
-          context: context,
-          isDismissible: false,
-          enableDrag: false,
-          backgroundColor: const Color(0xFF08130E),
-          shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.vertical(top: Radius.circular(26)),
-          ),
-          builder: (ctx) => _ExploreAdGateSheet(
-            onContinue: () async {
-              final shown = await ref
-                  .read(adMobServiceProvider)
-                  .showInterstitial(ArinAdUnit.exploreInterstitial);
-              if (!shown || !mounted) return false;
-              await adGate.recordRewardedUnlock(AdGatePlacement.exploreSwipe);
-              return true;
-            },
-            onPremium: () {
-              Navigator.pop(ctx);
-              context.go('/premium');
-            },
-            onExit: () {
-              Navigator.pop(ctx);
-              if (context.canPop()) {
-                context.pop();
-              } else {
-                context.go('/home');
-              }
-            },
-          ),
-        );
+        final shown = await ref
+            .read(adMobServiceProvider)
+            .showInterstitial(ArinAdUnit.exploreInterstitial);
+        if (!mounted) return;
+        if (shown) {
+          await adGate.recordRewardedUnlock(AdGatePlacement.exploreSwipe);
+        } else {
+          await adGate.clearPending(AdGatePlacement.exploreSwipe);
+        }
         return;
       }
     } finally {
@@ -387,124 +364,6 @@ class _InstagramLikePageScrollPhysics extends PageScrollPhysics {
   }
 }
 
-class _ExploreAdGateSheet extends StatefulWidget {
-  const _ExploreAdGateSheet({
-    required this.onContinue,
-    required this.onPremium,
-    required this.onExit,
-  });
-
-  final Future<bool> Function() onContinue;
-  final VoidCallback onPremium;
-  final VoidCallback onExit;
-
-  @override
-  State<_ExploreAdGateSheet> createState() => _ExploreAdGateSheetState();
-}
-
-class _ExploreAdGateSheetState extends State<_ExploreAdGateSheet> {
-  bool _loading = false;
-  String? _error;
-
-  Future<void> _continueAfterAd() async {
-    if (_loading) return;
-    setState(() {
-      _loading = true;
-      _error = null;
-    });
-    final shown = await widget.onContinue();
-    if (!mounted) return;
-    if (shown) {
-      Navigator.pop(context);
-      return;
-    }
-    setState(() {
-      _loading = false;
-      _error =
-          'Reklam şu an yüklenemedi. AdMob hesabı onaylanana kadar gerçek '
-          'reklamlar dönmeyebilir; birkaç saniye sonra tekrar deneyebilirsin.';
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return PopScope(
-      canPop: false,
-      child: Padding(
-        padding: EdgeInsets.fromLTRB(
-          20,
-          20,
-          20,
-          MediaQuery.paddingOf(context).bottom + 20,
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            const Icon(
-              Icons.play_circle_outline_rounded,
-              color: Color(0xFF4ADE80),
-              size: 42,
-            ),
-            const SizedBox(height: 12),
-            const Text(
-              'Kısa reklam arası',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 20,
-                fontWeight: FontWeight.w900,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Premium kullanıcılar Keşfet akışını reklamsız kullanır. '
-              'Ücretsiz kullanımda birkaç kaydırmadan sonra kısa reklam gösterilir.',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: Colors.white.withValues(alpha: 0.7),
-                height: 1.35,
-              ),
-            ),
-            if (_error != null) ...[
-              const SizedBox(height: 12),
-              Text(
-                _error!,
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                  color: Color(0xFFFFD166),
-                  fontSize: 13,
-                  height: 1.35,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ],
-            const SizedBox(height: 16),
-            FilledButton(
-              onPressed: _loading ? null : _continueAfterAd,
-              child: _loading
-                  ? const SizedBox(
-                      width: 18,
-                      height: 18,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
-                  : const Text('Reklam sonrası devam et'),
-            ),
-            TextButton(
-              onPressed: _loading ? null : widget.onPremium,
-              child: const Text('Premium ile reklamsız kullan'),
-            ),
-            if (_error != null)
-              TextButton(
-                onPressed: _loading ? null : widget.onExit,
-                child: const Text('Keşfetten çık'),
-              ),
-          ],
-        ),
-      ),
-    );
-  }
-}
 
 class _ViewerEmpty extends StatelessWidget {
   const _ViewerEmpty({required this.onClose});

@@ -85,7 +85,12 @@ DailyNamazWisdom dailyNamazWisdomForNotificationWithPool(
   DateTime nowLocal,
   String localeCode,
 ) {
-  final items = r.itemsFromCache(QuotePoolIds.homeNamazWisdom);
+  // Önce özel bildirim havuzu — doluysa buradan al.
+  var items = r.itemsFromCache(QuotePoolIds.notificationNamazWisdom);
+  // Boşsa ana sayfa havuzuna düş (home_namaz_wisdom dokunulmadan kalır).
+  if (items.isEmpty) {
+    items = r.itemsFromCache(QuotePoolIds.homeNamazWisdom);
+  }
   if (items.isEmpty) {
     return dailyNamazWisdomForNotification(nowLocal);
   }
@@ -102,6 +107,49 @@ DailyNamazWisdom dailyNamazWisdomForNotificationWithPool(
   final anchor = DateTime(2020, 1, 1);
   final days = d.difference(anchor).inDays;
   return parsed[(days + (n ~/ 2)) % n];
+}
+
+/// Günlük yerel bildirim (slot 0) için içerik.
+///
+/// Öncelik zinciri:
+///   1. `notification_daily_namaz_reminder` — admin tarafından yönetilen
+///      adanmış günlük hatırlatıcı havuzu (en yüksek öncelik).
+///   2. `notification_namaz_wisdom`          — genel namaz bildirimi havuzu.
+///   3. `home_namaz_wisdom`                  — ana sayfa paylaşımlı havuz.
+///   4. Yerleşik `kDailyNamazWisdomList`     — kod içi yedek liste.
+DailyNamazWisdom dailyNamazReminderWithPool(
+  QuotePoolsRepository r,
+  DateTime nowLocal,
+  String localeCode,
+) {
+  // 1) Adanmış günlük hatırlatıcı havuzu
+  var items = r.itemsFromCache(QuotePoolIds.notificationDailyNamazReminder);
+  // 2) Genel namaz bildirimi havuzu
+  if (items.isEmpty) {
+    items = r.itemsFromCache(QuotePoolIds.notificationNamazWisdom);
+  }
+  // 3) Ana sayfa namaz havuzu
+  if (items.isEmpty) {
+    items = r.itemsFromCache(QuotePoolIds.homeNamazWisdom);
+  }
+  // 4) Yerleşik yedek
+  if (items.isEmpty) {
+    return dailyNamazWisdomForNotification(nowLocal);
+  }
+  final parsed = <DailyNamazWisdom>[];
+  for (final m in items) {
+    final w = dailyNamazFromItemMap(m, localeCode: localeCode);
+    if (w != null) parsed.add(w);
+  }
+  if (parsed.isEmpty) {
+    return dailyNamazWisdomForNotification(nowLocal);
+  }
+  final n = parsed.length;
+  final d = DateTime(nowLocal.year, nowLocal.month, nowLocal.day);
+  final anchor = DateTime(2020, 1, 1);
+  final days = d.difference(anchor).inDays;
+  // Salt değeri slot 0 ile aynı (11) — farklı günler farklı metinler seçer.
+  return parsed[(days + 11) % n];
 }
 
 String zikirReflectionTextForDay(

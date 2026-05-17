@@ -22,6 +22,10 @@ String _localizedPoolLabel(AppLocalizations l10n, String poolId) {
       return l10n.adminPoolLabelHubArinmaMedical;
     case QuotePoolIds.notificationArinmaBodies:
       return l10n.adminPoolLabelNotificationArinmaBodies;
+    case QuotePoolIds.notificationNamazWisdom:
+      return l10n.adminPoolLabelNotificationNamazWisdom;
+    case QuotePoolIds.notificationDailyNamazReminder:
+      return l10n.adminPoolLabelNotificationDailyNamazReminder;
     default:
       return poolId;
   }
@@ -33,7 +37,7 @@ _poolUsageInfo(String poolId) {
     case QuotePoolIds.homeNamazWisdom:
       return (
         surface:
-            'Ana sayfa namaz kartında ve bildirim hazırlığında kullanılır.',
+            'Ana sayfa namaz kartında kullanılır.',
         cadence: 'Kullanıcı cihazları bu havuzu en fazla 6 saatte bir yeniler.',
         format: 'Türkçe + tür zorunlu; Arapça ve kaynak isteğe bağlıdır.',
         delay: const Duration(hours: 6),
@@ -107,6 +111,31 @@ _poolUsageInfo(String poolId) {
         cadence:
             'Kullanıcı cihazları bu havuzu en fazla 6 saatte bir yeniler; bildirim planı yeniden kurulunca görünür.',
         format: 'Kısa bildirim metni beklenir; çok uzun metin kesilebilir.',
+        delay: const Duration(hours: 6),
+      );
+    case QuotePoolIds.notificationNamazWisdom:
+      return (
+        surface:
+            'Günlük "Namaz" bildiriminin (slot 0) gövde metninde kullanılır. '
+            'Boşsa home_namaz_wisdom havuzuna, o da boşsa yerleşik listeye düşer.',
+        cadence:
+            'Kullanıcı cihazları bu havuzu en fazla 6 saatte bir yeniler; bildirim planı yeniden kurulunca görünür.',
+        format:
+            'Kısa Türkçe metin zorunlu; tür (Söz / Hadis / Ayet) ve kaynak isteğe bağlıdır.',
+        delay: const Duration(hours: 6),
+      );
+    case QuotePoolIds.notificationDailyNamazReminder:
+      return (
+        surface:
+            'Günlük yerel bildirim hatırlatıcısının (slot 0) içeriğini belirler. '
+            'En yüksek önceliğe sahiptir; boşsa notification_namaz_wisdom → '
+            'home_namaz_wisdom → yerleşik listeye sırayla düşer.',
+        cadence:
+            'Kullanıcı cihazları bu havuzu en fazla 6 saatte bir yeniler; '
+            'bildirim planı yeniden kurulunca görünür.',
+        format:
+            'Kısa namaza teşvik edici metin; tür (Söz / Hadis / Ayet / Hatırlatıcı) '
+            've kaynak isteğe bağlıdır. Çok uzun metin (>300 karakter) kesilebilir.',
         delay: const Duration(hours: 6),
       );
     default:
@@ -185,6 +214,11 @@ List<String> _poolQualityWarnings(
     }
     if (poolId == QuotePoolIds.notificationArinmaBodies &&
         (text.length > 140 || turkish.length > 140)) {
+      longNotification++;
+    }
+    if ((poolId == QuotePoolIds.notificationNamazWisdom ||
+            poolId == QuotePoolIds.notificationDailyNamazReminder) &&
+        (text.length > 300 || turkish.length > 300)) {
       longNotification++;
     }
   }

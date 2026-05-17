@@ -149,6 +149,7 @@ abstract final class AppLocalNotificationScheduler {
     SharedPreferences prefs, {
     QuotePoolsRepository? pools,
     PrayerTimesModel? prayerTimes,
+    List<PrayerTimesModel>? upcomingDays,
     bool force = false,
   }) {
     final now = DateTime.now();
@@ -170,6 +171,7 @@ abstract final class AppLocalNotificationScheduler {
         prefs,
         pools: pools,
         prayerTimes: prayerTimes,
+        upcomingDays: upcomingDays,
         force: force,
       ),
     );
@@ -181,6 +183,7 @@ abstract final class AppLocalNotificationScheduler {
     SharedPreferences prefs, {
     QuotePoolsRepository? pools,
     PrayerTimesModel? prayerTimes,
+    List<PrayerTimesModel>? upcomingDays,
     required bool force,
   }) async {
     if (!supported) return;
@@ -281,9 +284,20 @@ abstract final class AppLocalNotificationScheduler {
             now.day,
           ).add(Duration(days: d));
 
+          // O güne ait namaz vakti modeli: upcomingDays listesinden eşleştir.
+          // Liste yoksa (offline / eski çağrı yolu) tek günlük prayerTimes'a düş.
+          PrayerTimesModel? dayPrayer;
+          if (upcomingDays != null && upcomingDays.isNotEmpty) {
+            dayPrayer = upcomingDays.firstWhere(
+              (m) => m.matchesCalendarDay(day),
+              orElse: () => upcomingDays.first,
+            );
+          }
+          dayPrayer ??= prayerTimes;
+
           // Slot 0 (namaz sözü) — öğle vakti - 15 dk; offline fallback rastgele.
           final slot0Min = _namazSlot0Minutes(
-            prayerTimes: prayerTimes,
+            prayerTimes: dayPrayer,
             dayLocal: day,
             salt: 11,
             startMin: start,
@@ -310,11 +324,12 @@ abstract final class AppLocalNotificationScheduler {
               AppLocalNotificationIds.arinmaWeekStart +
               d * AppLocalNotificationIds.arinmaSlotsPerDay;
 
-          // Slot 0: namaz sözü/hadisi — home_namaz_wisdom havuzundan
+          // Slot 0: namaz sözü/hadisi — önce adanmış günlük hatırlatıcı havuzu,
+          // yoksa notification_namaz_wisdom, yoksa home_namaz_wisdom, yoksa yerleşik.
           if (when0.isAfter(now)) {
             final noon = DateTime(day.year, day.month, day.day, 12);
             final entry = pools != null
-                ? dailyNamazWisdomForNotificationWithPool(
+                ? dailyNamazReminderWithPool(
                     pools,
                     noon,
                     localeCode,
@@ -864,9 +879,7 @@ abstract final class AppLocalNotificationScheduler {
       return 'افتح تطبيق آرين لعرض حكمة اليوم.';
     }
     final text = entry.turkish.trim();
-    if (code == 'en') {
-      return 'Open Arin to view today\'s wisdom.';
-    }
+    // EN için İngilizce çeviri embedded içerikte yok; Türkçe metni göster.
     return text;
   }
 
@@ -979,6 +992,18 @@ abstract final class AppLocalNotificationScheduler {
       await pools.ensureSyncedToday(QuotePoolIds.homeNamazWisdom);
     } catch (e) {
       debugPrint('AppLocalNtf: pool homeNamazWisdom sync failed: $e');
+    }
+    try {
+      await pools.ensureSyncedToday(QuotePoolIds.notificationDailyNamazReminder);
+    } catch (e) {
+      debugPrint(
+        'AppLocalNtf: pool notificationDailyNamazReminder sync failed: $e',
+      );
+    }
+    try {
+      await pools.ensureSyncedToday(QuotePoolIds.notificationNamazWisdom);
+    } catch (e) {
+      debugPrint('AppLocalNtf: pool notificationNamazWisdom sync failed: $e');
     }
     try {
       await pools.ensureSyncedToday(QuotePoolIds.notificationArinmaBodies);

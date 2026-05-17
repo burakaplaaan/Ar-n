@@ -69,6 +69,12 @@
         <meta-data
             android:name="firebase_crashlytics_collection_enabled"
             android:value="${firebaseCrashlyticsEnabled}" />
+        <!-- FCM default bildirim kanalı: Android 8.0+'da kanal tanımlı olmazsa
+             bildirimler sessizce düşer. Bu meta-data Firebase SDK'yı bildirim
+             geldiğinde kanalı otomatik oluşturmaya yönlendirir. -->
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_channel_id"
+            android:value="arin_ntf_broadcast" />
         <!-- Yerel bildirim özel sesleri (content:// — file:// sistem tarafından çalınmıyor) -->
         <provider
             android:name="androidx.core.content.FileProvider"
