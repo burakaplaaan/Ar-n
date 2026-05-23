@@ -136,6 +136,7 @@ class _QuitOnboardingFlowPageState
         return;
       }
     }
+    FocusScope.of(context).unfocus();
     await _page.nextPage(
       duration: const Duration(milliseconds: 320),
       curve: Curves.easeInOutCubic,
@@ -348,7 +349,10 @@ class _QuitOnboardingFlowPageState
             ),
           ),
         ),
-        body: Column(
+        body: GestureDetector(
+          onTap: () => FocusScope.of(context).unfocus(),
+          behavior: HitTestBehavior.opaque,
+          child: Column(
           children: [
             Padding(
               padding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
@@ -515,6 +519,7 @@ class _QuitOnboardingFlowPageState
                 ),
               ),
           ],
+          ),
         ),
       ),
     );

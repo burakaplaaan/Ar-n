@@ -5,6 +5,7 @@
 import 'dart:async';
 import 'dart:io' show Platform;
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -32,6 +33,7 @@ import 'data/services/app_notification_channel_prefs.dart';
 import 'data/services/arin_local_notifications_plugin.dart';
 import 'data/services/admob_service.dart';
 import 'data/services/arin_widget_sync.dart';
+import 'data/services/purchase_service.dart';
 import 'data/services/diyanet_district_matcher.dart';
 import 'data/services/fcm_token_service.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -373,6 +375,18 @@ Future<void> _runDeferredStartup(SharedPreferences prefs) async {
           const Duration(seconds: 6),
           AdMobService.initialize,
         ),
+      );
+
+      // RevenueCat: abonelik SDK'sını Firebase UID ile başlat.
+      // Gecikme olmadan başlatılır; satın alma ekranı açılmadan önce hazır olsun.
+      unawaited(
+        () async {
+          final uid =
+              isFirebaseReady
+                  ? FirebaseAuth.instance.currentUser?.uid
+                  : null;
+          return PurchaseService.initialize(firebaseUid: uid);
+        }(),
       );
     }
   }

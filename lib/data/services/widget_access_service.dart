@@ -62,10 +62,19 @@ class WidgetAccessService {
     final states = <ArinWidgetAccessKind, WidgetGateState>{};
     for (final kind in ArinWidgetAccessKind.values) {
       final firstSeen = await _readWidgetFirstUse(kind);
+
+      // firstSeen henüz yazılmamış ama native gate daha önce "kilitli" olarak
+      // işaretlenmişse (önceki syncAll'dan kalan "1" değeri), widget'ı yanlışlıkla
+      // açmamak için mevcut kilit durumunu koru.
+      final effectiveFirstSeen =
+          (firstSeen == null && !isPremium && await _readNativeGateLocked(kind))
+              ? DateTime.fromMillisecondsSinceEpoch(0)
+              : firstSeen;
+
       final adState = await adGate.widgetStateFor(
         kind.placement,
         isPremium: isPremium,
-        firstSeen: firstSeen,
+        firstSeen: effectiveFirstSeen,
       );
       if (globallyLocked) {
         // Global kilit aktifken reklam unlock'u geçerliyse erişime izin ver.
@@ -110,6 +119,35 @@ class WidgetAccessService {
   }) async {
     final adGate = AdGateService(_prefs);
     final firstSeen = await _readWidgetFirstUse(kind);
+
+    // firstSeen henüz yazılmamışsa widget'ın home ekrana yeni eklendiği varsayılır
+    // ve trial başlatılmaz (erişime izin verilir). Ancak native gate daha önce
+    // "kilitli" olarak işaretlendiyse (önceki syncAll'ın yazdığı "1" değeri)
+    // bu bypass'ı uygulamamalıyız; sadece rewarded unlock'u kontrol ederiz.
+    if (firstSeen == null && !isPremium) {
+      final nativeLocked = await _readNativeGateLocked(kind);
+      if (nativeLocked) {
+        final unlock = adGate.unlockUntil(kind.placement);
+        final unlocked = unlock != null && unlock.isAfter(DateTime.now());
+        final globallyLocked = GlobalWidgetLockService.isGloballyLocked(_prefs);
+        // Global kilit + geçersiz unlock → kesinlikle kilitli.
+        if (globallyLocked && !unlocked) {
+          return const WidgetGateState(
+            allowed: false,
+            inTrial: false,
+            unlockUntil: null,
+            trialUntil: null,
+          );
+        }
+        return WidgetGateState(
+          allowed: unlocked,
+          inTrial: false,
+          unlockUntil: unlocked ? unlock : null,
+          trialUntil: null,
+        );
+      }
+    }
+
     final adState = await adGate.widgetStateFor(
       kind.placement,
       isPremium: isPremium,
@@ -169,6 +207,25 @@ class WidgetAccessService {
     } catch (e) {
       debugPrint('WidgetAccessService._readWidgetFirstUse(${kind.id}): $e');
       return null;
+    }
+  }
+
+  /// Native gate anahtarını (`arin_widget_gate_<kind>_locked`) okuyarak
+  /// Flutter'ın daha önce bu widget'ı "kilitli" olarak işaretleyip
+  /// işaretlemediğini döndürür. "1" ise `true`, aksi halde `false`.
+  ///
+  /// Bu, `firstSeen` henüz yazılmamışken (race condition veya ilk kurulum)
+  /// kilit kapısının yanlışlıkla atlanmasını önler.
+  Future<bool> _readNativeGateLocked(ArinWidgetAccessKind kind) async {
+    if (kIsWeb) return false;
+    try {
+      final raw = await HomeWidget.getWidgetData<String>(
+        'arin_widget_gate_${kind.id}_locked',
+      );
+      return raw == '1';
+    } catch (e) {
+      debugPrint('WidgetAccessService._readNativeGateLocked(${kind.id}): $e');
+      return false;
     }
   }
 }

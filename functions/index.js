@@ -10,10 +10,12 @@
 //      kullanıcı bildirimi tıklayarak 5 dakika içinde ayeti görebilir.
 
 const { onSchedule } = require("firebase-functions/v2/scheduler");
-const { onCall, HttpsError } = require("firebase-functions/v2/https");
+const { onCall, HttpsError, onRequest } = require("firebase-functions/v2/https");
 const { initializeApp } = require("firebase-admin/app");
-const { getFirestore, FieldValue } = require("firebase-admin/firestore");
+const { getFirestore, FieldValue, Timestamp } = require("firebase-admin/firestore");
 const { getMessaging } = require("firebase-admin/messaging");
+const { getAuth } = require("firebase-admin/auth");
+const crypto = require("crypto");
 
 initializeApp();
 
@@ -684,4 +686,127 @@ exports.sendTestNotification = onCall(
       body: ntfBody,
     };
   }
+);
+
+// ─── RevenueCat Webhook ───────────────────────────────────────────────────────
+//
+// RevenueCat Dashboard → Project Settings → Integrations → Webhooks:
+//   URL: https://<region>-<project-id>.cloudfunctions.net/revenuecatWebhook
+//   Authorization: <REVENUECAT_WEBHOOK_SECRET> (ortam değişkeni ile set edilir)
+//
+// Firebase secret eklemek için:
+//   firebase functions:secrets:set REVENUECAT_WEBHOOK_SECRET
+//
+// Desteklenen olaylar:
+//   INITIAL_PURCHASE, RENEWAL, PRODUCT_CHANGE → premium_entitlements'a yazar
+//   CANCELLATION, EXPIRATION, BILLING_ISSUE   → active = false yapar
+//
+// app_user_id = Firebase UID (PurchaseService.initialize içinde logIn ile set edilir)
+exports.revenuecatWebhook = onRequest(
+  {
+    region: "europe-west1",
+    secrets: ["REVENUECAT_WEBHOOK_SECRET"],
+  },
+  async (req, res) => {
+    if (req.method !== "POST") {
+      res.status(405).send("Method Not Allowed");
+      return;
+    }
+
+    // ── İmza doğrulaması ─────────────────────────────────────────────────
+    const secret = process.env.REVENUECAT_WEBHOOK_SECRET;
+    if (secret) {
+      const signature = req.headers["x-revenuecat-signature"] || "";
+      const rawBody = JSON.stringify(req.body);
+      const expected = crypto
+        .createHmac("sha256", secret)
+        .update(rawBody)
+        .digest("hex");
+      if (signature !== expected) {
+        console.warn("[RC Webhook] İmza geçersiz — istek reddedildi");
+        res.status(401).send("Unauthorized");
+        return;
+      }
+    }
+
+    const event = req.body?.event;
+    if (!event) {
+      res.status(400).send("Bad Request: event missing");
+      return;
+    }
+
+    const uid = event.app_user_id;
+    if (!uid || uid.startsWith("$RCAnonymousID")) {
+      // Anonim kullanıcı — Firestore'a yazma.
+      console.log("[RC Webhook] Anonim kullanıcı, atlandı:", uid);
+      res.status(200).json({ ok: true, skipped: true });
+      return;
+    }
+
+    const db = getFirestore();
+    const docRef = db.collection("premium_entitlements").doc(uid);
+    const now = Timestamp.now();
+
+    // E-postayı önce RevenueCat subscriber_attributes'dan dene,
+    // yoksa Firebase Auth'dan çek.
+    let email = null;
+    try {
+      const rcEmail = event.subscriber_attributes?.$email?.value;
+      if (rcEmail && rcEmail.trim().length > 0) {
+        email = rcEmail.trim().toLowerCase();
+      } else {
+        const userRecord = await getAuth().getUser(uid);
+        email = userRecord.email?.trim().toLowerCase() ?? null;
+      }
+    } catch (e) {
+      console.warn("[RC Webhook] E-posta alınamadı:", e?.message);
+    }
+
+    const type = event.type;
+    const activeTypes = new Set([
+      "INITIAL_PURCHASE",
+      "RENEWAL",
+      "PRODUCT_CHANGE",
+      "UNCANCELLATION",
+    ]);
+    const inactiveTypes = new Set([
+      "CANCELLATION",
+      "EXPIRATION",
+      "BILLING_ISSUE",
+    ]);
+
+    if (activeTypes.has(type)) {
+      const expiresAtMs = event.expiration_at_ms;
+      await docRef.set(
+        {
+          active: true,
+          source: "revenuecat",
+          email: email,
+          productId: event.product_id ?? null,
+          platform: event.store ?? null,
+          expiresAt: expiresAtMs
+            ? Timestamp.fromMillis(expiresAtMs)
+            : null,
+          updatedAt: now,
+        },
+        { merge: true },
+      );
+      console.log(`[RC Webhook] ${type} → ${uid} (${email ?? "e-posta yok"}) premium aktif edildi`);
+    } else if (inactiveTypes.has(type)) {
+      await docRef.set(
+        {
+          active: false,
+          source: "revenuecat",
+          email: email,
+          updatedAt: now,
+        },
+        { merge: true },
+      );
+      console.log(`[RC Webhook] ${type} → ${uid} (${email ?? "e-posta yok"}) premium pasif edildi`);
+    } else {
+      console.log(`[RC Webhook] Bilinmeyen olay tipi: ${type} — atlandı`);
+    }
+
+    res.status(200).json({ ok: true });
+  },
 );

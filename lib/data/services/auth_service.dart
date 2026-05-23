@@ -11,6 +11,7 @@ import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
 import '../../core/firebase/firebase_bootstrap.dart';
 import '../../firebase_options.dart';
+import 'purchase_service.dart';
 
 class AuthService {
   AuthService({FirebaseAuth? firebaseAuth})
@@ -168,6 +169,8 @@ class AuthService {
     if (_googleInitialized) {
       await GoogleSignIn.instance.signOut();
     }
+    // RevenueCat oturumu da kapat — bir sonraki kullanıcıya karışmasın.
+    await PurchaseService.logoutUser();
   }
 
   /// Federated sağlayıcı (Google / Apple) için yeniden doğrulama.

@@ -1,5 +1,7 @@
+import 'dart:io' show Platform;
 import 'dart:ui';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -7,8 +9,21 @@ import 'package:go_router/go_router.dart';
 
 import '../../core/constants/app_colors.dart';
 import '../../core/router/app_router.dart';
+import '../../data/models/purchase_result.dart' show PurchaseOutcomeX;
+import '../../data/services/purchase_service.dart';
 import '../shared/providers/auth_providers.dart';
 import '../shared/providers/premium_providers.dart';
+
+/// Android'de mağazadan gerçek fiyatları çeker.
+/// iOS'ta her zaman boş map döner (hardcoded fiyatlar kullanılır).
+final _premiumPricesProvider =
+    FutureProvider.autoDispose<Map<String, String>>((ref) async {
+  if (kIsWeb || !Platform.isAndroid) return {};
+  return PurchaseService().fetchProductPriceStrings([
+    PremiumPage.yearlyProductId,
+    PremiumPage.monthlyProductId,
+  ]);
+});
 
 class PremiumPage extends ConsumerStatefulWidget {
   const PremiumPage({super.key});
@@ -32,14 +47,73 @@ class _PremiumPageState extends ConsumerState<PremiumPage> {
 
     setState(() => _busyProductId = productId);
     try {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            'Ürün hazırlanıyor: $productId. Mağaza ürünleri açılınca '
-            'gerçek satın alma akışı burada başlayacak.',
-          ),
+      final result = await ref.read(purchaseServiceProvider).purchase(productId);
+
+      if (!mounted) return;
+
+      if (result.isSuccess) {
+        // Premium aktif: Firestore'u yenile ve başarı sayfası/mesajı göster.
+        ref.invalidate(premiumEntitlementProvider);
+        await _showSuccessDialog();
+      } else if (!result.isCancelled) {
+        final msg = result.userMessage;
+        if (msg != null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(msg)),
+          );
+        }
+      }
+    } finally {
+      if (mounted) setState(() => _busyProductId = null);
+    }
+  }
+
+  Future<void> _showSuccessDialog() async {
+    if (!mounted) return;
+    await showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: const Text(
+          '🌿 Hoş geldin!',
+          style: TextStyle(fontWeight: FontWeight.w800),
         ),
-      );
+        content: const Text(
+          'ARIN Premium aktif. Reklamsız, kilitsiz deneyimin açık.\n\n'
+          'İstediğin zaman mağaza hesabından aboneliğini yönetebilirsin.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(ctx);
+              if (mounted && context.canPop()) context.pop();
+            },
+            child: const Text('Harika!'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _restorePurchases() async {
+    setState(() => _busyProductId = '__restore__');
+    try {
+      final result =
+          await ref.read(purchaseServiceProvider).restorePurchases();
+      if (!mounted) return;
+
+      if (result.isSuccess) {
+        ref.invalidate(premiumEntitlementProvider);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Premium geri yüklendi!')),
+        );
+      } else {
+        final msg = result.userMessage ?? 'Aktif abonelik bulunamadı.';
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(msg)),
+        );
+      }
     } finally {
       if (mounted) setState(() => _busyProductId = null);
     }
@@ -110,8 +184,24 @@ class _PremiumPageState extends ConsumerState<PremiumPage> {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final premiumAsync = ref.watch(premiumEntitlementProvider);
-    final isPremium = premiumAsync.asData?.value.isActive ?? false;
+    final entitlement = premiumAsync.asData?.value;
+    final isPremium = entitlement?.isActive ?? false;
+    final activeProductId = entitlement?.productId ?? '';
+
+    // Google Play subscription id'leri basePlan id'si ile birleşip gelebilir
+    // (örn: arin_premium_yearly_launch:p1y). Bu yüzden startsWith kullanıyoruz.
+    final hasYearly =
+        isPremium && activeProductId.startsWith(PremiumPage.yearlyProductId);
+    final hasMonthly =
+        isPremium && activeProductId.startsWith(PremiumPage.monthlyProductId);
     final signedIn = ref.watch(authUserProvider).asData?.value != null;
+
+    // Android'de mağazadan gerçek fiyatlar; iOS'ta hardcoded değerler kullanılır.
+    final prices = ref.watch(_premiumPricesProvider).asData?.value ?? {};
+    final yearlyPrice =
+        prices[PremiumPage.yearlyProductId] ?? '₺600,00 / yıl';
+    final monthlyPrice =
+        prices[PremiumPage.monthlyProductId] ?? '₺59,99 / ay';
 
     final titleTextColor = isDark ? Colors.white : AppColors.textPrimary;
     final subtitleTextColor = isDark
@@ -151,14 +241,7 @@ class _PremiumPageState extends ConsumerState<PremiumPage> {
                             ),
                             const Spacer(),
                             TextButton(
-                              onPressed: () {
-                                ref.invalidate(premiumEntitlementProvider);
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Text('Satın alımlar yenilendi.'),
-                                  ),
-                                );
-                              },
+                              onPressed: () => _restorePurchases(),
                               child: const Text('Geri yükle'),
                             ),
                           ],
@@ -199,13 +282,15 @@ class _PremiumPageState extends ConsumerState<PremiumPage> {
                         ],
                         _PlanCard(
                           title: 'Yıllık Premium',
-                          badge: 'EN AVANTAJLI',
+                          badge: hasYearly ? null : 'EN AVANTAJLI',
                           oldPrice: '₺1.559,88',
-                          price: '₺599,99 / yıl',
-                          subline: 'Ayda sadece ₺49,99',
+                          price: yearlyPrice,
+                          subline: 'Ayda sadece ₺50,00',
                           productId: PremiumPage.yearlyProductId,
-                          highlighted: true,
-                          enabled: !isPremium,
+                          highlighted: !hasYearly,
+                          isOwned: hasYearly,
+                          enabled: !isPremium || hasMonthly,
+                          buttonLabel: hasMonthly ? 'Yıllığa geç' : null,
                           busy: _busyProductId == PremiumPage.yearlyProductId,
                           onPressed: () =>
                               _startPurchase(PremiumPage.yearlyProductId),
@@ -214,10 +299,12 @@ class _PremiumPageState extends ConsumerState<PremiumPage> {
                         _PlanCard(
                           title: 'Aylık Premium',
                           oldPrice: '₺129,99',
-                          price: '₺59,99 / ay',
+                          price: monthlyPrice,
                           subline: 'Lansman fiyatıyla başla',
                           productId: PremiumPage.monthlyProductId,
                           highlighted: false,
+                          isOwned: hasMonthly,
+                          // Herhangi bir premium varsa aylık devre dışı.
                           enabled: !isPremium,
                           busy: _busyProductId == PremiumPage.monthlyProductId,
                           onPressed: () =>
@@ -613,6 +700,8 @@ class _PlanCard extends StatelessWidget {
     required this.busy,
     required this.onPressed,
     this.badge,
+    this.isOwned = false,
+    this.buttonLabel,
   });
 
   final String title;
@@ -625,6 +714,10 @@ class _PlanCard extends StatelessWidget {
   final bool busy;
   final VoidCallback onPressed;
   final String? badge;
+  /// Kullanıcının aktif olarak sahip olduğu plan.
+  final bool isOwned;
+  /// Varsayılan buton metnini override eder (örn. "Yıllığa geç").
+  final String? buttonLabel;
 
   @override
   Widget build(BuildContext context) {
@@ -636,24 +729,39 @@ class _PlanCard extends StatelessWidget {
         : AppColors.textMuted;
     final priceTextColor = isDark ? Colors.white : AppColors.textPrimary;
 
-    final borderColor = highlighted
-        ? AppColors.goldAccent
-        : (isDark
-              ? Colors.white.withValues(alpha: 0.14)
-              : AppColors.creamDark);
-    final containerColor = highlighted
-        ? AppColors.goldAccent.withValues(alpha: 0.12)
-        : (isDark
-              ? Colors.white.withValues(alpha: 0.07)
-              : AppColors.creamSurface.withValues(alpha: 0.85));
+    // isOwned ise yeşil border + hafif yeşil arka plan.
+    final borderColor = isOwned
+        ? AppColors.accentNeonGreen.withValues(alpha: 0.7)
+        : (highlighted
+              ? AppColors.goldAccent
+              : (isDark
+                    ? Colors.white.withValues(alpha: 0.14)
+                    : AppColors.creamDark));
+    final containerColor = isOwned
+        ? AppColors.accentNeonGreen.withValues(alpha: 0.08)
+        : (highlighted
+              ? AppColors.goldAccent.withValues(alpha: 0.12)
+              : (isDark
+                    ? Colors.white.withValues(alpha: 0.07)
+                    : AppColors.creamSurface.withValues(alpha: 0.85)));
+
+    // Badge: isOwned ise "Aktif planınız ✓", aksi halde verilen badge.
+    final effectiveBadge = isOwned ? 'Aktif planınız ✓' : badge;
+    final badgeBgColor =
+        isOwned ? AppColors.accentNeonGreen : AppColors.goldAccent;
+    final badgeFgColor =
+        isOwned ? const Color(0xFF07110B) : const Color(0xFF241900);
 
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: containerColor,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: borderColor, width: highlighted ? 1.4 : 1),
-        boxShadow: highlighted
+        border: Border.all(
+          color: borderColor,
+          width: (highlighted || isOwned) ? 1.4 : 1,
+        ),
+        boxShadow: highlighted && !isOwned
             ? [
                 BoxShadow(
                   color: AppColors.goldAccent.withValues(alpha: 0.18),
@@ -678,20 +786,20 @@ class _PlanCard extends StatelessWidget {
                   ),
                 ),
               ),
-              if (badge != null)
+              if (effectiveBadge != null)
                 Container(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 9,
                     vertical: 5,
                   ),
                   decoration: BoxDecoration(
-                    color: AppColors.goldAccent,
+                    color: badgeBgColor,
                     borderRadius: BorderRadius.circular(999),
                   ),
                   child: Text(
-                    badge!,
-                    style: const TextStyle(
-                      color: Color(0xFF241900),
+                    effectiveBadge,
+                    style: TextStyle(
+                      color: badgeFgColor,
                       fontSize: 10,
                       fontWeight: FontWeight.w900,
                     ),
@@ -725,11 +833,19 @@ class _PlanCard extends StatelessWidget {
           Text(
             subline,
             style: TextStyle(
-              color: highlighted
-                  ? AppColors.goldAccent
-                  : (isDark
+              color: isOwned
+                  ? (isDark
                         ? AppColors.accentNeonGreen
-                        : AppColors.accentGreenOnLight),
+                        : AppColors.accentGreenOnLight)
+                  : (!enabled
+                        ? (isDark
+                              ? Colors.white24
+                              : Colors.black26)
+                        : (highlighted
+                              ? AppColors.goldAccent
+                              : (isDark
+                                    ? AppColors.accentNeonGreen
+                                    : AppColors.accentGreenOnLight))),
               fontWeight: FontWeight.w800,
             ),
           ),
@@ -752,7 +868,11 @@ class _PlanCard extends StatelessWidget {
                       child: CircularProgressIndicator(strokeWidth: 2),
                     )
                   : Text(
-                      enabled ? 'Lansman Fiyatıyla Başla' : 'Premium aktif',
+                      isOwned
+                          ? 'Aktif planınız'
+                          : (enabled
+                                ? (buttonLabel ?? 'Lansman Fiyatıyla Başla')
+                                : 'Premium aktif'),
                       style: const TextStyle(fontWeight: FontWeight.w900),
                     ),
             ),

@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 
 import '../../core/firebase/firebase_bootstrap.dart';
 import '../models/premium_entitlement.dart';
+import '../services/purchase_service.dart';
 
 class PremiumEntitlementRepository {
   PremiumEntitlementRepository({
@@ -19,6 +20,13 @@ class PremiumEntitlementRepository {
     if (!isFirebaseReady) return PremiumEntitlement.inactive;
     final user = _auth.currentUser;
     if (user == null) return PremiumEntitlement.inactive;
+
+    // RevenueCat lokal cache: satın alma hemen ardından güncellenir,
+    // Firestore webhook'u (5-30 sn gecikebilir) beklemeden doğru sonuç verir.
+    final localEntitlement = await PurchaseService().getLocalPremiumEntitlement();
+    if (localEntitlement != null && localEntitlement.isActive) {
+      return localEntitlement;
+    }
 
     final direct = await _loadDocument('premium_entitlements', user.uid);
     if (direct.isActive) return direct;
