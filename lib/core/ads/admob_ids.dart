@@ -5,25 +5,29 @@ import 'package:flutter/foundation.dart';
 enum ArinAdUnit { exploreInterstitial, rewardedUnlock }
 
 abstract final class AdMobIds {
-  /// AdMob hesap onayı tamamlanana kadar TÜM build'lerde (release dahil)
-  /// Google'ın test ad unit ID'leri kullanılır. Hesap "Ready" duruma geçtiğinde
-  /// ve gerçek mağaza yayını başlamadan ÖNCE `false` yapılmalı; aksi halde
-  /// "Account not approved yet" load fail'leri tekrar tekrar denenip ana
-  /// isolate'i meşgul ediyor, kullanıcı reklam değil bekleme görüyor.
+  /// Tüm non-release build'lerde test reklam kullanılır.
+  /// iOS release'te gerçek reklam göstermek için false olmalı.
+  /// Android release için ayrı bir politika anahtarı vardır:
+  /// [kForceAndroidReleaseTestAds].
   ///
-  /// Ne zaman `false` yapacaksın:
+  /// Ne zaman `false` yapacaksın (iOS release için):
   ///   1. AdMob Console → Apps → Arın → Status: Ready (yeşil tik)
   ///   2. Test cihazında en az 3 reklam başarıyla yüklendi
   ///   3. App Store Connect'e gönderilecek release build alıyorsun
   ///
   /// Test ID'leri her zaman %100 fill rate verir, gelir üretmez ama UX'i
   /// gerçek reklamla aynıdır → kullanıcı hiç fark etmez, log temiz kalır.
-  static const bool kForceTestAds = true;
+  static const bool kForceTestAds = false;
+  static const bool kForceAndroidReleaseTestAds = true;
 
   static String? unitId(ArinAdUnit unit) {
     if (kIsWeb) return null;
 
-    const useTestIds = !kReleaseMode || kForceTestAds;
+    final isReleaseAndroid = kReleaseMode && Platform.isAndroid;
+    final useTestIds =
+        !kReleaseMode ||
+        kForceTestAds ||
+        (isReleaseAndroid && kForceAndroidReleaseTestAds);
 
     if (useTestIds) {
       return switch (unit) {
