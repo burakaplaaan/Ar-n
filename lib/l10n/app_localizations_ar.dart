@@ -2759,7 +2759,7 @@ class AppLocalizationsAr extends AppLocalizations {
       'نحتاج إذن الإشعارات حتى لا تفوتك تنبيهات الأوقات واقتراحات المحتوى. يمكنك إيقافها في أي وقت من الإعدادات.';
 
   @override
-  String get surveyNotificationAllow => 'السماح بالإشعارات';
+  String get surveyNotificationAllow => 'متابعة';
 
   @override
   String get surveyNotificationSkip => 'تخطي الآن';
@@ -2813,6 +2813,16 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get surveySummarySaveError =>
       'تعذر حفظ بيانات البداية. يرجى المحاولة مرة أخرى.';
+
+  @override
+  String get premiumLegalPrivacyPolicy => 'سياسة الخصوصية';
+
+  @override
+  String get premiumLegalTermsOfUse => 'شروط الاستخدام';
+
+  @override
+  String get premiumLinkOpenFailed =>
+      'تعذر فتح الرابط. يرجى المحاولة مرة أخرى.';
 
   @override
   String get moodHappy => 'سعيد';

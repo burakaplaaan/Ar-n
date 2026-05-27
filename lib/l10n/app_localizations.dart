@@ -4859,7 +4859,7 @@ abstract class AppLocalizations {
   /// No description provided for @surveyNotificationAllow.
   ///
   /// In tr, this message translates to:
-  /// **'Bildirimlere izin ver'**
+  /// **'Devam Et'**
   String get surveyNotificationAllow;
 
   /// No description provided for @surveyNotificationSkip.
@@ -4963,6 +4963,24 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'Başlangıç kaydedilemedi. Lütfen tekrar dene.'**
   String get surveySummarySaveError;
+
+  /// No description provided for @premiumLegalPrivacyPolicy.
+  ///
+  /// In tr, this message translates to:
+  /// **'Gizlilik Politikası'**
+  String get premiumLegalPrivacyPolicy;
+
+  /// No description provided for @premiumLegalTermsOfUse.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kullanım Şartları'**
+  String get premiumLegalTermsOfUse;
+
+  /// No description provided for @premiumLinkOpenFailed.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bağlantı açılamadı. Lütfen tekrar dene.'**
+  String get premiumLinkOpenFailed;
 
   /// No description provided for @moodHappy.
   ///

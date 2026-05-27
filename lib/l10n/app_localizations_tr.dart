@@ -2770,7 +2770,7 @@ class AppLocalizationsTr extends AppLocalizations {
       'Vakit bildirimleri ile içerik önerilerinin kaçmaması için bildirim iznine ihtiyacımız var. İstediğin zaman ayarlardan kapatabilirsin.';
 
   @override
-  String get surveyNotificationAllow => 'Bildirimlere izin ver';
+  String get surveyNotificationAllow => 'Devam Et';
 
   @override
   String get surveyNotificationSkip => 'Şimdilik geç';
@@ -2824,6 +2824,15 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String get surveySummarySaveError =>
       'Başlangıç kaydedilemedi. Lütfen tekrar dene.';
+
+  @override
+  String get premiumLegalPrivacyPolicy => 'Gizlilik Politikası';
+
+  @override
+  String get premiumLegalTermsOfUse => 'Kullanım Şartları';
+
+  @override
+  String get premiumLinkOpenFailed => 'Bağlantı açılamadı. Lütfen tekrar dene.';
 
   @override
   String get moodHappy => 'Mutlu';

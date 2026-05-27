@@ -6,11 +6,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../core/constants/app_colors.dart';
 import '../../core/router/app_router.dart';
 import '../../data/models/purchase_result.dart' show PurchaseOutcomeX;
 import '../../data/services/purchase_service.dart';
+import '../../l10n/app_localizations.dart';
 import '../shared/providers/auth_providers.dart';
 import '../shared/providers/premium_providers.dart';
 
@@ -36,7 +38,28 @@ class PremiumPage extends ConsumerStatefulWidget {
 }
 
 class _PremiumPageState extends ConsumerState<PremiumPage> {
+  static const _privacyPolicyUrl = 'https://arinapp-7b136.web.app/privacy';
+  static const _termsOfUseUrl = 'https://arinapp-7b136.web.app/terms';
+
   String? _busyProductId;
+
+  Future<void> _openExternalUrl(String rawUrl) async {
+    final l10n = AppLocalizations.of(context)!;
+    try {
+      final uri = Uri.parse(rawUrl);
+      final ok = await launchUrl(uri, mode: LaunchMode.externalApplication);
+      if (!ok && mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(l10n.premiumLinkOpenFailed)));
+      }
+    } catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.premiumLinkOpenFailed)));
+    }
+  }
 
   Future<void> _startPurchase(String productId) async {
     final user = ref.read(authUserProvider).asData?.value;
@@ -182,6 +205,7 @@ class _PremiumPageState extends ConsumerState<PremiumPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final premiumAsync = ref.watch(premiumEntitlementProvider);
     final entitlement = premiumAsync.asData?.value;
@@ -321,6 +345,29 @@ class _PremiumPageState extends ConsumerState<PremiumPage> {
                             fontSize: 12,
                             height: 1.4,
                           ),
+                        ),
+                        const SizedBox(height: 12),
+                        Wrap(
+                          alignment: WrapAlignment.center,
+                          crossAxisAlignment: WrapCrossAlignment.center,
+                          spacing: 8,
+                          children: [
+                            TextButton(
+                              onPressed: () => _openExternalUrl(_privacyPolicyUrl),
+                              child: Text(l10n.premiumLegalPrivacyPolicy),
+                            ),
+                            Text(
+                              '•',
+                              style: TextStyle(
+                                color: footerTextColor,
+                                fontSize: 12,
+                              ),
+                            ),
+                            TextButton(
+                              onPressed: () => _openExternalUrl(_termsOfUseUrl),
+                              child: Text(l10n.premiumLegalTermsOfUse),
+                            ),
+                          ],
                         ),
                       ],
                     ),

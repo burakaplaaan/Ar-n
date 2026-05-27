@@ -2777,7 +2777,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'We need notification permission so prayer alerts and content suggestions are not missed. You can turn it off anytime in settings.';
 
   @override
-  String get surveyNotificationAllow => 'Allow notifications';
+  String get surveyNotificationAllow => 'Continue';
 
   @override
   String get surveyNotificationSkip => 'Skip for now';
@@ -2831,6 +2831,15 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get surveySummarySaveError =>
       'Could not save start data. Please try again.';
+
+  @override
+  String get premiumLegalPrivacyPolicy => 'Privacy Policy';
+
+  @override
+  String get premiumLegalTermsOfUse => 'Terms of Use';
+
+  @override
+  String get premiumLinkOpenFailed => 'Could not open link. Please try again.';
 
   @override
   String get moodHappy => 'Happy';
