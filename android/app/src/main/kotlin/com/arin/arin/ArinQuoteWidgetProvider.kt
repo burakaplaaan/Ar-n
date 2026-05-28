@@ -209,14 +209,15 @@ class ArinQuoteWidgetProvider : HomeWidgetProvider() {
 
     private fun isWidgetLocked(widgetData: SharedPreferences, kind: String): Boolean {
         if (widgetData.getString(KEY_GATE_PREMIUM, null) == "1") return false
+        val now = System.currentTimeMillis()
+        val unlockUntil = widgetData.getString("arin_widget_gate_${kind}_unlock_until_ms", null)
+            ?.toLongOrNull() ?: 0L
+        if (unlockUntil > now) return false
         if (widgetData.getString(KEY_GATE_LOCKED, null) == "1") return true
         val firstUse = firstUseMs(widgetData, kind)
         if (firstUse <= 0L) return false
         val trialEnd = firstUse + WIDGET_TRIAL_DURATION_MS
-        val unlockUntil = widgetData.getString("arin_widget_gate_${kind}_unlock_until_ms", null)
-            ?.toLongOrNull() ?: 0L
-        val now = System.currentTimeMillis()
-        return now >= trialEnd && now >= unlockUntil
+        return now >= trialEnd
     }
 
     private fun gateRefreshMs(widgetData: SharedPreferences, kind: String): Long? {

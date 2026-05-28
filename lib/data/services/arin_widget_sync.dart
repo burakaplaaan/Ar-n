@@ -84,7 +84,7 @@ abstract final class ArinWidgetSync {
   }) async {
     if (kIsWeb) return;
     try {
-      if (!_appGroupReadyOrStart()) return;
+      if (!await _ensureAppGroupReady()) return;
       var t = _widgetQuotePreferredLineBreaks(text.trim());
       final s = source;
       await HomeWidget.saveWidgetData<String>(ArinWidgetKeys.quoteText, t);
@@ -346,7 +346,7 @@ abstract final class ArinWidgetSync {
   }) async {
     if (kIsWeb) return;
     try {
-      if (!_appGroupReadyOrStart()) return;
+      if (!await _ensureAppGroupReady()) return;
       final now = DateTime.now();
       final loc = formatWidgetLocationLabel(
         location.savedCity,
@@ -596,8 +596,14 @@ abstract final class ArinWidgetSync {
         ArinWidgetKeys.widgetGateComboLocked,
         ArinWidgetKeys.widgetGateTrackingLocked,
         ArinWidgetKeys.widgetGatePremium,
+        ArinWidgetKeys.widgetGateLockNote,
       ]) {
         await HomeWidget.saveWidgetData<String>(k, '');
+      }
+      for (final kind in const ['quote', 'prayer', 'combo', 'tracking']) {
+        await HomeWidget.saveWidgetData<String>('arin_widget_first_use_ms_$kind', '');
+        await HomeWidget.saveWidgetData<String>('arin_widget_gate_${kind}_trial_until_ms', '');
+        await HomeWidget.saveWidgetData<String>('arin_widget_gate_${kind}_unlock_until_ms', '');
       }
       await HomeWidget.updateWidget(
         qualifiedAndroidName: _androidQuote,
@@ -626,16 +632,6 @@ abstract final class ArinWidgetSync {
   ///
   /// Bu sayede pool sync (ana açılış path'i) AppGroup için 2 saniye
   /// beklemez; widget bir sonraki başarı turunda güncellenir.
-  static bool _appGroupReadyOrStart() {
-    if (kIsWeb) return false;
-    if (!Platform.isIOS) return true;
-    if (_appGroupReady) return true;
-    if (_appGroupFuture == null) {
-      unawaited(_ensureAppGroupReady());
-    }
-    return false;
-  }
-
   static Future<bool> _ensureAppGroupReady() {
     if (kIsWeb || !Platform.isIOS) return Future<bool>.value(true);
     final existing = _appGroupFuture;

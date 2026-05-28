@@ -59,8 +59,11 @@ class _WidgetUnlockPageState extends ConsumerState<WidgetUnlockPage> {
     try {
       await context.push(AppRoutes.premium);
       if (!mounted) return;
-      final entitlement = ref.read(premiumEntitlementProvider).asData?.value;
-      if (entitlement?.isActive == true) {
+      final entitlement = await ref.read(premiumEntitlementProvider.future);
+      if (entitlement.isActive) {
+        final service = ref.read(widgetAccessServiceProvider);
+        await service.syncAll(isPremium: true);
+        if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Premium aktif! Tüm widgetlar açıldı. 🎉'),

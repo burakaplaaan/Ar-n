@@ -141,13 +141,14 @@ private func widgetFirstUseMs(_ kind: String) -> Double {
 private func widgetLocked(_ kind: String) -> Bool {
   let u = suite()
   if u?.string(forKey: "arin_widget_gate_premium") == "1" { return false }
+  let nowMs = Date().timeIntervalSince1970 * 1000.0
+  let unlockUntilMs = Double(u?.string(forKey: "arin_widget_gate_\(kind)_unlock_until_ms") ?? "") ?? 0
+  if unlockUntilMs > nowMs { return false }
   if u?.string(forKey: "arin_widget_gate_\(kind)_locked") == "1" { return true }
   let firstUseMs = widgetFirstUseMs(kind)
   if firstUseMs <= 0 { return false }
   let trialEndMs = firstUseMs + kWidgetTrialDurationMs
-  let unlockUntilMs = Double(u?.string(forKey: "arin_widget_gate_\(kind)_unlock_until_ms") ?? "") ?? 0
-  let nowMs = Date().timeIntervalSince1970 * 1000.0
-  return nowMs >= trialEndMs && nowMs >= unlockUntilMs
+  return nowMs >= trialEndMs
 }
 
 private func widgetGateRefreshDate(_ kind: String) -> Date? {

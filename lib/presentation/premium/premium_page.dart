@@ -145,6 +145,18 @@ class _PremiumPageState extends ConsumerState<PremiumPage> {
         }
         if (!mounted) return;
       }
+    } else {
+      try {
+        await PurchaseService.loginUser(user.uid);
+      } catch (e) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Hesap eşlemesi tamamlanamadı. Lütfen tekrar deneyin.'),
+          ),
+        );
+        return;
+      }
     }
 
     setState(() => _busyProductId = productId);
@@ -210,6 +222,40 @@ class _PremiumPageState extends ConsumerState<PremiumPage> {
 
   Future<void> _restorePurchases() async {
     if (_busyProductId != null) return;
+    
+    final user = ref.read(authUserProvider).asData?.value;
+    if (user == null) {
+      final signedIn = await _showSignInSheet();
+      if (signedIn != true || !mounted) return;
+      final uid = FirebaseAuth.instance.currentUser?.uid;
+      if (uid != null && uid.isNotEmpty) {
+        try {
+          await PurchaseService.loginUser(uid);
+        } catch (e) {
+          if (!mounted) return;
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Hesap eşlemesi tamamlanamadı. Lütfen tekrar deneyin.'),
+            ),
+          );
+          return;
+        }
+        if (!mounted) return;
+      }
+    } else {
+      try {
+        await PurchaseService.loginUser(user.uid);
+      } catch (e) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Hesap eşlemesi tamamlanamadı. Lütfen tekrar deneyin.'),
+          ),
+        );
+        return;
+      }
+    }
+
     setState(() => _busyProductId = '__restore__');
     try {
       final result =
@@ -218,10 +264,18 @@ class _PremiumPageState extends ConsumerState<PremiumPage> {
 
       if (result.isSuccess) {
         ref.invalidate(premiumEntitlementProvider);
-        await ref.read(premiumEntitlementProvider.future);
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Premium geri yüklendi!')),
-        );
+        final entitlement = await ref.read(premiumEntitlementProvider.future);
+        if (!mounted) return;
+        
+        if (entitlement.isActive) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Premium geri yüklendi!')),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Aktif abonelik bulunamadı.')),
+          );
+        }
       } else {
         final msg = result.userMessage ?? 'Aktif abonelik bulunamadı.';
         ScaffoldMessenger.of(context).showSnackBar(
@@ -650,7 +704,6 @@ class _PremiumBenefits extends StatelessWidget {
     (Icons.widgets_rounded, 'Widget kilidi yok'),
     (Icons.explore_rounded, 'Keşfet akışı kesintisiz'),
     (Icons.notifications_active_rounded, '2. ezan alarmı açık'),
-    (Icons.spa_rounded, 'Zikir, pusula ve frekanslarda reklam yok'),
   ];
 
   @override
