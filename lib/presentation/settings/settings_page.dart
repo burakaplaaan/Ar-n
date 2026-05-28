@@ -28,6 +28,7 @@ import '../../core/theme/arin_shell_background.dart';
 import '../../l10n/app_localizations.dart';
 import '../../core/providers/shared_preferences_provider.dart';
 import '../../data/services/habit_cloud_sync_service.dart';
+import '../../data/services/inspiration_engagement_sync_service.dart';
 import '../../data/services/local_data_wipe_service.dart';
 import '../../data/services/location_service.dart';
 import '../../data/services/user_cloud_backup_service.dart';
@@ -355,6 +356,11 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
       }
       return;
     }
+
+    try {
+      await HabitCloudSyncService.flushPendingDeletes(uid: uid, prefs: ref.read(sharedPreferencesProvider));
+      await InspirationEngagementSyncService.flushPendingPush();
+    } catch (_) {}
 
     // Oturum hâlâ açıkken cloud verisini doğrudan sil — Firestore kuralları
     // `request.auth.uid == uid` istiyor; Auth silindikten sonra istemci taraflı

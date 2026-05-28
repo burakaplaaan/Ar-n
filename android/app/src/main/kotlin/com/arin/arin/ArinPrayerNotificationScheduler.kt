@@ -128,7 +128,9 @@ object ArinPrayerNotificationScheduler {
                 Manifest.permission.POST_NOTIFICATIONS
             ) != PackageManager.PERMISSION_GRANTED
         ) {
-            removeRecord(context, id)
+            // İzin reddedilmişse alarmı silme, sadece bildirimi gösterme.
+            // Kullanıcı ayarları değiştirirse veya uygulamaya tekrar girerse, 
+            // schedule veya rescheduleStored() üzerinde kayıt korunur.
             return
         }
 

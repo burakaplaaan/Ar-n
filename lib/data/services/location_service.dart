@@ -148,80 +148,120 @@ class LocationService {
     await _prefs.put(_countryKey, 'Turkey');
   }
 
+  String _locationKey() {
+    final id = savedDistrictId;
+    final city = savedCity.trim().toLowerCase();
+    return '${id ?? 'nil'}|$city';
+  }
+
   /// Aşağı çekince GPS + ters jeokodun tekrar çalışması için.
   Future<void> clearPrayerLocationThrottle() async {
     await _prefs.delete(_lastPrayerLocSyncMs);
   }
 
+  /// Senkronizasyon işlemi için mutex
+  bool _syncInProgress = false;
+  int _syncGeneration = 0;
+
   /// İzin varsa GPS alır; ters jeokod ile il/ülke güncellenir (Türkiye: çoğunlukla il).
   /// [forceRefresh]: true ise süre sınırı yok (yenileme hareketi).
   /// Oturumda ilk çağrıda bir kez GPS denenir (şehir değişimi / uygulamaya yeniden giriş).
   Future<void> syncPrayerLocation({bool forceRefresh = false}) async {
-    // Manuel yenileme (forceRefresh) her zaman çalışır. Otomatik çalışmada:
-    //  • neverUpdate → kullanıcı sadece manuel değiştirmek istiyor; GPS'e dokunma.
-    //  • ask         → şehir değişimi diyalog akışı (LocationChangeListener) üstlenir;
-    //                  burada sessizce kaydetme, sadece koordinatları taze tut.
-    if (!forceRefresh) {
-      final pref = locationUpdatePref;
-      if (pref == LocationUpdatePref.neverUpdate) {
-        _sessionAutoGpsPending = false;
-        return;
-      }
-      if (pref == LocationUpdatePref.ask) {
-        _sessionAutoGpsPending = false;
-        return;
-      }
-    }
-
-    final sessionFirst = _sessionAutoGpsPending;
-    if (_sessionAutoGpsPending) _sessionAutoGpsPending = false;
-    final force = forceRefresh || sessionFirst;
-
-    if (!force) {
-      final last = _prefs.get(_lastPrayerLocSyncMs) as int?;
-      final now = DateTime.now().millisecondsSinceEpoch;
-      if (last != null &&
-          now - last < const Duration(minutes: 30).inMilliseconds) {
-        return;
-      }
-    }
-
-    final pos = await requestCurrentPosition();
-    if (pos == null) return;
-
+    if (_syncInProgress) return;
+    _syncInProgress = true;
+    final currentGen = ++_syncGeneration;
     try {
-      final marks = await placemarkFromCoordinates(pos.lat, pos.lon);
-      if (marks.isEmpty) return;
-      final p = marks.first;
-
-      String? city = _pickCityName(p);
-      if (city == null || city.isEmpty) return;
-
-      final country = _countryForAladhan(p);
-      await saveCity(city, country);
-
-      // Türkiye ise Diyanet `ilceId`'yi de çözmeye çalış. Matcher asset
-      // zaten `loadOnce()` edilmiş olmalı (main.dart init'te); çağrı
-      // idempotent, ek maliyet yok.
-      if ((p.isoCountryCode?.toUpperCase() ?? '') == 'TR') {
-        await _resolveDistrictIdFromPlacemark(p);
-      } else {
-        // TR dışına çıkıldıysa eski ilçe ID'si yanıltıcı; sıfırla.
-        await saveDistrictId(null);
+      final oldLocationKey = _locationKey();
+      
+      // Manuel yenileme (forceRefresh) her zaman çalışır. Otomatik çalışmada:
+      //  • neverUpdate → kullanıcı sadece manuel değiştirmek istiyor; GPS'e dokunma.
+      //  • ask         → şehir değişimi diyalog akışı (LocationChangeListener) üstlenir;
+      //                  burada sessizce kaydetme, sadece koordinatları taze tut.
+      if (!forceRefresh) {
+        final pref = locationUpdatePref;
+        if (pref == LocationUpdatePref.neverUpdate) {
+          _sessionAutoGpsPending = false;
+          return;
+        }
+        if (pref == LocationUpdatePref.ask) {
+          _sessionAutoGpsPending = false;
+          return;
+        }
       }
-      await _prefs.put(
-        _lastPrayerLocSyncMs,
-        DateTime.now().millisecondsSinceEpoch,
-      );
-    } catch (_) {
-      // Koordinatlar kayıtlı; Aladhan yine doğru vakit döner, şehir etiketi eski kalabilir.
+
+      final sessionFirst = _sessionAutoGpsPending;
+      if (_sessionAutoGpsPending) _sessionAutoGpsPending = false;
+      final force = forceRefresh || sessionFirst;
+
+      if (!force) {
+        final last = _prefs.get(_lastPrayerLocSyncMs) as int?;
+        final now = DateTime.now().millisecondsSinceEpoch;
+        if (last != null &&
+            now - last < const Duration(minutes: 30).inMilliseconds) {
+          return;
+        }
+      }
+
+      final pos = await requestCurrentPosition();
+      if (pos == null || currentGen != _syncGeneration) return;
+
+      try {
+        final marks = await placemarkFromCoordinates(pos.lat, pos.lon);
+        if (marks.isEmpty || currentGen != _syncGeneration) return;
+        final p = marks.first;
+
+        String? city = _pickCityName(p);
+        if (city == null || city.isEmpty) return;
+
+        final country = _countryForAladhan(p);
+        await saveCity(city, country);
+        if (currentGen != _syncGeneration) return;
+
+        // Türkiye ise Diyanet `ilceId`'yi de çözmeye çalış. Matcher asset
+        // zaten `loadOnce()` edilmiş olmalı (main.dart init'te); çağrı
+        // idempotent, ek maliyet yok.
+        if ((p.isoCountryCode?.toUpperCase() ?? '') == 'TR') {
+          await _resolveDistrictIdFromPlacemark(p);
+        } else {
+          // TR dışına çıkıldıysa eski ilçe ID'si yanıltıcı; sıfırla.
+          final oldCountry = _prefs.getString(_countryPrefKey) ?? '';
+          if (oldCountry.toUpperCase() == 'TR' || oldCountry.toUpperCase() == 'TURKEY') {
+            await saveDistrictId(null);
+          }
+        }
+        if (currentGen != _syncGeneration) return;
+        await _prefs.put(
+          _lastPrayerLocSyncMs,
+          DateTime.now().millisecondsSinceEpoch,
+        );
+        
+        final newLocationKey = _locationKey();
+        if (oldLocationKey != newLocationKey) {
+           _notifySilentLocationChange();
+        }
+      } catch (_) {
+        // Koordinatlar kayıtlı; Aladhan yine doğru vakit döner, şehir etiketi eski kalabilir.
+      }
+    } finally {
+      if (currentGen == _syncGeneration) {
+        _syncInProgress = false;
+      }
     }
   }
+
+  void _notifySilentLocationChange() {
+    onSilentLocationChanged?.call();
+  }
+
+  void Function()? onSilentLocationChanged;
 
   /// GPS ile güncel konumu alır, kayıtlı şehirden farklıysa [LocationChangeResult]
   /// döndürür. Hiçbir şey kaydetmez — kullanıcı onayından sonra [applyLocationChange]
   /// çağrılmalıdır. İzin yoksa, GPS alınamazsa veya şehir aynıysa `null` döner.
   Future<LocationChangeResult?> detectLocationChange() async {
+    // Diğer lokasyon algılamaları arka planda çalışırken ezilmemesi için:
+    _syncGeneration++;
+    _syncInProgress = false;
     // Koordinatları Hive'a yazmadan konum al — kayıt yalnızca applyLocationChange'de.
     final pos = await _getCurrentPositionNoSave();
     if (pos == null) return null;
@@ -264,6 +304,8 @@ class LocationService {
 
   /// [detectLocationChange]'in sonucunu Hive'a kalıcı olarak yazar.
   Future<void> applyLocationChange(LocationChangeResult result) async {
+    _syncGeneration++;
+    _syncInProgress = false;
     await saveCity(result.newCity, result.newCountry);
     await saveDistrictId(result.newDistrictId);
     await _prefs.put(_latKey, result.lat);
@@ -309,7 +351,10 @@ class LocationService {
         ilAdi: ilAdi,
         ilceAdi: ilceAdi,
       );
-      await saveDistrictId(match?.id);
+      if (match != null) {
+        await saveDistrictId(match.id);
+      }
+      // Bulunamadıysa sessiz kal; eski manuel/doğru seçimi ezme.
     } catch (_) {
       // Asset yoksa/okunamadıysa bile uygulama çalışsın; Aladhan fallback var.
     }

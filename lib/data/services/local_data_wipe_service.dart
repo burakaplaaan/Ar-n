@@ -102,8 +102,13 @@ abstract final class LocalDataWipeService {
 
   static Future<void> _clearFirestoreOfflineCacheSafely() async {
     if (kIsWeb) return;
+
+    // Ajan notu: `FirebaseFirestore.instance.terminate()` kullanmıyoruz çünkü
+    // aynı uygulama yaşam döngüsünde (örn. wipe sonrası hesap değiştirip tekrar
+    // giriş yapınca) terminate edilmiş client yeniden kullanılamaz ("The client
+    // has already been terminated" hatası atar). Sadece `clearPersistence()`
+    // kullanarak çevrimdışı önbelleği güvenle temizliyoruz.
     try {
-      await FirebaseFirestore.instance.terminate();
       await FirebaseFirestore.instance.clearPersistence();
       return;
     } catch (e, st) {
@@ -113,9 +118,6 @@ abstract final class LocalDataWipeService {
       );
     }
 
-    // Bazı cihaz/oturumlarda terminate sonrası persistence kilidi kısa süre
-    // yaşayabiliyor. Core local wipe başarılıysa bu adım wipe'ı bloklamamalı;
-    // kısa bekleme sonrası bir kez daha dene, yine olmazsa loglayıp devam et.
     try {
       await Future<void>.delayed(const Duration(milliseconds: 250));
       await FirebaseFirestore.instance.clearPersistence();

@@ -247,9 +247,20 @@ class AuthService {
     if (u == null) {
       throw StateError('Oturum açık değil.');
     }
+    
+    // RevenueCat çıkışı account delete akışını bloke etmesin.
+    // Başarısız olursa logla ve asıl Auth delete işlemine devam et.
+    Future<void> safeLogoutRc() async {
+      try {
+        await PurchaseService.logoutUser();
+      } catch (e) {
+        debugPrint('RC logout failed during deleteAccount: $e');
+      }
+    }
+
     try {
       // Kullanıcı silinmeden RC kimliğini anonime döndür.
-      await PurchaseService.logoutUser();
+      await safeLogoutRc();
       await u.delete();
     } on FirebaseAuthException catch (e) {
       if (e.code != 'requires-recent-login') {
@@ -262,7 +273,7 @@ class AuthService {
           'Yeniden doğrulama sonrası oturum bulunamadı; lütfen tekrar deneyin.',
         );
       }
-      await PurchaseService.logoutUser();
+      await safeLogoutRc();
       await fresh.delete();
     }
     if (_googleInitialized) {

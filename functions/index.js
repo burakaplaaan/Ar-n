@@ -1094,7 +1094,7 @@ exports.revenuecatWebhook = onRequest(
 // ─────────────────────────────────────────────────────────────────────────────
 exports.cleanupDeletedUserData = onSchedule(
   {
-    schedule: "every 24 hours",
+    schedule: "every 1 hours",
     timeZone: "Europe/Istanbul",
     memory: "256MiB",
     region: "europe-west1",

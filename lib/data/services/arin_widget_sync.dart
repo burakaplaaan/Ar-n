@@ -506,7 +506,7 @@ abstract final class ArinWidgetSync {
 
       add('İmsak', model.fajr);
       // Güneşe kadar kullanıcı hâlâ sabah namazı penceresinde olsun.
-      add('İmsak', model.sunrise);
+      add('Güneş', model.sunrise);
       add('Öğle', model.dhuhr);
       add('İkindi', model.asr);
       add('Akşam', model.maghrib);

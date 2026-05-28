@@ -19,6 +19,7 @@
 import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../presentation/shared/providers/prayer_time_providers.dart';
 
 import '../models/prayer_times_model.dart';
 import 'aladhan_service.dart';
@@ -67,6 +68,12 @@ class PrayerServiceResolver {
     final id = _location.savedDistrictId;
     final city = _location.savedCity.trim().toLowerCase();
     return '${id ?? 'nil'}|$city';
+  }
+
+  void invalidateCache() {
+    _memCache = null;
+    _memCacheAt = null;
+    _memCacheLocationKey = null;
   }
 
   /// Taze (bugünün) namaz vakitlerini getirir. İç sıralama:
@@ -269,11 +276,18 @@ final diyanetPrayerServiceProvider = Provider<DiyanetPrayerService>(
 );
 
 final prayerServiceResolverProvider = Provider<PrayerServiceResolver>((ref) {
-  return PrayerServiceResolver(
+  final resolver = PrayerServiceResolver(
     diyanet: ref.read(diyanetPrayerServiceProvider),
     aladhan: ref.read(_aladhanServiceForResolverProvider),
     location: ref.read(locationServiceProvider),
   );
+  ref.read(locationServiceProvider).onSilentLocationChanged = () {
+    resolver.invalidateCache();
+    // Cache'i invalidate edip doğrudan dışarıya provider invalidate çağrısı fırlatarak 
+    // dinleyicileri uyaralım.
+    Future.microtask(() => ref.invalidate(prayerTimesProvider));
+  };
+  return resolver;
 });
 
 /// `aladhanServiceProvider` `prayer_time_providers.dart`'ta da tanımlı;
