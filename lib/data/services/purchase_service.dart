@@ -29,26 +29,54 @@ class PurchaseService {
   /// Uygulama açılışında deferred startup'ta async olarak başlatıldığı için
   /// getLocalPremiumEntitlement() bu flag'i kontrol ederek RC hazır olana kadar bekler.
   static bool _isConfigured = false;
+  static Future<void>? _configureFuture;
 
   /// Ana app bootstrap sırasında bir kez çağrılır.
   /// Firebase Auth ile oturum açık olan kullanıcı ID'si verilirse
   /// RevenueCat o ID ile ilişkilendirir (webhook'ta Firestore'a yazılır).
   static Future<void> initialize({String? firebaseUid}) async {
     if (!_isSupportedPlatform) return;
+    if (_isConfigured) {
+      if (firebaseUid != null && firebaseUid.isNotEmpty) {
+        await _safeCall(() => Purchases.logIn(firebaseUid));
+      }
+      return;
+    }
+    if (_configureFuture != null) {
+      try {
+        await _configureFuture;
+      } catch (e) {
+        debugPrint('[PurchaseService] initialize wait error: $e');
+      }
+      if (firebaseUid != null && firebaseUid.isNotEmpty && _isConfigured) {
+        await _safeCall(() => Purchases.logIn(firebaseUid));
+      }
+      return;
+    }
 
-    final apiKey = Platform.isAndroid
-        ? RevenueCatIds.androidApiKey
-        : RevenueCatIds.iosApiKey;
+    _configureFuture = () async {
+      final apiKey = Platform.isAndroid
+          ? RevenueCatIds.androidApiKey
+          : RevenueCatIds.iosApiKey;
 
-    await Purchases.setLogLevel(
-      kReleaseMode ? LogLevel.error : LogLevel.debug,
-    );
+      await Purchases.setLogLevel(
+        kReleaseMode ? LogLevel.error : LogLevel.debug,
+      );
 
-    final config = PurchasesConfiguration(apiKey);
-    await Purchases.configure(config);
-    _isConfigured = true;
+      final config = PurchasesConfiguration(apiKey);
+      await Purchases.configure(config);
+      _isConfigured = true;
+    }();
+    try {
+      await _configureFuture;
+    } catch (e) {
+      _isConfigured = false;
+      debugPrint('[PurchaseService] initialize error: $e');
+    } finally {
+      _configureFuture = null;
+    }
 
-    if (firebaseUid != null && firebaseUid.isNotEmpty) {
+    if (firebaseUid != null && firebaseUid.isNotEmpty && _isConfigured) {
       await _safeCall(() => Purchases.logIn(firebaseUid));
     }
   }
@@ -75,14 +103,16 @@ class PurchaseService {
   /// Dönen map: { productId: priceString }. Bulunamayan ID'ler map'te yer almaz.
   Future<Map<String, String>> fetchProductPriceStrings(
     List<String> productIds,
+    {ProductCategory productCategory = ProductCategory.subscription}
   ) async {
     if (!_isSupportedPlatform) return {};
-    for (var i = 0; i < 2 && !_isConfigured; i++) {
-      await Future<void>.delayed(const Duration(seconds: 1));
-    }
-    if (!_isConfigured) return {};
+    final ready = await _waitUntilConfigured();
+    if (!ready) return {};
     try {
-      final products = await Purchases.getProducts(productIds);
+      final products = await Purchases.getProducts(
+        productIds,
+        productCategory: productCategory,
+      );
       return {for (final p in products) p.identifier: p.priceString};
     } catch (e) {
       debugPrint('[PurchaseService] fetchProductPriceStrings error: $e');
@@ -100,19 +130,31 @@ class PurchaseService {
         'Bu platformda satın alma desteklenmiyor.',
       );
     }
+    final ready = await _waitUntilConfigured();
+    if (!ready) {
+      return const PurchaseOutcome.error(
+        'Satın alma servisi henüz hazır değil. Lütfen birkaç saniye sonra tekrar deneyin.',
+      );
+    }
 
     // Offerings yerine doğrudan getProducts kullanılıyor.
     // Varsayılan ProductCategory.subscription, abonelik ürünleri getirir.
     // Billing client bağlantısı için 3 deneme × 2 sn retry.
     StoreProduct? product;
     for (var attempt = 0; attempt < 3; attempt++) {
-      final products = await Purchases.getProducts([productId]);
-      debugPrint(
-        '[PurchaseService] purchase getProducts($productId) attempt ${attempt + 1} → ${products.length} ürün',
-      );
-      if (products.isNotEmpty) {
-        product = products.first;
-        break;
+      try {
+        final products = await Purchases.getProducts([productId]);
+        debugPrint(
+          '[PurchaseService] purchase getProducts($productId) attempt ${attempt + 1} → ${products.length} ürün',
+        );
+        if (products.isNotEmpty) {
+          product = products.first;
+          break;
+        }
+      } catch (e) {
+        debugPrint(
+          '[PurchaseService] purchase getProducts($productId) attempt ${attempt + 1} error: $e',
+        );
       }
       if (attempt < 2) await Future<void>.delayed(const Duration(seconds: 2));
     }
@@ -159,6 +201,12 @@ class PurchaseService {
         'Bu platformda satın alma desteklenmiyor.',
       );
     }
+    final ready = await _waitUntilConfigured();
+    if (!ready) {
+      return const PurchaseOutcome.error(
+        'Destek satın alma servisi henüz hazır değil. Lütfen tekrar deneyin.',
+      );
+    }
     try {
       // Billing client bağlantısı configure'dan hemen sonra hazır olmayabilir.
       // 3 deneme, aralarında 2'şer saniye bekleme.
@@ -166,20 +214,26 @@ class PurchaseService {
       // şart; varsayılan subscription'dır ve INAPP ürünleri görmez.
       List<StoreProduct> products = [];
       for (var attempt = 0; attempt < 3; attempt++) {
-        products = await Purchases.getProducts(
-          [productId],
-          productCategory: ProductCategory.nonSubscription,
-        );
-        debugPrint(
-          '[PurchaseService] getProducts($productId) attempt ${attempt + 1} → ${products.length} ürün',
-        );
+        try {
+          products = await Purchases.getProducts(
+            [productId],
+            productCategory: ProductCategory.nonSubscription,
+          );
+          debugPrint(
+            '[PurchaseService] getProducts($productId) attempt ${attempt + 1} → ${products.length} ürün',
+          );
+        } catch (e) {
+          debugPrint(
+            '[PurchaseService] getProducts($productId) attempt ${attempt + 1} error: $e',
+          );
+        }
         if (products.isNotEmpty) break;
         if (attempt < 2) await Future<void>.delayed(const Duration(seconds: 2));
       }
       if (products.isEmpty) {
         return PurchaseOutcome.error(
           'Ürün bulunamadı [ID: $productId]. '
-          'Play Console\'da ürün aktif değil veya bağlantı yok.',
+          'Mağaza tarafında ürün aktif olmayabilir veya bağlantı sorunu olabilir.',
         );
       }
       final result = await Purchases.purchaseStoreProduct(products.first);
@@ -209,6 +263,12 @@ class PurchaseService {
   Future<PurchaseOutcome> restorePurchases() async {
     if (!_isSupportedPlatform) {
       return const PurchaseOutcome.error('Bu platformda desteklenmiyor.');
+    }
+    final ready = await _waitUntilConfigured();
+    if (!ready) {
+      return const PurchaseOutcome.error(
+        'Satın alma servisi henüz hazır değil. Lütfen birkaç saniye sonra tekrar deneyin.',
+      );
     }
     try {
       final info = await Purchases.restorePurchases();
@@ -273,13 +333,39 @@ class PurchaseService {
   /// Oturum açıldığında çağrılır; RevenueCat cihaz ID'sini Firebase UID ile eşler.
   static Future<void> loginUser(String firebaseUid) async {
     if (!_isSupportedPlatform) return;
-    await _safeCall(() => Purchases.logIn(firebaseUid));
+    await initialize();
+    if (!_isConfigured) {
+      throw StateError('RevenueCat başlatılamadı (login).');
+    }
+    try {
+      await Purchases.logIn(firebaseUid);
+    } catch (e) {
+      debugPrint('[PurchaseService] loginUser error: $e');
+      throw StateError('RevenueCat kullanıcı eşleme hatası.');
+    }
   }
 
   /// Oturum kapandığında çağrılır; RevenueCat anonim ID'ye döner.
   static Future<void> logoutUser() async {
     if (!_isSupportedPlatform) return;
-    await _safeCall(Purchases.logOut);
+    if (!_isConfigured && _configureFuture == null) {
+      await initialize();
+    } else if (!_isConfigured && _configureFuture != null) {
+      try {
+        await _configureFuture;
+      } catch (e) {
+        debugPrint('[PurchaseService] logout wait error: $e');
+      }
+    }
+    if (!_isConfigured) {
+      throw StateError('RevenueCat başlatılamadı (logout).');
+    }
+    try {
+      await Purchases.logOut();
+    } catch (e) {
+      debugPrint('[PurchaseService] logoutUser error: $e');
+      throw StateError('RevenueCat oturumu kapatılamadı.');
+    }
   }
 
   // ── Helpers ───────────────────────────────────────────────────────────────
@@ -312,5 +398,24 @@ class PurchaseService {
     } catch (e) {
       debugPrint('[PurchaseService] _safeCall error: $e');
     }
+  }
+
+  Future<bool> _waitUntilConfigured() async {
+    if (_isConfigured) return true;
+    for (var i = 0; i < 3; i++) {
+      if (_isConfigured) return true;
+      if (_configureFuture != null) {
+        try {
+          await _configureFuture;
+        } catch (e) {
+          debugPrint('[PurchaseService] configure wait error: $e');
+          _isConfigured = false;
+          return false;
+        }
+      } else {
+        await Future<void>.delayed(const Duration(seconds: 1));
+      }
+    }
+    return _isConfigured;
   }
 }

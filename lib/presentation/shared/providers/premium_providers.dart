@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../data/models/premium_entitlement.dart';
 import '../../../data/repositories/premium_entitlement_repository.dart';
+import '../../../data/services/purchase_service.dart';
 import 'auth_providers.dart';
 
 final premiumEntitlementRepositoryProvider =
@@ -15,8 +16,14 @@ final premiumEntitlementRepositoryProvider =
 final premiumEntitlementProvider =
     FutureProvider<PremiumEntitlement>((ref) async {
   final authAsync = ref.watch(authUserProvider);
-  final user = authAsync.asData?.value;
-  if (user == null) return PremiumEntitlement.inactive;
+  final user = authAsync.asData?.value ??
+      (authAsync.isLoading ? await ref.watch(authUserProvider.future) : null);
+  if (user == null) {
+    // Firebase oturumu yokken de RevenueCat local restore/purchase sonucu
+    // cihazda aktif olabilir; UI false-negative göstermesin.
+    final local = await PurchaseService().getLocalPremiumEntitlement();
+    return local ?? PremiumEntitlement.inactive;
+  }
   return ref.read(premiumEntitlementRepositoryProvider).loadForCurrentUser();
 });
 

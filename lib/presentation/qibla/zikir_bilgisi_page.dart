@@ -138,7 +138,10 @@ class _ZikirBilgisiPageState extends ConsumerState<ZikirBilgisiPage>
     );
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
-      _reload();
+      Future<void>(() {
+        if (!mounted) return;
+        _reload();
+      });
       _intro.forward();
     });
   }

@@ -165,12 +165,13 @@ class AuthService {
   }
 
   Future<void> signOut() async {
+    // RevenueCat oturumunu önce kapat ki auth null emit edildiğinde
+    // provider tarafı eski RC kullanıcısının entitlement'ını okumaya devam etmesin.
+    await PurchaseService.logoutUser();
     await _auth.signOut();
     if (_googleInitialized) {
       await GoogleSignIn.instance.signOut();
     }
-    // RevenueCat oturumu da kapat — bir sonraki kullanıcıya karışmasın.
-    await PurchaseService.logoutUser();
   }
 
   /// Federated sağlayıcı (Google / Apple) için yeniden doğrulama.
@@ -248,6 +249,8 @@ class AuthService {
       throw StateError('Oturum açık değil.');
     }
     try {
+      // Firebase user null emit etmeden önce RC'yi anonim profile döndür.
+      await PurchaseService.logoutUser();
       await u.delete();
     } on FirebaseAuthException catch (e) {
       if (e.code != 'requires-recent-login') {
@@ -260,6 +263,7 @@ class AuthService {
           'Yeniden doğrulama sonrası oturum bulunamadı; lütfen tekrar deneyin.',
         );
       }
+      await PurchaseService.logoutUser();
       await fresh.delete();
     }
     if (_googleInitialized) {

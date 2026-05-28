@@ -107,7 +107,10 @@ class _OnboardingSurveyPageState extends ConsumerState<OnboardingSurveyPage> {
     if (!mounted) return;
     setState(() {
       _notificationPermissionEnabled = status.isGranted || status.isLimited;
-      _includeNotificationStep = !_notificationPermissionEnabled;
+      // Bildirim adımını onboarding'de her zaman göster:
+      // - Apple review ekranına karşı tutarlı görünüm
+      // - Kullanıcı izin zaten açıksa bile neyin kontrol edildiğini görür.
+      _includeNotificationStep = true;
     });
   }
 
@@ -156,6 +159,10 @@ class _OnboardingSurveyPageState extends ConsumerState<OnboardingSurveyPage> {
   Future<void> _requestNotificationPermission() async {
     final l10n = AppLocalizations.of(context)!;
     if (_permissionRequestInFlight) return;
+    if (_notificationPermissionEnabled) {
+      _nextPage();
+      return;
+    }
     setState(() => _permissionRequestInFlight = true);
     try {
       final ok = await requestLocalNotificationRuntimePermissions(

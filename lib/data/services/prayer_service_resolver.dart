@@ -82,6 +82,14 @@ class PrayerServiceResolver {
   Future<PrayerFetchResult> fetchToday() async {
     final now = DateTime.now();
 
+    // İlk açılışta şehir/koordinat boşsa bir kez konum senkronu bekle;
+    // aksi halde Aladhan'a boş şehirle gidip sürekli hata döngüsüne girer.
+    if (_location.savedCity.trim().isEmpty ||
+        _location.savedCountry.trim().isEmpty ||
+        (_location.savedLat == null || _location.savedLon == null)) {
+      await _location.syncPrayerLocation(forceRefresh: true);
+    }
+
     // 1) Bellek içi önbellek kontrolü — aynı takvim günü + aynı konum +
     //    30 dk içinde ise anında dön; arka planda konumu tazele (GPS bloklamaz).
     final cached = _memCache;

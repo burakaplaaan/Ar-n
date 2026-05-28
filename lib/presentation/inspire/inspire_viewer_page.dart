@@ -102,6 +102,7 @@ class _ViewerBodyState extends ConsumerState<_ViewerBody> {
   late int _settledPage;
   bool _adGateShowing = false;
   int _pendingExploreAdGateViews = 0;
+  bool _initialPrecacheDone = false;
 
   /// Sol kenar “geri” jesti: sağa doğru sürükleme mesafesi (px).
   double _edgeSwipeDx = 0;
@@ -120,6 +121,8 @@ class _ViewerBodyState extends ConsumerState<_ViewerBody> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+    if (_initialPrecacheDone) return;
+    _initialPrecacheDone = true;
     // Viewer açılışında komşu slide'ların görsellerini ısıt — kullanıcı hızlı
     // dikey swipe yapınca ilk frame decode jank'i olmasın. `initState`'te
     // context henüz hazır değil, `didChangeDependencies` ilk çağrıda güvenli.

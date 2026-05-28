@@ -25,6 +25,7 @@ import 'data/services/fcm_token_service.dart';
 import 'data/services/location_service.dart';
 import 'data/services/prayer_notification_scheduler.dart';
 import 'data/services/prayer_reminder_prefs.dart';
+import 'data/services/purchase_service.dart';
 import 'data/services/global_widget_lock_service.dart';
 import 'data/services/widget_quote_override_service.dart';
 import 'l10n/app_localizations.dart';
@@ -276,6 +277,8 @@ class _ArinAppState extends ConsumerState<ArinApp> with WidgetsBindingObserver {
     ref.invalidate(appRouterProvider);
     ref.read(appRouterRefreshProvider).notifyAuthOrOnboarding();
     unawaited(ArinAnalytics.enable());
+    final uid = isFirebaseReady ? FirebaseAuth.instance.currentUser?.uid : null;
+    unawaited(PurchaseService.initialize(firebaseUid: uid));
 
     unawaited(_runForegroundMaintenance(initial: false));
   }
@@ -320,7 +323,6 @@ class _ArinAppState extends ConsumerState<ArinApp> with WidgetsBindingObserver {
     final router = ref.watch(appRouterProvider);
     final themeMode = ref.watch(themeModeProvider);
     final appLocale = ref.watch(appLocaleProvider);
-    ref.watch(exploreBgmNotifierProvider);
 
     ref.listen(userProfileProvider, (previous, next) {
       final wasDone = previous?.onboardingCompleted == true;
@@ -331,7 +333,17 @@ class _ArinAppState extends ConsumerState<ArinApp> with WidgetsBindingObserver {
 
     ref.listen<AsyncValue<User?>>(authUserProvider, (previous, next) {
       next.whenData((user) {
-        if (user == null || !isFirebaseReady) return;
+        final prev = previous?.asData?.value;
+        if (user == null) return;
+        if (prev != null && prev.uid == user.uid) return;
+        // RC kimliğini Firebase UID ile eşleştir ki webhook/restore akışı
+        // anonim kullanıcıya düşmesin.
+        unawaited(
+          PurchaseService.loginUser(user.uid).catchError(
+            (e) => debugPrint('PurchaseService.loginUser failed: $e'),
+          ),
+        );
+        if (!isFirebaseReady) return;
         final prefs = ref.read(sharedPreferencesProvider);
         unawaited(
           HabitCloudSyncService.flushPendingDeletes(
@@ -339,8 +351,6 @@ class _ArinAppState extends ConsumerState<ArinApp> with WidgetsBindingObserver {
             prefs: prefs,
           ),
         );
-        final prev = previous?.asData?.value;
-        if (prev != null && prev.uid == user.uid) return;
 
         final uid = user.uid;
         Future<void> run() async {

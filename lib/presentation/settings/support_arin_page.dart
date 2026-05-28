@@ -1,11 +1,16 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:purchases_flutter/purchases_flutter.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/revenuecat_ids.dart';
 import '../../data/models/purchase_result.dart';
 import '../../data/services/purchase_service.dart';
+import '../../l10n/app_localizations.dart';
 
 class SupportArinPage extends ConsumerStatefulWidget {
   const SupportArinPage({super.key});
@@ -15,10 +20,90 @@ class SupportArinPage extends ConsumerStatefulWidget {
 }
 
 class _SupportArinPageState extends ConsumerState<SupportArinPage> {
+  static const _privacyPolicyUrl = 'https://arinapp-7b136.web.app/privacy';
+  static const _termsOfUseUrl = 'https://arinapp-7b136.web.app/terms.html';
+
   String? _busyProductId;
+  bool _loadingProducts = true;
+  final Set<String> _availableProductIds = <String>{};
+  final Map<String, String> _priceByProductId = <String, String>{};
+  Timer? _productRetryTimer;
+
+  @override
+  void initState() {
+    super.initState();
+    Future.microtask(_loadSupportProducts);
+  }
+
+  @override
+  void dispose() {
+    _productRetryTimer?.cancel();
+    super.dispose();
+  }
+
+  Future<void> _loadSupportProducts() async {
+    final ids = <String>[
+      RevenueCatIds.smallSupportProductId,
+      RevenueCatIds.mediumSupportProductId,
+      RevenueCatIds.largeSupportProductId,
+    ];
+    final service = ref.read(purchaseServiceProvider);
+    await PurchaseService.initialize();
+    final prices = await service.fetchProductPriceStrings(
+      ids,
+      productCategory: ProductCategory.nonSubscription,
+    );
+    if (!mounted) return;
+    setState(() {
+      _loadingProducts = false;
+      _availableProductIds
+        ..clear()
+        ..addAll(prices.keys);
+      _priceByProductId
+        ..clear()
+        ..addAll(prices);
+    });
+    if (prices.isEmpty) {
+      _productRetryTimer?.cancel();
+      _productRetryTimer = Timer(const Duration(seconds: 2), () {
+        if (!mounted || _busyProductId != null || _availableProductIds.isNotEmpty) {
+          return;
+        }
+        setState(() => _loadingProducts = true);
+        unawaited(_loadSupportProducts());
+      });
+    }
+  }
+
+  Future<void> _openExternalUrl(String rawUrl) async {
+    final l10n = AppLocalizations.of(context)!;
+    try {
+      final uri = Uri.parse(rawUrl);
+      final ok = await launchUrl(uri, mode: LaunchMode.externalApplication);
+      if (!ok && mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(l10n.premiumLinkOpenFailed)));
+      }
+    } catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.premiumLinkOpenFailed)));
+    }
+  }
 
   Future<void> _startPurchase(String productId) async {
     if (_busyProductId != null) return;
+    if (_loadingProducts || !_availableProductIds.contains(productId)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text('Ürün bilgisi henüz hazır değil. Lütfen tekrar deneyin.'),
+          backgroundColor: Colors.red.shade700,
+        ),
+      );
+      return;
+    }
     setState(() => _busyProductId = productId);
 
     final service = ref.read(purchaseServiceProvider);
@@ -66,6 +151,7 @@ class _SupportArinPageState extends ConsumerState<SupportArinPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
       backgroundColor: isDark ? AppColors.backgroundNavy : AppColors.creamMist,
@@ -93,10 +179,15 @@ class _SupportArinPageState extends ConsumerState<SupportArinPage> {
             icon: Icons.local_cafe_rounded,
             title: 'Küçük Destek',
             subtitle: 'Bir kahve desteğiyle geliştirmeye katkı ver.',
-            price: '₺49,99',
+            price:
+                _priceByProductId[RevenueCatIds.smallSupportProductId] ??
+                '₺49,99',
             productId: RevenueCatIds.smallSupportProductId,
             isBusy: _busyProductId == RevenueCatIds.smallSupportProductId,
             anyBusy: _busyProductId != null,
+            isEnabled:
+                !_loadingProducts &&
+                _availableProductIds.contains(RevenueCatIds.smallSupportProductId),
             onTap: () => _startPurchase(RevenueCatIds.smallSupportProductId),
           ),
           const SizedBox(height: 12),
@@ -104,11 +195,16 @@ class _SupportArinPageState extends ConsumerState<SupportArinPage> {
             icon: Icons.favorite_rounded,
             title: 'Orta Destek',
             subtitle: 'Yeni içerik ve özelliklerin gelişmesini hızlandır.',
-            price: '₺149,99',
+            price:
+                _priceByProductId[RevenueCatIds.mediumSupportProductId] ??
+                '₺149,99',
             productId: RevenueCatIds.mediumSupportProductId,
             highlighted: true,
             isBusy: _busyProductId == RevenueCatIds.mediumSupportProductId,
             anyBusy: _busyProductId != null,
+            isEnabled:
+                !_loadingProducts &&
+                _availableProductIds.contains(RevenueCatIds.mediumSupportProductId),
             onTap: () => _startPurchase(RevenueCatIds.mediumSupportProductId),
           ),
           const SizedBox(height: 12),
@@ -116,10 +212,15 @@ class _SupportArinPageState extends ConsumerState<SupportArinPage> {
             icon: Icons.workspace_premium_rounded,
             title: 'Büyük Destek',
             subtitle: "Arın'ın uzun vadeli gelişimine güçlü katkı ver.",
-            price: '₺349,99',
+            price:
+                _priceByProductId[RevenueCatIds.largeSupportProductId] ??
+                '₺349,99',
             productId: RevenueCatIds.largeSupportProductId,
             isBusy: _busyProductId == RevenueCatIds.largeSupportProductId,
             anyBusy: _busyProductId != null,
+            isEnabled:
+                !_loadingProducts &&
+                _availableProductIds.contains(RevenueCatIds.largeSupportProductId),
             onTap: () => _startPurchase(RevenueCatIds.largeSupportProductId),
           ),
           const SizedBox(height: 16),
@@ -136,6 +237,29 @@ class _SupportArinPageState extends ConsumerState<SupportArinPage> {
                 ),
               );
             },
+          ),
+          const SizedBox(height: 10),
+          Wrap(
+            alignment: WrapAlignment.center,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            spacing: 8,
+            children: [
+              TextButton(
+                onPressed: () => _openExternalUrl(_privacyPolicyUrl),
+                child: Text(l10n.premiumLegalPrivacyPolicy),
+              ),
+              Text(
+                '•',
+                style: TextStyle(
+                  color: isDark ? Colors.white54 : AppColors.textMuted,
+                  fontSize: 12,
+                ),
+              ),
+              TextButton(
+                onPressed: () => _openExternalUrl(_termsOfUseUrl),
+                child: Text(l10n.premiumLegalTermsOfUse),
+              ),
+            ],
           ),
         ],
       ),
@@ -224,6 +348,7 @@ class _SupportCard extends StatelessWidget {
     required this.productId,
     required this.isBusy,
     required this.anyBusy,
+    required this.isEnabled,
     required this.onTap,
     this.highlighted = false,
   });
@@ -235,6 +360,7 @@ class _SupportCard extends StatelessWidget {
   final String productId;
   final bool isBusy;
   final bool anyBusy;
+  final bool isEnabled;
   final VoidCallback onTap;
   final bool highlighted;
 
@@ -256,14 +382,92 @@ class _SupportCard extends StatelessWidget {
               ? Colors.white.withValues(alpha: 0.12)
               : AppColors.creamDark);
 
-    return Container(
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final isCompact = constraints.maxWidth < 380;
+        return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: containerColor,
         borderRadius: BorderRadius.circular(22),
         border: Border.all(color: borderColor),
       ),
-      child: Row(
+      child: isCompact
+          ? Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      width: 46,
+                      height: 46,
+                      decoration: BoxDecoration(
+                        color: AppColors.accentNeonGreen.withValues(alpha: 0.14),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        icon,
+                        color: isDark
+                            ? AppColors.accentNeonGreen
+                            : AppColors.accentGreenOnLight,
+                      ),
+                    ),
+                    const SizedBox(width: 14),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            title,
+                            style: TextStyle(
+                              color: titleColor,
+                              fontWeight: FontWeight.w900,
+                              fontSize: 16,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            subtitle,
+                            style: TextStyle(color: subtitleColor, height: 1.28),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: FilledButton(
+                    onPressed: anyBusy || !isEnabled ? null : onTap,
+                    style: FilledButton.styleFrom(
+                      backgroundColor:
+                          highlighted
+                              ? AppColors.goldAccent
+                              : AppColors.accentNeonGreen,
+                      foregroundColor: const Color(0xFF07110B),
+                      disabledBackgroundColor:
+                          (highlighted
+                                  ? AppColors.goldAccent
+                                  : AppColors.accentNeonGreen)
+                              .withValues(alpha: 0.4),
+                    ),
+                    child:
+                        isBusy
+                            ? const SizedBox(
+                                width: 18,
+                                height: 18,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: Color(0xFF07110B),
+                                ),
+                              )
+                            : Text(price),
+                  ),
+                ),
+              ],
+            )
+          : Row(
         children: [
           Container(
             width: 46,
@@ -302,7 +506,7 @@ class _SupportCard extends StatelessWidget {
           ),
           const SizedBox(width: 12),
           FilledButton(
-            onPressed: anyBusy ? null : onTap,
+            onPressed: anyBusy || !isEnabled ? null : onTap,
             style: FilledButton.styleFrom(
               backgroundColor:
                   highlighted ? AppColors.goldAccent : AppColors.accentNeonGreen,
@@ -324,6 +528,8 @@ class _SupportCard extends StatelessWidget {
           ),
         ],
       ),
+    );
+      },
     );
   }
 }

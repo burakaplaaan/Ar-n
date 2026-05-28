@@ -167,7 +167,12 @@ class _ZikirMatikPageState extends ConsumerState<ZikirMatikPage>
       parent: _cardIntro,
       curve: Curves.easeOutCubic,
     );
-    WidgetsBinding.instance.addPostFrameCallback((_) => _loadSession());
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Future<void>(() {
+        if (!mounted) return;
+        _loadSession();
+      });
+    });
   }
 
   @override

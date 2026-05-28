@@ -15,7 +15,6 @@ const { initializeApp } = require("firebase-admin/app");
 const { getFirestore, FieldValue, Timestamp } = require("firebase-admin/firestore");
 const { getMessaging } = require("firebase-admin/messaging");
 const { getAuth } = require("firebase-admin/auth");
-const crypto = require("crypto");
 
 initializeApp();
 
@@ -40,6 +39,56 @@ const _defaultTeaserTexts = [
   "Bu an geçmeden bir bak",
   "Seninle buluşmak için bir an var",
 ];
+const _kPremiumProductIds = new Set([
+  "arin_premium_monthly_launch",
+  "arin_premium_yearly_launch",
+]);
+const _kValidRcEnvironments = new Set(["PRODUCTION"]);
+
+function _extractBaseProductId(productId) {
+  if (!productId || typeof productId !== "string") return null;
+  return productId.split(":")[0];
+}
+
+function _eventHasPremiumEntitlement(event) {
+  const ids = event && event.entitlement_ids;
+  return Array.isArray(ids) && ids.includes("premium");
+}
+
+function _resolveActiveUntilMs(event) {
+  const grace = Number(event.grace_period_expiration_at_ms);
+  if (Number.isFinite(grace) && grace > 0) return grace;
+  const expiry = Number(event.expiration_at_ms);
+  if (Number.isFinite(expiry) && expiry > 0) return expiry;
+  return null;
+}
+
+async function _isStaleForUid({ db, uid, eventTsMs }) {
+  const docRef = db.collection("premium_entitlements").doc(uid);
+  const snap = await docRef.get();
+  const lastEventTsRaw = Number(snap.data()?.lastEventTimestampMs);
+  return Number.isFinite(lastEventTsRaw) && lastEventTsRaw > eventTsMs;
+}
+
+async function _assertNotStaleForUid({ db, uid, eventTsMs }) {
+  try {
+    return await _isStaleForUid({ db, uid, eventTsMs });
+  } catch (e) {
+    throw new Error(`[RC Webhook] stale-check failed for ${uid}: ${e?.message || e}`);
+  }
+}
+
+function _isPremiumSubscriptionEvent(event) {
+  const rawProductId = event && event.product_id;
+  const baseProductId = _extractBaseProductId(rawProductId);
+  if (
+    (rawProductId && _kPremiumProductIds.has(rawProductId)) ||
+    (baseProductId && _kPremiumProductIds.has(baseProductId))
+  ) {
+    return true;
+  }
+  return _eventHasPremiumEntitlement(event);
+}
 
 /**
  * `admin_ntf_config/teasers` dökümanından yönetilebilir teaser listesini okur.
@@ -698,8 +747,10 @@ exports.sendTestNotification = onCall(
 //   firebase functions:secrets:set REVENUECAT_WEBHOOK_SECRET
 //
 // Desteklenen olaylar:
-//   INITIAL_PURCHASE, RENEWAL, PRODUCT_CHANGE → premium_entitlements'a yazar
-//   CANCELLATION, EXPIRATION, BILLING_ISSUE   → active = false yapar
+//   INITIAL_PURCHASE, RENEWAL, PRODUCT_CHANGE, UNCANCELLATION → active = true
+//   CANCELLATION, BILLING_ISSUE                               → expiry'e göre active
+//   EXPIRATION                                                → active = false
+//   TRANSFER                                                  → from pasif / to aktif
 //
 // app_user_id = Firebase UID (PurchaseService.initialize içinde logIn ile set edilir)
 exports.revenuecatWebhook = onRequest(
@@ -713,25 +764,122 @@ exports.revenuecatWebhook = onRequest(
       return;
     }
 
-    // ── İmza doğrulaması ─────────────────────────────────────────────────
+    // ── Yetki doğrulaması ────────────────────────────────────────────────
     const secret = process.env.REVENUECAT_WEBHOOK_SECRET;
-    if (secret) {
-      const signature = req.headers["x-revenuecat-signature"] || "";
-      const rawBody = JSON.stringify(req.body);
-      const expected = crypto
-        .createHmac("sha256", secret)
-        .update(rawBody)
-        .digest("hex");
-      if (signature !== expected) {
-        console.warn("[RC Webhook] İmza geçersiz — istek reddedildi");
-        res.status(401).send("Unauthorized");
-        return;
-      }
+    if (!secret) {
+      console.error("[RC Webhook] Secret eksik, fail-closed");
+      res.status(500).send("Webhook not configured");
+      return;
+    }
+    const authHeader = req.headers.authorization || "";
+    if (authHeader !== secret) {
+      console.warn("[RC Webhook] Authorization geçersiz — istek reddedildi");
+      res.status(401).send("Unauthorized");
+      return;
     }
 
     const event = req.body?.event;
     if (!event) {
       res.status(400).send("Bad Request: event missing");
+      return;
+    }
+
+    if (!_kValidRcEnvironments.has(String(event.environment || ""))) {
+      console.log(
+        `[RC Webhook] Ortam atlandı: ${String(event.environment || "unknown")}`,
+      );
+      res.status(200).json({ ok: true, skipped: true, environment: true });
+      return;
+    }
+
+    const db = getFirestore();
+    const now = Timestamp.now();
+    const nowMs = Date.now();
+    const eventTsMsRaw = Number(event.event_timestamp_ms);
+    if (!Number.isFinite(eventTsMsRaw) || eventTsMsRaw <= 0) {
+      console.warn("[RC Webhook] event_timestamp_ms geçersiz, event atlandı");
+      res.status(200).json({ ok: true, skipped: true, badTimestamp: true });
+      return;
+    }
+    const eventTsMs = eventTsMsRaw;
+
+    // E-postayı önce RevenueCat subscriber_attributes'dan dene,
+    // yoksa Firebase Auth'dan çek.
+    let email = null;
+    const type = event.type;
+    const productId = event.product_id ?? null;
+
+    if (type === "TRANSFER") {
+      if (!_isPremiumSubscriptionEvent(event)) {
+        console.log("[RC Webhook] TRANSFER premium değil, atlandı");
+        res.status(200).json({ ok: true, skipped: true });
+        return;
+      }
+      const transferredFrom = Array.isArray(event.transferred_from)
+        ? event.transferred_from
+        : [];
+      const transferredTo = Array.isArray(event.transferred_to)
+        ? event.transferred_to
+        : [];
+      const expiresAtMs = event.expiration_at_ms;
+      const activeUntilMs = _resolveActiveUntilMs(event);
+      const expiresAt = activeUntilMs ? Timestamp.fromMillis(activeUntilMs) : null;
+      const isActiveUntilExpiry = activeUntilMs ? activeUntilMs > nowMs : false;
+      const writes = [];
+      for (const fromUid of transferredFrom) {
+        if (!fromUid || String(fromUid).startsWith("$RCAnonymousID")) continue;
+        const normalizedUid = String(fromUid);
+        const stale = await _assertNotStaleForUid({
+          db,
+          uid: normalizedUid,
+          eventTsMs,
+        });
+        if (stale) continue;
+        writes.push(
+          db.collection("premium_entitlements").doc(normalizedUid).set(
+            {
+              active: false,
+              source: "revenuecat",
+              productId: _extractBaseProductId(productId) ?? productId,
+              platform: event.store ?? null,
+              updatedAt: now,
+              lastEventTimestampMs: eventTsMs,
+            },
+            { merge: true },
+          ),
+        );
+      }
+      for (const toUid of transferredTo) {
+        if (!toUid || String(toUid).startsWith("$RCAnonymousID")) continue;
+        const normalizedUid = String(toUid);
+        const stale = await _assertNotStaleForUid({
+          db,
+          uid: normalizedUid,
+          eventTsMs,
+        });
+        if (stale) continue;
+        writes.push(
+          db.collection("premium_entitlements").doc(normalizedUid).set(
+            {
+              active: isActiveUntilExpiry,
+              source: "revenuecat",
+              productId: _extractBaseProductId(productId) ?? productId,
+              platform: event.store ?? null,
+              expiresAt,
+              updatedAt: now,
+              lastEventTimestampMs: eventTsMs,
+            },
+            { merge: true },
+          ),
+        );
+      }
+      if (writes.length > 0) {
+        await Promise.all(writes);
+      }
+      console.log(
+        `[RC Webhook] TRANSFER işlendi from=${transferredFrom.length} to=${transferredTo.length}`,
+      );
+      res.status(200).json({ ok: true });
       return;
     }
 
@@ -742,14 +890,8 @@ exports.revenuecatWebhook = onRequest(
       res.status(200).json({ ok: true, skipped: true });
       return;
     }
-
-    const db = getFirestore();
     const docRef = db.collection("premium_entitlements").doc(uid);
-    const now = Timestamp.now();
 
-    // E-postayı önce RevenueCat subscriber_attributes'dan dene,
-    // yoksa Firebase Auth'dan çek.
-    let email = null;
     try {
       const rcEmail = event.subscriber_attributes?.$email?.value;
       if (rcEmail && rcEmail.trim().length > 0) {
@@ -762,18 +904,32 @@ exports.revenuecatWebhook = onRequest(
       console.warn("[RC Webhook] E-posta alınamadı:", e?.message);
     }
 
-    const type = event.type;
+    const stale = await _assertNotStaleForUid({ db, uid, eventTsMs });
+    if (stale) {
+      console.log(
+        `[RC Webhook] Eski event atlandı uid=${uid} eventTs=${eventTsMs}`,
+      );
+      res.status(200).json({ ok: true, skipped: true, stale: true });
+      return;
+    }
+
     const activeTypes = new Set([
       "INITIAL_PURCHASE",
       "RENEWAL",
       "PRODUCT_CHANGE",
       "UNCANCELLATION",
     ]);
-    const inactiveTypes = new Set([
-      "CANCELLATION",
-      "EXPIRATION",
-      "BILLING_ISSUE",
-    ]);
+    const inactiveTypes = new Set(["EXPIRATION"]);
+
+    // Sadece premium abonelik SKU'ları entitlement günceller.
+    // Destek ürünleri (tip/non-subscription) bu koleksiyonu etkilememeli.
+    if (!_isPremiumSubscriptionEvent(event)) {
+      console.log(
+        `[RC Webhook] Premium olmayan ürün atlandı: ${productId ?? "null"} (${type})`
+      );
+      res.status(200).json({ ok: true, skipped: true });
+      return;
+    }
 
     if (activeTypes.has(type)) {
       const expiresAtMs = event.expiration_at_ms;
@@ -782,12 +938,13 @@ exports.revenuecatWebhook = onRequest(
           active: true,
           source: "revenuecat",
           email: email,
-          productId: event.product_id ?? null,
+          productId: _extractBaseProductId(productId) ?? productId,
           platform: event.store ?? null,
           expiresAt: expiresAtMs
             ? Timestamp.fromMillis(expiresAtMs)
             : null,
           updatedAt: now,
+          lastEventTimestampMs: eventTsMs,
         },
         { merge: true },
       );
@@ -799,10 +956,37 @@ exports.revenuecatWebhook = onRequest(
           source: "revenuecat",
           email: email,
           updatedAt: now,
+          lastEventTimestampMs: eventTsMs,
         },
         { merge: true },
       );
       console.log(`[RC Webhook] ${type} → ${uid} (${email ?? "e-posta yok"}) premium pasif edildi`);
+    } else if (type === "CANCELLATION" || type === "BILLING_ISSUE") {
+      const activeUntilMs = _resolveActiveUntilMs(event);
+      if (!activeUntilMs) {
+        console.log(
+          `[RC Webhook] ${type} expiry/grace yok, event atlandı uid=${uid}`,
+        );
+        res.status(200).json({ ok: true, skipped: true, noExpiry: true });
+        return;
+      }
+      const isActiveUntilExpiry = activeUntilMs > nowMs;
+      await docRef.set(
+        {
+          active: isActiveUntilExpiry,
+          source: "revenuecat",
+          email: email,
+          productId: _extractBaseProductId(productId) ?? productId,
+          platform: event.store ?? null,
+          expiresAt: Timestamp.fromMillis(activeUntilMs),
+          updatedAt: now,
+          lastEventTimestampMs: eventTsMs,
+        },
+        { merge: true },
+      );
+      console.log(
+        `[RC Webhook] ${type} → ${uid} (${email ?? "e-posta yok"}) durum güncellendi (active=${isActiveUntilExpiry})`
+      );
     } else {
       console.log(`[RC Webhook] Bilinmeyen olay tipi: ${type} — atlandı`);
     }

@@ -1,6 +1,8 @@
+import 'dart:async';
 import 'dart:io' show Platform;
 import 'dart:ui';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -16,11 +18,10 @@ import '../../l10n/app_localizations.dart';
 import '../shared/providers/auth_providers.dart';
 import '../shared/providers/premium_providers.dart';
 
-/// Android'de mağazadan gerçek fiyatları çeker.
-/// iOS'ta her zaman boş map döner (hardcoded fiyatlar kullanılır).
+/// Android/iOS'ta mağazadan gerçek fiyatları çeker.
 final _premiumPricesProvider =
     FutureProvider.autoDispose<Map<String, String>>((ref) async {
-  if (kIsWeb || !Platform.isAndroid) return {};
+  if (kIsWeb || !(Platform.isAndroid || Platform.isIOS)) return {};
   return PurchaseService().fetchProductPriceStrings([
     PremiumPage.yearlyProductId,
     PremiumPage.monthlyProductId,
@@ -39,9 +40,62 @@ class PremiumPage extends ConsumerStatefulWidget {
 
 class _PremiumPageState extends ConsumerState<PremiumPage> {
   static const _privacyPolicyUrl = 'https://arinapp-7b136.web.app/privacy';
-  static const _termsOfUseUrl = 'https://arinapp-7b136.web.app/terms';
+  static const _termsOfUseUrl = 'https://arinapp-7b136.web.app/terms.html';
 
   String? _busyProductId;
+  bool _loadingProducts = true;
+  final Set<String> _availableProductIds = <String>{};
+  final Map<String, String> _storePriceByBaseId = <String, String>{};
+  Timer? _productRetryTimer;
+
+  @override
+  void initState() {
+    super.initState();
+    Future.microtask(_loadPremiumProducts);
+  }
+
+  @override
+  void dispose() {
+    _productRetryTimer?.cancel();
+    super.dispose();
+  }
+
+  Future<void> _loadPremiumProducts() async {
+    final ids = <String>[
+      PremiumPage.yearlyProductId,
+      PremiumPage.monthlyProductId,
+    ];
+    await PurchaseService.initialize();
+    final prices = await ref
+        .read(purchaseServiceProvider)
+        .fetchProductPriceStrings(ids);
+    if (!mounted) return;
+    setState(() {
+      _loadingProducts = false;
+      _availableProductIds
+        ..clear()
+        ..addAll(
+          prices.keys.map((id) => _normalizeProductId(id)).where((id) => id.isNotEmpty),
+        );
+      _storePriceByBaseId
+        ..clear()
+        ..addEntries(
+          prices.entries.map(
+            (e) => MapEntry(_normalizeProductId(e.key), e.value),
+          ),
+        );
+    });
+    if (prices.isEmpty) {
+      _productRetryTimer?.cancel();
+      _productRetryTimer = Timer(const Duration(seconds: 2), () {
+        if (!mounted || _busyProductId != null || _availableProductIds.isNotEmpty) {
+          return;
+        }
+        setState(() => _loadingProducts = true);
+        unawaited(_loadPremiumProducts());
+      });
+    }
+  }
 
   Future<void> _openExternalUrl(String rawUrl) async {
     final l10n = AppLocalizations.of(context)!;
@@ -62,10 +116,35 @@ class _PremiumPageState extends ConsumerState<PremiumPage> {
   }
 
   Future<void> _startPurchase(String productId) async {
+    if (_busyProductId != null) return;
+    if (_loadingProducts || !_containsProduct(productId)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text('Ürün bilgisi henüz hazır değil. Lütfen tekrar deneyin.'),
+          backgroundColor: Colors.red.shade700,
+        ),
+      );
+      return;
+    }
     final user = ref.read(authUserProvider).asData?.value;
     if (user == null) {
       final signedIn = await _showSignInSheet();
       if (signedIn != true || !mounted) return;
+      final uid = FirebaseAuth.instance.currentUser?.uid;
+      if (uid != null && uid.isNotEmpty) {
+        try {
+          await PurchaseService.loginUser(uid);
+        } catch (e) {
+          if (!mounted) return;
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Hesap eşlemesi tamamlanamadı. Lütfen tekrar deneyin.'),
+            ),
+          );
+          return;
+        }
+        if (!mounted) return;
+      }
     }
 
     setState(() => _busyProductId = productId);
@@ -77,6 +156,7 @@ class _PremiumPageState extends ConsumerState<PremiumPage> {
       if (result.isSuccess) {
         // Premium aktif: Firestore'u yenile ve başarı sayfası/mesajı göster.
         ref.invalidate(premiumEntitlementProvider);
+        await ref.read(premiumEntitlementProvider.future);
         await _showSuccessDialog();
       } else if (!result.isCancelled) {
         final msg = result.userMessage;
@@ -90,6 +170,15 @@ class _PremiumPageState extends ConsumerState<PremiumPage> {
       if (mounted) setState(() => _busyProductId = null);
     }
   }
+
+  String _normalizeProductId(String productId) {
+    final idx = productId.indexOf(':');
+    if (idx <= 0) return productId;
+    return productId.substring(0, idx);
+  }
+
+  bool _containsProduct(String productId) =>
+      _availableProductIds.contains(_normalizeProductId(productId));
 
   Future<void> _showSuccessDialog() async {
     if (!mounted) return;
@@ -120,6 +209,7 @@ class _PremiumPageState extends ConsumerState<PremiumPage> {
   }
 
   Future<void> _restorePurchases() async {
+    if (_busyProductId != null) return;
     setState(() => _busyProductId = '__restore__');
     try {
       final result =
@@ -128,6 +218,7 @@ class _PremiumPageState extends ConsumerState<PremiumPage> {
 
       if (result.isSuccess) {
         ref.invalidate(premiumEntitlementProvider);
+        await ref.read(premiumEntitlementProvider.future);
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Premium geri yüklendi!')),
         );
@@ -222,10 +313,18 @@ class _PremiumPageState extends ConsumerState<PremiumPage> {
 
     // Android'de mağazadan gerçek fiyatlar; iOS'ta hardcoded değerler kullanılır.
     final prices = ref.watch(_premiumPricesProvider).asData?.value ?? {};
+    final providerPriceByBaseId = <String, String>{
+      for (final entry in prices.entries)
+        _normalizeProductId(entry.key): entry.value,
+    };
+    final mergedPriceByBaseId = {
+      ...providerPriceByBaseId,
+      ..._storePriceByBaseId,
+    };
     final yearlyPrice =
-        prices[PremiumPage.yearlyProductId] ?? '₺600,00 / yıl';
+        mergedPriceByBaseId[PremiumPage.yearlyProductId] ?? '₺600,00 / yıl';
     final monthlyPrice =
-        prices[PremiumPage.monthlyProductId] ?? '₺59,99 / ay';
+        mergedPriceByBaseId[PremiumPage.monthlyProductId] ?? '₺59,99 / ay';
 
     final titleTextColor = isDark ? Colors.white : AppColors.textPrimary;
     final subtitleTextColor = isDark
@@ -313,7 +412,10 @@ class _PremiumPageState extends ConsumerState<PremiumPage> {
                           productId: PremiumPage.yearlyProductId,
                           highlighted: !hasYearly,
                           isOwned: hasYearly,
-                          enabled: !isPremium || hasMonthly,
+                          enabled:
+                              (!isPremium || hasMonthly) &&
+                              (!_loadingProducts &&
+                                  _containsProduct(PremiumPage.yearlyProductId)),
                           buttonLabel: hasMonthly ? 'Yıllığa geç' : null,
                           busy: _busyProductId == PremiumPage.yearlyProductId,
                           onPressed: () =>
@@ -329,7 +431,10 @@ class _PremiumPageState extends ConsumerState<PremiumPage> {
                           highlighted: false,
                           isOwned: hasMonthly,
                           // Herhangi bir premium varsa aylık devre dışı.
-                          enabled: !isPremium,
+                          enabled:
+                              !isPremium &&
+                              (!_loadingProducts &&
+                                  _containsProduct(PremiumPage.monthlyProductId)),
                           busy: _busyProductId == PremiumPage.monthlyProductId,
                           onPressed: () =>
                               _startPurchase(PremiumPage.monthlyProductId),
@@ -339,6 +444,19 @@ class _PremiumPageState extends ConsumerState<PremiumPage> {
                           'Lansman fiyatları sınırlı süre geçerlidir. '
                           'Abonelik mağaza hesabın üzerinden yönetilir ve '
                           'istediğin zaman iptal edilebilir.',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: footerTextColor,
+                            fontSize: 12,
+                            height: 1.4,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          'Abonelik, dönem bitiminden en az 24 saat önce iptal edilmezse '
+                          'otomatik yenilenir. Yenileme ücreti dönem bitimine 24 saat kala '
+                          'mağaza hesabından tahsil edilir. Aboneliklerini App Store/Play '
+                          'hesap ayarlarından yönetebilirsin.',
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             color: footerTextColor,
