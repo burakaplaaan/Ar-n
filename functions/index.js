@@ -1102,7 +1102,8 @@ exports.cleanupDeletedUserData = onSchedule(
   async () => {
     const db = getFirestore();
     const auth = getAuth();
-    let purged = 0;
+// Sadece explicit queue. `users` tablosu üzerinde tam scan yapılması
+    // rate limit ve maliyet açısından güvenli değil, o nedenle queue tek yetkili kaynaktır.
     let queueProcessed = 0;
 
     // 1) Explicit deletion queue (client writes before auth delete)
@@ -1156,38 +1157,9 @@ exports.cleanupDeletedUserData = onSchedule(
       if (queueSnap.size < 250) break;
     }
 
-    // 2) Safety net: any orphan users doc whose auth user is gone
-    let lastDoc = null;
-    while (true) {
-      let query = db.collection("users").orderBy("__name__").limit(250);
-      if (lastDoc) query = query.startAfter(lastDoc);
-      const usersSnap = await query.get();
-      if (usersSnap.empty) break;
-      for (const userDoc of usersSnap.docs) {
-        const uid = userDoc.id;
-        let shouldPurge = false;
-        let email = null;
-        try {
-          const record = await auth.getUser(uid);
-          email = record.email || null;
-        } catch (e) {
-          const code = e?.code || "";
-          if (code === "auth/user-not-found") {
-            shouldPurge = true;
-          }
-        }
-        if (!shouldPurge) continue;
-        await _purgeUserDataByUid(db, uid);
-        await _purgePremiumInviteByEmail(db, email);
-        purged += 1;
-      }
-      lastDoc = usersSnap.docs[usersSnap.docs.length - 1];
-      if (usersSnap.size < 250) break;
-    }
-
-    if (queueProcessed > 0 || purged > 0) {
+    if (queueProcessed > 0) {
       console.log(
-        `[CleanupDeletedUserData] queueProcessed=${queueProcessed} purgedOrphans=${purged}`,
+        `[CleanupDeletedUserData] queueProcessed=${queueProcessed}`,
       );
     }
   },

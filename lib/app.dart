@@ -230,7 +230,8 @@ class _ArinAppState extends ConsumerState<ArinApp> with WidgetsBindingObserver {
         await WidgetAccessService(prefs).syncAll(isPremium: premium.isActive);
       } catch (e) {
         debugPrint('Widget access sync failed: $e');
-        await WidgetAccessService(prefs).syncAll(isPremium: false);
+        // Hata durumunda (internet yok, vb) isPremium: false diyerek kilitleri devreye
+        // sokma; mevcut durumu bozmadan atla.
       }
       unawaited(
         TrackingWidgetService.refreshSelected(
@@ -370,7 +371,11 @@ class _ArinAppState extends ConsumerState<ArinApp> with WidgetsBindingObserver {
         // RC kimliğini Firebase UID ile eşleştir ki webhook/restore akışı
         // anonim kullanıcıya düşmesin.
         unawaited(
-          PurchaseService.loginUser(user.uid).catchError(
+          PurchaseService.loginUser(user.uid).then((_) {
+            // Eşleştirme tamamlandıktan sonra premium durumunu yenile ki
+            // yeni açılan/önbellekte olmayan entitlement devreye girsin.
+            ref.invalidate(premiumEntitlementProvider);
+          }).catchError(
             (e) => debugPrint('PurchaseService.loginUser failed: $e'),
           ),
         );

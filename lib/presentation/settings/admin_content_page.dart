@@ -381,7 +381,7 @@ class _AdminContentPageState extends ConsumerState<AdminContentPage>
         final entitlement = await ref.read(premiumEntitlementProvider.future);
         await WidgetAccessService(prefs).syncAll(isPremium: entitlement.isActive);
       } catch (_) {
-        await WidgetAccessService(prefs).syncAll(isPremium: false);
+        // Hata durumunda mevcut durumu koru, downgrade etme.
       }
       _snack(
         locked

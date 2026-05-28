@@ -9,6 +9,7 @@ import 'package:hive/hive.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../core/utils/hive_boxes.dart';
+import '../../main.dart' show deferredStartupDone;
 import '../models/habit_log_model.dart';
 import '../models/habit_model.dart';
 import '../models/user_profile_model.dart';
@@ -56,6 +57,12 @@ abstract final class LocalDataWipeService {
     }
 
     await prefs.setBool('onboarding_completed', false);
+    
+    // Oturum kapandıktan veya hesap silindikten sonra deferred startup işlerinin
+    // (AdMob init, FCM init, migrasyonlar vb.) yeni oturumda tekrar çalışabilmesi için
+    // flag'i sıfırlıyoruz.
+    deferredStartupDone = false;
+    
     await _clearFirestoreOfflineCacheSafely();
   }
 

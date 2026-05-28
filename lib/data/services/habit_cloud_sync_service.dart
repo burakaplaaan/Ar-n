@@ -535,14 +535,31 @@ abstract final class HabitCloudSyncService {
 
     await deleteCollection(userRef.collection('habits'));
     await deleteCollection(userRef.collection('habit_logs'));
-    await userRef.collection('zikir_matik').doc('state').delete();
-    await userRef.collection('user_backup').doc('state').delete();
-    await userRef.delete();
+    try {
+      await userRef.collection('zikir_matik').doc('state').delete();
+    } catch (_) {}
+    try {
+      await userRef.collection('user_backup').doc('state').delete();
+    } catch (_) {}
+    try {
+      await userRef.delete();
+    } catch (_) {}
+    
     // Hesap silmede premium kayıtları da temizle.
-    await fs.collection('premium_entitlements').doc(uid).delete();
+    // Client-side silme yetkisi (firestore.rules) olmadığından fail-safe olarak
+    // try/catch içinde çağırıyoruz; asıl temizliği backend (cleanupDeletedUserData) yapacak.
+    try {
+      await fs.collection('premium_entitlements').doc(uid).delete();
+    } catch (e) {
+      debugPrint('Client-side premium_entitlements delete skipped (rules): $e');
+    }
     final normalizedEmail = email?.trim().toLowerCase();
     if (normalizedEmail != null && normalizedEmail.isNotEmpty) {
-      await fs.collection('premium_invites').doc(normalizedEmail).delete();
+      try {
+        await fs.collection('premium_invites').doc(normalizedEmail).delete();
+      } catch (e) {
+        debugPrint('Client-side premium_invites delete skipped (rules): $e');
+      }
     }
   }
 

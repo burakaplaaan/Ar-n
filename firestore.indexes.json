@@ -1,6 +1,14 @@
 {
   "indexes": [
     {
+      "collectionGroup": "account_deletion_queue",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "status", "order": "ASCENDING" },
+        { "fieldPath": "__name__", "order": "ASCENDING" }
+      ]
+    },
+    {
       "collectionGroup": "admin_ntf_pool",
       "queryScope": "COLLECTION",
       "fields": [

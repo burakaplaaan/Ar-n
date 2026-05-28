@@ -311,10 +311,14 @@ class PurchaseService {
     }
     if (!_isConfigured) return null;
     try {
+      final appUserId = await Purchases.appUserID;
       final info = await Purchases.getCustomerInfo();
       if (expectedFirebaseUid != null && expectedFirebaseUid.isNotEmpty) {
-        final rcUserId = info.originalAppUserId.trim();
-        if (rcUserId.isEmpty || rcUserId != expectedFirebaseUid) {
+        final rcUserId = appUserId.trim();
+        // Anonim RC kullanıcısı veya UID uyuşmazlığı varsa fallback iptal
+        if (rcUserId.isEmpty || 
+            rcUserId.startsWith('\$RCAnonymousID:') || 
+            rcUserId != expectedFirebaseUid) {
           debugPrint(
             '[PurchaseService] local entitlement ignored due to RC identity mismatch. '
             'expected=$expectedFirebaseUid rc=$rcUserId',
