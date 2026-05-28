@@ -177,20 +177,30 @@ class _ViewerBodyState extends ConsumerState<_ViewerBody> {
       final adGate = ref.read(adGateServiceProvider);
       while (mounted && _pendingExploreAdGateViews > 0) {
         _pendingExploreAdGateViews -= 1;
+        var isPremium = false;
+        var premiumKnown = false;
+        try {
+          final entitlement = await ref.read(premiumEntitlementProvider.future);
+          isPremium = entitlement.isActive;
+          premiumKnown = true;
+        } catch (_) {
+          // Premium durumu bilinmiyorsa kullanıcıyı free kabul edip reklam
+          // göstermiyoruz; bir sonraki swipe'ta tekrar deneriz.
+          isPremium = false;
+          premiumKnown = false;
+        }
+        if (!mounted) return;
+        if (!premiumKnown) {
+          _pendingExploreAdGateViews += 1;
+          await Future<void>.delayed(const Duration(milliseconds: 250));
+          continue;
+        }
         final shouldShow = await adGate
-            .recordExploreViewAndShouldShowAd(isPremium: false);
+            .recordExploreViewAndShouldShowAd(isPremium: isPremium);
         if (!mounted) return;
         if (!shouldShow) continue;
 
         await adGate.markPending(AdGatePlacement.exploreSwipe);
-        if (!mounted) return;
-        var isPremium = false;
-        try {
-          final entitlement = await ref.read(premiumEntitlementProvider.future);
-          isPremium = entitlement.isActive;
-        } catch (_) {
-          isPremium = false;
-        }
         if (!mounted) return;
         if (isPremium) {
           await adGate.clearPending(AdGatePlacement.exploreSwipe);

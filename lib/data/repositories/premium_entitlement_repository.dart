@@ -20,21 +20,32 @@ class PremiumEntitlementRepository {
     if (!isFirebaseReady) return PremiumEntitlement.inactive;
     final user = _auth.currentUser;
     if (user == null) return PremiumEntitlement.inactive;
+    final uid = user.uid;
 
-    // RevenueCat lokal cache: satın alma hemen ardından güncellenir,
-    // Firestore webhook'u (5-30 sn gecikebilir) beklemeden doğru sonuç verir.
-    final localEntitlement = await PurchaseService().getLocalPremiumEntitlement();
-    if (localEntitlement != null && localEntitlement.isActive) {
-      return localEntitlement;
-    }
-
-    final direct = await _loadDocument('premium_entitlements', user.uid);
+    final direct = await _loadDocument('premium_entitlements', uid);
     if (direct.isActive) return direct;
 
     final email = _emailOf(user);
-    if (email == null) return direct;
+    if (email == null) {
+      final localEntitlement = await PurchaseService().getLocalPremiumEntitlement(
+        expectedFirebaseUid: uid,
+      );
+      return (localEntitlement != null && localEntitlement.isActive)
+          ? localEntitlement
+          : direct;
+    }
     final invite = await _loadDocument('premium_invites', email);
-    return invite.isActive ? invite : direct;
+    if (invite.isActive) return invite;
+
+    // Webhook gecikmesi / geçici Firestore erişim sorunlarında, cihazdaki güncel
+    // RevenueCat sonucu premium false-negative'i önler.
+    final localEntitlement = await PurchaseService().getLocalPremiumEntitlement(
+      expectedFirebaseUid: uid,
+    );
+    if (localEntitlement != null && localEntitlement.isActive) {
+      return localEntitlement;
+    }
+    return direct;
   }
 
   Future<PremiumEntitlement> _loadDocument(

@@ -506,7 +506,7 @@ abstract final class HabitCloudSyncService {
 
   /// Oturum açıkken çağrılmalı: `users/{uid}` altındaki tüm belgeleri siler.
   /// Auth kullanıcısı silinmeden önce kullanılmalı (kurallar `request.auth.uid` ister).
-  static Future<void> deleteAllUserCloudData(String uid) async {
+  static Future<void> deleteAllUserCloudData(String uid, {String? email}) async {
     if (!isFirebaseReady || uid.isEmpty) return;
 
     final fs = FirebaseFirestore.instance;
@@ -538,6 +538,28 @@ abstract final class HabitCloudSyncService {
     await userRef.collection('zikir_matik').doc('state').delete();
     await userRef.collection('user_backup').doc('state').delete();
     await userRef.delete();
+    // Hesap silmede premium kayıtları da temizle.
+    await fs.collection('premium_entitlements').doc(uid).delete();
+    final normalizedEmail = email?.trim().toLowerCase();
+    if (normalizedEmail != null && normalizedEmail.isNotEmpty) {
+      await fs.collection('premium_invites').doc(normalizedEmail).delete();
+    }
+  }
+
+  /// Hesap silme öncesi, backend tarafında güvenli purge kuyruğuna kayıt açar.
+  static Future<void> queueUserCloudDataDeletion({
+    required String uid,
+    String? email,
+  }) async {
+    if (!isFirebaseReady || uid.isEmpty) return;
+    final fs = FirebaseFirestore.instance;
+    await fs.collection('account_deletion_queue').doc(uid).set({
+      'uid': uid,
+      'email': email?.trim().toLowerCase(),
+      'requestedAt': FieldValue.serverTimestamp(),
+      'processedAt': null,
+      'status': 'pending',
+    }, SetOptions(merge: true));
   }
 
   /// Tek bir alışkanlığı buluttan kalıcı siler (habit dokumanı + bagli loglar).

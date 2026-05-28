@@ -317,6 +317,18 @@ class _NamazAdhanReminderCardState
 
   Future<bool> _ensureSecondReminderAccess(int secondValue) async {
     if (secondValue < 0) return true;
+    final entitlementAsync = ref.read(premiumEntitlementProvider);
+    if (entitlementAsync.isLoading || entitlementAsync.hasError) {
+      if (!mounted) return false;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Premium durumu yukleniyor. Lutfen kisa bir sure sonra tekrar deneyin.',
+          ),
+        ),
+      );
+      return false;
+    }
     final entitlement = await ref.read(premiumEntitlementProvider.future);
     if (!mounted) return false;
     if (entitlement.isActive) return true;

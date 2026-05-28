@@ -12,11 +12,18 @@
 const { onSchedule } = require("firebase-functions/v2/scheduler");
 const { onCall, HttpsError, onRequest } = require("firebase-functions/v2/https");
 const { initializeApp } = require("firebase-admin/app");
-const { getFirestore, FieldValue, Timestamp } = require("firebase-admin/firestore");
+const {
+  getFirestore,
+  FieldPath,
+  FieldValue,
+  Timestamp,
+} = require("firebase-admin/firestore");
 const { getMessaging } = require("firebase-admin/messaging");
 const { getAuth } = require("firebase-admin/auth");
 
 initializeApp();
+
+const _kNotificationClaimTtlMs = 5 * 60 * 1000;
 
 // İki YYYY-MM-DD stringi arasındaki tam gün farkı (b - a)
 function daysBetween(a, b) {
@@ -44,6 +51,54 @@ const _kPremiumProductIds = new Set([
   "arin_premium_yearly_launch",
 ]);
 const _kValidRcEnvironments = new Set(["PRODUCTION"]);
+function _safeEqual(a, b) {
+  const sa = String(a || "");
+  const sb = String(b || "");
+  if (sa.length !== sb.length) return false;
+  let diff = 0;
+  for (let i = 0; i < sa.length; i++) {
+    diff |= sa.charCodeAt(i) ^ sb.charCodeAt(i);
+  }
+  return diff === 0;
+}
+
+async function _deleteCollectionInBatches(query, batchSize = 400) {
+  const db = getFirestore();
+  while (true) {
+    const snap = await query.limit(batchSize).get();
+    if (snap.empty) break;
+    let batch = db.batch();
+    let n = 0;
+    for (const doc of snap.docs) {
+      batch.delete(doc.ref);
+      n += 1;
+      if (n >= batchSize) {
+        await batch.commit();
+        batch = db.batch();
+        n = 0;
+      }
+    }
+    if (n > 0) {
+      await batch.commit();
+    }
+  }
+}
+
+async function _purgeUserDataByUid(db, uid) {
+  const userRef = db.collection("users").doc(uid);
+  await _deleteCollectionInBatches(userRef.collection("habits"));
+  await _deleteCollectionInBatches(userRef.collection("habit_logs"));
+  await userRef.collection("zikir_matik").doc("state").delete().catch(() => {});
+  await userRef.collection("user_backup").doc("state").delete().catch(() => {});
+  await userRef.delete().catch(() => {});
+  await db.collection("premium_entitlements").doc(uid).delete().catch(() => {});
+}
+
+async function _purgePremiumInviteByEmail(db, email) {
+  const normalized = String(email || "").trim().toLowerCase();
+  if (!normalized) return;
+  await db.collection("premium_invites").doc(normalized).delete().catch(() => {});
+}
 
 function _extractBaseProductId(productId) {
   if (!productId || typeof productId !== "string") return null;
@@ -329,7 +384,40 @@ exports.sendScheduledNotifications = onSchedule(
         return;
       }
 
-      // ── 6. Gönder ──────────────────────────────────────────────────────────
+      // ── 6. Gönder (atomik claim) ──────────────────────────────────────────
+      // Aynı dakikada paralel scheduler instance'larında çift gönderimi engelle.
+      const claimRef = db.collection("admin_ntf_config").doc("today_plan_claim");
+      const claimOk = await db.runTransaction(async (tx) => {
+        const claimSnap = await tx.get(claimRef);
+        const claim = claimSnap.exists ? claimSnap.data() || {} : {};
+        const claimedAtMs = Number(claim.claimedAtMs || 0);
+        const claimPlanDate = String(claim.planDate || "");
+        const claimPlanItemId = String(claim.planItemId || "");
+        const stillFresh = nowMs - claimedAtMs < _kNotificationClaimTtlMs;
+        const alreadyClaimed =
+          stillFresh &&
+          claimPlanDate === todayStr &&
+          claimPlanItemId === String(plan.itemId || "");
+        if (alreadyClaimed) {
+          return false;
+        }
+        tx.set(
+          claimRef,
+          {
+            planDate: todayStr,
+            planItemId: String(plan.itemId || ""),
+            claimedAtMs: nowMs,
+            claimedAt: FieldValue.serverTimestamp(),
+          },
+          { merge: true },
+        );
+        return true;
+      });
+      if (!claimOk) {
+        console.log("[Havuz] Plan claim başka instance tarafından alındı, atlandı.");
+        return;
+      }
+
       const itemSnap = await db
         .collection("admin_ntf_pool")
         .doc(plan.itemId)
@@ -771,8 +859,12 @@ exports.revenuecatWebhook = onRequest(
       res.status(500).send("Webhook not configured");
       return;
     }
-    const authHeader = req.headers.authorization || "";
-    if (authHeader !== secret) {
+    const authHeader = String(req.headers.authorization || "").trim();
+    const normalizedAuth = authHeader.toLowerCase().startsWith("bearer ")
+      ? authHeader.slice(7).trim()
+      : authHeader;
+    const headerOk = _safeEqual(normalizedAuth, secret);
+    if (!headerOk) {
       console.warn("[RC Webhook] Authorization geçersiz — istek reddedildi");
       res.status(401).send("Unauthorized");
       return;
@@ -992,5 +1084,111 @@ exports.revenuecatWebhook = onRequest(
     }
 
     res.status(200).json({ ok: true });
+  },
+);
+
+// ─────────────────────────────────────────────────────────────────────────────
+// cleanupDeletedUserData — Firebase Auth'tan silinmiş kullanıcıların Firestore
+// kalıntılarını temizler. Böylece hesap silme akışında auth önce silinse bile
+// kullanıcı verileri kalıcı olarak tutulmaz.
+// ─────────────────────────────────────────────────────────────────────────────
+exports.cleanupDeletedUserData = onSchedule(
+  {
+    schedule: "every 24 hours",
+    timeZone: "Europe/Istanbul",
+    memory: "256MiB",
+    region: "europe-west1",
+  },
+  async () => {
+    const db = getFirestore();
+    const auth = getAuth();
+    let purged = 0;
+    let queueProcessed = 0;
+
+    // 1) Explicit deletion queue (client writes before auth delete)
+    let lastQueueDoc = null;
+    while (true) {
+      let queueQuery = db
+        .collection("account_deletion_queue")
+        .where("status", "==", "pending")
+        .orderBy(FieldPath.documentId())
+        .limit(250);
+      if (lastQueueDoc) {
+        queueQuery = queueQuery.startAfter(lastQueueDoc.id);
+      }
+      const queueSnap = await queueQuery.get();
+      if (queueSnap.empty) break;
+      for (const q of queueSnap.docs) {
+        const data = q.data() || {};
+        const uid = String(data.uid || q.id);
+        const email = data.email || null;
+        let authUserExists = true;
+        try {
+          await auth.getUser(uid);
+        } catch (e) {
+          if (e?.code === "auth/user-not-found") {
+            authUserExists = false;
+          } else {
+            console.error(
+              `[CleanupDeletedUserData] queue auth lookup failed uid=${uid}:`,
+              e,
+            );
+            continue;
+          }
+        }
+        if (authUserExists) {
+          // Auth kaydı hâlâ varsa purge yapma. Kuyruk pending kalır, bir sonraki
+          // çalışmada kullanıcı gerçekten silinmişse işlenecek.
+          continue;
+        }
+        await _purgeUserDataByUid(db, uid);
+        await _purgePremiumInviteByEmail(db, email);
+        await q.ref.set(
+          {
+            status: "done",
+            processedAt: FieldValue.serverTimestamp(),
+          },
+          { merge: true },
+        );
+        queueProcessed += 1;
+      }
+      lastQueueDoc = queueSnap.docs[queueSnap.docs.length - 1];
+      if (queueSnap.size < 250) break;
+    }
+
+    // 2) Safety net: any orphan users doc whose auth user is gone
+    let lastDoc = null;
+    while (true) {
+      let query = db.collection("users").orderBy("__name__").limit(250);
+      if (lastDoc) query = query.startAfter(lastDoc);
+      const usersSnap = await query.get();
+      if (usersSnap.empty) break;
+      for (const userDoc of usersSnap.docs) {
+        const uid = userDoc.id;
+        let shouldPurge = false;
+        let email = null;
+        try {
+          const record = await auth.getUser(uid);
+          email = record.email || null;
+        } catch (e) {
+          const code = e?.code || "";
+          if (code === "auth/user-not-found") {
+            shouldPurge = true;
+          }
+        }
+        if (!shouldPurge) continue;
+        await _purgeUserDataByUid(db, uid);
+        await _purgePremiumInviteByEmail(db, email);
+        purged += 1;
+      }
+      lastDoc = usersSnap.docs[usersSnap.docs.length - 1];
+      if (usersSnap.size < 250) break;
+    }
+
+    if (queueProcessed > 0 || purged > 0) {
+      console.log(
+        `[CleanupDeletedUserData] queueProcessed=${queueProcessed} purgedOrphans=${purged}`,
+      );
+    }
   },
 );

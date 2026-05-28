@@ -34,7 +34,10 @@ import '../../data/services/user_cloud_backup_service.dart';
 import '../settings/widgets/district_picker_sheet.dart';
 import '../shared/providers/auth_providers.dart';
 import '../shared/providers/habit_providers.dart';
+import '../inspire/inspiration_engagement_provider.dart';
+import '../kaza/kaza_tracking_provider.dart';
 import '../shared/providers/prayer_time_providers.dart';
+import '../shared/providers/premium_providers.dart';
 import '../shared/providers/user_profile_providers.dart';
 
 class SettingsPage extends ConsumerStatefulWidget {
@@ -152,9 +155,9 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
 
     final prefs = ref.read(sharedPreferencesProvider);
     if (isFirebaseReady) {
-      try {
-        final user = FirebaseAuth.instance.currentUser;
-        if (user != null) {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        try {
           await HabitCloudSyncService.pushFromLocal(
             uid: user.uid,
             repo: ref.read(habitRepositoryProvider),
@@ -167,23 +170,50 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
             prefs: prefs,
             force: true,
           );
+        } catch (e) {
+          debugPrint('signOut pre-push failed: $e');
         }
+      }
+      try {
         await ref.read(authServiceProvider).signOut();
       } catch (e) {
-        debugPrint('signOut: $e');
+        // signOut (RC logout / Firebase signOut / Google signOut) hata atsa
+        // bile yerel veri silme her durumda çalışmalı — aksi halde bir sonraki
+        // kullanıcı önceki kullanıcının habit/zikir/ayar verilerini görür.
+        debugPrint('signOut failed (continuing with local wipe): $e');
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(l10n.settingsAuthServiceUnavailable)),
+          );
+        }
       }
     }
 
-    await LocalDataWipeService.wipeAll(prefs);
+    try {
+      await LocalDataWipeService.wipeAll(prefs);
+    } catch (e) {
+      debugPrint('LocalDataWipeService.wipeAll failed: $e');
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.settingsAccountDeleteRetryMessage)),
+      );
+      return;
+    }
     _invalidateAfterWipe();
     ref.read(appRouterRefreshProvider).notifyAuthOrOnboarding();
     if (mounted) context.go(AppRoutes.onboarding);
   }
 
   void _invalidateAfterWipe() {
+    ref.invalidate(authUserProvider);
+    ref.invalidate(premiumEntitlementProvider);
     ref.invalidate(userProfileProvider);
     ref.invalidate(habitSummaryProvider);
     ref.invalidate(dailyContentProvider);
+    ref.invalidate(prayerTimesProvider);
+    ref.invalidate(inspirationSavedIdsProvider);
+    ref.invalidate(inspirationLikedIdsProvider);
+    ref.invalidate(kazaTrackingProvider);
   }
 
   Future<void> _deleteAccount() async {
@@ -244,6 +274,11 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
     if (ok != true || !mounted) return;
 
     final uid = firebaseUser.uid;
+    final email =
+        firebaseUser.email?.trim().toLowerCase() ??
+        firebaseUser.providerData
+            .map((p) => p.email?.trim().toLowerCase())
+            .firstWhere((e) => e != null && e.isNotEmpty, orElse: () => null);
     setState(() => _accountDeleteBusy = true);
     final rootNav = Navigator.of(context, rootNavigator: true);
     var loaderPushed = false;
@@ -321,19 +356,40 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
       return;
     }
 
+    // Oturum hâlâ açıkken cloud verisini doğrudan sil — Firestore kuralları
+    // `request.auth.uid == uid` istiyor; Auth silindikten sonra istemci taraflı
+    // silme imkânsız olur. Apple 5.1.1(v) / Play Data Safety: kullanıcı "Sil"
+    // dediği an verisi gitmeli, 24 saatlik backend scheduler beklenmemeli.
+    var cloudDeletedDirectly = false;
     try {
-      await HabitCloudSyncService.deleteAllUserCloudData(uid);
+      await HabitCloudSyncService.deleteAllUserCloudData(uid, email: email);
+      cloudDeletedDirectly = true;
     } catch (e) {
-      if (loaderPushed && mounted) {
-        rootNav.pop();
+      debugPrint('Direct cloud delete failed, will rely on queue: $e');
+    }
+
+    // Doğrudan silme başarısız ya da kısmen tamamlanmış olabilir; backend
+    // queue scheduled cleanup'ı yine de tetiklensin (idempotent).
+    try {
+      await HabitCloudSyncService.queueUserCloudDataDeletion(
+        uid: uid,
+        email: email,
+      );
+    } catch (e) {
+      // Doğrudan silme başardıysa queue başarısızlığı engelleyici değil.
+      if (!cloudDeletedDirectly) {
+        if (loaderPushed && mounted) {
+          rootNav.pop();
+        }
+        if (mounted) {
+          setState(() => _accountDeleteBusy = false);
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(l10n.settingsCloudDeleteFailedMessage)),
+          );
+        }
+        return;
       }
-      if (mounted) {
-        setState(() => _accountDeleteBusy = false);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(l10n.settingsCloudDeleteFailedMessage)),
-        );
-      }
-      return;
+      debugPrint('Queue write failed (cloud already purged): $e');
     }
 
     try {
@@ -354,7 +410,8 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
         );
       }
       return;
-    } catch (e) {
+    }
+    catch (e) {
       debugPrint('Account delete failed: $e');
       if (loaderPushed && mounted) {
         rootNav.pop();
@@ -376,7 +433,17 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
     }
 
     final prefs = ref.read(sharedPreferencesProvider);
-    await LocalDataWipeService.wipeAll(prefs);
+    try {
+      await LocalDataWipeService.wipeAll(prefs);
+    } catch (e) {
+      debugPrint('LocalDataWipeService.wipeAll (delete account) failed: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(l10n.settingsAccountDeleteRetryMessage)),
+        );
+      }
+      return;
+    }
     _invalidateAfterWipe();
     ref.read(appRouterRefreshProvider).notifyAuthOrOnboarding();
     if (mounted) context.go(AppRoutes.onboarding);

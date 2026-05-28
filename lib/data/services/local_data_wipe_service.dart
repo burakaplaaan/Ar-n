@@ -4,6 +4,7 @@
 // için kullanıcıya ait tüm lokal yan etkilerin sıfırlanmasını garanti ediyoruz.
 
 import 'package:flutter/foundation.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:hive/hive.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -13,6 +14,8 @@ import '../models/habit_model.dart';
 import '../models/user_profile_model.dart';
 import 'arin_local_notifications_plugin.dart';
 import 'arin_widget_sync.dart';
+import 'prayer_reminder_prefs.dart';
+import 'prayer_user_notification_sound_store.dart';
 
 abstract final class LocalDataWipeService {
   /// Tüm kullanıcı verilerini siler; profil kutusuna boş profil yazar.
@@ -31,6 +34,8 @@ abstract final class LocalDataWipeService {
   static Future<void> wipeAll(SharedPreferences prefs) async {
     await _cancelAllLocalNotifications();
     await _clearHomeWidgetData();
+    await _clearImportedPrayerSounds(prefs);
+    await _clearLegacyHiveBoxes();
 
     await prefs.clear();
 
@@ -51,6 +56,7 @@ abstract final class LocalDataWipeService {
     }
 
     await prefs.setBool('onboarding_completed', false);
+    await _clearFirestoreOfflineCacheSafely();
   }
 
   /// Hesabı silinen / çıkış yapan kullanıcıya ezan, arınma, zikir, milestone
@@ -59,15 +65,58 @@ abstract final class LocalDataWipeService {
   /// zaman init edilir ama test ortamında güvence altındayız.
   static Future<void> _cancelAllLocalNotifications() async {
     if (kIsWeb) return;
-    try {
-      await arinLocalNotificationsPlugin.cancelAll();
-    } catch (e, st) {
-      debugPrint('LocalDataWipeService.cancelAll: $e\n$st');
-    }
+    await arinLocalNotificationsPlugin.cancelAll();
   }
 
   static Future<void> _clearHomeWidgetData() async {
     if (kIsWeb) return;
     await ArinWidgetSync.clearAll();
+  }
+
+  static Future<void> _clearImportedPrayerSounds(SharedPreferences prefs) async {
+    if (kIsWeb) return;
+    for (var slot = 0; slot < PrayerReminderPrefs.slotCount; slot++) {
+      try {
+        await PrayerUserNotificationSoundStore.clearForSlot(prefs, slot);
+      } catch (e, st) {
+        throw StateError(
+          'Slot bazlı import ses temizliği başarısız (slot=$slot): $e\n$st',
+        );
+      }
+    }
+  }
+
+  static Future<void> _clearLegacyHiveBoxes() async {
+    if (Hive.isBoxOpen(HiveBoxes.legacyJournalEntries)) {
+      await Hive.box(HiveBoxes.legacyJournalEntries).clear();
+    }
+    await Hive.deleteBoxFromDisk(HiveBoxes.legacyJournalEntries);
+  }
+
+  static Future<void> _clearFirestoreOfflineCacheSafely() async {
+    if (kIsWeb) return;
+    try {
+      await FirebaseFirestore.instance.terminate();
+      await FirebaseFirestore.instance.clearPersistence();
+      return;
+    } catch (e, st) {
+      debugPrint(
+        'LocalDataWipeService.clearFirestoreOfflineCache first try failed: '
+        '$e\n$st',
+      );
+    }
+
+    // Bazı cihaz/oturumlarda terminate sonrası persistence kilidi kısa süre
+    // yaşayabiliyor. Core local wipe başarılıysa bu adım wipe'ı bloklamamalı;
+    // kısa bekleme sonrası bir kez daha dene, yine olmazsa loglayıp devam et.
+    try {
+      await Future<void>.delayed(const Duration(milliseconds: 250));
+      await FirebaseFirestore.instance.clearPersistence();
+    } catch (e, st) {
+      debugPrint(
+        'LocalDataWipeService.clearFirestoreOfflineCache retry failed: '
+        '$e\n$st',
+      );
+    }
   }
 }

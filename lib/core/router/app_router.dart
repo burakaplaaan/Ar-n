@@ -235,7 +235,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       if (done && (path.isEmpty || path == '/')) {
         return AppRoutes.home;
       }
-      if (path == AppRoutes.settingsAdmin) {
+      if (path.startsWith(AppRoutes.settingsAdmin)) {
         if (adminAsync.isLoading) {
           return null;
         }

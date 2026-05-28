@@ -69,7 +69,7 @@ class LocationService {
   /// Konum güncelleme tercihi. Olası değerler: [LocationUpdatePref].
   String get locationUpdatePref =>
       (_prefs.get(_locationUpdatePrefKey) as String?) ??
-      LocationUpdatePref.alwaysUpdate;
+      LocationUpdatePref.ask;
 
   Future<void> setLocationUpdatePref(String pref) async {
     await _prefs.put(_locationUpdatePrefKey, pref);

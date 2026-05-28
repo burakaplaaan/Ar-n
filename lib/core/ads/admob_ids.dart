@@ -18,7 +18,7 @@ abstract final class AdMobIds {
   /// Test ID'leri her zaman %100 fill rate verir, gelir üretmez ama UX'i
   /// gerçek reklamla aynıdır → kullanıcı hiç fark etmez, log temiz kalır.
   static const bool kForceTestAds = false;
-  static const bool kForceAndroidReleaseTestAds = true;
+  static const bool kForceAndroidReleaseTestAds = false;
 
   static String? unitId(ArinAdUnit unit) {
     if (kIsWeb) return null;

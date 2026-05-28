@@ -64,6 +64,120 @@ class _OnboardingSurveyPageState extends ConsumerState<OnboardingSurveyPage> {
     ];
   }
 
+  static const Map<String, String> _moodIdByLabel = {
+    'Mutlu': 'mood_happy',
+    'Happy': 'mood_happy',
+    'سعيد': 'mood_happy',
+    'Sakin': 'mood_calm',
+    'Calm': 'mood_calm',
+    'هادئ': 'mood_calm',
+    'Stresli': 'mood_stressed',
+    'Stressed': 'mood_stressed',
+    'متوتر': 'mood_stressed',
+    'Üzgün': 'mood_sad',
+    'Sad': 'mood_sad',
+    'حزين': 'mood_sad',
+    'Şükrediyorum': 'mood_grateful',
+    'Grateful': 'mood_grateful',
+    'ممتن': 'mood_grateful',
+    'Kaygılı': 'mood_anxious',
+    'Anxious': 'mood_anxious',
+    'قلِق': 'mood_anxious',
+    'Motive': 'mood_motivated',
+    'Motivated': 'mood_motivated',
+    'متحمس': 'mood_motivated',
+  };
+
+  static const Map<String, String> _sectorIdByLabel = {
+    'Lise / Üniversite / Hazırlık': 'sector_student',
+    'High school / University / Prep': 'sector_student',
+    'ثانوي / جامعة / تحضيري': 'sector_student',
+    'Özel Sektör': 'sector_private',
+    'Private sector': 'sector_private',
+    'القطاع الخاص': 'sector_private',
+    'Kamu Personeli': 'sector_public',
+    'Public sector': 'sector_public',
+    'القطاع الحكومي': 'sector_public',
+    'Kendi İşim / Serbest': 'sector_business',
+    'Own business / Freelance': 'sector_business',
+    'عملي الخاص / مستقل': 'sector_business',
+    'Ticaret': 'sector_trade',
+    'Trade': 'sector_trade',
+    'التجارة': 'sector_trade',
+    'Ev Hanımı / Ev Erkeği': 'sector_household',
+    'Homemaker': 'sector_household',
+    'رب/ربة منزل': 'sector_household',
+    'Diğer': 'sector_other',
+    'Other': 'sector_other',
+    'أخرى': 'sector_other',
+  };
+
+  static const Map<String, String> _needIdByLabel = {
+    'Motivasyon': 'need_motivation',
+    'Motivation': 'need_motivation',
+    'الدافعية': 'need_motivation',
+    'Sabır': 'need_sabr',
+    'Patience': 'need_sabr',
+    'الصبر': 'need_sabr',
+    'Şükür': 'need_shukr',
+    'Gratitude': 'need_shukr',
+    'الشكر': 'need_shukr',
+    'Tevekkül': 'need_tawakkul',
+    'Trust in God': 'need_tawakkul',
+    'التوكل': 'need_tawakkul',
+    'Odaklanma': 'need_focus',
+    'Focus': 'need_focus',
+    'التركيز': 'need_focus',
+    'Şifa': 'need_healing',
+    'Healing': 'need_healing',
+    'الشفاء': 'need_healing',
+    'Rızık & Bereket': 'need_rizq',
+    'Provision & Blessing': 'need_rizq',
+    'الرزق والبركة': 'need_rizq',
+  };
+
+  static const Map<String, String> _genderIdByLabel = {
+    'Erkek': 'gender_male',
+    'Male': 'gender_male',
+    'ذكر': 'gender_male',
+    'Kadın': 'gender_female',
+    'Female': 'gender_female',
+    'أنثى': 'gender_female',
+  };
+
+  String _normalizedLookupKey(String value) {
+    return value
+        .trim()
+        .toLowerCase()
+        .replaceAll('ı', 'i')
+        .replaceAll('ğ', 'g')
+        .replaceAll('ü', 'u')
+        .replaceAll('ş', 's')
+        .replaceAll('ö', 'o')
+        .replaceAll('ç', 'c')
+        .replaceAll(RegExp(r'\s+'), ' ');
+  }
+
+  String? _resolveStableId(String value, Map<String, String> map) {
+    final direct = map[value];
+    if (direct != null && direct.isNotEmpty) return direct;
+    final key = _normalizedLookupKey(value);
+    for (final entry in map.entries) {
+      if (_normalizedLookupKey(entry.key) == key) {
+        return entry.value;
+      }
+    }
+    return null;
+  }
+
+  List<String> _toStableIds(Set<String> selected, Map<String, String> map) {
+    return selected
+        .map((v) => _resolveStableId(v, map))
+        .whereType<String>()
+        .toSet()
+        .toList(growable: false);
+  }
+
   List<String> _sectorOptions(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     return [
@@ -207,10 +321,12 @@ class _OnboardingSurveyPageState extends ConsumerState<OnboardingSurveyPage> {
             name: _nameController.text.trim().isNotEmpty
                 ? _nameController.text.trim()
                 : null,
-            gender: _selectedGender,
-            moodTags: _selectedMoods.toList(),
-            sectorTags: _selectedSectors.toList(),
-            needTags: _selectedNeeds.toList(),
+            gender: _selectedGender == null
+                ? null
+                : (_genderIdByLabel[_selectedGender!] ?? _selectedGender),
+            moodTags: _toStableIds(_selectedMoods, _moodIdByLabel),
+            sectorTags: _toStableIds(_selectedSectors, _sectorIdByLabel),
+            needTags: _toStableIds(_selectedNeeds, _needIdByLabel),
           );
 
       final prefs = ref.read(sharedPreferencesProvider);

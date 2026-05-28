@@ -47,6 +47,7 @@ import 'presentation/shared/widgets/global_edge_swipe_back.dart';
 import 'presentation/shared/widgets/location_change_listener.dart';
 import 'presentation/shared/widgets/widget_launch_gate_listener.dart';
 import 'presentation/qibla/qibla_hub_navigator_key.dart';
+import 'main.dart' show runDeferredStartupIfNeeded;
 
 final themeModeProvider = StateProvider<ThemeMode>((ref) => ThemeMode.dark);
 
@@ -65,6 +66,8 @@ class ArinApp extends ConsumerStatefulWidget {
 class _ArinAppState extends ConsumerState<ArinApp> with WidgetsBindingObserver {
   DateTime? _lastForegroundMaintenance;
   bool _postOnboardingStartupScheduled = false;
+  bool _foregroundMaintenanceInFlight = false;
+  bool _foregroundMaintenanceQueued = false;
 
   Future<void> _flushHabitDeleteQueueIfSignedIn() async {
     if (!isFirebaseReady) return;
@@ -173,80 +176,95 @@ class _ArinAppState extends ConsumerState<ArinApp> with WidgetsBindingObserver {
       // FCM bildirim tıklaması yönlendirmesi: router hazır olduktan hemen
       // sonra callback enjekte edilir; initIfNeeded henüz çağrılmamışsa
       // _pendingNavigationRoute mekanizması yarış durumunu yakalar.
-      final router = ref.read(appRouterProvider);
-      FcmTokenService.setNavigationCallback((route) => router.go(route));
+      FcmTokenService.setNavigationCallback((route) {
+        final liveRouter = ref.read(appRouterProvider);
+        liveRouter.go(route);
+      });
 
       unawaited(_runForegroundMaintenance(initial: true));
     });
   }
 
   Future<void> _runForegroundMaintenance({required bool initial}) async {
-    if (!_isOnboardingCompletedForMaintenance()) {
-      debugPrint(
-        '══ ARIN ══ foreground maintenance: onboarding bitmemiş, atlandı',
-      );
+    if (_foregroundMaintenanceInFlight) {
+      _foregroundMaintenanceQueued = true;
       return;
     }
-
-    final now = DateTime.now();
-    final last = _lastForegroundMaintenance;
-    if (!initial &&
-        last != null &&
-        now.difference(last) < const Duration(minutes: 2)) {
-      return;
-    }
-    _lastForegroundMaintenance = now;
-
-    final prefs = ref.read(sharedPreferencesProvider);
-    if (initial) {
-      await Future<void>.delayed(const Duration(seconds: 2));
-    } else {
-      await Future<void>.delayed(const Duration(milliseconds: 700));
-    }
-    if (!mounted) return;
-
-    if (PrayerReminderPrefs.isEnabled(prefs)) {
-      await PrayerNotificationScheduler.promptLocalNotificationPermissions();
-    }
-    await _maybeOneTimeWidgetQuoteRefreshAfterAdminEdit();
+    _foregroundMaintenanceInFlight = true;
     try {
-      await GlobalWidgetLockService.applyIfDue(prefs);
-    } catch (e) {
-      debugPrint('Global widget lock sync failed: $e');
-    }
-    try {
-      final premium = await ref.read(premiumEntitlementProvider.future);
-      await WidgetAccessService(prefs).syncAll(isPremium: premium.isActive);
-    } catch (e) {
-      debugPrint('Widget access sync failed: $e');
-      await WidgetAccessService(prefs).syncAll(isPremium: false);
-    }
-    unawaited(
-      TrackingWidgetService.refreshSelected(
-        prefs: prefs,
-        habitRepo: ref.read(habitRepositoryProvider),
-        salatRepo: SalatLogRepository(),
-      ),
-    );
-
-    unawaited(_flushHabitDeleteQueueIfSignedIn());
-    if (isFirebaseReady) {
-      final user = FirebaseAuth.instance.currentUser;
-      if (user != null) {
-        unawaited(
-          UserCloudBackupService.pushFromLocal(uid: user.uid, prefs: prefs),
+      if (!_isOnboardingCompletedForMaintenance()) {
+        debugPrint(
+          '══ ARIN ══ foreground maintenance: onboarding bitmemiş, atlandı',
         );
+        return;
       }
-    }
 
-    await Future<void>.delayed(const Duration(seconds: 3));
-    if (!mounted) return;
-    unawaited(_warmupPoolsAndReschedule());
+      final now = DateTime.now();
+      final last = _lastForegroundMaintenance;
+      if (!initial &&
+          last != null &&
+          now.difference(last) < const Duration(minutes: 2)) {
+        return;
+      }
+      _lastForegroundMaintenance = now;
 
-    if (PrayerReminderPrefs.isEnabled(prefs)) {
+      final prefs = ref.read(sharedPreferencesProvider);
+      if (initial) {
+        await Future<void>.delayed(const Duration(seconds: 2));
+      } else {
+        await Future<void>.delayed(const Duration(milliseconds: 700));
+      }
+      if (!mounted) return;
+
+      if (PrayerReminderPrefs.isEnabled(prefs)) {
+        await PrayerNotificationScheduler.promptLocalNotificationPermissions();
+      }
+      await _maybeOneTimeWidgetQuoteRefreshAfterAdminEdit();
+      try {
+        await GlobalWidgetLockService.applyIfDue(prefs);
+      } catch (e) {
+        debugPrint('Global widget lock sync failed: $e');
+      }
+      try {
+        final premium = await ref.read(premiumEntitlementProvider.future);
+        await WidgetAccessService(prefs).syncAll(isPremium: premium.isActive);
+      } catch (e) {
+        debugPrint('Widget access sync failed: $e');
+        await WidgetAccessService(prefs).syncAll(isPremium: false);
+      }
+      unawaited(
+        TrackingWidgetService.refreshSelected(
+          prefs: prefs,
+          habitRepo: ref.read(habitRepositoryProvider),
+          salatRepo: SalatLogRepository(),
+        ),
+      );
+
+      unawaited(_flushHabitDeleteQueueIfSignedIn());
+      if (isFirebaseReady) {
+        final user = FirebaseAuth.instance.currentUser;
+        if (user != null) {
+          unawaited(
+            UserCloudBackupService.pushFromLocal(uid: user.uid, prefs: prefs),
+          );
+        }
+      }
+
       await Future<void>.delayed(const Duration(seconds: 3));
       if (!mounted) return;
-      unawaited(_bootstrapPrayerNotifications());
+      unawaited(_warmupPoolsAndReschedule());
+
+      if (PrayerReminderPrefs.isEnabled(prefs)) {
+        await Future<void>.delayed(const Duration(seconds: 3));
+        if (!mounted) return;
+        unawaited(_bootstrapPrayerNotifications());
+      }
+    } finally {
+      _foregroundMaintenanceInFlight = false;
+      if (_foregroundMaintenanceQueued && mounted) {
+        _foregroundMaintenanceQueued = false;
+        unawaited(_runForegroundMaintenance(initial: false));
+      }
     }
   }
 
@@ -279,6 +297,8 @@ class _ArinAppState extends ConsumerState<ArinApp> with WidgetsBindingObserver {
     unawaited(ArinAnalytics.enable());
     final uid = isFirebaseReady ? FirebaseAuth.instance.currentUser?.uid : null;
     unawaited(PurchaseService.initialize(firebaseUid: uid));
+    final prefs = ref.read(sharedPreferencesProvider);
+    unawaited(runDeferredStartupIfNeeded(prefs));
 
     unawaited(_runForegroundMaintenance(initial: false));
   }
@@ -331,10 +351,21 @@ class _ArinAppState extends ConsumerState<ArinApp> with WidgetsBindingObserver {
       }
     });
 
+    ref.listen(appRouterProvider, (_, __) {
+      FcmTokenService.setNavigationCallback((route) {
+        final liveRouter = ref.read(appRouterProvider);
+        liveRouter.go(route);
+      });
+    });
+
     ref.listen<AsyncValue<User?>>(authUserProvider, (previous, next) {
       next.whenData((user) {
         final prev = previous?.asData?.value;
-        if (user == null) return;
+        final signedOut = user == null;
+        if (signedOut) {
+          _foregroundMaintenanceQueued = false;
+          return;
+        }
         if (prev != null && prev.uid == user.uid) return;
         // RC kimliğini Firebase UID ile eşleştir ki webhook/restore akışı
         // anonim kullanıcıya düşmesin.
@@ -353,26 +384,36 @@ class _ArinAppState extends ConsumerState<ArinApp> with WidgetsBindingObserver {
         );
 
         final uid = user.uid;
+        bool isStillSignedInAsCurrentUser() =>
+            FirebaseAuth.instance.currentUser?.uid == uid;
+
         Future<void> run() async {
+          if (!isStillSignedInAsCurrentUser()) return;
           final repo = ref.read(habitRepositoryProvider);
           final habitPullOk = await HabitCloudSyncService.pullToLocal(
             uid: uid,
             repo: repo,
             prefs: prefs,
           );
+          if (!isStillSignedInAsCurrentUser()) return;
           if (!habitPullOk) return;
           await HabitCloudSyncService.pushFromLocal(
             uid: uid,
             repo: repo,
             prefs: prefs,
           );
+          if (!isStillSignedInAsCurrentUser()) return;
           await UserCloudBackupService.syncAfterSignIn(uid: uid, prefs: prefs);
+          if (!isStillSignedInAsCurrentUser()) return;
           await InspirationEngagementSyncService.pullMergeLocal(
             uid: uid,
             prefs: prefs,
           );
+          if (!isStillSignedInAsCurrentUser()) return;
           await InspirationEngagementSyncService.pushFromPrefs(prefs);
+          if (!isStillSignedInAsCurrentUser()) return;
           await InspirationEngagementSyncService.flushPendingPush();
+          if (!isStillSignedInAsCurrentUser()) return;
           ref.invalidate(inspirationSavedIdsProvider);
           ref.invalidate(inspirationLikedIdsProvider);
           ref.read(habitSummaryProvider.notifier).refresh();
@@ -382,7 +423,7 @@ class _ArinAppState extends ConsumerState<ArinApp> with WidgetsBindingObserver {
           }
         }
 
-        Future.microtask(run);
+        unawaited(run());
       });
     });
 
@@ -416,8 +457,6 @@ class _ArinAppState extends ConsumerState<ArinApp> with WidgetsBindingObserver {
         if (child == null) return const SizedBox.shrink();
         final mq = MediaQuery.of(context);
         return Directionality(
-          // Force global layout direction to LTR so Arabic locale does not
-          // mirror full-screen structure (bars, rows, navigation flow).
           textDirection: TextDirection.ltr,
           child: MediaQuery(
             data: mq.copyWith(
@@ -426,30 +465,29 @@ class _ArinAppState extends ConsumerState<ArinApp> with WidgetsBindingObserver {
                 maxScaleFactor: 1.3,
               ),
             ),
-              child: GlobalEdgeSwipeBack(
-                onBackRequested: () async {
-                  final currentPath =
-                      router.routeInformationProvider.value.uri.path;
-                  final onQiblaStack =
-                      currentPath == AppRoutes.qibla ||
-                      currentPath.startsWith('${AppRoutes.qibla}/');
-                  if (onQiblaStack) {
-                    final qiblaNav = qiblaHubNavigatorKey.currentState;
-                    if (qiblaNav != null && qiblaNav.canPop()) {
-                      qiblaNav.pop();
-                      return true;
-                    }
+            child: GlobalEdgeSwipeBack(
+              onBackRequested: () async {
+                final currentPath = router.routeInformationProvider.value.uri.path;
+                final onQiblaStack =
+                    currentPath == AppRoutes.qibla ||
+                    currentPath.startsWith('${AppRoutes.qibla}/');
+                if (onQiblaStack) {
+                  final qiblaNav = qiblaHubNavigatorKey.currentState;
+                  if (qiblaNav != null && qiblaNav.canPop()) {
+                    qiblaNav.pop();
+                    return true;
                   }
-                  final rootNav = router.routerDelegate.navigatorKey.currentState;
-                  if (rootNav != null && rootNav.canPop()) {
-                    return rootNav.maybePop();
-                  }
-                  return false;
-                },
-                child: WidgetLaunchGateListener(
-                  child: LocationChangeListener(child: child),
-                ),
+                }
+                final rootNav = router.routerDelegate.navigatorKey.currentState;
+                if (rootNav != null && rootNav.canPop()) {
+                  return rootNav.maybePop();
+                }
+                return false;
+              },
+              child: WidgetLaunchGateListener(
+                child: LocationChangeListener(child: child),
               ),
+            ),
           ),
         );
       },

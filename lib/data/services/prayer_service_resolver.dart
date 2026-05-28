@@ -106,18 +106,10 @@ class PrayerServiceResolver {
       }
     }
 
-    // 2) Mevcut konum parmak izini GPS arka plana geçmeden önce yakala.
-    //    Dart tek iş parçacıklı olduğundan unawaited çağrısı ilk await'e
-    //    kadar senkron ilerler; o noktada savedDistrictId henüz değişmemiştir.
-    //    Yine de ilerleyen await'lerde GPS yazabilir; önbelleği fetch
-    //    başlangıcındaki konum bilgisiyle etiketlemek doğru davranış.
+    // 2) Konumu önce senkronize et; böylece şehir/ilçe değişikliği sonrası
+    //    yanlış konumdan çekim yapılıp cache'e yazılmaz.
+    await _location.syncPrayerLocation();
     final fetchLocationKey = _locationKey();
-
-    // 3) Konum senkronizasyonunu arka planda başlat; kayıtlı konum
-    //    verileri (savedDistrictId, savedCity, savedLat/Lon) anında okunur.
-    //    GPS tamamlandığında Hive güncellenir — bir sonraki fetchToday
-    //    artık taze konumu kullanır.
-    unawaited(_location.syncPrayerLocation());
 
     final isTR = _isTurkey(_location.savedCountry);
     final ilceId = _location.savedDistrictId;

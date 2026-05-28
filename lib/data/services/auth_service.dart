@@ -165,8 +165,7 @@ class AuthService {
   }
 
   Future<void> signOut() async {
-    // RevenueCat oturumunu önce kapat ki auth null emit edildiğinde
-    // provider tarafı eski RC kullanıcısının entitlement'ını okumaya devam etmesin.
+    // Entitlement bleed-through olmaması için RC logout zorunlu.
     await PurchaseService.logoutUser();
     await _auth.signOut();
     if (_googleInitialized) {
@@ -249,7 +248,7 @@ class AuthService {
       throw StateError('Oturum açık değil.');
     }
     try {
-      // Firebase user null emit etmeden önce RC'yi anonim profile döndür.
+      // Kullanıcı silinmeden RC kimliğini anonime döndür.
       await PurchaseService.logoutUser();
       await u.delete();
     } on FirebaseAuthException catch (e) {

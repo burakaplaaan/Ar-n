@@ -164,6 +164,8 @@ class _BootstrapAppState extends State<_BootstrapApp> {
   }
 }
 
+bool deferredStartupDone = false;
+
 class _BootstrapSplash extends StatelessWidget {
   const _BootstrapSplash({required this.message, this.detail});
 
@@ -354,6 +356,7 @@ Future<void> _configureFirebaseServicesAfterBootstrap() async {
 }
 
 Future<void> _runDeferredStartup(SharedPreferences prefs) async {
+  if (deferredStartupDone) return;
   final onboardingCompleted = _isOnboardingCompletedForStartup(prefs);
 
   // İlk kurulum/onboarding sırasında WebKit (AdMob), notification migration
@@ -427,6 +430,11 @@ Future<void> _runDeferredStartup(SharedPreferences prefs) async {
 
   // İlk-launch timestamp (review penceresini ilk 2 gün açmamak için).
   await ArinReviewPrompter.markAppLaunched(prefs);
+  deferredStartupDone = true;
+}
+
+Future<void> runDeferredStartupIfNeeded(SharedPreferences prefs) {
+  return _runDeferredStartup(prefs);
 }
 
 bool _isOnboardingCompletedForStartup(SharedPreferences prefs) {

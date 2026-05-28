@@ -300,7 +300,9 @@ class PurchaseService {
   /// Cihaz üzerindeki anlık premium durumunu productId ile birlikte döner.
   /// Uygulama yeniden başlatıldığında RC henüz configure edilmemiş olabilir;
   /// bu durumda max 2 sn RC'nin hazır olmasını bekler, sonra Firestore fallback'e düşer.
-  Future<PremiumEntitlement?> getLocalPremiumEntitlement() async {
+  Future<PremiumEntitlement?> getLocalPremiumEntitlement({
+    String? expectedFirebaseUid,
+  }) async {
     if (!_isSupportedPlatform) return null;
     // RC configure edilmeden getCustomerInfo() çağrısı exception fırlatır.
     // App restart'ta deferred startup tamamlanmadan burada olunabilir; 2 sn bekle.
@@ -310,6 +312,16 @@ class PurchaseService {
     if (!_isConfigured) return null;
     try {
       final info = await Purchases.getCustomerInfo();
+      if (expectedFirebaseUid != null && expectedFirebaseUid.isNotEmpty) {
+        final rcUserId = info.originalAppUserId.trim();
+        if (rcUserId.isEmpty || rcUserId != expectedFirebaseUid) {
+          debugPrint(
+            '[PurchaseService] local entitlement ignored due to RC identity mismatch. '
+            'expected=$expectedFirebaseUid rc=$rcUserId',
+          );
+          return null;
+        }
+      }
       final entitlement =
           info.entitlements.active[RevenueCatIds.premiumEntitlement];
       if (entitlement != null && entitlement.isActive) {
