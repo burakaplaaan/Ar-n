@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_text_styles.dart';
+import 'package:arin/l10n/app_localizations.dart';
 import '../../core/localization/locale_text.dart';
 import '../../core/router/app_router.dart';
 import '../../data/models/habit_model.dart';
@@ -26,24 +27,17 @@ class CustomHabitDetailPage extends ConsumerStatefulWidget {
 }
 
 class _CustomHabitDetailPageState extends ConsumerState<CustomHabitDetailPage> {
-  String _t(
-    BuildContext context, {
-    required String tr,
-    required String en,
-    required String ar,
-  }) => trEnAr(context, tr: tr, en: en, ar: ar);
-
   Color _accent(HabitModel h) =>
       h.type == HabitType.bad ? _kArinmaAccent : AppColors.accentNeonGreen;
 
   String _periodHint(BuildContext context, HabitModel h) {
     switch (h.customRepeatCycle.clamp(0, 2)) {
       case 1:
-        return _t(context, tr: 'Bu haftanın hedefi', en: 'This week\'s goal', ar: 'هدف هذا الأسبوع');
+        return AppLocalizations.of(context)!.customHabitThisWeekGoal;
       case 2:
-        return _t(context, tr: 'Bu ayın hedefi', en: 'This month\'s goal', ar: 'هدف هذا الشهر');
+        return AppLocalizations.of(context)!.customHabitThisMonthGoal;
       default:
-        return _t(context, tr: 'Günlük hedef', en: 'Daily goal', ar: 'الهدف اليومي');
+        return AppLocalizations.of(context)!.customHabitDailyGoal;
     }
   }
 
@@ -51,18 +45,18 @@ class _CustomHabitDetailPageState extends ConsumerState<CustomHabitDetailPage> {
     if (current >= target) {
       switch (h.customRepeatCycle.clamp(0, 2)) {
         case 1:
-          return _t(context, tr: 'Bu haftanın hedefi tamam.', en: 'This week\'s goal is complete.', ar: 'اكتمل هدف هذا الأسبوع.');
+          return AppLocalizations.of(context)!.customHabitThisWeekGoalComplete;
         case 2:
-          return _t(context, tr: 'Bu ayın hedefi tamam.', en: 'This month\'s goal is complete.', ar: 'اكتمل هدف هذا الشهر.');
+          return AppLocalizations.of(context)!.customHabitThisMonthGoalComplete;
         default:
-          return _t(context, tr: 'Bugünkü hedef tamam.', en: 'Today\'s goal is complete.', ar: 'اكتمل هدف اليوم.');
+          return AppLocalizations.of(context)!.customHabitTodayGoalComplete;
       }
     }
-    if (current <= 0) return _t(context, tr: 'Haydi başla!', en: 'Let\'s start!', ar: 'هيا ابدأ!');
+    if (current <= 0) return AppLocalizations.of(context)!.customHabitLetsStart;
     final r = target > 0 ? current / target : 0.0;
-    if (r < 0.35) return _t(context, tr: 'İyi gidiyorsun.', en: 'You are doing well.', ar: 'أنت تسير بشكل جيد.');
-    if (r < 0.7) return _t(context, tr: 'Neredeyse.', en: 'Almost there.', ar: 'أوشكت.');
-    return _t(context, tr: 'Son bir adım.', en: 'One last step.', ar: 'خطوة أخيرة.');
+    if (r < 0.35) return AppLocalizations.of(context)!.customHabitDoingWell;
+    if (r < 0.7) return AppLocalizations.of(context)!.customHabitAlmostThere;
+    return AppLocalizations.of(context)!.customHabitOneLastStep;
   }
 
   Future<void> _confirmArchive(BuildContext context, String habitId) async {
@@ -71,14 +65,14 @@ class _CustomHabitDetailPageState extends ConsumerState<CustomHabitDetailPage> {
       builder: (ctx) => AlertDialog(
         backgroundColor: AppColors.anthraciteMid,
         title: Text(
-          _t(context, tr: 'Bu alışkanlığı silmek istiyor musun?', en: 'Do you want to delete this habit?', ar: 'هل تريد حذف هذه العادة؟'),
+          AppLocalizations.of(context)!.habitsDeleteConfirmTitle,
           style: AppTextStyles.headlineSmall.copyWith(color: AppColors.creamBase),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
             child: Text(
-              _t(context, tr: 'Vazgeç', en: 'Cancel', ar: 'إلغاء'),
+              AppLocalizations.of(context)!.habitsCancel,
               style: AppTextStyles.labelLarge.copyWith(color: AppColors.textMuted),
             ),
           ),
@@ -86,7 +80,7 @@ class _CustomHabitDetailPageState extends ConsumerState<CustomHabitDetailPage> {
             onPressed: () => Navigator.pop(ctx, true),
             style: FilledButton.styleFrom(backgroundColor: AppColors.error),
             child: Text(
-              _t(context, tr: 'Evet, Sil', en: 'Yes, Delete', ar: 'نعم، احذف'),
+              AppLocalizations.of(context)!.habitsYesDelete,
               style: AppTextStyles.labelLarge.copyWith(color: Colors.white),
             ),
           ),
@@ -118,7 +112,7 @@ class _CustomHabitDetailPageState extends ConsumerState<CustomHabitDetailPage> {
         backgroundColor: AppColors.anthraciteDark,
         body: Center(
           child: Text(
-            _t(context, tr: 'Kayıt bulunamadı', en: 'Record not found', ar: 'لم يتم العثور على السجل'),
+            AppLocalizations.of(context)!.customHabitRecordNotFound,
             style: AppTextStyles.bodyMedium.copyWith(color: AppColors.creamBase),
           ),
         ),
@@ -143,8 +137,8 @@ class _CustomHabitDetailPageState extends ConsumerState<CustomHabitDetailPage> {
     final isPercent = habit.customTrackingKind == 2;
     final streakLabel =
         habit.customRepeatCycle != 0
-            ? _t(context, tr: 'Seri', en: 'Streak', ar: 'سلسلة')
-            : _t(context, tr: 'Gün serisi', en: 'Day streak', ar: 'سلسلة أيام');
+            ? AppLocalizations.of(context)!.customHabitStreak
+            : AppLocalizations.of(context)!.customHabitDayStreak;
 
     return Scaffold(
       backgroundColor: AppColors.anthraciteDark,
@@ -152,7 +146,7 @@ class _CustomHabitDetailPageState extends ConsumerState<CustomHabitDetailPage> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          tooltip: _t(context, tr: 'Geri', en: 'Back', ar: 'رجوع'),
+          tooltip: AppLocalizations.of(context)!.customHabitBack,
           icon: const Icon(Icons.arrow_back_rounded, color: AppColors.creamBase),
           onPressed: () => popOrGoWillpowerHub(context),
         ),
@@ -164,7 +158,7 @@ class _CustomHabitDetailPageState extends ConsumerState<CustomHabitDetailPage> {
         ),
         actions: [
           IconButton(
-            tooltip: _t(context, tr: 'Kaldır', en: 'Remove', ar: 'إزالة'),
+            tooltip: AppLocalizations.of(context)!.customHabitRemove,
             icon: Icon(
               Icons.delete_outline_rounded,
               color: AppColors.creamBase.withValues(alpha: 0.42),
@@ -172,7 +166,7 @@ class _CustomHabitDetailPageState extends ConsumerState<CustomHabitDetailPage> {
             onPressed: () => _confirmArchive(context, habit.id),
           ),
           IconButton(
-            tooltip: _t(context, tr: 'Alışkanlık takibine dön', en: 'Back to habit tracker', ar: 'العودة لمتابعة العادات'),
+            tooltip: AppLocalizations.of(context)!.customHabitBackToTracker,
             icon: const Icon(Icons.close_rounded, color: AppColors.creamBase),
             onPressed: () => popOrGoWillpowerHub(context),
           ),
@@ -209,8 +203,8 @@ class _CustomHabitDetailPageState extends ConsumerState<CustomHabitDetailPage> {
           const SizedBox(height: 20),
           Text(
             habit.type == HabitType.good
-                ? _t(context, tr: 'Gelişim', en: 'Growth', ar: 'التطوير')
-                : _t(context, tr: 'Arınma', en: 'Purification', ar: 'التزكية'),
+                ? AppLocalizations.of(context)!.habitsGrowth
+                : AppLocalizations.of(context)!.habitsPurification,
             textAlign: TextAlign.center,
             style: AppTextStyles.labelLarge.copyWith(
               color: accent,
@@ -335,7 +329,7 @@ class _CustomHabitDetailPageState extends ConsumerState<CustomHabitDetailPage> {
               Expanded(
                 child: _StatTile(
                   icon: Icons.track_changes_rounded,
-                  label: _t(context, tr: 'Hedef', en: 'Goal', ar: 'الهدف'),
+                  label: AppLocalizations.of(context)!.customHabitGoal,
                   value: '$target',
                   borderColor: accent.withValues(alpha: 0.45),
                   iconColor: accent,
@@ -347,8 +341,8 @@ class _CustomHabitDetailPageState extends ConsumerState<CustomHabitDetailPage> {
             const SizedBox(height: 12),
             Text(
               habit.customRepeatCycle == 0
-                  ? _t(context, tr: 'Bugün hedefi tamamladın.', en: 'You completed today\'s goal.', ar: 'أكملت هدف اليوم.')
-                  : _t(context, tr: 'Bu dönem hedefi tamamladın.', en: 'You completed this period\'s goal.', ar: 'أكملت هدف هذه الفترة.'),
+                  ? AppLocalizations.of(context)!.customHabitCompletedToday
+                  : AppLocalizations.of(context)!.customHabitCompletedPeriod,
               textAlign: TextAlign.center,
               style: AppTextStyles.labelSmall.copyWith(
                 color: accent.withValues(alpha: 0.85),
@@ -372,7 +366,7 @@ class _CustomHabitDetailPageState extends ConsumerState<CustomHabitDetailPage> {
                 ),
               ),
               child: Text(
-                _t(context, tr: 'Bitir', en: 'Finish', ar: 'إنهاء'),
+                AppLocalizations.of(context)!.customHabitFinish,
                 style: AppTextStyles.labelLarge.copyWith(
                   color: accent,
                   fontWeight: FontWeight.w800,

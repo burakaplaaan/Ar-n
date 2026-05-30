@@ -95,23 +95,9 @@ abstract final class FcmTokenService {
         sound: true,
       );
 
-      final settings = await FirebaseMessaging.instance.requestPermission(
-        alert: true,
-        badge: true,
-        sound: true,
-        provisional: false,
-        announcement: false,
-        carPlay: false,
-        criticalAlert: false,
-      );
-      debugPrint(
-        '══ ARIN FCM ══ izin durumu: ${settings.authorizationStatus.name}',
-      );
-
-      // Tüm kullanıcıların aldığı yayın topic'i.
-      await FirebaseMessaging.instance.subscribeToTopic('broadcast_all');
-      debugPrint('══ ARIN FCM ══ broadcast_all topic\'ine kayıt tamam');
-
+      // Tüm kullanıcıların aldığı yayın topic'i. (Kaldırıldı: Explicit opt-in ile yapılacak)
+      // await FirebaseMessaging.instance.subscribeToTopic('broadcast_all');
+      
       // Uygulama ön plandayken Android sistem bildirimi otomatik göstermez;
       // manuel olarak `arin_ntf_broadcast` kanalına yerel bildirim atıyoruz.
       // iOS tarafı `setForegroundNotificationPresentationOptions` ile zaten
@@ -172,6 +158,37 @@ abstract final class FcmTokenService {
       debugPrint('══ ARIN FCM ══ arin_ntf_broadcast kanalı hazır');
     } on PlatformException catch (e) {
       debugPrint('══ ARIN FCM ══ broadcast kanalı oluşturulamadı: $e');
+    }
+  }
+
+  /// Kullanıcı Anın Ayeti / Yayın bildirimlerini açıkça kabul ettiğinde çağrılır.
+  static Future<bool> requestBroadcastPermissions() async {
+    try {
+      final settings = await FirebaseMessaging.instance.requestPermission(
+        alert: true,
+        badge: true,
+        sound: true,
+        provisional: false,
+      );
+      if (settings.authorizationStatus == AuthorizationStatus.authorized ||
+          settings.authorizationStatus == AuthorizationStatus.provisional) {
+        await FirebaseMessaging.instance.subscribeToTopic('broadcast_all');
+        debugPrint('══ ARIN FCM ══ broadcast_all topic\'ine kayıt tamam');
+        return true;
+      }
+      return false;
+    } catch (e) {
+      debugPrint('══ ARIN FCM ══ permission request failed: $e');
+      return false;
+    }
+  }
+
+  /// Kullanıcı abonelikten çıkmak istediğinde veya veri silindiğinde çağrılır.
+  static Future<void> unsubscribeFromBroadcasts() async {
+    try {
+      await FirebaseMessaging.instance.unsubscribeFromTopic('broadcast_all');
+    } catch (e) {
+      debugPrint('══ ARIN FCM ══ unsubscribeFromTopic failed: $e');
     }
   }
 }

@@ -330,6 +330,7 @@ class _ZikirMatikPageState extends ConsumerState<ZikirMatikPage>
   }
 
   Future<void> _fireTargetFeedback() async {
+    final l10n = AppLocalizations.of(context)!;
     if (_vibrateTarget) {
       HapticFeedback.heavyImpact();
       if (!kIsWeb) {
@@ -343,14 +344,7 @@ class _ZikirMatikPageState extends ConsumerState<ZikirMatikPage>
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(
-          _ztr(
-            context,
-            tr: 'Tur tamamlandı',
-            en: 'Round completed',
-            ar: 'اكتملت الجولة',
-          ),
-        ),
+        content: Text(l10n.zikirmatikRoundCompleted),
         behavior: SnackBarBehavior.floating,
         duration: const Duration(seconds: 2),
       ),
@@ -358,6 +352,7 @@ class _ZikirMatikPageState extends ConsumerState<ZikirMatikPage>
   }
 
   Future<void> _reset() async {
+    final l10n = AppLocalizations.of(context)!;
     final ok = await showDialog<bool>(
       context: context,
       barrierColor: Colors.black.withValues(alpha: 0.72),
@@ -391,12 +386,7 @@ class _ZikirMatikPageState extends ConsumerState<ZikirMatikPage>
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     Text(
-                      _ztr(
-                        context,
-                        tr: 'Sayacı sıfırla?',
-                        en: 'Reset counter?',
-                        ar: 'إعادة تعيين العداد؟',
-                      ),
+                      l10n.zikirmatikResetCounter,
                       style: const TextStyle(
                         color: _ZikirmatikColors.labelMuted,
                         fontSize: 19,
@@ -407,12 +397,7 @@ class _ZikirMatikPageState extends ConsumerState<ZikirMatikPage>
                     ),
                     const SizedBox(height: 12),
                     Text(
-                      _ztr(
-                        context,
-                        tr: 'Toplam sayı ve tur bilgisi sıfırlanır.',
-                        en: 'Total count and round information will reset.',
-                        ar: 'سيتم تصفير العدد الإجمالي ومعلومات الجولة.',
-                      ),
+                      l10n.zikirmatikResetCounterDesc,
                       style: TextStyle(
                         color: _ZikirmatikColors.labelMuted.withValues(
                           alpha: 0.72,
@@ -435,12 +420,7 @@ class _ZikirMatikPageState extends ConsumerState<ZikirMatikPage>
                             ),
                           ),
                           child: Text(
-                            _ztr(
-                              context,
-                              tr: 'Vazgeç',
-                              en: 'Cancel',
-                              ar: 'إلغاء',
-                            ),
+                            l10n.zikirmatikCancel,
                             style: const TextStyle(
                               fontWeight: FontWeight.w600,
                               fontSize: 14,
@@ -462,12 +442,7 @@ class _ZikirMatikPageState extends ConsumerState<ZikirMatikPage>
                             shape: const StadiumBorder(),
                           ),
                           child: Text(
-                            _ztr(
-                              context,
-                              tr: 'Sıfırla',
-                              en: 'Reset',
-                              ar: 'تصفير',
-                            ),
+                            l10n.zikirmatikReset,
                             style: const TextStyle(
                               fontWeight: FontWeight.w700,
                               fontSize: 14,
@@ -605,18 +580,12 @@ class _ZikirMatikPageState extends ConsumerState<ZikirMatikPage>
   }
 
   Future<void> _editPhrase() async {
+    final l10n = AppLocalizations.of(context)!;
     final controller = TextEditingController(text: _phrase);
     final action = await showDialog<_ZikirCustomPhraseAction>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text(
-          _ztr(
-            context,
-            tr: 'Zikir adını düzenle',
-            en: 'Edit dhikr name',
-            ar: 'تعديل اسم الذكر',
-          ),
-        ),
+        title: Text(l10n.zikirmatikEditPhraseTitle),
         content: TextField(
           controller: controller,
           decoration: const InputDecoration(border: OutlineInputBorder()),
@@ -626,23 +595,16 @@ class _ZikirMatikPageState extends ConsumerState<ZikirMatikPage>
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: Text(_ztr(context, tr: 'Vazgeç', en: 'Cancel', ar: 'إلغاء')),
+            child: Text(l10n.zikirmatikCancel),
           ),
           TextButton(
             onPressed: () => Navigator.pop(ctx, _ZikirCustomPhraseAction.use),
-            child: Text(_ztr(context, tr: 'Kullan', en: 'Use', ar: 'استخدم')),
+            child: Text(l10n.zikirmatikUse),
           ),
           FilledButton(
             onPressed: () =>
                 Navigator.pop(ctx, _ZikirCustomPhraseAction.saveAndUse),
-            child: Text(
-              _ztr(
-                context,
-                tr: 'Kaydet ve Kullan',
-                en: 'Save & Use',
-                ar: 'احفظ واستخدم',
-              ),
-            ),
+            child: Text(l10n.zikirmatikSaveAndUse),
           ),
         ],
       ),
@@ -677,15 +639,11 @@ class _ZikirMatikPageState extends ConsumerState<ZikirMatikPage>
       );
     }
 
+    final l10n = AppLocalizations.of(context)!;
     return Semantics(
-      label: _ztr(
-        context,
-        tr: 'Zikirmatik sayacı',
-        en: 'Dhikr counter',
-        ar: 'عداد الذكر',
-      ),
+      label: l10n.zikirmatikCounterSemantics,
       value:
-          '$_total, ${_ztr(context, tr: 'TUR', en: 'ROUND', ar: 'جولة')} $_tur',
+          '$_total, ${l10n.zikirmatikRound} $_tur',
       child: Scaffold(
         backgroundColor: _ZikirmatikColors.pageBg,
         body: SafeArea(
@@ -821,7 +779,7 @@ class _ZikirMatikPageState extends ConsumerState<ZikirMatikPage>
                                               ),
                                               const SizedBox(height: 7),
                                               Text(
-                                                '${_ztr(context, tr: 'BU TUR', en: 'THIS ROUND', ar: 'هذه الجولة')}: $_round / $_target',
+                                                '${l10n.zikirmatikThisRound}: $_round / $_target',
                                                 style: TextStyle(
                                                   color: _ZikirmatikColors.outer
                                                       .withValues(alpha: 0.92),
@@ -830,7 +788,7 @@ class _ZikirMatikPageState extends ConsumerState<ZikirMatikPage>
                                                 ),
                                               ),
                                               Text(
-                                                '${_ztr(context, tr: 'TUR', en: 'ROUND', ar: 'جولة')}: $_tur',
+                                                '${l10n.zikirmatikRound}: $_tur',
                                                 style: TextStyle(
                                                   color: _ZikirmatikColors.outer
                                                       .withValues(alpha: 0.92),
@@ -852,22 +810,12 @@ class _ZikirMatikPageState extends ConsumerState<ZikirMatikPage>
                                                     _ZikirMatikCircleIconButton(
                                                       onPressed: _reset,
                                                       icon: Icons.undo_rounded,
-                                                      tooltip: _ztr(
-                                                        context,
-                                                        tr: 'Sıfırla',
-                                                        en: 'Reset',
-                                                        ar: 'تصفير',
-                                                      ),
+                                                      tooltip: l10n.zikirmatikReset,
                                                     ),
                                                     _ZikirMatikCircleIconButton(
                                                       onPressed: _pickTarget,
                                                       icon: Icons.sync_rounded,
-                                                      tooltip: _ztr(
-                                                        context,
-                                                        tr: 'Hedef',
-                                                        en: 'Target',
-                                                        ar: 'الهدف',
-                                                      ),
+                                                      tooltip: l10n.zikirmatikTarget,
                                                     ),
                                                   ],
                                                 ),
@@ -882,18 +830,8 @@ class _ZikirMatikPageState extends ConsumerState<ZikirMatikPage>
                                               // anında güncellenir.
                                               Semantics(
                                                 button: true,
-                                                label: _ztr(
-                                                  context,
-                                                  tr: 'Zikir sayacı. $_round / $_target, toplam $_total',
-                                                  en: 'Dhikr counter. $_round / $_target, total $_total',
-                                                  ar: 'عداد الذكر. $_round / $_target، الإجمالي $_total',
-                                                ),
-                                                hint: _ztr(
-                                                  context,
-                                                  tr: 'Dokunarak sayıyı bir artır',
-                                                  en: 'Tap to increase by one',
-                                                  ar: 'اضغط لزيادة العد بواحد',
-                                                ),
+                                                label: l10n.zikirmatikCounterSemanticsLabel(_round, _target, _total),
+                                                hint: l10n.zikirmatikCounterSemanticsHint,
                                                 child: Material(
                                                   color:
                                                       _ZikirmatikColors.outer,
@@ -934,18 +872,8 @@ class _ZikirMatikPageState extends ConsumerState<ZikirMatikPage>
                               icon: _vibrateTarget
                                   ? Icons.phonelink_ring_rounded
                                   : Icons.mobile_off_rounded,
-                              label: _ztr(
-                                context,
-                                tr: 'Titreşim',
-                                en: 'Vibration',
-                                ar: 'اهتزاز',
-                              ),
-                              tooltip: _ztr(
-                                context,
-                                tr: 'Açıkken her sayımda titreşir; tur bitince ek güçlü titreşim',
-                                en: 'Vibrates on each count; stronger vibration at round end',
-                                ar: 'يهتز مع كل عدّ؛ اهتزاز أقوى عند نهاية الجولة',
-                              ),
+                              label: l10n.zikirmatikVibration,
+                              tooltip: l10n.zikirmatikVibrationTooltip,
                               activeVisual: _vibrateTarget,
                               semanticsToggled: _vibrateTarget,
                               onTap: () async {
@@ -958,18 +886,8 @@ class _ZikirMatikPageState extends ConsumerState<ZikirMatikPage>
                             _ZikirmatikRoundToolColumn(
                               diameter: _kZikirRoundToolsDiameter,
                               icon: Icons.menu_book_rounded,
-                              label: _ztr(
-                                context,
-                                tr: 'Zikir bilgisi',
-                                en: 'Dhikr info',
-                                ar: 'معلومات الذكر',
-                              ),
-                              tooltip: _ztr(
-                                context,
-                                tr: 'Zikir bilgisi',
-                                en: 'Dhikr info',
-                                ar: 'معلومات الذكر',
-                              ),
+                              label: l10n.zikirmatikInfo,
+                              tooltip: l10n.zikirmatikInfo,
                               onTap: _openList,
                             ),
                           ],

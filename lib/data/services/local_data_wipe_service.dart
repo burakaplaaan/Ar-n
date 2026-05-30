@@ -15,6 +15,7 @@ import '../models/habit_model.dart';
 import '../models/user_profile_model.dart';
 import 'arin_local_notifications_plugin.dart';
 import 'arin_widget_sync.dart';
+import 'fcm_token_service.dart';
 import 'prayer_reminder_prefs.dart';
 import 'prayer_user_notification_sound_store.dart';
 
@@ -62,6 +63,8 @@ abstract final class LocalDataWipeService {
     // (AdMob init, FCM init, migrasyonlar vb.) yeni oturumda tekrar çalışabilmesi için
     // flag'i sıfırlıyoruz.
     deferredStartupDone = false;
+    
+    await FcmTokenService.unsubscribeFromBroadcasts();
     
     await _clearFirestoreOfflineCacheSafely();
   }

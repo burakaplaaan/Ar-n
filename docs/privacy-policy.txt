@@ -23,10 +23,10 @@ Arin respects your privacy. This policy explains what data is processed, why it 
 
 4) Third-party services
 - Arin uses:
-  - Firebase Authentication (sign-in),
-  - Cloud Firestore (data sync/storage),
-  - Firebase Analytics (usage analytics),
-  - Firebase Crashlytics (crash diagnostics).
+  - Firebase Authentication (sign-in), Cloud Firestore (data sync), Firebase Cloud Messaging (notifications), Firebase Analytics, and Firebase Crashlytics.
+  - Google AdMob (for serving ads and analytics).
+  - RevenueCat (for processing and managing premium subscriptions).
+  - Aladhan / Diyanet APIs (we may send your city or coordinates to calculate prayer times).
 
 5) Your controls
 - You can deny location/notification permissions in device settings.
@@ -37,4 +37,4 @@ Arin respects your privacy. This policy explains what data is processed, why it 
 - Arin is not intended for children under 13 years old.
 
 7) Contact
-- For privacy questions: arin.app.help@gmail.com
+- For privacy questions: arinapphelp@gmail.com

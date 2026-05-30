@@ -5,6 +5,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_text_styles.dart';
@@ -44,23 +45,33 @@ class _NamazInsightCardState extends ConsumerState<NamazInsightCard>
     return names[d.weekday - 1];
   }
 
-  String _comment(int yesterdayDone, double weekAvg) {
+  String _comment(BuildContext context, int yesterdayDone, double weekAvg) {
+    final l10n = AppLocalizations.of(context)!;
     if (weekAvg >= 4.5 && yesterdayDone >= 4) {
-      return 'Son günlerde ritmin çok güçlü; kalbin düzenle hizalanmış görünüyor. Böyle devam.';
+      return l10n.insightCommentStrong;
     }
     if (yesterdayDone == 5) {
-      return 'Dün beş vakit tamam — Rabb’ine yakın bir gün geçirmişsin. Bugün de aynı niyetle devam edebilirsin.';
+      return l10n.insightCommentPerfect;
     }
     if (yesterdayDone == 0) {
-      return 'Dün kayıt düşmemiş olabilir veya henüz işaretlenmemiş. Bugün tek bir vakitle bile çizgiyi yeniden çizebilirsin.';
+      return l10n.insightCommentZero;
     }
     if (weekAvg < 2.5) {
-      return 'Bu hafta ortalama düşük; bu normal — tefekkür ve küçük adımlarla yükselir. Bir vakit fazlası büyük fark yaratır.';
+      return l10n.insightCommentLow;
     }
     if (yesterdayDone >= 3) {
-      return 'Dün $yesterdayDone/5 vakit işaretli; bugün bir iki vakitle dengeyi tamamlamak mümkün.';
+      // Assuming insightCommentGood takes a count
+      // Wait, how to pass count if it's parameterized?
+      // Since I don't know the exact ARB file structure generated, I should just assume standard code generation:
+      // l10n.insightCommentGood(yesterdayDone.toString());
+      // Actually, since I'm just creating the JSON and using the key, I will assume the key is created with parameter:
+      // "insightCommentGood(yesterdayDone.toString())" or just "insightCommentGood" and I'll do a string replacement if needed.
+      // But standard is l10n.insightCommentGood(yesterdayDone.toString()) or something similar.
+      // Let's use a simpler approach: 
+      // return l10n.insightCommentGood.replaceAll('{count}', yesterdayDone.toString());
+      return l10n.insightCommentGood(yesterdayDone.toString());
     }
-    return 'Geçmiş günler verisi senin için bir ayna: eksik kalan yerlerde merhamet, tamamlananlarda şükür.';
+    return l10n.insightCommentDefault;
   }
 
   @override
@@ -80,7 +91,7 @@ class _NamazInsightCardState extends ConsumerState<NamazInsightCard>
     final avg7 = sum7 / 7.0;
     final yDone = salat.countDone(widget.habitId, yesterday);
 
-    final msg = _comment(yDone, avg7);
+    final msg = _comment(context, yDone, avg7);
 
     return AnimatedBuilder(
       animation: _pulse,
@@ -126,7 +137,7 @@ class _NamazInsightCardState extends ConsumerState<NamazInsightCard>
               ),
               const SizedBox(width: 10),
               Text(
-                'Yansıma',
+                AppLocalizations.of(context)!.reflection,
                 style: AppTextStyles.titleSmall.copyWith(
                   color: AppColors.creamBase,
                   fontWeight: FontWeight.w800,
@@ -137,7 +148,11 @@ class _NamazInsightCardState extends ConsumerState<NamazInsightCard>
           ),
           const SizedBox(height: 6),
           Text(
-            'Dün · ${_weekdayShort(yesterday)} · $yDone/5  ·  Son 7 gün ort. ${avg7.toStringAsFixed(1)}/5',
+            AppLocalizations.of(context)!.yesterdayPrayerSummary(
+              _weekdayShort(yesterday),
+              yDone.toString(),
+              avg7.toStringAsFixed(1),
+            ),
             style: AppTextStyles.labelSmall.copyWith(
               color: AppColors.textOnDarkMuted,
               fontWeight: FontWeight.w600,

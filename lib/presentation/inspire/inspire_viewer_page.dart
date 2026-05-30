@@ -80,8 +80,11 @@ class _InspireViewerPageState extends ConsumerState<InspireViewerPage> {
           padding: EdgeInsets.all(24),
           child: ArinSkeletonCard(height: 520, borderRadius: 24),
         ),
-        error: (e, _) =>
-            _ViewerError(message: '$e', onClose: () => context.pop()),
+        error: (e, _) => _ViewerError(
+          message: '$e',
+          onClose: () => context.pop(),
+          onRetry: () => ref.invalidate(inspirationCatalogProvider),
+        ),
       ),
     );
   }
@@ -405,13 +408,19 @@ class _ViewerEmpty extends StatelessWidget {
 }
 
 class _ViewerError extends StatelessWidget {
-  const _ViewerError({required this.message, required this.onClose});
+  const _ViewerError({
+    required this.message,
+    required this.onClose,
+    this.onRetry,
+  });
 
   final String message;
   final VoidCallback onClose;
+  final VoidCallback? onRetry;
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return SafeArea(
       child: Padding(
         padding: const EdgeInsets.all(24),
@@ -425,11 +434,45 @@ class _ViewerError extends StatelessWidget {
               ),
             ),
             const Spacer(),
-            Text(
-              message,
-              textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.white.withValues(alpha: 0.6)),
+            Icon(
+              Icons.cloud_off_rounded,
+              color: Colors.white.withValues(alpha: 0.5),
+              size: 48,
             ),
+            const SizedBox(height: 16),
+            Text(
+              l10n.inspireLoadFailedTitle,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 18,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              l10n.inspireLoadFailedBody,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: Colors.white.withValues(alpha: 0.7),
+                height: 1.4,
+              ),
+            ),
+            if (onRetry != null) ...[
+              const SizedBox(height: 24),
+              FilledButton.icon(
+                onPressed: onRetry,
+                icon: const Icon(Icons.refresh_rounded, size: 18),
+                label: Text(l10n.inspireLoadRetry),
+                style: FilledButton.styleFrom(
+                  backgroundColor: AppColors.emeraldMid,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 12,
+                  ),
+                ),
+              ),
+            ],
             const Spacer(),
           ],
         ),

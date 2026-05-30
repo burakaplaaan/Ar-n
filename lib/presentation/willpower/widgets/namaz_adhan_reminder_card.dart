@@ -323,7 +323,7 @@ class _NamazAdhanReminderCardState
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text(
-            'Premium durumu yukleniyor. Lutfen kisa bir sure sonra tekrar deneyin.',
+            AppLocalizations.of(context)!.premiumLoadingWait,
           ),
         ),
       );
@@ -341,19 +341,18 @@ class _NamazAdhanReminderCardState
     final accepted = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('2. alarm premium özelliği'),
-        content: const Text(
-          'Ücretsiz kullanımda 2. ezan alarmını açmak için kısa reklam '
-          'izlenir. Premium kullanıcılar bu kilidi görmez.',
+        title: Text(AppLocalizations.of(ctx)!.secondAlarmPremiumFeature),
+        content: Text(
+          AppLocalizations.of(ctx)!.secondAlarmAdWatchText,
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('Vazgeç'),
+            child: Text(AppLocalizations.of(ctx)!.giveUp),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(ctx, true),
-            child: const Text('Reklam sonrası aç'),
+            child: Text(AppLocalizations.of(ctx)!.openAfterAd),
           ),
         ],
       ),

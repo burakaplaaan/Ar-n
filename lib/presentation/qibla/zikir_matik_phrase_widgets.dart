@@ -1,3 +1,5 @@
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+
 part of 'zikir_matik_page.dart';
 
 /// Alt araç: yuvarlak düğme + alt etiket (titreşim / zikir bilgisi).
@@ -158,12 +160,7 @@ class _ZikirPhraseConcreteCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     Text(
-                      _ztr(
-                        context,
-                        tr: 'Zikirmatik',
-                        en: 'Dhikr Counter',
-                        ar: 'عداد الذكر',
-                      ).toUpperCase(),
+                      AppLocalizations.of(context)!.zikirmatikTitle.toUpperCase(),
                       textAlign: TextAlign.center,
                       style: GoogleFonts.outfit(
                         fontSize: 11,
@@ -176,12 +173,7 @@ class _ZikirPhraseConcreteCard extends StatelessWidget {
                     if (phrase.trim().isEmpty) ...[
                       const SizedBox(height: 12),
                       Text(
-                        _ztr(
-                          context,
-                          tr: 'Zikir seçmek için dokun',
-                          en: 'Tap to choose dhikr',
-                          ar: 'اضغط لاختيار الذكر',
-                        ),
+                        AppLocalizations.of(context)!.zikirmatikTapToChoose,
                         textAlign: TextAlign.center,
                         style: GoogleFonts.outfit(
                           fontSize: 14,
@@ -414,12 +406,7 @@ class _ZikirPhrasePickerPanel extends StatelessWidget {
                       Expanded(
                         child: _stagger(
                           Text(
-                            _ztr(
-                              context,
-                              tr: 'ZİKİR SEÇ',
-                              en: 'PICK DHIKR',
-                              ar: 'اختر الذكر',
-                            ),
+                            AppLocalizations.of(context)!.zikirmatikPickDhikr,
                             style: GoogleFonts.outfit(
                               color: _ZikirmatikColors.labelMuted,
                               fontSize: 22,
@@ -443,12 +430,7 @@ class _ZikirPhrasePickerPanel extends StatelessWidget {
                             ),
                             size: 26,
                           ),
-                          tooltip: _ztr(
-                            context,
-                            tr: 'Vazgeç',
-                            en: 'Cancel',
-                            ar: 'إلغاء',
-                          ),
+                          tooltip: AppLocalizations.of(context)!.zikirmatikCancel,
                         ),
                         0.04,
                         0.24,
@@ -484,12 +466,7 @@ class _ZikirPhrasePickerPanel extends StatelessWidget {
                     padding: const EdgeInsets.fromLTRB(18, 8, 18, 0),
                     child: _stagger(
                       _ZikirPickerSectionLabel(
-                        label: _ztr(
-                          context,
-                          tr: 'KAYDETTİKLERİM',
-                          en: 'SAVED',
-                          ar: 'المحفوظة',
-                        ),
+                        label: AppLocalizations.of(context)!.zikirmatikSaved,
                       ),
                       0.28,
                       0.58,
@@ -672,7 +649,7 @@ class _ZikirSavedPhraseChip extends StatelessWidget {
                 ),
                 const SizedBox(width: 6),
                 Tooltip(
-                  message: _ztr(context, tr: 'Sil', en: 'Delete', ar: 'حذف'),
+                  message: AppLocalizations.of(context)!.zikirmatikDelete,
                   child: InkResponse(
                     onTap: onDelete,
                     radius: 18,
@@ -742,12 +719,7 @@ class _ZikirCustomPhraseTile extends StatelessWidget {
                 const SizedBox(width: 10),
                 Flexible(
                   child: Text(
-                    _ztr(
-                      context,
-                      tr: 'KENDİ METNİNİ YAZ…',
-                      en: 'WRITE YOUR OWN TEXT…',
-                      ar: 'اكتب نصك الخاص…',
-                    ),
+                    AppLocalizations.of(context)!.zikirmatikWriteOwnText,
                     textAlign: TextAlign.center,
                     style: GoogleFonts.outfit(
                       color: _ZikirmatikColors.labelMuted,

@@ -5,6 +5,7 @@ import 'dart:ui';
 
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -92,10 +93,10 @@ class _ArinFriendlyErrorScreen extends StatelessWidget {
                     size: 56,
                   ),
                   const SizedBox(height: 20),
-                  const Text(
-                    'Bir şeyler ters gitti',
+                  Text(
+                    AppLocalizations.of(context)?.errorScreenTitle ?? 'Bir şeyler ters gitti',
                     textAlign: TextAlign.center,
-                    style: TextStyle(
+                    style: const TextStyle(
                       color: Colors.white,
                       fontSize: 20,
                       fontWeight: FontWeight.w600,
@@ -104,8 +105,7 @@ class _ArinFriendlyErrorScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 10),
                   Text(
-                    'Bu bölüm şu an açılamadı. '
-                    'Uygulamayı kapatıp tekrar açmayı deneyebilirsin.',
+                    AppLocalizations.of(context)?.errorScreenBody ?? 'Bu bölüm şu an açılamadı. Uygulamayı kapatıp tekrar açmayı deneyebilirsin.',
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       color: Colors.white.withValues(alpha: 0.72),
@@ -141,34 +141,34 @@ class _ArinDebugErrorScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Row(
-                  children: [
-                    Icon(
-                      Icons.bug_report,
-                      color: Colors.red.shade300,
-                      size: 28,
-                    ),
-                    const SizedBox(width: 10),
-                    const Expanded(
-                      child: Text(
-                        'ARIN — widget hatası (debug)',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.bug_report,
+                        color: Colors.red.shade300,
+                        size: 28,
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Text(
+                          AppLocalizations.of(context)?.errorScreenDebugTitle ?? 'ARIN — widget hatası (debug)',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  'Debug moddasınız. Aşağıdaki metni kopyalayın.',
-                  style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.6),
-                    fontSize: 12,
+                    ],
                   ),
-                ),
+                  const SizedBox(height: 8),
+                  Text(
+                    AppLocalizations.of(context)?.errorScreenDebugBody ?? 'Debug moddasınız. Aşağıdaki metni kopyalayın.',
+                    style: TextStyle(
+                      color: Colors.white.withValues(alpha: 0.6),
+                      fontSize: 12,
+                    ),
+                  ),
                 const SizedBox(height: 12),
                 Expanded(
                   child: Container(

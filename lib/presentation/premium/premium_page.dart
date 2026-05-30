@@ -120,7 +120,7 @@ class _PremiumPageState extends ConsumerState<PremiumPage> {
     if (_loadingProducts || !_containsProduct(productId)) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: const Text('Ürün bilgisi henüz hazır değil. Lütfen tekrar deneyin.'),
+          content: Text(AppLocalizations.of(context)!.premiumProductNotReadyError),
           backgroundColor: Colors.red.shade700,
         ),
       );
@@ -137,8 +137,8 @@ class _PremiumPageState extends ConsumerState<PremiumPage> {
         } catch (e) {
           if (!mounted) return;
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Hesap eşlemesi tamamlanamadı. Lütfen tekrar deneyin.'),
+             SnackBar(
+              content: Text(AppLocalizations.of(context)!.premiumAccountLinkError),
             ),
           );
           return;
@@ -151,8 +151,8 @@ class _PremiumPageState extends ConsumerState<PremiumPage> {
       } catch (e) {
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Hesap eşlemesi tamamlanamadı. Lütfen tekrar deneyin.'),
+           SnackBar(
+            content: Text(AppLocalizations.of(context)!.premiumAccountLinkError),
           ),
         );
         return;
@@ -194,26 +194,24 @@ class _PremiumPageState extends ConsumerState<PremiumPage> {
 
   Future<void> _showSuccessDialog() async {
     if (!mounted) return;
+    final l10n = AppLocalizations.of(context)!;
     await showDialog<void>(
       context: context,
       barrierDismissible: false,
       builder: (ctx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Text(
-          '🌿 Hoş geldin!',
-          style: TextStyle(fontWeight: FontWeight.w800),
+        title: Text(
+          l10n.premiumWelcomeTitle,
+          style: const TextStyle(fontWeight: FontWeight.w800),
         ),
-        content: const Text(
-          'ARIN Premium aktif. Reklamsız, kilitsiz deneyimin açık.\n\n'
-          'İstediğin zaman mağaza hesabından aboneliğini yönetebilirsin.',
-        ),
+        content: Text(l10n.premiumWelcomeMessage),
         actions: [
           TextButton(
             onPressed: () {
               Navigator.pop(ctx);
               if (mounted && context.canPop()) context.pop();
             },
-            child: const Text('Harika!'),
+            child: Text(l10n.premiumWelcomeButton),
           ),
         ],
       ),
@@ -224,32 +222,14 @@ class _PremiumPageState extends ConsumerState<PremiumPage> {
     if (_busyProductId != null) return;
     
     final user = ref.read(authUserProvider).asData?.value;
-    if (user == null) {
-      final signedIn = await _showSignInSheet();
-      if (signedIn != true || !mounted) return;
-      final uid = FirebaseAuth.instance.currentUser?.uid;
-      if (uid != null && uid.isNotEmpty) {
-        try {
-          await PurchaseService.loginUser(uid);
-        } catch (e) {
-          if (!mounted) return;
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Hesap eşlemesi tamamlanamadı. Lütfen tekrar deneyin.'),
-            ),
-          );
-          return;
-        }
-        if (!mounted) return;
-      }
-    } else {
+    if (user != null) {
       try {
         await PurchaseService.loginUser(user.uid);
       } catch (e) {
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Hesap eşlemesi tamamlanamadı. Lütfen tekrar deneyin.'),
+           SnackBar(
+            content: Text(AppLocalizations.of(context)!.premiumAccountLinkError),
           ),
         );
         return;
@@ -267,17 +247,19 @@ class _PremiumPageState extends ConsumerState<PremiumPage> {
         final entitlement = await ref.read(premiumEntitlementProvider.future);
         if (!mounted) return;
         
-        if (entitlement.isActive) {
+        final localActive = await ref.read(purchaseServiceProvider).isPremiumLocally();
+        
+        if (entitlement.isActive || localActive) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Premium geri yüklendi!')),
+             SnackBar(content: Text(AppLocalizations.of(context)!.premiumRestoreSuccess)),
           );
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Aktif abonelik bulunamadı.')),
+             SnackBar(content: Text(AppLocalizations.of(context)!.premiumNoActiveSubscription)),
           );
         }
       } else {
-        final msg = result.userMessage ?? 'Aktif abonelik bulunamadı.';
+        final msg = result.userMessage ?? AppLocalizations.of(context)!.premiumNoActiveSubscription;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(msg)),
         );
@@ -341,7 +323,7 @@ class _PremiumPageState extends ConsumerState<PremiumPage> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Giriş tamamlanamadı: $e')),
+          SnackBar(content: Text('${AppLocalizations.of(context)!.premiumSignInErrorPrefix}$e')),
         );
       }
       return false;
@@ -447,7 +429,7 @@ class _PremiumPageState extends ConsumerState<PremiumPage> {
                           )
                         else ...[
                           Text(
-                            isPremium ? 'ARIN Premium aktif' : 'ARIN Premium',
+                            isPremium ? l10n.premiumActiveTitle : l10n.premiumTitle,
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               color: titleTextColor,
@@ -459,8 +441,8 @@ class _PremiumPageState extends ConsumerState<PremiumPage> {
                           const SizedBox(height: 8),
                           Text(
                             isPremium
-                                ? 'Reklamsız ve kilitsiz deneyimin açık.'
-                                : 'Reklamsız, kesintisiz ve kilitsiz manevi rutin.',
+                                ? l10n.premiumActiveSubtitle
+                                : l10n.premiumSubtitle,
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               color: subtitleTextColor,
@@ -479,11 +461,11 @@ class _PremiumPageState extends ConsumerState<PremiumPage> {
                           ],
                           if (yearlyPrice != null) ...[
                             _PlanCard(
-                              title: 'Yıllık Premium',
-                              badge: hasYearly ? null : 'EN AVANTAJLI',
+                              title: l10n.premiumYearlyPlanTitle,
+                              badge: hasYearly ? null : l10n.premiumMostAdvantageousBadge,
                               oldPrice: null, // Hardcoded oldPrice was removed
                               price: yearlyPrice,
-                              subline: 'Yıllık Abonelik',
+                              subline: l10n.premiumYearlyPlanSubtitle,
                               productId: PremiumPage.yearlyProductId,
                               highlighted: !hasYearly,
                               isOwned: hasYearly,
@@ -491,7 +473,7 @@ class _PremiumPageState extends ConsumerState<PremiumPage> {
                                   (!isPremium || hasMonthly) &&
                                   (!_loadingProducts &&
                                       _containsProduct(PremiumPage.yearlyProductId)),
-                              buttonLabel: hasMonthly ? 'Yıllığa geç' : null,
+                              buttonLabel: hasMonthly ? l10n.premiumSwitchToYearly : null,
                               busy: _busyProductId == PremiumPage.yearlyProductId,
                               onPressed: () =>
                                   _startPurchase(PremiumPage.yearlyProductId),
@@ -500,10 +482,10 @@ class _PremiumPageState extends ConsumerState<PremiumPage> {
                           ],
                           if (monthlyPrice != null)
                             _PlanCard(
-                              title: 'Aylık Premium',
+                              title: l10n.premiumMonthlyPlanTitle,
                               oldPrice: null, // Hardcoded oldPrice was removed
                               price: monthlyPrice,
-                              subline: 'Aylık Abonelik',
+                              subline: l10n.premiumMonthlyPlanSubtitle,
                               productId: PremiumPage.monthlyProductId,
                               highlighted: false,
                               isOwned: hasMonthly,
@@ -519,9 +501,7 @@ class _PremiumPageState extends ConsumerState<PremiumPage> {
                           const SizedBox(height: 18),
                         ],
                         Text(
-                          'Lansman fiyatları sınırlı süre geçerlidir. '
-                          'Abonelik mağaza hesabın üzerinden yönetilir ve '
-                          'istediğin zaman iptal edilebilir.',
+                          l10n.premiumFooterText1,
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             color: footerTextColor,
@@ -531,10 +511,7 @@ class _PremiumPageState extends ConsumerState<PremiumPage> {
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          'Abonelik, dönem bitiminden en az 24 saat önce iptal edilmezse '
-                          'otomatik yenilenir. Yenileme ücreti dönem bitimine 24 saat kala '
-                          'mağaza hesabından tahsil edilir. Aboneliklerini App Store/Play '
-                          'hesap ayarlarından yönetebilirsin.',
+                          l10n.premiumFooterText2,
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             color: footerTextColor,
@@ -662,9 +639,9 @@ class _LaunchBadge extends StatelessWidget {
             color: AppColors.goldAccent.withValues(alpha: 0.58),
           ),
         ),
-        child: const Text(
-          'LANSMANA ÖZEL',
-          style: TextStyle(
+        child: Text(
+          AppLocalizations.of(context)!.premiumLaunchBadge,
+          style: const TextStyle(
             color: AppColors.goldAccent,
             fontWeight: FontWeight.w900,
             fontSize: 12,
@@ -705,8 +682,7 @@ class _CountdownLikeNotice extends StatelessWidget {
           const SizedBox(width: 10),
           Expanded(
             child: Text(
-              'Bu fiyat sınırlı süre geçerli. Lansman bitmeden premiumu '
-              'en avantajlı fiyatla aç.',
+              AppLocalizations.of(context)!.premiumCountdownNotice,
               style: TextStyle(
                 color: textColor,
                 height: 1.35,
@@ -723,23 +699,24 @@ class _CountdownLikeNotice extends StatelessWidget {
 class _PremiumBenefits extends StatelessWidget {
   const _PremiumBenefits();
 
-  static const _items = [
-    (Icons.block_rounded, 'Reklamsız kullanım'),
-    (Icons.widgets_rounded, 'Widget kilidi yok'),
-    (Icons.explore_rounded, 'Keşfet akışı kesintisiz'),
-    (Icons.notifications_active_rounded, '2. ezan alarmı açık'),
-  ];
-
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final textColor = isDark
         ? Colors.white.withValues(alpha: 0.88)
         : AppColors.textPrimary;
+    final l10n = AppLocalizations.of(context)!;
+
+    final items = [
+      (Icons.block_rounded, l10n.premiumBenefitAdFree),
+      (Icons.widgets_rounded, l10n.premiumBenefitWidgets),
+      (Icons.explore_rounded, l10n.premiumBenefitExplore),
+      (Icons.notifications_active_rounded, l10n.premiumBenefitAdhan),
+    ];
 
     return Column(
       children: [
-        for (final item in _items)
+        for (final item in items)
           Padding(
             padding: const EdgeInsets.only(bottom: 10),
             child: Row(
@@ -807,8 +784,7 @@ class _SignInRequiredNotice extends StatelessWidget {
           const SizedBox(width: 10),
           Expanded(
             child: Text(
-              'Fiyatları inceleyebilirsin. Satın almadan önce premiumu '
-              'hesabına bağlamak için Google veya Apple ile giriş isteyeceğiz.',
+              AppLocalizations.of(context)!.premiumSignInRequired,
               style: TextStyle(
                 color: textColor,
                 height: 1.35,
@@ -869,7 +845,7 @@ class _PremiumSignInSheet extends StatelessWidget {
             ),
             const SizedBox(height: 12),
             Text(
-              'Premium için hesabını bağla',
+              AppLocalizations.of(context)!.premiumSignInSheetTitle,
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: titleColor,
@@ -879,8 +855,7 @@ class _PremiumSignInSheet extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Text(
-              'Satın aldığın premium cihaz değiştirince kaybolmasın diye '
-              'önce hesabına bağlanır. Fiyatları görmek için giriş gerekmez.',
+              AppLocalizations.of(context)!.premiumSignInSheetSubtitle,
               textAlign: TextAlign.center,
               style: TextStyle(color: subtitleColor, height: 1.35),
             ),
@@ -898,7 +873,7 @@ class _PremiumSignInSheet extends StatelessWidget {
                       width: 20,
                       height: 20,
                     ),
-              label: const Text('Google ile devam et'),
+              label: Text(AppLocalizations.of(context)!.premiumContinueWithGoogle),
               style: FilledButton.styleFrom(
                 backgroundColor: AppColors.accentNeonGreen,
                 foregroundColor: const Color(0xFF07110B),
@@ -910,7 +885,7 @@ class _PremiumSignInSheet extends StatelessWidget {
               OutlinedButton.icon(
                 onPressed: authBusy ? null : onApple,
                 icon: const Icon(Icons.apple_rounded),
-                label: const Text('Apple ile devam et'),
+                label: Text(AppLocalizations.of(context)!.premiumContinueWithApple),
                 style: OutlinedButton.styleFrom(
                   foregroundColor: appleButtonColor,
                   side: BorderSide(color: appleBorderColor),
@@ -921,7 +896,7 @@ class _PremiumSignInSheet extends StatelessWidget {
             const SizedBox(height: 10),
             TextButton(
               onPressed: authBusy ? null : () => Navigator.pop(context, false),
-              child: const Text('Şimdilik vazgeç'),
+              child: Text(AppLocalizations.of(context)!.premiumCancelForNow),
             ),
           ],
         ),
@@ -988,7 +963,7 @@ class _PlanCard extends StatelessWidget {
                     : AppColors.creamSurface.withValues(alpha: 0.85)));
 
     // Badge: isOwned ise "Aktif planınız ✓", aksi halde verilen badge.
-    final effectiveBadge = isOwned ? 'Aktif planınız ✓' : badge;
+    final effectiveBadge = isOwned ? AppLocalizations.of(context)!.premiumActivePlanBadge : badge;
     final badgeBgColor =
         isOwned ? AppColors.accentNeonGreen : AppColors.goldAccent;
     final badgeFgColor =
@@ -1113,10 +1088,10 @@ class _PlanCard extends StatelessWidget {
                     )
                   : Text(
                       isOwned
-                          ? 'Aktif planınız'
+                          ? AppLocalizations.of(context)!.premiumActivePlanButton
                           : (enabled
-                                ? (buttonLabel ?? 'Lansman Fiyatıyla Başla')
-                                : 'Premium aktif'),
+                                ? (buttonLabel ?? AppLocalizations.of(context)!.premiumStartWithLaunchPrice)
+                                : AppLocalizations.of(context)!.premiumIsActiveButton),
                       style: const TextStyle(fontWeight: FontWeight.w900),
                     ),
             ),

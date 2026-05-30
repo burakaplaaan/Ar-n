@@ -9,6 +9,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_text_styles.dart';
+import 'package:arin/l10n/app_localizations.dart';
 import '../../core/localization/locale_text.dart';
 import '../../core/router/app_router.dart';
 import '../../data/models/habit_model.dart';
@@ -40,10 +41,7 @@ class HabitsPage extends ConsumerWidget {
             expandedHeight: 110,
             flexibleSpace: FlexibleSpaceBar(
               titlePadding: const EdgeInsets.fromLTRB(24, 0, 0, 16),
-              title: Text(t(
-                      tr: 'Alışkanlıklarım',
-                      en: 'My Habits',
-                      ar: 'عاداتي'),
+              title: Text(AppLocalizations.of(context)!.habitsMyHabits,
                   style: AppTextStyles.headlineLarge),
               background: Container(
                 decoration: const BoxDecoration(
@@ -66,11 +64,7 @@ class HabitsPage extends ConsumerWidget {
                           size: 72, color: AppColors.emeraldFaint),
                       const SizedBox(height: 20),
                       Text(
-                        t(
-                          tr: 'Henüz alışkanlık eklemedin.\nYeni bir başlangıç yapmaya hazır mısın?',
-                          en: 'You have not added any habits yet.\nReady for a fresh start?',
-                          ar: 'لم تضف أي عادة بعد.\nهل أنت مستعد لبداية جديدة؟',
-                        ),
+                        AppLocalizations.of(context)!.habitsNoHabitsYet,
                         textAlign: TextAlign.center,
                         style: AppTextStyles.bodyMedium
                             .copyWith(color: AppColors.textMuted),
@@ -82,7 +76,7 @@ class HabitsPage extends ConsumerWidget {
             ),
           if (goodHabits.isNotEmpty) ...[
             _SectionHeader(
-              title: t(tr: 'Gelişim', en: 'Growth', ar: 'التطوير'),
+              title: AppLocalizations.of(context)!.habitsGrowth,
               icon: '✅',
             ),
             SliverPadding(
@@ -107,7 +101,7 @@ class HabitsPage extends ConsumerWidget {
           ],
           if (badHabits.isNotEmpty) ...[
             _SectionHeader(
-              title: t(tr: 'Arınma', en: 'Purification', ar: 'التزكية'),
+              title: AppLocalizations.of(context)!.habitsPurification,
               icon: '🚫',
             ),
             SliverPadding(
@@ -143,11 +137,7 @@ class HabitsPage extends ConsumerWidget {
             backgroundColor: const Color(0xFFC0392B),
             foregroundColor: Colors.white,
             icon: const Icon(Icons.remove_circle_outline_rounded),
-            label: Text(t(
-                    tr: 'Arınma hedefi ekle',
-                    en: 'Add purification goal',
-                    ar: 'أضف هدف تزكية',
-                  ),
+            label: Text(AppLocalizations.of(context)!.habitsAddPurificationGoal,
                 style: AppTextStyles.labelMedium
                     .copyWith(color: Colors.white)),
           ),
@@ -159,11 +149,7 @@ class HabitsPage extends ConsumerWidget {
             backgroundColor: AppColors.emeraldDark,
             foregroundColor: AppColors.creamBase,
             icon: const Icon(Icons.add_circle_outline_rounded),
-            label: Text(t(
-                    tr: 'Gelişim rutini ekle',
-                    en: 'Add growth routine',
-                    ar: 'أضف روتين تطوير',
-                  ),
+            label: Text(AppLocalizations.of(context)!.habitsAddGrowthRoutine,
                 style: AppTextStyles.labelMedium
                     .copyWith(color: AppColors.creamBase)),
           ),
@@ -181,19 +167,13 @@ class HabitsPage extends ConsumerWidget {
       context: context,
       builder: (ctx) => AlertDialog(
         title: Text(
-            trEnAr(
-              context,
-              tr: 'Bu alışkanlığı silmek istiyor musun?',
-              en: 'Do you want to delete this habit?',
-              ar: 'هل تريد حذف هذه العادة؟',
-            ),
+            AppLocalizations.of(context)!.habitsDeleteConfirmTitle,
             style: AppTextStyles.headlineSmall),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
             child: Text(
-                trEnAr(context,
-                    tr: 'Vazgeç', en: 'Cancel', ar: 'إلغاء'),
+                AppLocalizations.of(context)!.habitsCancel,
                 style:
                     AppTextStyles.labelLarge.copyWith(color: AppColors.textMuted)),
           ),
@@ -202,8 +182,7 @@ class HabitsPage extends ConsumerWidget {
             style: FilledButton.styleFrom(
                 backgroundColor: AppColors.error),
             child: Text(
-                trEnAr(context,
-                    tr: 'Evet, Sil', en: 'Yes, Delete', ar: 'نعم، احذف'),
+                AppLocalizations.of(context)!.habitsYesDelete,
                 style: AppTextStyles.labelLarge.copyWith(color: Colors.white)),
           ),
         ],
@@ -267,12 +246,7 @@ class _HabitTile extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final isBad = item.habit.type == HabitType.bad;
     final done = item.completedToday;
-    final streakLabel = trEnAr(
-      context,
-      tr: 'gün serisi',
-      en: 'day streak',
-      ar: 'سلسلة أيام',
-    );
+    final streakLabel = AppLocalizations.of(context)!.habitsDayStreak;
 
     return Container(
       margin: const EdgeInsets.only(bottom: 10),

@@ -23,6 +23,8 @@ import '../../core/router/app_router.dart';
 import '../../core/theme/arin_shell_background.dart';
 import '../../data/services/qibla_compass_controller.dart';
 
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+
 // ─── Painter renk sabitleri (dark canvas için) ───────────────────────────────
 const _tickNorth  = Color(0xFFF87171);         // kuzey kırmızı
 const _tickDim    = Color(0x59FFFFFF);          // beyaz %35
@@ -295,7 +297,7 @@ class _TopBar extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
-                      'Kıble Pusulası',
+                      AppLocalizations.of(context)!.qiblaCompassTitle,
                       style: TextStyle(
                         color: light
                             ? AppColors.emeraldDark
@@ -308,7 +310,7 @@ class _TopBar extends StatelessWidget {
                     if (got) ...[
                       const SizedBox(height: 2),
                       Text(
-                        'Kıble: ${deg.toStringAsFixed(1)}°',
+                        '${AppLocalizations.of(context)!.qiblaCompassQibla}: ${deg.toStringAsFixed(1)}°',
                         style: const TextStyle(
                           color: AppColors.accentNeonGreen,
                           fontSize: 12,
@@ -354,7 +356,7 @@ class _LoadingView extends StatelessWidget {
           ),
           const SizedBox(height: 18),
           Text(
-            'Konum alınıyor…',
+            AppLocalizations.of(context)!.qiblaCompassGettingLocation,
             style: TextStyle(
               color: light
                   ? AppColors.textSecondary
@@ -399,7 +401,7 @@ class _ErrorView extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             Text(
-              'Konum veya pusula\nbaşlatılamadı',
+              AppLocalizations.of(context)!.qiblaCompassInitError,
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: textColor,
@@ -427,7 +429,7 @@ class _ErrorView extends StatelessWidget {
                   ),
                 ),
                 child: const Text(
-                  'Yeniden dene',
+                  AppLocalizations.of(context)!.qiblaCompassRetry,
                   style: TextStyle(
                     color: AppColors.accentNeonGreen,
                     fontSize: 14,
@@ -500,6 +502,7 @@ class _CompassView extends StatelessWidget {
                           qiblaBearingDeg: deg,
                           ringColor:       ringColor,
                           light:           light,
+                          context:         context,
                         ),
                       ),
                     ),
@@ -567,10 +570,10 @@ class _CompassView extends StatelessWidget {
                     ],
                     Text(
                       isAligned
-                          ? 'Kıbleye dönüktür'
+                          ? AppLocalizations.of(context)!.qiblaCompassAligned
                           : (isStable
-                              ? '${delta.toStringAsFixed(1)}° sapma'
-                              : 'Ölçüm sabitleniyor'),
+                              ? '${delta.toStringAsFixed(1)}° ${AppLocalizations.of(context)!.qiblaCompassDeviation}'
+                              : AppLocalizations.of(context)!.qiblaCompassStabilizing),
                       style: TextStyle(
                         color: isAligned
                             ? AppColors.accentNeonGreen
@@ -606,7 +609,7 @@ class _GuidanceCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final light = ArinShellBackground.isLight(context);
-    final config = _configFor(guidance);
+    final config = _configFor(context, guidance);
     final isGood = stable && guidance == QiblaGuidance.good;
     final accent = isGood ? AppColors.accentNeonGreen : config.color;
 
@@ -660,31 +663,32 @@ class _GuidanceCard extends StatelessWidget {
     );
   }
 
-  _GuidanceConfig _configFor(QiblaGuidance guidance) {
+  _GuidanceConfig _configFor(BuildContext context, QiblaGuidance guidance) {
+    final l10n = AppLocalizations.of(context)!;
     return switch (guidance) {
-      QiblaGuidance.tilt => const _GuidanceConfig(
+      QiblaGuidance.tilt => _GuidanceConfig(
           icon: Icons.screen_rotation_alt_rounded,
           color: AppColors.warning,
-          title: 'Telefonu düz tut',
-          body: 'Pusulayı yatay kullan. Dik, yan veya ters tutuşta yön kilitlenmez.',
+          title: l10n.qiblaCompassGuidanceTiltTitle,
+          body: l10n.qiblaCompassGuidanceTiltBody,
         ),
-      QiblaGuidance.calibrate => const _GuidanceConfig(
+      QiblaGuidance.calibrate => _GuidanceConfig(
           icon: Icons.explore_off_rounded,
           color: AppColors.warning,
-          title: 'Pusulayı kalibre et',
-          body: 'Telefonu birkaç kez 8 çizerek çevir, sonra metalden uzak tut.',
+          title: l10n.qiblaCompassGuidanceCalibrateTitle,
+          body: l10n.qiblaCompassGuidanceCalibrateBody,
         ),
-      QiblaGuidance.unstable => const _GuidanceConfig(
+      QiblaGuidance.unstable => _GuidanceConfig(
           icon: Icons.sensors_off_rounded,
           color: AppColors.warning,
-          title: 'Manyetik alan kararsız',
-          body: 'Laptop, mıknatıs, metal masa ve manyetik kılıftan uzaklaş.',
+          title: l10n.qiblaCompassGuidanceUnstableTitle,
+          body: l10n.qiblaCompassGuidanceUnstableBody,
         ),
-      QiblaGuidance.good => const _GuidanceConfig(
+      QiblaGuidance.good => _GuidanceConfig(
           icon: Icons.check_circle_outline_rounded,
           color: AppColors.accentNeonGreen,
-          title: 'Ölçüm hazır',
-          body: 'Telefonu yatay tut, kıbleye yavaşça dön. Sabitlenince yeşil rozet yanar.',
+          title: l10n.qiblaCompassGuidanceGoodTitle,
+          body: l10n.qiblaCompassGuidanceGoodBody,
         ),
     };
   }
@@ -716,17 +720,20 @@ class _CompassPainter extends CustomPainter {
     required this.qiblaBearingDeg,
     required this.ringColor,
     required this.light,
+    required this.context,
   });
 
   final double qiblaBearingDeg;
   final Color  ringColor;
   final bool   light;
+  final BuildContext context;
 
   @override
   bool shouldRepaint(covariant _CompassPainter old) =>
       old.qiblaBearingDeg != qiblaBearingDeg ||
       old.ringColor       != ringColor        ||
-      old.light           != light;
+      old.light           != light ||
+      old.context         != context;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -782,10 +789,10 @@ class _CompassPainter extends CustomPainter {
 
       if (isCard) {
         final label = switch (i) {
-          0  => 'K',
-          18 => 'D',
-          36 => 'G',
-          54 => 'B',
+          0  => AppLocalizations.of(context)!.qiblaCompassNorth,
+          18 => AppLocalizations.of(context)!.qiblaCompassEast,
+          36 => AppLocalizations.of(context)!.qiblaCompassSouth,
+          54 => AppLocalizations.of(context)!.qiblaCompassWest,
           _  => '',
         };
         final lr = outer - len - 13.0;
@@ -833,7 +840,7 @@ class _CompassPainter extends CustomPainter {
     final lbR = tipR - 15.0;
     _text(
       canvas,
-      'KIBLE',
+      AppLocalizations.of(context)!.qiblaCompassQiblaText,
       Offset(c.dx + lbR * sinA, c.dy - lbR * cosA),
       color: arrowColor,
       size: 8.5,

@@ -3,6 +3,7 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_text_styles.dart';
@@ -33,7 +34,7 @@ class QuitSmokingWeeklyStrip extends StatelessWidget {
         Row(
           children: [
             Text(
-              'Haftalık görünüm',
+              AppLocalizations.of(context)!.weeklyView,
               style: AppTextStyles.labelMedium.copyWith(
                 color: AppColors.creamBase,
                 fontWeight: FontWeight.w600,
@@ -41,7 +42,7 @@ class QuitSmokingWeeklyStrip extends StatelessWidget {
             ),
             const Spacer(),
             Text(
-              '$done/7 gün',
+              AppLocalizations.of(context)!.daysDoneSummary(done.toString()),
               style: AppTextStyles.labelSmall.copyWith(
                 color: accent,
                 fontWeight: FontWeight.w700,
@@ -434,7 +435,7 @@ class QuitWisdomCarousel extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'İlham ve farkındalık',
+          AppLocalizations.of(context)!.inspirationAndAwareness,
           style: AppTextStyles.labelMedium.copyWith(
             color: AppColors.creamBase.withValues(alpha: 0.92),
             fontWeight: FontWeight.w600,
@@ -443,7 +444,7 @@ class QuitWisdomCarousel extends StatelessWidget {
         ),
         const SizedBox(height: 4),
         Text(
-          'Hakikat ve şuur için kısa molalar',
+          AppLocalizations.of(context)!.shortBreaksForTruth,
           style: AppTextStyles.labelSmall.copyWith(
             color: AppColors.textOnDarkMuted,
             fontSize: 11,

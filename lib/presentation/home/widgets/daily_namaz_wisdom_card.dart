@@ -7,7 +7,6 @@ import 'package:arin/l10n/app_localizations.dart';
 
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_text_styles.dart';
-import '../../../core/localization/locale_text.dart';
 import '../../../core/theme/arin_shell_background.dart';
 import '../../../data/content/daily_namaz_wisdom.dart';
 
@@ -29,12 +28,7 @@ class _DailyNamazWisdomBody extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final fallbackText = trEnAr(
-      context,
-      tr: 'Hatırlatıcı metni yüklenemedi. Sayfayı yenilemeyi dene.',
-      en: 'Reminder text could not be loaded. Try refreshing the page.',
-      ar: 'تعذر تحميل نص التذكير. حاول تحديث الصفحة.',
-    );
+    final fallbackText = l10n.dailyNamazWisdomFallback;
     final onDark = !ArinShellBackground.isLight(context);
     const accent = AppColors.accentNeonGreen;
     final borderC = accent.withValues(alpha: onDark ? 0.38 : 0.45);

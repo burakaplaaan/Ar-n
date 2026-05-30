@@ -96,9 +96,10 @@ class _SupportArinPageState extends ConsumerState<SupportArinPage> {
   Future<void> _startPurchase(String productId) async {
     if (_busyProductId != null) return;
     if (_loadingProducts || !_availableProductIds.contains(productId)) {
+      final l10n = AppLocalizations.of(context)!;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: const Text('Ürün bilgisi henüz hazır değil. Lütfen tekrar deneyin.'),
+          content: Text(l10n.supportProductNotReady),
           backgroundColor: Colors.red.shade700,
         ),
       );
@@ -128,21 +129,19 @@ class _SupportArinPageState extends ConsumerState<SupportArinPage> {
   }
 
   void _showSuccessDialog() {
+    final l10n = AppLocalizations.of(context)!;
     final isDark = Theme.of(context).brightness == Brightness.dark;
     showDialog<void>(
       context: context,
       builder: (dialogContext) => AlertDialog(
         backgroundColor: isDark ? AppColors.cardSurface : Colors.white,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-        title: const Text('Teşekkürler! 🙏'),
-        content: const Text(
-          'Desteğin Arın için çok değerli. '
-          'Bu katkıyla daha güzel bir deneyim sunmaya devam edeceğiz.',
-        ),
+        title: Text(l10n.supportThanksTitle),
+        content: Text(l10n.supportThanksBody),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(dialogContext).pop(),
-            child: const Text('Tamam'),
+            child: Text(l10n.commonOk),
           ),
         ],
       ),
@@ -163,7 +162,7 @@ class _SupportArinPageState extends ConsumerState<SupportArinPage> {
           onPressed: () => context.pop(),
           icon: const Icon(Icons.arrow_back_ios_new_rounded),
         ),
-        title: const Text("Arın'a Destek Ol"),
+        title: Text(l10n.supportPageTitle),
       ),
       body: ListView(
         padding: EdgeInsets.fromLTRB(
@@ -177,8 +176,8 @@ class _SupportArinPageState extends ConsumerState<SupportArinPage> {
           const SizedBox(height: 18),
           _SupportCard(
             icon: Icons.local_cafe_rounded,
-            title: 'Küçük Destek',
-            subtitle: 'Bir kahve desteğiyle geliştirmeye katkı ver.',
+            title: l10n.supportTierSmallTitle,
+            subtitle: l10n.supportTierSmallDesc,
             price:
                 _priceByProductId[RevenueCatIds.smallSupportProductId] ??
                 '₺49,99',
@@ -193,8 +192,8 @@ class _SupportArinPageState extends ConsumerState<SupportArinPage> {
           const SizedBox(height: 12),
           _SupportCard(
             icon: Icons.favorite_rounded,
-            title: 'Orta Destek',
-            subtitle: 'Yeni içerik ve özelliklerin gelişmesini hızlandır.',
+            title: l10n.supportTierMediumTitle,
+            subtitle: l10n.supportTierMediumDesc,
             price:
                 _priceByProductId[RevenueCatIds.mediumSupportProductId] ??
                 '₺149,99',
@@ -210,8 +209,8 @@ class _SupportArinPageState extends ConsumerState<SupportArinPage> {
           const SizedBox(height: 12),
           _SupportCard(
             icon: Icons.workspace_premium_rounded,
-            title: 'Büyük Destek',
-            subtitle: "Arın'ın uzun vadeli gelişimine güçlü katkı ver.",
+            title: l10n.supportTierLargeTitle,
+            subtitle: l10n.supportTierLargeDesc,
             price:
                 _priceByProductId[RevenueCatIds.largeSupportProductId] ??
                 '₺349,99',
@@ -227,9 +226,9 @@ class _SupportArinPageState extends ConsumerState<SupportArinPage> {
           Builder(
             builder: (context) {
               final isDark = Theme.of(context).brightness == Brightness.dark;
+              final l10n = AppLocalizations.of(context)!;
               return Text(
-                'Destek paketleri tek seferlik mağaza ürünleri olarak çalışır. '
-                'Premium abonelikten ayrıdır.',
+                l10n.supportPackagesDisclaimer,
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: isDark ? Colors.white54 : AppColors.textMuted,
@@ -284,6 +283,7 @@ class _HeaderCard extends StatelessWidget {
         ? Colors.white.withValues(alpha: 0.12)
         : AppColors.goldAccent.withValues(alpha: 0.14);
 
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
@@ -318,7 +318,7 @@ class _HeaderCard extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           Text(
-            "Arın'ın yanında ol",
+            l10n.supportHeaderTitle,
             style: TextStyle(
               color: textColor,
               fontSize: 26,
@@ -328,9 +328,7 @@ class _HeaderCard extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            'Bağış değil, mağaza kurallarına uygun tek seferlik destek '
-            'paketleri. Uygulamanın reklamsız ve premium deneyimini '
-            'büyütmemize yardımcı olur.',
+            l10n.supportHeaderDesc,
             style: TextStyle(color: subtitleColor, height: 1.4),
           ),
         ],

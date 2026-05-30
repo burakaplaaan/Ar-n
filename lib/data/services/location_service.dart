@@ -6,11 +6,15 @@
 // çifti `DiyanetDistrictMatcher` ile `ilceId`'ye eşlenir; sonuç Hive'a
 // yazılır ve `prayer_service_resolver` burada okur.
 
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geocoding/geocoding.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:hive/hive.dart';
 import '../../core/utils/hive_boxes.dart';
+import '../../core/router/app_router.dart';
+import '../../core/constants/app_colors.dart';
 import 'diyanet_district_matcher.dart';
 
 /// GPS ile tespit edilen şehir, kaydedilen şehirden farklıysa döner.
@@ -408,6 +412,34 @@ class LocationService {
     var permission = await Geolocator.checkPermission();
 
     if (permission == LocationPermission.denied) {
+      final ctx = rootNavigatorKey.currentContext;
+      if (ctx != null) {
+        // Play Store requirement: show prominent disclosure before requesting permission
+        final confirmed = await showDialog<bool>(
+          context: ctx,
+          builder: (dialogCtx) => AlertDialog(
+            title: Text(AppLocalizations.of(dialogCtx)?.locationPermissionRequiredTitle ?? 'Konum İzni Gerekli'),
+            content: Text(
+              AppLocalizations.of(dialogCtx)?.locationPermissionRequiredBody ??
+              'Arın, namaz vakitlerini ve kıble yönünü doğru hesaplayabilmek için '
+              'konumunuza erişim izni gerektirir. Konum verileriniz yalnızca bu amaçlar '
+              'için kullanılır ve cihazınızda işlenir.',
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(dialogCtx).pop(false),
+                child: Text(AppLocalizations.of(dialogCtx)?.locationPermissionNotNow ?? 'Şimdi Değil'),
+              ),
+              TextButton(
+                onPressed: () => Navigator.of(dialogCtx).pop(true),
+                child: Text(AppLocalizations.of(dialogCtx)?.locationPermissionContinue ?? 'Devam Et'),
+              ),
+            ],
+          ),
+        );
+        if (confirmed != true) return null;
+      }
+
       permission = await Geolocator.requestPermission();
       if (permission == LocationPermission.denied ||
           permission == LocationPermission.deniedForever) {

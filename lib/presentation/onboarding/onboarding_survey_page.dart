@@ -19,6 +19,7 @@ import '../../core/constants/app_text_styles.dart';
 import '../../core/providers/shared_preferences_provider.dart';
 import '../../core/router/app_router.dart';
 import '../../data/services/arin_local_notifications_plugin.dart';
+import '../../data/services/fcm_token_service.dart';
 import '../../data/services/local_notification_permission_gate.dart';
 import '../shared/providers/user_profile_providers.dart';
 
@@ -64,86 +65,52 @@ class _OnboardingSurveyPageState extends ConsumerState<OnboardingSurveyPage> {
     ];
   }
 
-  static const Map<String, String> _moodIdByLabel = {
-    'Mutlu': 'mood_happy',
-    'Happy': 'mood_happy',
-    'سعيد': 'mood_happy',
-    'Sakin': 'mood_calm',
-    'Calm': 'mood_calm',
-    'هادئ': 'mood_calm',
-    'Stresli': 'mood_stressed',
-    'Stressed': 'mood_stressed',
-    'متوتر': 'mood_stressed',
-    'Üzgün': 'mood_sad',
-    'Sad': 'mood_sad',
-    'حزين': 'mood_sad',
-    'Şükrediyorum': 'mood_grateful',
-    'Grateful': 'mood_grateful',
-    'ممتن': 'mood_grateful',
-    'Kaygılı': 'mood_anxious',
-    'Anxious': 'mood_anxious',
-    'قلِق': 'mood_anxious',
-    'Motive': 'mood_motivated',
-    'Motivated': 'mood_motivated',
-    'متحمس': 'mood_motivated',
-  };
+  Map<String, String> _moodIdByLabel(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    return {
+      l10n.surveyDictMoodHappy: 'mood_happy',
+      l10n.surveyDictMoodCalm: 'mood_calm',
+      l10n.surveyDictMoodStressed: 'mood_stressed',
+      l10n.surveyDictMoodSad: 'mood_sad',
+      l10n.surveyDictMoodGrateful: 'mood_grateful',
+      l10n.surveyDictMoodAnxious: 'mood_anxious',
+      l10n.surveyDictMoodMotivated: 'mood_motivated',
+    };
+  }
 
-  static const Map<String, String> _sectorIdByLabel = {
-    'Lise / Üniversite / Hazırlık': 'sector_student',
-    'High school / University / Prep': 'sector_student',
-    'ثانوي / جامعة / تحضيري': 'sector_student',
-    'Özel Sektör': 'sector_private',
-    'Private sector': 'sector_private',
-    'القطاع الخاص': 'sector_private',
-    'Kamu Personeli': 'sector_public',
-    'Public sector': 'sector_public',
-    'القطاع الحكومي': 'sector_public',
-    'Kendi İşim / Serbest': 'sector_business',
-    'Own business / Freelance': 'sector_business',
-    'عملي الخاص / مستقل': 'sector_business',
-    'Ticaret': 'sector_trade',
-    'Trade': 'sector_trade',
-    'التجارة': 'sector_trade',
-    'Ev Hanımı / Ev Erkeği': 'sector_household',
-    'Homemaker': 'sector_household',
-    'رب/ربة منزل': 'sector_household',
-    'Diğer': 'sector_other',
-    'Other': 'sector_other',
-    'أخرى': 'sector_other',
-  };
+  Map<String, String> _sectorIdByLabel(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    return {
+      l10n.surveyDictSectorStudent: 'sector_student',
+      l10n.surveyDictSectorPrivate: 'sector_private',
+      l10n.surveyDictSectorPublic: 'sector_public',
+      l10n.surveyDictSectorBusiness: 'sector_business',
+      l10n.surveyDictSectorTrade: 'sector_trade',
+      l10n.surveyDictSectorHousehold: 'sector_household',
+      l10n.surveyDictSectorOther: 'sector_other',
+    };
+  }
 
-  static const Map<String, String> _needIdByLabel = {
-    'Motivasyon': 'need_motivation',
-    'Motivation': 'need_motivation',
-    'الدافعية': 'need_motivation',
-    'Sabır': 'need_sabr',
-    'Patience': 'need_sabr',
-    'الصبر': 'need_sabr',
-    'Şükür': 'need_shukr',
-    'Gratitude': 'need_shukr',
-    'الشكر': 'need_shukr',
-    'Tevekkül': 'need_tawakkul',
-    'Trust in God': 'need_tawakkul',
-    'التوكل': 'need_tawakkul',
-    'Odaklanma': 'need_focus',
-    'Focus': 'need_focus',
-    'التركيز': 'need_focus',
-    'Şifa': 'need_healing',
-    'Healing': 'need_healing',
-    'الشفاء': 'need_healing',
-    'Rızık & Bereket': 'need_rizq',
-    'Provision & Blessing': 'need_rizq',
-    'الرزق والبركة': 'need_rizq',
-  };
+  Map<String, String> _needIdByLabel(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    return {
+      l10n.surveyDictNeedMotivation: 'need_motivation',
+      l10n.surveyDictNeedSabr: 'need_sabr',
+      l10n.surveyDictNeedShukr: 'need_shukr',
+      l10n.surveyDictNeedTawakkul: 'need_tawakkul',
+      l10n.surveyDictNeedFocus: 'need_focus',
+      l10n.surveyDictNeedHealing: 'need_healing',
+      l10n.surveyDictNeedRizq: 'need_rizq',
+    };
+  }
 
-  static const Map<String, String> _genderIdByLabel = {
-    'Erkek': 'gender_male',
-    'Male': 'gender_male',
-    'ذكر': 'gender_male',
-    'Kadın': 'gender_female',
-    'Female': 'gender_female',
-    'أنثى': 'gender_female',
-  };
+  Map<String, String> _genderIdByLabel(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    return {
+      l10n.surveyDictGenderMale: 'gender_male',
+      l10n.surveyDictGenderFemale: 'gender_female',
+    };
+  }
 
   String _normalizedLookupKey(String value) {
     return value
@@ -286,12 +253,34 @@ class _OnboardingSurveyPageState extends ConsumerState<OnboardingSurveyPage> {
       if (!mounted) return;
 
       // Battery optimization dialog'u (Android'de Samsung/Xiaomi için önemli).
-      // İzin reddedilirse akış tıkanmasın — yine next page.
-      await requestIgnoreBatteryOptimizations();
+      // Play Store şartı: Sistem popup'ından önce kullanıcıya bilgi ver.
+      if (ok) {
+        final confirmed = await showDialog<bool>(
+          context: context,
+          builder: (ctx) => AlertDialog(
+            title: Text(l10n.notificationsBatteryRationaleTitle),
+            content: Text(l10n.notificationsBatteryRationaleBody),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(ctx).pop(false),
+                child: Text(l10n.notificationsBatteryRationaleCancel),
+              ),
+              TextButton(
+                onPressed: () => Navigator.of(ctx).pop(true),
+                child: Text(l10n.notificationsBatteryRationaleConfirm),
+              ),
+            ],
+          ),
+        );
+        if (confirmed == true) {
+          await requestIgnoreBatteryOptimizations();
+        }
+      }
       if (!mounted) return;
 
       if (ok) {
         setState(() => _notificationPermissionEnabled = true);
+        unawaited(FcmTokenService.requestBroadcastPermissions());
         _nextPage();
       } else {
         setState(() => _notificationPermissionEnabled = false);
@@ -323,10 +312,10 @@ class _OnboardingSurveyPageState extends ConsumerState<OnboardingSurveyPage> {
                 : null,
             gender: _selectedGender == null
                 ? null
-                : (_genderIdByLabel[_selectedGender!] ?? _selectedGender),
-            moodTags: _toStableIds(_selectedMoods, _moodIdByLabel),
-            sectorTags: _toStableIds(_selectedSectors, _sectorIdByLabel),
-            needTags: _toStableIds(_selectedNeeds, _needIdByLabel),
+                : (_genderIdByLabel(context)[_selectedGender!] ?? _selectedGender),
+            moodTags: _toStableIds(_selectedMoods, _moodIdByLabel(context)),
+            sectorTags: _toStableIds(_selectedSectors, _sectorIdByLabel(context)),
+            needTags: _toStableIds(_selectedNeeds, _needIdByLabel(context)),
           );
 
       final prefs = ref.read(sharedPreferencesProvider);

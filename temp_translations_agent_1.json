@@ -1,0 +1,617 @@
+{
+  "mgmtDailyPrayers": {
+    "tr": "Günlük namaz",
+    "en": "Daily prayers",
+    "ar": "الصلوات اليومية"
+  },
+  "mgmtRoutineWorkshop": {
+    "tr": "Rutin atölyesi",
+    "en": "Routine workshop",
+    "ar": "ورشة الروتين"
+  },
+  "mgmtChooseGrowth": {
+    "tr": "Gelişim seç",
+    "en": "Choose growth",
+    "ar": "اختر التطوير"
+  },
+  "mgmtPickPrayerOrMakeup": {
+    "tr": "Namaz veya kaza takibini işaretle; özel bir gelişim için alttaki alanı kullan.",
+    "en": "Pick prayer or makeup tracking; use the section below for a custom growth routine.",
+    "ar": "اختر تتبع الصلاة أو القضاء؛ واستخدم القسم أدناه لروتين تطوير مخصص."
+  },
+  "mgmtCountingAndCompensation": {
+    "tr": "Sayım ve telafi",
+    "en": "Counting and compensation",
+    "ar": "العدّ والتدارك"
+  },
+  "mgmtPrayer": {
+    "tr": "Namaz",
+    "en": "Prayer",
+    "ar": "الصلاة"
+  },
+  "mgmtTimeAndKhushu": {
+    "tr": "Vakit ve huşû",
+    "en": "Time and khushu",
+    "ar": "الوقت والخشوع"
+  },
+  "mgmtCustomRoutine": {
+    "tr": "Özel rutin",
+    "en": "Custom routine",
+    "ar": "روتين مخصص"
+  },
+  "mgmtChooseYourOwnTitle": {
+    "tr": "Başlık, emoji ve hatırlatmayı sen belirle.",
+    "en": "Choose your own title, emoji and reminder.",
+    "ar": "حدد العنوان والرمز التفاعلي والتذكير بنفسك."
+  },
+  "mgmtSelect": {
+    "tr": "Seç",
+    "en": "Select",
+    "ar": "اختر"
+  },
+  "habitsMyHabits": {
+    "tr": "Alışkanlıklarım",
+    "en": "My Habits",
+    "ar": "عاداتي"
+  },
+  "habitsNoHabitsYet": {
+    "tr": "Henüz alışkanlık eklemedin.\nYeni bir başlangıç yapmaya hazır mısın?",
+    "en": "You have not added any habits yet.\nReady for a fresh start?",
+    "ar": "لم تضف أي عادة بعد.\nهل أنت مستعد لبداية جديدة؟"
+  },
+  "habitsGrowth": {
+    "tr": "Gelişim",
+    "en": "Growth",
+    "ar": "التطوير"
+  },
+  "habitsPurification": {
+    "tr": "Arınma",
+    "en": "Purification",
+    "ar": "التزكية"
+  },
+  "habitsAddPurificationGoal": {
+    "tr": "Arınma hedefi ekle",
+    "en": "Add purification goal",
+    "ar": "أضف هدف تزكية"
+  },
+  "habitsAddGrowthRoutine": {
+    "tr": "Gelişim rutini ekle",
+    "en": "Add growth routine",
+    "ar": "أضف روتين تطوير"
+  },
+  "habitsDeleteConfirmTitle": {
+    "tr": "Bu alışkanlığı silmek istiyor musun?",
+    "en": "Do you want to delete this habit?",
+    "ar": "هل تريد حذف هذه العادة؟"
+  },
+  "habitsCancel": {
+    "tr": "Vazgeç",
+    "en": "Cancel",
+    "ar": "إلغاء"
+  },
+  "habitsYesDelete": {
+    "tr": "Evet, Sil",
+    "en": "Yes, Delete",
+    "ar": "نعم، احذف"
+  },
+  "habitsDayStreak": {
+    "tr": "gün serisi",
+    "en": "day streak",
+    "ar": "سلسلة أيام"
+  },
+  "customHabitThisWeekGoal": {
+    "tr": "Bu haftanın hedefi",
+    "en": "This week's goal",
+    "ar": "هدف هذا الأسبوع"
+  },
+  "customHabitThisMonthGoal": {
+    "tr": "Bu ayın hedefi",
+    "en": "This month's goal",
+    "ar": "هدف هذا الشهر"
+  },
+  "customHabitDailyGoal": {
+    "tr": "Günlük hedef",
+    "en": "Daily goal",
+    "ar": "الهدف اليومي"
+  },
+  "customHabitThisWeekGoalComplete": {
+    "tr": "Bu haftanın hedefi tamam.",
+    "en": "This week's goal is complete.",
+    "ar": "اكتمل هدف هذا الأسبوع."
+  },
+  "customHabitThisMonthGoalComplete": {
+    "tr": "Bu ayın hedefi tamam.",
+    "en": "This month's goal is complete.",
+    "ar": "اكتمل هدف هذا الشهر."
+  },
+  "customHabitTodayGoalComplete": {
+    "tr": "Bugünkü hedef tamam.",
+    "en": "Today's goal is complete.",
+    "ar": "اكتمل هدف اليوم."
+  },
+  "customHabitLetsStart": {
+    "tr": "Haydi başla!",
+    "en": "Let's start!",
+    "ar": "هيا ابدأ!"
+  },
+  "customHabitDoingWell": {
+    "tr": "İyi gidiyorsun.",
+    "en": "You are doing well.",
+    "ar": "أنت تسير بشكل جيد."
+  },
+  "customHabitAlmostThere": {
+    "tr": "Neredeyse.",
+    "en": "Almost there.",
+    "ar": "أوشكت."
+  },
+  "customHabitOneLastStep": {
+    "tr": "Son bir adım.",
+    "en": "One last step.",
+    "ar": "خطوة أخيرة."
+  },
+  "customHabitRecordNotFound": {
+    "tr": "Kayıt bulunamadı",
+    "en": "Record not found",
+    "ar": "لم يتم العثور على السجل"
+  },
+  "customHabitStreak": {
+    "tr": "Seri",
+    "en": "Streak",
+    "ar": "سلسلة"
+  },
+  "customHabitDayStreak": {
+    "tr": "Gün serisi",
+    "en": "Day streak",
+    "ar": "سلسلة أيام"
+  },
+  "customHabitBack": {
+    "tr": "Geri",
+    "en": "Back",
+    "ar": "رجوع"
+  },
+  "customHabitRemove": {
+    "tr": "Kaldır",
+    "en": "Remove",
+    "ar": "إزالة"
+  },
+  "customHabitBackToTracker": {
+    "tr": "Alışkanlık takibine dön",
+    "en": "Back to habit tracker",
+    "ar": "العودة لمتابعة العادات"
+  },
+  "customHabitGoal": {
+    "tr": "Hedef",
+    "en": "Goal",
+    "ar": "الهدف"
+  },
+  "customHabitCompletedToday": {
+    "tr": "Bugün hedefi tamamladın.",
+    "en": "You completed today's goal.",
+    "ar": "أكملت هدف اليوم."
+  },
+  "customHabitCompletedPeriod": {
+    "tr": "Bu dönem hedefi tamamladın.",
+    "en": "You completed this period's goal.",
+    "ar": "أكملت هدف هذه الفترة."
+  },
+  "customHabitFinish": {
+    "tr": "Bitir",
+    "en": "Finish",
+    "ar": "إنهاء"
+  },
+  "addHabitUnitTimes": {
+    "tr": "kez",
+    "en": "times",
+    "ar": "مرات"
+  },
+  "addHabitUnitMinutes": {
+    "tr": "dakika",
+    "en": "minutes",
+    "ar": "دقائق"
+  },
+  "addHabitUnitHours": {
+    "tr": "saat",
+    "en": "hours",
+    "ar": "ساعات"
+  },
+  "addHabitUnitPages": {
+    "tr": "sayfa",
+    "en": "pages",
+    "ar": "صفحات"
+  },
+  "addHabitUnitGlasses": {
+    "tr": "bardak",
+    "en": "glasses",
+    "ar": "أكواب"
+  },
+  "addHabitUnitSets": {
+    "tr": "set",
+    "en": "sets",
+    "ar": "مجموعات"
+  },
+  "addHabitUnitLaps": {
+    "tr": "tur",
+    "en": "laps",
+    "ar": "دورات"
+  },
+  "addHabitDaily": {
+    "tr": "Günlük",
+    "en": "Daily",
+    "ar": "يومي"
+  },
+  "addHabitWeekly": {
+    "tr": "Haftalık",
+    "en": "Weekly",
+    "ar": "أسبوعي"
+  },
+  "addHabitMonthly": {
+    "tr": "Aylık",
+    "en": "Monthly",
+    "ar": "شهري"
+  },
+  "addHabitSummaryWeekly": {
+    "tr": "{amount} {unit} haftalık",
+    "en": "{amount} {unit} weekly",
+    "ar": "{amount} {unit} أسبوعي"
+  },
+  "addHabitSummaryMonthly": {
+    "tr": "{amount} {unit} aylık",
+    "en": "{amount} {unit} monthly",
+    "ar": "{amount} {unit} شهري"
+  },
+  "addHabitSummaryDaily": {
+    "tr": "{amount} {unit} günlük",
+    "en": "{amount} {unit} daily",
+    "ar": "{amount} {unit} يومي"
+  },
+  "addHabitCancel": {
+    "tr": "İptal",
+    "en": "Cancel",
+    "ar": "إلغاء"
+  },
+  "addHabitOk": {
+    "tr": "Tamam",
+    "en": "OK",
+    "ar": "حسناً"
+  },
+  "addHabitCustom": {
+    "tr": "Özel",
+    "en": "Custom",
+    "ar": "مخصص"
+  },
+  "addHabitSave": {
+    "tr": "Kaydet",
+    "en": "Save",
+    "ar": "حفظ"
+  },
+  "addHabitGrowthName": {
+    "tr": "Gelişim Adı",
+    "en": "Growth Name",
+    "ar": "اسم التطوير"
+  },
+  "addHabitPurificationName": {
+    "tr": "Arınma Adı",
+    "en": "Purification Name",
+    "ar": "اسم التزكية"
+  },
+  "addHabitGrowthHint": {
+    "tr": "Örn: 30 dakika kitap okuma",
+    "en": "Ex: Read a book for 30 minutes",
+    "ar": "مثال: قراءة كتاب لمدة 30 دقيقة"
+  },
+  "addHabitPurificationHint": {
+    "tr": "Örn: Gereksiz ekran süresini azalt",
+    "en": "Ex: Reduce unnecessary screen time",
+    "ar": "مثال: تقليل وقت الشاشة غير الضروري"
+  },
+  "addHabitNameRequired": {
+    "tr": "İsim gerekli",
+    "en": "Name is required",
+    "ar": "الاسم مطلوب"
+  },
+  "addHabitNameTooLong": {
+    "tr": "En fazla 60 karakter",
+    "en": "Maximum 60 characters",
+    "ar": "الحد الأقصى 60 حرفاً"
+  },
+  "addHabitNoteOptional": {
+    "tr": "Not (isteğe bağlı)",
+    "en": "Note (optional)",
+    "ar": "ملاحظة (اختياري)"
+  },
+  "addHabitNoteHint": {
+    "tr": "Kendine kısa bir not…",
+    "en": "A short note to yourself...",
+    "ar": "ملاحظة قصيرة لنفسك..."
+  },
+  "habitCalendarToday": {
+    "tr": "Bugün: {date}",
+    "en": "Today: {date}",
+    "ar": "اليوم: {date}"
+  },
+  "habitCalendarTitle": {
+    "tr": "Alışkanlık takvimi",
+    "en": "Habit calendar",
+    "ar": "تقويم العادات"
+  },
+  "habitCalendarMonth": {
+    "tr": "Ay",
+    "en": "Month",
+    "ar": "شهر"
+  },
+  "habitCalendarMonthNote": {
+    "tr": "Ay notu · {month} {year}",
+    "en": "Month note · {month} {year}",
+    "ar": "ملاحظة الشهر · {month} {year}"
+  },
+  "habitCalendarNoRecords": {
+    "tr": "Bu ay için henüz kayıt yok veya alışkanlık eklemedin.",
+    "en": "No records yet for this month or no habits added.",
+    "ar": "لا توجد سجلات لهذا الشهر بعد أو لم تتم إضافة عادات."
+  },
+  "habitCalendarQuitInsight": {
+    "tr": "“{title}”: bu ay {n} gün Arınma sayacı takvimde (başlangıçtan itibaren).",
+    "en": "“{title}”: {n} days Purification counter on calendar this month (since start).",
+    "ar": "“{title}”: {n} أيام عداد التزكية في التقويم هذا الشهر (منذ البداية)."
+  },
+  "habitCalendarPrayerInsight": {
+    "tr": "“{title}”: {anyPrayer} günde en az bir vakit işaretlendi; {fullFive} günde 5/5 tamamlandı.",
+    "en": "“{title}”: At least one prayer marked on {anyPrayer} days; 5/5 completed on {fullFive} days.",
+    "ar": "“{title}”: تم وضع علامة على صلاة واحدة على الأقل في {anyPrayer} يوماً؛ اكتمل 5/5 في {fullFive} يوماً."
+  },
+  "habitCalendarCustomInsightPeriod": {
+    "tr": "“{title}”: bu ay {n} {periodLabel} hedefine ulaşıldı.",
+    "en": "“{title}”: {n} {periodLabel} goal reached this month.",
+    "ar": "“{title}”: تم الوصول إلى هدف {n} {periodLabel} هذا الشهر."
+  },
+  "habitCalendarWeekLabel": {
+    "tr": "hafta",
+    "en": "week",
+    "ar": "أسبوع"
+  },
+  "habitCalendarMonthLabel": {
+    "tr": "ay",
+    "en": "month",
+    "ar": "شهر"
+  },
+  "habitCalendarCustomInsightDays": {
+    "tr": "“{title}”: bu ay toplam {completedDays} gün tamamlandı olarak işaretlendi.",
+    "en": "“{title}”: A total of {completedDays} days marked as completed this month.",
+    "ar": "“{title}”: تم وضع علامة مكتمل على {completedDays} يوماً إجمالاً هذا الشهر."
+  },
+  "habitCalendarLegend": {
+    "tr": "Hücredeki gri simgeler: o gün için kayıt var demektir. Arınma simgesi özellikle sayacın aktif olduğu günleri gösterir; namaz/rutin simgeleri ilgili günün tamamlanan kayıtlarını gösterir.",
+    "en": "Grey icons in cells: means there is a record for that day. The purification icon specifically shows days the counter was active; prayer/routine icons show completed records for the respective day.",
+    "ar": "الرموز الرمادية في الخلايا: تعني وجود سجل لذلك اليوم. يوضح رمز التزكية تحديداً الأيام التي كان فيها العداد نشطاً؛ رموز الصلاة/الروتين تظهر السجلات المكتملة لليوم المعني."
+  },
+  "kazaPrayerFajr": {
+    "tr": "Sabah namazı",
+    "en": "Fajr prayer",
+    "ar": "صلاة الفجر"
+  },
+  "kazaPrayerDhuhr": {
+    "tr": "Öğle namazı",
+    "en": "Dhuhr prayer",
+    "ar": "صلاة الظهر"
+  },
+  "kazaPrayerAsr": {
+    "tr": "İkindi namazı",
+    "en": "Asr prayer",
+    "ar": "صلاة العصر"
+  },
+  "kazaPrayerMaghrib": {
+    "tr": "Akşam namazı",
+    "en": "Maghrib prayer",
+    "ar": "صلاة المغرب"
+  },
+  "kazaPrayerIsha": {
+    "tr": "Yatsı namazı",
+    "en": "Isha prayer",
+    "ar": "صلاة العشاء"
+  },
+  "kazaPrayerWitr": {
+    "tr": "Vitir namazı",
+    "en": "Witr prayer",
+    "ar": "صلاة الوتر"
+  },
+  "kazaReset": {
+    "tr": "Sıfırla",
+    "en": "Reset",
+    "ar": "إعادة تعيين"
+  },
+  "kazaResetConfirmDesc": {
+    "tr": "Tüm kaza sayıları sıfırlanacak. Emin misin?",
+    "en": "All makeup prayer counts will be reset. Are you sure?",
+    "ar": "سيتم إعادة تعيين جميع أعداد قضاء الصلوات. هل أنت متأكد؟"
+  },
+  "kazaCancel": {
+    "tr": "İptal",
+    "en": "Cancel",
+    "ar": "إلغاء"
+  },
+  "kazaTrackerTitle": {
+    "tr": "Kaza takibi",
+    "en": "Makeup tracking",
+    "ar": "تتبع القضاء"
+  },
+  "kazaClose": {
+    "tr": "Kapat",
+    "en": "Close",
+    "ar": "إغلاق"
+  },
+  "kazaTrackerSubtitle": {
+    "tr": "Kaza namazı takibi",
+    "en": "Makeup prayer tracking",
+    "ar": "تتبع قضاء الصلوات"
+  },
+  "kazaTrackerDesc": {
+    "tr": "Kaza namazlarını vakit namazları kılındıktan sonra kılmaya özen göster. Eksik (+) ile borç ekleyebilir, kıldığın her rekat için (−) ile sayacı azaltabilirsin.",
+    "en": "Try to perform makeup prayers after the regular daily prayers. You can add debt with (+) and decrease the counter with (−) for each prayer performed.",
+    "ar": "احرص على أداء صلوات القضاء بعد الصلوات اليومية. يمكنك إضافة دين بـ (+) وتقليل العداد بـ (−) لكل صلاة تؤديها."
+  },
+  "kazaCalcBirthDate": {
+    "tr": "Doğum tarihi",
+    "en": "Birth date",
+    "ar": "تاريخ الميلاد"
+  },
+  "kazaCalcApply": {
+    "tr": "Uygula",
+    "en": "Apply",
+    "ar": "تطبيق"
+  },
+  "kazaCalcUpdateCounters": {
+    "tr": "Sayaçları güncelle?",
+    "en": "Update counters?",
+    "ar": "تحديث العدادات؟"
+  },
+  "kazaCalcUpdateDesc": {
+    "tr": "Mevcut kaza sayıların silinip hesaplanan değerlerle değiştirilecek.",
+    "en": "Your current makeup prayer counts will be deleted and replaced with calculated values.",
+    "ar": "سيتم حذف أعداد صلوات القضاء الحالية واستبدالها بالقيم المحسوبة."
+  },
+  "kazaCalcCancel": {
+    "tr": "İptal",
+    "en": "Cancel",
+    "ar": "إلغاء"
+  },
+  "kazaCalcContinue": {
+    "tr": "Devam",
+    "en": "Continue",
+    "ar": "متابعة"
+  },
+  "kazaCalcErrorPubertyFuture": {
+    "tr": "Buluğ tarihi bugünden sonra olamaz. Doğum tarihini veya buluğ yaşını kontrol et.",
+    "en": "Puberty date cannot be after today. Check birth date or puberty age.",
+    "ar": "لا يمكن أن يكون تاريخ البلوغ بعد اليوم. تحقق من تاريخ الميلاد أو سن البلوغ."
+  },
+  "kazaCalcErrorZeroRemaining": {
+    "tr": "Kalan namaz 0: tam kılınan gün, borçlu güne eşit veya fazlaysa üst sınıra çekilir; 6 vakit sayacı da buna göre sıfır kalır.",
+    "en": "Remaining prayers 0: if fully prayed days equal or exceed liable days, it is capped; the 6 prayer counters remain zero accordingly.",
+    "ar": "الصلوات المتبقية 0: إذا كانت الأيام المصلّاة بالكامل تساوي أو تتجاوز الأيام الملزم بها، يتم تقييدها؛ وتبقى عدادات الصلوات الـ 6 صفراً بناءً على ذلك."
+  },
+  "kazaCalcTitle": {
+    "tr": "Kaza takibi",
+    "en": "Makeup tracking",
+    "ar": "تتبع القضاء"
+  },
+  "kazaCalcSubtitle": {
+    "tr": "Kaza namazı takibi",
+    "en": "Makeup prayer tracking",
+    "ar": "تتبع قضاء الصلوات"
+  },
+  "kazaCalcDesc": {
+    "tr": "Farz namazlar buluğ çağından itibaren başlar. Tam yaşını bilmiyorsan erkeklerde 12, kadınlarda 9 yaşını referans alabilirsin. Bu ekran tahmini bir sayı üretir; kaza namazlarını vakit namazlarından sonra kılmaya devam et.",
+    "en": "Obligatory prayers start from puberty. If you don't know the exact age, you can reference 12 for males and 9 for females. This screen produces an estimated number; continue performing makeup prayers after regular prayers.",
+    "ar": "الصلوات المفروضة تبدأ من سن البلوغ. إذا كنت لا تعرف العمر الدقيق، يمكنك الرجوع إلى 12 للذكور و 9 للإناث كمرجع. تنتج هذه الشاشة عدداً تقديرياً؛ استمر في أداء صلوات القضاء بعد الصلوات المنتظمة."
+  },
+  "kazaCalcFemaleNote": {
+    "tr": "Kadınlar için: buluğdan bugüne kadar geçen her takvim ayı için yaklaşık 6 gün namazdan muaf sayılır (toplam günü geçmez).",
+    "en": "For females: roughly 6 days are exempted from prayers for each calendar month passed since puberty (not exceeding total days).",
+    "ar": "للإناث: يُعفى تقريباً 6 أيام من الصلاة لكل شهر تقويمي مضى منذ البلوغ (لا يتجاوز إجمالي الأيام)."
+  },
+  "kazaCalcFormula": {
+    "tr": "Formül: borçlu gün = takvim günü − hayız muafiyeti; toplam namaz = borçlu gün × 6 − (tam kılınan gün × 6). Kılınan gün sayısı borçlu günü aşamaz.",
+    "en": "Formula: liable days = calendar days − menstruation exemption; total prayers = liable days × 6 − (fully prayed days × 6). Prayed days cannot exceed liable days.",
+    "ar": "المعادلة: الأيام الملزم بها = أيام التقويم − إعفاء الحيض؛ إجمالي الصلوات = الأيام الملزم بها × 6 − (الأيام المصلّاة بالكامل × 6). لا يمكن أن تتجاوز الأيام المصلّاة الأيام الملزم بها."
+  },
+  "kazaCalcCalculateTitle": {
+    "tr": "Kaza namazı hesapla",
+    "en": "Calculate makeup prayers",
+    "ar": "حساب صلوات القضاء"
+  },
+  "kazaCalcGender": {
+    "tr": "Cinsiyetiniz",
+    "en": "Your gender",
+    "ar": "جنسك"
+  },
+  "kazaCalcMale": {
+    "tr": "Erkek",
+    "en": "Male",
+    "ar": "ذكر"
+  },
+  "kazaCalcFemale": {
+    "tr": "Kadın",
+    "en": "Female",
+    "ar": "أنثى"
+  },
+  "kazaCalcBirthDateTitle": {
+    "tr": "Doğum tarihiniz",
+    "en": "Your birth date",
+    "ar": "تاريخ ميلادك"
+  },
+  "kazaCalcPubertyAge": {
+    "tr": "Buluğ çaşına girdiğiniz yaş",
+    "en": "Age you reached puberty",
+    "ar": "عمر بلوغك"
+  },
+  "kazaCalcPubertyNote": {
+    "tr": "Alt sınır: erkek 12, kadın 9 yaş (daha küçük girilirse hesapta {minPuberty} kullanılır).",
+    "en": "Lower limit: male 12, female 9 years (if smaller is entered, {minPuberty} is used in calculation).",
+    "ar": "الحد الأدنى: ذكر 12، أنثى 9 سنوات (إذا تم إدخال رقم أصغر، يتم استخدام {minPuberty} في الحساب)."
+  },
+  "kazaCalcPrayedDays": {
+    "tr": "Kaç gün namaz kıldınız?",
+    "en": "How many days have you prayed?",
+    "ar": "كم يوماً صليت؟"
+  },
+  "kazaCalcPrayedDaysNote": {
+    "tr": "Bugüne kadar, o gün içinde bütün vakitleri kıldığın toplam gün sayısı.",
+    "en": "Total number of days so far where you performed all prayers within the day.",
+    "ar": "إجمالي عدد الأيام حتى الآن التي أديت فيها جميع الصلوات خلال اليوم."
+  },
+  "kazaCalcCalculate": {
+    "tr": "Hesapla",
+    "en": "Calculate",
+    "ar": "حساب"
+  },
+  "kazaCalcLiveError": {
+    "tr": "Buluğ tarihi bugünden sonra olamaz; doğum ve buluğ yaşını kontrol et.",
+    "en": "Puberty date cannot be after today; check birth and puberty age.",
+    "ar": "لا يمكن أن يكون تاريخ البلوغ بعد اليوم؛ تحقق من تاريخ الميلاد وعمر البلوغ."
+  },
+  "kazaCalcLiveHayiz": {
+    "tr": "Hayız muafiyeti: −{days} gün\n",
+    "en": "Menstruation exemption: −{days} days\n",
+    "ar": "إعفاء الحيض: −{days} أيام\n"
+  },
+  "kazaCalcLiveApplied": {
+    "tr": "\n(Tam kılınan gün üst sınır: {applied})",
+    "en": "\n(Fully prayed days upper limit: {applied})",
+    "ar": "\n(الحد الأقصى للأيام المصلّاة بالكامل: {applied})"
+  },
+  "kazaCalcLiveSummary": {
+    "tr": "Canlı özet",
+    "en": "Live summary",
+    "ar": "ملخص مباشر"
+  },
+  "kazaCalcLiveCalendarDays": {
+    "tr": "Takvim günü: {days}\n",
+    "en": "Calendar days: {days}\n",
+    "ar": "أيام التقويم: {days}\n"
+  },
+  "kazaCalcLiveLiableDays": {
+    "tr": "Borçlu gün: {days}\n",
+    "en": "Liable days: {days}\n",
+    "ar": "الأيام الملزم بها: {days}\n"
+  },
+  "kazaCalcLiveOwed": {
+    "tr": "Namaz borcu (borçlu gün × {perDay}): {total}\n",
+    "en": "Prayer debt (liable days × {perDay}): {total}\n",
+    "ar": "دين الصلاة (الأيام الملزم بها × {perDay}): {total}\n"
+  },
+  "kazaCalcLiveCredited": {
+    "tr": "Düşülen (tam gün × {perDay}): {credited}{appliedNote}\n",
+    "en": "Deducted (full days × {perDay}): {credited}{appliedNote}\n",
+    "ar": "المخصوم (أيام كاملة × {perDay}): {credited}{appliedNote}\n"
+  },
+  "kazaCalcLiveRemaining": {
+    "tr": "—\nKalan toplam: {remaining} namaz",
+    "en": "—\nRemaining total: {remaining} prayers",
+    "ar": "—\nالإجمالي المتبقي: {remaining} صلوات"
+  },
+  "kazaCalcLiveZeroNote": {
+    "tr": "Hesapla sonrası sayaç: kalan toplam 6 vakte bölünür; kalan 0 ise her vakit 0 kalır.",
+    "en": "Post-calculation counter: remaining total is divided into 6 prayers; if remaining is 0, each prayer stays 0.",
+    "ar": "عداد ما بعد الحساب: يتم تقسيم الإجمالي المتبقي إلى 6 صلوات؛ إذا كان المتبقي 0، تظل كل صلاة 0."
+  }
+}

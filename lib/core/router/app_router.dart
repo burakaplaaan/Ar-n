@@ -9,6 +9,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../analytics/arin_analytics.dart';
 import '../providers/shared_preferences_provider.dart';
 import 'app_router_refresh.dart';
+
+final GlobalKey<NavigatorState> rootNavigatorKey = GlobalKey<NavigatorState>();
 import '../../presentation/onboarding/onboarding_page.dart';
 import '../../presentation/shared/providers/user_profile_providers.dart';
 import '../../presentation/onboarding/onboarding_survey_page.dart';
@@ -206,6 +208,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
   final analyticsObserver = ArinAnalytics.observerIfAvailable();
 
   return GoRouter(
+    navigatorKey: rootNavigatorKey,
     initialLocation: onboardingDone ? AppRoutes.home : AppRoutes.onboarding,
     refreshListenable: refresh,
     debugLogDiagnostics: kDebugMode,

@@ -12,6 +12,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/turkey_provinces.dart';
@@ -202,7 +203,7 @@ class _LocationChangeDialogState extends State<_LocationChangeDialog> {
                 ),
                 const SizedBox(width: 8),
                 Text(
-                  'Farklı bir konumdasın',
+                  AppLocalizations.of(context)!.differentLocation,
                   style: TextStyle(
                     color: titleColor,
                     fontSize: 16,
@@ -236,7 +237,7 @@ class _LocationChangeDialogState extends State<_LocationChangeDialog> {
 
             // Açıklama
             Text(
-              'Namaz vakitlerini ${widget.newCity}\'a göre güncelleyelim mi?',
+              AppLocalizations.of(context)!.updatePrayerTimesForCity(widget.newCity),
               style: TextStyle(
                 color: bodyColor,
                 fontSize: 14,
@@ -275,7 +276,7 @@ class _LocationChangeDialogState extends State<_LocationChangeDialog> {
                   const SizedBox(width: 10),
                   Expanded(
                     child: Text(
-                      'Bu tercihi hatırla, bir daha sorma',
+                      AppLocalizations.of(context)!.rememberThisChoice,
                       style: TextStyle(
                         color: bodyColor,
                         fontSize: 13,
@@ -303,7 +304,7 @@ class _LocationChangeDialogState extends State<_LocationChangeDialog> {
                 children: [
                   Expanded(
                     child: _DialogButton(
-                      label: 'Kalsın',
+                      label: AppLocalizations.of(context)!.keepCurrentLocation,
                       onPressed: () => _handle(false),
                       primary: false,
                       isDark: isDark,
@@ -312,7 +313,7 @@ class _LocationChangeDialogState extends State<_LocationChangeDialog> {
                   const SizedBox(width: 10),
                   Expanded(
                     child: _DialogButton(
-                      label: 'Güncelle',
+                      label: AppLocalizations.of(context)!.updateLocation,
                       onPressed: () => _handle(true),
                       primary: true,
                       isDark: isDark,

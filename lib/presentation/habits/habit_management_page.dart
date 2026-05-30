@@ -46,12 +46,7 @@ class _HabitManagementPageState extends ConsumerState<HabitManagementPage> {
       final h = salatHabit ??
           await ref.read(habitSummaryProvider.notifier).createFromTemplate(
                 templateId: WillpowerTemplates.salatDaily,
-                title: trEnAr(
-                  context,
-                  tr: 'Günlük namaz',
-                  en: 'Daily prayers',
-                  ar: 'الصلوات اليومية',
-                ),
+                title: AppLocalizations.of(context)!.mgmtDailyPrayers,
                 type: HabitType.good,
                 emoji: '🕌',
                 onboardingCompleted: false,
@@ -112,12 +107,7 @@ class _HabitManagementPageState extends ConsumerState<HabitManagementPage> {
                       ),
                       Expanded(
                         child: Text(
-                          trEnAr(
-                            context,
-                            tr: 'Rutin atölyesi',
-                            en: 'Routine workshop',
-                            ar: 'ورشة الروتين',
-                          ),
+                          l10n.mgmtRoutineWorkshop,
                           textAlign: TextAlign.center,
                           style: AppTextStyles.titleMedium.copyWith(
                             color: AppColors.creamBase,
@@ -148,12 +138,7 @@ class _HabitManagementPageState extends ConsumerState<HabitManagementPage> {
                     padding: const EdgeInsets.fromLTRB(20, 8, 20, 32),
                     children: [
                       Text(
-                        trEnAr(
-                          context,
-                          tr: 'Gelişim seç',
-                          en: 'Choose growth',
-                          ar: 'اختر التطوير',
-                        ),
+                        l10n.mgmtChooseGrowth,
                         style: AppTextStyles.titleMedium.copyWith(
                           color: AppColors.creamBase,
                           fontWeight: FontWeight.w700,
@@ -162,12 +147,7 @@ class _HabitManagementPageState extends ConsumerState<HabitManagementPage> {
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        trEnAr(
-                          context,
-                          tr: 'Namaz veya kaza takibini işaretle; özel bir gelişim için alttaki alanı kullan.',
-                          en: 'Pick prayer or makeup tracking; use the section below for a custom growth routine.',
-                          ar: 'اختر تتبع الصلاة أو القضاء؛ واستخدم القسم أدناه لروتين تطوير مخصص.',
-                        ),
+                        l10n.mgmtPickPrayerOrMakeup,
                         style: AppTextStyles.bodySmall.copyWith(
                           color: AppColors.textOnDarkMuted,
                           height: 1.45,
@@ -196,12 +176,7 @@ class _HabitManagementPageState extends ConsumerState<HabitManagementPage> {
                                     ),
                                     const SizedBox(height: 2),
                                     Text(
-                                      trEnAr(
-                                        context,
-                                        tr: 'Sayım ve telafi',
-                                        en: 'Counting and compensation',
-                                        ar: 'العدّ والتدارك',
-                                      ),
+                                      l10n.mgmtCountingAndCompensation,
                                       textAlign: TextAlign.center,
                                       style: AppTextStyles.labelSmall.copyWith(
                                         color: AppColors.textOnDarkMuted,
@@ -228,12 +203,7 @@ class _HabitManagementPageState extends ConsumerState<HabitManagementPage> {
                                 child: Column(
                                   children: [
                                     Text(
-                                      trEnAr(
-                                        context,
-                                        tr: 'Namaz',
-                                        en: 'Prayer',
-                                        ar: 'الصلاة',
-                                      ),
+                                      l10n.mgmtPrayer,
                                       textAlign: TextAlign.center,
                                       style: AppTextStyles.titleSmall.copyWith(
                                         color: AppColors.creamBase,
@@ -243,12 +213,7 @@ class _HabitManagementPageState extends ConsumerState<HabitManagementPage> {
                                     ),
                                     const SizedBox(height: 2),
                                     Text(
-                                      trEnAr(
-                                        context,
-                                        tr: 'Vakit ve huşû',
-                                        en: 'Time and khushu',
-                                        ar: 'الوقت والخشوع',
-                                      ),
+                                      l10n.mgmtTimeAndKhushu,
                                       textAlign: TextAlign.center,
                                       style: AppTextStyles.labelSmall.copyWith(
                                         color: AppColors.textOnDarkMuted,
@@ -537,12 +502,7 @@ class _SpecialRoutineCompactButton extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         Text(
-          trEnAr(
-            context,
-            tr: 'Özel rutin',
-            en: 'Custom routine',
-            ar: 'روتين مخصص',
-          ),
+          AppLocalizations.of(context)!.mgmtCustomRoutine,
           textAlign: TextAlign.center,
           style: AppTextStyles.titleSmall.copyWith(
             color: AppColors.creamBase,
@@ -554,12 +514,7 @@ class _SpecialRoutineCompactButton extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 12),
           child: Text(
-            trEnAr(
-              context,
-              tr: 'Başlık, emoji ve hatırlatmayı sen belirle.',
-              en: 'Choose your own title, emoji and reminder.',
-              ar: 'حدد العنوان والرمز التفاعلي والتذكير بنفسك.',
-            ),
+            AppLocalizations.of(context)!.mgmtChooseYourOwnTitle,
             textAlign: TextAlign.center,
             style: AppTextStyles.labelSmall.copyWith(
               color: AppColors.textOnDarkMuted,
@@ -597,12 +552,7 @@ class _SpecialRoutineCompactButton extends StatelessWidget {
                 ),
                 const SizedBox(width: 6),
                 Text(
-                  trEnAr(
-                    context,
-                    tr: 'Seç',
-                    en: 'Select',
-                    ar: 'اختر',
-                  ),
+                  AppLocalizations.of(context)!.mgmtSelect,
                   style: AppTextStyles.labelLarge.copyWith(
                     fontWeight: FontWeight.w700,
                     fontSize: 13,

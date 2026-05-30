@@ -1,3 +1,5 @@
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+
 part of 'zikir_matik_page.dart';
 
 class _ZikirMatikTargetPickerSheet extends StatefulWidget {
@@ -70,6 +72,7 @@ class _ZikirMatikTargetPickerSheetState extends State<_ZikirMatikTargetPickerShe
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final bottomInset = MediaQuery.viewInsetsOf(context).bottom;
     final sel33 = widget.initialTarget == 33;
     final sel99 = widget.initialTarget == 99;

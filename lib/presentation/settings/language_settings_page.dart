@@ -85,14 +85,9 @@ class _LanguageSettingsPageState extends ConsumerState<LanguageSettingsPage> {
     } catch (e) {
       debugPrint('Language switch failed: $e');
       if (!mounted) return;
-      final lang = Localizations.localeOf(context).languageCode;
-      final message = switch (lang) {
-        'en' => 'Language could not be changed. Please try again.',
-        'ar' => 'تعذر تغيير اللغة. يرجى المحاولة مرة أخرى.',
-        _ => 'Dil degistirilemedi. Lutfen tekrar dene.',
-      };
+      final l10n = AppLocalizations.of(context)!;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(message)),
+        SnackBar(content: Text(l10n.languageChangeFailed)),
       );
     } finally {
       if (mounted) setState(() => _switchingCode = null);

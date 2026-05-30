@@ -1,0 +1,87 @@
+{
+  "premiumLoadingWait": {
+    "tr": "Premium durumu yükleniyor. Lütfen kısa bir süre sonra tekrar deneyin.",
+    "en": "Loading premium status. Please try again shortly.",
+    "ar": "جاري تحميل حالة القسط. يرجى المحاولة مرة أخرى قريباً."
+  },
+  "secondAlarmPremiumFeature": {
+    "tr": "2. alarm premium özelliği",
+    "en": "2nd alarm premium feature",
+    "ar": "ميزة الإنذار الثاني للقسط"
+  },
+  "secondAlarmAdWatchText": {
+    "tr": "Ücretsiz kullanımda 2. ezan alarmını açmak için kısa reklam izlenir. Premium kullanıcılar bu kilidi görmez.",
+    "en": "To enable the 2nd azan alarm in free usage, a short ad is watched. Premium users do not see this lock.",
+    "ar": "لتمكين إنذار الأذان الثاني في الاستخدام المجاني، تتم مشاهدة إعلان قصير. مستخدمو القسط لا يرون هذا القفل."
+  },
+  "giveUp": {
+    "tr": "Vazgeç",
+    "en": "Give up",
+    "ar": "تخلى"
+  },
+  "openAfterAd": {
+    "tr": "Reklam sonrası aç",
+    "en": "Open after ad",
+    "ar": "افتح بعد الإعلان"
+  },
+  "reflection": {
+    "tr": "Yansıma",
+    "en": "Reflection",
+    "ar": "انعكاس"
+  },
+  "yesterdayPrayerSummary": {
+    "tr": "Dün · {weekday} · {yDone}/5  ·  Son 7 gün ort. {avg}/5",
+    "en": "Yesterday · {weekday} · {yDone}/5  ·  Last 7 days avg. {avg}/5",
+    "ar": "أمس · {weekday} · {yDone}/5  ·  متوسط آخر 7 أيام {avg}/5"
+  },
+  "weeklyView": {
+    "tr": "Haftalık görünüm",
+    "en": "Weekly view",
+    "ar": "عرض أسبوعي"
+  },
+  "daysDoneSummary": {
+    "tr": "{done}/7 gün",
+    "en": "{done}/7 days",
+    "ar": "{done}/7 أيام"
+  },
+  "inspirationAndAwareness": {
+    "tr": "İlham ve farkındalık",
+    "en": "Inspiration and awareness",
+    "ar": "الإلهام والوعي"
+  },
+  "shortBreaksForTruth": {
+    "tr": "Hakikat ve şuur için kısa molalar",
+    "en": "Short breaks for truth and consciousness",
+    "ar": "فترات راحة قصيرة للحقيقة والوعي"
+  },
+  "insightCommentStrong": {
+    "tr": "Son günlerde ritmin çok güçlü; kalbin düzenle hizalanmış görünüyor. Böyle devam.",
+    "en": "Your rhythm is very strong recently; your heart seems aligned with order. Keep it up.",
+    "ar": "إيقاعك قوي جداً مؤخراً؛ يبدو أن قلبك متوافق مع النظام. استمر."
+  },
+  "insightCommentPerfect": {
+    "tr": "Dün beş vakit tamam — Rabb’ine yakın bir gün geçirmişsin. Bugün de aynı niyetle devam edebilirsin.",
+    "en": "Five times completed yesterday — you've spent a day close to your Lord. You can continue with the same intention today.",
+    "ar": "خمس مرات اكتملت أمس — لقد قضيت يوماً قريباً من ربك. يمكنك الاستمرار بنفس النية اليوم."
+  },
+  "insightCommentZero": {
+    "tr": "Dün kayıt düşmemiş olabilir veya henüz işaretlenmemiş. Bugün tek bir vakitle bile çizgiyi yeniden çizebilirsin.",
+    "en": "Yesterday might not have been recorded or checked yet. Even with a single prayer today, you can redraw the line.",
+    "ar": "ربما لم يتم تسجيل الأمس أو التحقق منه بعد. حتى بصلاة واحدة اليوم، يمكنك إعادة رسم الخط."
+  },
+  "insightCommentLow": {
+    "tr": "Bu hafta ortalama düşük; bu normal — tefekkür ve küçük adımlarla yükselir. Bir vakit fazlası büyük fark yaratır.",
+    "en": "The average is low this week; this is normal — it rises with reflection and small steps. One more prayer makes a big difference.",
+    "ar": "المتوسط منخفض هذا الأسبوع؛ هذا طبيعي — يرتفع بالتأمل والخطوات الصغيرة. صلاة واحدة إضافية تحدث فرقاً كبيراً."
+  },
+  "insightCommentGood": {
+    "tr": "Dün {count}/5 vakit işaretli; bugün bir iki vakitle dengeyi tamamlamak mümkün.",
+    "en": "{count}/5 prayers marked yesterday; it's possible to complete the balance with one or two prayers today.",
+    "ar": "تم تحديد {count}/5 صلوات أمس؛ من الممكن إكمال التوازن بصلاة أو صلاتين اليوم."
+  },
+  "insightCommentDefault": {
+    "tr": "Geçmiş günler verisi senin için bir ayna: eksik kalan yerlerde merhamet, tamamlananlarda şükür.",
+    "en": "Past days' data is a mirror for you: mercy in the missing parts, gratitude in the completed ones.",
+    "ar": "بيانات الأيام الماضية هي مرآة لك: رحمة في الأجزاء المفقودة، وامتنان في الأجزاء المكتملة."
+  }
+}

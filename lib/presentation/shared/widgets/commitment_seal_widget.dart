@@ -8,7 +8,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
 import '../../../core/constants/app_text_styles.dart';
-import '../../../core/localization/locale_text.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class CommitmentSealWidget extends StatefulWidget {
   const CommitmentSealWidget({
@@ -114,55 +114,13 @@ class _CommitmentSealWidgetState extends State<CommitmentSealWidget>
 
   @override
   Widget build(BuildContext context) {
-    final titlePrefix = widget.titlePrefix ??
-        trEnAr(
-          context,
-          tr: 'Niyetini mühürle',
-          en: 'Seal your intention',
-          ar: 'اختم نيتك',
-        );
-    final infoText = widget.infoBannerText ??
-        trEnAr(
-          context,
-          tr: 'Az önce paylaştığın işaretler ve adın bu başlangıcın parçası; basılı tutarak niyetini pekiştir.',
-          en: 'The details you just shared are part of this beginning; hold to reinforce your intention.',
-          ar: 'التفاصيل التي شاركتها للتو جزء من هذه البداية؛ اضغط مطولًا لتثبيت نيتك.',
-        );
-    final encourageIdle = widget.encourageWhileNotHolding ??
-        trEnAr(
-          context,
-          tr: 'Hazır olduğunda dokun ve basılı tut.',
-          en: 'Touch and hold when you are ready.',
-          ar: 'عندما تكون مستعدًا، المس واستمر بالضغط.',
-        );
-    final encourageHold = widget.encourageWhileHolding ??
-        trEnAr(
-          context,
-          tr: 'Çok yaklaştın!',
-          en: 'You are almost there!',
-          ar: 'أنت قريب جدًا!',
-        );
-    final successMsg = widget.successMessage ??
-        trEnAr(
-          context,
-          tr: 'Tebrikler, Sözün Mühürlendi!',
-          en: 'Congratulations, your promise is sealed!',
-          ar: 'تهانينا، تم ختم عهدك!',
-        );
-    final holdBottom = widget.holdHint ??
-        trEnAr(
-          context,
-          tr: 'Ekrana dokun ve basılı tut\nDevam etmek için…',
-          en: 'Touch and hold the screen\nTo continue…',
-          ar: 'المس الشاشة واستمر بالضغط\nللمتابعة…',
-        );
-    final skipLabel = widget.skipLabel ??
-        trEnAr(
-          context,
-          tr: 'Atla ➔',
-          en: 'Skip ➔',
-          ar: 'تخطَّ ➔',
-        );
+    final titlePrefix = widget.titlePrefix ?? AppLocalizations.of(context)!.sealYourIntention;
+    final infoText = widget.infoBannerText ?? AppLocalizations.of(context)!.sealIntentionInfo;
+    final encourageIdle = widget.encourageWhileNotHolding ?? AppLocalizations.of(context)!.touchAndHoldWhenReady;
+    final encourageHold = widget.encourageWhileHolding ?? AppLocalizations.of(context)!.youAreAlmostThere;
+    final successMsg = widget.successMessage ?? AppLocalizations.of(context)!.promiseSealed;
+    final holdBottom = widget.holdHint ?? AppLocalizations.of(context)!.touchAndHoldToContinue;
+    final skipLabel = widget.skipLabel ?? AppLocalizations.of(context)!.skipWithArrow;
     final track = widget.progressTrackColor ??
         Colors.white.withValues(alpha: 0.1);
     final accent = widget.accentColor;
@@ -333,19 +291,9 @@ class _CommitmentSealWidgetState extends State<CommitmentSealWidget>
           const SizedBox(height: 40),
           Text(
             _isCompleted
-                ? trEnAr(
-                    context,
-                    tr: 'Yönlendiriliyorsun...',
-                    en: 'Redirecting...',
-                    ar: 'جارٍ التوجيه...',
-                  )
+                ? AppLocalizations.of(context)!.redirecting
                 : (isHolding
-                    ? trEnAr(
-                        context,
-                        tr: 'Devam et...',
-                        en: 'Keep going...',
-                        ar: 'تابع...',
-                      )
+                    ? AppLocalizations.of(context)!.keepGoing
                     : holdBottom),
             textAlign: TextAlign.center,
             style: TextStyle(

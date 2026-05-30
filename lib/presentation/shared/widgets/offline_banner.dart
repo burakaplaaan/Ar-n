@@ -6,6 +6,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:arin/l10n/app_localizations.dart';
 
 import '../../../core/constants/app_colors.dart';
 import '../providers/connectivity_provider.dart';
@@ -78,6 +79,7 @@ class _OfflineBannerState extends ConsumerState<OfflineBanner> {
 
     final showOffline = !online;
     final showReconnected = online && _showReconnected;
+    final l10n = AppLocalizations.of(context)!;
 
     return AnimatedSwitcher(
       duration: const Duration(milliseconds: 220),
@@ -87,17 +89,17 @@ class _OfflineBannerState extends ConsumerState<OfflineBanner> {
         child: FadeTransition(opacity: anim, child: child),
       ),
       child: showOffline
-          ? const _BannerBody(
-              key: ValueKey('offline'),
-              text: 'Çevrimdışısın',
-              bgColor: Color(0xFFB45309),
+          ? _BannerBody(
+              key: const ValueKey('offline'),
+              text: l10n.offlineBannerOffline,
+              bgColor: const Color(0xFFB45309),
               fgColor: Colors.white,
             )
           : showReconnected
-              ? const _BannerBody(
-                  key: ValueKey('reconnected'),
+              ? _BannerBody(
+                  key: const ValueKey('reconnected'),
                   icon: Icons.wifi_rounded,
-                  text: 'Tekrar bağlandın',
+                  text: l10n.offlineBannerReconnected,
                   bgColor: AppColors.emeraldMid,
                   fgColor: Colors.white,
                 )

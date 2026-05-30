@@ -1144,13 +1144,9 @@ exports.cleanupDeletedUserData = onSchedule(
         }
         await _purgeUserDataByUid(db, uid);
         await _purgePremiumInviteByEmail(db, email);
-        await q.ref.set(
-          {
-            status: "done",
-            processedAt: FieldValue.serverTimestamp(),
-          },
-          { merge: true },
-        );
+        // Veri başarıyla silindiğinde kuyruk dokümanını da sileriz ki e-posta
+        // veya UID sunucuda kalıcı olarak tutulmasın (GDPR).
+        await q.ref.delete();
         queueProcessed += 1;
       }
       lastQueueDoc = queueSnap.docs[queueSnap.docs.length - 1];

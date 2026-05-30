@@ -539,12 +539,12 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
   String _appleSignInFailureMessage(Object error, AppLocalizations l10n) {
     if (error is SignInWithAppleAuthorizationException) {
       if (error.code == AuthorizationErrorCode.canceled) {
-        return _trOnlyAppleMessage(l10n, 'Apple girişi iptal edildi.');
+        return _trOnlyAppleMessage(l10n, l10n.appleSignInCanceled);
       }
       if (error.code == AuthorizationErrorCode.failed) {
         return _trOnlyAppleMessage(
           l10n,
-          'Apple hesabı yetki vermedi. iPhone Ayarları > Apple Kimliği > Giriş Yapma ve Güvenlik bölümünden Apple ile giriş iznini kontrol edin.',
+          l10n.appleSignInNotAuthorized,
         );
       }
     }
@@ -555,20 +555,20 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
       if (error.code == 'operation-not-allowed') {
         return _trOnlyAppleMessage(
           l10n,
-          'Firebase konsolunda Apple giriş sağlayıcısı kapalı görünüyor.',
+          l10n.appleSignInProviderDisabled,
         );
       }
       if (error.code == 'invalid-credential' ||
           error.code == 'invalid-oauth-credential') {
         return _trOnlyAppleMessage(
           l10n,
-          'Apple kimlik doğrulama bilgisi geçersiz geldi. Bundle ID ve Apple Sign In yetkisini Xcode/Firebase tarafında kontrol edin.',
+          l10n.appleSignInInvalidCredential,
         );
       }
       if (error.code == 'network-request-failed') {
         return _trOnlyAppleMessage(
           l10n,
-          'İnternet bağlantısı yüzünden Apple girişi tamamlanamadı.',
+          l10n.appleSignInNetworkFailed,
         );
       }
     }
@@ -740,8 +740,8 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                         iconBgColor: AppColors.goldAccent.withValues(
                           alpha: onDark ? 0.14 : 0.2,
                         ),
-                        title: 'ARIN Premium',
-                        subtitle: 'Lansman fiyatları ve reklamsız deneyim',
+                        title: l10n.settingsMenuPremiumTitle,
+                        subtitle: l10n.settingsMenuPremiumSubtitle,
                         delayMs: 270,
                         onTap: () => context.push(AppRoutes.premium),
                       ),
@@ -764,8 +764,8 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                         iconBgColor: AppColors.accentNeonGreen.withValues(
                           alpha: onDark ? 0.12 : 0.18,
                         ),
-                        title: 'Widget Merkezi',
-                        subtitle: 'Kullanım bilgileri ve takip widgetı',
+                        title: l10n.settingsMenuWidgetsTitle,
+                        subtitle: l10n.settingsMenuWidgetsSubtitle,
                         delayMs: 285,
                         onTap: () => context.push(AppRoutes.settingsWidgets),
                       ),

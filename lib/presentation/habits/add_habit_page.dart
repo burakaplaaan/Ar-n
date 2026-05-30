@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:arin/l10n/app_localizations.dart';
 
 import '../../core/constants/app_colors.dart';
 import '../../core/theme/arin_shell_background.dart';
@@ -34,17 +35,19 @@ class _AddHabitPageState extends ConsumerState<AddHabitPage>
 
   HabitType _type = HabitType.good;
 
-  /// Çift sütun çark — sol miktar, sağ birim (takip türü birimden türetilir).
-  static const _wheelUnits = [
-    'kez',
-    'dakika',
-    'saat',
-    'sayfa',
-    'bardak',
-    'set',
-    'tur',
-    '%',
-  ];
+  List<String> _getWheelUnits(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    return [
+      l10n.addHabitUnitTimes,
+      l10n.addHabitUnitMinutes,
+      l10n.addHabitUnitHours,
+      l10n.addHabitUnitPages,
+      l10n.addHabitUnitGlasses,
+      l10n.addHabitUnitSets,
+      l10n.addHabitUnitLaps,
+      l10n.addHabitUnitPercent,
+    ];
+  }
 
   late FixedExtentScrollController _amountController;
   late FixedExtentScrollController _unitController;
@@ -94,18 +97,25 @@ class _AddHabitPageState extends ConsumerState<AddHabitPage>
       ? _unitController.selectedItem
       : 0;
 
-  String get _unit => _wheelUnits[_unitIndex.clamp(0, _wheelUnits.length - 1)];
+  String _getUnit(BuildContext context) {
+    final units = _getWheelUnits(context);
+    return units[_unitIndex.clamp(0, units.length - 1)];
+  }
 
-  int get _maxAmountForUnit => _unit == '%' ? 100 : 99;
+  int get _maxAmountForUnit {
+    if (!mounted) return 99;
+    return _getUnit(context) == AppLocalizations.of(context)!.addHabitUnitPercent ? 100 : 99;
+  }
 
-  int _trackingKindForUnit(String u) {
-    if (u == '%') return 2;
-    if (u == 'dakika' || u == 'saat') return 1;
+  int _trackingKindForUnit(String u, BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    if (u == l10n.addHabitUnitPercent) return 2;
+    if (u == l10n.addHabitUnitMinutes || u == l10n.addHabitUnitHours) return 1;
     return 0;
   }
 
-  void _onUnitChanged(int index) {
-    final maxA = _wheelUnits[index] == '%' ? 100 : 99;
+  void _onUnitChanged(int index, BuildContext context) {
+    final maxA = _getWheelUnits(context)[index] == AppLocalizations.of(context)!.addHabitUnitPercent ? 100 : 99;
     final current = _amount;
     if (current > maxA && _amountController.hasClients) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -115,16 +125,21 @@ class _AddHabitPageState extends ConsumerState<AddHabitPage>
     }
   }
 
-  static const _repeatLabels = ['Günlük', 'Haftalık', 'Aylık'];
+  List<String> _getRepeatLabels(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    return [l10n.addHabitDaily, l10n.addHabitWeekly, l10n.addHabitMonthly];
+  }
 
-  String _goalSummaryLine() {
+  String _goalSummaryLine(BuildContext context) {
+    final unit = _getUnit(context);
+    final l10n = AppLocalizations.of(context)!;
     switch (_repeatCycle.clamp(0, 2)) {
       case 1:
-        return '$_amount $_unit haftalık';
+        return l10n.addHabitSummaryWeekly.replaceAll('{amount}', '$_amount').replaceAll('{unit}', unit);
       case 2:
-        return '$_amount $_unit aylık';
+        return l10n.addHabitSummaryMonthly.replaceAll('{amount}', '$_amount').replaceAll('{unit}', unit);
       default:
-        return '$_amount $_unit günlük';
+        return l10n.addHabitSummaryDaily.replaceAll('{amount}', '$_amount').replaceAll('{unit}', unit);
     }
   }
 
@@ -164,7 +179,7 @@ class _AddHabitPageState extends ConsumerState<AddHabitPage>
                       TextButton(
                         onPressed: () => Navigator.pop(ctx),
                         child: Text(
-                          'İptal',
+                          AppLocalizations.of(context)!.addHabitCancel,
                           style: AppTextStyles.labelLarge.copyWith(
                             color: AppColors.creamBase.withValues(alpha: 0.85),
                           ),
@@ -177,7 +192,7 @@ class _AddHabitPageState extends ConsumerState<AddHabitPage>
                           Navigator.pop(ctx);
                         },
                         child: Text(
-                          'Tamam',
+                          AppLocalizations.of(context)!.addHabitOk,
                           style: AppTextStyles.labelLarge.copyWith(
                             color: _accent,
                             fontWeight: FontWeight.w800,
@@ -200,7 +215,7 @@ class _AddHabitPageState extends ConsumerState<AddHabitPage>
                       childCount: 3,
                       builder: (_, i) => Center(
                         child: Text(
-                          _repeatLabels[i],
+                          _getRepeatLabels(context)[i],
                           style: AppTextStyles.titleMedium.copyWith(
                             color: AppColors.creamBase,
                             fontWeight: FontWeight.w700,
@@ -224,8 +239,8 @@ class _AddHabitPageState extends ConsumerState<AddHabitPage>
     if (!_formKey.currentState!.validate()) return;
 
     final target = _amount.clamp(1, _maxAmountForUnit);
-    final unit = _unit;
-    final kind = _trackingKindForUnit(unit);
+    final unit = _getUnit(context);
+    final kind = _trackingKindForUnit(unit, context);
 
     setState(() => _saving = true);
     try {
@@ -235,7 +250,7 @@ class _AddHabitPageState extends ConsumerState<AddHabitPage>
             emoji: _type == HabitType.bad ? '◆' : '▲',
             note: _noteController.text.trim(),
             customTarget: target.clamp(1, 999999),
-            customUnit: kind == 2 ? '%' : unit,
+            customUnit: kind == 2 ? AppLocalizations.of(context)!.addHabitUnitPercent : unit,
             customTrackingKind: kind,
             customFlexible: false,
             customMinTarget: 0,
@@ -254,8 +269,9 @@ class _AddHabitPageState extends ConsumerState<AddHabitPage>
   @override
   Widget build(BuildContext context) {
     final isGelisim = _type == HabitType.good;
-    final nameLabel = isGelisim ? 'Gelişim Adı' : 'Arınma Adı';
-    final categoryLabel = isGelisim ? 'Gelişim' : 'Arınma';
+    final l10n = AppLocalizations.of(context)!;
+    final nameLabel = isGelisim ? l10n.addHabitGrowthName : l10n.addHabitPurificationName;
+    final categoryLabel = isGelisim ? l10n.addHabitGrowth : l10n.addHabitPurification;
     final light = ArinShellBackground.isLight(context);
 
     return Scaffold(

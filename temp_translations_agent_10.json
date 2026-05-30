@@ -1,0 +1,10 @@
+{
+  "locationPermissionRequiredTitle": { "tr": "Konum İzni Gerekli", "en": "Location Permission Required", "ar": "إذن الموقع مطلوب" },
+  "locationPermissionRequiredBody": { "tr": "Arın, namaz vakitlerini ve kıble yönünü doğru hesaplayabilmek için konumunuza erişim izni gerektirir. Konum verileriniz yalnızca bu amaçlar için kullanılır ve cihazınızda işlenir.", "en": "Arin requires access to your location to accurately calculate prayer times and Qibla direction. Your location data is used only for these purposes and processed on your device.", "ar": "يتطلب أرين الوصول إلى موقعك لحساب أوقات الصلاة واتجاه القبلة بدقة. تُستخدم بيانات موقعك لهذه الأغراض فقط وتتم معالجتها على جهازك." },
+  "locationPermissionNotNow": { "tr": "Şimdi Değil", "en": "Not Now", "ar": "ليس الآن" },
+  "locationPermissionContinue": { "tr": "Devam Et", "en": "Continue", "ar": "متابعة" },
+  "errorScreenTitle": { "tr": "Bir şeyler ters gitti", "en": "Something went wrong", "ar": "حدث خطأ ما" },
+  "errorScreenBody": { "tr": "Bu bölüm şu an açılamadı. Uygulamayı kapatıp tekrar açmayı deneyebilirsin.", "en": "This section could not be opened right now. You can try closing and reopening the app.", "ar": "لا يمكن فتح هذا القسم في الوقت الحالي. يمكنك محاولة إغلاق التطبيق وإعادة فتحه." },
+  "errorScreenDebugTitle": { "tr": "ARIN — widget hatası (debug)", "en": "ARIN — widget error (debug)", "ar": "أرين - خطأ في الأداة (تصحيح)" },
+  "errorScreenDebugBody": { "tr": "Debug moddasınız. Aşağıdaki metni kopyalayın.", "en": "You are in debug mode. Copy the text below.", "ar": "أنت في وضع التصحيح. انسخ النص أدناه." }
+}
