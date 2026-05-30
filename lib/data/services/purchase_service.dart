@@ -30,6 +30,9 @@ class PurchaseService {
   /// getLocalPremiumEntitlement() bu flag'i kontrol ederek RC hazır olana kadar bekler.
   static bool _isConfigured = false;
   static Future<void>? _configureFuture;
+  
+  /// Global callback for customer info updates (e.g. to invalidate provider)
+  static void Function()? onCustomerInfoUpdated;
 
   /// Ana app bootstrap sırasında bir kez çağrılır.
   /// Firebase Auth ile oturum açık olan kullanıcı ID'si verilirse
@@ -65,6 +68,11 @@ class PurchaseService {
 
       final config = PurchasesConfiguration(apiKey);
       await Purchases.configure(config);
+      Purchases.addCustomerInfoUpdateListener((_) {
+        // App lifecycle boyunca (arka planda / anlık push ile) gelen abonelik değişikliklerini
+        // dinleyip Premium state'i tazele.
+        onCustomerInfoUpdated?.call();
+      });
       _isConfigured = true;
     }();
     try {

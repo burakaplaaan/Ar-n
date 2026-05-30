@@ -13,10 +13,17 @@ import io.flutter.plugin.common.MethodChannel
 import java.io.File
 
 class MainActivity : FlutterActivity() {
+    companion object {
+        const val EXTRA_WIDGET_KIND = "widget_kind"
+        const val EXTRA_WIDGET_LOCK = "widget_lock"
+    }
+
     private var pendingWidgetLaunchKind: String? = null
+    private var pendingWidgetLaunchLock: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         pendingWidgetLaunchKind = intent?.getStringExtra(EXTRA_WIDGET_KIND)
+        pendingWidgetLaunchLock = intent?.getStringExtra(EXTRA_WIDGET_LOCK)
         super.onCreate(savedInstanceState)
     }
 
@@ -24,6 +31,7 @@ class MainActivity : FlutterActivity() {
         super.onNewIntent(intent)
         setIntent(intent)
         pendingWidgetLaunchKind = intent.getStringExtra(EXTRA_WIDGET_KIND)
+        pendingWidgetLaunchLock = intent.getStringExtra(EXTRA_WIDGET_LOCK)
     }
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
@@ -35,8 +43,18 @@ class MainActivity : FlutterActivity() {
                 when (call.method) {
                     "consumeWidgetLaunch" -> {
                         val kind = pendingWidgetLaunchKind
+                        val lock = pendingWidgetLaunchLock
                         pendingWidgetLaunchKind = null
-                        result.success(kind)
+                        pendingWidgetLaunchLock = null
+                        if (kind != null) {
+                            if (lock == "1") {
+                                result.success("$kind?lock=1")
+                            } else {
+                                result.success(kind)
+                            }
+                        } else {
+                            result.success(null)
+                        }
                     }
                     else -> result.notImplemented()
                 }

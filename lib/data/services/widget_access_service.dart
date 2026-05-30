@@ -175,11 +175,11 @@ class WidgetAccessService {
     await AdGateService(_prefs).recordWidgetRewardedUnlock(kind.placement);
   }
 
-  Future<ArinWidgetAccessKind?> consumeLaunchedWidgetKind() async {
+  Future<String?> consumeLaunchedWidgetKind() async {
     if (kIsWeb || !Platform.isAndroid) return null;
     try {
       final raw = await _channel.invokeMethod<String>('consumeWidgetLaunch');
-      return ArinWidgetAccessKind.fromId(raw);
+      return raw;
     } catch (e) {
       debugPrint('WidgetAccessService.consumeLaunchedWidgetKind: $e');
       return null;

@@ -54,10 +54,14 @@ class _WidgetLaunchGateListenerState
   }
 
   Future<void> _consumeAndroidLaunch() async {
-    final kind = await ref
+    final raw = await ref
         .read(widgetAccessServiceProvider)
         .consumeLaunchedWidgetKind();
-    if (kind != null) await _handleKind(kind);
+    if (raw == null || raw.isEmpty) return;
+    
+    // Simulate URI parsing for lock flag like iOS
+    final uri = Uri.tryParse('arin://widget/$raw');
+    await _handleUri(uri);
   }
 
   Future<void> _consumeHomeWidgetLaunch() async {

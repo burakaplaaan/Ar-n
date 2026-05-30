@@ -219,6 +219,11 @@ class _ArinAppState extends ConsumerState<ArinApp> with WidgetsBindingObserver {
       if (PrayerReminderPrefs.isEnabled(prefs)) {
         await PrayerNotificationScheduler.promptLocalNotificationPermissions();
       }
+      
+      // Her resume'da premium state'in eskimesini engellemek için provider'ı invalidate edip
+      // widget gate'leri (2 dakikalık throttle'a takılmadan) anlık tazeliyoruz.
+      ref.invalidate(premiumEntitlementProvider);
+      
       await _maybeOneTimeWidgetQuoteRefreshAfterAdminEdit();
       try {
         await GlobalWidgetLockService.applyIfDue(prefs);
@@ -296,6 +301,9 @@ class _ArinAppState extends ConsumerState<ArinApp> with WidgetsBindingObserver {
     ref.invalidate(appRouterProvider);
     ref.read(appRouterRefreshProvider).notifyAuthOrOnboarding();
     unawaited(ArinAnalytics.enable());
+    PurchaseService.onCustomerInfoUpdated = () {
+      ref.invalidate(premiumEntitlementProvider);
+    };
     final uid = isFirebaseReady ? FirebaseAuth.instance.currentUser?.uid : null;
     unawaited(PurchaseService.initialize(firebaseUid: uid));
     final prefs = ref.read(sharedPreferencesProvider);

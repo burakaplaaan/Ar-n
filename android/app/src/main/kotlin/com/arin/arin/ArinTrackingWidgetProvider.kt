@@ -39,6 +39,9 @@ class ArinTrackingWidgetProvider : HomeWidgetProvider() {
         val openApp = Intent(context, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
             putExtra(MainActivity.EXTRA_WIDGET_KIND, "tracking")
+            if (locked) {
+                putExtra(MainActivity.EXTRA_WIDGET_LOCK, "1")
+            }
         }
         val piFlags =
             android.app.PendingIntent.FLAG_UPDATE_CURRENT or
