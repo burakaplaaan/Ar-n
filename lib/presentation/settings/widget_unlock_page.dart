@@ -39,8 +39,8 @@ class _WidgetUnlockPageState extends ConsumerState<WidgetUnlockPage> {
       }
       final service = ref.read(widgetAccessServiceProvider);
       await service.recordRewardedUnlock(widget.kind);
-      final premium = ref.read(premiumEntitlementProvider).asData?.value;
-      await service.syncAll(isPremium: premium?.isActive == true);
+      final premium = await ref.read(premiumEntitlementProvider.future);
+      await service.syncAll(isPremium: premium.isActive);
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(

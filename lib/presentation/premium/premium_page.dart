@@ -353,16 +353,20 @@ class _PremiumPageState extends ConsumerState<PremiumPage> {
     final l10n = AppLocalizations.of(context)!;
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final premiumAsync = ref.watch(premiumEntitlementProvider);
+    
+    // Yükleniyor durumundayken "ücretsiz" muamelesi yapmamak için skeleton veya loading gösterebiliriz.
+    // Ancak arka plandaki fetchProducts devam ederken de premium loading state'te olabilir,
+    // tüm paywall'u gizlemeyip isPremium fallback değerini bilinmeyen durumda null tutalım.
     final entitlement = premiumAsync.asData?.value;
-    final isPremium = entitlement?.isActive ?? false;
+    final isPremium = premiumAsync.isLoading ? null : (entitlement?.isActive ?? false);
     final activeProductId = entitlement?.productId ?? '';
 
     // Google Play subscription id'leri basePlan id'si ile birleşip gelebilir
     // (örn: arin_premium_yearly_launch:p1y). Bu yüzden startsWith kullanıyoruz.
     final hasYearly =
-        isPremium && activeProductId.startsWith(PremiumPage.yearlyProductId);
+        isPremium == true && activeProductId.startsWith(PremiumPage.yearlyProductId);
     final hasMonthly =
-        isPremium && activeProductId.startsWith(PremiumPage.monthlyProductId);
+        isPremium == true && activeProductId.startsWith(PremiumPage.monthlyProductId);
     final signedIn = ref.watch(authUserProvider).asData?.value != null;
 
     // Android'de mağazadan gerçek fiyatlar; iOS'ta hardcoded değerler kullanılır.
@@ -375,10 +379,9 @@ class _PremiumPageState extends ConsumerState<PremiumPage> {
       ...providerPriceByBaseId,
       ..._storePriceByBaseId,
     };
-    final yearlyPrice =
-        mergedPriceByBaseId[PremiumPage.yearlyProductId] ?? '₺600,00 / yıl';
-    final monthlyPrice =
-        mergedPriceByBaseId[PremiumPage.monthlyProductId] ?? '₺59,99 / ay';
+    
+    final yearlyPrice = mergedPriceByBaseId[PremiumPage.yearlyProductId];
+    final monthlyPrice = mergedPriceByBaseId[PremiumPage.monthlyProductId];
 
     final titleTextColor = isDark ? Colors.white : AppColors.textPrimary;
     final subtitleTextColor = isDark
@@ -387,6 +390,8 @@ class _PremiumPageState extends ConsumerState<PremiumPage> {
     final footerTextColor = isDark
         ? Colors.white.withValues(alpha: 0.52)
         : AppColors.textMuted;
+
+    final restoreBusy = _busyProductId == '__restore__';
 
     return Scaffold(
       backgroundColor:
@@ -417,83 +422,102 @@ class _PremiumPageState extends ConsumerState<PremiumPage> {
                               color: isDark ? Colors.white : AppColors.emeraldDark,
                             ),
                             const Spacer(),
-                            TextButton(
-                              onPressed: () => _restorePurchases(),
-                              child: const Text('Geri yükle'),
+                            TextButton.icon(
+                              onPressed: restoreBusy ? null : () => _restorePurchases(),
+                              icon: restoreBusy
+                                  ? const SizedBox(
+                                      width: 14,
+                                      height: 14,
+                                      child: CircularProgressIndicator(strokeWidth: 2),
+                                    )
+                                  : const Icon(Icons.restore_rounded, size: 18),
+                              label: Text(l10n.premiumRestorePurchasesLabel),
                             ),
                           ],
                         ),
                         const SizedBox(height: 8),
                         const _LaunchBadge(),
                         const SizedBox(height: 18),
-                        Text(
-                          isPremium ? 'ARIN Premium aktif' : 'ARIN Premium',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            color: titleTextColor,
-                            fontSize: 34,
-                            fontWeight: FontWeight.w900,
-                            letterSpacing: -1.1,
+                        if (isPremium == null)
+                          const Center(
+                            child: Padding(
+                              padding: EdgeInsets.all(24.0),
+                              child: CircularProgressIndicator(),
+                            ),
+                          )
+                        else ...[
+                          Text(
+                            isPremium ? 'ARIN Premium aktif' : 'ARIN Premium',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: titleTextColor,
+                              fontSize: 34,
+                              fontWeight: FontWeight.w900,
+                              letterSpacing: -1.1,
+                            ),
                           ),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          isPremium
-                              ? 'Reklamsız ve kilitsiz deneyimin açık.'
-                              : 'Reklamsız, kesintisiz ve kilitsiz manevi rutin.',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            color: subtitleTextColor,
-                            fontSize: 15,
-                            height: 1.35,
+                          const SizedBox(height: 8),
+                          Text(
+                            isPremium
+                                ? 'Reklamsız ve kilitsiz deneyimin açık.'
+                                : 'Reklamsız, kesintisiz ve kilitsiz manevi rutin.',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: subtitleTextColor,
+                              fontSize: 15,
+                              height: 1.35,
+                            ),
                           ),
-                        ),
-                        const SizedBox(height: 22),
-                        const _CountdownLikeNotice(),
-                        const SizedBox(height: 22),
-                        const _PremiumBenefits(),
-                        const SizedBox(height: 22),
-                        if (!isPremium && !signedIn) ...[
-                          const _SignInRequiredNotice(),
-                          const SizedBox(height: 14),
+                          const SizedBox(height: 22),
+                          const _CountdownLikeNotice(),
+                          const SizedBox(height: 22),
+                          const _PremiumBenefits(),
+                          const SizedBox(height: 22),
+                          if (!isPremium && !signedIn) ...[
+                            const _SignInRequiredNotice(),
+                            const SizedBox(height: 14),
+                          ],
+                          if (yearlyPrice != null) ...[
+                            _PlanCard(
+                              title: 'Yıllık Premium',
+                              badge: hasYearly ? null : 'EN AVANTAJLI',
+                              oldPrice: null, // Hardcoded oldPrice was removed
+                              price: yearlyPrice,
+                              subline: 'Yıllık Abonelik',
+                              productId: PremiumPage.yearlyProductId,
+                              highlighted: !hasYearly,
+                              isOwned: hasYearly,
+                              enabled:
+                                  (!isPremium || hasMonthly) &&
+                                  (!_loadingProducts &&
+                                      _containsProduct(PremiumPage.yearlyProductId)),
+                              buttonLabel: hasMonthly ? 'Yıllığa geç' : null,
+                              busy: _busyProductId == PremiumPage.yearlyProductId,
+                              onPressed: () =>
+                                  _startPurchase(PremiumPage.yearlyProductId),
+                            ),
+                            const SizedBox(height: 12),
+                          ],
+                          if (monthlyPrice != null)
+                            _PlanCard(
+                              title: 'Aylık Premium',
+                              oldPrice: null, // Hardcoded oldPrice was removed
+                              price: monthlyPrice,
+                              subline: 'Aylık Abonelik',
+                              productId: PremiumPage.monthlyProductId,
+                              highlighted: false,
+                              isOwned: hasMonthly,
+                              // Herhangi bir premium varsa aylık devre dışı.
+                              enabled:
+                                  !isPremium &&
+                                  (!_loadingProducts &&
+                                      _containsProduct(PremiumPage.monthlyProductId)),
+                              busy: _busyProductId == PremiumPage.monthlyProductId,
+                              onPressed: () =>
+                                  _startPurchase(PremiumPage.monthlyProductId),
+                            ),
+                          const SizedBox(height: 18),
                         ],
-                        _PlanCard(
-                          title: 'Yıllık Premium',
-                          badge: hasYearly ? null : 'EN AVANTAJLI',
-                          oldPrice: '₺1.559,88',
-                          price: yearlyPrice,
-                          subline: 'Ayda sadece ₺50,00',
-                          productId: PremiumPage.yearlyProductId,
-                          highlighted: !hasYearly,
-                          isOwned: hasYearly,
-                          enabled:
-                              (!isPremium || hasMonthly) &&
-                              (!_loadingProducts &&
-                                  _containsProduct(PremiumPage.yearlyProductId)),
-                          buttonLabel: hasMonthly ? 'Yıllığa geç' : null,
-                          busy: _busyProductId == PremiumPage.yearlyProductId,
-                          onPressed: () =>
-                              _startPurchase(PremiumPage.yearlyProductId),
-                        ),
-                        const SizedBox(height: 12),
-                        _PlanCard(
-                          title: 'Aylık Premium',
-                          oldPrice: '₺129,99',
-                          price: monthlyPrice,
-                          subline: 'Lansman fiyatıyla başla',
-                          productId: PremiumPage.monthlyProductId,
-                          highlighted: false,
-                          isOwned: hasMonthly,
-                          // Herhangi bir premium varsa aylık devre dışı.
-                          enabled:
-                              !isPremium &&
-                              (!_loadingProducts &&
-                                  _containsProduct(PremiumPage.monthlyProductId)),
-                          busy: _busyProductId == PremiumPage.monthlyProductId,
-                          onPressed: () =>
-                              _startPurchase(PremiumPage.monthlyProductId),
-                        ),
-                        const SizedBox(height: 18),
                         Text(
                           'Lansman fiyatları sınırlı süre geçerlidir. '
                           'Abonelik mağaza hesabın üzerinden yönetilir ve '
@@ -923,7 +947,7 @@ class _PlanCard extends StatelessWidget {
   });
 
   final String title;
-  final String oldPrice;
+  final String? oldPrice;
   final String price;
   final String subline;
   final String productId;
@@ -1026,18 +1050,20 @@ class _PlanCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 14),
-          Text(
-            oldPrice,
-            style: TextStyle(
-              color: oldPriceColor,
-              fontSize: 15,
-              fontWeight: FontWeight.w700,
-              decoration: TextDecoration.lineThrough,
-              decorationColor: oldPriceColor,
-              decorationThickness: 2,
+          if (oldPrice != null) ...[
+            Text(
+              oldPrice!,
+              style: TextStyle(
+                color: oldPriceColor,
+                fontSize: 15,
+                fontWeight: FontWeight.w700,
+                decoration: TextDecoration.lineThrough,
+                decorationColor: oldPriceColor,
+                decorationThickness: 2,
+              ),
             ),
-          ),
-          const SizedBox(height: 4),
+            const SizedBox(height: 4),
+          ],
           Text(
             price,
             style: TextStyle(
