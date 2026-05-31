@@ -11,4 +11,8 @@
     <string name="widget_placeholder_quote_source">AT-TALAQ 3</string>
     <string name="widget_placeholder_quote">Whoever puts trust in Allah,\nHe is sufficient for them.</string>
     <string name="widget_placeholder_location">Location not set</string>
+    <string name="widget_combo_title">Arin · Combo</string>
+    <string name="widget_combo_description">Arin — quote and prayer times</string>
+    <string name="widget_tracking_title">Arin · Tracking</string>
+    <string name="widget_tracking_description">Arin — habit and purification tracking</string>
 </resources>

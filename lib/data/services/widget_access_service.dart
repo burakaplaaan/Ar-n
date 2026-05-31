@@ -22,13 +22,6 @@ enum ArinWidgetAccessKind {
     ArinWidgetAccessKind.tracking => 'tracking',
   };
 
-  String get title => switch (this) {
-    ArinWidgetAccessKind.quote => 'Günlük Söz Widgetı',
-    ArinWidgetAccessKind.prayer => 'Namaz Vakti Widgetı',
-    ArinWidgetAccessKind.combo => 'Söz + Namaz Widgetı',
-    ArinWidgetAccessKind.tracking => 'Takip Widgetı',
-  };
-
   AdGatePlacement get placement => switch (this) {
     ArinWidgetAccessKind.quote => AdGatePlacement.widgetQuote,
     ArinWidgetAccessKind.prayer => AdGatePlacement.widgetPrayer,

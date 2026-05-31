@@ -4,6 +4,8 @@ import 'package:flutter/widgets.dart';
 
 import '../../../core/localization/locale_text.dart';
 
+import 'package:arin/l10n/app_localizations.dart';
+
 /// Hub kartında gösterilen kısa rol etiketi (büyük daire altı).
 abstract final class HealingFreqCatalog {
   static const List<int> orderedHz = <int>[
@@ -21,23 +23,24 @@ abstract final class HealingFreqCatalog {
       'sounds/healing/tones/tone_${hz}hz.wav';
 
   static String shortTitle(BuildContext context, int hz) {
+    final l10n = AppLocalizations.of(context)!;
     switch (hz) {
       case 174:
-        return trEnAr(context, tr: 'Terapi Frekansı', en: 'Therapy Frequency', ar: 'تردد علاجي');
+        return l10n.healingFreq174Short;
       case 285:
-        return trEnAr(context, tr: 'Direnç ve Metanet', en: 'Resilience', ar: 'الصبر والثبات');
+        return l10n.healingFreq285Short;
       case 396:
-        return trEnAr(context, tr: 'Yenilenme', en: 'Renewal', ar: 'تجدد');
+        return l10n.healingFreq396Short;
       case 417:
-        return trEnAr(context, tr: 'İç güç', en: 'Inner strength', ar: 'قوة داخلية');
+        return l10n.healingFreq417Short;
       case 528:
-        return trEnAr(context, tr: 'Huzur', en: 'Peace', ar: 'سكينة');
+        return l10n.healingFreq528Short;
       case 639:
-        return trEnAr(context, tr: 'Arınma', en: 'Purification', ar: 'تزكية');
+        return l10n.healingFreq639Short;
       case 741:
-        return trEnAr(context, tr: 'Tefekkür', en: 'Contemplation', ar: 'تفكر');
+        return l10n.healingFreq741Short;
       case 852:
-        return trEnAr(context, tr: 'Sekîne', en: 'Tranquility', ar: 'سكينة عميقة');
+        return l10n.healingFreq852Short;
       default:
         return '$hz Hz';
     }
@@ -55,46 +58,48 @@ abstract final class HealingFreqCatalog {
   }
 
   static String heading(BuildContext context, int hz) {
+    final l10n = AppLocalizations.of(context)!;
     switch (hz) {
       case 174:
-        return trEnAr(context, tr: '174 Hz - Şifa ve Rahatlama', en: '174 Hz - Healing and Relaxation', ar: '174 هرتز - شفاء واسترخاء');
+        return l10n.healingFreq174Heading;
       case 285:
-        return trEnAr(context, tr: '285 Hz - Sabır ve Sebat', en: '285 Hz - Patience and Steadiness', ar: '285 هرتز - صبر وثبات');
+        return l10n.healingFreq285Heading;
       case 396:
-        return trEnAr(context, tr: '396 Hz - Bereket ve Başlangıç', en: '396 Hz - Blessing and New Start', ar: '396 هرتز - بركة وبداية');
+        return l10n.healingFreq396Heading;
       case 417:
-        return trEnAr(context, tr: '417 Hz - İç Güç ve İman', en: '417 Hz - Inner Strength and Faith', ar: '417 هرتز - قوة داخلية وإيمان');
+        return l10n.healingFreq417Heading;
       case 528:
-        return trEnAr(context, tr: '528 Hz - Huzur ve Sükûnet', en: '528 Hz - Peace and Calm', ar: '528 هرتز - سكينة وهدوء');
+        return l10n.healingFreq528Heading;
       case 639:
-        return trEnAr(context, tr: '639 Hz - Arınma ve Temizlik', en: '639 Hz - Purification and Cleansing', ar: '639 هرتز - تزكية وتنقية');
+        return l10n.healingFreq639Heading;
       case 741:
-        return trEnAr(context, tr: '741 Hz - Tefekkür ve Dikkat', en: '741 Hz - Reflection and Focus', ar: '741 هرتز - تفكر وتركيز');
+        return l10n.healingFreq741Heading;
       case 852:
-        return trEnAr(context, tr: '852 Hz - Sekîne (Derin Huzur)', en: '852 Hz - Tranquility (Deep Peace)', ar: '852 هرتز - سكينة (طمأنينة عميقة)');
+        return l10n.healingFreq852Heading;
       default:
         return '$hz Hz';
     }
   }
 
   static String body(BuildContext context, int hz) {
+    final l10n = AppLocalizations.of(context)!;
     switch (hz) {
       case 174:
-        return trEnAr(context, tr: 'Bedensel ve ruhsal yorgunlukta sükûnete yönelme; şifa Allah’tandır.', en: 'Turn toward calm in physical and spiritual fatigue; healing is from Allah.', ar: 'اتجه إلى السكون عند التعب الجسدي والروحي؛ الشفاء من الله.');
+        return l10n.healingFreq174Body;
       case 285:
-        return trEnAr(context, tr: 'Zorlukta kalbi yumuşatma; Allah’a tevekkül ile devam etme niyeti.', en: 'Soften the heart in hardship; continue with trust in Allah.', ar: 'تليين القلب وقت الشدة؛ الاستمرار بالتوكل على الله.');
+        return l10n.healingFreq285Body;
       case 396:
-        return trEnAr(context, tr: 'Yeni bir sayfa açma; günahtan arınma ve affa yönelme duası.', en: 'Open a new page; a prayer for repentance and forgiveness.', ar: 'فتح صفحة جديدة؛ دعاء للتوبة وطلب المغفرة.');
+        return l10n.healingFreq396Body;
       case 417:
-        return trEnAr(context, tr: 'Kalbi güçlendirme; imanı tazeleme ve istikamet hatırlaması.', en: 'Strengthen the heart; renew faith and remember right direction.', ar: 'تقوية القلب؛ تجديد الإيمان وتذكّر الاستقامة.');
+        return l10n.healingFreq417Body;
       case 528:
-        return trEnAr(context, tr: 'Gönül sükûneti; şükür ve teslimiyetle nefes alma.', en: 'Inner calm; breathe with gratitude and surrender.', ar: 'سكون القلب؛ تنفّس بالشكر والتسليم.');
+        return l10n.healingFreq528Body;
       case 639:
-        return trEnAr(context, tr: 'Kalbi kirleten düşüncelerden uzaklaşma; bağışlanma dileği.', en: 'Step away from thoughts that cloud the heart; seek forgiveness.', ar: 'الابتعاد عن الأفكار التي تكدّر القلب؛ طلب المغفرة.');
+        return l10n.healingFreq639Body;
       case 741:
-        return trEnAr(context, tr: 'Ayete ve yaratılışa odaklanma; dağılan zihni toplama.', en: 'Focus on verses and creation; gather a scattered mind.', ar: 'التركيز على الآيات والخلق؛ جمع الذهن المشتت.');
+        return l10n.healingFreq741Body;
       case 852:
-        return trEnAr(context, tr: 'Kalbe ferahlık veren sükûnet; Allah’ın rahmetine sığınma.', en: 'A calm that brings relief to the heart; seek Allah’s mercy.', ar: 'سكينة تشرح الصدر؛ الالتجاء إلى رحمة الله.');
+        return l10n.healingFreq852Body;
       default:
         return '';
     }

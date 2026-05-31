@@ -1393,7 +1393,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settingsPrivacyThirdPartyBody =>
-      'Arin uses Firebase Authentication, Cloud Firestore, Firebase Analytics, and Firebase Crashlytics for sign-in, data sync, usage analytics, and crash diagnostics.';
+      'Arin uses Firebase services for sign-in, sync, and notifications, Google AdMob for ads, RevenueCat for subscriptions, and Aladhan/Diyanet APIs for prayer times.';
 
   @override
   String get settingsPrivacyControlsTitle => 'User control';
@@ -3013,4 +3013,1418 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get adminEmailInviteLabel => 'Email invite';
+
+  @override
+  String get offlineBannerOffline => 'You are offline';
+
+  @override
+  String get offlineBannerReconnected => 'Reconnected';
+
+  @override
+  String get premiumRestorePurchasesLabel => 'Restore purchases';
+
+  @override
+  String get premiumActivePlanLabel => 'Active plan';
+
+  @override
+  String get premiumPlanMonthlyLaunch => 'Start with Launch Price';
+
+  @override
+  String get premiumPlanYearlySwitch => 'Switch to Yearly';
+
+  @override
+  String get premiumFeatureNoAds => 'Ad-free experience';
+
+  @override
+  String get premiumFeatureWidgets => 'No widget locks';
+
+  @override
+  String get premiumFeatureReels => 'Uninterrupted explore feed';
+
+  @override
+  String get premiumFeatureSecondAlarm => '2nd adhan alarm enabled';
+
+  @override
+  String get premiumFeatureExtras => 'No ads in zikr, compass, and frequencies';
+
+  @override
+  String get premiumSignInRequired =>
+      'Sign-in is not required for purchase. You can use Premium on this device immediately and optionally link your account later to access it on other devices.';
+
+  @override
+  String get premiumSignInTitle => 'Sign in for Premium';
+
+  @override
+  String get premiumSignInSubtitle =>
+      'Your premium purchase is linked to your account first so it isn\'t lost when changing devices. Sign in is not required to view prices.';
+
+  @override
+  String get premiumSignInGoogle => 'Continue with Google';
+
+  @override
+  String get premiumSignInApple => 'Continue with Apple';
+
+  @override
+  String get premiumSignInCancel => 'Not now';
+
+  @override
+  String get locationPermissionRequiredTitle => 'Location Permission Required';
+
+  @override
+  String get locationPermissionRequiredBody =>
+      'Arin requires access to your location to accurately calculate prayer times and Qibla direction. Your location data is used only for these purposes and processed on your device.';
+
+  @override
+  String get locationPermissionNotNow => 'Not Now';
+
+  @override
+  String get locationPermissionContinue => 'Continue';
+
+  @override
+  String get errorScreenTitle => 'Something went wrong';
+
+  @override
+  String get errorScreenBody =>
+      'This section could not be opened right now. You can try closing and reopening the app.';
+
+  @override
+  String get errorScreenDebugTitle => 'ARIN — widget error (debug)';
+
+  @override
+  String get errorScreenDebugBody =>
+      'You are in debug mode. Copy the text below.';
+
+  @override
+  String get widgetUnlockQuoteTitle => 'Daily Quote Widget';
+
+  @override
+  String get widgetUnlockPrayerTitle => 'Prayer Time Widget';
+
+  @override
+  String get widgetUnlockComboTitle => 'Quote + Prayer Widget';
+
+  @override
+  String get widgetUnlockTrackingTitle => 'Tracking Widget';
+
+  @override
+  String get widgetUnlockAdLoadFailed =>
+      'The ad could not be loaded right now, please try again later.';
+
+  @override
+  String widgetUnlockSuccessTitle(Object title) {
+    return '$title unlocked for 24 hours! 🎉';
+  }
+
+  @override
+  String get widgetUnlockPremiumSuccess =>
+      'Premium active! All widgets unlocked. 🎉';
+
+  @override
+  String get widgetUnlockDescription =>
+      'You can watch a short ad to unlock this widget for 24 hours. Upgrade to Premium for permanent access.';
+
+  @override
+  String get widgetUnlockAdButton => 'Watch ad — Unlock for 24h';
+
+  @override
+  String get widgetUnlockPremiumButton => 'Upgrade to Premium';
+
+  @override
+  String get widgetUnlockCancelButton => 'Not now';
+
+  @override
+  String get purchaseErrorNotFound =>
+      'Product not found. Please check your internet connection.';
+
+  @override
+  String purchaseErrorUnexpected(Object error) {
+    return 'Unexpected error: $error';
+  }
+
+  @override
+  String get purchaseErrorNotSupported =>
+      'Purchasing is not supported on this platform.';
+
+  @override
+  String get audioPermissionRequiredTitle => 'Media Permission Required';
+
+  @override
+  String get audioPermissionRequiredBody =>
+      'Arin requires access to your audio files so you can choose a custom adhan or notification sound from your device. These files are only used as notifications within the app.';
+
+  @override
+  String get audioPickerTitle => 'Select audio file';
+
+  @override
+  String get mgmtDailyPrayers => 'Daily prayers';
+
+  @override
+  String get mgmtRoutineWorkshop => 'Routine workshop';
+
+  @override
+  String get mgmtChooseGrowth => 'Choose growth';
+
+  @override
+  String get mgmtPickPrayerOrMakeup =>
+      'Pick prayer or makeup tracking; use the section below for a custom growth routine.';
+
+  @override
+  String get mgmtCountingAndCompensation => 'Counting and compensation';
+
+  @override
+  String get mgmtPrayer => 'Prayer';
+
+  @override
+  String get mgmtTimeAndKhushu => 'Time and khushu';
+
+  @override
+  String get mgmtCustomRoutine => 'Custom routine';
+
+  @override
+  String get mgmtChooseYourOwnTitle =>
+      'Choose your own title, emoji and reminder.';
+
+  @override
+  String get mgmtSelect => 'Select';
+
+  @override
+  String get habitsMyHabits => 'My Habits';
+
+  @override
+  String get habitsNoHabitsYet =>
+      'You have not added any habits yet.\nReady for a fresh start?';
+
+  @override
+  String get habitsGrowth => 'Growth';
+
+  @override
+  String get habitsPurification => 'Purification';
+
+  @override
+  String get habitsAddPurificationGoal => 'Add purification goal';
+
+  @override
+  String get habitsAddGrowthRoutine => 'Add growth routine';
+
+  @override
+  String get habitsDeleteConfirmTitle => 'Do you want to delete this habit?';
+
+  @override
+  String get habitsCancel => 'Cancel';
+
+  @override
+  String get habitsYesDelete => 'Yes, Delete';
+
+  @override
+  String get habitsDayStreak => 'day streak';
+
+  @override
+  String get customHabitThisWeekGoal => 'This week\'s goal';
+
+  @override
+  String get customHabitThisMonthGoal => 'This month\'s goal';
+
+  @override
+  String get customHabitDailyGoal => 'Daily goal';
+
+  @override
+  String get customHabitThisWeekGoalComplete =>
+      'This week\'s goal is complete.';
+
+  @override
+  String get customHabitThisMonthGoalComplete =>
+      'This month\'s goal is complete.';
+
+  @override
+  String get customHabitTodayGoalComplete => 'Today\'s goal is complete.';
+
+  @override
+  String get customHabitLetsStart => 'Let\'s start!';
+
+  @override
+  String get customHabitDoingWell => 'You are doing well.';
+
+  @override
+  String get customHabitAlmostThere => 'Almost there.';
+
+  @override
+  String get customHabitOneLastStep => 'One last step.';
+
+  @override
+  String get customHabitRecordNotFound => 'Record not found';
+
+  @override
+  String get customHabitStreak => 'Streak';
+
+  @override
+  String get customHabitDayStreak => 'Day streak';
+
+  @override
+  String get customHabitBack => 'Back';
+
+  @override
+  String get customHabitRemove => 'Remove';
+
+  @override
+  String get customHabitBackToTracker => 'Back to habit tracker';
+
+  @override
+  String get customHabitGoal => 'Goal';
+
+  @override
+  String get customHabitCompletedToday => 'You completed today\'s goal.';
+
+  @override
+  String get customHabitCompletedPeriod => 'You completed this period\'s goal.';
+
+  @override
+  String get customHabitFinish => 'Finish';
+
+  @override
+  String get addHabitUnitTimes => 'times';
+
+  @override
+  String get addHabitUnitMinutes => 'minutes';
+
+  @override
+  String get addHabitUnitHours => 'hours';
+
+  @override
+  String get addHabitUnitPages => 'pages';
+
+  @override
+  String get addHabitUnitGlasses => 'glasses';
+
+  @override
+  String get addHabitUnitSets => 'sets';
+
+  @override
+  String get addHabitUnitLaps => 'laps';
+
+  @override
+  String get addHabitDaily => 'Daily';
+
+  @override
+  String get addHabitWeekly => 'Weekly';
+
+  @override
+  String get addHabitMonthly => 'Monthly';
+
+  @override
+  String addHabitSummaryWeekly(Object amount, Object unit) {
+    return '$amount $unit weekly';
+  }
+
+  @override
+  String addHabitSummaryMonthly(Object amount, Object unit) {
+    return '$amount $unit monthly';
+  }
+
+  @override
+  String addHabitSummaryDaily(Object amount, Object unit) {
+    return '$amount $unit daily';
+  }
+
+  @override
+  String get addHabitCancel => 'Cancel';
+
+  @override
+  String get addHabitOk => 'OK';
+
+  @override
+  String get addHabitCustom => 'Custom';
+
+  @override
+  String get addHabitSave => 'Save';
+
+  @override
+  String get addHabitGrowthName => 'Growth Name';
+
+  @override
+  String get addHabitPurificationName => 'Purification Name';
+
+  @override
+  String get addHabitGrowthHint => 'Ex: Read a book for 30 minutes';
+
+  @override
+  String get addHabitPurificationHint => 'Ex: Reduce unnecessary screen time';
+
+  @override
+  String get addHabitNameRequired => 'Name is required';
+
+  @override
+  String get addHabitNameTooLong => 'Maximum 60 characters';
+
+  @override
+  String get addHabitNoteOptional => 'Note (optional)';
+
+  @override
+  String get addHabitNoteHint => 'A short note to yourself...';
+
+  @override
+  String habitCalendarToday(Object date) {
+    return 'Today: $date';
+  }
+
+  @override
+  String get habitCalendarTitle => 'Habit calendar';
+
+  @override
+  String get habitCalendarMonth => 'Month';
+
+  @override
+  String habitCalendarMonthNote(Object month, Object year) {
+    return 'Month note · $month $year';
+  }
+
+  @override
+  String get habitCalendarNoRecords =>
+      'No records yet for this month or no habits added.';
+
+  @override
+  String habitCalendarQuitInsight(Object n, Object title) {
+    return '“$title”: $n days Purification counter on calendar this month (since start).';
+  }
+
+  @override
+  String habitCalendarPrayerInsight(
+    Object anyPrayer,
+    Object fullFive,
+    Object title,
+  ) {
+    return '“$title”: At least one prayer marked on $anyPrayer days; 5/5 completed on $fullFive days.';
+  }
+
+  @override
+  String habitCalendarCustomInsightPeriod(
+    Object n,
+    Object periodLabel,
+    Object title,
+  ) {
+    return '“$title”: $n $periodLabel goal reached this month.';
+  }
+
+  @override
+  String get habitCalendarWeekLabel => 'week';
+
+  @override
+  String get habitCalendarMonthLabel => 'month';
+
+  @override
+  String habitCalendarCustomInsightDays(Object completedDays, Object title) {
+    return '“$title”: A total of $completedDays days marked as completed this month.';
+  }
+
+  @override
+  String get habitCalendarLegend =>
+      'Grey icons in cells: means there is a record for that day. The purification icon specifically shows days the counter was active; prayer/routine icons show completed records for the respective day.';
+
+  @override
+  String get kazaPrayerFajr => 'Fajr prayer';
+
+  @override
+  String get kazaPrayerDhuhr => 'Dhuhr prayer';
+
+  @override
+  String get kazaPrayerAsr => 'Asr prayer';
+
+  @override
+  String get kazaPrayerMaghrib => 'Maghrib prayer';
+
+  @override
+  String get kazaPrayerIsha => 'Isha prayer';
+
+  @override
+  String get kazaPrayerWitr => 'Witr prayer';
+
+  @override
+  String get kazaReset => 'Reset';
+
+  @override
+  String get kazaResetConfirmDesc =>
+      'All makeup prayer counts will be reset. Are you sure?';
+
+  @override
+  String get kazaCancel => 'Cancel';
+
+  @override
+  String get kazaTrackerTitle => 'Makeup tracking';
+
+  @override
+  String get kazaClose => 'Close';
+
+  @override
+  String get kazaTrackerSubtitle => 'Makeup prayer tracking';
+
+  @override
+  String get kazaTrackerDesc =>
+      'Try to perform makeup prayers after the regular daily prayers. You can add debt with (+) and decrease the counter with (−) for each prayer performed.';
+
+  @override
+  String get kazaCalcBirthDate => 'Birth date';
+
+  @override
+  String get kazaCalcApply => 'Apply';
+
+  @override
+  String get kazaCalcUpdateCounters => 'Update counters?';
+
+  @override
+  String get kazaCalcUpdateDesc =>
+      'Your current makeup prayer counts will be deleted and replaced with calculated values.';
+
+  @override
+  String get kazaCalcCancel => 'Cancel';
+
+  @override
+  String get kazaCalcContinue => 'Continue';
+
+  @override
+  String get kazaCalcErrorPubertyFuture =>
+      'Puberty date cannot be after today. Check birth date or puberty age.';
+
+  @override
+  String get kazaCalcErrorZeroRemaining =>
+      'Remaining prayers 0: if fully prayed days equal or exceed liable days, it is capped; the 6 prayer counters remain zero accordingly.';
+
+  @override
+  String get kazaCalcTitle => 'Makeup tracking';
+
+  @override
+  String get kazaCalcSubtitle => 'Makeup prayer tracking';
+
+  @override
+  String get kazaCalcDesc =>
+      'Obligatory prayers start from puberty. If you don\'t know the exact age, you can reference 12 for males and 9 for females. This screen produces an estimated number; continue performing makeup prayers after regular prayers.';
+
+  @override
+  String get kazaCalcFemaleNote =>
+      'For females: roughly 6 days are exempted from prayers for each calendar month passed since puberty (not exceeding total days).';
+
+  @override
+  String get kazaCalcFormula =>
+      'Formula: liable days = calendar days − menstruation exemption; total prayers = liable days × 6 − (fully prayed days × 6). Prayed days cannot exceed liable days.';
+
+  @override
+  String get kazaCalcCalculateTitle => 'Calculate makeup prayers';
+
+  @override
+  String get kazaCalcGender => 'Your gender';
+
+  @override
+  String get kazaCalcMale => 'Male';
+
+  @override
+  String get kazaCalcFemale => 'Female';
+
+  @override
+  String get kazaCalcBirthDateTitle => 'Your birth date';
+
+  @override
+  String get kazaCalcPubertyAge => 'Age you reached puberty';
+
+  @override
+  String kazaCalcPubertyNote(Object minPuberty) {
+    return 'Lower limit: male 12, female 9 years (if smaller is entered, $minPuberty is used in calculation).';
+  }
+
+  @override
+  String get kazaCalcPrayedDays => 'How many days have you prayed?';
+
+  @override
+  String get kazaCalcPrayedDaysNote =>
+      'Total number of days so far where you performed all prayers within the day.';
+
+  @override
+  String get kazaCalcCalculate => 'Calculate';
+
+  @override
+  String get kazaCalcLiveError =>
+      'Puberty date cannot be after today; check birth and puberty age.';
+
+  @override
+  String kazaCalcLiveHayiz(Object days) {
+    return 'Menstruation exemption: −$days days\n';
+  }
+
+  @override
+  String kazaCalcLiveApplied(Object applied) {
+    return '\n(Fully prayed days upper limit: $applied)';
+  }
+
+  @override
+  String get kazaCalcLiveSummary => 'Live summary';
+
+  @override
+  String kazaCalcLiveCalendarDays(Object days) {
+    return 'Calendar days: $days\n';
+  }
+
+  @override
+  String kazaCalcLiveLiableDays(Object days) {
+    return 'Liable days: $days\n';
+  }
+
+  @override
+  String kazaCalcLiveOwed(Object perDay, Object total) {
+    return 'Prayer debt (liable days × $perDay): $total\n';
+  }
+
+  @override
+  String kazaCalcLiveCredited(
+    Object appliedNote,
+    Object credited,
+    Object perDay,
+  ) {
+    return 'Deducted (full days × $perDay): $credited$appliedNote\n';
+  }
+
+  @override
+  String kazaCalcLiveRemaining(Object remaining) {
+    return '—\nRemaining total: $remaining prayers';
+  }
+
+  @override
+  String get kazaCalcLiveZeroNote =>
+      'Post-calculation counter: remaining total is divided into 6 prayers; if remaining is 0, each prayer stays 0.';
+
+  @override
+  String get dailyNamazWisdomFallback =>
+      'Reminder text could not be loaded. Try refreshing the page.';
+
+  @override
+  String get momentVerseError => 'Failed to load. Please try again.';
+
+  @override
+  String get momentVerseEmptyTitle => 'No moment yet';
+
+  @override
+  String get momentVerseEmptyDesc => 'Wait for the next notification.';
+
+  @override
+  String get momentVerseExpiredTitle => 'This time has passed';
+
+  @override
+  String get momentVerseExpiredDesc =>
+      'Some moments only come once.\nMaybe we will meet in the next one.';
+
+  @override
+  String get momentVerseExpiredNote =>
+      'Keep notifications on,\nso you don\'t miss the next moment.';
+
+  @override
+  String get momentVerseActiveWhisper =>
+      'The verse whispered to you by the clock';
+
+  @override
+  String get momentVerseSurah => 'Surah';
+
+  @override
+  String get momentVerseVerse => 'Verse';
+
+  @override
+  String get momentVerseOneVerse => 'a verse';
+
+  @override
+  String get momentVerseClock => 'Clock';
+
+  @override
+  String get momentVerseMeaningDesc =>
+      'This is no coincidence; the numbers of time turn into an address in the Quran. So does you opening this notification exactly on time and standing before this verse.';
+
+  @override
+  String get momentVerseDisappear => 'this moment will disappear in';
+
+  @override
+  String get momentVerseReturnHome => 'Return to Home';
+
+  @override
+  String get momentVerseClose => 'Close';
+
+  @override
+  String get surveyDictMoodHappy => 'Happy';
+
+  @override
+  String get surveyDictMoodCalm => 'Calm';
+
+  @override
+  String get surveyDictMoodStressed => 'Stressed';
+
+  @override
+  String get surveyDictMoodSad => 'Sad';
+
+  @override
+  String get surveyDictMoodGrateful => 'Grateful';
+
+  @override
+  String get surveyDictMoodAnxious => 'Anxious';
+
+  @override
+  String get surveyDictMoodMotivated => 'Motivated';
+
+  @override
+  String get surveyDictSectorStudent => 'High school / University / Prep';
+
+  @override
+  String get surveyDictSectorPrivate => 'Private sector';
+
+  @override
+  String get surveyDictSectorPublic => 'Public sector';
+
+  @override
+  String get surveyDictSectorBusiness => 'Own business / Freelance';
+
+  @override
+  String get surveyDictSectorTrade => 'Trade';
+
+  @override
+  String get surveyDictSectorHousehold => 'Homemaker';
+
+  @override
+  String get surveyDictSectorOther => 'Other';
+
+  @override
+  String get surveyDictNeedMotivation => 'Motivation';
+
+  @override
+  String get surveyDictNeedSabr => 'Patience';
+
+  @override
+  String get surveyDictNeedShukr => 'Gratitude';
+
+  @override
+  String get surveyDictNeedTawakkul => 'Trust in God';
+
+  @override
+  String get surveyDictNeedFocus => 'Focus';
+
+  @override
+  String get surveyDictNeedHealing => 'Healing';
+
+  @override
+  String get surveyDictNeedRizq => 'Provision & Blessing';
+
+  @override
+  String get surveyDictGenderMale => 'Male';
+
+  @override
+  String get surveyDictGenderFemale => 'Female';
+
+  @override
+  String get premiumProductNotReadyError =>
+      'Product information is not ready yet. Please try again.';
+
+  @override
+  String get premiumAccountLinkError =>
+      'Account linking could not be completed. Please try again.';
+
+  @override
+  String get premiumWelcomeTitle => '🌿 Welcome!';
+
+  @override
+  String get premiumWelcomeMessage =>
+      'ARIN Premium is active. Your ad-free, unlocked experience is open.\n\nYou can manage your subscription from your store account at any time.';
+
+  @override
+  String get premiumWelcomeButton => 'Great!';
+
+  @override
+  String get premiumRestoreSuccess => 'Premium restored!';
+
+  @override
+  String get premiumNoActiveSubscription => 'No active subscription found.';
+
+  @override
+  String get premiumSignInErrorPrefix => 'Sign in could not be completed: ';
+
+  @override
+  String get premiumActiveTitle => 'ARIN Premium is active';
+
+  @override
+  String get premiumTitle => 'ARIN Premium';
+
+  @override
+  String get premiumActiveSubtitle =>
+      'Your ad-free and unlocked experience is open.';
+
+  @override
+  String get premiumSubtitle =>
+      'Ad-free, uninterrupted and unlocked spiritual routine.';
+
+  @override
+  String get premiumYearlyPlanTitle => 'Yearly Premium';
+
+  @override
+  String get premiumMostAdvantageousBadge => 'BEST VALUE';
+
+  @override
+  String get premiumYearlyPlanSubtitle => 'Yearly Subscription';
+
+  @override
+  String get premiumSwitchToYearly => 'Switch to Yearly';
+
+  @override
+  String get premiumMonthlyPlanTitle => 'Monthly Premium';
+
+  @override
+  String get premiumMonthlyPlanSubtitle => 'Monthly Subscription';
+
+  @override
+  String get premiumFooterText1 =>
+      'Launch prices are valid for a limited time. The subscription is managed through your store account and can be canceled at any time.';
+
+  @override
+  String get premiumFooterText2 =>
+      'The subscription renews automatically unless canceled at least 24 hours before the end of the period. The renewal fee is charged to your store account 24 hours before the end of the period. You can manage your subscriptions in App Store/Play account settings.';
+
+  @override
+  String get premiumLaunchBadge => 'LAUNCH SPECIAL';
+
+  @override
+  String get premiumCountdownNotice =>
+      'This price is valid for a limited time. Unlock premium with the best price before the launch ends.';
+
+  @override
+  String get premiumBenefitAdFree => 'Ad-free usage';
+
+  @override
+  String get premiumBenefitWidgets => 'No widget locks';
+
+  @override
+  String get premiumBenefitExplore => 'Uninterrupted explore feed';
+
+  @override
+  String get premiumBenefitAdhan => '2nd adhan alarm enabled';
+
+  @override
+  String get premiumSignInRequiredNotice =>
+      'Sign-in is not required for purchase. You can use Premium on this device right away; optionally link your account afterward to access it on your other devices.';
+
+  @override
+  String get premiumSignInSheetTitle => 'Link your account for Premium';
+
+  @override
+  String get premiumSignInSheetSubtitle =>
+      'Linking your account makes it easier to restore Premium on your other devices. Sign-in is optional for purchase.';
+
+  @override
+  String get premiumContinueWithGoogle => 'Continue with Google';
+
+  @override
+  String get premiumContinueWithApple => 'Continue with Apple';
+
+  @override
+  String get premiumCancelForNow => 'Cancel for now';
+
+  @override
+  String get premiumPostPurchaseLinkTitle => 'Premium is active';
+
+  @override
+  String get premiumPostPurchaseLinkBody =>
+      'Premium is active on this device. Would you like to link your account now so you can easily use it on your other devices?';
+
+  @override
+  String get premiumPostPurchaseLinkLater => 'Later';
+
+  @override
+  String get premiumPostPurchaseLinkNow => 'Link my account';
+
+  @override
+  String get premiumPostPurchaseLinkSuccess =>
+      'Account linked. Premium can now be synced across your devices.';
+
+  @override
+  String get premiumActivePlanBadge => 'Your active plan ✓';
+
+  @override
+  String get premiumActivePlanButton => 'Your active plan';
+
+  @override
+  String get premiumStartWithLaunchPrice => 'Start with Launch Price';
+
+  @override
+  String get premiumIsActiveButton => 'Premium active';
+
+  @override
+  String get qiblaCompassTitle => 'Qibla Compass';
+
+  @override
+  String get qiblaCompassQibla => 'Qibla';
+
+  @override
+  String get qiblaCompassGettingLocation => 'Getting location…';
+
+  @override
+  String get qiblaCompassInitError =>
+      'Location or compass\ncould not be initialized';
+
+  @override
+  String get qiblaCompassRetry => 'Retry';
+
+  @override
+  String get qiblaCompassAligned => 'Aligned to Qibla';
+
+  @override
+  String get qiblaCompassDeviation => 'deviation';
+
+  @override
+  String get qiblaCompassStabilizing => 'Stabilizing measurement';
+
+  @override
+  String get qiblaCompassGuidanceTiltTitle => 'Hold phone flat';
+
+  @override
+  String get qiblaCompassGuidanceTiltBody =>
+      'Use compass horizontally. Direction won\'t lock if held upright, sideways, or upside down.';
+
+  @override
+  String get qiblaCompassGuidanceCalibrateTitle => 'Calibrate compass';
+
+  @override
+  String get qiblaCompassGuidanceCalibrateBody =>
+      'Move phone in a figure 8 a few times, then keep away from metal.';
+
+  @override
+  String get qiblaCompassGuidanceUnstableTitle => 'Magnetic field unstable';
+
+  @override
+  String get qiblaCompassGuidanceUnstableBody =>
+      'Move away from laptops, magnets, metal tables, and magnetic cases.';
+
+  @override
+  String get qiblaCompassGuidanceGoodTitle => 'Measurement ready';
+
+  @override
+  String get qiblaCompassGuidanceGoodBody =>
+      'Hold phone flat, turn slowly to Qibla. Green badge lights up when stable.';
+
+  @override
+  String get qiblaCompassNorth => 'N';
+
+  @override
+  String get qiblaCompassEast => 'E';
+
+  @override
+  String get qiblaCompassSouth => 'S';
+
+  @override
+  String get qiblaCompassWest => 'W';
+
+  @override
+  String get qiblaCompassQiblaText => 'QIBLA';
+
+  @override
+  String get zikirmatikCounterSemantics => 'Dhikr counter';
+
+  @override
+  String get zikirmatikRound => 'ROUND';
+
+  @override
+  String get zikirmatikRoundCompleted => 'Round completed';
+
+  @override
+  String get zikirmatikResetCounter => 'Reset counter?';
+
+  @override
+  String get zikirmatikResetCounterDesc =>
+      'Total count and round information will reset.';
+
+  @override
+  String get zikirmatikCancel => 'Cancel';
+
+  @override
+  String get zikirmatikReset => 'Reset';
+
+  @override
+  String get zikirmatikEditPhraseTitle => 'Edit dhikr name';
+
+  @override
+  String get zikirmatikUse => 'Use';
+
+  @override
+  String get zikirmatikSaveAndUse => 'Save & Use';
+
+  @override
+  String get zikirmatikThisRound => 'THIS ROUND';
+
+  @override
+  String get zikirmatikTarget => 'Target';
+
+  @override
+  String zikirmatikCounterSemanticsLabel(
+    Object round,
+    Object target,
+    Object total,
+  ) {
+    return 'Dhikr counter. $round / $target, total $total';
+  }
+
+  @override
+  String get zikirmatikCounterSemanticsHint => 'Tap to increase by one';
+
+  @override
+  String get zikirmatikVibration => 'Vibration';
+
+  @override
+  String get zikirmatikVibrationTooltip =>
+      'Vibrates on each count; stronger vibration at round end';
+
+  @override
+  String get zikirmatikInfo => 'Dhikr info';
+
+  @override
+  String get zikirmatikTitle => 'Dhikr Counter';
+
+  @override
+  String get zikirmatikTapToChoose => 'Tap to choose dhikr';
+
+  @override
+  String get zikirmatikPickDhikr => 'PICK DHIKR';
+
+  @override
+  String get zikirmatikSaved => 'SAVED';
+
+  @override
+  String get zikirmatikDelete => 'Delete';
+
+  @override
+  String get zikirmatikWriteOwnText => 'WRITE YOUR OWN TEXT…';
+
+  @override
+  String get zikirmatikCustomTarget => 'Custom…';
+
+  @override
+  String get zikirmatikTargetOk => 'OK';
+
+  @override
+  String get zikirmatikDeleteRoundRecord => 'Delete this round record?';
+
+  @override
+  String get zikirmatikDhikr => 'dhikr';
+
+  @override
+  String get zikirmatikShareError =>
+      'Share could not be opened. Please try again.';
+
+  @override
+  String get zikirmatikDeleteRecord => 'Delete record?';
+
+  @override
+  String get zikirmatikCompletedRounds => 'Completed rounds';
+
+  @override
+  String get zikirmatikNoCompletedRounds =>
+      'No completed rounds yet. They will appear here when you hit your target.';
+
+  @override
+  String get zikirmatikArchivedSessions => 'Archived sessions';
+
+  @override
+  String get zikirmatikTodaysReflection => 'Today\'s reflection';
+
+  @override
+  String zikirmatikCompareLine(Object diff, Object first, Object second) {
+    return 'You completed “$first” $diff more rounds than “$second”.';
+  }
+
+  @override
+  String zikirmatikOnlyOneRecord(Object first) {
+    return 'Right now you only have round records for “$first”.';
+  }
+
+  @override
+  String get zikirmatikSummaryAndAnalytics => 'Summary and analytics';
+
+  @override
+  String get zikirmatikAnalyticsNoLogs =>
+      'As you complete more rounds, summaries and comparisons appear here.';
+
+  @override
+  String zikirmatikTotalRoundsCompleted(Object total) {
+    return 'You completed $total rounds in total.';
+  }
+
+  @override
+  String zikirmatikActiveDays(Object days) {
+    return 'You have dhikr records on $days different days.';
+  }
+
+  @override
+  String zikirmatikLast7Days(Object rounds) {
+    return '$rounds rounds were completed in the last 7 days.';
+  }
+
+  @override
+  String zikirmatikMostCompleted(Object phrase, Object rounds) {
+    return 'Most completed: “$phrase” ($rounds rounds).';
+  }
+
+  @override
+  String get zikirmatikCompleted => 'completed';
+
+  @override
+  String get zikirmatikTotalCounter => 'total counter';
+
+  @override
+  String get healingAmbientForest => 'Forest Sound';
+
+  @override
+  String get healingAmbientFire => 'Fire Sound';
+
+  @override
+  String get healingAmbientCosmic => 'Cosmic Sound';
+
+  @override
+  String get healingAmbientInshirah => 'Surah Al-Inshirah';
+
+  @override
+  String get healingSleepOff => 'Off';
+
+  @override
+  String get healingSleepRemaining => 'Remaining ';
+
+  @override
+  String healingSleepMinutes(Object m) {
+    return '$m minutes';
+  }
+
+  @override
+  String get healingInfoTitle => 'Info';
+
+  @override
+  String get healingInfoBody =>
+      'This section is for relaxation and reflection; it is not a medical treatment. Listen at low volume. Stop if you feel discomfort.';
+
+  @override
+  String get healingInfoOk => 'OK';
+
+  @override
+  String get healingFrequenciesTitle => 'Healing Frequencies';
+
+  @override
+  String get healingAmbientSound => 'Ambient Sound';
+
+  @override
+  String get healingPresets => 'PRESETS';
+
+  @override
+  String get healingFrequencyTone => 'Frequency tone (Hz)';
+
+  @override
+  String get healingAmbient => 'Ambient';
+
+  @override
+  String get healingSleepTimer => 'Sleep Timer';
+
+  @override
+  String get healingInshirahLocked =>
+      'Frequency controls are locked in Inshirah mode.';
+
+  @override
+  String get healingAllFrequencies => 'All Frequencies';
+
+  @override
+  String get healingPresetFocus => 'Focus';
+
+  @override
+  String get healingPresetSleep => 'Sleep';
+
+  @override
+  String get healingAmbientForestShort => 'Forest';
+
+  @override
+  String get healingAmbientFireShort => 'Fire';
+
+  @override
+  String get healingAmbientCosmicShort => 'Cosmic';
+
+  @override
+  String get healingAmbientInshirahShort => 'Inshirah';
+
+  @override
+  String get healingAmbientChoose => 'Choose Ambient Sound';
+
+  @override
+  String get healingSleepCancel => 'Cancel';
+
+  @override
+  String get healingSleepStopAfter => 'Stop after how many minutes?';
+
+  @override
+  String get healingSleepTimerOff => 'Timer off';
+
+  @override
+  String get healingFreq174Short => 'Therapy Frequency';
+
+  @override
+  String get healingFreq285Short => 'Resilience';
+
+  @override
+  String get healingFreq396Short => 'Renewal';
+
+  @override
+  String get healingFreq417Short => 'Inner strength';
+
+  @override
+  String get healingFreq528Short => 'Peace';
+
+  @override
+  String get healingFreq639Short => 'Purification';
+
+  @override
+  String get healingFreq741Short => 'Contemplation';
+
+  @override
+  String get healingFreq852Short => 'Tranquility';
+
+  @override
+  String get healingFreq174Heading => '174 Hz - Healing and Relaxation';
+
+  @override
+  String get healingFreq285Heading => '285 Hz - Patience and Steadiness';
+
+  @override
+  String get healingFreq396Heading => '396 Hz - Blessing and New Start';
+
+  @override
+  String get healingFreq417Heading => '417 Hz - Inner Strength and Faith';
+
+  @override
+  String get healingFreq528Heading => '528 Hz - Peace and Calm';
+
+  @override
+  String get healingFreq639Heading => '639 Hz - Purification and Cleansing';
+
+  @override
+  String get healingFreq741Heading => '741 Hz - Reflection and Focus';
+
+  @override
+  String get healingFreq852Heading => '852 Hz - Tranquility (Deep Peace)';
+
+  @override
+  String get healingFreq174Body =>
+      'Turn toward calm in physical and spiritual fatigue; healing is from Allah.';
+
+  @override
+  String get healingFreq285Body =>
+      'Soften the heart in hardship; continue with trust in Allah.';
+
+  @override
+  String get healingFreq396Body =>
+      'Open a new page; a prayer for repentance and forgiveness.';
+
+  @override
+  String get healingFreq417Body =>
+      'Strengthen the heart; renew faith and remember right direction.';
+
+  @override
+  String get healingFreq528Body =>
+      'Inner calm; breathe with gratitude and surrender.';
+
+  @override
+  String get healingFreq639Body =>
+      'Step away from thoughts that cloud the heart; seek forgiveness.';
+
+  @override
+  String get healingFreq741Body =>
+      'Focus on verses and creation; gather a scattered mind.';
+
+  @override
+  String get healingFreq852Body =>
+      'A calm that brings relief to the heart; seek Allah’s mercy.';
+
+  @override
+  String get appleSignInCanceled => 'Apple sign in canceled.';
+
+  @override
+  String get appleSignInNotAuthorized =>
+      'Apple account not authorized. Check Apple sign in permission from iPhone Settings > Apple ID > Sign-In & Security.';
+
+  @override
+  String get appleSignInProviderDisabled =>
+      'Apple sign in provider appears disabled in Firebase console.';
+
+  @override
+  String get appleSignInInvalidCredential =>
+      'Invalid Apple authentication credential. Check Bundle ID and Apple Sign In capabilities on Xcode/Firebase.';
+
+  @override
+  String get appleSignInNetworkFailed =>
+      'Apple sign in could not be completed due to network connection.';
+
+  @override
+  String get settingsMenuPremiumTitle => 'ARIN Premium';
+
+  @override
+  String get settingsMenuPremiumSubtitle =>
+      'Launch prices and ad-free experience';
+
+  @override
+  String get settingsMenuWidgetsTitle => 'Widget Center';
+
+  @override
+  String get settingsMenuWidgetsSubtitle => 'Usage info and tracking widget';
+
+  @override
+  String get supportProductNotReady =>
+      'Product information is not ready yet. Please try again.';
+
+  @override
+  String get supportThanksTitle => 'Thank You! 🙏';
+
+  @override
+  String get supportThanksBody =>
+      'Your support is very valuable to Arın. With this contribution, we will continue to provide a better experience.';
+
+  @override
+  String get commonOk => 'OK';
+
+  @override
+  String get supportPageTitle => 'Support Arın';
+
+  @override
+  String get supportTierSmallTitle => 'Small Support';
+
+  @override
+  String get supportTierSmallDesc =>
+      'Contribute to development with a coffee support.';
+
+  @override
+  String get supportTierMediumTitle => 'Medium Support';
+
+  @override
+  String get supportTierMediumDesc =>
+      'Accelerate the development of new content and features.';
+
+  @override
+  String get supportTierLargeTitle => 'Large Support';
+
+  @override
+  String get supportTierLargeDesc =>
+      'Make a strong contribution to Arın\'s long-term development.';
+
+  @override
+  String get supportPackagesDisclaimer =>
+      'Support packages work as one-time store products. They are separate from Premium subscription.';
+
+  @override
+  String get supportHeaderTitle => 'Stand with Arın';
+
+  @override
+  String get supportHeaderDesc =>
+      'Not a donation, but one-time support packages compliant with store rules. They help us grow the ad-free and premium experience of the app.';
+
+  @override
+  String get languageChangeFailed =>
+      'Language could not be changed. Please try again.';
+
+  @override
+  String get differentLocation => 'You are in a different location';
+
+  @override
+  String updatePrayerTimesForCity(Object city) {
+    return 'Should we update prayer times for $city?';
+  }
+
+  @override
+  String get rememberThisChoice => 'Remember this choice, do not ask again';
+
+  @override
+  String get keepCurrentLocation => 'Keep';
+
+  @override
+  String get updateLocation => 'Update';
+
+  @override
+  String get sealYourIntention => 'Seal your intention';
+
+  @override
+  String get sealIntentionInfo =>
+      'The details you just shared are part of this beginning; hold to reinforce your intention.';
+
+  @override
+  String get touchAndHoldWhenReady => 'Touch and hold when you are ready.';
+
+  @override
+  String get youAreAlmostThere => 'You are almost there!';
+
+  @override
+  String get promiseSealed => 'Congratulations, your promise is sealed!';
+
+  @override
+  String get touchAndHoldToContinue =>
+      'Touch and hold the screen\nTo continue…';
+
+  @override
+  String get skipWithArrow => 'Skip ➔';
+
+  @override
+  String get redirecting => 'Redirecting...';
+
+  @override
+  String get keepGoing => 'Keep going...';
+
+  @override
+  String get premiumLoadingWait =>
+      'Loading premium status. Please try again shortly.';
+
+  @override
+  String get secondAlarmPremiumFeature => '2nd alarm premium feature';
+
+  @override
+  String get secondAlarmAdWatchText =>
+      'To enable the 2nd azan alarm in free usage, a short ad is watched. Premium users do not see this lock.';
+
+  @override
+  String get giveUp => 'Give up';
+
+  @override
+  String get openAfterAd => 'Open after ad';
+
+  @override
+  String get reflection => 'Reflection';
+
+  @override
+  String yesterdayPrayerSummary(Object avg, Object weekday, Object yDone) {
+    return 'Yesterday · $weekday · $yDone/5  ·  Last 7 days avg. $avg/5';
+  }
+
+  @override
+  String get weeklyView => 'Weekly view';
+
+  @override
+  String daysDoneSummary(Object done) {
+    return '$done/7 days';
+  }
+
+  @override
+  String get inspirationAndAwareness => 'Inspiration and awareness';
+
+  @override
+  String get shortBreaksForTruth => 'Short breaks for truth and consciousness';
+
+  @override
+  String get insightCommentStrong =>
+      'Your rhythm is very strong recently; your heart seems aligned with order. Keep it up.';
+
+  @override
+  String get insightCommentPerfect =>
+      'Five times completed yesterday — you\'ve spent a day close to your Lord. You can continue with the same intention today.';
+
+  @override
+  String get insightCommentZero =>
+      'Yesterday might not have been recorded or checked yet. Even with a single prayer today, you can redraw the line.';
+
+  @override
+  String get insightCommentLow =>
+      'The average is low this week; this is normal — it rises with reflection and small steps. One more prayer makes a big difference.';
+
+  @override
+  String insightCommentGood(Object count) {
+    return '$count/5 prayers marked yesterday; it\'s possible to complete the balance with one or two prayers today.';
+  }
+
+  @override
+  String get insightCommentDefault =>
+      'Past days\' data is a mirror for you: mercy in the missing parts, gratitude in the completed ones.';
 }

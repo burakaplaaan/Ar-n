@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:arin/l10n/app_localizations.dart';
 
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_text_styles.dart';
@@ -12,14 +13,17 @@ import '../shared/providers/willpower_hub_nav_provider.dart';
 import 'kaza_tracking_provider.dart';
 import 'kaza_widgets.dart';
 
-const List<String> kKazaPrayerLabels = [
-  'Sabah namazı',
-  'Öğle namazı',
-  'İkindi namazı',
-  'Akşam namazı',
-  'Yatsı namazı',
-  'Vitir namazı',
-];
+  List<String> _getPrayerLabels(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    return [
+      l10n.kazaPrayerFajr,
+      l10n.kazaPrayerDhuhr,
+      l10n.kazaPrayerAsr,
+      l10n.kazaPrayerMaghrib,
+      l10n.kazaPrayerIsha,
+      l10n.kazaPrayerWitr,
+    ];
+  }
 
 const Color _kDebtPlusColor = Color(0xFFFF6B6B);
 
@@ -32,11 +36,11 @@ class KazaTrackerPage extends ConsumerWidget {
       builder: (ctx) => AlertDialog(
         backgroundColor: AppColors.anthraciteMid,
         title: Text(
-          'Sıfırla',
+          AppLocalizations.of(context)!.kazaReset,
           style: AppTextStyles.titleSmall.copyWith(color: AppColors.creamBase),
         ),
         content: Text(
-          'Tüm kaza sayıları sıfırlanacak. Emin misin?',
+          AppLocalizations.of(context)!.kazaResetConfirmDesc,
           style: AppTextStyles.bodySmall.copyWith(
             color: AppColors.textOnDarkMuted,
             height: 1.45,
@@ -45,16 +49,16 @@ class KazaTrackerPage extends ConsumerWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: const Text(
-              'İptal',
-              style: TextStyle(color: AppColors.textOnDarkMuted),
+            child: Text(
+              AppLocalizations.of(context)!.kazaCancel,
+              style: const TextStyle(color: AppColors.textOnDarkMuted),
             ),
           ),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
-            child: const Text(
-              'Sıfırla',
-              style: TextStyle(
+            child: Text(
+              AppLocalizations.of(context)!.kazaReset,
+              style: const TextStyle(
                 color: _kDebtPlusColor,
                 fontWeight: FontWeight.w700,
               ),
@@ -95,7 +99,7 @@ class KazaTrackerPage extends ConsumerWidget {
                     ),
                     Expanded(
                       child: Text(
-                        'Kaza takibi',
+                        AppLocalizations.of(context)!.kazaTrackerTitle,
                         textAlign: TextAlign.center,
                         style: AppTextStyles.titleMedium.copyWith(
                           color: AppColors.creamBase,
@@ -117,7 +121,7 @@ class KazaTrackerPage extends ConsumerWidget {
                         tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                       ),
                       child: Text(
-                        'Kapat',
+                        AppLocalizations.of(context)!.kazaClose,
                         style: AppTextStyles.labelLarge.copyWith(
                           color: AppColors.accentNeonGreen.withValues(
                             alpha: 0.95,
@@ -138,7 +142,7 @@ class KazaTrackerPage extends ConsumerWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Kaza namazı takibi',
+                            AppLocalizations.of(context)!.kazaTrackerSubtitle,
                             style: AppTextStyles.titleSmall.copyWith(
                               color: AppColors.creamBase,
                               fontWeight: FontWeight.w800,
@@ -146,9 +150,7 @@ class KazaTrackerPage extends ConsumerWidget {
                           ),
                           const SizedBox(height: 8),
                           Text(
-                            'Kaza namazlarını vakit namazları kılındıktan sonra kılmaya '
-                            'özen göster. Eksik (+) ile borç ekleyebilir, kıldığın '
-                            'her rekat için (−) ile sayacı azaltabilirsin.',
+                            AppLocalizations.of(context)!.kazaTrackerDesc,
                             style: AppTextStyles.bodySmall.copyWith(
                               color: AppColors.textOnDarkMuted,
                               height: 1.5,
@@ -163,7 +165,7 @@ class KazaTrackerPage extends ConsumerWidget {
                       return Padding(
                         padding: const EdgeInsets.only(bottom: 12),
                         child: _KazaPrayerRow(
-                          label: kKazaPrayerLabels[i],
+                          label: _getPrayerLabels(context)[i],
                           count: n,
                           onAdd: () => ref
                               .read(kazaTrackingProvider.notifier)
@@ -208,7 +210,7 @@ class KazaTrackerPage extends ConsumerWidget {
                               color: Colors.white.withValues(alpha: 0.04),
                             ),
                             child: Text(
-                              'Sıfırla',
+                              AppLocalizations.of(context)!.kazaReset,
                               style: AppTextStyles.labelLarge.copyWith(
                                 color: AppColors.creamBase.withValues(alpha: 0.85),
                                 fontWeight: FontWeight.w600,

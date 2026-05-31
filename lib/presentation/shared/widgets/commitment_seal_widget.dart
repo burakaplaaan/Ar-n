@@ -8,7 +8,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
 import '../../../core/constants/app_text_styles.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:arin/l10n/app_localizations.dart';
 
 class CommitmentSealWidget extends StatefulWidget {
   const CommitmentSealWidget({

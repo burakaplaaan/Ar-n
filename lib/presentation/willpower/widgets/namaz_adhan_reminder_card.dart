@@ -320,13 +320,13 @@ class _NamazAdhanReminderCardState
     final entitlementAsync = ref.read(premiumEntitlementProvider);
     if (entitlementAsync.isLoading || entitlementAsync.hasError) {
       if (!mounted) return false;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(
-            AppLocalizations.of(context)!.premiumLoadingWait,
-          ),
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          AppLocalizations.of(context)!.premiumLoadingWait,
         ),
-      );
+      ),
+    );
       return false;
     }
     final entitlement = await ref.read(premiumEntitlementProvider.future);

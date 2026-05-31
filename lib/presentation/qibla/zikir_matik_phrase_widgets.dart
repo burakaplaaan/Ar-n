@@ -1,5 +1,3 @@
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-
 part of 'zikir_matik_page.dart';
 
 /// Alt araç: yuvarlak düğme + alt etiket (titreşim / zikir bilgisi).

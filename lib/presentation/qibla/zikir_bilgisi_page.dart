@@ -14,6 +14,8 @@ import '../../data/models/zikir_matik_record.dart';
 import '../../data/models/zikir_matik_tur_log.dart';
 import '../../data/repositories/zikir_matik_repository.dart';
 
+import 'package:arin/l10n/app_localizations.dart';
+
 abstract final class _Zc {
   static const pageBg = Color(0xFF1A2B34);
   static const outer = Color(0xFF708A96);
@@ -71,6 +73,33 @@ String _zbtr(
 }) => trEnAr(context, tr: tr, en: en, ar: ar);
 
 List<String> _zikirDailyReflections(BuildContext context) {
+  final l10n = AppLocalizations.of(context)!;
+  // Temporary fallback logic for zikir daily reflections depending on locale.
+  // Idealy these should be fully localized in ARB, but as a quick fix,
+  // we check the locale name and return english or arabic arrays if needed.
+  if (l10n.localeName.startsWith('en')) {
+    return [
+      'Zikr is a soft and peaceful velvet cover laid upon the heart.',
+      'To reach that deep silence beyond words, zikr is the surest bridge.',
+      'Making peace with oneself begins with the tongue reciting love.',
+      'Zikr is an ointment that heals the wounds of the soul.',
+      'It is the state of holding onto that greatest unseen power felt with the heart.',
+      'With each bead, you let go of a worry that tires you.',
+      'Zikr reminds us that breathing is not just a biological act, but a spiritual one.',
+      'That single name echoing in the deepest room of the heart is the most peaceful answer.'
+    ];
+  } else if (l10n.localeName.startsWith('ar')) {
+    return [
+      'الذكر هو غطاء ناعم وهادئ يوضع على القلب.',
+      'للوصول إلى ذلك الصمت العميق وراء الكلمات، الذكر هو الجسر الأكثر أماناً.',
+      'التصالح مع الذات يبدأ بذكر اللسان للحب.',
+      'الذكر مرهم يشفي جراح الروح.',
+      'إنه حالة التمسك بتلك القوة الخفية العظمى التي تشعر بها بالقلب.',
+      'مع كل حبة سبحة، تتخلى عن قلق يتعبك.',
+      'الذكر يذكرنا بأن التنفس ليس مجرد فعل بيولوجي، بل روحي.',
+      'ذلك الاسم الواحد الذي يتردد في أعمق غرفة في القلب هو الجواب الأكثر سلاماً.'
+    ];
+  }
   return _kZikirDailyReflections;
 }
 
@@ -162,6 +191,7 @@ class _ZikirBilgisiPageState extends ConsumerState<ZikirBilgisiPage>
   }
 
   Future<void> _deleteTur(ZikirMatikTurLog log) async {
+    final l10n = AppLocalizations.of(context)!;
     final ok = await showDialog<bool>(
       context: context,
       barrierColor: Colors.black.withValues(alpha: 0.72),
@@ -184,12 +214,7 @@ class _ZikirBilgisiPageState extends ConsumerState<ZikirBilgisiPage>
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   Text(
-                    _zbtr(
-                      context,
-                      tr: 'Bu tur kaydını sil?',
-                      en: 'Delete this round record?',
-                      ar: 'حذف سجل هذه الجولة؟',
-                    ),
+                    l10n.zikirmatikDeleteRoundRecord,
                     style: TextStyle(
                       color: _Zc.labelMuted,
                       fontWeight: FontWeight.w800,
@@ -203,7 +228,7 @@ class _ZikirBilgisiPageState extends ConsumerState<ZikirBilgisiPage>
                       TextButton(
                         onPressed: () => Navigator.pop(ctx, false),
                         child: Text(
-                          _zbtr(context, tr: 'Vazgeç', en: 'Cancel', ar: 'إلغاء'),
+                          l10n.zikirmatikCancel,
                           style: TextStyle(color: _Zc.outer),
                         ),
                       ),
@@ -214,9 +239,7 @@ class _ZikirBilgisiPageState extends ConsumerState<ZikirBilgisiPage>
                           foregroundColor: Colors.white,
                           shape: const StadiumBorder(),
                         ),
-                        child: Text(
-                          _zbtr(context, tr: 'Sil', en: 'Delete', ar: 'حذف'),
-                        ),
+                        child: Text(l10n.zikirmatikDelete),
                       ),
                     ],
                   ),
@@ -234,24 +257,20 @@ class _ZikirBilgisiPageState extends ConsumerState<ZikirBilgisiPage>
   }
 
   Future<void> _shareArchive(ZikirMatikRecord r) async {
+    final l10n = AppLocalizations.of(context)!;
     final d = r.savedAt;
     final dateStr = DateFormat('dd.MM.yyyy HH:mm', 'tr_TR').format(d);
     final text =
-        '${r.phrase}\n${r.totalCount} zikir\n'
-        '${_zbtr(context, tr: 'TUR', en: 'ROUND', ar: 'جولة')}: ${r.tur}\n'
-        '${_zbtr(context, tr: 'Hedef', en: 'Target', ar: 'الهدف')}: ${r.target}\n$dateStr';
+        '${r.phrase}\n${r.totalCount} ${l10n.zikirmatikDhikr}\n'
+        '${l10n.zikirmatikRound}: ${r.tur}\n'
+        '${l10n.zikirmatikTarget}: ${r.target}\n$dateStr';
     try {
       await SharePlus.instance.share(ShareParams(text: text));
     } catch (e) {
       if (!mounted) return;
-      final msg = isMethodChannelLateInitResultError(e)
+          final msg = isMethodChannelLateInitResultError(e)
           ? platformShareTransientErrorMessage()
-          : _zbtr(
-              context,
-              tr: 'Paylaşım açılamadı. Tekrar deneyin.',
-              en: 'Share could not be opened. Please try again.',
-              ar: 'تعذر فتح المشاركة. حاول مرة أخرى.',
-            );
+          : l10n.zikirmatikShareError;
       ScaffoldMessenger.maybeOf(context)?.showSnackBar(
         SnackBar(content: Text(msg), behavior: SnackBarBehavior.floating),
       );
@@ -259,30 +278,26 @@ class _ZikirBilgisiPageState extends ConsumerState<ZikirBilgisiPage>
   }
 
   Future<void> _deleteArchive(ZikirMatikRecord r) async {
+    final l10n = AppLocalizations.of(context)!;
     final ok = await showDialog<bool>(
       context: context,
       barrierColor: Colors.black.withValues(alpha: 0.72),
       builder: (ctx) => AlertDialog(
         backgroundColor: _Zc.dialogSurface,
         title: Text(
-          _zbtr(
-            context,
-            tr: 'Kaydı sil?',
-            en: 'Delete record?',
-            ar: 'حذف السجل؟',
-          ),
+          l10n.zikirmatikDeleteRecord,
           style: TextStyle(color: _Zc.labelMuted),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: Text(_zbtr(context, tr: 'Vazgeç', en: 'Cancel', ar: 'إلغاء'),
+            child: Text(l10n.zikirmatikCancel,
                 style: TextStyle(color: _Zc.outer)),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(ctx, true),
             style: FilledButton.styleFrom(backgroundColor: _Zc.outer),
-            child: Text(_zbtr(context, tr: 'Sil', en: 'Delete', ar: 'حذف')),
+            child: Text(l10n.zikirmatikDelete),
           ),
         ],
       ),
@@ -304,6 +319,7 @@ class _ZikirBilgisiPageState extends ConsumerState<ZikirBilgisiPage>
       );
     }
 
+    final l10n = AppLocalizations.of(context)!;
     final idx = _dailyReflectionIndex();
     final text = _zikirDailyReflections(context)[idx];
     final analytics = _computeAnalytics(_turLogs);
@@ -387,12 +403,7 @@ class _ZikirBilgisiPageState extends ConsumerState<ZikirBilgisiPage>
                           const SizedBox(width: 10),
                           Expanded(
                             child: Text(
-                              _zbtr(
-                                context,
-                                tr: 'Zikir bilgisi',
-                                en: 'Dhikr info',
-                                ar: 'معلومات الذكر',
-                              ),
+                              l10n.zikirmatikInfo,
                               style: TextStyle(
                                 color: _Zc.labelMuted,
                                 fontSize: 19,
@@ -449,12 +460,7 @@ class _ZikirBilgisiPageState extends ConsumerState<ZikirBilgisiPage>
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
                 child: Text(
-                  _zbtr(
-                    context,
-                    tr: 'Tamamlanan turlar',
-                    en: 'Completed rounds',
-                    ar: 'الجولات المكتملة',
-                  ),
+                  l10n.zikirmatikCompletedRounds,
                   style: TextStyle(
                     color: _Zc.outer.withValues(alpha: 0.95),
                     fontSize: 14,
@@ -469,12 +475,7 @@ class _ZikirBilgisiPageState extends ConsumerState<ZikirBilgisiPage>
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                   child: Text(
-                    _zbtr(
-                      context,
-                      tr: 'Henüz tamamlanan tur kaydı yok. Hedefe ulaştığında buraya düşer.',
-                      en: 'No completed rounds yet. They will appear here when you hit your target.',
-                      ar: 'لا توجد جولات مكتملة بعد. ستظهر هنا عند بلوغ الهدف.',
-                    ),
+                    l10n.zikirmatikNoCompletedRounds,
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       color: _Zc.labelMuted.withValues(alpha: 0.7),
@@ -507,12 +508,7 @@ class _ZikirBilgisiPageState extends ConsumerState<ZikirBilgisiPage>
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(20, 20, 20, 8),
                   child: Text(
-                    _zbtr(
-                      context,
-                      tr: 'Arşiv oturumları',
-                      en: 'Archived sessions',
-                      ar: 'الجلسات المؤرشفة',
-                    ),
+                    l10n.zikirmatikArchivedSessions,
                     style: TextStyle(
                       color: _Zc.outer.withValues(alpha: 0.95),
                       fontSize: 14,
@@ -586,12 +582,7 @@ class _DailyCard extends StatelessWidget {
                   color: _Zc.lcdBg.withValues(alpha: 0.95), size: 20),
               const SizedBox(width: 8),
               Text(
-                _zbtr(
-                  context,
-                  tr: 'Bugünün payı',
-                  en: 'Today\'s reflection',
-                  ar: 'ورد اليوم',
-                ),
+                AppLocalizations.of(context)!.zikirmatikTodaysReflection,
                 style: TextStyle(
                   color: _Zc.labelMuted.withValues(alpha: 0.92),
                   fontWeight: FontWeight.w800,
@@ -628,6 +619,7 @@ class _AnalyticsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final top = analytics.sortedPhrases;
     final first = top.isNotEmpty ? top.first : null;
     final second = top.length > 1 ? top[1] : null;
@@ -638,19 +630,9 @@ class _AnalyticsCard extends StatelessWidget {
         first.value > second.value &&
         second.value > 0) {
       final diff = first.value - second.value;
-      compareLine = _zbtr(
-        context,
-        tr: '“${first.key}” zikrini “${second.key}”e göre $diff tur daha çok tamamladın.',
-        en: 'You completed “${first.key}” $diff more rounds than “${second.key}”.',
-        ar: 'أكملت «${first.key}» بعدد $diff جولة أكثر من «${second.key}».',
-      );
+      compareLine = l10n.zikirmatikCompareLine(first.key, second.key, diff);
     } else if (first != null && top.length == 1) {
-      compareLine = _zbtr(
-        context,
-        tr: 'Şu an yalnızca “${first.key}” için tur kaydın var.',
-        en: 'Right now you only have round records for “${first.key}”.',
-        ar: 'لديك حاليًا سجلات جولات لـ «${first.key}» فقط.',
-      );
+      compareLine = l10n.zikirmatikOnlyOneRecord(first.key);
     }
 
     return Container(
@@ -665,12 +647,7 @@ class _AnalyticsCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            _zbtr(
-              context,
-              tr: 'Özet ve analiz',
-              en: 'Summary and analytics',
-              ar: 'الملخص والتحليل',
-            ),
+            l10n.zikirmatikSummaryAndAnalytics,
             style: TextStyle(
               color: _Zc.outer.withValues(alpha: 0.95),
               fontWeight: FontWeight.w800,
@@ -680,12 +657,7 @@ class _AnalyticsCard extends StatelessWidget {
           const SizedBox(height: 14),
           if (!hasLogs)
             Text(
-              _zbtr(
-                context,
-                tr: 'Daha fazla tur tamamladıkça özet ve karşılaştırmalar burada oluşur.',
-                en: 'As you complete more rounds, summaries and comparisons appear here.',
-                ar: 'كلما أكملت جولات أكثر ستظهر الملخصات والمقارنات هنا.',
-              ),
+              l10n.zikirmatikAnalyticsNoLogs,
               style: TextStyle(
                 color: _Zc.labelMuted.withValues(alpha: 0.72),
                 height: 1.45,
@@ -695,40 +667,20 @@ class _AnalyticsCard extends StatelessWidget {
           else ...[
             _AnLine(
               icon: Icons.layers_rounded,
-              text: _zbtr(
-                context,
-                tr: 'Toplam ${analytics.totalTurs} tur tamamladın.',
-                en: 'You completed ${analytics.totalTurs} rounds in total.',
-                ar: 'أكملت إجمالًا ${analytics.totalTurs} جولة.',
-              ),
+              text: l10n.zikirmatikTotalRoundsCompleted(analytics.totalTurs),
             ),
             _AnLine(
               icon: Icons.calendar_month_rounded,
-              text: _zbtr(
-                context,
-                tr: '${analytics.activeDays} farklı günde zikir kaydın var.',
-                en: 'You have dhikr records on ${analytics.activeDays} different days.',
-                ar: 'لديك سجلات ذكر في ${analytics.activeDays} أيام مختلفة.',
-              ),
+              text: l10n.zikirmatikActiveDays(analytics.activeDays),
             ),
             _AnLine(
               icon: Icons.trending_up_rounded,
-              text: _zbtr(
-                context,
-                tr: 'Son 7 günde ${analytics.last7Days} tur tamamlandı.',
-                en: '${analytics.last7Days} rounds were completed in the last 7 days.',
-                ar: 'تم إكمال ${analytics.last7Days} جولة خلال آخر 7 أيام.',
-              ),
+              text: l10n.zikirmatikLast7Days(analytics.last7Days),
             ),
             if (first != null)
               _AnLine(
                 icon: Icons.star_rounded,
-                text: _zbtr(
-                  context,
-                  tr: 'En çok tamamlanan: “${first.key}” (${first.value} tur).',
-                  en: 'Most completed: “${first.key}” (${first.value} rounds).',
-                  ar: 'الأكثر إكمالًا: «${first.key}» (${first.value} جولة).',
-                ),
+                text: l10n.zikirmatikMostCompleted(first.key, first.value),
               ),
             if (compareLine != null) ...[
               const SizedBox(height: 8),
@@ -793,6 +745,7 @@ class _TurLogTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
       decoration: BoxDecoration(
@@ -819,14 +772,14 @@ class _TurLogTile extends StatelessWidget {
                 onPressed: onDelete,
                 icon: Icon(Icons.delete_outline_rounded,
                     color: Colors.red.shade300, size: 22),
-                tooltip: _zbtr(context, tr: 'Sil', en: 'Delete', ar: 'حذف'),
+                tooltip: l10n.zikirmatikDelete,
               ),
             ],
           ),
           const SizedBox(height: 6),
           Text(
-            '${_zbtr(context, tr: 'TUR', en: 'ROUND', ar: 'جولة')} ${log.completedTur} ${_zbtr(context, tr: 'tamamlandı', en: 'completed', ar: 'مكتملة')} · '
-            '${_zbtr(context, tr: 'hedef', en: 'target', ar: 'الهدف')} ${log.target} · ${_zbtr(context, tr: 'toplam sayaç', en: 'total counter', ar: 'العداد الكلي')} ${log.totalCountAtEvent}',
+            '${l10n.zikirmatikRound} ${log.completedTur} ${l10n.zikirmatikCompleted} · '
+            '${l10n.zikirmatikTarget} ${log.target} · ${l10n.zikirmatikTotalCounter} ${log.totalCountAtEvent}',
             style: TextStyle(
               color: _Zc.outer.withValues(alpha: 0.92),
               fontSize: 13,
@@ -859,6 +812,7 @@ class _ArchiveTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final d = record.savedAt;
     final line = DateFormat('dd.MM.yyyy HH:mm', 'tr_TR').format(d);
     return Container(
@@ -896,8 +850,8 @@ class _ArchiveTile extends StatelessWidget {
             ],
           ),
           Text(
-            '${record.totalCount} ${_zbtr(context, tr: 'zikir', en: 'dhikr', ar: 'ذكر')} · '
-            '${_zbtr(context, tr: 'TUR', en: 'ROUND', ar: 'جولة')} ${record.tur} · ${_zbtr(context, tr: 'hedef', en: 'target', ar: 'الهدف')} ${record.target}',
+            '${record.totalCount} ${l10n.zikirmatikDhikr} · '
+            '${l10n.zikirmatikRound} ${record.tur} · ${l10n.zikirmatikTarget} ${record.target}',
             style: TextStyle(color: _Zc.outer.withValues(alpha: 0.85), fontSize: 12),
           ),
           Text(

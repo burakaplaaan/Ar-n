@@ -1,5 +1,3 @@
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-
 part of 'zikir_matik_page.dart';
 
 class _ZikirMatikTargetPickerSheet extends StatefulWidget {
@@ -109,14 +107,9 @@ class _ZikirMatikTargetPickerSheetState extends State<_ZikirMatikTargetPickerShe
                 ),
                 _enter(
                   1,
-                  Text(
-                    _ztr(
-                      context,
-                      tr: 'Hedef',
-                      en: 'Target',
-                      ar: 'الهدف',
-                    ),
-                    style: TextStyle(
+                    Text(
+                      l10n.zikirmatikTarget,
+                      style: TextStyle(
                       color: _ZikirmatikColors.labelMuted,
                       fontSize: 20,
                       fontWeight: FontWeight.w800,
@@ -131,7 +124,7 @@ class _ZikirMatikTargetPickerSheetState extends State<_ZikirMatikTargetPickerShe
                     children: [
                       Expanded(
                         child: _TargetPresetPill(
-                          label: _ztr(context, tr: '33', en: '33', ar: '٣٣'),
+                          label: '33',
                           selected: sel33,
                           onTap: () => _commit(33),
                         ),
@@ -139,7 +132,7 @@ class _ZikirMatikTargetPickerSheetState extends State<_ZikirMatikTargetPickerShe
                       const SizedBox(width: 12),
                       Expanded(
                         child: _TargetPresetPill(
-                          label: _ztr(context, tr: '99', en: '99', ar: '٩٩'),
+                          label: '99',
                           selected: sel99,
                           onTap: () => _commit(99),
                         ),
@@ -163,12 +156,7 @@ class _ZikirMatikTargetPickerSheetState extends State<_ZikirMatikTargetPickerShe
                         ),
                         cursorColor: _ZikirmatikColors.lcdBg,
                         decoration: InputDecoration(
-                          labelText: _ztr(
-                            context,
-                            tr: 'Özel…',
-                            en: 'Custom…',
-                            ar: 'مخصص…',
-                          ),
+                          labelText: l10n.zikirmatikCustomTarget,
                           labelStyle: TextStyle(
                             color: _ZikirmatikColors.outer
                                 .withValues(alpha: 0.95),
@@ -238,12 +226,7 @@ class _ZikirMatikTargetPickerSheetState extends State<_ZikirMatikTargetPickerShe
                         shape: const StadiumBorder(),
                       ),
                       child: Text(
-                        _ztr(
-                          context,
-                          tr: 'Tamam',
-                          en: 'OK',
-                          ar: 'حسنًا',
-                        ),
+                        l10n.zikirmatikTargetOk,
                         style: TextStyle(
                           fontWeight: FontWeight.w700,
                           fontSize: 14,

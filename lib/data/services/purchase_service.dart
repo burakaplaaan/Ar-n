@@ -11,6 +11,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 
 import '../../core/constants/revenuecat_ids.dart';
+import '../../l10n/app_localizations.dart';
 import '../models/premium_entitlement.dart';
 import '../models/purchase_result.dart';
 
@@ -132,17 +133,13 @@ class PurchaseService {
 
   /// Verilen productId için abonelik satın alma başlatır.
   /// Kullanıcı iptal ederse [PurchaseOutcome.cancelled] döner.
-  Future<PurchaseOutcome> purchase(String productId) async {
+  Future<PurchaseOutcome> purchase(String productId, {AppLocalizations? l10n}) async {
     if (!_isSupportedPlatform) {
-      return const PurchaseOutcome.error(
-        'Bu platformda satın alma desteklenmiyor.',
-      );
+      return PurchaseOutcome.error(l10n?.purchaseErrorNotSupported ?? 'Bu platformda satın alma desteklenmiyor.');
     }
     final ready = await _waitUntilConfigured();
     if (!ready) {
-      return const PurchaseOutcome.error(
-        'Satın alma servisi henüz hazır değil. Lütfen birkaç saniye sonra tekrar deneyin.',
-      );
+      return PurchaseOutcome.error(l10n?.purchaseErrorUnexpected('Not ready') ?? 'Satın alma servisi henüz hazır değil. Lütfen birkaç saniye sonra tekrar deneyin.');
     }
 
     // Offerings yerine doğrudan getProducts kullanılıyor.
@@ -168,9 +165,7 @@ class PurchaseService {
     }
 
     if (product == null) {
-      return const PurchaseOutcome.error(
-        'Ürün bulunamadı. İnternet bağlantınızı kontrol edin.',
-      );
+      return PurchaseOutcome.error(l10n?.purchaseErrorNotFound ?? 'Ürün bulunamadı. İnternet bağlantınızı kontrol edin.');
     }
 
     try {
@@ -185,17 +180,17 @@ class PurchaseService {
       }
       return active
           ? const PurchaseOutcome.success()
-          : const PurchaseOutcome.error(
-              'Satın alma tamamlandı ancak premium aktif olmadı.',
+          : PurchaseOutcome.error(
+              l10n?.purchaseErrorUnexpected('Activation failed') ?? 'Satın alma tamamlandı ancak premium aktif olmadı.',
             );
     } on PlatformException catch (e) {
       final code = PurchasesErrorHelper.getErrorCode(e);
       if (code == PurchasesErrorCode.purchaseCancelledError) {
         return const PurchaseOutcome.cancelled();
       }
-      return PurchaseOutcome.error(_errorMessage(code));
+      return PurchaseOutcome.error(l10n != null ? _errorMessage(code, l10n) : 'Hata: ${code.name}');
     } catch (e) {
-      return PurchaseOutcome.error('Beklenmedik hata: $e');
+      return PurchaseOutcome.error(l10n?.purchaseErrorUnexpected(e.toString()) ?? 'Beklenmedik hata: $e');
     }
   }
 
@@ -203,17 +198,13 @@ class PurchaseService {
 
   /// Tek seferlik destek ürünü satın alır (Non-Consumable).
   /// Abonelikten farklı olarak doğrudan [productId] ile product fetch eder.
-  Future<PurchaseOutcome> purchaseSupportProduct(String productId) async {
+  Future<PurchaseOutcome> purchaseSupportProduct(String productId, {AppLocalizations? l10n}) async {
     if (!_isSupportedPlatform) {
-      return const PurchaseOutcome.error(
-        'Bu platformda satın alma desteklenmiyor.',
-      );
+      return PurchaseOutcome.error(l10n?.purchaseErrorNotSupported ?? 'Bu platformda satın alma desteklenmiyor.');
     }
     final ready = await _waitUntilConfigured();
     if (!ready) {
-      return const PurchaseOutcome.error(
-        'Destek satın alma servisi henüz hazır değil. Lütfen tekrar deneyin.',
-      );
+      return PurchaseOutcome.error(l10n?.purchaseErrorUnexpected('Not ready') ?? 'Destek satın alma servisi henüz hazır değil. Lütfen tekrar deneyin.');
     }
     try {
       // Billing client bağlantısı configure'dan hemen sonra hazır olmayabilir.
@@ -239,44 +230,37 @@ class PurchaseService {
         if (attempt < 2) await Future<void>.delayed(const Duration(seconds: 2));
       }
       if (products.isEmpty) {
-        return PurchaseOutcome.error(
-          'Ürün bulunamadı [ID: $productId]. '
-          'Mağaza tarafında ürün aktif olmayabilir veya bağlantı sorunu olabilir.',
-        );
+        return PurchaseOutcome.error(l10n?.purchaseErrorNotFound ?? 'Ürün bulunamadı [ID: $productId]. Mağaza tarafında ürün aktif olmayabilir veya bağlantı sorunu olabilir.');
       }
       final result = await Purchases.purchaseStoreProduct(products.first);
       final purchased = result.customerInfo.nonSubscriptionTransactions
           .any((t) => t.productIdentifier == productId);
       return purchased
           ? const PurchaseOutcome.success()
-          : const PurchaseOutcome.error(
-              'Satın alma tamamlandı ancak doğrulanamadı.',
-            );
+          : PurchaseOutcome.error(l10n?.purchaseErrorUnexpected('Verification failed') ?? 'Satın alma tamamlandı ancak doğrulanamadı.');
     } on PlatformException catch (e) {
       final code = PurchasesErrorHelper.getErrorCode(e);
       debugPrint('[PurchaseService] PlatformException: ${e.message} | code: ${code.name}');
       if (code == PurchasesErrorCode.purchaseCancelledError) {
         return const PurchaseOutcome.cancelled();
       }
-      return PurchaseOutcome.error('${_errorMessage(code)} [${code.name}]');
+      return PurchaseOutcome.error(l10n != null ? _errorMessage(code, l10n) : 'Hata: ${code.name}');
     } catch (e) {
       debugPrint('[PurchaseService] Unexpected error: $e');
-      return PurchaseOutcome.error('Hata: $e');
+      return PurchaseOutcome.error(l10n?.purchaseErrorUnexpected(e.toString()) ?? 'Hata: $e');
     }
   }
 
   // ── Restore ───────────────────────────────────────────────────────────────
 
   /// Önceki satın alımları geri yükler.
-  Future<PurchaseOutcome> restorePurchases() async {
+  Future<PurchaseOutcome> restorePurchases({AppLocalizations? l10n}) async {
     if (!_isSupportedPlatform) {
-      return const PurchaseOutcome.error('Bu platformda desteklenmiyor.');
+      return PurchaseOutcome.error(l10n?.purchaseErrorNotSupported ?? 'Bu platformda desteklenmiyor.');
     }
     final ready = await _waitUntilConfigured();
     if (!ready) {
-      return const PurchaseOutcome.error(
-        'Satın alma servisi henüz hazır değil. Lütfen birkaç saniye sonra tekrar deneyin.',
-      );
+      return PurchaseOutcome.error(l10n?.purchaseErrorUnexpected('Not ready') ?? 'Satın alma servisi henüz hazır değil. Lütfen birkaç saniye sonra tekrar deneyin.');
     }
     try {
       final info = await Purchases.restorePurchases();
@@ -284,11 +268,10 @@ class PurchaseService {
           ? const PurchaseOutcome.success()
           : const PurchaseOutcome.notFound();
     } on PlatformException catch (e) {
-      return PurchaseOutcome.error(
-        _errorMessage(PurchasesErrorHelper.getErrorCode(e)),
-      );
+      final code = PurchasesErrorHelper.getErrorCode(e);
+      return PurchaseOutcome.error(l10n != null ? _errorMessage(code, l10n) : 'Ağ hatası veya beklenmedik sorun.');
     } catch (e) {
-      return PurchaseOutcome.error('Beklenmedik hata: $e');
+      return PurchaseOutcome.error(l10n?.purchaseErrorUnexpected(e.toString()) ?? 'Beklenmedik hata: $e');
     }
   }
 
@@ -402,17 +385,19 @@ class PurchaseService {
         .containsKey(RevenueCatIds.premiumEntitlement);
   }
 
-  String _errorMessage(PurchasesErrorCode code) {
+  String _errorMessage(PurchasesErrorCode code, AppLocalizations l10n) {
     return switch (code) {
-      PurchasesErrorCode.networkError =>
-        'Ağ hatası. İnternet bağlantınızı kontrol edin.',
-      PurchasesErrorCode.receiptAlreadyInUseError =>
-        'Bu satın alım başka bir hesaba bağlı.',
-      PurchasesErrorCode.invalidAppUserIdError =>
-        'Geçersiz kullanıcı. Lütfen tekrar giriş yapın.',
-      PurchasesErrorCode.paymentPendingError =>
-        'Ödeme onay bekliyor.',
-      _ => 'Bir sorun oluştu (${code.name}). Lütfen tekrar deneyin.',
+      PurchasesErrorCode.networkError => l10n.purchaseErrorUnexpected('Network error'),
+      PurchasesErrorCode.receiptAlreadyInUseError => l10n.purchaseErrorUnexpected(
+        'Receipt already in use',
+      ),
+      PurchasesErrorCode.invalidAppUserIdError => l10n.purchaseErrorUnexpected(
+        'Invalid app user id',
+      ),
+      PurchasesErrorCode.paymentPendingError => l10n.purchaseErrorUnexpected(
+        'Payment pending',
+      ),
+      _ => l10n.purchaseErrorUnexpected(code.name),
     };
   }
 

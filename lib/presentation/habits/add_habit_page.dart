@@ -283,7 +283,7 @@ class _AddHabitPageState extends ConsumerState<AddHabitPage>
         leading: TextButton(
           onPressed: _saving ? null : () => context.pop(),
           child: Text(
-            'İptal',
+            l10n.addHabitCancel,
             style: AppTextStyles.labelLarge.copyWith(
               color: AppColors.shellOnCanvasPrimary(context)
                   .withValues(alpha: 0.88),
@@ -292,7 +292,7 @@ class _AddHabitPageState extends ConsumerState<AddHabitPage>
         ),
         leadingWidth: 72,
         title: Text(
-          'Özel',
+          l10n.addHabitCustom,
           style: AppTextStyles.titleMedium.copyWith(
             color: AppColors.shellOnCanvasPrimary(context),
             fontWeight: FontWeight.w600,
@@ -311,7 +311,7 @@ class _AddHabitPageState extends ConsumerState<AddHabitPage>
                     ),
                   )
                 : Text(
-                    'Kaydet',
+                    l10n.addHabitSave,
                     style: AppTextStyles.labelLarge.copyWith(
                       color: _accent,
                       fontWeight: FontWeight.w800,
@@ -406,15 +406,15 @@ class _AddHabitPageState extends ConsumerState<AddHabitPage>
                       decoration: _inputDeco(
                         context,
                         hint: isGelisim
-                            ? 'Örn: 30 dakika kitap okuma'
-                            : 'Örn: Gereksiz ekran süresini azalt',
+                            ? l10n.addHabitGrowthHint
+                            : l10n.addHabitPurificationHint,
                       ),
                       validator: (v) {
                         if (v == null || v.trim().isEmpty) {
-                          return 'İsim gerekli';
+                          return l10n.addHabitNameRequired;
                         }
                         if (v.trim().length > 60) {
-                          return 'En fazla 60 karakter';
+                          return l10n.addHabitNameTooLong;
                         }
                         return null;
                       },
@@ -436,7 +436,7 @@ class _AddHabitPageState extends ConsumerState<AddHabitPage>
                     _SummaryExpandTile(
                       accent: _accent,
                       expanded: _goalPickerOpen,
-                      summaryText: _goalSummaryLine(),
+                      summaryText: _goalSummaryLine(context),
                       onTap: () {
                         HapticFeedback.selectionClick();
                         setState(() => _goalPickerOpen = !_goalPickerOpen);
@@ -454,10 +454,10 @@ class _AddHabitPageState extends ConsumerState<AddHabitPage>
                                 amountController: _amountController,
                                 unitController: _unitController,
                                 maxAmount: _maxAmountForUnit,
-                                units: _wheelUnits,
+                                units: _getWheelUnits(context),
                                 onAmountChanged: (_) => setState(() {}),
                                 onUnitChanged: (i) {
-                                  setState(() => _onUnitChanged(i));
+                                  setState(() => _onUnitChanged(i, context));
                                 },
                               ),
                             )
@@ -466,7 +466,7 @@ class _AddHabitPageState extends ConsumerState<AddHabitPage>
                     const SizedBox(height: 18),
                     _RepeatCycleSummaryTile(
                       accent: _accent,
-                      label: _repeatLabels[_repeatCycle.clamp(0, 2)],
+                      label: _getRepeatLabels(context)[_repeatCycle.clamp(0, 2)],
                       onTap: _openRepeatCycleSheet,
                     ),
                   ],
@@ -483,9 +483,9 @@ class _AddHabitPageState extends ConsumerState<AddHabitPage>
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const _FieldLabel(
+                    _FieldLabel(
                       icon: Icons.note_outlined,
-                      text: 'Not (isteğe bağlı)',
+                      text: l10n.addHabitNoteOptional,
                     ),
                     const SizedBox(height: 10),
                     TextFormField(
@@ -496,7 +496,7 @@ class _AddHabitPageState extends ConsumerState<AddHabitPage>
                         color: AppColors.shellOnCanvasPrimary(context),
                       ),
                       decoration:
-                          _inputDeco(context, hint: 'Kendine kısa bir not…'),
+                          _inputDeco(context, hint: l10n.addHabitNoteHint),
                     ),
                   ],
                 ),

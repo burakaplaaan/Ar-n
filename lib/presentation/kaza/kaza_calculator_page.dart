@@ -6,6 +6,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:arin/l10n/app_localizations.dart';
 
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_text_styles.dart';
@@ -119,7 +120,7 @@ class _KazaCalculatorPageState extends ConsumerState<KazaCalculatorPage> {
                     ),
                     const SizedBox(height: 14),
                     Text(
-                      'Doğum tarihi',
+                      AppLocalizations.of(context)!.kazaCalcBirthDate,
                       style: AppTextStyles.titleSmall.copyWith(
                         color: AppColors.creamBase,
                         fontWeight: FontWeight.w700,
@@ -182,7 +183,7 @@ class _KazaCalculatorPageState extends ConsumerState<KazaCalculatorPage> {
                             ),
                           ),
                           child: Text(
-                            'Uygula',
+                            AppLocalizations.of(context)!.kazaCalcApply,
                             style: AppTextStyles.labelLarge.copyWith(
                               color: const Color(0xFF052E16),
                               fontWeight: FontWeight.w800,
@@ -208,11 +209,11 @@ class _KazaCalculatorPageState extends ConsumerState<KazaCalculatorPage> {
       builder: (ctx) => AlertDialog(
         backgroundColor: AppColors.anthraciteMid,
         title: Text(
-          'Sayaçları güncelle?',
+          AppLocalizations.of(context)!.kazaCalcUpdateCounters,
           style: AppTextStyles.titleSmall.copyWith(color: AppColors.creamBase),
         ),
         content: Text(
-          'Mevcut kaza sayıların silinip hesaplanan değerlerle değiştirilecek.',
+          AppLocalizations.of(context)!.kazaCalcUpdateDesc,
           style: AppTextStyles.bodySmall.copyWith(
             color: AppColors.textOnDarkMuted,
             height: 1.45,
@@ -221,16 +222,16 @@ class _KazaCalculatorPageState extends ConsumerState<KazaCalculatorPage> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: const Text(
-              'İptal',
-              style: TextStyle(color: AppColors.textOnDarkMuted),
+            child: Text(
+              AppLocalizations.of(context)!.kazaCalcCancel,
+              style: const TextStyle(color: AppColors.textOnDarkMuted),
             ),
           ),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
-            child: const Text(
-              'Devam',
-              style: TextStyle(
+            child: Text(
+              AppLocalizations.of(context)!.kazaCalcContinue,
+              style: const TextStyle(
                 color: AppColors.accentNeonGreen,
                 fontWeight: FontWeight.w700,
               ),
@@ -260,8 +261,7 @@ class _KazaCalculatorPageState extends ConsumerState<KazaCalculatorPage> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            'Buluğ tarihi bugünden sonra olamaz. Doğum tarihini veya buluğ yaşını '
-            'kontrol et.',
+            AppLocalizations.of(context)!.kazaCalcErrorPubertyFuture,
             style: AppTextStyles.bodySmall.copyWith(color: AppColors.creamBase),
           ),
           backgroundColor: AppColors.anthraciteMid,
@@ -291,8 +291,7 @@ class _KazaCalculatorPageState extends ConsumerState<KazaCalculatorPage> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            'Kalan namaz 0: tam kılınan gün, borçlu güne eşit veya fazlaysa üst sınıra '
-            'çekilir; 6 vakit sayacı da buna göre sıfır kalır.',
+            AppLocalizations.of(context)!.kazaCalcErrorZeroRemaining,
             style: AppTextStyles.bodySmall.copyWith(color: AppColors.creamBase),
           ),
           backgroundColor: AppColors.anthraciteMid,
@@ -332,7 +331,7 @@ class _KazaCalculatorPageState extends ConsumerState<KazaCalculatorPage> {
                     ),
                     Expanded(
                       child: Text(
-                        'Kaza takibi',
+                        AppLocalizations.of(context)!.kazaCalcTitle,
                         textAlign: TextAlign.center,
                         style: AppTextStyles.titleMedium.copyWith(
                           color: AppColors.creamBase,
@@ -354,7 +353,7 @@ class _KazaCalculatorPageState extends ConsumerState<KazaCalculatorPage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Kaza namazı takibi',
+                            AppLocalizations.of(context)!.kazaCalcSubtitle,
                             style: AppTextStyles.titleSmall.copyWith(
                               color: AppColors.creamBase,
                               fontWeight: FontWeight.w800,
@@ -363,10 +362,7 @@ class _KazaCalculatorPageState extends ConsumerState<KazaCalculatorPage> {
                           ),
                           const SizedBox(height: 10),
                           Text(
-                            'Farz namazlar buluğ çağından itibaren başlar. Tam yaşını '
-                            'bilmiyorsan erkeklerde 12, kadınlarda 9 yaşını referans '
-                            'alabilirsin. Bu ekran tahmini bir sayı üretir; kaza '
-                            'namazlarını vakit namazlarından sonra kılmaya devam et.',
+                            AppLocalizations.of(context)!.kazaCalcDesc,
                             style: AppTextStyles.bodySmall.copyWith(
                               color: AppColors.textOnDarkMuted,
                               height: 1.5,
@@ -374,8 +370,7 @@ class _KazaCalculatorPageState extends ConsumerState<KazaCalculatorPage> {
                           ),
                           const SizedBox(height: 12),
                           Text(
-                            'Kadınlar için: buluğdan bugüne kadar geçen her takvim ayı '
-                            'için yaklaşık 6 gün namazdan muaf sayılır (toplam günü geçmez).',
+                            AppLocalizations.of(context)!.kazaCalcFemaleNote,
                             style: AppTextStyles.labelSmall.copyWith(
                               color: AppColors.accentNeonGreen
                                   .withValues(alpha: 0.85),
@@ -385,9 +380,7 @@ class _KazaCalculatorPageState extends ConsumerState<KazaCalculatorPage> {
                           ),
                           const SizedBox(height: 10),
                           Text(
-                            'Formül: borçlu gün = takvim günü − hayız muafiyeti; '
-                            'toplam namaz = borçlu gün × 6 − (tam kılınan gün × 6). '
-                            'Kılınan gün sayısı borçlu günü aşamaz.',
+                            AppLocalizations.of(context)!.kazaCalcFormula,
                             style: AppTextStyles.labelSmall.copyWith(
                               color: AppColors.textOnDarkMuted
                                   .withValues(alpha: 0.88),
@@ -411,7 +404,7 @@ class _KazaCalculatorPageState extends ConsumerState<KazaCalculatorPage> {
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
                           Text(
-                            'Kaza namazı hesapla',
+                            AppLocalizations.of(context)!.kazaCalcCalculateTitle,
                             textAlign: TextAlign.center,
                             style: AppTextStyles.titleSmall.copyWith(
                               color: AppColors.creamBase,
@@ -420,7 +413,7 @@ class _KazaCalculatorPageState extends ConsumerState<KazaCalculatorPage> {
                           ),
                           const SizedBox(height: 20),
                           Text(
-                            'Cinsiyetiniz',
+                            AppLocalizations.of(context)!.kazaCalcGender,
                             textAlign: TextAlign.center,
                             style: AppTextStyles.labelSmall.copyWith(
                               color: AppColors.textOnDarkMuted,
@@ -432,7 +425,7 @@ class _KazaCalculatorPageState extends ConsumerState<KazaCalculatorPage> {
                             children: [
                               Expanded(
                                 child: _GenderChip(
-                                  label: 'Erkek',
+                                  label: AppLocalizations.of(context)!.kazaCalcMale,
                                   selected: !_isFemale,
                                   onTap: () =>
                                       setState(() => _isFemale = false),
@@ -441,7 +434,7 @@ class _KazaCalculatorPageState extends ConsumerState<KazaCalculatorPage> {
                               const SizedBox(width: 12),
                               Expanded(
                                 child: _GenderChip(
-                                  label: 'Kadın',
+                                  label: AppLocalizations.of(context)!.kazaCalcFemale,
                                   selected: _isFemale,
                                   onTap: () =>
                                       setState(() => _isFemale = true),
@@ -451,7 +444,7 @@ class _KazaCalculatorPageState extends ConsumerState<KazaCalculatorPage> {
                           ),
                           const SizedBox(height: 22),
                           Text(
-                            'Doğum tarihiniz',
+                            AppLocalizations.of(context)!.kazaCalcBirthDateTitle,
                             textAlign: TextAlign.center,
                             style: AppTextStyles.labelSmall.copyWith(
                               color: AppColors.textOnDarkMuted,
@@ -490,7 +483,7 @@ class _KazaCalculatorPageState extends ConsumerState<KazaCalculatorPage> {
                           ),
                           const SizedBox(height: 22),
                           Text(
-                            'Buluğ çaşına girdiğiniz yaş',
+                            AppLocalizations.of(context)!.kazaCalcPubertyAge,
                             textAlign: TextAlign.center,
                             style: AppTextStyles.labelSmall.copyWith(
                               color: AppColors.textOnDarkMuted,
@@ -499,8 +492,7 @@ class _KazaCalculatorPageState extends ConsumerState<KazaCalculatorPage> {
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            'Alt sınır: erkek 12, kadın 9 yaş (daha küçük girilirse '
-                            'hesapta $minPuberty kullanılır).',
+                            AppLocalizations.of(context)!.kazaCalcPubertyNote.replaceAll('{minPuberty}', '$minPuberty'),
                             textAlign: TextAlign.center,
                             style: AppTextStyles.labelSmall.copyWith(
                               color: AppColors.textOnDarkMuted
@@ -517,7 +509,7 @@ class _KazaCalculatorPageState extends ConsumerState<KazaCalculatorPage> {
                           ),
                           const SizedBox(height: 22),
                           Text(
-                            'Kaç gün namaz kıldınız?',
+                            AppLocalizations.of(context)!.kazaCalcPrayedDays,
                             textAlign: TextAlign.center,
                             style: AppTextStyles.labelSmall.copyWith(
                               color: AppColors.textOnDarkMuted,
@@ -526,8 +518,7 @@ class _KazaCalculatorPageState extends ConsumerState<KazaCalculatorPage> {
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            'Bugüne kadar, o gün içinde bütün vakitleri kıldığın '
-                            'toplam gün sayısı.',
+                            AppLocalizations.of(context)!.kazaCalcPrayedDaysNote,
                             textAlign: TextAlign.center,
                             style: AppTextStyles.labelSmall.copyWith(
                               color: AppColors.textOnDarkMuted
@@ -551,7 +542,7 @@ class _KazaCalculatorPageState extends ConsumerState<KazaCalculatorPage> {
                           ),
                           const SizedBox(height: 22),
                           KazaPrimaryButton(
-                            label: 'Hesapla',
+                            label: AppLocalizations.of(context)!.kazaCalcCalculate,
                             onPressed: _onCalculate,
                           ),
                         ],
@@ -616,7 +607,7 @@ class _LiveCalculationSummary extends StatelessWidget {
           ),
         ),
         child: Text(
-          'Buluğ tarihi bugünden sonra olamaz; doğum ve buluğ yaşını kontrol et.',
+          AppLocalizations.of(context)!.kazaCalcLiveError,
           style: AppTextStyles.labelSmall.copyWith(
             color: AppColors.textOnDarkMuted,
             height: 1.4,
@@ -625,11 +616,12 @@ class _LiveCalculationSummary extends StatelessWidget {
       );
     }
 
+    final l10n = AppLocalizations.of(context)!;
     final hayizLine = r.hayizExemptDays > 0
-        ? 'Hayız muafiyeti: −${r.hayizExemptDays} gün\n'
+        ? l10n.kazaCalcLiveHayiz.replaceAll('{days}', '${r.hayizExemptDays}')
         : '';
     final appliedNote = r.prayedFullDaysInput != r.prayedFullDaysApplied
-        ? '\n(Tam kılınan gün üst sınır: ${r.prayedFullDaysApplied})'
+        ? l10n.kazaCalcLiveApplied.replaceAll('{applied}', '${r.prayedFullDaysApplied}')
         : '';
 
     return Container(
@@ -646,7 +638,7 @@ class _LiveCalculationSummary extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Canlı özet',
+            l10n.kazaCalcLiveSummary,
             style: AppTextStyles.labelSmall.copyWith(
               color: AppColors.accentNeonGreen,
               fontWeight: FontWeight.w800,
@@ -655,15 +647,12 @@ class _LiveCalculationSummary extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            'Takvim günü: ${r.inclusiveCalendarDays}\n'
-            '$hayizLine'
-            'Borçlu gün: ${r.effectiveLiableDays}\n'
-            'Namaz borcu (borçlu gün × ${KazaCalculator.prayersPerLiableDay}): '
-            '${r.totalPrayersOwed}\n'
-            'Düşülen (tam gün × ${KazaCalculator.prayersPerLiableDay}): '
-            '${r.prayersCredited}$appliedNote\n'
-            '—\n'
-            'Kalan toplam: ${r.remainingPrayers} namaz',
+            l10n.kazaCalcLiveCalendarDays.replaceAll('{days}', '${r.inclusiveCalendarDays}') +
+            hayizLine +
+            l10n.kazaCalcLiveLiableDays.replaceAll('{days}', '${r.effectiveLiableDays}') +
+            l10n.kazaCalcLiveOwed.replaceAll('{perDay}', '${KazaCalculator.prayersPerLiableDay}').replaceAll('{total}', '${r.totalPrayersOwed}') +
+            l10n.kazaCalcLiveCredited.replaceAll('{perDay}', '${KazaCalculator.prayersPerLiableDay}').replaceAll('{credited}', '${r.prayersCredited}').replaceAll('{appliedNote}', appliedNote) +
+            l10n.kazaCalcLiveRemaining.replaceAll('{remaining}', '${r.remainingPrayers}'),
             style: AppTextStyles.bodySmall.copyWith(
               color: AppColors.creamBase.withValues(alpha: 0.92),
               height: 1.48,
@@ -673,7 +662,7 @@ class _LiveCalculationSummary extends StatelessWidget {
           if (r.remainingPrayers == 0) ...[
             const SizedBox(height: 10),
             Text(
-              'Hesapla sonrası sayaç: kalan toplam 6 vakte bölünür; kalan 0 ise her vakit 0 kalır.',
+              l10n.kazaCalcLiveZeroNote,
               style: AppTextStyles.labelSmall.copyWith(
                 color: AppColors.textOnDarkMuted.withValues(alpha: 0.95),
                 height: 1.42,

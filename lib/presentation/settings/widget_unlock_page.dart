@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:arin/l10n/app_localizations.dart';
 
 import '../../core/ads/admob_ids.dart';
 import '../../core/constants/app_colors.dart';
@@ -22,7 +23,8 @@ class WidgetUnlockPage extends ConsumerStatefulWidget {
 class _WidgetUnlockPageState extends ConsumerState<WidgetUnlockPage> {
   bool _busy = false;
 
-  Future<void> _watchAd() async {
+  Future<void> _watchAd(BuildContext context) async {
+    final l10n = AppLocalizations.of(context)!;
     setState(() => _busy = true);
     try {
       final ok = await ref
@@ -31,8 +33,8 @@ class _WidgetUnlockPageState extends ConsumerState<WidgetUnlockPage> {
       if (!mounted) return;
       if (!ok) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Reklam şu an yüklenemedi, daha sonra tekrar dene.'),
+          SnackBar(
+            content: Text(l10n.widgetUnlockAdLoadFailed),
           ),
         );
         return;
@@ -42,9 +44,17 @@ class _WidgetUnlockPageState extends ConsumerState<WidgetUnlockPage> {
       final premium = await ref.read(premiumEntitlementProvider.future);
       await service.syncAll(isPremium: premium.isActive);
       if (!mounted) return;
+      
+      final kindTitle = switch (widget.kind) {
+        ArinWidgetAccessKind.quote => l10n.widgetUnlockQuoteTitle,
+        ArinWidgetAccessKind.prayer => l10n.widgetUnlockPrayerTitle,
+        ArinWidgetAccessKind.combo => l10n.widgetUnlockComboTitle,
+        ArinWidgetAccessKind.tracking => l10n.widgetUnlockTrackingTitle,
+      };
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('${widget.kind.title} 24 saat açıldı! 🎉'),
+          content: Text(l10n.widgetUnlockSuccessTitle(kindTitle)),
           duration: const Duration(seconds: 4),
         ),
       );
@@ -54,7 +64,8 @@ class _WidgetUnlockPageState extends ConsumerState<WidgetUnlockPage> {
     }
   }
 
-  Future<void> _goPremium() async {
+  Future<void> _goPremium(BuildContext context) async {
+    final l10n = AppLocalizations.of(context)!;
     setState(() => _busy = true);
     try {
       await context.push(AppRoutes.premium);
@@ -65,9 +76,9 @@ class _WidgetUnlockPageState extends ConsumerState<WidgetUnlockPage> {
         await service.syncAll(isPremium: true);
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Premium aktif! Tüm widgetlar açıldı. 🎉'),
-            duration: Duration(seconds: 4),
+          SnackBar(
+            content: Text(l10n.widgetUnlockPremiumSuccess),
+            duration: const Duration(seconds: 4),
           ),
         );
         context.pop();
@@ -79,6 +90,14 @@ class _WidgetUnlockPageState extends ConsumerState<WidgetUnlockPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final kindTitle = switch (widget.kind) {
+      ArinWidgetAccessKind.quote => l10n.widgetUnlockQuoteTitle,
+      ArinWidgetAccessKind.prayer => l10n.widgetUnlockPrayerTitle,
+      ArinWidgetAccessKind.combo => l10n.widgetUnlockComboTitle,
+      ArinWidgetAccessKind.tracking => l10n.widgetUnlockTrackingTitle,
+    };
+
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: DecoratedBox(
@@ -129,7 +148,7 @@ class _WidgetUnlockPageState extends ConsumerState<WidgetUnlockPage> {
                       ),
                       const SizedBox(height: 24),
                       Text(
-                        widget.kind.title,
+                        kindTitle,
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 22,
@@ -140,8 +159,7 @@ class _WidgetUnlockPageState extends ConsumerState<WidgetUnlockPage> {
                       ),
                       const SizedBox(height: 10),
                       Text(
-                        'Bu widgetı 24 saat açmak için kısa bir reklam izleyebilirsin. '
-                        'Kalıcı erişim için Premium\'a geç.',
+                        l10n.widgetUnlockDescription,
                         style: TextStyle(
                           color: Colors.white.withValues(alpha: 0.65),
                           fontSize: 14,
@@ -153,7 +171,7 @@ class _WidgetUnlockPageState extends ConsumerState<WidgetUnlockPage> {
                       SizedBox(
                         width: double.infinity,
                         child: FilledButton.icon(
-                          onPressed: _busy ? null : _watchAd,
+                          onPressed: _busy ? null : () => _watchAd(context),
                           icon: _busy
                               ? const SizedBox(
                                   width: 18,
@@ -164,7 +182,7 @@ class _WidgetUnlockPageState extends ConsumerState<WidgetUnlockPage> {
                                   ),
                                 )
                               : const Icon(Icons.play_circle_outline_rounded),
-                          label: const Text('Reklam izle — 24 saat aç'),
+                          label: Text(l10n.widgetUnlockAdButton),
                           style: FilledButton.styleFrom(
                             backgroundColor: AppColors.emeraldLight,
                             foregroundColor: const Color(0xFF071815),
@@ -183,9 +201,9 @@ class _WidgetUnlockPageState extends ConsumerState<WidgetUnlockPage> {
                       SizedBox(
                         width: double.infinity,
                         child: OutlinedButton.icon(
-                          onPressed: _busy ? null : _goPremium,
+                          onPressed: _busy ? null : () => _goPremium(context),
                           icon: const Icon(Icons.star_rounded),
-                          label: const Text('Premium\'a geç'),
+                          label: Text(l10n.widgetUnlockPremiumButton),
                           style: OutlinedButton.styleFrom(
                             foregroundColor: const Color(0xFF9BE7C3),
                             side: const BorderSide(
@@ -207,7 +225,7 @@ class _WidgetUnlockPageState extends ConsumerState<WidgetUnlockPage> {
                       TextButton(
                         onPressed: _busy ? null : () => context.pop(),
                         child: Text(
-                          'Şimdi değil',
+                          l10n.widgetUnlockCancelButton,
                           style: TextStyle(
                             color: Colors.white.withValues(alpha: 0.4),
                             fontSize: 14,

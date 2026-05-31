@@ -9,7 +9,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geocoding/geocoding.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:arin/l10n/app_localizations.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:hive/hive.dart';
 import '../../core/utils/hive_boxes.dart';

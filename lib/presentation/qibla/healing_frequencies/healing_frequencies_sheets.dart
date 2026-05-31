@@ -8,6 +8,8 @@ import '../../../core/localization/locale_text.dart';
 import '../../../core/providers/shared_preferences_provider.dart';
 import 'healing_audio_notifier.dart';
 
+import 'package:arin/l10n/app_localizations.dart';
+
 Future<void> showHealingAmbientSheet(
   BuildContext context,
   WidgetRef ref,
@@ -39,12 +41,15 @@ class _AmbientSheetState extends State<_AmbientSheet> {
   late String _category;
   late String _previewKey;
 
-  List<({String key, String label})> _chips(BuildContext context) => <({String key, String label})>[
-    (key: kHealingAmbientForest, label: trEnAr(context, tr: 'Orman', en: 'Forest', ar: 'غابة')),
-    (key: kHealingAmbientFire, label: trEnAr(context, tr: 'Ateş', en: 'Fire', ar: 'نار')),
-    (key: kHealingAmbientEvren, label: trEnAr(context, tr: 'Evren', en: 'Cosmic', ar: 'كون')),
-    (key: kHealingAmbientInshirah, label: trEnAr(context, tr: 'İnşirah', en: 'Inshirah', ar: 'الشرح')),
-  ];
+  List<({String key, String label})> _chips(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    return <({String key, String label})>[
+      (key: kHealingAmbientForest, label: l10n.healingAmbientForestShort),
+      (key: kHealingAmbientFire, label: l10n.healingAmbientFireShort),
+      (key: kHealingAmbientEvren, label: l10n.healingAmbientCosmicShort),
+      (key: kHealingAmbientInshirah, label: l10n.healingAmbientInshirahShort),
+    ];
+  }
 
   @override
   void initState() {
@@ -54,17 +59,18 @@ class _AmbientSheetState extends State<_AmbientSheet> {
   }
 
   String _displayFor(String key) {
+    final l10n = AppLocalizations.of(context)!;
     switch (key) {
       case kHealingAmbientForest:
-        return trEnAr(context, tr: 'Orman Sesi', en: 'Forest Sound', ar: 'صوت الغابة');
+        return l10n.healingAmbientForest;
       case kHealingAmbientFire:
-        return trEnAr(context, tr: 'Ateş Sesi', en: 'Fire Sound', ar: 'صوت النار');
+        return l10n.healingAmbientFire;
       case kHealingAmbientEvren:
-        return trEnAr(context, tr: 'Evren Sesi', en: 'Cosmic Sound', ar: 'صوت الكون');
+        return l10n.healingAmbientCosmic;
       case kHealingAmbientInshirah:
-        return trEnAr(context, tr: 'İnşirah Suresi', en: 'Surah Al-Inshirah', ar: 'سورة الشرح');
+        return l10n.healingAmbientInshirah;
       default:
-        return trEnAr(context, tr: 'Orman Sesi', en: 'Forest Sound', ar: 'صوت الغابة');
+        return l10n.healingAmbientForest;
     }
   }
 
@@ -111,12 +117,7 @@ class _AmbientSheetState extends State<_AmbientSheet> {
             Padding(
               padding: EdgeInsets.fromLTRB(20, 18, 20, 8),
               child: Text(
-                trEnAr(
-                  context,
-                  tr: 'Ambiyans Sesi Seçin',
-                  en: 'Choose Ambient Sound',
-                  ar: 'اختر صوت الخلفية',
-                ),
+                l10n.healingAmbientChoose,
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 18,
@@ -262,22 +263,12 @@ class _SleepTimerSheet extends StatelessWidget {
                       side: BorderSide(color: Colors.white.withValues(alpha: 0.2)),
                     ),
                     child: Text(
-                      trEnAr(
-                        context,
-                        tr: 'İptal',
-                        en: 'Cancel',
-                        ar: 'إلغاء',
-                      ),
+                      l10n.healingSleepCancel,
                     ),
                   ),
                   Expanded(
                     child: Text(
-                      trEnAr(
-                        context,
-                        tr: 'Uyku Zamanlayıcı',
-                        en: 'Sleep Timer',
-                        ar: 'مؤقت النوم',
-                      ),
+                      l10n.healingSleepTimer,
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         color: Colors.white,
@@ -293,12 +284,7 @@ class _SleepTimerSheet extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.fromLTRB(20, 8, 20, 16),
               child: Text(
-                trEnAr(
-                  context,
-                  tr: 'Kaç dakika sonra durdurulsun?',
-                  en: 'Stop after how many minutes?',
-                  ar: 'بعد كم دقيقة يتوقف؟',
-                ),
+                l10n.healingSleepStopAfter,
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: Colors.white.withValues(alpha: 0.55),
@@ -327,12 +313,7 @@ class _SleepTimerSheet extends StatelessWidget {
                         const SizedBox(width: 12),
                         Expanded(
                           child: Text(
-                            trEnAr(
-                              context,
-                              tr: 'Zamanlayıcı kapalı',
-                              en: 'Timer off',
-                              ar: 'المؤقت متوقف',
-                            ),
+                            AppLocalizations.of(context)!.healingSleepTimerOff,
                             style: TextStyle(
                               color: Colors.white.withValues(alpha: 0.85),
                               fontSize: 16,
@@ -370,12 +351,7 @@ class _SleepTimerSheet extends StatelessWidget {
                           const SizedBox(width: 12),
                           Expanded(
                             child: Text(
-                              trEnAr(
-                                context,
-                                tr: '$m Dakika',
-                                en: '$m Minutes',
-                                ar: '$m دقيقة',
-                              ),
+                              AppLocalizations.of(context)!.healingSleepMinutes(m),
                               style: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 16,

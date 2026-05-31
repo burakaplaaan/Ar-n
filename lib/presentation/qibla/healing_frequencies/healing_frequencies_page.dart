@@ -16,6 +16,8 @@ import '../../shared/providers/quote_pool_content_providers.dart';
 import 'healing_freq_catalog.dart';
 import 'healing_frequencies_sheets.dart';
 
+import 'package:arin/l10n/app_localizations.dart';
+
 class HealingFrequenciesPage extends ConsumerStatefulWidget {
   const HealingFrequenciesPage({super.key});
 
@@ -45,36 +47,33 @@ class _HealingFrequenciesPageState extends ConsumerState<HealingFrequenciesPage>
     }
   }
 
-  String _ambientLabel(String key) {
+  String _ambientLabel(BuildContext context, String key) {
+    final l10n = AppLocalizations.of(context)!;
     switch (key) {
       case kHealingAmbientForest:
-        return trEnAr(context, tr: 'Orman Sesi', en: 'Forest Sound', ar: 'صوت الغابة');
+        return l10n.healingAmbientForest;
       case kHealingAmbientFire:
-        return trEnAr(context, tr: 'Ateş Sesi', en: 'Fire Sound', ar: 'صوت النار');
+        return l10n.healingAmbientFire;
       case kHealingAmbientEvren:
-        return trEnAr(context, tr: 'Evren Sesi', en: 'Cosmic Sound', ar: 'صوت الكون');
+        return l10n.healingAmbientCosmic;
       case kHealingAmbientInshirah:
-        return trEnAr(context, tr: 'İnşirah Suresi', en: 'Surah Al-Inshirah', ar: 'سورة الشرح');
+        return l10n.healingAmbientInshirah;
       default:
-        return trEnAr(context, tr: 'Orman Sesi', en: 'Forest Sound', ar: 'صوت الغابة');
+        return l10n.healingAmbientForest;
     }
   }
 
-  String _sleepRowSubtitle(HealingAudioState s) {
+  String _sleepRowSubtitle(BuildContext context, HealingAudioState s) {
+    final l10n = AppLocalizations.of(context)!;
     final m = s.selectedSleepMinutes;
-    if (m == null) return trEnAr(context, tr: 'Kapalı', en: 'Off', ar: 'متوقف');
+    if (m == null) return l10n.healingSleepOff;
     if (s.isPlaying && s.sleepEndsAt != null) {
       final left = s.sleepEndsAt!.difference(DateTime.now());
       if (!left.isNegative) {
-        return '${trEnAr(context, tr: 'Kalan ', en: 'Remaining ', ar: 'المتبقي ')}${_fmtMmSs(left)}';
+        return '${l10n.healingSleepRemaining}${_fmtMmSs(left)}';
       }
     }
-    return trEnAr(
-      context,
-      tr: '$m dakika',
-      en: '$m minutes',
-      ar: '$m دقيقة',
-    );
+    return l10n.healingSleepMinutes(m);
   }
 
   double _progress(HealingAudioState s) {
@@ -111,6 +110,7 @@ class _HealingFrequenciesPageState extends ConsumerState<HealingFrequenciesPage>
   }
 
   Future<void> _showInfo() async {
+    final l10n = AppLocalizations.of(context)!;
     await showDialog<void>(
       context: context,
       barrierColor: Colors.black.withValues(alpha: 0.62),
@@ -174,12 +174,7 @@ class _HealingFrequenciesPageState extends ConsumerState<HealingFrequenciesPage>
                         const SizedBox(width: 10),
                         Expanded(
                           child: Text(
-                            trEnAr(
-                              context,
-                              tr: 'Bilgi',
-                              en: 'Info',
-                              ar: 'معلومات',
-                            ),
+                            l10n.healingInfoTitle,
                             style: TextStyle(
                               color: Colors.white,
                               fontWeight: FontWeight.w800,
@@ -192,12 +187,7 @@ class _HealingFrequenciesPageState extends ConsumerState<HealingFrequenciesPage>
                     ),
                     const SizedBox(height: 12),
                     Text(
-                      trEnAr(
-                        context,
-                        tr: 'Bu bölüm rahatlama ve tefekkür için tasarlanmıştır; tıbbi tedavi yerine geçmez. Sesleri düşük seviyede dinlemeniz önerilir. Rahatsızlık hissederseniz durdurun.',
-                        en: 'This section is for relaxation and reflection; it is not a medical treatment. Listen at low volume. Stop if you feel discomfort.',
-                        ar: 'هذا القسم للاسترخاء والتأمل وليس بديلاً عن العلاج الطبي. يُنصح بالاستماع بصوت منخفض. أوقفه إذا شعرت بعدم الارتياح.',
-                      ),
+                      l10n.healingInfoBody,
                       style: TextStyle(
                         color: Colors.white.withValues(alpha: 0.78),
                         height: 1.5,
@@ -216,14 +206,7 @@ class _HealingFrequenciesPageState extends ConsumerState<HealingFrequenciesPage>
                             fontSize: 15,
                           ),
                         ),
-                        child: Text(
-                          trEnAr(
-                            context,
-                            tr: 'Tamam',
-                            en: 'OK',
-                            ar: 'حسنًا',
-                          ),
-                        ),
+                        child: Text(l10n.healingInfoOk),
                       ),
                     ),
                   ],
@@ -238,6 +221,7 @@ class _HealingFrequenciesPageState extends ConsumerState<HealingFrequenciesPage>
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final s = ref.watch(healingAudioNotifierProvider);
     final n = ref.read(healingAudioNotifierProvider.notifier);
     final hz = s.hz;
@@ -271,12 +255,7 @@ class _HealingFrequenciesPageState extends ConsumerState<HealingFrequenciesPage>
                         child: Column(
                           children: [
                             Text(
-                              trEnAr(
-                                context,
-                                tr: 'İyileştirici Frekanslar',
-                                en: 'Healing Frequencies',
-                                ar: 'الترددات العلاجية',
-                              ),
+                              l10n.healingFrequenciesTitle,
                               textAlign: TextAlign.center,
                               style: TextStyle(
                                 color: Colors.white,
@@ -339,13 +318,8 @@ class _HealingFrequenciesPageState extends ConsumerState<HealingFrequenciesPage>
                       const _VerseCard(teal: teal),
                       const SizedBox(height: 22),
                       _AmbientRow(
-                        label: trEnAr(
-                          context,
-                          tr: 'Ambiyans Sesi',
-                          en: 'Ambient Sound',
-                          ar: 'صوت الخلفية',
-                        ),
-                        value: _ambientLabel(s.ambientKey),
+                        label: l10n.healingAmbientSound,
+                        value: _ambientLabel(context, s.ambientKey),
                         onTap: () async {
                           HapticFeedback.lightImpact();
                           await _pauseIfPlaying();
@@ -360,12 +334,7 @@ class _HealingFrequenciesPageState extends ConsumerState<HealingFrequenciesPage>
                       Align(
                         alignment: Alignment.centerLeft,
                         child: Text(
-                          trEnAr(
-                            context,
-                            tr: 'ÖNAYARLAR',
-                            en: 'PRESETS',
-                            ar: 'إعدادات مسبقة',
-                          ),
+                          l10n.healingPresets,
                           style: TextStyle(
                             color: Colors.white.withValues(alpha: 0.45),
                             fontSize: 11,
@@ -411,12 +380,7 @@ class _HealingFrequenciesPageState extends ConsumerState<HealingFrequenciesPage>
                       const SizedBox(height: 22),
                       _VolumeSlider(
                         icon: Icons.graphic_eq_rounded,
-                        label: trEnAr(
-                          context,
-                          tr: 'Frekans tonu (Hz)',
-                          en: 'Frequency tone (Hz)',
-                          ar: 'نغمة التردد (Hz)',
-                        ),
+                        label: l10n.healingFrequencyTone,
                         value: s.toneVolume01,
                         tint: teal,
                         trailingPct: '${(s.toneVolume01 * 100).round()}%',
@@ -427,12 +391,7 @@ class _HealingFrequenciesPageState extends ConsumerState<HealingFrequenciesPage>
                       const SizedBox(height: 14),
                       _VolumeSlider(
                         icon: Icons.local_fire_department_outlined,
-                        label: trEnAr(
-                          context,
-                          tr: 'Ambiyans',
-                          en: 'Ambient',
-                          ar: 'الخلفية',
-                        ),
+                        label: l10n.healingAmbient,
                         value: s.ambientVolume01,
                         tint: AppColors.healingOrange,
                         trailingPct: '${(s.ambientVolume01 * 100).round()}%',
@@ -440,13 +399,8 @@ class _HealingFrequenciesPageState extends ConsumerState<HealingFrequenciesPage>
                       ),
                       const SizedBox(height: 18),
                       _AmbientRow(
-                        label: trEnAr(
-                          context,
-                          tr: 'Uyku Zamanlayıcı',
-                          en: 'Sleep Timer',
-                          ar: 'مؤقت النوم',
-                        ),
-                        value: _sleepRowSubtitle(s),
+                        label: l10n.healingSleepTimer,
+                        value: _sleepRowSubtitle(context, s),
                         onTap: () async {
                           HapticFeedback.lightImpact();
                           await _pauseIfPlaying();
@@ -460,12 +414,7 @@ class _HealingFrequenciesPageState extends ConsumerState<HealingFrequenciesPage>
                         Padding(
                           padding: const EdgeInsets.only(bottom: 10),
                           child: Text(
-                            trEnAr(
-                              context,
-                              tr: 'İnşirah modunda frekans kontrolleri kapalıdır.',
-                              en: 'Frequency controls are locked in Inshirah mode.',
-                              ar: 'عناصر التحكم بالتردد مقفلة في وضع الشرح.',
-                            ),
+                            l10n.healingInshirahLocked,
                             style: TextStyle(
                               color: Colors.white.withValues(alpha: 0.58),
                               fontSize: 12,
@@ -474,12 +423,7 @@ class _HealingFrequenciesPageState extends ConsumerState<HealingFrequenciesPage>
                           ),
                         ),
                       Text(
-                        trEnAr(
-                          context,
-                          tr: 'Tüm Frekanslar',
-                          en: 'All Frequencies',
-                          ar: 'كل الترددات',
-                        ),
+                        l10n.healingAllFrequencies,
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: 16,
@@ -819,16 +763,12 @@ class _PresetRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Row(
       children: [
         Expanded(
           child: _PresetChip(
-            label: trEnAr(
-              context,
-              tr: 'Odak',
-              en: 'Focus',
-              ar: 'تركيز',
-            ),
+            label: l10n.healingPresetFocus,
             icon: Icons.psychology_outlined,
             tint: AppColors.healingTeal,
             selected: active == HealingPreset.focus,
@@ -838,12 +778,7 @@ class _PresetRow extends StatelessWidget {
         const SizedBox(width: 8),
         Expanded(
           child: _PresetChip(
-            label: trEnAr(
-              context,
-              tr: 'Uyku',
-              en: 'Sleep',
-              ar: 'نوم',
-            ),
+            label: l10n.healingPresetSleep,
             icon: Icons.bedtime_outlined,
             tint: Colors.lightBlueAccent.shade100,
             selected: active == HealingPreset.sleep,

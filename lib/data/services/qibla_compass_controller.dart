@@ -19,8 +19,11 @@ import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:geolocator/geolocator.dart';
+
+import '../../core/router/app_router.dart';
 
 const _compassChannel = EventChannel('com.arin.arin/rotation_compass');
 const _geomagChannel  = MethodChannel('com.arin.arin/compass_geomagnetic');
@@ -155,6 +158,34 @@ class QiblaCompassController {
     var perm = await Geolocator.checkPermission();
     if (_disposed) return false;
     if (perm == LocationPermission.denied) {
+      final ctx = rootNavigatorKey.currentContext;
+      if (ctx != null) {
+        final confirmed = await showDialog<bool>(
+          context: ctx,
+          builder: (dialogCtx) => AlertDialog(
+            title: const Text('Konum İzni Gerekli'),
+            content: const Text(
+              'Arın, namaz vakitlerini ve kıble yönünü doğru hesaplayabilmek için '
+              'konumunuza erişim izni gerektirir. Konum verileriniz yalnızca bu amaçlar '
+              'için kullanılır ve cihazınızda işlenir.',
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(dialogCtx).pop(false),
+                child: const Text('Şimdi Değil'),
+              ),
+              TextButton(
+                onPressed: () => Navigator.of(dialogCtx).pop(true),
+                child: const Text('Devam Et'),
+              ),
+            ],
+          ),
+        );
+        if (confirmed != true) {
+          _out.addError(Exception('location_permission_denied'));
+          return false;
+        }
+      }
       perm = await Geolocator.requestPermission();
     }
     if (_disposed) return false;

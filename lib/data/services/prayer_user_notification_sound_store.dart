@@ -2,12 +2,14 @@
 
 import 'dart:io';
 
+import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../core/router/app_router.dart';
 import 'prayer_reminder_prefs.dart';
 
 abstract final class PrayerUserNotificationSoundStore {
@@ -61,6 +63,34 @@ abstract final class PrayerUserNotificationSoundStore {
   /// [FileType.any] ile tam gezinti, sonra uzantı filtresi. Manifest’te [queries] şart.
   static Future<FilePickerResult?> _pickFilesWithFallback() async {
     if (!kIsWeb && Platform.isAndroid) {
+      var perm = await Permission.audio.status;
+      if (perm.isDenied) {
+        final ctx = rootNavigatorKey.currentContext;
+        if (ctx != null) {
+          final confirmed = await showDialog<bool>(
+            context: ctx,
+            builder: (dialogCtx) => AlertDialog(
+              title: const Text('Medya İzni Gerekli'),
+              content: const Text(
+                'Arın, kendi cihazınızdan özel ezan veya bildirim sesi seçebilmeniz için '
+                'ses dosyalarınıza erişim izni gerektirir. Bu dosyalar sadece uygulama '
+                'içinde bildirim olarak kullanılır.',
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(dialogCtx).pop(false),
+                  child: const Text('Şimdi Değil'),
+                ),
+                TextButton(
+                  onPressed: () => Navigator.of(dialogCtx).pop(true),
+                  child: const Text('Devam Et'),
+                ),
+              ],
+            ),
+          );
+          if (confirmed != true) return null;
+        }
+      }
       await Permission.audio.request();
     }
     if (!kIsWeb && Platform.isAndroid) {

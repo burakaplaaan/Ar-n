@@ -11,4 +11,8 @@
     <string name="widget_placeholder_quote_source">الطلاق ٣</string>
     <string name="widget_placeholder_quote">وَمَنْ يَتَوَكَّلْ عَلَى اللَّهِ\nفَهُوَ حَسْبُهُ.</string>
     <string name="widget_placeholder_location">الموقع غير مضبوط</string>
+    <string name="widget_combo_title">آرين · تجميع</string>
+    <string name="widget_combo_description">آرين — اقتباس ومواقيت الصلاة</string>
+    <string name="widget_tracking_title">آرين · تتبع</string>
+    <string name="widget_tracking_description">آرين — تتبع العادات والتزكية</string>
 </resources>

@@ -5,6 +5,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:table_calendar/table_calendar.dart';
+import 'package:arin/l10n/app_localizations.dart';
 
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_text_styles.dart';
@@ -135,6 +136,7 @@ class _HabitCalendarPageState extends ConsumerState<HabitCalendarPage> {
     final repo = ref.watch(habitRepositoryProvider);
     final salat = ref.watch(salatLogRepositoryProvider);
 
+    final l10n = AppLocalizations.of(context)!;
     final firstDay = DateTime.utc(2023, 1, 1);
     final lastDay = DateTime.now().add(const Duration(days: 365));
 
@@ -143,6 +145,7 @@ class _HabitCalendarPageState extends ConsumerState<HabitCalendarPage> {
       habits,
       repo,
       salat,
+      context,
     );
 
     return Scaffold(
@@ -160,7 +163,7 @@ class _HabitCalendarPageState extends ConsumerState<HabitCalendarPage> {
           onPressed: () => context.pop(),
         ),
         title: Text(
-          'Alışkanlık takvimi',
+          l10n.habitCalendarTitle,
           style: AppTextStyles.titleMedium.copyWith(
             color: AppColors.shellOnCanvasPrimary(context),
             fontWeight: FontWeight.w700,
@@ -174,7 +177,7 @@ class _HabitCalendarPageState extends ConsumerState<HabitCalendarPage> {
             child: Padding(
               padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
               child: Text(
-                'Bugün: ${DateTime.now().displayDateTr}',
+                l10n.habitCalendarToday.replaceAll('{date}', DateTime.now().displayDateTr),
                 style: AppTextStyles.labelSmall.copyWith(
                   color: AppColors.shellOnCanvasSecondary(context),
                   letterSpacing: 0.2,
@@ -211,7 +214,7 @@ class _HabitCalendarPageState extends ConsumerState<HabitCalendarPage> {
                   },
                   onPageChanged: (f) => setState(() => _focusedDay = f),
                   calendarFormat: CalendarFormat.month,
-                  availableCalendarFormats: const {CalendarFormat.month: 'Ay'},
+                  availableCalendarFormats: {CalendarFormat.month: l10n.habitCalendarMonth},
                   locale: 'tr_TR',
                   startingDayOfWeek: StartingDayOfWeek.monday,
                   headerStyle: HeaderStyle(
@@ -309,7 +312,9 @@ class _HabitCalendarPageState extends ConsumerState<HabitCalendarPage> {
                       ),
                       const SizedBox(width: 10),
                       Text(
-                        'Ay notu · ${_focusedDay.fullMonthTr} ${_focusedDay.year}',
+                        l10n.habitCalendarMonthNote
+                            .replaceAll('{month}', _focusedDay.fullMonthTr)
+                            .replaceAll('{year}', '${_focusedDay.year}'),
                         style: AppTextStyles.titleSmall.copyWith(
                           color: AppColors.shellOnCanvasPrimary(context),
                           fontWeight: FontWeight.w700,
@@ -320,7 +325,7 @@ class _HabitCalendarPageState extends ConsumerState<HabitCalendarPage> {
                   const SizedBox(height: 14),
                   if (insights.isEmpty)
                     Text(
-                      'Bu ay için henüz kayıt yok veya alışkanlık eklemedin.',
+                      l10n.habitCalendarNoRecords,
                       style: AppTextStyles.bodySmall.copyWith(
                         color: AppColors.shellOnCanvasSecondary(context),
                         height: 1.45,
@@ -369,9 +374,7 @@ class _HabitCalendarPageState extends ConsumerState<HabitCalendarPage> {
                         ),
                   const SizedBox(height: 8),
                   Text(
-                    'Hücredeki gri simgeler: o gün için kayıt var demektir. '
-                    'Arınma simgesi özellikle sayacın aktif olduğu günleri gösterir; '
-                    'namaz/rutin simgeleri ilgili günün tamamlanan kayıtlarını gösterir.',
+                    l10n.habitCalendarLegend,
                     style: AppTextStyles.labelSmall.copyWith(
                       color: AppColors.shellOnCanvasSecondary(context),
                       height: 1.4,
@@ -392,11 +395,13 @@ class _HabitCalendarPageState extends ConsumerState<HabitCalendarPage> {
     List<HabitModel> habits,
     HabitRepository repo,
     SalatLogRepository salat,
+    BuildContext context,
   ) {
     final start = DateTime(month.year, month.month, 1);
     final end = DateTime(month.year, month.month + 1, 0);
     final today = _dayOnly(DateTime.now());
     final lines = <String>[];
+    final l10n = AppLocalizations.of(context)!;
 
     for (final h in habits) {
       if (h.isArchived) continue;
@@ -420,7 +425,9 @@ class _HabitCalendarPageState extends ConsumerState<HabitCalendarPage> {
         }
         if (n > 0) {
           lines.add(
-            '“${h.title}”: bu ay $n gün Arınma sayacı takvimde (başlangıçtan itibaren).',
+            l10n.habitCalendarQuitInsight
+                .replaceAll('{title}', h.title)
+                .replaceAll('{n}', '$n'),
           );
         }
         continue;
@@ -440,7 +447,10 @@ class _HabitCalendarPageState extends ConsumerState<HabitCalendarPage> {
         }
         if (anyPrayer > 0) {
           lines.add(
-            '“${h.title}”: $anyPrayer günde en az bir vakit işaretlendi; $fullFive günde 5/5 tamamlandı.',
+            l10n.habitCalendarPrayerInsight
+                .replaceAll('{title}', h.title)
+                .replaceAll('{anyPrayer}', '$anyPrayer')
+                .replaceAll('{fullFive}', '$fullFive'),
           );
         }
         continue;
@@ -464,14 +474,19 @@ class _HabitCalendarPageState extends ConsumerState<HabitCalendarPage> {
       if (h.isCustomTracked && h.customRepeatCycle != 0) {
         final n = completedPeriods.length;
         if (n > 0) {
-          final periodLabel = h.customRepeatCycle == 1 ? 'hafta' : 'ay';
+          final periodLabel = h.customRepeatCycle == 1 ? l10n.habitCalendarWeekLabel : l10n.habitCalendarMonthLabel;
           lines.add(
-            '“${h.title}”: bu ay $n $periodLabel hedefine ulaşıldı.',
+            l10n.habitCalendarCustomInsightPeriod
+                .replaceAll('{title}', h.title)
+                .replaceAll('{n}', '$n')
+                .replaceAll('{periodLabel}', periodLabel),
           );
         }
       } else if (completedDays > 0) {
         lines.add(
-          '“${h.title}”: bu ay toplam $completedDays gün tamamlandı olarak işaretlendi.',
+          l10n.habitCalendarCustomInsightDays
+              .replaceAll('{title}', h.title)
+              .replaceAll('{completedDays}', '$completedDays'),
         );
       }
     }

@@ -12,6 +12,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:uuid/uuid.dart';
 import 'package:vibration/vibration.dart';
 
+import 'package:arin/l10n/app_localizations.dart';
 import '../../core/analytics/arin_analytics.dart';
 import '../../core/localization/locale_text.dart';
 import '../../core/providers/shared_preferences_provider.dart';

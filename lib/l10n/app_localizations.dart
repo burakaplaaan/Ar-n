@@ -2499,7 +2499,7 @@ abstract class AppLocalizations {
   /// No description provided for @settingsPrivacyThirdPartyBody.
   ///
   /// In tr, this message translates to:
-  /// **'Arin; oturum açma, veri eşitleme, kullanım analizi ve çökme tanılama için Firebase Authentication, Cloud Firestore, Firebase Analytics ve Firebase Crashlytics kullanır.'**
+  /// **'Arin; oturum açma, bildirimler ve veri eşitleme için Firebase servislerini, reklamlar için Google AdMob\'u, abonelik yönetimi için RevenueCat\'i ve namaz vakitleri için Aladhan/Diyanet API\'lerini kullanır.'**
   String get settingsPrivacyThirdPartyBody;
 
   /// No description provided for @settingsPrivacyControlsTitle.
@@ -5317,6 +5317,2518 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'E-posta daveti'**
   String get adminEmailInviteLabel;
+
+  /// No description provided for @offlineBannerOffline.
+  ///
+  /// In tr, this message translates to:
+  /// **'Çevrimdışısın'**
+  String get offlineBannerOffline;
+
+  /// No description provided for @offlineBannerReconnected.
+  ///
+  /// In tr, this message translates to:
+  /// **'Tekrar bağlandın'**
+  String get offlineBannerReconnected;
+
+  /// No description provided for @premiumRestorePurchasesLabel.
+  ///
+  /// In tr, this message translates to:
+  /// **'Geri yükle'**
+  String get premiumRestorePurchasesLabel;
+
+  /// No description provided for @premiumActivePlanLabel.
+  ///
+  /// In tr, this message translates to:
+  /// **'Aktif planınız'**
+  String get premiumActivePlanLabel;
+
+  /// No description provided for @premiumPlanMonthlyLaunch.
+  ///
+  /// In tr, this message translates to:
+  /// **'Lansman Fiyatıyla Başla'**
+  String get premiumPlanMonthlyLaunch;
+
+  /// No description provided for @premiumPlanYearlySwitch.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yıllığa geç'**
+  String get premiumPlanYearlySwitch;
+
+  /// No description provided for @premiumFeatureNoAds.
+  ///
+  /// In tr, this message translates to:
+  /// **'Reklamsız kullanım'**
+  String get premiumFeatureNoAds;
+
+  /// No description provided for @premiumFeatureWidgets.
+  ///
+  /// In tr, this message translates to:
+  /// **'Widget kilidi yok'**
+  String get premiumFeatureWidgets;
+
+  /// No description provided for @premiumFeatureReels.
+  ///
+  /// In tr, this message translates to:
+  /// **'Keşfet akışı kesintisiz'**
+  String get premiumFeatureReels;
+
+  /// No description provided for @premiumFeatureSecondAlarm.
+  ///
+  /// In tr, this message translates to:
+  /// **'2. ezan alarmı açık'**
+  String get premiumFeatureSecondAlarm;
+
+  /// No description provided for @premiumFeatureExtras.
+  ///
+  /// In tr, this message translates to:
+  /// **'Zikir, pusula ve frekanslarda reklam yok'**
+  String get premiumFeatureExtras;
+
+  /// No description provided for @premiumSignInRequired.
+  ///
+  /// In tr, this message translates to:
+  /// **'Satın alma için giriş zorunlu değil. Premiumu bu cihazda hemen kullanabilir, istersen daha sonra hesabını bağlayarak diğer cihazlarında da erişebilirsin.'**
+  String get premiumSignInRequired;
+
+  /// No description provided for @premiumSignInTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Premium için hesabını bağla'**
+  String get premiumSignInTitle;
+
+  /// No description provided for @premiumSignInSubtitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Satın aldığın premium cihaz değiştirince kaybolmasın diye önce hesabına bağlanır. Fiyatları görmek için giriş gerekmez.'**
+  String get premiumSignInSubtitle;
+
+  /// No description provided for @premiumSignInGoogle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Google ile devam et'**
+  String get premiumSignInGoogle;
+
+  /// No description provided for @premiumSignInApple.
+  ///
+  /// In tr, this message translates to:
+  /// **'Apple ile devam et'**
+  String get premiumSignInApple;
+
+  /// No description provided for @premiumSignInCancel.
+  ///
+  /// In tr, this message translates to:
+  /// **'Şimdilik vazgeç'**
+  String get premiumSignInCancel;
+
+  /// No description provided for @locationPermissionRequiredTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Konum İzni Gerekli'**
+  String get locationPermissionRequiredTitle;
+
+  /// No description provided for @locationPermissionRequiredBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'Arın, namaz vakitlerini ve kıble yönünü doğru hesaplayabilmek için konumunuza erişim izni gerektirir. Konum verileriniz yalnızca bu amaçlar için kullanılır ve cihazınızda işlenir.'**
+  String get locationPermissionRequiredBody;
+
+  /// No description provided for @locationPermissionNotNow.
+  ///
+  /// In tr, this message translates to:
+  /// **'Şimdi Değil'**
+  String get locationPermissionNotNow;
+
+  /// No description provided for @locationPermissionContinue.
+  ///
+  /// In tr, this message translates to:
+  /// **'Devam Et'**
+  String get locationPermissionContinue;
+
+  /// No description provided for @errorScreenTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bir şeyler ters gitti'**
+  String get errorScreenTitle;
+
+  /// No description provided for @errorScreenBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu bölüm şu an açılamadı. Uygulamayı kapatıp tekrar açmayı deneyebilirsin.'**
+  String get errorScreenBody;
+
+  /// No description provided for @errorScreenDebugTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'ARIN — widget hatası (debug)'**
+  String get errorScreenDebugTitle;
+
+  /// No description provided for @errorScreenDebugBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'Debug moddasınız. Aşağıdaki metni kopyalayın.'**
+  String get errorScreenDebugBody;
+
+  /// No description provided for @widgetUnlockQuoteTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Günlük Söz Widgetı'**
+  String get widgetUnlockQuoteTitle;
+
+  /// No description provided for @widgetUnlockPrayerTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Namaz Vakti Widgetı'**
+  String get widgetUnlockPrayerTitle;
+
+  /// No description provided for @widgetUnlockComboTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Söz + Namaz Widgetı'**
+  String get widgetUnlockComboTitle;
+
+  /// No description provided for @widgetUnlockTrackingTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Takip Widgetı'**
+  String get widgetUnlockTrackingTitle;
+
+  /// No description provided for @widgetUnlockAdLoadFailed.
+  ///
+  /// In tr, this message translates to:
+  /// **'Reklam şu an yüklenemedi, daha sonra tekrar dene.'**
+  String get widgetUnlockAdLoadFailed;
+
+  /// No description provided for @widgetUnlockSuccessTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'{title} 24 saat açıldı! 🎉'**
+  String widgetUnlockSuccessTitle(Object title);
+
+  /// No description provided for @widgetUnlockPremiumSuccess.
+  ///
+  /// In tr, this message translates to:
+  /// **'Premium aktif! Tüm widgetlar açıldı. 🎉'**
+  String get widgetUnlockPremiumSuccess;
+
+  /// No description provided for @widgetUnlockDescription.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu widgetı 24 saat açmak için kısa bir reklam izleyebilirsin. Kalıcı erişim için Premium\'a geç.'**
+  String get widgetUnlockDescription;
+
+  /// No description provided for @widgetUnlockAdButton.
+  ///
+  /// In tr, this message translates to:
+  /// **'Reklam izle — 24 saat aç'**
+  String get widgetUnlockAdButton;
+
+  /// No description provided for @widgetUnlockPremiumButton.
+  ///
+  /// In tr, this message translates to:
+  /// **'Premium\'a geç'**
+  String get widgetUnlockPremiumButton;
+
+  /// No description provided for @widgetUnlockCancelButton.
+  ///
+  /// In tr, this message translates to:
+  /// **'Şimdi değil'**
+  String get widgetUnlockCancelButton;
+
+  /// No description provided for @purchaseErrorNotFound.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ürün bulunamadı. İnternet bağlantınızı kontrol edin.'**
+  String get purchaseErrorNotFound;
+
+  /// No description provided for @purchaseErrorUnexpected.
+  ///
+  /// In tr, this message translates to:
+  /// **'Beklenmedik hata: {error}'**
+  String purchaseErrorUnexpected(Object error);
+
+  /// No description provided for @purchaseErrorNotSupported.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu platformda satın alma desteklenmiyor.'**
+  String get purchaseErrorNotSupported;
+
+  /// No description provided for @audioPermissionRequiredTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Medya İzni Gerekli'**
+  String get audioPermissionRequiredTitle;
+
+  /// No description provided for @audioPermissionRequiredBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'Arın, kendi cihazınızdan özel ezan veya bildirim sesi seçebilmeniz için ses dosyalarınıza erişim izni gerektirir. Bu dosyalar sadece uygulama içinde bildirim olarak kullanılır.'**
+  String get audioPermissionRequiredBody;
+
+  /// No description provided for @audioPickerTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ses dosyası seç'**
+  String get audioPickerTitle;
+
+  /// No description provided for @mgmtDailyPrayers.
+  ///
+  /// In tr, this message translates to:
+  /// **'Günlük namaz'**
+  String get mgmtDailyPrayers;
+
+  /// No description provided for @mgmtRoutineWorkshop.
+  ///
+  /// In tr, this message translates to:
+  /// **'Rutin atölyesi'**
+  String get mgmtRoutineWorkshop;
+
+  /// No description provided for @mgmtChooseGrowth.
+  ///
+  /// In tr, this message translates to:
+  /// **'Gelişim seç'**
+  String get mgmtChooseGrowth;
+
+  /// No description provided for @mgmtPickPrayerOrMakeup.
+  ///
+  /// In tr, this message translates to:
+  /// **'Namaz veya kaza takibini işaretle; özel bir gelişim için alttaki alanı kullan.'**
+  String get mgmtPickPrayerOrMakeup;
+
+  /// No description provided for @mgmtCountingAndCompensation.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sayım ve telafi'**
+  String get mgmtCountingAndCompensation;
+
+  /// No description provided for @mgmtPrayer.
+  ///
+  /// In tr, this message translates to:
+  /// **'Namaz'**
+  String get mgmtPrayer;
+
+  /// No description provided for @mgmtTimeAndKhushu.
+  ///
+  /// In tr, this message translates to:
+  /// **'Vakit ve huşû'**
+  String get mgmtTimeAndKhushu;
+
+  /// No description provided for @mgmtCustomRoutine.
+  ///
+  /// In tr, this message translates to:
+  /// **'Özel rutin'**
+  String get mgmtCustomRoutine;
+
+  /// No description provided for @mgmtChooseYourOwnTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Başlık, emoji ve hatırlatmayı sen belirle.'**
+  String get mgmtChooseYourOwnTitle;
+
+  /// No description provided for @mgmtSelect.
+  ///
+  /// In tr, this message translates to:
+  /// **'Seç'**
+  String get mgmtSelect;
+
+  /// No description provided for @habitsMyHabits.
+  ///
+  /// In tr, this message translates to:
+  /// **'Alışkanlıklarım'**
+  String get habitsMyHabits;
+
+  /// No description provided for @habitsNoHabitsYet.
+  ///
+  /// In tr, this message translates to:
+  /// **'Henüz alışkanlık eklemedin.\nYeni bir başlangıç yapmaya hazır mısın?'**
+  String get habitsNoHabitsYet;
+
+  /// No description provided for @habitsGrowth.
+  ///
+  /// In tr, this message translates to:
+  /// **'Gelişim'**
+  String get habitsGrowth;
+
+  /// No description provided for @habitsPurification.
+  ///
+  /// In tr, this message translates to:
+  /// **'Arınma'**
+  String get habitsPurification;
+
+  /// No description provided for @habitsAddPurificationGoal.
+  ///
+  /// In tr, this message translates to:
+  /// **'Arınma hedefi ekle'**
+  String get habitsAddPurificationGoal;
+
+  /// No description provided for @habitsAddGrowthRoutine.
+  ///
+  /// In tr, this message translates to:
+  /// **'Gelişim rutini ekle'**
+  String get habitsAddGrowthRoutine;
+
+  /// No description provided for @habitsDeleteConfirmTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu alışkanlığı silmek istiyor musun?'**
+  String get habitsDeleteConfirmTitle;
+
+  /// No description provided for @habitsCancel.
+  ///
+  /// In tr, this message translates to:
+  /// **'Vazgeç'**
+  String get habitsCancel;
+
+  /// No description provided for @habitsYesDelete.
+  ///
+  /// In tr, this message translates to:
+  /// **'Evet, Sil'**
+  String get habitsYesDelete;
+
+  /// No description provided for @habitsDayStreak.
+  ///
+  /// In tr, this message translates to:
+  /// **'gün serisi'**
+  String get habitsDayStreak;
+
+  /// No description provided for @customHabitThisWeekGoal.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu haftanın hedefi'**
+  String get customHabitThisWeekGoal;
+
+  /// No description provided for @customHabitThisMonthGoal.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu ayın hedefi'**
+  String get customHabitThisMonthGoal;
+
+  /// No description provided for @customHabitDailyGoal.
+  ///
+  /// In tr, this message translates to:
+  /// **'Günlük hedef'**
+  String get customHabitDailyGoal;
+
+  /// No description provided for @customHabitThisWeekGoalComplete.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu haftanın hedefi tamam.'**
+  String get customHabitThisWeekGoalComplete;
+
+  /// No description provided for @customHabitThisMonthGoalComplete.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu ayın hedefi tamam.'**
+  String get customHabitThisMonthGoalComplete;
+
+  /// No description provided for @customHabitTodayGoalComplete.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bugünkü hedef tamam.'**
+  String get customHabitTodayGoalComplete;
+
+  /// No description provided for @customHabitLetsStart.
+  ///
+  /// In tr, this message translates to:
+  /// **'Haydi başla!'**
+  String get customHabitLetsStart;
+
+  /// No description provided for @customHabitDoingWell.
+  ///
+  /// In tr, this message translates to:
+  /// **'İyi gidiyorsun.'**
+  String get customHabitDoingWell;
+
+  /// No description provided for @customHabitAlmostThere.
+  ///
+  /// In tr, this message translates to:
+  /// **'Neredeyse.'**
+  String get customHabitAlmostThere;
+
+  /// No description provided for @customHabitOneLastStep.
+  ///
+  /// In tr, this message translates to:
+  /// **'Son bir adım.'**
+  String get customHabitOneLastStep;
+
+  /// No description provided for @customHabitRecordNotFound.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kayıt bulunamadı'**
+  String get customHabitRecordNotFound;
+
+  /// No description provided for @customHabitStreak.
+  ///
+  /// In tr, this message translates to:
+  /// **'Seri'**
+  String get customHabitStreak;
+
+  /// No description provided for @customHabitDayStreak.
+  ///
+  /// In tr, this message translates to:
+  /// **'Gün serisi'**
+  String get customHabitDayStreak;
+
+  /// No description provided for @customHabitBack.
+  ///
+  /// In tr, this message translates to:
+  /// **'Geri'**
+  String get customHabitBack;
+
+  /// No description provided for @customHabitRemove.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kaldır'**
+  String get customHabitRemove;
+
+  /// No description provided for @customHabitBackToTracker.
+  ///
+  /// In tr, this message translates to:
+  /// **'Alışkanlık takibine dön'**
+  String get customHabitBackToTracker;
+
+  /// No description provided for @customHabitGoal.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hedef'**
+  String get customHabitGoal;
+
+  /// No description provided for @customHabitCompletedToday.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bugün hedefi tamamladın.'**
+  String get customHabitCompletedToday;
+
+  /// No description provided for @customHabitCompletedPeriod.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu dönem hedefi tamamladın.'**
+  String get customHabitCompletedPeriod;
+
+  /// No description provided for @customHabitFinish.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bitir'**
+  String get customHabitFinish;
+
+  /// No description provided for @addHabitUnitTimes.
+  ///
+  /// In tr, this message translates to:
+  /// **'kez'**
+  String get addHabitUnitTimes;
+
+  /// No description provided for @addHabitUnitMinutes.
+  ///
+  /// In tr, this message translates to:
+  /// **'dakika'**
+  String get addHabitUnitMinutes;
+
+  /// No description provided for @addHabitUnitHours.
+  ///
+  /// In tr, this message translates to:
+  /// **'saat'**
+  String get addHabitUnitHours;
+
+  /// No description provided for @addHabitUnitPages.
+  ///
+  /// In tr, this message translates to:
+  /// **'sayfa'**
+  String get addHabitUnitPages;
+
+  /// No description provided for @addHabitUnitGlasses.
+  ///
+  /// In tr, this message translates to:
+  /// **'bardak'**
+  String get addHabitUnitGlasses;
+
+  /// No description provided for @addHabitUnitSets.
+  ///
+  /// In tr, this message translates to:
+  /// **'set'**
+  String get addHabitUnitSets;
+
+  /// No description provided for @addHabitUnitLaps.
+  ///
+  /// In tr, this message translates to:
+  /// **'tur'**
+  String get addHabitUnitLaps;
+
+  /// No description provided for @addHabitDaily.
+  ///
+  /// In tr, this message translates to:
+  /// **'Günlük'**
+  String get addHabitDaily;
+
+  /// No description provided for @addHabitWeekly.
+  ///
+  /// In tr, this message translates to:
+  /// **'Haftalık'**
+  String get addHabitWeekly;
+
+  /// No description provided for @addHabitMonthly.
+  ///
+  /// In tr, this message translates to:
+  /// **'Aylık'**
+  String get addHabitMonthly;
+
+  /// No description provided for @addHabitSummaryWeekly.
+  ///
+  /// In tr, this message translates to:
+  /// **'{amount} {unit} haftalık'**
+  String addHabitSummaryWeekly(Object amount, Object unit);
+
+  /// No description provided for @addHabitSummaryMonthly.
+  ///
+  /// In tr, this message translates to:
+  /// **'{amount} {unit} aylık'**
+  String addHabitSummaryMonthly(Object amount, Object unit);
+
+  /// No description provided for @addHabitSummaryDaily.
+  ///
+  /// In tr, this message translates to:
+  /// **'{amount} {unit} günlük'**
+  String addHabitSummaryDaily(Object amount, Object unit);
+
+  /// No description provided for @addHabitCancel.
+  ///
+  /// In tr, this message translates to:
+  /// **'İptal'**
+  String get addHabitCancel;
+
+  /// No description provided for @addHabitOk.
+  ///
+  /// In tr, this message translates to:
+  /// **'Tamam'**
+  String get addHabitOk;
+
+  /// No description provided for @addHabitCustom.
+  ///
+  /// In tr, this message translates to:
+  /// **'Özel'**
+  String get addHabitCustom;
+
+  /// No description provided for @addHabitSave.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kaydet'**
+  String get addHabitSave;
+
+  /// No description provided for @addHabitGrowthName.
+  ///
+  /// In tr, this message translates to:
+  /// **'Gelişim Adı'**
+  String get addHabitGrowthName;
+
+  /// No description provided for @addHabitPurificationName.
+  ///
+  /// In tr, this message translates to:
+  /// **'Arınma Adı'**
+  String get addHabitPurificationName;
+
+  /// No description provided for @addHabitGrowthHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Örn: 30 dakika kitap okuma'**
+  String get addHabitGrowthHint;
+
+  /// No description provided for @addHabitPurificationHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Örn: Gereksiz ekran süresini azalt'**
+  String get addHabitPurificationHint;
+
+  /// No description provided for @addHabitNameRequired.
+  ///
+  /// In tr, this message translates to:
+  /// **'İsim gerekli'**
+  String get addHabitNameRequired;
+
+  /// No description provided for @addHabitNameTooLong.
+  ///
+  /// In tr, this message translates to:
+  /// **'En fazla 60 karakter'**
+  String get addHabitNameTooLong;
+
+  /// No description provided for @addHabitNoteOptional.
+  ///
+  /// In tr, this message translates to:
+  /// **'Not (isteğe bağlı)'**
+  String get addHabitNoteOptional;
+
+  /// No description provided for @addHabitNoteHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kendine kısa bir not…'**
+  String get addHabitNoteHint;
+
+  /// No description provided for @habitCalendarToday.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bugün: {date}'**
+  String habitCalendarToday(Object date);
+
+  /// No description provided for @habitCalendarTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Alışkanlık takvimi'**
+  String get habitCalendarTitle;
+
+  /// No description provided for @habitCalendarMonth.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ay'**
+  String get habitCalendarMonth;
+
+  /// No description provided for @habitCalendarMonthNote.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ay notu · {month} {year}'**
+  String habitCalendarMonthNote(Object month, Object year);
+
+  /// No description provided for @habitCalendarNoRecords.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu ay için henüz kayıt yok veya alışkanlık eklemedin.'**
+  String get habitCalendarNoRecords;
+
+  /// No description provided for @habitCalendarQuitInsight.
+  ///
+  /// In tr, this message translates to:
+  /// **'“{title}”: bu ay {n} gün Arınma sayacı takvimde (başlangıçtan itibaren).'**
+  String habitCalendarQuitInsight(Object n, Object title);
+
+  /// No description provided for @habitCalendarPrayerInsight.
+  ///
+  /// In tr, this message translates to:
+  /// **'“{title}”: {anyPrayer} günde en az bir vakit işaretlendi; {fullFive} günde 5/5 tamamlandı.'**
+  String habitCalendarPrayerInsight(
+    Object anyPrayer,
+    Object fullFive,
+    Object title,
+  );
+
+  /// No description provided for @habitCalendarCustomInsightPeriod.
+  ///
+  /// In tr, this message translates to:
+  /// **'“{title}”: bu ay {n} {periodLabel} hedefine ulaşıldı.'**
+  String habitCalendarCustomInsightPeriod(
+    Object n,
+    Object periodLabel,
+    Object title,
+  );
+
+  /// No description provided for @habitCalendarWeekLabel.
+  ///
+  /// In tr, this message translates to:
+  /// **'hafta'**
+  String get habitCalendarWeekLabel;
+
+  /// No description provided for @habitCalendarMonthLabel.
+  ///
+  /// In tr, this message translates to:
+  /// **'ay'**
+  String get habitCalendarMonthLabel;
+
+  /// No description provided for @habitCalendarCustomInsightDays.
+  ///
+  /// In tr, this message translates to:
+  /// **'“{title}”: bu ay toplam {completedDays} gün tamamlandı olarak işaretlendi.'**
+  String habitCalendarCustomInsightDays(Object completedDays, Object title);
+
+  /// No description provided for @habitCalendarLegend.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hücredeki gri simgeler: o gün için kayıt var demektir. Arınma simgesi özellikle sayacın aktif olduğu günleri gösterir; namaz/rutin simgeleri ilgili günün tamamlanan kayıtlarını gösterir.'**
+  String get habitCalendarLegend;
+
+  /// No description provided for @kazaPrayerFajr.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sabah namazı'**
+  String get kazaPrayerFajr;
+
+  /// No description provided for @kazaPrayerDhuhr.
+  ///
+  /// In tr, this message translates to:
+  /// **'Öğle namazı'**
+  String get kazaPrayerDhuhr;
+
+  /// No description provided for @kazaPrayerAsr.
+  ///
+  /// In tr, this message translates to:
+  /// **'İkindi namazı'**
+  String get kazaPrayerAsr;
+
+  /// No description provided for @kazaPrayerMaghrib.
+  ///
+  /// In tr, this message translates to:
+  /// **'Akşam namazı'**
+  String get kazaPrayerMaghrib;
+
+  /// No description provided for @kazaPrayerIsha.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yatsı namazı'**
+  String get kazaPrayerIsha;
+
+  /// No description provided for @kazaPrayerWitr.
+  ///
+  /// In tr, this message translates to:
+  /// **'Vitir namazı'**
+  String get kazaPrayerWitr;
+
+  /// No description provided for @kazaReset.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sıfırla'**
+  String get kazaReset;
+
+  /// No description provided for @kazaResetConfirmDesc.
+  ///
+  /// In tr, this message translates to:
+  /// **'Tüm kaza sayıları sıfırlanacak. Emin misin?'**
+  String get kazaResetConfirmDesc;
+
+  /// No description provided for @kazaCancel.
+  ///
+  /// In tr, this message translates to:
+  /// **'İptal'**
+  String get kazaCancel;
+
+  /// No description provided for @kazaTrackerTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kaza takibi'**
+  String get kazaTrackerTitle;
+
+  /// No description provided for @kazaClose.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kapat'**
+  String get kazaClose;
+
+  /// No description provided for @kazaTrackerSubtitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kaza namazı takibi'**
+  String get kazaTrackerSubtitle;
+
+  /// No description provided for @kazaTrackerDesc.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kaza namazlarını vakit namazları kılındıktan sonra kılmaya özen göster. Eksik (+) ile borç ekleyebilir, kıldığın her rekat için (−) ile sayacı azaltabilirsin.'**
+  String get kazaTrackerDesc;
+
+  /// No description provided for @kazaCalcBirthDate.
+  ///
+  /// In tr, this message translates to:
+  /// **'Doğum tarihi'**
+  String get kazaCalcBirthDate;
+
+  /// No description provided for @kazaCalcApply.
+  ///
+  /// In tr, this message translates to:
+  /// **'Uygula'**
+  String get kazaCalcApply;
+
+  /// No description provided for @kazaCalcUpdateCounters.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sayaçları güncelle?'**
+  String get kazaCalcUpdateCounters;
+
+  /// No description provided for @kazaCalcUpdateDesc.
+  ///
+  /// In tr, this message translates to:
+  /// **'Mevcut kaza sayıların silinip hesaplanan değerlerle değiştirilecek.'**
+  String get kazaCalcUpdateDesc;
+
+  /// No description provided for @kazaCalcCancel.
+  ///
+  /// In tr, this message translates to:
+  /// **'İptal'**
+  String get kazaCalcCancel;
+
+  /// No description provided for @kazaCalcContinue.
+  ///
+  /// In tr, this message translates to:
+  /// **'Devam'**
+  String get kazaCalcContinue;
+
+  /// No description provided for @kazaCalcErrorPubertyFuture.
+  ///
+  /// In tr, this message translates to:
+  /// **'Buluğ tarihi bugünden sonra olamaz. Doğum tarihini veya buluğ yaşını kontrol et.'**
+  String get kazaCalcErrorPubertyFuture;
+
+  /// No description provided for @kazaCalcErrorZeroRemaining.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kalan namaz 0: tam kılınan gün, borçlu güne eşit veya fazlaysa üst sınıra çekilir; 6 vakit sayacı da buna göre sıfır kalır.'**
+  String get kazaCalcErrorZeroRemaining;
+
+  /// No description provided for @kazaCalcTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kaza takibi'**
+  String get kazaCalcTitle;
+
+  /// No description provided for @kazaCalcSubtitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kaza namazı takibi'**
+  String get kazaCalcSubtitle;
+
+  /// No description provided for @kazaCalcDesc.
+  ///
+  /// In tr, this message translates to:
+  /// **'Farz namazlar buluğ çağından itibaren başlar. Tam yaşını bilmiyorsan erkeklerde 12, kadınlarda 9 yaşını referans alabilirsin. Bu ekran tahmini bir sayı üretir; kaza namazlarını vakit namazlarından sonra kılmaya devam et.'**
+  String get kazaCalcDesc;
+
+  /// No description provided for @kazaCalcFemaleNote.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kadınlar için: buluğdan bugüne kadar geçen her takvim ayı için yaklaşık 6 gün namazdan muaf sayılır (toplam günü geçmez).'**
+  String get kazaCalcFemaleNote;
+
+  /// No description provided for @kazaCalcFormula.
+  ///
+  /// In tr, this message translates to:
+  /// **'Formül: borçlu gün = takvim günü − hayız muafiyeti; toplam namaz = borçlu gün × 6 − (tam kılınan gün × 6). Kılınan gün sayısı borçlu günü aşamaz.'**
+  String get kazaCalcFormula;
+
+  /// No description provided for @kazaCalcCalculateTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kaza namazı hesapla'**
+  String get kazaCalcCalculateTitle;
+
+  /// No description provided for @kazaCalcGender.
+  ///
+  /// In tr, this message translates to:
+  /// **'Cinsiyetiniz'**
+  String get kazaCalcGender;
+
+  /// No description provided for @kazaCalcMale.
+  ///
+  /// In tr, this message translates to:
+  /// **'Erkek'**
+  String get kazaCalcMale;
+
+  /// No description provided for @kazaCalcFemale.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kadın'**
+  String get kazaCalcFemale;
+
+  /// No description provided for @kazaCalcBirthDateTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Doğum tarihiniz'**
+  String get kazaCalcBirthDateTitle;
+
+  /// No description provided for @kazaCalcPubertyAge.
+  ///
+  /// In tr, this message translates to:
+  /// **'Buluğ çaşına girdiğiniz yaş'**
+  String get kazaCalcPubertyAge;
+
+  /// No description provided for @kazaCalcPubertyNote.
+  ///
+  /// In tr, this message translates to:
+  /// **'Alt sınır: erkek 12, kadın 9 yaş (daha küçük girilirse hesapta {minPuberty} kullanılır).'**
+  String kazaCalcPubertyNote(Object minPuberty);
+
+  /// No description provided for @kazaCalcPrayedDays.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kaç gün namaz kıldınız?'**
+  String get kazaCalcPrayedDays;
+
+  /// No description provided for @kazaCalcPrayedDaysNote.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bugüne kadar, o gün içinde bütün vakitleri kıldığın toplam gün sayısı.'**
+  String get kazaCalcPrayedDaysNote;
+
+  /// No description provided for @kazaCalcCalculate.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hesapla'**
+  String get kazaCalcCalculate;
+
+  /// No description provided for @kazaCalcLiveError.
+  ///
+  /// In tr, this message translates to:
+  /// **'Buluğ tarihi bugünden sonra olamaz; doğum ve buluğ yaşını kontrol et.'**
+  String get kazaCalcLiveError;
+
+  /// No description provided for @kazaCalcLiveHayiz.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hayız muafiyeti: −{days} gün\n'**
+  String kazaCalcLiveHayiz(Object days);
+
+  /// No description provided for @kazaCalcLiveApplied.
+  ///
+  /// In tr, this message translates to:
+  /// **'\n(Tam kılınan gün üst sınır: {applied})'**
+  String kazaCalcLiveApplied(Object applied);
+
+  /// No description provided for @kazaCalcLiveSummary.
+  ///
+  /// In tr, this message translates to:
+  /// **'Canlı özet'**
+  String get kazaCalcLiveSummary;
+
+  /// No description provided for @kazaCalcLiveCalendarDays.
+  ///
+  /// In tr, this message translates to:
+  /// **'Takvim günü: {days}\n'**
+  String kazaCalcLiveCalendarDays(Object days);
+
+  /// No description provided for @kazaCalcLiveLiableDays.
+  ///
+  /// In tr, this message translates to:
+  /// **'Borçlu gün: {days}\n'**
+  String kazaCalcLiveLiableDays(Object days);
+
+  /// No description provided for @kazaCalcLiveOwed.
+  ///
+  /// In tr, this message translates to:
+  /// **'Namaz borcu (borçlu gün × {perDay}): {total}\n'**
+  String kazaCalcLiveOwed(Object perDay, Object total);
+
+  /// No description provided for @kazaCalcLiveCredited.
+  ///
+  /// In tr, this message translates to:
+  /// **'Düşülen (tam gün × {perDay}): {credited}{appliedNote}\n'**
+  String kazaCalcLiveCredited(
+    Object appliedNote,
+    Object credited,
+    Object perDay,
+  );
+
+  /// No description provided for @kazaCalcLiveRemaining.
+  ///
+  /// In tr, this message translates to:
+  /// **'—\nKalan toplam: {remaining} namaz'**
+  String kazaCalcLiveRemaining(Object remaining);
+
+  /// No description provided for @kazaCalcLiveZeroNote.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hesapla sonrası sayaç: kalan toplam 6 vakte bölünür; kalan 0 ise her vakit 0 kalır.'**
+  String get kazaCalcLiveZeroNote;
+
+  /// No description provided for @dailyNamazWisdomFallback.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hatırlatıcı metni yüklenemedi. Sayfayı yenilemeyi dene.'**
+  String get dailyNamazWisdomFallback;
+
+  /// No description provided for @momentVerseError.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yüklenemedi. Lütfen tekrar dene.'**
+  String get momentVerseError;
+
+  /// No description provided for @momentVerseEmptyTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Henüz bir an yok'**
+  String get momentVerseEmptyTitle;
+
+  /// No description provided for @momentVerseEmptyDesc.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bir sonraki bildirimi bekle.'**
+  String get momentVerseEmptyDesc;
+
+  /// No description provided for @momentVerseExpiredTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu vakit geçti'**
+  String get momentVerseExpiredTitle;
+
+  /// No description provided for @momentVerseExpiredDesc.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bazı anlar yalnızca bir kez gelir.\nBelki bir sonrakinde buluşuruz.'**
+  String get momentVerseExpiredDesc;
+
+  /// No description provided for @momentVerseExpiredNote.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bildirimleri açık tut,\nbir sonraki an kaçmasın.'**
+  String get momentVerseExpiredNote;
+
+  /// No description provided for @momentVerseActiveWhisper.
+  ///
+  /// In tr, this message translates to:
+  /// **'Saatin sana fısıldadığı ayet'**
+  String get momentVerseActiveWhisper;
+
+  /// No description provided for @momentVerseSurah.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sure'**
+  String get momentVerseSurah;
+
+  /// No description provided for @momentVerseVerse.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ayet'**
+  String get momentVerseVerse;
+
+  /// No description provided for @momentVerseOneVerse.
+  ///
+  /// In tr, this message translates to:
+  /// **'bir ayet'**
+  String get momentVerseOneVerse;
+
+  /// No description provided for @momentVerseClock.
+  ///
+  /// In tr, this message translates to:
+  /// **'Saat'**
+  String get momentVerseClock;
+
+  /// No description provided for @momentVerseMeaningDesc.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu tesadüf değil; zamanın rakamları Kur\'an\'da bir adrese dönüşür. Bu bildirimi tam vaktinde açman ve bu ayetin önüne geçmen de öyle.'**
+  String get momentVerseMeaningDesc;
+
+  /// No description provided for @momentVerseDisappear.
+  ///
+  /// In tr, this message translates to:
+  /// **'sonra bu an kaybolacak'**
+  String get momentVerseDisappear;
+
+  /// No description provided for @momentVerseReturnHome.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ana Sayfaya Dön'**
+  String get momentVerseReturnHome;
+
+  /// No description provided for @momentVerseClose.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kapat'**
+  String get momentVerseClose;
+
+  /// No description provided for @surveyDictMoodHappy.
+  ///
+  /// In tr, this message translates to:
+  /// **'Mutlu'**
+  String get surveyDictMoodHappy;
+
+  /// No description provided for @surveyDictMoodCalm.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sakin'**
+  String get surveyDictMoodCalm;
+
+  /// No description provided for @surveyDictMoodStressed.
+  ///
+  /// In tr, this message translates to:
+  /// **'Stresli'**
+  String get surveyDictMoodStressed;
+
+  /// No description provided for @surveyDictMoodSad.
+  ///
+  /// In tr, this message translates to:
+  /// **'Üzgün'**
+  String get surveyDictMoodSad;
+
+  /// No description provided for @surveyDictMoodGrateful.
+  ///
+  /// In tr, this message translates to:
+  /// **'Şükrediyorum'**
+  String get surveyDictMoodGrateful;
+
+  /// No description provided for @surveyDictMoodAnxious.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kaygılı'**
+  String get surveyDictMoodAnxious;
+
+  /// No description provided for @surveyDictMoodMotivated.
+  ///
+  /// In tr, this message translates to:
+  /// **'Motive'**
+  String get surveyDictMoodMotivated;
+
+  /// No description provided for @surveyDictSectorStudent.
+  ///
+  /// In tr, this message translates to:
+  /// **'Lise / Üniversite / Hazırlık'**
+  String get surveyDictSectorStudent;
+
+  /// No description provided for @surveyDictSectorPrivate.
+  ///
+  /// In tr, this message translates to:
+  /// **'Özel Sektör'**
+  String get surveyDictSectorPrivate;
+
+  /// No description provided for @surveyDictSectorPublic.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kamu Personeli'**
+  String get surveyDictSectorPublic;
+
+  /// No description provided for @surveyDictSectorBusiness.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kendi İşim / Serbest'**
+  String get surveyDictSectorBusiness;
+
+  /// No description provided for @surveyDictSectorTrade.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ticaret'**
+  String get surveyDictSectorTrade;
+
+  /// No description provided for @surveyDictSectorHousehold.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ev Hanımı / Ev Erkeği'**
+  String get surveyDictSectorHousehold;
+
+  /// No description provided for @surveyDictSectorOther.
+  ///
+  /// In tr, this message translates to:
+  /// **'Diğer'**
+  String get surveyDictSectorOther;
+
+  /// No description provided for @surveyDictNeedMotivation.
+  ///
+  /// In tr, this message translates to:
+  /// **'Motivasyon'**
+  String get surveyDictNeedMotivation;
+
+  /// No description provided for @surveyDictNeedSabr.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sabır'**
+  String get surveyDictNeedSabr;
+
+  /// No description provided for @surveyDictNeedShukr.
+  ///
+  /// In tr, this message translates to:
+  /// **'Şükür'**
+  String get surveyDictNeedShukr;
+
+  /// No description provided for @surveyDictNeedTawakkul.
+  ///
+  /// In tr, this message translates to:
+  /// **'Tevekkül'**
+  String get surveyDictNeedTawakkul;
+
+  /// No description provided for @surveyDictNeedFocus.
+  ///
+  /// In tr, this message translates to:
+  /// **'Odaklanma'**
+  String get surveyDictNeedFocus;
+
+  /// No description provided for @surveyDictNeedHealing.
+  ///
+  /// In tr, this message translates to:
+  /// **'Şifa'**
+  String get surveyDictNeedHealing;
+
+  /// No description provided for @surveyDictNeedRizq.
+  ///
+  /// In tr, this message translates to:
+  /// **'Rızık & Bereket'**
+  String get surveyDictNeedRizq;
+
+  /// No description provided for @surveyDictGenderMale.
+  ///
+  /// In tr, this message translates to:
+  /// **'Erkek'**
+  String get surveyDictGenderMale;
+
+  /// No description provided for @surveyDictGenderFemale.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kadın'**
+  String get surveyDictGenderFemale;
+
+  /// No description provided for @premiumProductNotReadyError.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ürün bilgisi henüz hazır değil. Lütfen tekrar deneyin.'**
+  String get premiumProductNotReadyError;
+
+  /// No description provided for @premiumAccountLinkError.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hesap eşlemesi tamamlanamadı. Lütfen tekrar deneyin.'**
+  String get premiumAccountLinkError;
+
+  /// No description provided for @premiumWelcomeTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'🌿 Hoş geldin!'**
+  String get premiumWelcomeTitle;
+
+  /// No description provided for @premiumWelcomeMessage.
+  ///
+  /// In tr, this message translates to:
+  /// **'ARIN Premium aktif. Reklamsız, kilitsiz deneyimin açık.\n\nİstediğin zaman mağaza hesabından aboneliğini yönetebilirsin.'**
+  String get premiumWelcomeMessage;
+
+  /// No description provided for @premiumWelcomeButton.
+  ///
+  /// In tr, this message translates to:
+  /// **'Harika!'**
+  String get premiumWelcomeButton;
+
+  /// No description provided for @premiumRestoreSuccess.
+  ///
+  /// In tr, this message translates to:
+  /// **'Premium geri yüklendi!'**
+  String get premiumRestoreSuccess;
+
+  /// No description provided for @premiumNoActiveSubscription.
+  ///
+  /// In tr, this message translates to:
+  /// **'Aktif abonelik bulunamadı.'**
+  String get premiumNoActiveSubscription;
+
+  /// No description provided for @premiumSignInErrorPrefix.
+  ///
+  /// In tr, this message translates to:
+  /// **'Giriş tamamlanamadı: '**
+  String get premiumSignInErrorPrefix;
+
+  /// No description provided for @premiumActiveTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'ARIN Premium aktif'**
+  String get premiumActiveTitle;
+
+  /// No description provided for @premiumTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'ARIN Premium'**
+  String get premiumTitle;
+
+  /// No description provided for @premiumActiveSubtitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Reklamsız ve kilitsiz deneyimin açık.'**
+  String get premiumActiveSubtitle;
+
+  /// No description provided for @premiumSubtitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Reklamsız, kesintisiz ve kilitsiz manevi rutin.'**
+  String get premiumSubtitle;
+
+  /// No description provided for @premiumYearlyPlanTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yıllık Premium'**
+  String get premiumYearlyPlanTitle;
+
+  /// No description provided for @premiumMostAdvantageousBadge.
+  ///
+  /// In tr, this message translates to:
+  /// **'EN AVANTAJLI'**
+  String get premiumMostAdvantageousBadge;
+
+  /// No description provided for @premiumYearlyPlanSubtitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yıllık Abonelik'**
+  String get premiumYearlyPlanSubtitle;
+
+  /// No description provided for @premiumSwitchToYearly.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yıllığa geç'**
+  String get premiumSwitchToYearly;
+
+  /// No description provided for @premiumMonthlyPlanTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Aylık Premium'**
+  String get premiumMonthlyPlanTitle;
+
+  /// No description provided for @premiumMonthlyPlanSubtitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Aylık Abonelik'**
+  String get premiumMonthlyPlanSubtitle;
+
+  /// No description provided for @premiumFooterText1.
+  ///
+  /// In tr, this message translates to:
+  /// **'Lansman fiyatları sınırlı süre geçerlidir. Abonelik mağaza hesabın üzerinden yönetilir ve istediğin zaman iptal edilebilir.'**
+  String get premiumFooterText1;
+
+  /// No description provided for @premiumFooterText2.
+  ///
+  /// In tr, this message translates to:
+  /// **'Abonelik, dönem bitiminden en az 24 saat önce iptal edilmezse otomatik yenilenir. Yenileme ücreti dönem bitimine 24 saat kala mağaza hesabından tahsil edilir. Aboneliklerini App Store/Play hesap ayarlarından yönetebilirsin.'**
+  String get premiumFooterText2;
+
+  /// No description provided for @premiumLaunchBadge.
+  ///
+  /// In tr, this message translates to:
+  /// **'LANSMANA ÖZEL'**
+  String get premiumLaunchBadge;
+
+  /// No description provided for @premiumCountdownNotice.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu fiyat sınırlı süre geçerli. Lansman bitmeden premiumu en avantajlı fiyatla aç.'**
+  String get premiumCountdownNotice;
+
+  /// No description provided for @premiumBenefitAdFree.
+  ///
+  /// In tr, this message translates to:
+  /// **'Reklamsız kullanım'**
+  String get premiumBenefitAdFree;
+
+  /// No description provided for @premiumBenefitWidgets.
+  ///
+  /// In tr, this message translates to:
+  /// **'Widget kilidi yok'**
+  String get premiumBenefitWidgets;
+
+  /// No description provided for @premiumBenefitExplore.
+  ///
+  /// In tr, this message translates to:
+  /// **'Keşfet akışı kesintisiz'**
+  String get premiumBenefitExplore;
+
+  /// No description provided for @premiumBenefitAdhan.
+  ///
+  /// In tr, this message translates to:
+  /// **'2. ezan alarmı açık'**
+  String get premiumBenefitAdhan;
+
+  /// No description provided for @premiumSignInRequiredNotice.
+  ///
+  /// In tr, this message translates to:
+  /// **'Satın alma için giriş zorunlu değil. Premiumu bu cihazda hemen kullanabilirsin; istersen sonrasında hesabını bağlayıp diğer cihazlarda da erişebilirsin.'**
+  String get premiumSignInRequiredNotice;
+
+  /// No description provided for @premiumSignInSheetTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Premium için hesabını bağla'**
+  String get premiumSignInSheetTitle;
+
+  /// No description provided for @premiumSignInSheetSubtitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hesabını bağlarsan premiumun diğer cihazlarında da daha kolay geri yüklenir. Satın alma için giriş zorunlu değildir.'**
+  String get premiumSignInSheetSubtitle;
+
+  /// No description provided for @premiumContinueWithGoogle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Google ile devam et'**
+  String get premiumContinueWithGoogle;
+
+  /// No description provided for @premiumContinueWithApple.
+  ///
+  /// In tr, this message translates to:
+  /// **'Apple ile devam et'**
+  String get premiumContinueWithApple;
+
+  /// No description provided for @premiumCancelForNow.
+  ///
+  /// In tr, this message translates to:
+  /// **'Şimdilik vazgeç'**
+  String get premiumCancelForNow;
+
+  /// No description provided for @premiumPostPurchaseLinkTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Premium aktif'**
+  String get premiumPostPurchaseLinkTitle;
+
+  /// No description provided for @premiumPostPurchaseLinkBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'Premium bu cihazda aktif. Başka cihazlarda da kolayca kullanmak için hesabını şimdi bağlamak ister misin?'**
+  String get premiumPostPurchaseLinkBody;
+
+  /// No description provided for @premiumPostPurchaseLinkLater.
+  ///
+  /// In tr, this message translates to:
+  /// **'Daha sonra'**
+  String get premiumPostPurchaseLinkLater;
+
+  /// No description provided for @premiumPostPurchaseLinkNow.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hesabımı bağla'**
+  String get premiumPostPurchaseLinkNow;
+
+  /// No description provided for @premiumPostPurchaseLinkSuccess.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hesap bağlandı. Premium cihazların arasında senkronize edilebilir.'**
+  String get premiumPostPurchaseLinkSuccess;
+
+  /// No description provided for @premiumActivePlanBadge.
+  ///
+  /// In tr, this message translates to:
+  /// **'Aktif planınız ✓'**
+  String get premiumActivePlanBadge;
+
+  /// No description provided for @premiumActivePlanButton.
+  ///
+  /// In tr, this message translates to:
+  /// **'Aktif planınız'**
+  String get premiumActivePlanButton;
+
+  /// No description provided for @premiumStartWithLaunchPrice.
+  ///
+  /// In tr, this message translates to:
+  /// **'Lansman Fiyatıyla Başla'**
+  String get premiumStartWithLaunchPrice;
+
+  /// No description provided for @premiumIsActiveButton.
+  ///
+  /// In tr, this message translates to:
+  /// **'Premium aktif'**
+  String get premiumIsActiveButton;
+
+  /// No description provided for @qiblaCompassTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kıble Pusulası'**
+  String get qiblaCompassTitle;
+
+  /// No description provided for @qiblaCompassQibla.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kıble'**
+  String get qiblaCompassQibla;
+
+  /// No description provided for @qiblaCompassGettingLocation.
+  ///
+  /// In tr, this message translates to:
+  /// **'Konum alınıyor…'**
+  String get qiblaCompassGettingLocation;
+
+  /// No description provided for @qiblaCompassInitError.
+  ///
+  /// In tr, this message translates to:
+  /// **'Konum veya pusula\nbaşlatılamadı'**
+  String get qiblaCompassInitError;
+
+  /// No description provided for @qiblaCompassRetry.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yeniden dene'**
+  String get qiblaCompassRetry;
+
+  /// No description provided for @qiblaCompassAligned.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kıbleye dönüktür'**
+  String get qiblaCompassAligned;
+
+  /// No description provided for @qiblaCompassDeviation.
+  ///
+  /// In tr, this message translates to:
+  /// **'sapma'**
+  String get qiblaCompassDeviation;
+
+  /// No description provided for @qiblaCompassStabilizing.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ölçüm sabitleniyor'**
+  String get qiblaCompassStabilizing;
+
+  /// No description provided for @qiblaCompassGuidanceTiltTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Telefonu düz tut'**
+  String get qiblaCompassGuidanceTiltTitle;
+
+  /// No description provided for @qiblaCompassGuidanceTiltBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'Pusulayı yatay kullan. Dik, yan veya ters tutuşta yön kilitlenmez.'**
+  String get qiblaCompassGuidanceTiltBody;
+
+  /// No description provided for @qiblaCompassGuidanceCalibrateTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Pusulayı kalibre et'**
+  String get qiblaCompassGuidanceCalibrateTitle;
+
+  /// No description provided for @qiblaCompassGuidanceCalibrateBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'Telefonu birkaç kez 8 çizerek çevir, sonra metalden uzak tut.'**
+  String get qiblaCompassGuidanceCalibrateBody;
+
+  /// No description provided for @qiblaCompassGuidanceUnstableTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Manyetik alan kararsız'**
+  String get qiblaCompassGuidanceUnstableTitle;
+
+  /// No description provided for @qiblaCompassGuidanceUnstableBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'Laptop, mıknatıs, metal masa ve manyetik kılıftan uzaklaş.'**
+  String get qiblaCompassGuidanceUnstableBody;
+
+  /// No description provided for @qiblaCompassGuidanceGoodTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ölçüm hazır'**
+  String get qiblaCompassGuidanceGoodTitle;
+
+  /// No description provided for @qiblaCompassGuidanceGoodBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'Telefonu yatay tut, kıbleye yavaşça dön. Sabitlenince yeşil rozet yanar.'**
+  String get qiblaCompassGuidanceGoodBody;
+
+  /// No description provided for @qiblaCompassNorth.
+  ///
+  /// In tr, this message translates to:
+  /// **'K'**
+  String get qiblaCompassNorth;
+
+  /// No description provided for @qiblaCompassEast.
+  ///
+  /// In tr, this message translates to:
+  /// **'D'**
+  String get qiblaCompassEast;
+
+  /// No description provided for @qiblaCompassSouth.
+  ///
+  /// In tr, this message translates to:
+  /// **'G'**
+  String get qiblaCompassSouth;
+
+  /// No description provided for @qiblaCompassWest.
+  ///
+  /// In tr, this message translates to:
+  /// **'B'**
+  String get qiblaCompassWest;
+
+  /// No description provided for @qiblaCompassQiblaText.
+  ///
+  /// In tr, this message translates to:
+  /// **'KIBLE'**
+  String get qiblaCompassQiblaText;
+
+  /// No description provided for @zikirmatikCounterSemantics.
+  ///
+  /// In tr, this message translates to:
+  /// **'Zikirmatik sayacı'**
+  String get zikirmatikCounterSemantics;
+
+  /// No description provided for @zikirmatikRound.
+  ///
+  /// In tr, this message translates to:
+  /// **'TUR'**
+  String get zikirmatikRound;
+
+  /// No description provided for @zikirmatikRoundCompleted.
+  ///
+  /// In tr, this message translates to:
+  /// **'Tur tamamlandı'**
+  String get zikirmatikRoundCompleted;
+
+  /// No description provided for @zikirmatikResetCounter.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sayacı sıfırla?'**
+  String get zikirmatikResetCounter;
+
+  /// No description provided for @zikirmatikResetCounterDesc.
+  ///
+  /// In tr, this message translates to:
+  /// **'Toplam sayı ve tur bilgisi sıfırlanır.'**
+  String get zikirmatikResetCounterDesc;
+
+  /// No description provided for @zikirmatikCancel.
+  ///
+  /// In tr, this message translates to:
+  /// **'Vazgeç'**
+  String get zikirmatikCancel;
+
+  /// No description provided for @zikirmatikReset.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sıfırla'**
+  String get zikirmatikReset;
+
+  /// No description provided for @zikirmatikEditPhraseTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Zikir adını düzenle'**
+  String get zikirmatikEditPhraseTitle;
+
+  /// No description provided for @zikirmatikUse.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kullan'**
+  String get zikirmatikUse;
+
+  /// No description provided for @zikirmatikSaveAndUse.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kaydet ve Kullan'**
+  String get zikirmatikSaveAndUse;
+
+  /// No description provided for @zikirmatikThisRound.
+  ///
+  /// In tr, this message translates to:
+  /// **'BU TUR'**
+  String get zikirmatikThisRound;
+
+  /// No description provided for @zikirmatikTarget.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hedef'**
+  String get zikirmatikTarget;
+
+  /// No description provided for @zikirmatikCounterSemanticsLabel.
+  ///
+  /// In tr, this message translates to:
+  /// **'Zikir sayacı. {round} / {target}, toplam {total}'**
+  String zikirmatikCounterSemanticsLabel(
+    Object round,
+    Object target,
+    Object total,
+  );
+
+  /// No description provided for @zikirmatikCounterSemanticsHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Dokunarak sayıyı bir artır'**
+  String get zikirmatikCounterSemanticsHint;
+
+  /// No description provided for @zikirmatikVibration.
+  ///
+  /// In tr, this message translates to:
+  /// **'Titreşim'**
+  String get zikirmatikVibration;
+
+  /// No description provided for @zikirmatikVibrationTooltip.
+  ///
+  /// In tr, this message translates to:
+  /// **'Açıkken her sayımda titreşir; tur bitince ek güçlü titreşim'**
+  String get zikirmatikVibrationTooltip;
+
+  /// No description provided for @zikirmatikInfo.
+  ///
+  /// In tr, this message translates to:
+  /// **'Zikir bilgisi'**
+  String get zikirmatikInfo;
+
+  /// No description provided for @zikirmatikTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Zikirmatik'**
+  String get zikirmatikTitle;
+
+  /// No description provided for @zikirmatikTapToChoose.
+  ///
+  /// In tr, this message translates to:
+  /// **'Zikir seçmek için dokun'**
+  String get zikirmatikTapToChoose;
+
+  /// No description provided for @zikirmatikPickDhikr.
+  ///
+  /// In tr, this message translates to:
+  /// **'ZİKİR SEÇ'**
+  String get zikirmatikPickDhikr;
+
+  /// No description provided for @zikirmatikSaved.
+  ///
+  /// In tr, this message translates to:
+  /// **'KAYDETTİKLERİM'**
+  String get zikirmatikSaved;
+
+  /// No description provided for @zikirmatikDelete.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sil'**
+  String get zikirmatikDelete;
+
+  /// No description provided for @zikirmatikWriteOwnText.
+  ///
+  /// In tr, this message translates to:
+  /// **'KENDİ METNİNİ YAZ…'**
+  String get zikirmatikWriteOwnText;
+
+  /// No description provided for @zikirmatikCustomTarget.
+  ///
+  /// In tr, this message translates to:
+  /// **'Özel…'**
+  String get zikirmatikCustomTarget;
+
+  /// No description provided for @zikirmatikTargetOk.
+  ///
+  /// In tr, this message translates to:
+  /// **'Tamam'**
+  String get zikirmatikTargetOk;
+
+  /// No description provided for @zikirmatikDeleteRoundRecord.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu tur kaydını sil?'**
+  String get zikirmatikDeleteRoundRecord;
+
+  /// No description provided for @zikirmatikDhikr.
+  ///
+  /// In tr, this message translates to:
+  /// **'zikir'**
+  String get zikirmatikDhikr;
+
+  /// No description provided for @zikirmatikShareError.
+  ///
+  /// In tr, this message translates to:
+  /// **'Paylaşım açılamadı. Tekrar deneyin.'**
+  String get zikirmatikShareError;
+
+  /// No description provided for @zikirmatikDeleteRecord.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kaydı sil?'**
+  String get zikirmatikDeleteRecord;
+
+  /// No description provided for @zikirmatikCompletedRounds.
+  ///
+  /// In tr, this message translates to:
+  /// **'Tamamlanan turlar'**
+  String get zikirmatikCompletedRounds;
+
+  /// No description provided for @zikirmatikNoCompletedRounds.
+  ///
+  /// In tr, this message translates to:
+  /// **'Henüz tamamlanan tur kaydı yok. Hedefe ulaştığında buraya düşer.'**
+  String get zikirmatikNoCompletedRounds;
+
+  /// No description provided for @zikirmatikArchivedSessions.
+  ///
+  /// In tr, this message translates to:
+  /// **'Arşiv oturumları'**
+  String get zikirmatikArchivedSessions;
+
+  /// No description provided for @zikirmatikTodaysReflection.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bugünün payı'**
+  String get zikirmatikTodaysReflection;
+
+  /// No description provided for @zikirmatikCompareLine.
+  ///
+  /// In tr, this message translates to:
+  /// **'“{first}” zikrini “{second}”e göre {diff} tur daha çok tamamladın.'**
+  String zikirmatikCompareLine(Object diff, Object first, Object second);
+
+  /// No description provided for @zikirmatikOnlyOneRecord.
+  ///
+  /// In tr, this message translates to:
+  /// **'Şu an yalnızca “{first}” için tur kaydın var.'**
+  String zikirmatikOnlyOneRecord(Object first);
+
+  /// No description provided for @zikirmatikSummaryAndAnalytics.
+  ///
+  /// In tr, this message translates to:
+  /// **'Özet ve analiz'**
+  String get zikirmatikSummaryAndAnalytics;
+
+  /// No description provided for @zikirmatikAnalyticsNoLogs.
+  ///
+  /// In tr, this message translates to:
+  /// **'Daha fazla tur tamamladıkça özet ve karşılaştırmalar burada oluşur.'**
+  String get zikirmatikAnalyticsNoLogs;
+
+  /// No description provided for @zikirmatikTotalRoundsCompleted.
+  ///
+  /// In tr, this message translates to:
+  /// **'Toplam {total} tur tamamladın.'**
+  String zikirmatikTotalRoundsCompleted(Object total);
+
+  /// No description provided for @zikirmatikActiveDays.
+  ///
+  /// In tr, this message translates to:
+  /// **'{days} farklı günde zikir kaydın var.'**
+  String zikirmatikActiveDays(Object days);
+
+  /// No description provided for @zikirmatikLast7Days.
+  ///
+  /// In tr, this message translates to:
+  /// **'Son 7 günde {rounds} tur tamamlandı.'**
+  String zikirmatikLast7Days(Object rounds);
+
+  /// No description provided for @zikirmatikMostCompleted.
+  ///
+  /// In tr, this message translates to:
+  /// **'En çok tamamlanan: “{phrase}” ({rounds} tur).'**
+  String zikirmatikMostCompleted(Object phrase, Object rounds);
+
+  /// No description provided for @zikirmatikCompleted.
+  ///
+  /// In tr, this message translates to:
+  /// **'tamamlandı'**
+  String get zikirmatikCompleted;
+
+  /// No description provided for @zikirmatikTotalCounter.
+  ///
+  /// In tr, this message translates to:
+  /// **'toplam sayaç'**
+  String get zikirmatikTotalCounter;
+
+  /// No description provided for @healingAmbientForest.
+  ///
+  /// In tr, this message translates to:
+  /// **'Orman Sesi'**
+  String get healingAmbientForest;
+
+  /// No description provided for @healingAmbientFire.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ateş Sesi'**
+  String get healingAmbientFire;
+
+  /// No description provided for @healingAmbientCosmic.
+  ///
+  /// In tr, this message translates to:
+  /// **'Evren Sesi'**
+  String get healingAmbientCosmic;
+
+  /// No description provided for @healingAmbientInshirah.
+  ///
+  /// In tr, this message translates to:
+  /// **'İnşirah Suresi'**
+  String get healingAmbientInshirah;
+
+  /// No description provided for @healingSleepOff.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kapalı'**
+  String get healingSleepOff;
+
+  /// No description provided for @healingSleepRemaining.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kalan '**
+  String get healingSleepRemaining;
+
+  /// No description provided for @healingSleepMinutes.
+  ///
+  /// In tr, this message translates to:
+  /// **'{m} dakika'**
+  String healingSleepMinutes(Object m);
+
+  /// No description provided for @healingInfoTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bilgi'**
+  String get healingInfoTitle;
+
+  /// No description provided for @healingInfoBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu bölüm rahatlama ve tefekkür için tasarlanmıştır; tıbbi tedavi yerine geçmez. Sesleri düşük seviyede dinlemeniz önerilir. Rahatsızlık hissederseniz durdurun.'**
+  String get healingInfoBody;
+
+  /// No description provided for @healingInfoOk.
+  ///
+  /// In tr, this message translates to:
+  /// **'Tamam'**
+  String get healingInfoOk;
+
+  /// No description provided for @healingFrequenciesTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'İyileştirici Frekanslar'**
+  String get healingFrequenciesTitle;
+
+  /// No description provided for @healingAmbientSound.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ambiyans Sesi'**
+  String get healingAmbientSound;
+
+  /// No description provided for @healingPresets.
+  ///
+  /// In tr, this message translates to:
+  /// **'ÖNAYARLAR'**
+  String get healingPresets;
+
+  /// No description provided for @healingFrequencyTone.
+  ///
+  /// In tr, this message translates to:
+  /// **'Frekans tonu (Hz)'**
+  String get healingFrequencyTone;
+
+  /// No description provided for @healingAmbient.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ambiyans'**
+  String get healingAmbient;
+
+  /// No description provided for @healingSleepTimer.
+  ///
+  /// In tr, this message translates to:
+  /// **'Uyku Zamanlayıcı'**
+  String get healingSleepTimer;
+
+  /// No description provided for @healingInshirahLocked.
+  ///
+  /// In tr, this message translates to:
+  /// **'İnşirah modunda frekans kontrolleri kapalıdır.'**
+  String get healingInshirahLocked;
+
+  /// No description provided for @healingAllFrequencies.
+  ///
+  /// In tr, this message translates to:
+  /// **'Tüm Frekanslar'**
+  String get healingAllFrequencies;
+
+  /// No description provided for @healingPresetFocus.
+  ///
+  /// In tr, this message translates to:
+  /// **'Odak'**
+  String get healingPresetFocus;
+
+  /// No description provided for @healingPresetSleep.
+  ///
+  /// In tr, this message translates to:
+  /// **'Uyku'**
+  String get healingPresetSleep;
+
+  /// No description provided for @healingAmbientForestShort.
+  ///
+  /// In tr, this message translates to:
+  /// **'Orman'**
+  String get healingAmbientForestShort;
+
+  /// No description provided for @healingAmbientFireShort.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ateş'**
+  String get healingAmbientFireShort;
+
+  /// No description provided for @healingAmbientCosmicShort.
+  ///
+  /// In tr, this message translates to:
+  /// **'Evren'**
+  String get healingAmbientCosmicShort;
+
+  /// No description provided for @healingAmbientInshirahShort.
+  ///
+  /// In tr, this message translates to:
+  /// **'İnşirah'**
+  String get healingAmbientInshirahShort;
+
+  /// No description provided for @healingAmbientChoose.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ambiyans Sesi Seçin'**
+  String get healingAmbientChoose;
+
+  /// No description provided for @healingSleepCancel.
+  ///
+  /// In tr, this message translates to:
+  /// **'İptal'**
+  String get healingSleepCancel;
+
+  /// No description provided for @healingSleepStopAfter.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kaç dakika sonra durdurulsun?'**
+  String get healingSleepStopAfter;
+
+  /// No description provided for @healingSleepTimerOff.
+  ///
+  /// In tr, this message translates to:
+  /// **'Zamanlayıcı kapalı'**
+  String get healingSleepTimerOff;
+
+  /// No description provided for @healingFreq174Short.
+  ///
+  /// In tr, this message translates to:
+  /// **'Terapi Frekansı'**
+  String get healingFreq174Short;
+
+  /// No description provided for @healingFreq285Short.
+  ///
+  /// In tr, this message translates to:
+  /// **'Direnç ve Metanet'**
+  String get healingFreq285Short;
+
+  /// No description provided for @healingFreq396Short.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yenilenme'**
+  String get healingFreq396Short;
+
+  /// No description provided for @healingFreq417Short.
+  ///
+  /// In tr, this message translates to:
+  /// **'İç güç'**
+  String get healingFreq417Short;
+
+  /// No description provided for @healingFreq528Short.
+  ///
+  /// In tr, this message translates to:
+  /// **'Huzur'**
+  String get healingFreq528Short;
+
+  /// No description provided for @healingFreq639Short.
+  ///
+  /// In tr, this message translates to:
+  /// **'Arınma'**
+  String get healingFreq639Short;
+
+  /// No description provided for @healingFreq741Short.
+  ///
+  /// In tr, this message translates to:
+  /// **'Tefekkür'**
+  String get healingFreq741Short;
+
+  /// No description provided for @healingFreq852Short.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sekîne'**
+  String get healingFreq852Short;
+
+  /// No description provided for @healingFreq174Heading.
+  ///
+  /// In tr, this message translates to:
+  /// **'174 Hz - Şifa ve Rahatlama'**
+  String get healingFreq174Heading;
+
+  /// No description provided for @healingFreq285Heading.
+  ///
+  /// In tr, this message translates to:
+  /// **'285 Hz - Sabır ve Sebat'**
+  String get healingFreq285Heading;
+
+  /// No description provided for @healingFreq396Heading.
+  ///
+  /// In tr, this message translates to:
+  /// **'396 Hz - Bereket ve Başlangıç'**
+  String get healingFreq396Heading;
+
+  /// No description provided for @healingFreq417Heading.
+  ///
+  /// In tr, this message translates to:
+  /// **'417 Hz - İç Güç ve İman'**
+  String get healingFreq417Heading;
+
+  /// No description provided for @healingFreq528Heading.
+  ///
+  /// In tr, this message translates to:
+  /// **'528 Hz - Huzur ve Sükûnet'**
+  String get healingFreq528Heading;
+
+  /// No description provided for @healingFreq639Heading.
+  ///
+  /// In tr, this message translates to:
+  /// **'639 Hz - Arınma ve Temizlik'**
+  String get healingFreq639Heading;
+
+  /// No description provided for @healingFreq741Heading.
+  ///
+  /// In tr, this message translates to:
+  /// **'741 Hz - Tefekkür ve Dikkat'**
+  String get healingFreq741Heading;
+
+  /// No description provided for @healingFreq852Heading.
+  ///
+  /// In tr, this message translates to:
+  /// **'852 Hz - Sekîne (Derin Huzur)'**
+  String get healingFreq852Heading;
+
+  /// No description provided for @healingFreq174Body.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bedensel ve ruhsal yorgunlukta sükûnete yönelme; şifa Allah’tandır.'**
+  String get healingFreq174Body;
+
+  /// No description provided for @healingFreq285Body.
+  ///
+  /// In tr, this message translates to:
+  /// **'Zorlukta kalbi yumuşatma; Allah’a tevekkül ile devam etme niyeti.'**
+  String get healingFreq285Body;
+
+  /// No description provided for @healingFreq396Body.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yeni bir sayfa açma; günahtan arınma ve affa yönelme duası.'**
+  String get healingFreq396Body;
+
+  /// No description provided for @healingFreq417Body.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kalbi güçlendirme; imanı tazeleme ve istikamet hatırlaması.'**
+  String get healingFreq417Body;
+
+  /// No description provided for @healingFreq528Body.
+  ///
+  /// In tr, this message translates to:
+  /// **'Gönül sükûneti; şükür ve teslimiyetle nefes alma.'**
+  String get healingFreq528Body;
+
+  /// No description provided for @healingFreq639Body.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kalbi kirleten düşüncelerden uzaklaşma; bağışlanma dileği.'**
+  String get healingFreq639Body;
+
+  /// No description provided for @healingFreq741Body.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ayete ve yaratılışa odaklanma; dağılan zihni toplama.'**
+  String get healingFreq741Body;
+
+  /// No description provided for @healingFreq852Body.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kalbe ferahlık veren sükûnet; Allah’ın rahmetine sığınma.'**
+  String get healingFreq852Body;
+
+  /// No description provided for @appleSignInCanceled.
+  ///
+  /// In tr, this message translates to:
+  /// **'Apple girişi iptal edildi.'**
+  String get appleSignInCanceled;
+
+  /// No description provided for @appleSignInNotAuthorized.
+  ///
+  /// In tr, this message translates to:
+  /// **'Apple hesabı yetki vermedi. iPhone Ayarları > Apple Kimliği > Giriş Yapma ve Güvenlik bölümünden Apple ile giriş iznini kontrol edin.'**
+  String get appleSignInNotAuthorized;
+
+  /// No description provided for @appleSignInProviderDisabled.
+  ///
+  /// In tr, this message translates to:
+  /// **'Firebase konsolunda Apple giriş sağlayıcısı kapalı görünüyor.'**
+  String get appleSignInProviderDisabled;
+
+  /// No description provided for @appleSignInInvalidCredential.
+  ///
+  /// In tr, this message translates to:
+  /// **'Apple kimlik doğrulama bilgisi geçersiz geldi. Bundle ID ve Apple Sign In yetkisini Xcode/Firebase tarafında kontrol edin.'**
+  String get appleSignInInvalidCredential;
+
+  /// No description provided for @appleSignInNetworkFailed.
+  ///
+  /// In tr, this message translates to:
+  /// **'İnternet bağlantısı yüzünden Apple girişi tamamlanamadı.'**
+  String get appleSignInNetworkFailed;
+
+  /// No description provided for @settingsMenuPremiumTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'ARIN Premium'**
+  String get settingsMenuPremiumTitle;
+
+  /// No description provided for @settingsMenuPremiumSubtitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Lansman fiyatları ve reklamsız deneyim'**
+  String get settingsMenuPremiumSubtitle;
+
+  /// No description provided for @settingsMenuWidgetsTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Widget Merkezi'**
+  String get settingsMenuWidgetsTitle;
+
+  /// No description provided for @settingsMenuWidgetsSubtitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kullanım bilgileri ve takip widgetı'**
+  String get settingsMenuWidgetsSubtitle;
+
+  /// No description provided for @supportProductNotReady.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ürün bilgisi henüz hazır değil. Lütfen tekrar deneyin.'**
+  String get supportProductNotReady;
+
+  /// No description provided for @supportThanksTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Teşekkürler! 🙏'**
+  String get supportThanksTitle;
+
+  /// No description provided for @supportThanksBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'Desteğin Arın için çok değerli. Bu katkıyla daha güzel bir deneyim sunmaya devam edeceğiz.'**
+  String get supportThanksBody;
+
+  /// No description provided for @commonOk.
+  ///
+  /// In tr, this message translates to:
+  /// **'Tamam'**
+  String get commonOk;
+
+  /// No description provided for @supportPageTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Arın\'a Destek Ol'**
+  String get supportPageTitle;
+
+  /// No description provided for @supportTierSmallTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Küçük Destek'**
+  String get supportTierSmallTitle;
+
+  /// No description provided for @supportTierSmallDesc.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bir kahve desteğiyle geliştirmeye katkı ver.'**
+  String get supportTierSmallDesc;
+
+  /// No description provided for @supportTierMediumTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Orta Destek'**
+  String get supportTierMediumTitle;
+
+  /// No description provided for @supportTierMediumDesc.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yeni içerik ve özelliklerin gelişmesini hızlandır.'**
+  String get supportTierMediumDesc;
+
+  /// No description provided for @supportTierLargeTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Büyük Destek'**
+  String get supportTierLargeTitle;
+
+  /// No description provided for @supportTierLargeDesc.
+  ///
+  /// In tr, this message translates to:
+  /// **'Arın\'ın uzun vadeli gelişimine güçlü katkı ver.'**
+  String get supportTierLargeDesc;
+
+  /// No description provided for @supportPackagesDisclaimer.
+  ///
+  /// In tr, this message translates to:
+  /// **'Destek paketleri tek seferlik mağaza ürünleri olarak çalışır. Premium abonelikten ayrıdır.'**
+  String get supportPackagesDisclaimer;
+
+  /// No description provided for @supportHeaderTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Arın\'ın yanında ol'**
+  String get supportHeaderTitle;
+
+  /// No description provided for @supportHeaderDesc.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bağış değil, mağaza kurallarına uygun tek seferlik destek paketleri. Uygulamanın reklamsız ve premium deneyimini büyütmemize yardımcı olur.'**
+  String get supportHeaderDesc;
+
+  /// No description provided for @languageChangeFailed.
+  ///
+  /// In tr, this message translates to:
+  /// **'Dil değiştirilemedi. Lütfen tekrar dene.'**
+  String get languageChangeFailed;
+
+  /// No description provided for @differentLocation.
+  ///
+  /// In tr, this message translates to:
+  /// **'Farklı bir konumdasın'**
+  String get differentLocation;
+
+  /// No description provided for @updatePrayerTimesForCity.
+  ///
+  /// In tr, this message translates to:
+  /// **'Namaz vakitlerini {city}\'a göre güncelleyelim mi?'**
+  String updatePrayerTimesForCity(Object city);
+
+  /// No description provided for @rememberThisChoice.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu tercihi hatırla, bir daha sorma'**
+  String get rememberThisChoice;
+
+  /// No description provided for @keepCurrentLocation.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kalsın'**
+  String get keepCurrentLocation;
+
+  /// No description provided for @updateLocation.
+  ///
+  /// In tr, this message translates to:
+  /// **'Güncelle'**
+  String get updateLocation;
+
+  /// No description provided for @sealYourIntention.
+  ///
+  /// In tr, this message translates to:
+  /// **'Niyetini mühürle'**
+  String get sealYourIntention;
+
+  /// No description provided for @sealIntentionInfo.
+  ///
+  /// In tr, this message translates to:
+  /// **'Az önce paylaştığın işaretler ve adın bu başlangıcın parçası; basılı tutarak niyetini pekiştir.'**
+  String get sealIntentionInfo;
+
+  /// No description provided for @touchAndHoldWhenReady.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hazır olduğunda dokun ve basılı tut.'**
+  String get touchAndHoldWhenReady;
+
+  /// No description provided for @youAreAlmostThere.
+  ///
+  /// In tr, this message translates to:
+  /// **'Çok yaklaştın!'**
+  String get youAreAlmostThere;
+
+  /// No description provided for @promiseSealed.
+  ///
+  /// In tr, this message translates to:
+  /// **'Tebrikler, Sözün Mühürlendi!'**
+  String get promiseSealed;
+
+  /// No description provided for @touchAndHoldToContinue.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ekrana dokun ve basılı tut\nDevam etmek için…'**
+  String get touchAndHoldToContinue;
+
+  /// No description provided for @skipWithArrow.
+  ///
+  /// In tr, this message translates to:
+  /// **'Atla ➔'**
+  String get skipWithArrow;
+
+  /// No description provided for @redirecting.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yönlendiriliyorsun...'**
+  String get redirecting;
+
+  /// No description provided for @keepGoing.
+  ///
+  /// In tr, this message translates to:
+  /// **'Devam et...'**
+  String get keepGoing;
+
+  /// No description provided for @premiumLoadingWait.
+  ///
+  /// In tr, this message translates to:
+  /// **'Premium durumu yükleniyor. Lütfen kısa bir süre sonra tekrar deneyin.'**
+  String get premiumLoadingWait;
+
+  /// No description provided for @secondAlarmPremiumFeature.
+  ///
+  /// In tr, this message translates to:
+  /// **'2. alarm premium özelliği'**
+  String get secondAlarmPremiumFeature;
+
+  /// No description provided for @secondAlarmAdWatchText.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ücretsiz kullanımda 2. ezan alarmını açmak için kısa reklam izlenir. Premium kullanıcılar bu kilidi görmez.'**
+  String get secondAlarmAdWatchText;
+
+  /// No description provided for @giveUp.
+  ///
+  /// In tr, this message translates to:
+  /// **'Vazgeç'**
+  String get giveUp;
+
+  /// No description provided for @openAfterAd.
+  ///
+  /// In tr, this message translates to:
+  /// **'Reklam sonrası aç'**
+  String get openAfterAd;
+
+  /// No description provided for @reflection.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yansıma'**
+  String get reflection;
+
+  /// No description provided for @yesterdayPrayerSummary.
+  ///
+  /// In tr, this message translates to:
+  /// **'Dün · {weekday} · {yDone}/5  ·  Son 7 gün ort. {avg}/5'**
+  String yesterdayPrayerSummary(Object avg, Object weekday, Object yDone);
+
+  /// No description provided for @weeklyView.
+  ///
+  /// In tr, this message translates to:
+  /// **'Haftalık görünüm'**
+  String get weeklyView;
+
+  /// No description provided for @daysDoneSummary.
+  ///
+  /// In tr, this message translates to:
+  /// **'{done}/7 gün'**
+  String daysDoneSummary(Object done);
+
+  /// No description provided for @inspirationAndAwareness.
+  ///
+  /// In tr, this message translates to:
+  /// **'İlham ve farkındalık'**
+  String get inspirationAndAwareness;
+
+  /// No description provided for @shortBreaksForTruth.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hakikat ve şuur için kısa molalar'**
+  String get shortBreaksForTruth;
+
+  /// No description provided for @insightCommentStrong.
+  ///
+  /// In tr, this message translates to:
+  /// **'Son günlerde ritmin çok güçlü; kalbin düzenle hizalanmış görünüyor. Böyle devam.'**
+  String get insightCommentStrong;
+
+  /// No description provided for @insightCommentPerfect.
+  ///
+  /// In tr, this message translates to:
+  /// **'Dün beş vakit tamam — Rabb’ine yakın bir gün geçirmişsin. Bugün de aynı niyetle devam edebilirsin.'**
+  String get insightCommentPerfect;
+
+  /// No description provided for @insightCommentZero.
+  ///
+  /// In tr, this message translates to:
+  /// **'Dün kayıt düşmemiş olabilir veya henüz işaretlenmemiş. Bugün tek bir vakitle bile çizgiyi yeniden çizebilirsin.'**
+  String get insightCommentZero;
+
+  /// No description provided for @insightCommentLow.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu hafta ortalama düşük; bu normal — tefekkür ve küçük adımlarla yükselir. Bir vakit fazlası büyük fark yaratır.'**
+  String get insightCommentLow;
+
+  /// No description provided for @insightCommentGood.
+  ///
+  /// In tr, this message translates to:
+  /// **'Dün {count}/5 vakit işaretli; bugün bir iki vakitle dengeyi tamamlamak mümkün.'**
+  String insightCommentGood(Object count);
+
+  /// No description provided for @insightCommentDefault.
+  ///
+  /// In tr, this message translates to:
+  /// **'Geçmiş günler verisi senin için bir ayna: eksik kalan yerlerde merhamet, tamamlananlarda şükür.'**
+  String get insightCommentDefault;
 }
 
 class _AppLocalizationsDelegate

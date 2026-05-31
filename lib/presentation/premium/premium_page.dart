@@ -117,42 +117,26 @@ class _PremiumPageState extends ConsumerState<PremiumPage> {
 
   Future<void> _startPurchase(String productId) async {
     if (_busyProductId != null) return;
+    final messenger = ScaffoldMessenger.of(context);
+    final l10n = AppLocalizations.of(context)!;
     if (_loadingProducts || !_containsProduct(productId)) {
-      ScaffoldMessenger.of(context).showSnackBar(
+      messenger.showSnackBar(
         SnackBar(
-          content: Text(AppLocalizations.of(context)!.premiumProductNotReadyError),
+          content: Text(l10n.premiumProductNotReadyError),
           backgroundColor: Colors.red.shade700,
         ),
       );
       return;
     }
     final user = ref.read(authUserProvider).asData?.value;
-    if (user == null) {
-      final signedIn = await _showSignInSheet();
-      if (signedIn != true || !mounted) return;
-      final uid = FirebaseAuth.instance.currentUser?.uid;
-      if (uid != null && uid.isNotEmpty) {
-        try {
-          await PurchaseService.loginUser(uid);
-        } catch (e) {
-          if (!mounted) return;
-          ScaffoldMessenger.of(context).showSnackBar(
-             SnackBar(
-              content: Text(AppLocalizations.of(context)!.premiumAccountLinkError),
-            ),
-          );
-          return;
-        }
-        if (!mounted) return;
-      }
-    } else {
+    if (user != null) {
       try {
         await PurchaseService.loginUser(user.uid);
       } catch (e) {
         if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-           SnackBar(
-            content: Text(AppLocalizations.of(context)!.premiumAccountLinkError),
+        messenger.showSnackBar(
+          SnackBar(
+            content: Text(l10n.premiumAccountLinkError),
           ),
         );
         return;
@@ -161,7 +145,9 @@ class _PremiumPageState extends ConsumerState<PremiumPage> {
 
     setState(() => _busyProductId = productId);
     try {
-      final result = await ref.read(purchaseServiceProvider).purchase(productId);
+      final result = await ref
+          .read(purchaseServiceProvider)
+          .purchase(productId, l10n: l10n);
 
       if (!mounted) return;
 
@@ -169,17 +155,60 @@ class _PremiumPageState extends ConsumerState<PremiumPage> {
         // Premium aktif: Firestore'u yenile ve başarı sayfası/mesajı göster.
         ref.invalidate(premiumEntitlementProvider);
         await ref.read(premiumEntitlementProvider.future);
+        if (mounted && ref.read(authUserProvider).asData?.value == null) {
+          await _maybePromptAccountLinkAfterPurchase();
+        }
         await _showSuccessDialog();
       } else if (!result.isCancelled) {
         final msg = result.userMessage;
         if (msg != null) {
-          ScaffoldMessenger.of(context).showSnackBar(
+          messenger.showSnackBar(
             SnackBar(content: Text(msg)),
           );
         }
       }
     } finally {
       if (mounted) setState(() => _busyProductId = null);
+    }
+  }
+
+  Future<void> _maybePromptAccountLinkAfterPurchase() async {
+    final l10n = AppLocalizations.of(context)!;
+    final shouldLink = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Text(l10n.premiumPostPurchaseLinkTitle),
+        content: Text(l10n.premiumPostPurchaseLinkBody),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: Text(l10n.premiumPostPurchaseLinkLater),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: Text(l10n.premiumPostPurchaseLinkNow),
+          ),
+        ],
+      ),
+    );
+    if (shouldLink != true || !mounted) return;
+    final signedIn = await _showSignInSheet();
+    if (signedIn != true || !mounted) return;
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid == null || uid.isEmpty) return;
+    try {
+      await PurchaseService.loginUser(uid);
+      if (!mounted) return;
+      ref.invalidate(premiumEntitlementProvider);
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.premiumPostPurchaseLinkSuccess)));
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.premiumAccountLinkError)),
+      );
     }
   }
 
@@ -220,16 +249,18 @@ class _PremiumPageState extends ConsumerState<PremiumPage> {
 
   Future<void> _restorePurchases() async {
     if (_busyProductId != null) return;
-    
+    final messenger = ScaffoldMessenger.of(context);
+    final l10n = AppLocalizations.of(context)!;
+
     final user = ref.read(authUserProvider).asData?.value;
     if (user != null) {
       try {
         await PurchaseService.loginUser(user.uid);
       } catch (e) {
         if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-           SnackBar(
-            content: Text(AppLocalizations.of(context)!.premiumAccountLinkError),
+        messenger.showSnackBar(
+          SnackBar(
+            content: Text(l10n.premiumAccountLinkError),
           ),
         );
         return;
@@ -238,8 +269,9 @@ class _PremiumPageState extends ConsumerState<PremiumPage> {
 
     setState(() => _busyProductId = '__restore__');
     try {
-      final result =
-          await ref.read(purchaseServiceProvider).restorePurchases();
+      final result = await ref
+          .read(purchaseServiceProvider)
+          .restorePurchases(l10n: l10n);
       if (!mounted) return;
 
       if (result.isSuccess) {
@@ -250,17 +282,17 @@ class _PremiumPageState extends ConsumerState<PremiumPage> {
         final localActive = await ref.read(purchaseServiceProvider).isPremiumLocally();
         
         if (entitlement.isActive || localActive) {
-          ScaffoldMessenger.of(context).showSnackBar(
-             SnackBar(content: Text(AppLocalizations.of(context)!.premiumRestoreSuccess)),
+          messenger.showSnackBar(
+            SnackBar(content: Text(l10n.premiumRestoreSuccess)),
           );
         } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-             SnackBar(content: Text(AppLocalizations.of(context)!.premiumNoActiveSubscription)),
+          messenger.showSnackBar(
+            SnackBar(content: Text(l10n.premiumNoActiveSubscription)),
           );
         }
       } else {
-        final msg = result.userMessage ?? AppLocalizations.of(context)!.premiumNoActiveSubscription;
-        ScaffoldMessenger.of(context).showSnackBar(
+        final msg = result.userMessage ?? l10n.premiumNoActiveSubscription;
+        messenger.showSnackBar(
           SnackBar(content: Text(msg)),
         );
       }

@@ -23,7 +23,7 @@ import '../../core/router/app_router.dart';
 import '../../core/theme/arin_shell_background.dart';
 import '../../data/services/qibla_compass_controller.dart';
 
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:arin/l10n/app_localizations.dart';
 
 // ─── Painter renk sabitleri (dark canvas için) ───────────────────────────────
 const _tickNorth  = Color(0xFFF87171);         // kuzey kırmızı
@@ -428,7 +428,7 @@ class _ErrorView extends StatelessWidget {
                     color: AppColors.accentNeonGreen.withValues(alpha: 0.45),
                   ),
                 ),
-                child: const Text(
+                child: Text(
                   AppLocalizations.of(context)!.qiblaCompassRetry,
                   style: TextStyle(
                     color: AppColors.accentNeonGreen,

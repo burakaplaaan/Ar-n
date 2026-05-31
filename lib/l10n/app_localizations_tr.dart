@@ -1388,7 +1388,7 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get settingsPrivacyThirdPartyBody =>
-      'Arin; oturum açma, veri eşitleme, kullanım analizi ve çökme tanılama için Firebase Authentication, Cloud Firestore, Firebase Analytics ve Firebase Crashlytics kullanır.';
+      'Arin; oturum açma, bildirimler ve veri eşitleme için Firebase servislerini, reklamlar için Google AdMob\'u, abonelik yönetimi için RevenueCat\'i ve namaz vakitleri için Aladhan/Diyanet API\'lerini kullanır.';
 
   @override
   String get settingsPrivacyControlsTitle => 'Kullanıcı kontrolü';
@@ -3007,4 +3007,1412 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get adminEmailInviteLabel => 'E-posta daveti';
+
+  @override
+  String get offlineBannerOffline => 'Çevrimdışısın';
+
+  @override
+  String get offlineBannerReconnected => 'Tekrar bağlandın';
+
+  @override
+  String get premiumRestorePurchasesLabel => 'Geri yükle';
+
+  @override
+  String get premiumActivePlanLabel => 'Aktif planınız';
+
+  @override
+  String get premiumPlanMonthlyLaunch => 'Lansman Fiyatıyla Başla';
+
+  @override
+  String get premiumPlanYearlySwitch => 'Yıllığa geç';
+
+  @override
+  String get premiumFeatureNoAds => 'Reklamsız kullanım';
+
+  @override
+  String get premiumFeatureWidgets => 'Widget kilidi yok';
+
+  @override
+  String get premiumFeatureReels => 'Keşfet akışı kesintisiz';
+
+  @override
+  String get premiumFeatureSecondAlarm => '2. ezan alarmı açık';
+
+  @override
+  String get premiumFeatureExtras => 'Zikir, pusula ve frekanslarda reklam yok';
+
+  @override
+  String get premiumSignInRequired =>
+      'Satın alma için giriş zorunlu değil. Premiumu bu cihazda hemen kullanabilir, istersen daha sonra hesabını bağlayarak diğer cihazlarında da erişebilirsin.';
+
+  @override
+  String get premiumSignInTitle => 'Premium için hesabını bağla';
+
+  @override
+  String get premiumSignInSubtitle =>
+      'Satın aldığın premium cihaz değiştirince kaybolmasın diye önce hesabına bağlanır. Fiyatları görmek için giriş gerekmez.';
+
+  @override
+  String get premiumSignInGoogle => 'Google ile devam et';
+
+  @override
+  String get premiumSignInApple => 'Apple ile devam et';
+
+  @override
+  String get premiumSignInCancel => 'Şimdilik vazgeç';
+
+  @override
+  String get locationPermissionRequiredTitle => 'Konum İzni Gerekli';
+
+  @override
+  String get locationPermissionRequiredBody =>
+      'Arın, namaz vakitlerini ve kıble yönünü doğru hesaplayabilmek için konumunuza erişim izni gerektirir. Konum verileriniz yalnızca bu amaçlar için kullanılır ve cihazınızda işlenir.';
+
+  @override
+  String get locationPermissionNotNow => 'Şimdi Değil';
+
+  @override
+  String get locationPermissionContinue => 'Devam Et';
+
+  @override
+  String get errorScreenTitle => 'Bir şeyler ters gitti';
+
+  @override
+  String get errorScreenBody =>
+      'Bu bölüm şu an açılamadı. Uygulamayı kapatıp tekrar açmayı deneyebilirsin.';
+
+  @override
+  String get errorScreenDebugTitle => 'ARIN — widget hatası (debug)';
+
+  @override
+  String get errorScreenDebugBody =>
+      'Debug moddasınız. Aşağıdaki metni kopyalayın.';
+
+  @override
+  String get widgetUnlockQuoteTitle => 'Günlük Söz Widgetı';
+
+  @override
+  String get widgetUnlockPrayerTitle => 'Namaz Vakti Widgetı';
+
+  @override
+  String get widgetUnlockComboTitle => 'Söz + Namaz Widgetı';
+
+  @override
+  String get widgetUnlockTrackingTitle => 'Takip Widgetı';
+
+  @override
+  String get widgetUnlockAdLoadFailed =>
+      'Reklam şu an yüklenemedi, daha sonra tekrar dene.';
+
+  @override
+  String widgetUnlockSuccessTitle(Object title) {
+    return '$title 24 saat açıldı! 🎉';
+  }
+
+  @override
+  String get widgetUnlockPremiumSuccess =>
+      'Premium aktif! Tüm widgetlar açıldı. 🎉';
+
+  @override
+  String get widgetUnlockDescription =>
+      'Bu widgetı 24 saat açmak için kısa bir reklam izleyebilirsin. Kalıcı erişim için Premium\'a geç.';
+
+  @override
+  String get widgetUnlockAdButton => 'Reklam izle — 24 saat aç';
+
+  @override
+  String get widgetUnlockPremiumButton => 'Premium\'a geç';
+
+  @override
+  String get widgetUnlockCancelButton => 'Şimdi değil';
+
+  @override
+  String get purchaseErrorNotFound =>
+      'Ürün bulunamadı. İnternet bağlantınızı kontrol edin.';
+
+  @override
+  String purchaseErrorUnexpected(Object error) {
+    return 'Beklenmedik hata: $error';
+  }
+
+  @override
+  String get purchaseErrorNotSupported =>
+      'Bu platformda satın alma desteklenmiyor.';
+
+  @override
+  String get audioPermissionRequiredTitle => 'Medya İzni Gerekli';
+
+  @override
+  String get audioPermissionRequiredBody =>
+      'Arın, kendi cihazınızdan özel ezan veya bildirim sesi seçebilmeniz için ses dosyalarınıza erişim izni gerektirir. Bu dosyalar sadece uygulama içinde bildirim olarak kullanılır.';
+
+  @override
+  String get audioPickerTitle => 'Ses dosyası seç';
+
+  @override
+  String get mgmtDailyPrayers => 'Günlük namaz';
+
+  @override
+  String get mgmtRoutineWorkshop => 'Rutin atölyesi';
+
+  @override
+  String get mgmtChooseGrowth => 'Gelişim seç';
+
+  @override
+  String get mgmtPickPrayerOrMakeup =>
+      'Namaz veya kaza takibini işaretle; özel bir gelişim için alttaki alanı kullan.';
+
+  @override
+  String get mgmtCountingAndCompensation => 'Sayım ve telafi';
+
+  @override
+  String get mgmtPrayer => 'Namaz';
+
+  @override
+  String get mgmtTimeAndKhushu => 'Vakit ve huşû';
+
+  @override
+  String get mgmtCustomRoutine => 'Özel rutin';
+
+  @override
+  String get mgmtChooseYourOwnTitle =>
+      'Başlık, emoji ve hatırlatmayı sen belirle.';
+
+  @override
+  String get mgmtSelect => 'Seç';
+
+  @override
+  String get habitsMyHabits => 'Alışkanlıklarım';
+
+  @override
+  String get habitsNoHabitsYet =>
+      'Henüz alışkanlık eklemedin.\nYeni bir başlangıç yapmaya hazır mısın?';
+
+  @override
+  String get habitsGrowth => 'Gelişim';
+
+  @override
+  String get habitsPurification => 'Arınma';
+
+  @override
+  String get habitsAddPurificationGoal => 'Arınma hedefi ekle';
+
+  @override
+  String get habitsAddGrowthRoutine => 'Gelişim rutini ekle';
+
+  @override
+  String get habitsDeleteConfirmTitle => 'Bu alışkanlığı silmek istiyor musun?';
+
+  @override
+  String get habitsCancel => 'Vazgeç';
+
+  @override
+  String get habitsYesDelete => 'Evet, Sil';
+
+  @override
+  String get habitsDayStreak => 'gün serisi';
+
+  @override
+  String get customHabitThisWeekGoal => 'Bu haftanın hedefi';
+
+  @override
+  String get customHabitThisMonthGoal => 'Bu ayın hedefi';
+
+  @override
+  String get customHabitDailyGoal => 'Günlük hedef';
+
+  @override
+  String get customHabitThisWeekGoalComplete => 'Bu haftanın hedefi tamam.';
+
+  @override
+  String get customHabitThisMonthGoalComplete => 'Bu ayın hedefi tamam.';
+
+  @override
+  String get customHabitTodayGoalComplete => 'Bugünkü hedef tamam.';
+
+  @override
+  String get customHabitLetsStart => 'Haydi başla!';
+
+  @override
+  String get customHabitDoingWell => 'İyi gidiyorsun.';
+
+  @override
+  String get customHabitAlmostThere => 'Neredeyse.';
+
+  @override
+  String get customHabitOneLastStep => 'Son bir adım.';
+
+  @override
+  String get customHabitRecordNotFound => 'Kayıt bulunamadı';
+
+  @override
+  String get customHabitStreak => 'Seri';
+
+  @override
+  String get customHabitDayStreak => 'Gün serisi';
+
+  @override
+  String get customHabitBack => 'Geri';
+
+  @override
+  String get customHabitRemove => 'Kaldır';
+
+  @override
+  String get customHabitBackToTracker => 'Alışkanlık takibine dön';
+
+  @override
+  String get customHabitGoal => 'Hedef';
+
+  @override
+  String get customHabitCompletedToday => 'Bugün hedefi tamamladın.';
+
+  @override
+  String get customHabitCompletedPeriod => 'Bu dönem hedefi tamamladın.';
+
+  @override
+  String get customHabitFinish => 'Bitir';
+
+  @override
+  String get addHabitUnitTimes => 'kez';
+
+  @override
+  String get addHabitUnitMinutes => 'dakika';
+
+  @override
+  String get addHabitUnitHours => 'saat';
+
+  @override
+  String get addHabitUnitPages => 'sayfa';
+
+  @override
+  String get addHabitUnitGlasses => 'bardak';
+
+  @override
+  String get addHabitUnitSets => 'set';
+
+  @override
+  String get addHabitUnitLaps => 'tur';
+
+  @override
+  String get addHabitDaily => 'Günlük';
+
+  @override
+  String get addHabitWeekly => 'Haftalık';
+
+  @override
+  String get addHabitMonthly => 'Aylık';
+
+  @override
+  String addHabitSummaryWeekly(Object amount, Object unit) {
+    return '$amount $unit haftalık';
+  }
+
+  @override
+  String addHabitSummaryMonthly(Object amount, Object unit) {
+    return '$amount $unit aylık';
+  }
+
+  @override
+  String addHabitSummaryDaily(Object amount, Object unit) {
+    return '$amount $unit günlük';
+  }
+
+  @override
+  String get addHabitCancel => 'İptal';
+
+  @override
+  String get addHabitOk => 'Tamam';
+
+  @override
+  String get addHabitCustom => 'Özel';
+
+  @override
+  String get addHabitSave => 'Kaydet';
+
+  @override
+  String get addHabitGrowthName => 'Gelişim Adı';
+
+  @override
+  String get addHabitPurificationName => 'Arınma Adı';
+
+  @override
+  String get addHabitGrowthHint => 'Örn: 30 dakika kitap okuma';
+
+  @override
+  String get addHabitPurificationHint => 'Örn: Gereksiz ekran süresini azalt';
+
+  @override
+  String get addHabitNameRequired => 'İsim gerekli';
+
+  @override
+  String get addHabitNameTooLong => 'En fazla 60 karakter';
+
+  @override
+  String get addHabitNoteOptional => 'Not (isteğe bağlı)';
+
+  @override
+  String get addHabitNoteHint => 'Kendine kısa bir not…';
+
+  @override
+  String habitCalendarToday(Object date) {
+    return 'Bugün: $date';
+  }
+
+  @override
+  String get habitCalendarTitle => 'Alışkanlık takvimi';
+
+  @override
+  String get habitCalendarMonth => 'Ay';
+
+  @override
+  String habitCalendarMonthNote(Object month, Object year) {
+    return 'Ay notu · $month $year';
+  }
+
+  @override
+  String get habitCalendarNoRecords =>
+      'Bu ay için henüz kayıt yok veya alışkanlık eklemedin.';
+
+  @override
+  String habitCalendarQuitInsight(Object n, Object title) {
+    return '“$title”: bu ay $n gün Arınma sayacı takvimde (başlangıçtan itibaren).';
+  }
+
+  @override
+  String habitCalendarPrayerInsight(
+    Object anyPrayer,
+    Object fullFive,
+    Object title,
+  ) {
+    return '“$title”: $anyPrayer günde en az bir vakit işaretlendi; $fullFive günde 5/5 tamamlandı.';
+  }
+
+  @override
+  String habitCalendarCustomInsightPeriod(
+    Object n,
+    Object periodLabel,
+    Object title,
+  ) {
+    return '“$title”: bu ay $n $periodLabel hedefine ulaşıldı.';
+  }
+
+  @override
+  String get habitCalendarWeekLabel => 'hafta';
+
+  @override
+  String get habitCalendarMonthLabel => 'ay';
+
+  @override
+  String habitCalendarCustomInsightDays(Object completedDays, Object title) {
+    return '“$title”: bu ay toplam $completedDays gün tamamlandı olarak işaretlendi.';
+  }
+
+  @override
+  String get habitCalendarLegend =>
+      'Hücredeki gri simgeler: o gün için kayıt var demektir. Arınma simgesi özellikle sayacın aktif olduğu günleri gösterir; namaz/rutin simgeleri ilgili günün tamamlanan kayıtlarını gösterir.';
+
+  @override
+  String get kazaPrayerFajr => 'Sabah namazı';
+
+  @override
+  String get kazaPrayerDhuhr => 'Öğle namazı';
+
+  @override
+  String get kazaPrayerAsr => 'İkindi namazı';
+
+  @override
+  String get kazaPrayerMaghrib => 'Akşam namazı';
+
+  @override
+  String get kazaPrayerIsha => 'Yatsı namazı';
+
+  @override
+  String get kazaPrayerWitr => 'Vitir namazı';
+
+  @override
+  String get kazaReset => 'Sıfırla';
+
+  @override
+  String get kazaResetConfirmDesc =>
+      'Tüm kaza sayıları sıfırlanacak. Emin misin?';
+
+  @override
+  String get kazaCancel => 'İptal';
+
+  @override
+  String get kazaTrackerTitle => 'Kaza takibi';
+
+  @override
+  String get kazaClose => 'Kapat';
+
+  @override
+  String get kazaTrackerSubtitle => 'Kaza namazı takibi';
+
+  @override
+  String get kazaTrackerDesc =>
+      'Kaza namazlarını vakit namazları kılındıktan sonra kılmaya özen göster. Eksik (+) ile borç ekleyebilir, kıldığın her rekat için (−) ile sayacı azaltabilirsin.';
+
+  @override
+  String get kazaCalcBirthDate => 'Doğum tarihi';
+
+  @override
+  String get kazaCalcApply => 'Uygula';
+
+  @override
+  String get kazaCalcUpdateCounters => 'Sayaçları güncelle?';
+
+  @override
+  String get kazaCalcUpdateDesc =>
+      'Mevcut kaza sayıların silinip hesaplanan değerlerle değiştirilecek.';
+
+  @override
+  String get kazaCalcCancel => 'İptal';
+
+  @override
+  String get kazaCalcContinue => 'Devam';
+
+  @override
+  String get kazaCalcErrorPubertyFuture =>
+      'Buluğ tarihi bugünden sonra olamaz. Doğum tarihini veya buluğ yaşını kontrol et.';
+
+  @override
+  String get kazaCalcErrorZeroRemaining =>
+      'Kalan namaz 0: tam kılınan gün, borçlu güne eşit veya fazlaysa üst sınıra çekilir; 6 vakit sayacı da buna göre sıfır kalır.';
+
+  @override
+  String get kazaCalcTitle => 'Kaza takibi';
+
+  @override
+  String get kazaCalcSubtitle => 'Kaza namazı takibi';
+
+  @override
+  String get kazaCalcDesc =>
+      'Farz namazlar buluğ çağından itibaren başlar. Tam yaşını bilmiyorsan erkeklerde 12, kadınlarda 9 yaşını referans alabilirsin. Bu ekran tahmini bir sayı üretir; kaza namazlarını vakit namazlarından sonra kılmaya devam et.';
+
+  @override
+  String get kazaCalcFemaleNote =>
+      'Kadınlar için: buluğdan bugüne kadar geçen her takvim ayı için yaklaşık 6 gün namazdan muaf sayılır (toplam günü geçmez).';
+
+  @override
+  String get kazaCalcFormula =>
+      'Formül: borçlu gün = takvim günü − hayız muafiyeti; toplam namaz = borçlu gün × 6 − (tam kılınan gün × 6). Kılınan gün sayısı borçlu günü aşamaz.';
+
+  @override
+  String get kazaCalcCalculateTitle => 'Kaza namazı hesapla';
+
+  @override
+  String get kazaCalcGender => 'Cinsiyetiniz';
+
+  @override
+  String get kazaCalcMale => 'Erkek';
+
+  @override
+  String get kazaCalcFemale => 'Kadın';
+
+  @override
+  String get kazaCalcBirthDateTitle => 'Doğum tarihiniz';
+
+  @override
+  String get kazaCalcPubertyAge => 'Buluğ çaşına girdiğiniz yaş';
+
+  @override
+  String kazaCalcPubertyNote(Object minPuberty) {
+    return 'Alt sınır: erkek 12, kadın 9 yaş (daha küçük girilirse hesapta $minPuberty kullanılır).';
+  }
+
+  @override
+  String get kazaCalcPrayedDays => 'Kaç gün namaz kıldınız?';
+
+  @override
+  String get kazaCalcPrayedDaysNote =>
+      'Bugüne kadar, o gün içinde bütün vakitleri kıldığın toplam gün sayısı.';
+
+  @override
+  String get kazaCalcCalculate => 'Hesapla';
+
+  @override
+  String get kazaCalcLiveError =>
+      'Buluğ tarihi bugünden sonra olamaz; doğum ve buluğ yaşını kontrol et.';
+
+  @override
+  String kazaCalcLiveHayiz(Object days) {
+    return 'Hayız muafiyeti: −$days gün\n';
+  }
+
+  @override
+  String kazaCalcLiveApplied(Object applied) {
+    return '\n(Tam kılınan gün üst sınır: $applied)';
+  }
+
+  @override
+  String get kazaCalcLiveSummary => 'Canlı özet';
+
+  @override
+  String kazaCalcLiveCalendarDays(Object days) {
+    return 'Takvim günü: $days\n';
+  }
+
+  @override
+  String kazaCalcLiveLiableDays(Object days) {
+    return 'Borçlu gün: $days\n';
+  }
+
+  @override
+  String kazaCalcLiveOwed(Object perDay, Object total) {
+    return 'Namaz borcu (borçlu gün × $perDay): $total\n';
+  }
+
+  @override
+  String kazaCalcLiveCredited(
+    Object appliedNote,
+    Object credited,
+    Object perDay,
+  ) {
+    return 'Düşülen (tam gün × $perDay): $credited$appliedNote\n';
+  }
+
+  @override
+  String kazaCalcLiveRemaining(Object remaining) {
+    return '—\nKalan toplam: $remaining namaz';
+  }
+
+  @override
+  String get kazaCalcLiveZeroNote =>
+      'Hesapla sonrası sayaç: kalan toplam 6 vakte bölünür; kalan 0 ise her vakit 0 kalır.';
+
+  @override
+  String get dailyNamazWisdomFallback =>
+      'Hatırlatıcı metni yüklenemedi. Sayfayı yenilemeyi dene.';
+
+  @override
+  String get momentVerseError => 'Yüklenemedi. Lütfen tekrar dene.';
+
+  @override
+  String get momentVerseEmptyTitle => 'Henüz bir an yok';
+
+  @override
+  String get momentVerseEmptyDesc => 'Bir sonraki bildirimi bekle.';
+
+  @override
+  String get momentVerseExpiredTitle => 'Bu vakit geçti';
+
+  @override
+  String get momentVerseExpiredDesc =>
+      'Bazı anlar yalnızca bir kez gelir.\nBelki bir sonrakinde buluşuruz.';
+
+  @override
+  String get momentVerseExpiredNote =>
+      'Bildirimleri açık tut,\nbir sonraki an kaçmasın.';
+
+  @override
+  String get momentVerseActiveWhisper => 'Saatin sana fısıldadığı ayet';
+
+  @override
+  String get momentVerseSurah => 'Sure';
+
+  @override
+  String get momentVerseVerse => 'Ayet';
+
+  @override
+  String get momentVerseOneVerse => 'bir ayet';
+
+  @override
+  String get momentVerseClock => 'Saat';
+
+  @override
+  String get momentVerseMeaningDesc =>
+      'Bu tesadüf değil; zamanın rakamları Kur\'an\'da bir adrese dönüşür. Bu bildirimi tam vaktinde açman ve bu ayetin önüne geçmen de öyle.';
+
+  @override
+  String get momentVerseDisappear => 'sonra bu an kaybolacak';
+
+  @override
+  String get momentVerseReturnHome => 'Ana Sayfaya Dön';
+
+  @override
+  String get momentVerseClose => 'Kapat';
+
+  @override
+  String get surveyDictMoodHappy => 'Mutlu';
+
+  @override
+  String get surveyDictMoodCalm => 'Sakin';
+
+  @override
+  String get surveyDictMoodStressed => 'Stresli';
+
+  @override
+  String get surveyDictMoodSad => 'Üzgün';
+
+  @override
+  String get surveyDictMoodGrateful => 'Şükrediyorum';
+
+  @override
+  String get surveyDictMoodAnxious => 'Kaygılı';
+
+  @override
+  String get surveyDictMoodMotivated => 'Motive';
+
+  @override
+  String get surveyDictSectorStudent => 'Lise / Üniversite / Hazırlık';
+
+  @override
+  String get surveyDictSectorPrivate => 'Özel Sektör';
+
+  @override
+  String get surveyDictSectorPublic => 'Kamu Personeli';
+
+  @override
+  String get surveyDictSectorBusiness => 'Kendi İşim / Serbest';
+
+  @override
+  String get surveyDictSectorTrade => 'Ticaret';
+
+  @override
+  String get surveyDictSectorHousehold => 'Ev Hanımı / Ev Erkeği';
+
+  @override
+  String get surveyDictSectorOther => 'Diğer';
+
+  @override
+  String get surveyDictNeedMotivation => 'Motivasyon';
+
+  @override
+  String get surveyDictNeedSabr => 'Sabır';
+
+  @override
+  String get surveyDictNeedShukr => 'Şükür';
+
+  @override
+  String get surveyDictNeedTawakkul => 'Tevekkül';
+
+  @override
+  String get surveyDictNeedFocus => 'Odaklanma';
+
+  @override
+  String get surveyDictNeedHealing => 'Şifa';
+
+  @override
+  String get surveyDictNeedRizq => 'Rızık & Bereket';
+
+  @override
+  String get surveyDictGenderMale => 'Erkek';
+
+  @override
+  String get surveyDictGenderFemale => 'Kadın';
+
+  @override
+  String get premiumProductNotReadyError =>
+      'Ürün bilgisi henüz hazır değil. Lütfen tekrar deneyin.';
+
+  @override
+  String get premiumAccountLinkError =>
+      'Hesap eşlemesi tamamlanamadı. Lütfen tekrar deneyin.';
+
+  @override
+  String get premiumWelcomeTitle => '🌿 Hoş geldin!';
+
+  @override
+  String get premiumWelcomeMessage =>
+      'ARIN Premium aktif. Reklamsız, kilitsiz deneyimin açık.\n\nİstediğin zaman mağaza hesabından aboneliğini yönetebilirsin.';
+
+  @override
+  String get premiumWelcomeButton => 'Harika!';
+
+  @override
+  String get premiumRestoreSuccess => 'Premium geri yüklendi!';
+
+  @override
+  String get premiumNoActiveSubscription => 'Aktif abonelik bulunamadı.';
+
+  @override
+  String get premiumSignInErrorPrefix => 'Giriş tamamlanamadı: ';
+
+  @override
+  String get premiumActiveTitle => 'ARIN Premium aktif';
+
+  @override
+  String get premiumTitle => 'ARIN Premium';
+
+  @override
+  String get premiumActiveSubtitle => 'Reklamsız ve kilitsiz deneyimin açık.';
+
+  @override
+  String get premiumSubtitle =>
+      'Reklamsız, kesintisiz ve kilitsiz manevi rutin.';
+
+  @override
+  String get premiumYearlyPlanTitle => 'Yıllık Premium';
+
+  @override
+  String get premiumMostAdvantageousBadge => 'EN AVANTAJLI';
+
+  @override
+  String get premiumYearlyPlanSubtitle => 'Yıllık Abonelik';
+
+  @override
+  String get premiumSwitchToYearly => 'Yıllığa geç';
+
+  @override
+  String get premiumMonthlyPlanTitle => 'Aylık Premium';
+
+  @override
+  String get premiumMonthlyPlanSubtitle => 'Aylık Abonelik';
+
+  @override
+  String get premiumFooterText1 =>
+      'Lansman fiyatları sınırlı süre geçerlidir. Abonelik mağaza hesabın üzerinden yönetilir ve istediğin zaman iptal edilebilir.';
+
+  @override
+  String get premiumFooterText2 =>
+      'Abonelik, dönem bitiminden en az 24 saat önce iptal edilmezse otomatik yenilenir. Yenileme ücreti dönem bitimine 24 saat kala mağaza hesabından tahsil edilir. Aboneliklerini App Store/Play hesap ayarlarından yönetebilirsin.';
+
+  @override
+  String get premiumLaunchBadge => 'LANSMANA ÖZEL';
+
+  @override
+  String get premiumCountdownNotice =>
+      'Bu fiyat sınırlı süre geçerli. Lansman bitmeden premiumu en avantajlı fiyatla aç.';
+
+  @override
+  String get premiumBenefitAdFree => 'Reklamsız kullanım';
+
+  @override
+  String get premiumBenefitWidgets => 'Widget kilidi yok';
+
+  @override
+  String get premiumBenefitExplore => 'Keşfet akışı kesintisiz';
+
+  @override
+  String get premiumBenefitAdhan => '2. ezan alarmı açık';
+
+  @override
+  String get premiumSignInRequiredNotice =>
+      'Satın alma için giriş zorunlu değil. Premiumu bu cihazda hemen kullanabilirsin; istersen sonrasında hesabını bağlayıp diğer cihazlarda da erişebilirsin.';
+
+  @override
+  String get premiumSignInSheetTitle => 'Premium için hesabını bağla';
+
+  @override
+  String get premiumSignInSheetSubtitle =>
+      'Hesabını bağlarsan premiumun diğer cihazlarında da daha kolay geri yüklenir. Satın alma için giriş zorunlu değildir.';
+
+  @override
+  String get premiumContinueWithGoogle => 'Google ile devam et';
+
+  @override
+  String get premiumContinueWithApple => 'Apple ile devam et';
+
+  @override
+  String get premiumCancelForNow => 'Şimdilik vazgeç';
+
+  @override
+  String get premiumPostPurchaseLinkTitle => 'Premium aktif';
+
+  @override
+  String get premiumPostPurchaseLinkBody =>
+      'Premium bu cihazda aktif. Başka cihazlarda da kolayca kullanmak için hesabını şimdi bağlamak ister misin?';
+
+  @override
+  String get premiumPostPurchaseLinkLater => 'Daha sonra';
+
+  @override
+  String get premiumPostPurchaseLinkNow => 'Hesabımı bağla';
+
+  @override
+  String get premiumPostPurchaseLinkSuccess =>
+      'Hesap bağlandı. Premium cihazların arasında senkronize edilebilir.';
+
+  @override
+  String get premiumActivePlanBadge => 'Aktif planınız ✓';
+
+  @override
+  String get premiumActivePlanButton => 'Aktif planınız';
+
+  @override
+  String get premiumStartWithLaunchPrice => 'Lansman Fiyatıyla Başla';
+
+  @override
+  String get premiumIsActiveButton => 'Premium aktif';
+
+  @override
+  String get qiblaCompassTitle => 'Kıble Pusulası';
+
+  @override
+  String get qiblaCompassQibla => 'Kıble';
+
+  @override
+  String get qiblaCompassGettingLocation => 'Konum alınıyor…';
+
+  @override
+  String get qiblaCompassInitError => 'Konum veya pusula\nbaşlatılamadı';
+
+  @override
+  String get qiblaCompassRetry => 'Yeniden dene';
+
+  @override
+  String get qiblaCompassAligned => 'Kıbleye dönüktür';
+
+  @override
+  String get qiblaCompassDeviation => 'sapma';
+
+  @override
+  String get qiblaCompassStabilizing => 'Ölçüm sabitleniyor';
+
+  @override
+  String get qiblaCompassGuidanceTiltTitle => 'Telefonu düz tut';
+
+  @override
+  String get qiblaCompassGuidanceTiltBody =>
+      'Pusulayı yatay kullan. Dik, yan veya ters tutuşta yön kilitlenmez.';
+
+  @override
+  String get qiblaCompassGuidanceCalibrateTitle => 'Pusulayı kalibre et';
+
+  @override
+  String get qiblaCompassGuidanceCalibrateBody =>
+      'Telefonu birkaç kez 8 çizerek çevir, sonra metalden uzak tut.';
+
+  @override
+  String get qiblaCompassGuidanceUnstableTitle => 'Manyetik alan kararsız';
+
+  @override
+  String get qiblaCompassGuidanceUnstableBody =>
+      'Laptop, mıknatıs, metal masa ve manyetik kılıftan uzaklaş.';
+
+  @override
+  String get qiblaCompassGuidanceGoodTitle => 'Ölçüm hazır';
+
+  @override
+  String get qiblaCompassGuidanceGoodBody =>
+      'Telefonu yatay tut, kıbleye yavaşça dön. Sabitlenince yeşil rozet yanar.';
+
+  @override
+  String get qiblaCompassNorth => 'K';
+
+  @override
+  String get qiblaCompassEast => 'D';
+
+  @override
+  String get qiblaCompassSouth => 'G';
+
+  @override
+  String get qiblaCompassWest => 'B';
+
+  @override
+  String get qiblaCompassQiblaText => 'KIBLE';
+
+  @override
+  String get zikirmatikCounterSemantics => 'Zikirmatik sayacı';
+
+  @override
+  String get zikirmatikRound => 'TUR';
+
+  @override
+  String get zikirmatikRoundCompleted => 'Tur tamamlandı';
+
+  @override
+  String get zikirmatikResetCounter => 'Sayacı sıfırla?';
+
+  @override
+  String get zikirmatikResetCounterDesc =>
+      'Toplam sayı ve tur bilgisi sıfırlanır.';
+
+  @override
+  String get zikirmatikCancel => 'Vazgeç';
+
+  @override
+  String get zikirmatikReset => 'Sıfırla';
+
+  @override
+  String get zikirmatikEditPhraseTitle => 'Zikir adını düzenle';
+
+  @override
+  String get zikirmatikUse => 'Kullan';
+
+  @override
+  String get zikirmatikSaveAndUse => 'Kaydet ve Kullan';
+
+  @override
+  String get zikirmatikThisRound => 'BU TUR';
+
+  @override
+  String get zikirmatikTarget => 'Hedef';
+
+  @override
+  String zikirmatikCounterSemanticsLabel(
+    Object round,
+    Object target,
+    Object total,
+  ) {
+    return 'Zikir sayacı. $round / $target, toplam $total';
+  }
+
+  @override
+  String get zikirmatikCounterSemanticsHint => 'Dokunarak sayıyı bir artır';
+
+  @override
+  String get zikirmatikVibration => 'Titreşim';
+
+  @override
+  String get zikirmatikVibrationTooltip =>
+      'Açıkken her sayımda titreşir; tur bitince ek güçlü titreşim';
+
+  @override
+  String get zikirmatikInfo => 'Zikir bilgisi';
+
+  @override
+  String get zikirmatikTitle => 'Zikirmatik';
+
+  @override
+  String get zikirmatikTapToChoose => 'Zikir seçmek için dokun';
+
+  @override
+  String get zikirmatikPickDhikr => 'ZİKİR SEÇ';
+
+  @override
+  String get zikirmatikSaved => 'KAYDETTİKLERİM';
+
+  @override
+  String get zikirmatikDelete => 'Sil';
+
+  @override
+  String get zikirmatikWriteOwnText => 'KENDİ METNİNİ YAZ…';
+
+  @override
+  String get zikirmatikCustomTarget => 'Özel…';
+
+  @override
+  String get zikirmatikTargetOk => 'Tamam';
+
+  @override
+  String get zikirmatikDeleteRoundRecord => 'Bu tur kaydını sil?';
+
+  @override
+  String get zikirmatikDhikr => 'zikir';
+
+  @override
+  String get zikirmatikShareError => 'Paylaşım açılamadı. Tekrar deneyin.';
+
+  @override
+  String get zikirmatikDeleteRecord => 'Kaydı sil?';
+
+  @override
+  String get zikirmatikCompletedRounds => 'Tamamlanan turlar';
+
+  @override
+  String get zikirmatikNoCompletedRounds =>
+      'Henüz tamamlanan tur kaydı yok. Hedefe ulaştığında buraya düşer.';
+
+  @override
+  String get zikirmatikArchivedSessions => 'Arşiv oturumları';
+
+  @override
+  String get zikirmatikTodaysReflection => 'Bugünün payı';
+
+  @override
+  String zikirmatikCompareLine(Object diff, Object first, Object second) {
+    return '“$first” zikrini “$second”e göre $diff tur daha çok tamamladın.';
+  }
+
+  @override
+  String zikirmatikOnlyOneRecord(Object first) {
+    return 'Şu an yalnızca “$first” için tur kaydın var.';
+  }
+
+  @override
+  String get zikirmatikSummaryAndAnalytics => 'Özet ve analiz';
+
+  @override
+  String get zikirmatikAnalyticsNoLogs =>
+      'Daha fazla tur tamamladıkça özet ve karşılaştırmalar burada oluşur.';
+
+  @override
+  String zikirmatikTotalRoundsCompleted(Object total) {
+    return 'Toplam $total tur tamamladın.';
+  }
+
+  @override
+  String zikirmatikActiveDays(Object days) {
+    return '$days farklı günde zikir kaydın var.';
+  }
+
+  @override
+  String zikirmatikLast7Days(Object rounds) {
+    return 'Son 7 günde $rounds tur tamamlandı.';
+  }
+
+  @override
+  String zikirmatikMostCompleted(Object phrase, Object rounds) {
+    return 'En çok tamamlanan: “$phrase” ($rounds tur).';
+  }
+
+  @override
+  String get zikirmatikCompleted => 'tamamlandı';
+
+  @override
+  String get zikirmatikTotalCounter => 'toplam sayaç';
+
+  @override
+  String get healingAmbientForest => 'Orman Sesi';
+
+  @override
+  String get healingAmbientFire => 'Ateş Sesi';
+
+  @override
+  String get healingAmbientCosmic => 'Evren Sesi';
+
+  @override
+  String get healingAmbientInshirah => 'İnşirah Suresi';
+
+  @override
+  String get healingSleepOff => 'Kapalı';
+
+  @override
+  String get healingSleepRemaining => 'Kalan ';
+
+  @override
+  String healingSleepMinutes(Object m) {
+    return '$m dakika';
+  }
+
+  @override
+  String get healingInfoTitle => 'Bilgi';
+
+  @override
+  String get healingInfoBody =>
+      'Bu bölüm rahatlama ve tefekkür için tasarlanmıştır; tıbbi tedavi yerine geçmez. Sesleri düşük seviyede dinlemeniz önerilir. Rahatsızlık hissederseniz durdurun.';
+
+  @override
+  String get healingInfoOk => 'Tamam';
+
+  @override
+  String get healingFrequenciesTitle => 'İyileştirici Frekanslar';
+
+  @override
+  String get healingAmbientSound => 'Ambiyans Sesi';
+
+  @override
+  String get healingPresets => 'ÖNAYARLAR';
+
+  @override
+  String get healingFrequencyTone => 'Frekans tonu (Hz)';
+
+  @override
+  String get healingAmbient => 'Ambiyans';
+
+  @override
+  String get healingSleepTimer => 'Uyku Zamanlayıcı';
+
+  @override
+  String get healingInshirahLocked =>
+      'İnşirah modunda frekans kontrolleri kapalıdır.';
+
+  @override
+  String get healingAllFrequencies => 'Tüm Frekanslar';
+
+  @override
+  String get healingPresetFocus => 'Odak';
+
+  @override
+  String get healingPresetSleep => 'Uyku';
+
+  @override
+  String get healingAmbientForestShort => 'Orman';
+
+  @override
+  String get healingAmbientFireShort => 'Ateş';
+
+  @override
+  String get healingAmbientCosmicShort => 'Evren';
+
+  @override
+  String get healingAmbientInshirahShort => 'İnşirah';
+
+  @override
+  String get healingAmbientChoose => 'Ambiyans Sesi Seçin';
+
+  @override
+  String get healingSleepCancel => 'İptal';
+
+  @override
+  String get healingSleepStopAfter => 'Kaç dakika sonra durdurulsun?';
+
+  @override
+  String get healingSleepTimerOff => 'Zamanlayıcı kapalı';
+
+  @override
+  String get healingFreq174Short => 'Terapi Frekansı';
+
+  @override
+  String get healingFreq285Short => 'Direnç ve Metanet';
+
+  @override
+  String get healingFreq396Short => 'Yenilenme';
+
+  @override
+  String get healingFreq417Short => 'İç güç';
+
+  @override
+  String get healingFreq528Short => 'Huzur';
+
+  @override
+  String get healingFreq639Short => 'Arınma';
+
+  @override
+  String get healingFreq741Short => 'Tefekkür';
+
+  @override
+  String get healingFreq852Short => 'Sekîne';
+
+  @override
+  String get healingFreq174Heading => '174 Hz - Şifa ve Rahatlama';
+
+  @override
+  String get healingFreq285Heading => '285 Hz - Sabır ve Sebat';
+
+  @override
+  String get healingFreq396Heading => '396 Hz - Bereket ve Başlangıç';
+
+  @override
+  String get healingFreq417Heading => '417 Hz - İç Güç ve İman';
+
+  @override
+  String get healingFreq528Heading => '528 Hz - Huzur ve Sükûnet';
+
+  @override
+  String get healingFreq639Heading => '639 Hz - Arınma ve Temizlik';
+
+  @override
+  String get healingFreq741Heading => '741 Hz - Tefekkür ve Dikkat';
+
+  @override
+  String get healingFreq852Heading => '852 Hz - Sekîne (Derin Huzur)';
+
+  @override
+  String get healingFreq174Body =>
+      'Bedensel ve ruhsal yorgunlukta sükûnete yönelme; şifa Allah’tandır.';
+
+  @override
+  String get healingFreq285Body =>
+      'Zorlukta kalbi yumuşatma; Allah’a tevekkül ile devam etme niyeti.';
+
+  @override
+  String get healingFreq396Body =>
+      'Yeni bir sayfa açma; günahtan arınma ve affa yönelme duası.';
+
+  @override
+  String get healingFreq417Body =>
+      'Kalbi güçlendirme; imanı tazeleme ve istikamet hatırlaması.';
+
+  @override
+  String get healingFreq528Body =>
+      'Gönül sükûneti; şükür ve teslimiyetle nefes alma.';
+
+  @override
+  String get healingFreq639Body =>
+      'Kalbi kirleten düşüncelerden uzaklaşma; bağışlanma dileği.';
+
+  @override
+  String get healingFreq741Body =>
+      'Ayete ve yaratılışa odaklanma; dağılan zihni toplama.';
+
+  @override
+  String get healingFreq852Body =>
+      'Kalbe ferahlık veren sükûnet; Allah’ın rahmetine sığınma.';
+
+  @override
+  String get appleSignInCanceled => 'Apple girişi iptal edildi.';
+
+  @override
+  String get appleSignInNotAuthorized =>
+      'Apple hesabı yetki vermedi. iPhone Ayarları > Apple Kimliği > Giriş Yapma ve Güvenlik bölümünden Apple ile giriş iznini kontrol edin.';
+
+  @override
+  String get appleSignInProviderDisabled =>
+      'Firebase konsolunda Apple giriş sağlayıcısı kapalı görünüyor.';
+
+  @override
+  String get appleSignInInvalidCredential =>
+      'Apple kimlik doğrulama bilgisi geçersiz geldi. Bundle ID ve Apple Sign In yetkisini Xcode/Firebase tarafında kontrol edin.';
+
+  @override
+  String get appleSignInNetworkFailed =>
+      'İnternet bağlantısı yüzünden Apple girişi tamamlanamadı.';
+
+  @override
+  String get settingsMenuPremiumTitle => 'ARIN Premium';
+
+  @override
+  String get settingsMenuPremiumSubtitle =>
+      'Lansman fiyatları ve reklamsız deneyim';
+
+  @override
+  String get settingsMenuWidgetsTitle => 'Widget Merkezi';
+
+  @override
+  String get settingsMenuWidgetsSubtitle =>
+      'Kullanım bilgileri ve takip widgetı';
+
+  @override
+  String get supportProductNotReady =>
+      'Ürün bilgisi henüz hazır değil. Lütfen tekrar deneyin.';
+
+  @override
+  String get supportThanksTitle => 'Teşekkürler! 🙏';
+
+  @override
+  String get supportThanksBody =>
+      'Desteğin Arın için çok değerli. Bu katkıyla daha güzel bir deneyim sunmaya devam edeceğiz.';
+
+  @override
+  String get commonOk => 'Tamam';
+
+  @override
+  String get supportPageTitle => 'Arın\'a Destek Ol';
+
+  @override
+  String get supportTierSmallTitle => 'Küçük Destek';
+
+  @override
+  String get supportTierSmallDesc =>
+      'Bir kahve desteğiyle geliştirmeye katkı ver.';
+
+  @override
+  String get supportTierMediumTitle => 'Orta Destek';
+
+  @override
+  String get supportTierMediumDesc =>
+      'Yeni içerik ve özelliklerin gelişmesini hızlandır.';
+
+  @override
+  String get supportTierLargeTitle => 'Büyük Destek';
+
+  @override
+  String get supportTierLargeDesc =>
+      'Arın\'ın uzun vadeli gelişimine güçlü katkı ver.';
+
+  @override
+  String get supportPackagesDisclaimer =>
+      'Destek paketleri tek seferlik mağaza ürünleri olarak çalışır. Premium abonelikten ayrıdır.';
+
+  @override
+  String get supportHeaderTitle => 'Arın\'ın yanında ol';
+
+  @override
+  String get supportHeaderDesc =>
+      'Bağış değil, mağaza kurallarına uygun tek seferlik destek paketleri. Uygulamanın reklamsız ve premium deneyimini büyütmemize yardımcı olur.';
+
+  @override
+  String get languageChangeFailed => 'Dil değiştirilemedi. Lütfen tekrar dene.';
+
+  @override
+  String get differentLocation => 'Farklı bir konumdasın';
+
+  @override
+  String updatePrayerTimesForCity(Object city) {
+    return 'Namaz vakitlerini $city\'a göre güncelleyelim mi?';
+  }
+
+  @override
+  String get rememberThisChoice => 'Bu tercihi hatırla, bir daha sorma';
+
+  @override
+  String get keepCurrentLocation => 'Kalsın';
+
+  @override
+  String get updateLocation => 'Güncelle';
+
+  @override
+  String get sealYourIntention => 'Niyetini mühürle';
+
+  @override
+  String get sealIntentionInfo =>
+      'Az önce paylaştığın işaretler ve adın bu başlangıcın parçası; basılı tutarak niyetini pekiştir.';
+
+  @override
+  String get touchAndHoldWhenReady => 'Hazır olduğunda dokun ve basılı tut.';
+
+  @override
+  String get youAreAlmostThere => 'Çok yaklaştın!';
+
+  @override
+  String get promiseSealed => 'Tebrikler, Sözün Mühürlendi!';
+
+  @override
+  String get touchAndHoldToContinue =>
+      'Ekrana dokun ve basılı tut\nDevam etmek için…';
+
+  @override
+  String get skipWithArrow => 'Atla ➔';
+
+  @override
+  String get redirecting => 'Yönlendiriliyorsun...';
+
+  @override
+  String get keepGoing => 'Devam et...';
+
+  @override
+  String get premiumLoadingWait =>
+      'Premium durumu yükleniyor. Lütfen kısa bir süre sonra tekrar deneyin.';
+
+  @override
+  String get secondAlarmPremiumFeature => '2. alarm premium özelliği';
+
+  @override
+  String get secondAlarmAdWatchText =>
+      'Ücretsiz kullanımda 2. ezan alarmını açmak için kısa reklam izlenir. Premium kullanıcılar bu kilidi görmez.';
+
+  @override
+  String get giveUp => 'Vazgeç';
+
+  @override
+  String get openAfterAd => 'Reklam sonrası aç';
+
+  @override
+  String get reflection => 'Yansıma';
+
+  @override
+  String yesterdayPrayerSummary(Object avg, Object weekday, Object yDone) {
+    return 'Dün · $weekday · $yDone/5  ·  Son 7 gün ort. $avg/5';
+  }
+
+  @override
+  String get weeklyView => 'Haftalık görünüm';
+
+  @override
+  String daysDoneSummary(Object done) {
+    return '$done/7 gün';
+  }
+
+  @override
+  String get inspirationAndAwareness => 'İlham ve farkındalık';
+
+  @override
+  String get shortBreaksForTruth => 'Hakikat ve şuur için kısa molalar';
+
+  @override
+  String get insightCommentStrong =>
+      'Son günlerde ritmin çok güçlü; kalbin düzenle hizalanmış görünüyor. Böyle devam.';
+
+  @override
+  String get insightCommentPerfect =>
+      'Dün beş vakit tamam — Rabb’ine yakın bir gün geçirmişsin. Bugün de aynı niyetle devam edebilirsin.';
+
+  @override
+  String get insightCommentZero =>
+      'Dün kayıt düşmemiş olabilir veya henüz işaretlenmemiş. Bugün tek bir vakitle bile çizgiyi yeniden çizebilirsin.';
+
+  @override
+  String get insightCommentLow =>
+      'Bu hafta ortalama düşük; bu normal — tefekkür ve küçük adımlarla yükselir. Bir vakit fazlası büyük fark yaratır.';
+
+  @override
+  String insightCommentGood(Object count) {
+    return 'Dün $count/5 vakit işaretli; bugün bir iki vakitle dengeyi tamamlamak mümkün.';
+  }
+
+  @override
+  String get insightCommentDefault =>
+      'Geçmiş günler verisi senin için bir ayna: eksik kalan yerlerde merhamet, tamamlananlarda şükür.';
 }

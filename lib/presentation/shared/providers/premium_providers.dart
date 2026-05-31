@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../data/models/premium_entitlement.dart';
 import '../../../data/repositories/premium_entitlement_repository.dart';
+import '../../../data/services/purchase_service.dart';
 import 'auth_providers.dart';
 
 final premiumEntitlementRepositoryProvider =
@@ -18,7 +19,10 @@ final premiumEntitlementProvider =
   final user = authAsync.asData?.value ??
       (authAsync.isLoading ? await ref.watch(authUserProvider.future) : null);
   if (user == null) {
-    return PremiumEntitlement.inactive;
+    // Sign-in artık satın alma için zorunlu değil. Oturum yoksa da cihazdaki
+    // RevenueCat entitlement'ını okuyup premium'u aktif gösterebilmeliyiz.
+    final local = await PurchaseService().getLocalPremiumEntitlement();
+    return local ?? PremiumEntitlement.inactive;
   }
   return ref.read(premiumEntitlementRepositoryProvider).loadForCurrentUser();
 });

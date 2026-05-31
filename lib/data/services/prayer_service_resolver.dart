@@ -18,8 +18,8 @@
 
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../presentation/shared/providers/prayer_time_providers.dart';
 
 import '../models/prayer_times_model.dart';
 import 'aladhan_service.dart';
@@ -63,6 +63,10 @@ class PrayerServiceResolver {
   String? _memCacheLocationKey;
 
   static const _memCacheTtl = Duration(minutes: 30);
+
+  VoidCallback? onCacheInvalidated;
+
+  void notifyCacheInvalidated() => onCacheInvalidated?.call();
 
   String _locationKey() {
     final id = _location.savedDistrictId;
@@ -283,12 +287,13 @@ final prayerServiceResolverProvider = Provider<PrayerServiceResolver>((ref) {
   );
   ref.read(locationServiceProvider).onSilentLocationChanged = () {
     resolver.invalidateCache();
-    // Cache'i invalidate edip doğrudan dışarıya provider invalidate çağrısı fırlatarak 
-    // dinleyicileri uyaralım.
-    Future.microtask(() => ref.invalidate(prayerTimesProvider));
+    // Dinleyicileri uyaralım
+    Future.microtask(() => resolver.notifyCacheInvalidated());
   };
   return resolver;
 });
+
+class _AladhanServiceForResolverProvider {}
 
 /// `aladhanServiceProvider` `prayer_time_providers.dart`'ta da tanımlı;
 /// dairesel import'tan kaçınmak için burada küçük bir forward-provider

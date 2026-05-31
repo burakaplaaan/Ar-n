@@ -13,6 +13,7 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:arin/l10n/app_localizations.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/router/app_router.dart';
 
@@ -146,7 +147,7 @@ class _MomentVersePageState extends State<MomentVersePage>
       if (!mounted) return;
       setState(() {
         _loading = false;
-        _error = 'Yüklenemedi. Lütfen tekrar dene.';
+        _error = 'error';
       });
     }
   }
@@ -240,7 +241,7 @@ class _MomentVersePageState extends State<MomentVersePage>
             const Icon(Icons.wifi_off_rounded, color: Colors.white24, size: 40),
             const SizedBox(height: 16),
             Text(
-              _error!,
+              AppLocalizations.of(context)!.momentVerseError,
               textAlign: TextAlign.center,
               style: const TextStyle(color: Colors.white54, fontSize: 14),
             ),
@@ -271,7 +272,7 @@ class _MomentVersePageState extends State<MomentVersePage>
                   ),
                   const SizedBox(height: 20),
                   Text(
-                    'Henüz bir an yok',
+                    AppLocalizations.of(context)!.momentVerseEmptyTitle,
                     style: const TextStyle(
                       fontFamily: 'PlusJakartaSans',
                       fontSize: 20,
@@ -281,7 +282,7 @@ class _MomentVersePageState extends State<MomentVersePage>
                   ),
                   const SizedBox(height: 10),
                   Text(
-                    'Bir sonraki bildirimi bekle.',
+                    AppLocalizations.of(context)!.momentVerseEmptyDesc,
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 14,
@@ -333,7 +334,7 @@ class _MomentVersePageState extends State<MomentVersePage>
                   ),
                   const SizedBox(height: 24),
                   Text(
-                    'Bu vakit geçti',
+                    AppLocalizations.of(context)!.momentVerseExpiredTitle,
                     style: TextStyle(
                       fontFamily: 'PlusJakartaSans',
                       fontSize: 22,
@@ -343,7 +344,7 @@ class _MomentVersePageState extends State<MomentVersePage>
                   ),
                   const SizedBox(height: 14),
                   Text(
-                    'Bazı anlar yalnızca bir kez gelir.\nBelki bir sonrakinde buluşuruz.',
+                    AppLocalizations.of(context)!.momentVerseExpiredDesc,
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 15,
@@ -360,7 +361,7 @@ class _MomentVersePageState extends State<MomentVersePage>
                   ),
                   const SizedBox(height: 24),
                   Text(
-                    'Bildirimleri açık tut,\nbir sonraki an kaçmasın.',
+                    AppLocalizations.of(context)!.momentVerseExpiredNote,
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 13,
@@ -419,7 +420,7 @@ class _MomentVersePageState extends State<MomentVersePage>
                     // anlasın. Şiirsel ton korunur, mantık bir kez aktarılır.
                     if (hasRef && moment.clockStr.isNotEmpty) ...[
                       Text(
-                        'Saatin sana fısıldadığı ayet',
+                        AppLocalizations.of(context)!.momentVerseActiveWhisper,
                         style: TextStyle(
                           fontSize: 12,
                           letterSpacing: 0.3,
@@ -429,8 +430,8 @@ class _MomentVersePageState extends State<MomentVersePage>
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        '${moment.clockStr}  →  Sure ${moment.surahNumber}, '
-                        'Ayet ${moment.verseNumber}',
+                        '${moment.clockStr}  →  ${AppLocalizations.of(context)!.momentVerseSurah} ${moment.surahNumber}, '
+                        '${AppLocalizations.of(context)!.momentVerseVerse} ${moment.verseNumber}',
                         style: TextStyle(
                           fontFamily: 'PlusJakartaSans',
                           fontSize: 11,
@@ -461,8 +462,8 @@ class _MomentVersePageState extends State<MomentVersePage>
                         ),
                         child: Text(
                           moment.surahName.isNotEmpty
-                              ? '${moment.surahName} ${moment.verseNumber}. Ayet'
-                              : 'Sure ${moment.surahNumber}, Ayet ${moment.verseNumber}',
+                              ? '${moment.surahName} ${moment.verseNumber}. ${AppLocalizations.of(context)!.momentVerseVerse}'
+                              : '${AppLocalizations.of(context)!.momentVerseSurah} ${moment.surahNumber}, ${AppLocalizations.of(context)!.momentVerseVerse} ${moment.verseNumber}',
                           style: TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.w600,
@@ -594,11 +595,11 @@ class _MomentVersePageState extends State<MomentVersePage>
     // bu alanlar boş olabilir — not yine de gösterilsin, mantık ayakta kalsın.
     String address;
     if (moment.surahNumber != null && moment.verseNumber != null) {
-      address = 'Sure ${moment.surahNumber}, ${moment.verseNumber}. ayet';
+      address = '${AppLocalizations.of(context)!.momentVerseSurah} ${moment.surahNumber}, ${moment.verseNumber}. ${AppLocalizations.of(context)!.momentVerseVerse.toLowerCase()}';
     } else if (moment.ref.isNotEmpty) {
       address = moment.ref;
     } else {
-      address = 'bir ayet';
+      address = AppLocalizations.of(context)!.momentVerseOneVerse;
     }
 
     return Padding(
@@ -613,9 +614,8 @@ class _MomentVersePageState extends State<MomentVersePage>
           ),
           const SizedBox(height: 14),
           Text(
-            'Saat ${moment.clockStr} — $address. '
-            'Bu tesadüf değil; zamanın rakamları Kur\'an\'da bir adrese dönüşür. '
-            'Bu bildirimi tam vaktinde açman ve bu ayetin önüne geçmen de öyle.',
+            '${AppLocalizations.of(context)!.momentVerseClock} ${moment.clockStr} — $address. '
+            '${AppLocalizations.of(context)!.momentVerseMeaningDesc}',
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 12.5,
@@ -654,7 +654,7 @@ class _MomentVersePageState extends State<MomentVersePage>
           ),
           const SizedBox(height: 8),
           Text(
-            '${_formatCountdown(_remaining)} sonra bu an kaybolacak',
+            '${_formatCountdown(_remaining)} ${AppLocalizations.of(context)!.momentVerseDisappear}',
             style: TextStyle(
               fontSize: 12,
               color: Colors.white.withValues(alpha: 0.25),
@@ -685,9 +685,9 @@ class _MomentVersePageState extends State<MomentVersePage>
             ),
           ),
           onPressed: () => context.go(AppRoutes.home),
-          child: const Text(
-            'Ana Sayfaya Dön',
-            style: TextStyle(
+          child: Text(
+            AppLocalizations.of(context)!.momentVerseReturnHome,
+            style: const TextStyle(
               fontFamily: 'PlusJakartaSans',
               fontSize: 15,
               fontWeight: FontWeight.w700,
@@ -702,7 +702,7 @@ class _MomentVersePageState extends State<MomentVersePage>
     return TextButton(
       onPressed: () => context.go(AppRoutes.home),
       child: Text(
-        'Kapat',
+        AppLocalizations.of(context)!.momentVerseClose,
         style: TextStyle(
           color: Colors.white.withValues(alpha: 0.5),
           fontSize: 14,

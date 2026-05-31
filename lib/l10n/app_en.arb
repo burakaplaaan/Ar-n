@@ -785,26 +785,54 @@
   "adminDiagnosticsEnabled": "on",
   "adminDiagnosticsDisabled": "off",
   "adminDiagnosticsPrayerStatus": "Prayer: {status}",
-  "@adminDiagnosticsPrayerStatus": {"placeholders": {"status": {}}},
+  "@adminDiagnosticsPrayerStatus": {
+    "placeholders": {
+      "status": {}
+    }
+  },
   "adminDiagnosticsDailyStatus": "Daily: {status}",
-  "@adminDiagnosticsDailyStatus": {"placeholders": {"status": {}}},
+  "@adminDiagnosticsDailyStatus": {
+    "placeholders": {
+      "status": {}
+    }
+  },
   "adminDiagnosticsMilestoneStatus": "Milestone: {status}",
-  "@adminDiagnosticsMilestoneStatus": {"placeholders": {"status": {}}},
+  "@adminDiagnosticsMilestoneStatus": {
+    "placeholders": {
+      "status": {}
+    }
+  },
   "adminDiagnosticsTaskStatus": "Task: {status}",
-  "@adminDiagnosticsTaskStatus": {"placeholders": {"status": {}}},
+  "@adminDiagnosticsTaskStatus": {
+    "placeholders": {
+      "status": {}
+    }
+  },
   "adminDiagnosticsZikirStatus": "Dhikr: {status}",
-  "@adminDiagnosticsZikirStatus": {"placeholders": {"status": {}}},
+  "@adminDiagnosticsZikirStatus": {
+    "placeholders": {
+      "status": {}
+    }
+  },
   "adminDiagnosticsPendingQueue": "Pending queue: {count}",
   "@adminDiagnosticsPendingQueue": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "adminRefreshAction": "Refresh",
   "adminDiagnosticsExportLog": "Export log",
   "adminDiagnosticsClearLog": "Clear log",
   "adminDiagnosticsRecentEvents": "Recent events ({count})",
-  "@adminDiagnosticsRecentEvents": {"placeholders": {"count": {"type": "int"}}},
+  "@adminDiagnosticsRecentEvents": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "adminDiagnosticsNoLogsHint": "No logs yet. Reopen the app, use it for a while, then refresh.",
   "adminDiagnosticsOutcomeOk": "ok",
   "adminDiagnosticsOutcomeError": "error",
@@ -813,14 +841,30 @@
   "adminDiagnosticsOutcomeDisabled": "disabled",
   "adminDiagnosticsOutcomeInvalidPayloadSkip": "skipped (invalid payload)",
   "adminDiagnosticsOutcomeUnknown": "unknown ({outcome})",
-  "@adminDiagnosticsOutcomeUnknown": {"placeholders": {"outcome": {}}},
+  "@adminDiagnosticsOutcomeUnknown": {
+    "placeholders": {
+      "outcome": {}
+    }
+  },
   "adminDevOffsetSavedAndRescheduled": "Offset saved; notifications rescheduled.",
   "adminDevOffsetReset": "Offset reset.",
   "adminDevOffsetDisabled": "Off (API times)",
   "adminDevOffsetForwardMinutes": "Earlier: {minutes} min",
-  "@adminDevOffsetForwardMinutes": {"placeholders": {"minutes": {"type": "int"}}},
+  "@adminDevOffsetForwardMinutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
   "adminDevOffsetBackwardMinutes": "Later: {minutes} min",
-  "@adminDevOffsetBackwardMinutes": {"placeholders": {"minutes": {"type": "int"}}},
+  "@adminDevOffsetBackwardMinutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
   "adminDevPrayerOffsetTitle": "Prayer time offset (this device only)",
   "adminDevPrayerOffsetSubtitle": "Negative values shift all times earlier (notifications follow). API/server values are unchanged.",
   "adminDevResetAction": "Reset",
@@ -837,7 +881,11 @@
   "adminFirebaseNotReady": "Firebase is not ready.",
   "adminDevCrashlyticsNonFatalSent": "Non-fatal record sent. It should appear in Console in a few minutes.",
   "adminErrorWithReason": "Error: {reason}",
-  "@adminErrorWithReason": {"placeholders": {"reason": {}}},
+  "@adminErrorWithReason": {
+    "placeholders": {
+      "reason": {}
+    }
+  },
   "adminDevSendNonFatalTestAction": "Test: send non-fatal error",
   "adminDevCrashNowFatalAction": "Test: crash app NOW (fatal)",
   "adminDevCrashDialogTitle": "Crash the app?",
@@ -865,10 +913,19 @@
   "adminSeedSelectedPoolDefaults": "Reset selected pool to defaults",
   "adminPoolNotLoadedYet": "Pool is not loaded yet.",
   "adminPoolBackupShareText": "Arin pool backup — {poolId} ({timestamp})",
-  "@adminPoolBackupShareText": {"placeholders": {"poolId": {}, "timestamp": {}}},
+  "@adminPoolBackupShareText": {
+    "placeholders": {
+      "poolId": {},
+      "timestamp": {}
+    }
+  },
   "adminPoolBackupShareSubject": "Arin pool backup",
   "adminBackupCreationFailed": "Backup could not be created: {error}",
-  "@adminBackupCreationFailed": {"placeholders": {"error": {}}},
+  "@adminBackupCreationFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
   "adminBackupInvalidJsonObject": "Backup file could not be read: JSON object expected.",
   "adminBackupPoolDocumentMissing": "Pool document was not found in backup file.",
   "adminBackupItemsListMissing": "\"items\" list is missing in backup file.",
@@ -881,22 +938,58 @@
       "fileName": {},
       "sourcePool": {},
       "selectedPool": {},
-      "itemCount": {"type": "int"},
+      "itemCount": {
+        "type": "int"
+      },
       "warningText": {}
     }
   },
   "adminRestoreBackupDifferentPoolWarning": "Warning: backup is from a different pool.",
   "adminRestoreFromBackupAction": "Restore from backup ({fileName})",
-  "@adminRestoreFromBackupAction": {"placeholders": {"fileName": {}}},
+  "@adminRestoreFromBackupAction": {
+    "placeholders": {
+      "fileName": {}
+    }
+  },
   "adminRestoreBackupFailed": "Backup file could not be restored.",
   "adminRequiresManagerOrFullAccessForMissingSeed": "Manager or full access is required to add missing records.",
   "adminRequiresFullAccessForReset": "Full access is required for full reset.",
   "adminBulkPreviewFailed": "Bulk operation preview could not be fetched.",
   "adminSeedAllPoolsTitle": "Seed all pools",
   "adminMergeSeedPreview": "Preview:\n• Checked pools: {poolCount}\n• Changed pools: {changedPoolCount}\n• Items to add: {addedItemCount}\n• Total items after operation: {targetItemCount}\n\nManual changes are preserved. Continue?",
-  "@adminMergeSeedPreview": {"placeholders": {"poolCount": {"type": "int"}, "changedPoolCount": {"type": "int"}, "addedItemCount": {"type": "int"}, "targetItemCount": {"type": "int"}}},
+  "@adminMergeSeedPreview": {
+    "placeholders": {
+      "poolCount": {
+        "type": "int"
+      },
+      "changedPoolCount": {
+        "type": "int"
+      },
+      "addedItemCount": {
+        "type": "int"
+      },
+      "targetItemCount": {
+        "type": "int"
+      }
+    }
+  },
   "adminResetSeedPreview": "Preview:\n• Checked pools: {poolCount}\n• Pools to overwrite: {changedPoolCount}\n• Current items: {currentItemCount}\n• New items: {targetItemCount}\n\nCurrent content will be removed. Make sure you backed up first. Continue?",
-  "@adminResetSeedPreview": {"placeholders": {"poolCount": {"type": "int"}, "changedPoolCount": {"type": "int"}, "currentItemCount": {"type": "int"}, "targetItemCount": {"type": "int"}}},
+  "@adminResetSeedPreview": {
+    "placeholders": {
+      "poolCount": {
+        "type": "int"
+      },
+      "changedPoolCount": {
+        "type": "int"
+      },
+      "currentItemCount": {
+        "type": "int"
+      },
+      "targetItemCount": {
+        "type": "int"
+      }
+    }
+  },
   "adminOverwriteAction": "Overwrite",
   "adminMissingItemsAddedToPools": "Missing items were added to pools.",
   "adminAllPoolsOverwritten": "All pools were overwritten.",
@@ -906,10 +999,18 @@
   "adminRequiresManagerOrFullAccessForDiagnostics": "Manager or full access is required for diagnostics actions.",
   "adminNotificationLogsCleared": "Notification logs cleared.",
   "adminNotificationLogsShareText": "Arin notification logs ({timestamp})",
-  "@adminNotificationLogsShareText": {"placeholders": {"timestamp": {}}},
+  "@adminNotificationLogsShareText": {
+    "placeholders": {
+      "timestamp": {}
+    }
+  },
   "adminNotificationLogsShareSubject": "Arin notification diagnostics",
   "adminLogExportFailed": "Log export failed: {error}",
-  "@adminLogExportFailed": {"placeholders": {"error": {}}},
+  "@adminLogExportFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
   "adminInspireCardHasEmptyTurkishText": "There is a card with empty Turkish text; fill it or delete it.",
   "adminReviewCardsBeforeSaveTitle": "Review before saving cards",
   "adminInspireCardsWillBeUpdated": "Explore cards will be updated",
@@ -917,11 +1018,29 @@
   "adminInspireCardsSaveFailed": "Explore cards could not be saved.",
   "adminAuditInspireCardsUpdated": "Explore cards were updated",
   "adminCurrentRecordCount": "Current records: {count}",
-  "@adminCurrentRecordCount": {"placeholders": {"count": {"type": "int"}}},
+  "@adminCurrentRecordCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "adminRecordCountToSave": "Records to save: {count}",
-  "@adminRecordCountToSave": {"placeholders": {"count": {"type": "int"}}},
+  "@adminRecordCountToSave": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "adminChangedRowCount": "Changed rows: {count}",
-  "@adminChangedRowCount": {"placeholders": {"count": {"type": "int"}}},
+  "@adminChangedRowCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "adminConcurrentEditWarning": "If another admin saved meanwhile, the system will show a warning.",
   "adminSaveAction": "Save",
   "adminGrantsListFetchFailed": "Grant list could not be fetched.",
@@ -941,7 +1060,11 @@
   "adminFullAccessAccountCannotBeRemoved": "This account has in-app full access and cannot be removed from panel.",
   "adminRemoveGrantTitle": "Remove grant",
   "adminRemoveGrantMessage": "Management access will be removed for {label}.",
-  "@adminRemoveGrantMessage": {"placeholders": {"label": {}}},
+  "@adminRemoveGrantMessage": {
+    "placeholders": {
+      "label": {}
+    }
+  },
   "adminGrantRemoved": "Grant removed.",
   "adminGrantRemoveFailed": "Grant could not be removed.",
   "adminAuditGrantRemoved": "Admin grant was removed",
@@ -984,7 +1107,11 @@
   "adminDeveloperToolsDeveloperOnly": "Developer tools are available only for developer level.",
   "adminDeletePoolItemTitle": "Delete item from pool",
   "adminDeletePoolItemMessage": "This item will be permanently deleted from pool \"{poolId}\" and written to Firestore immediately. It cannot be undone.",
-  "@adminDeletePoolItemMessage": {"placeholders": {"poolId": {}}},
+  "@adminDeletePoolItemMessage": {
+    "placeholders": {
+      "poolId": {}
+    }
+  },
   "adminPoolItemWillBeDeleted": "Pool item will be deleted",
   "adminRemoveCardFromListTitle": "Remove card from list",
   "adminRemoveCardFromListMessage": "Card will be removed from local list. Press \"Save\" for changes to sync to Firestore.",
@@ -999,9 +1126,19 @@
   "adminGrantManagementAccessDeniedSubtitle": "Granting/removing admin levels can be done by developer role.",
   "adminGrantHint": "Enter an email or UID to grant content, manager, or developer level.",
   "adminFixedFullAccess": "Fixed full-access accounts: {emails}",
-  "@adminFixedFullAccess": {"placeholders": {"emails": {}}},
+  "@adminFixedFullAccess": {
+    "placeholders": {
+      "emails": {}
+    }
+  },
   "adminDefinedGrants": "Defined grants ({count})",
-  "@adminDefinedGrants": {"placeholders": {"count": {"type": "int"}}},
+  "@adminDefinedGrants": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "adminGrantsLoading": "Loading grants...",
   "adminNoFirestoreGrantsYet": "No grants added through Firestore yet.",
   "generalLoading": "Loading...",
@@ -1309,10 +1446,419 @@
   "premiumFeatureReels": "Uninterrupted explore feed",
   "premiumFeatureSecondAlarm": "2nd adhan alarm enabled",
   "premiumFeatureExtras": "No ads in zikr, compass, and frequencies",
-  "premiumSignInRequired": "You can view the prices. Before purchasing, we will ask you to sign in with Google or Apple to link premium to your account.",
+  "premiumSignInRequired": "Sign-in is not required for purchase. You can use Premium on this device immediately and optionally link your account later to access it on other devices.",
   "premiumSignInTitle": "Sign in for Premium",
   "premiumSignInSubtitle": "Your premium purchase is linked to your account first so it isn't lost when changing devices. Sign in is not required to view prices.",
   "premiumSignInGoogle": "Continue with Google",
   "premiumSignInApple": "Continue with Apple",
-  "premiumSignInCancel": "Not now"
+  "premiumSignInCancel": "Not now",
+  "locationPermissionRequiredTitle": "Location Permission Required",
+  "locationPermissionRequiredBody": "Arin requires access to your location to accurately calculate prayer times and Qibla direction. Your location data is used only for these purposes and processed on your device.",
+  "locationPermissionNotNow": "Not Now",
+  "locationPermissionContinue": "Continue",
+  "errorScreenTitle": "Something went wrong",
+  "errorScreenBody": "This section could not be opened right now. You can try closing and reopening the app.",
+  "errorScreenDebugTitle": "ARIN — widget error (debug)",
+  "errorScreenDebugBody": "You are in debug mode. Copy the text below.",
+  "widgetUnlockQuoteTitle": "Daily Quote Widget",
+  "widgetUnlockPrayerTitle": "Prayer Time Widget",
+  "widgetUnlockComboTitle": "Quote + Prayer Widget",
+  "widgetUnlockTrackingTitle": "Tracking Widget",
+  "widgetUnlockAdLoadFailed": "The ad could not be loaded right now, please try again later.",
+  "widgetUnlockSuccessTitle": "{title} unlocked for 24 hours! 🎉",
+  "@widgetUnlockSuccessTitle": {
+    "placeholders": {
+      "title": {}
+    }
+  },
+  "widgetUnlockPremiumSuccess": "Premium active! All widgets unlocked. 🎉",
+  "widgetUnlockDescription": "You can watch a short ad to unlock this widget for 24 hours. Upgrade to Premium for permanent access.",
+  "widgetUnlockAdButton": "Watch ad — Unlock for 24h",
+  "widgetUnlockPremiumButton": "Upgrade to Premium",
+  "widgetUnlockCancelButton": "Not now",
+  "purchaseErrorNotFound": "Product not found. Please check your internet connection.",
+  "purchaseErrorUnexpected": "Unexpected error: {error}",
+  "@purchaseErrorUnexpected": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "purchaseErrorNotSupported": "Purchasing is not supported on this platform.",
+  "audioPermissionRequiredTitle": "Media Permission Required",
+  "audioPermissionRequiredBody": "Arin requires access to your audio files so you can choose a custom adhan or notification sound from your device. These files are only used as notifications within the app.",
+  "audioPickerTitle": "Select audio file",
+  "mgmtDailyPrayers": "Daily prayers",
+  "mgmtRoutineWorkshop": "Routine workshop",
+  "mgmtChooseGrowth": "Choose growth",
+  "mgmtPickPrayerOrMakeup": "Pick prayer or makeup tracking; use the section below for a custom growth routine.",
+  "mgmtCountingAndCompensation": "Counting and compensation",
+  "mgmtPrayer": "Prayer",
+  "mgmtTimeAndKhushu": "Time and khushu",
+  "mgmtCustomRoutine": "Custom routine",
+  "mgmtChooseYourOwnTitle": "Choose your own title, emoji and reminder.",
+  "mgmtSelect": "Select",
+  "habitsMyHabits": "My Habits",
+  "habitsNoHabitsYet": "You have not added any habits yet.\nReady for a fresh start?",
+  "habitsGrowth": "Growth",
+  "habitsPurification": "Purification",
+  "habitsAddPurificationGoal": "Add purification goal",
+  "habitsAddGrowthRoutine": "Add growth routine",
+  "habitsDeleteConfirmTitle": "Do you want to delete this habit?",
+  "habitsCancel": "Cancel",
+  "habitsYesDelete": "Yes, Delete",
+  "habitsDayStreak": "day streak",
+  "customHabitThisWeekGoal": "This week's goal",
+  "customHabitThisMonthGoal": "This month's goal",
+  "customHabitDailyGoal": "Daily goal",
+  "customHabitThisWeekGoalComplete": "This week's goal is complete.",
+  "customHabitThisMonthGoalComplete": "This month's goal is complete.",
+  "customHabitTodayGoalComplete": "Today's goal is complete.",
+  "customHabitLetsStart": "Let's start!",
+  "customHabitDoingWell": "You are doing well.",
+  "customHabitAlmostThere": "Almost there.",
+  "customHabitOneLastStep": "One last step.",
+  "customHabitRecordNotFound": "Record not found",
+  "customHabitStreak": "Streak",
+  "customHabitDayStreak": "Day streak",
+  "customHabitBack": "Back",
+  "customHabitRemove": "Remove",
+  "customHabitBackToTracker": "Back to habit tracker",
+  "customHabitGoal": "Goal",
+  "customHabitCompletedToday": "You completed today's goal.",
+  "customHabitCompletedPeriod": "You completed this period's goal.",
+  "customHabitFinish": "Finish",
+  "addHabitUnitTimes": "times",
+  "addHabitUnitMinutes": "minutes",
+  "addHabitUnitHours": "hours",
+  "addHabitUnitPages": "pages",
+  "addHabitUnitGlasses": "glasses",
+  "addHabitUnitSets": "sets",
+  "addHabitUnitLaps": "laps",
+  "addHabitDaily": "Daily",
+  "addHabitWeekly": "Weekly",
+  "addHabitMonthly": "Monthly",
+  "addHabitSummaryWeekly": "{amount} {unit} weekly",
+  "addHabitSummaryMonthly": "{amount} {unit} monthly",
+  "addHabitSummaryDaily": "{amount} {unit} daily",
+  "addHabitCancel": "Cancel",
+  "addHabitOk": "OK",
+  "addHabitCustom": "Custom",
+  "addHabitSave": "Save",
+  "addHabitGrowthName": "Growth Name",
+  "addHabitPurificationName": "Purification Name",
+  "addHabitGrowthHint": "Ex: Read a book for 30 minutes",
+  "addHabitPurificationHint": "Ex: Reduce unnecessary screen time",
+  "addHabitNameRequired": "Name is required",
+  "addHabitNameTooLong": "Maximum 60 characters",
+  "addHabitNoteOptional": "Note (optional)",
+  "addHabitNoteHint": "A short note to yourself...",
+  "habitCalendarToday": "Today: {date}",
+  "habitCalendarTitle": "Habit calendar",
+  "habitCalendarMonth": "Month",
+  "habitCalendarMonthNote": "Month note · {month} {year}",
+  "habitCalendarNoRecords": "No records yet for this month or no habits added.",
+  "habitCalendarQuitInsight": "“{title}”: {n} days Purification counter on calendar this month (since start).",
+  "habitCalendarPrayerInsight": "“{title}”: At least one prayer marked on {anyPrayer} days; 5/5 completed on {fullFive} days.",
+  "habitCalendarCustomInsightPeriod": "“{title}”: {n} {periodLabel} goal reached this month.",
+  "habitCalendarWeekLabel": "week",
+  "habitCalendarMonthLabel": "month",
+  "habitCalendarCustomInsightDays": "“{title}”: A total of {completedDays} days marked as completed this month.",
+  "habitCalendarLegend": "Grey icons in cells: means there is a record for that day. The purification icon specifically shows days the counter was active; prayer/routine icons show completed records for the respective day.",
+  "kazaPrayerFajr": "Fajr prayer",
+  "kazaPrayerDhuhr": "Dhuhr prayer",
+  "kazaPrayerAsr": "Asr prayer",
+  "kazaPrayerMaghrib": "Maghrib prayer",
+  "kazaPrayerIsha": "Isha prayer",
+  "kazaPrayerWitr": "Witr prayer",
+  "kazaReset": "Reset",
+  "kazaResetConfirmDesc": "All makeup prayer counts will be reset. Are you sure?",
+  "kazaCancel": "Cancel",
+  "kazaTrackerTitle": "Makeup tracking",
+  "kazaClose": "Close",
+  "kazaTrackerSubtitle": "Makeup prayer tracking",
+  "kazaTrackerDesc": "Try to perform makeup prayers after the regular daily prayers. You can add debt with (+) and decrease the counter with (−) for each prayer performed.",
+  "kazaCalcBirthDate": "Birth date",
+  "kazaCalcApply": "Apply",
+  "kazaCalcUpdateCounters": "Update counters?",
+  "kazaCalcUpdateDesc": "Your current makeup prayer counts will be deleted and replaced with calculated values.",
+  "kazaCalcCancel": "Cancel",
+  "kazaCalcContinue": "Continue",
+  "kazaCalcErrorPubertyFuture": "Puberty date cannot be after today. Check birth date or puberty age.",
+  "kazaCalcErrorZeroRemaining": "Remaining prayers 0: if fully prayed days equal or exceed liable days, it is capped; the 6 prayer counters remain zero accordingly.",
+  "kazaCalcTitle": "Makeup tracking",
+  "kazaCalcSubtitle": "Makeup prayer tracking",
+  "kazaCalcDesc": "Obligatory prayers start from puberty. If you don't know the exact age, you can reference 12 for males and 9 for females. This screen produces an estimated number; continue performing makeup prayers after regular prayers.",
+  "kazaCalcFemaleNote": "For females: roughly 6 days are exempted from prayers for each calendar month passed since puberty (not exceeding total days).",
+  "kazaCalcFormula": "Formula: liable days = calendar days − menstruation exemption; total prayers = liable days × 6 − (fully prayed days × 6). Prayed days cannot exceed liable days.",
+  "kazaCalcCalculateTitle": "Calculate makeup prayers",
+  "kazaCalcGender": "Your gender",
+  "kazaCalcMale": "Male",
+  "kazaCalcFemale": "Female",
+  "kazaCalcBirthDateTitle": "Your birth date",
+  "kazaCalcPubertyAge": "Age you reached puberty",
+  "kazaCalcPubertyNote": "Lower limit: male 12, female 9 years (if smaller is entered, {minPuberty} is used in calculation).",
+  "kazaCalcPrayedDays": "How many days have you prayed?",
+  "kazaCalcPrayedDaysNote": "Total number of days so far where you performed all prayers within the day.",
+  "kazaCalcCalculate": "Calculate",
+  "kazaCalcLiveError": "Puberty date cannot be after today; check birth and puberty age.",
+  "kazaCalcLiveHayiz": "Menstruation exemption: −{days} days\n",
+  "kazaCalcLiveApplied": "\n(Fully prayed days upper limit: {applied})",
+  "kazaCalcLiveSummary": "Live summary",
+  "kazaCalcLiveCalendarDays": "Calendar days: {days}\n",
+  "kazaCalcLiveLiableDays": "Liable days: {days}\n",
+  "kazaCalcLiveOwed": "Prayer debt (liable days × {perDay}): {total}\n",
+  "kazaCalcLiveCredited": "Deducted (full days × {perDay}): {credited}{appliedNote}\n",
+  "kazaCalcLiveRemaining": "—\nRemaining total: {remaining} prayers",
+  "kazaCalcLiveZeroNote": "Post-calculation counter: remaining total is divided into 6 prayers; if remaining is 0, each prayer stays 0.",
+  "dailyNamazWisdomFallback": "Reminder text could not be loaded. Try refreshing the page.",
+  "momentVerseError": "Failed to load. Please try again.",
+  "momentVerseEmptyTitle": "No moment yet",
+  "momentVerseEmptyDesc": "Wait for the next notification.",
+  "momentVerseExpiredTitle": "This time has passed",
+  "momentVerseExpiredDesc": "Some moments only come once.\nMaybe we will meet in the next one.",
+  "momentVerseExpiredNote": "Keep notifications on,\nso you don't miss the next moment.",
+  "momentVerseActiveWhisper": "The verse whispered to you by the clock",
+  "momentVerseSurah": "Surah",
+  "momentVerseVerse": "Verse",
+  "momentVerseOneVerse": "a verse",
+  "momentVerseClock": "Clock",
+  "momentVerseMeaningDesc": "This is no coincidence; the numbers of time turn into an address in the Quran. So does you opening this notification exactly on time and standing before this verse.",
+  "momentVerseDisappear": "this moment will disappear in",
+  "momentVerseReturnHome": "Return to Home",
+  "momentVerseClose": "Close",
+  "surveyDictMoodHappy": "Happy",
+  "surveyDictMoodCalm": "Calm",
+  "surveyDictMoodStressed": "Stressed",
+  "surveyDictMoodSad": "Sad",
+  "surveyDictMoodGrateful": "Grateful",
+  "surveyDictMoodAnxious": "Anxious",
+  "surveyDictMoodMotivated": "Motivated",
+  "surveyDictSectorStudent": "High school / University / Prep",
+  "surveyDictSectorPrivate": "Private sector",
+  "surveyDictSectorPublic": "Public sector",
+  "surveyDictSectorBusiness": "Own business / Freelance",
+  "surveyDictSectorTrade": "Trade",
+  "surveyDictSectorHousehold": "Homemaker",
+  "surveyDictSectorOther": "Other",
+  "surveyDictNeedMotivation": "Motivation",
+  "surveyDictNeedSabr": "Patience",
+  "surveyDictNeedShukr": "Gratitude",
+  "surveyDictNeedTawakkul": "Trust in God",
+  "surveyDictNeedFocus": "Focus",
+  "surveyDictNeedHealing": "Healing",
+  "surveyDictNeedRizq": "Provision & Blessing",
+  "surveyDictGenderMale": "Male",
+  "surveyDictGenderFemale": "Female",
+  "premiumProductNotReadyError": "Product information is not ready yet. Please try again.",
+  "premiumAccountLinkError": "Account linking could not be completed. Please try again.",
+  "premiumWelcomeTitle": "🌿 Welcome!",
+  "premiumWelcomeMessage": "ARIN Premium is active. Your ad-free, unlocked experience is open.\n\nYou can manage your subscription from your store account at any time.",
+  "premiumWelcomeButton": "Great!",
+  "premiumRestoreSuccess": "Premium restored!",
+  "premiumNoActiveSubscription": "No active subscription found.",
+  "premiumSignInErrorPrefix": "Sign in could not be completed: ",
+  "premiumActiveTitle": "ARIN Premium is active",
+  "premiumTitle": "ARIN Premium",
+  "premiumActiveSubtitle": "Your ad-free and unlocked experience is open.",
+  "premiumSubtitle": "Ad-free, uninterrupted and unlocked spiritual routine.",
+  "premiumYearlyPlanTitle": "Yearly Premium",
+  "premiumMostAdvantageousBadge": "BEST VALUE",
+  "premiumYearlyPlanSubtitle": "Yearly Subscription",
+  "premiumSwitchToYearly": "Switch to Yearly",
+  "premiumMonthlyPlanTitle": "Monthly Premium",
+  "premiumMonthlyPlanSubtitle": "Monthly Subscription",
+  "premiumFooterText1": "Launch prices are valid for a limited time. The subscription is managed through your store account and can be canceled at any time.",
+  "premiumFooterText2": "The subscription renews automatically unless canceled at least 24 hours before the end of the period. The renewal fee is charged to your store account 24 hours before the end of the period. You can manage your subscriptions in App Store/Play account settings.",
+  "premiumLaunchBadge": "LAUNCH SPECIAL",
+  "premiumCountdownNotice": "This price is valid for a limited time. Unlock premium with the best price before the launch ends.",
+  "premiumBenefitAdFree": "Ad-free usage",
+  "premiumBenefitWidgets": "No widget locks",
+  "premiumBenefitExplore": "Uninterrupted explore feed",
+  "premiumBenefitAdhan": "2nd adhan alarm enabled",
+  "premiumSignInRequiredNotice": "Sign-in is not required for purchase. You can use Premium on this device right away; optionally link your account afterward to access it on your other devices.",
+  "premiumSignInSheetTitle": "Link your account for Premium",
+  "premiumSignInSheetSubtitle": "Linking your account makes it easier to restore Premium on your other devices. Sign-in is optional for purchase.",
+  "premiumContinueWithGoogle": "Continue with Google",
+  "premiumContinueWithApple": "Continue with Apple",
+  "premiumCancelForNow": "Cancel for now",
+  "premiumPostPurchaseLinkTitle": "Premium is active",
+  "premiumPostPurchaseLinkBody": "Premium is active on this device. Would you like to link your account now so you can easily use it on your other devices?",
+  "premiumPostPurchaseLinkLater": "Later",
+  "premiumPostPurchaseLinkNow": "Link my account",
+  "premiumPostPurchaseLinkSuccess": "Account linked. Premium can now be synced across your devices.",
+  "premiumActivePlanBadge": "Your active plan ✓",
+  "premiumActivePlanButton": "Your active plan",
+  "premiumStartWithLaunchPrice": "Start with Launch Price",
+  "premiumIsActiveButton": "Premium active",
+  "qiblaCompassTitle": "Qibla Compass",
+  "qiblaCompassQibla": "Qibla",
+  "qiblaCompassGettingLocation": "Getting location…",
+  "qiblaCompassInitError": "Location or compass\ncould not be initialized",
+  "qiblaCompassRetry": "Retry",
+  "qiblaCompassAligned": "Aligned to Qibla",
+  "qiblaCompassDeviation": "deviation",
+  "qiblaCompassStabilizing": "Stabilizing measurement",
+  "qiblaCompassGuidanceTiltTitle": "Hold phone flat",
+  "qiblaCompassGuidanceTiltBody": "Use compass horizontally. Direction won't lock if held upright, sideways, or upside down.",
+  "qiblaCompassGuidanceCalibrateTitle": "Calibrate compass",
+  "qiblaCompassGuidanceCalibrateBody": "Move phone in a figure 8 a few times, then keep away from metal.",
+  "qiblaCompassGuidanceUnstableTitle": "Magnetic field unstable",
+  "qiblaCompassGuidanceUnstableBody": "Move away from laptops, magnets, metal tables, and magnetic cases.",
+  "qiblaCompassGuidanceGoodTitle": "Measurement ready",
+  "qiblaCompassGuidanceGoodBody": "Hold phone flat, turn slowly to Qibla. Green badge lights up when stable.",
+  "qiblaCompassNorth": "N",
+  "qiblaCompassEast": "E",
+  "qiblaCompassSouth": "S",
+  "qiblaCompassWest": "W",
+  "qiblaCompassQiblaText": "QIBLA",
+  "zikirmatikCounterSemantics": "Dhikr counter",
+  "zikirmatikRound": "ROUND",
+  "zikirmatikRoundCompleted": "Round completed",
+  "zikirmatikResetCounter": "Reset counter?",
+  "zikirmatikResetCounterDesc": "Total count and round information will reset.",
+  "zikirmatikCancel": "Cancel",
+  "zikirmatikReset": "Reset",
+  "zikirmatikEditPhraseTitle": "Edit dhikr name",
+  "zikirmatikUse": "Use",
+  "zikirmatikSaveAndUse": "Save & Use",
+  "zikirmatikThisRound": "THIS ROUND",
+  "zikirmatikTarget": "Target",
+  "zikirmatikCounterSemanticsLabel": "Dhikr counter. {round} / {target}, total {total}",
+  "zikirmatikCounterSemanticsHint": "Tap to increase by one",
+  "zikirmatikVibration": "Vibration",
+  "zikirmatikVibrationTooltip": "Vibrates on each count; stronger vibration at round end",
+  "zikirmatikInfo": "Dhikr info",
+  "zikirmatikTitle": "Dhikr Counter",
+  "zikirmatikTapToChoose": "Tap to choose dhikr",
+  "zikirmatikPickDhikr": "PICK DHIKR",
+  "zikirmatikSaved": "SAVED",
+  "zikirmatikDelete": "Delete",
+  "zikirmatikWriteOwnText": "WRITE YOUR OWN TEXT…",
+  "zikirmatikCustomTarget": "Custom…",
+  "zikirmatikTargetOk": "OK",
+  "zikirmatikDeleteRoundRecord": "Delete this round record?",
+  "zikirmatikDhikr": "dhikr",
+  "zikirmatikShareError": "Share could not be opened. Please try again.",
+  "zikirmatikDeleteRecord": "Delete record?",
+  "zikirmatikCompletedRounds": "Completed rounds",
+  "zikirmatikNoCompletedRounds": "No completed rounds yet. They will appear here when you hit your target.",
+  "zikirmatikArchivedSessions": "Archived sessions",
+  "zikirmatikTodaysReflection": "Today's reflection",
+  "zikirmatikCompareLine": "You completed “{first}” {diff} more rounds than “{second}”.",
+  "zikirmatikOnlyOneRecord": "Right now you only have round records for “{first}”.",
+  "zikirmatikSummaryAndAnalytics": "Summary and analytics",
+  "zikirmatikAnalyticsNoLogs": "As you complete more rounds, summaries and comparisons appear here.",
+  "zikirmatikTotalRoundsCompleted": "You completed {total} rounds in total.",
+  "zikirmatikActiveDays": "You have dhikr records on {days} different days.",
+  "zikirmatikLast7Days": "{rounds} rounds were completed in the last 7 days.",
+  "zikirmatikMostCompleted": "Most completed: “{phrase}” ({rounds} rounds).",
+  "zikirmatikCompleted": "completed",
+  "zikirmatikTotalCounter": "total counter",
+  "healingAmbientForest": "Forest Sound",
+  "healingAmbientFire": "Fire Sound",
+  "healingAmbientCosmic": "Cosmic Sound",
+  "healingAmbientInshirah": "Surah Al-Inshirah",
+  "healingSleepOff": "Off",
+  "healingSleepRemaining": "Remaining ",
+  "healingSleepMinutes": "{m} minutes",
+  "healingInfoTitle": "Info",
+  "healingInfoBody": "This section is for relaxation and reflection; it is not a medical treatment. Listen at low volume. Stop if you feel discomfort.",
+  "healingInfoOk": "OK",
+  "healingFrequenciesTitle": "Healing Frequencies",
+  "healingAmbientSound": "Ambient Sound",
+  "healingPresets": "PRESETS",
+  "healingFrequencyTone": "Frequency tone (Hz)",
+  "healingAmbient": "Ambient",
+  "healingSleepTimer": "Sleep Timer",
+  "healingInshirahLocked": "Frequency controls are locked in Inshirah mode.",
+  "healingAllFrequencies": "All Frequencies",
+  "healingPresetFocus": "Focus",
+  "healingPresetSleep": "Sleep",
+  "healingAmbientForestShort": "Forest",
+  "healingAmbientFireShort": "Fire",
+  "healingAmbientCosmicShort": "Cosmic",
+  "healingAmbientInshirahShort": "Inshirah",
+  "healingAmbientChoose": "Choose Ambient Sound",
+  "healingSleepCancel": "Cancel",
+  "healingSleepStopAfter": "Stop after how many minutes?",
+  "healingSleepTimerOff": "Timer off",
+  "healingFreq174Short": "Therapy Frequency",
+  "healingFreq285Short": "Resilience",
+  "healingFreq396Short": "Renewal",
+  "healingFreq417Short": "Inner strength",
+  "healingFreq528Short": "Peace",
+  "healingFreq639Short": "Purification",
+  "healingFreq741Short": "Contemplation",
+  "healingFreq852Short": "Tranquility",
+  "healingFreq174Heading": "174 Hz - Healing and Relaxation",
+  "healingFreq285Heading": "285 Hz - Patience and Steadiness",
+  "healingFreq396Heading": "396 Hz - Blessing and New Start",
+  "healingFreq417Heading": "417 Hz - Inner Strength and Faith",
+  "healingFreq528Heading": "528 Hz - Peace and Calm",
+  "healingFreq639Heading": "639 Hz - Purification and Cleansing",
+  "healingFreq741Heading": "741 Hz - Reflection and Focus",
+  "healingFreq852Heading": "852 Hz - Tranquility (Deep Peace)",
+  "healingFreq174Body": "Turn toward calm in physical and spiritual fatigue; healing is from Allah.",
+  "healingFreq285Body": "Soften the heart in hardship; continue with trust in Allah.",
+  "healingFreq396Body": "Open a new page; a prayer for repentance and forgiveness.",
+  "healingFreq417Body": "Strengthen the heart; renew faith and remember right direction.",
+  "healingFreq528Body": "Inner calm; breathe with gratitude and surrender.",
+  "healingFreq639Body": "Step away from thoughts that cloud the heart; seek forgiveness.",
+  "healingFreq741Body": "Focus on verses and creation; gather a scattered mind.",
+  "healingFreq852Body": "A calm that brings relief to the heart; seek Allah’s mercy.",
+  "appleSignInCanceled": "Apple sign in canceled.",
+  "appleSignInNotAuthorized": "Apple account not authorized. Check Apple sign in permission from iPhone Settings > Apple ID > Sign-In & Security.",
+  "appleSignInProviderDisabled": "Apple sign in provider appears disabled in Firebase console.",
+  "appleSignInInvalidCredential": "Invalid Apple authentication credential. Check Bundle ID and Apple Sign In capabilities on Xcode/Firebase.",
+  "appleSignInNetworkFailed": "Apple sign in could not be completed due to network connection.",
+  "settingsMenuPremiumTitle": "ARIN Premium",
+  "settingsMenuPremiumSubtitle": "Launch prices and ad-free experience",
+  "settingsMenuWidgetsTitle": "Widget Center",
+  "settingsMenuWidgetsSubtitle": "Usage info and tracking widget",
+  "supportProductNotReady": "Product information is not ready yet. Please try again.",
+  "supportThanksTitle": "Thank You! 🙏",
+  "supportThanksBody": "Your support is very valuable to Arın. With this contribution, we will continue to provide a better experience.",
+  "commonOk": "OK",
+  "supportPageTitle": "Support Arın",
+  "supportTierSmallTitle": "Small Support",
+  "supportTierSmallDesc": "Contribute to development with a coffee support.",
+  "supportTierMediumTitle": "Medium Support",
+  "supportTierMediumDesc": "Accelerate the development of new content and features.",
+  "supportTierLargeTitle": "Large Support",
+  "supportTierLargeDesc": "Make a strong contribution to Arın's long-term development.",
+  "supportPackagesDisclaimer": "Support packages work as one-time store products. They are separate from Premium subscription.",
+  "supportHeaderTitle": "Stand with Arın",
+  "supportHeaderDesc": "Not a donation, but one-time support packages compliant with store rules. They help us grow the ad-free and premium experience of the app.",
+  "languageChangeFailed": "Language could not be changed. Please try again.",
+  "differentLocation": "You are in a different location",
+  "updatePrayerTimesForCity": "Should we update prayer times for {city}?",
+  "rememberThisChoice": "Remember this choice, do not ask again",
+  "keepCurrentLocation": "Keep",
+  "updateLocation": "Update",
+  "sealYourIntention": "Seal your intention",
+  "sealIntentionInfo": "The details you just shared are part of this beginning; hold to reinforce your intention.",
+  "touchAndHoldWhenReady": "Touch and hold when you are ready.",
+  "youAreAlmostThere": "You are almost there!",
+  "promiseSealed": "Congratulations, your promise is sealed!",
+  "touchAndHoldToContinue": "Touch and hold the screen\nTo continue…",
+  "skipWithArrow": "Skip ➔",
+  "redirecting": "Redirecting...",
+  "keepGoing": "Keep going...",
+  "premiumLoadingWait": "Loading premium status. Please try again shortly.",
+  "secondAlarmPremiumFeature": "2nd alarm premium feature",
+  "secondAlarmAdWatchText": "To enable the 2nd azan alarm in free usage, a short ad is watched. Premium users do not see this lock.",
+  "giveUp": "Give up",
+  "openAfterAd": "Open after ad",
+  "reflection": "Reflection",
+  "yesterdayPrayerSummary": "Yesterday · {weekday} · {yDone}/5  ·  Last 7 days avg. {avg}/5",
+  "weeklyView": "Weekly view",
+  "daysDoneSummary": "{done}/7 days",
+  "inspirationAndAwareness": "Inspiration and awareness",
+  "shortBreaksForTruth": "Short breaks for truth and consciousness",
+  "insightCommentStrong": "Your rhythm is very strong recently; your heart seems aligned with order. Keep it up.",
+  "insightCommentPerfect": "Five times completed yesterday — you've spent a day close to your Lord. You can continue with the same intention today.",
+  "insightCommentZero": "Yesterday might not have been recorded or checked yet. Even with a single prayer today, you can redraw the line.",
+  "insightCommentLow": "The average is low this week; this is normal — it rises with reflection and small steps. One more prayer makes a big difference.",
+  "insightCommentGood": "{count}/5 prayers marked yesterday; it's possible to complete the balance with one or two prayers today.",
+  "insightCommentDefault": "Past days' data is a mirror for you: mercy in the missing parts, gratitude in the completed ones."
 }

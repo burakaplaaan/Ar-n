@@ -1384,7 +1384,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get settingsPrivacyThirdPartyBody =>
-      'تستخدم Arin خدمات Firebase Authentication وCloud Firestore وFirebase Analytics وFirebase Crashlytics لتسجيل الدخول ومزامنة البيانات وتحليل الاستخدام وتشخيص الأعطال.';
+      'تستخدم Arin خدمات Firebase لتسجيل الدخول والمزامنة والإشعارات، وGoogle AdMob للإعلانات، وRevenueCat للاشتراكات، وواجهات برمجة تطبيقات Aladhan/Diyanet لمواقيت الصلاة.';
 
   @override
   String get settingsPrivacyControlsTitle => 'تحكم المستخدم';
@@ -2995,4 +2995,1405 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get adminEmailInviteLabel => 'دعوة بريد إلكتروني';
+
+  @override
+  String get offlineBannerOffline => 'أنت غير متصل بالإنترنت';
+
+  @override
+  String get offlineBannerReconnected => 'تمت إعادة الاتصال';
+
+  @override
+  String get premiumRestorePurchasesLabel => 'استعادة المشتريات';
+
+  @override
+  String get premiumActivePlanLabel => 'الخطة الفعالة';
+
+  @override
+  String get premiumPlanMonthlyLaunch => 'ابدأ بسعر الإطلاق';
+
+  @override
+  String get premiumPlanYearlySwitch => 'التبديل إلى السنوي';
+
+  @override
+  String get premiumFeatureNoAds => 'استخدام بدون إعلانات';
+
+  @override
+  String get premiumFeatureWidgets => 'بدون أقفال للأدوات (Widgets)';
+
+  @override
+  String get premiumFeatureReels => 'تصفح مستمر بدون انقطاع';
+
+  @override
+  String get premiumFeatureSecondAlarm => 'تمكين التنبيه الثاني للأذان';
+
+  @override
+  String get premiumFeatureExtras => 'بدون إعلانات في الذكر والبوصلة والترددات';
+
+  @override
+  String get premiumSignInRequired =>
+      'تسجيل الدخول غير مطلوب للشراء. يمكنك استخدام Premium على هذا الجهاز فورًا، ويمكنك ربط حسابك لاحقًا لاستخدامه على الأجهزة الأخرى.';
+
+  @override
+  String get premiumSignInTitle => 'تسجيل الدخول للاشتراك';
+
+  @override
+  String get premiumSignInSubtitle =>
+      'يُربط الاشتراك المميز بحسابك حتى لا تفقده عند تغيير الجهاز. لا يتطلب تسجيل الدخول لعرض الأسعار.';
+
+  @override
+  String get premiumSignInGoogle => 'المتابعة مع جوجل';
+
+  @override
+  String get premiumSignInApple => 'المتابعة مع آبل';
+
+  @override
+  String get premiumSignInCancel => 'ليس الآن';
+
+  @override
+  String get locationPermissionRequiredTitle => 'إذن الموقع مطلوب';
+
+  @override
+  String get locationPermissionRequiredBody =>
+      'يتطلب أرين الوصول إلى موقعك لحساب أوقات الصلاة واتجاه القبلة بدقة. تُستخدم بيانات موقعك لهذه الأغراض فقط وتتم معالجتها على جهازك.';
+
+  @override
+  String get locationPermissionNotNow => 'ليس الآن';
+
+  @override
+  String get locationPermissionContinue => 'متابعة';
+
+  @override
+  String get errorScreenTitle => 'حدث خطأ ما';
+
+  @override
+  String get errorScreenBody =>
+      'لا يمكن فتح هذا القسم في الوقت الحالي. يمكنك محاولة إغلاق التطبيق وإعادة فتحه.';
+
+  @override
+  String get errorScreenDebugTitle => 'أرين - خطأ في الأداة (تصحيح)';
+
+  @override
+  String get errorScreenDebugBody => 'أنت في وضع التصحيح. انسخ النص أدناه.';
+
+  @override
+  String get widgetUnlockQuoteTitle => 'أداة الاقتباس اليومي';
+
+  @override
+  String get widgetUnlockPrayerTitle => 'أداة وقت الصلاة';
+
+  @override
+  String get widgetUnlockComboTitle => 'أداة الاقتباس + الصلاة';
+
+  @override
+  String get widgetUnlockTrackingTitle => 'أداة التتبع';
+
+  @override
+  String get widgetUnlockAdLoadFailed =>
+      'تعذر تحميل الإعلان الآن، يرجى المحاولة مرة أخرى لاحقًا.';
+
+  @override
+  String widgetUnlockSuccessTitle(Object title) {
+    return 'تم فتح $title لمدة 24 ساعة! 🎉';
+  }
+
+  @override
+  String get widgetUnlockPremiumSuccess =>
+      'النسخة المميزة نشطة! تم فتح جميع الأدوات. 🎉';
+
+  @override
+  String get widgetUnlockDescription =>
+      'يمكنك مشاهدة إعلان قصير لفتح هذه الأداة لمدة 24 ساعة. قم بالترقية إلى النسخة المميزة للوصول الدائم.';
+
+  @override
+  String get widgetUnlockAdButton => 'مشاهدة إعلان — الفتح لمدة 24 ساعة';
+
+  @override
+  String get widgetUnlockPremiumButton => 'الترقية إلى النسخة المميزة';
+
+  @override
+  String get widgetUnlockCancelButton => 'ليس الآن';
+
+  @override
+  String get purchaseErrorNotFound =>
+      'لم يتم العثور على المنتج. يرجى التحقق من اتصالك بالإنترنت.';
+
+  @override
+  String purchaseErrorUnexpected(Object error) {
+    return 'خطأ غير متوقع: $error';
+  }
+
+  @override
+  String get purchaseErrorNotSupported => 'الشراء غير مدعوم على هذه المنصة.';
+
+  @override
+  String get audioPermissionRequiredTitle => 'مطلوب إذن الوسائط';
+
+  @override
+  String get audioPermissionRequiredBody =>
+      'يتطلب أرين الوصول إلى ملفات الصوت الخاصة بك حتى تتمكن من اختيار أذان مخصص أو صوت إشعار من جهازك. تُستخدم هذه الملفات كإشعارات داخل التطبيق فقط.';
+
+  @override
+  String get audioPickerTitle => 'اختر ملف صوتي';
+
+  @override
+  String get mgmtDailyPrayers => 'الصلوات اليومية';
+
+  @override
+  String get mgmtRoutineWorkshop => 'ورشة الروتين';
+
+  @override
+  String get mgmtChooseGrowth => 'اختر التطوير';
+
+  @override
+  String get mgmtPickPrayerOrMakeup =>
+      'اختر تتبع الصلاة أو القضاء؛ واستخدم القسم أدناه لروتين تطوير مخصص.';
+
+  @override
+  String get mgmtCountingAndCompensation => 'العدّ والتدارك';
+
+  @override
+  String get mgmtPrayer => 'الصلاة';
+
+  @override
+  String get mgmtTimeAndKhushu => 'الوقت والخشوع';
+
+  @override
+  String get mgmtCustomRoutine => 'روتين مخصص';
+
+  @override
+  String get mgmtChooseYourOwnTitle =>
+      'حدد العنوان والرمز التفاعلي والتذكير بنفسك.';
+
+  @override
+  String get mgmtSelect => 'اختر';
+
+  @override
+  String get habitsMyHabits => 'عاداتي';
+
+  @override
+  String get habitsNoHabitsYet =>
+      'لم تضف أي عادة بعد.\nهل أنت مستعد لبداية جديدة؟';
+
+  @override
+  String get habitsGrowth => 'التطوير';
+
+  @override
+  String get habitsPurification => 'التزكية';
+
+  @override
+  String get habitsAddPurificationGoal => 'أضف هدف تزكية';
+
+  @override
+  String get habitsAddGrowthRoutine => 'أضف روتين تطوير';
+
+  @override
+  String get habitsDeleteConfirmTitle => 'هل تريد حذف هذه العادة؟';
+
+  @override
+  String get habitsCancel => 'إلغاء';
+
+  @override
+  String get habitsYesDelete => 'نعم، احذف';
+
+  @override
+  String get habitsDayStreak => 'سلسلة أيام';
+
+  @override
+  String get customHabitThisWeekGoal => 'هدف هذا الأسبوع';
+
+  @override
+  String get customHabitThisMonthGoal => 'هدف هذا الشهر';
+
+  @override
+  String get customHabitDailyGoal => 'الهدف اليومي';
+
+  @override
+  String get customHabitThisWeekGoalComplete => 'اكتمل هدف هذا الأسبوع.';
+
+  @override
+  String get customHabitThisMonthGoalComplete => 'اكتمل هدف هذا الشهر.';
+
+  @override
+  String get customHabitTodayGoalComplete => 'اكتمل هدف اليوم.';
+
+  @override
+  String get customHabitLetsStart => 'هيا ابدأ!';
+
+  @override
+  String get customHabitDoingWell => 'أنت تسير بشكل جيد.';
+
+  @override
+  String get customHabitAlmostThere => 'أوشكت.';
+
+  @override
+  String get customHabitOneLastStep => 'خطوة أخيرة.';
+
+  @override
+  String get customHabitRecordNotFound => 'لم يتم العثور على السجل';
+
+  @override
+  String get customHabitStreak => 'سلسلة';
+
+  @override
+  String get customHabitDayStreak => 'سلسلة أيام';
+
+  @override
+  String get customHabitBack => 'رجوع';
+
+  @override
+  String get customHabitRemove => 'إزالة';
+
+  @override
+  String get customHabitBackToTracker => 'العودة لمتابعة العادات';
+
+  @override
+  String get customHabitGoal => 'الهدف';
+
+  @override
+  String get customHabitCompletedToday => 'أكملت هدف اليوم.';
+
+  @override
+  String get customHabitCompletedPeriod => 'أكملت هدف هذه الفترة.';
+
+  @override
+  String get customHabitFinish => 'إنهاء';
+
+  @override
+  String get addHabitUnitTimes => 'مرات';
+
+  @override
+  String get addHabitUnitMinutes => 'دقائق';
+
+  @override
+  String get addHabitUnitHours => 'ساعات';
+
+  @override
+  String get addHabitUnitPages => 'صفحات';
+
+  @override
+  String get addHabitUnitGlasses => 'أكواب';
+
+  @override
+  String get addHabitUnitSets => 'مجموعات';
+
+  @override
+  String get addHabitUnitLaps => 'دورات';
+
+  @override
+  String get addHabitDaily => 'يومي';
+
+  @override
+  String get addHabitWeekly => 'أسبوعي';
+
+  @override
+  String get addHabitMonthly => 'شهري';
+
+  @override
+  String addHabitSummaryWeekly(Object amount, Object unit) {
+    return '$amount $unit أسبوعي';
+  }
+
+  @override
+  String addHabitSummaryMonthly(Object amount, Object unit) {
+    return '$amount $unit شهري';
+  }
+
+  @override
+  String addHabitSummaryDaily(Object amount, Object unit) {
+    return '$amount $unit يومي';
+  }
+
+  @override
+  String get addHabitCancel => 'إلغاء';
+
+  @override
+  String get addHabitOk => 'حسناً';
+
+  @override
+  String get addHabitCustom => 'مخصص';
+
+  @override
+  String get addHabitSave => 'حفظ';
+
+  @override
+  String get addHabitGrowthName => 'اسم التطوير';
+
+  @override
+  String get addHabitPurificationName => 'اسم التزكية';
+
+  @override
+  String get addHabitGrowthHint => 'مثال: قراءة كتاب لمدة 30 دقيقة';
+
+  @override
+  String get addHabitPurificationHint => 'مثال: تقليل وقت الشاشة غير الضروري';
+
+  @override
+  String get addHabitNameRequired => 'الاسم مطلوب';
+
+  @override
+  String get addHabitNameTooLong => 'الحد الأقصى 60 حرفاً';
+
+  @override
+  String get addHabitNoteOptional => 'ملاحظة (اختياري)';
+
+  @override
+  String get addHabitNoteHint => 'ملاحظة قصيرة لنفسك...';
+
+  @override
+  String habitCalendarToday(Object date) {
+    return 'اليوم: $date';
+  }
+
+  @override
+  String get habitCalendarTitle => 'تقويم العادات';
+
+  @override
+  String get habitCalendarMonth => 'شهر';
+
+  @override
+  String habitCalendarMonthNote(Object month, Object year) {
+    return 'ملاحظة الشهر · $month $year';
+  }
+
+  @override
+  String get habitCalendarNoRecords =>
+      'لا توجد سجلات لهذا الشهر بعد أو لم تتم إضافة عادات.';
+
+  @override
+  String habitCalendarQuitInsight(Object n, Object title) {
+    return '“$title”: $n أيام عداد التزكية في التقويم هذا الشهر (منذ البداية).';
+  }
+
+  @override
+  String habitCalendarPrayerInsight(
+    Object anyPrayer,
+    Object fullFive,
+    Object title,
+  ) {
+    return '“$title”: تم وضع علامة على صلاة واحدة على الأقل في $anyPrayer يوماً؛ اكتمل 5/5 في $fullFive يوماً.';
+  }
+
+  @override
+  String habitCalendarCustomInsightPeriod(
+    Object n,
+    Object periodLabel,
+    Object title,
+  ) {
+    return '“$title”: تم الوصول إلى هدف $n $periodLabel هذا الشهر.';
+  }
+
+  @override
+  String get habitCalendarWeekLabel => 'أسبوع';
+
+  @override
+  String get habitCalendarMonthLabel => 'شهر';
+
+  @override
+  String habitCalendarCustomInsightDays(Object completedDays, Object title) {
+    return '“$title”: تم وضع علامة مكتمل على $completedDays يوماً إجمالاً هذا الشهر.';
+  }
+
+  @override
+  String get habitCalendarLegend =>
+      'الرموز الرمادية في الخلايا: تعني وجود سجل لذلك اليوم. يوضح رمز التزكية تحديداً الأيام التي كان فيها العداد نشطاً؛ رموز الصلاة/الروتين تظهر السجلات المكتملة لليوم المعني.';
+
+  @override
+  String get kazaPrayerFajr => 'صلاة الفجر';
+
+  @override
+  String get kazaPrayerDhuhr => 'صلاة الظهر';
+
+  @override
+  String get kazaPrayerAsr => 'صلاة العصر';
+
+  @override
+  String get kazaPrayerMaghrib => 'صلاة المغرب';
+
+  @override
+  String get kazaPrayerIsha => 'صلاة العشاء';
+
+  @override
+  String get kazaPrayerWitr => 'صلاة الوتر';
+
+  @override
+  String get kazaReset => 'إعادة تعيين';
+
+  @override
+  String get kazaResetConfirmDesc =>
+      'سيتم إعادة تعيين جميع أعداد قضاء الصلوات. هل أنت متأكد؟';
+
+  @override
+  String get kazaCancel => 'إلغاء';
+
+  @override
+  String get kazaTrackerTitle => 'تتبع القضاء';
+
+  @override
+  String get kazaClose => 'إغلاق';
+
+  @override
+  String get kazaTrackerSubtitle => 'تتبع قضاء الصلوات';
+
+  @override
+  String get kazaTrackerDesc =>
+      'احرص على أداء صلوات القضاء بعد الصلوات اليومية. يمكنك إضافة دين بـ (+) وتقليل العداد بـ (−) لكل صلاة تؤديها.';
+
+  @override
+  String get kazaCalcBirthDate => 'تاريخ الميلاد';
+
+  @override
+  String get kazaCalcApply => 'تطبيق';
+
+  @override
+  String get kazaCalcUpdateCounters => 'تحديث العدادات؟';
+
+  @override
+  String get kazaCalcUpdateDesc =>
+      'سيتم حذف أعداد صلوات القضاء الحالية واستبدالها بالقيم المحسوبة.';
+
+  @override
+  String get kazaCalcCancel => 'إلغاء';
+
+  @override
+  String get kazaCalcContinue => 'متابعة';
+
+  @override
+  String get kazaCalcErrorPubertyFuture =>
+      'لا يمكن أن يكون تاريخ البلوغ بعد اليوم. تحقق من تاريخ الميلاد أو سن البلوغ.';
+
+  @override
+  String get kazaCalcErrorZeroRemaining =>
+      'الصلوات المتبقية 0: إذا كانت الأيام المصلّاة بالكامل تساوي أو تتجاوز الأيام الملزم بها، يتم تقييدها؛ وتبقى عدادات الصلوات الـ 6 صفراً بناءً على ذلك.';
+
+  @override
+  String get kazaCalcTitle => 'تتبع القضاء';
+
+  @override
+  String get kazaCalcSubtitle => 'تتبع قضاء الصلوات';
+
+  @override
+  String get kazaCalcDesc =>
+      'الصلوات المفروضة تبدأ من سن البلوغ. إذا كنت لا تعرف العمر الدقيق، يمكنك الرجوع إلى 12 للذكور و 9 للإناث كمرجع. تنتج هذه الشاشة عدداً تقديرياً؛ استمر في أداء صلوات القضاء بعد الصلوات المنتظمة.';
+
+  @override
+  String get kazaCalcFemaleNote =>
+      'للإناث: يُعفى تقريباً 6 أيام من الصلاة لكل شهر تقويمي مضى منذ البلوغ (لا يتجاوز إجمالي الأيام).';
+
+  @override
+  String get kazaCalcFormula =>
+      'المعادلة: الأيام الملزم بها = أيام التقويم − إعفاء الحيض؛ إجمالي الصلوات = الأيام الملزم بها × 6 − (الأيام المصلّاة بالكامل × 6). لا يمكن أن تتجاوز الأيام المصلّاة الأيام الملزم بها.';
+
+  @override
+  String get kazaCalcCalculateTitle => 'حساب صلوات القضاء';
+
+  @override
+  String get kazaCalcGender => 'جنسك';
+
+  @override
+  String get kazaCalcMale => 'ذكر';
+
+  @override
+  String get kazaCalcFemale => 'أنثى';
+
+  @override
+  String get kazaCalcBirthDateTitle => 'تاريخ ميلادك';
+
+  @override
+  String get kazaCalcPubertyAge => 'عمر بلوغك';
+
+  @override
+  String kazaCalcPubertyNote(Object minPuberty) {
+    return 'الحد الأدنى: ذكر 12، أنثى 9 سنوات (إذا تم إدخال رقم أصغر، يتم استخدام $minPuberty في الحساب).';
+  }
+
+  @override
+  String get kazaCalcPrayedDays => 'كم يوماً صليت؟';
+
+  @override
+  String get kazaCalcPrayedDaysNote =>
+      'إجمالي عدد الأيام حتى الآن التي أديت فيها جميع الصلوات خلال اليوم.';
+
+  @override
+  String get kazaCalcCalculate => 'حساب';
+
+  @override
+  String get kazaCalcLiveError =>
+      'لا يمكن أن يكون تاريخ البلوغ بعد اليوم؛ تحقق من تاريخ الميلاد وعمر البلوغ.';
+
+  @override
+  String kazaCalcLiveHayiz(Object days) {
+    return 'إعفاء الحيض: −$days أيام\n';
+  }
+
+  @override
+  String kazaCalcLiveApplied(Object applied) {
+    return '\n(الحد الأقصى للأيام المصلّاة بالكامل: $applied)';
+  }
+
+  @override
+  String get kazaCalcLiveSummary => 'ملخص مباشر';
+
+  @override
+  String kazaCalcLiveCalendarDays(Object days) {
+    return 'أيام التقويم: $days\n';
+  }
+
+  @override
+  String kazaCalcLiveLiableDays(Object days) {
+    return 'الأيام الملزم بها: $days\n';
+  }
+
+  @override
+  String kazaCalcLiveOwed(Object perDay, Object total) {
+    return 'دين الصلاة (الأيام الملزم بها × $perDay): $total\n';
+  }
+
+  @override
+  String kazaCalcLiveCredited(
+    Object appliedNote,
+    Object credited,
+    Object perDay,
+  ) {
+    return 'المخصوم (أيام كاملة × $perDay): $credited$appliedNote\n';
+  }
+
+  @override
+  String kazaCalcLiveRemaining(Object remaining) {
+    return '—\nالإجمالي المتبقي: $remaining صلوات';
+  }
+
+  @override
+  String get kazaCalcLiveZeroNote =>
+      'عداد ما بعد الحساب: يتم تقسيم الإجمالي المتبقي إلى 6 صلوات؛ إذا كان المتبقي 0، تظل كل صلاة 0.';
+
+  @override
+  String get dailyNamazWisdomFallback =>
+      'تعذر تحميل نص التذكير. حاول تحديث الصفحة.';
+
+  @override
+  String get momentVerseError => 'فشل التحميل. حاول مرة أخرى.';
+
+  @override
+  String get momentVerseEmptyTitle => 'لا توجد لحظة بعد';
+
+  @override
+  String get momentVerseEmptyDesc => 'انتظر الإشعار التالي.';
+
+  @override
+  String get momentVerseExpiredTitle => 'لقد مر هذا الوقت';
+
+  @override
+  String get momentVerseExpiredDesc =>
+      'بعض اللحظات تأتي مرة واحدة فقط.\nربما نلتقي في اللحظة التالية.';
+
+  @override
+  String get momentVerseExpiredNote =>
+      'احتفظ بالإشعارات قيد التشغيل،\nحتى لا تفوت اللحظة التالية.';
+
+  @override
+  String get momentVerseActiveWhisper => 'الآية التي همست لك بها الساعة';
+
+  @override
+  String get momentVerseSurah => 'سورة';
+
+  @override
+  String get momentVerseVerse => 'آية';
+
+  @override
+  String get momentVerseOneVerse => 'آية';
+
+  @override
+  String get momentVerseClock => 'الساعة';
+
+  @override
+  String get momentVerseMeaningDesc =>
+      'هذه ليست صدفة؛ تتحول أرقام الوقت إلى عنوان في القرآن. وكذلك فتحك لهذا الإشعار في الوقت المحدد ووقوفك أمام هذه الآية.';
+
+  @override
+  String get momentVerseDisappear => 'ستختفي هذه اللحظة بعد';
+
+  @override
+  String get momentVerseReturnHome => 'العودة إلى الصفحة الرئيسية';
+
+  @override
+  String get momentVerseClose => 'إغلاق';
+
+  @override
+  String get surveyDictMoodHappy => 'سعيد';
+
+  @override
+  String get surveyDictMoodCalm => 'هادئ';
+
+  @override
+  String get surveyDictMoodStressed => 'متوتر';
+
+  @override
+  String get surveyDictMoodSad => 'حزين';
+
+  @override
+  String get surveyDictMoodGrateful => 'ممتن';
+
+  @override
+  String get surveyDictMoodAnxious => 'قلِق';
+
+  @override
+  String get surveyDictMoodMotivated => 'متحمس';
+
+  @override
+  String get surveyDictSectorStudent => 'ثانوي / جامعة / تحضيري';
+
+  @override
+  String get surveyDictSectorPrivate => 'القطاع الخاص';
+
+  @override
+  String get surveyDictSectorPublic => 'القطاع الحكومي';
+
+  @override
+  String get surveyDictSectorBusiness => 'عملي الخاص / مستقل';
+
+  @override
+  String get surveyDictSectorTrade => 'التجارة';
+
+  @override
+  String get surveyDictSectorHousehold => 'رب/ربة منزل';
+
+  @override
+  String get surveyDictSectorOther => 'أخرى';
+
+  @override
+  String get surveyDictNeedMotivation => 'الدافعية';
+
+  @override
+  String get surveyDictNeedSabr => 'الصبر';
+
+  @override
+  String get surveyDictNeedShukr => 'الشكر';
+
+  @override
+  String get surveyDictNeedTawakkul => 'التوكل';
+
+  @override
+  String get surveyDictNeedFocus => 'التركيز';
+
+  @override
+  String get surveyDictNeedHealing => 'الشفاء';
+
+  @override
+  String get surveyDictNeedRizq => 'الرزق والبركة';
+
+  @override
+  String get surveyDictGenderMale => 'ذكر';
+
+  @override
+  String get surveyDictGenderFemale => 'أنثى';
+
+  @override
+  String get premiumProductNotReadyError =>
+      'معلومات المنتج ليست جاهزة بعد. يرجى المحاولة مرة أخرى.';
+
+  @override
+  String get premiumAccountLinkError =>
+      'تعذر إكمال ربط الحساب. يرجى المحاولة مرة أخرى.';
+
+  @override
+  String get premiumWelcomeTitle => '🌿 أهلاً بك!';
+
+  @override
+  String get premiumWelcomeMessage =>
+      'ARIN Premium نشط. تجربتك الخالية من الإعلانات والمفتوحة متاحة.\n\nيمكنك إدارة اشتراكك من حساب المتجر الخاص بك في أي وقت.';
+
+  @override
+  String get premiumWelcomeButton => 'رائع!';
+
+  @override
+  String get premiumRestoreSuccess => 'تم استعادة Premium!';
+
+  @override
+  String get premiumNoActiveSubscription => 'لم يتم العثور على اشتراك نشط.';
+
+  @override
+  String get premiumSignInErrorPrefix => 'تعذر إكمال تسجيل الدخول: ';
+
+  @override
+  String get premiumActiveTitle => 'ARIN Premium نشط';
+
+  @override
+  String get premiumTitle => 'ARIN Premium';
+
+  @override
+  String get premiumActiveSubtitle =>
+      'تجربتك الخالية من الإعلانات والمفتوحة متاحة.';
+
+  @override
+  String get premiumSubtitle =>
+      'روتين روحي خالٍ من الإعلانات، غير منقطع ومفتوح.';
+
+  @override
+  String get premiumYearlyPlanTitle => 'Premium سنوي';
+
+  @override
+  String get premiumMostAdvantageousBadge => 'الأكثر فائدة';
+
+  @override
+  String get premiumYearlyPlanSubtitle => 'اشتراك سنوي';
+
+  @override
+  String get premiumSwitchToYearly => 'التبديل إلى السنوي';
+
+  @override
+  String get premiumMonthlyPlanTitle => 'Premium شهري';
+
+  @override
+  String get premiumMonthlyPlanSubtitle => 'اشتراك شهري';
+
+  @override
+  String get premiumFooterText1 =>
+      'أسعار الإطلاق صالحة لفترة محدودة. تتم إدارة الاشتراك من خلال حساب المتجر الخاص بك ويمكن إلغاؤه في أي وقت.';
+
+  @override
+  String get premiumFooterText2 =>
+      'يتم تجديد الاشتراك تلقائيًا ما لم يتم إلغاؤه قبل 24 ساعة على الأقل من نهاية الفترة. يتم خصم رسوم التجديد من حساب المتجر الخاص بك قبل 24 ساعة من نهاية الفترة. يمكنك إدارة اشتراكاتك في إعدادات حساب App Store/Play.';
+
+  @override
+  String get premiumLaunchBadge => 'خاص بالإطلاق';
+
+  @override
+  String get premiumCountdownNotice =>
+      'هذا السعر صالح لفترة محدودة. افتح premium بأفضل سعر قبل انتهاء الإطلاق.';
+
+  @override
+  String get premiumBenefitAdFree => 'استخدام بدون إعلانات';
+
+  @override
+  String get premiumBenefitWidgets => 'لا يوجد قفل للأدوات';
+
+  @override
+  String get premiumBenefitExplore => 'تدفق استكشاف غير منقطع';
+
+  @override
+  String get premiumBenefitAdhan => 'منبه الأذان الثاني مفعل';
+
+  @override
+  String get premiumSignInRequiredNotice =>
+      'تسجيل الدخول غير مطلوب للشراء. يمكنك استخدام Premium على هذا الجهاز فورًا، ويمكنك ربط حسابك لاحقًا لاستخدامه على أجهزتك الأخرى.';
+
+  @override
+  String get premiumSignInSheetTitle => 'اربط حسابك لـ Premium';
+
+  @override
+  String get premiumSignInSheetSubtitle =>
+      'ربط الحساب يجعل استعادة Premium على أجهزتك الأخرى أسهل. تسجيل الدخول اختياري لإتمام الشراء.';
+
+  @override
+  String get premiumContinueWithGoogle => 'المتابعة باستخدام Google';
+
+  @override
+  String get premiumContinueWithApple => 'المتابعة باستخدام Apple';
+
+  @override
+  String get premiumCancelForNow => 'إلغاء الآن';
+
+  @override
+  String get premiumPostPurchaseLinkTitle => 'Premium مفعل';
+
+  @override
+  String get premiumPostPurchaseLinkBody =>
+      'Premium مفعل على هذا الجهاز. هل تريد ربط حسابك الآن لاستخدامه بسهولة على أجهزتك الأخرى؟';
+
+  @override
+  String get premiumPostPurchaseLinkLater => 'لاحقًا';
+
+  @override
+  String get premiumPostPurchaseLinkNow => 'اربط حسابي';
+
+  @override
+  String get premiumPostPurchaseLinkSuccess =>
+      'تم ربط الحساب. يمكن الآن مزامنة Premium بين أجهزتك.';
+
+  @override
+  String get premiumActivePlanBadge => 'خطتك النشطة ✓';
+
+  @override
+  String get premiumActivePlanButton => 'خطتك النشطة';
+
+  @override
+  String get premiumStartWithLaunchPrice => 'ابدأ بسعر الإطلاق';
+
+  @override
+  String get premiumIsActiveButton => 'Premium نشط';
+
+  @override
+  String get qiblaCompassTitle => 'بوصلة القبلة';
+
+  @override
+  String get qiblaCompassQibla => 'القبلة';
+
+  @override
+  String get qiblaCompassGettingLocation => 'جاري تحديد الموقع…';
+
+  @override
+  String get qiblaCompassInitError => 'تعذر تهيئة\nالموقع أو البوصلة';
+
+  @override
+  String get qiblaCompassRetry => 'إعادة المحاولة';
+
+  @override
+  String get qiblaCompassAligned => 'متجه نحو القبلة';
+
+  @override
+  String get qiblaCompassDeviation => 'انحراف';
+
+  @override
+  String get qiblaCompassStabilizing => 'جاري استقرار القياس';
+
+  @override
+  String get qiblaCompassGuidanceTiltTitle => 'امسك الهاتف بشكل مسطح';
+
+  @override
+  String get qiblaCompassGuidanceTiltBody =>
+      'استخدم البوصلة أفقيًا. لن يتم قفل الاتجاه إذا تم الإمساك به بشكل عمودي أو جانبي أو مقلوب.';
+
+  @override
+  String get qiblaCompassGuidanceCalibrateTitle => 'معايرة البوصلة';
+
+  @override
+  String get qiblaCompassGuidanceCalibrateBody =>
+      'حرك الهاتف على شكل رقم 8 عدة مرات، ثم ابعده عن المعادن.';
+
+  @override
+  String get qiblaCompassGuidanceUnstableTitle => 'المجال المغناطيسي غير مستقر';
+
+  @override
+  String get qiblaCompassGuidanceUnstableBody =>
+      'ابتعد عن أجهزة الكمبيوتر المحمولة والمغناطيس والطاولات المعدنية والأغطية المغناطيسية.';
+
+  @override
+  String get qiblaCompassGuidanceGoodTitle => 'القياس جاهز';
+
+  @override
+  String get qiblaCompassGuidanceGoodBody =>
+      'امسك الهاتف بشكل مسطح، استدر ببطء نحو القبلة. تضيء الشارة الخضراء عند الاستقرار.';
+
+  @override
+  String get qiblaCompassNorth => 'ش';
+
+  @override
+  String get qiblaCompassEast => 'ق';
+
+  @override
+  String get qiblaCompassSouth => 'ج';
+
+  @override
+  String get qiblaCompassWest => 'غ';
+
+  @override
+  String get qiblaCompassQiblaText => 'القبلة';
+
+  @override
+  String get zikirmatikCounterSemantics => 'عداد الذكر';
+
+  @override
+  String get zikirmatikRound => 'جولة';
+
+  @override
+  String get zikirmatikRoundCompleted => 'اكتملت الجولة';
+
+  @override
+  String get zikirmatikResetCounter => 'إعادة تعيين العداد؟';
+
+  @override
+  String get zikirmatikResetCounterDesc =>
+      'سيتم تصفير العدد الإجمالي ومعلومات الجولة.';
+
+  @override
+  String get zikirmatikCancel => 'إلغاء';
+
+  @override
+  String get zikirmatikReset => 'تصفير';
+
+  @override
+  String get zikirmatikEditPhraseTitle => 'تعديل اسم الذكر';
+
+  @override
+  String get zikirmatikUse => 'استخدم';
+
+  @override
+  String get zikirmatikSaveAndUse => 'احفظ واستخدم';
+
+  @override
+  String get zikirmatikThisRound => 'هذه الجولة';
+
+  @override
+  String get zikirmatikTarget => 'الهدف';
+
+  @override
+  String zikirmatikCounterSemanticsLabel(
+    Object round,
+    Object target,
+    Object total,
+  ) {
+    return 'عداد الذكر. $round / $target، الإجمالي $total';
+  }
+
+  @override
+  String get zikirmatikCounterSemanticsHint => 'اضغط لزيادة العد بواحد';
+
+  @override
+  String get zikirmatikVibration => 'اهتزاز';
+
+  @override
+  String get zikirmatikVibrationTooltip =>
+      'يهتز مع كل عدّ؛ اهتزاز أقوى عند نهاية الجولة';
+
+  @override
+  String get zikirmatikInfo => 'معلومات الذكر';
+
+  @override
+  String get zikirmatikTitle => 'عداد الذكر';
+
+  @override
+  String get zikirmatikTapToChoose => 'اضغط لاختيار الذكر';
+
+  @override
+  String get zikirmatikPickDhikr => 'اختر الذكر';
+
+  @override
+  String get zikirmatikSaved => 'المحفوظة';
+
+  @override
+  String get zikirmatikDelete => 'حذف';
+
+  @override
+  String get zikirmatikWriteOwnText => 'اكتب نصك الخاص…';
+
+  @override
+  String get zikirmatikCustomTarget => 'مخصص…';
+
+  @override
+  String get zikirmatikTargetOk => 'حسنًا';
+
+  @override
+  String get zikirmatikDeleteRoundRecord => 'حذف سجل هذه الجولة؟';
+
+  @override
+  String get zikirmatikDhikr => 'ذكر';
+
+  @override
+  String get zikirmatikShareError => 'تعذر فتح المشاركة. حاول مرة أخرى.';
+
+  @override
+  String get zikirmatikDeleteRecord => 'حذف السجل؟';
+
+  @override
+  String get zikirmatikCompletedRounds => 'الجولات المكتملة';
+
+  @override
+  String get zikirmatikNoCompletedRounds =>
+      'لا توجد جولات مكتملة بعد. ستظهر هنا عند بلوغ الهدف.';
+
+  @override
+  String get zikirmatikArchivedSessions => 'الجلسات المؤرشفة';
+
+  @override
+  String get zikirmatikTodaysReflection => 'ورد اليوم';
+
+  @override
+  String zikirmatikCompareLine(Object diff, Object first, Object second) {
+    return 'أكملت «$first» بعدد $diff جولة أكثر من «$second».';
+  }
+
+  @override
+  String zikirmatikOnlyOneRecord(Object first) {
+    return 'لديك حاليًا سجلات جولات لـ «$first» فقط.';
+  }
+
+  @override
+  String get zikirmatikSummaryAndAnalytics => 'الملخص والتحليل';
+
+  @override
+  String get zikirmatikAnalyticsNoLogs =>
+      'كلما أكملت جولات أكثر ستظهر الملخصات والمقارنات هنا.';
+
+  @override
+  String zikirmatikTotalRoundsCompleted(Object total) {
+    return 'أكملت إجمالًا $total جولة.';
+  }
+
+  @override
+  String zikirmatikActiveDays(Object days) {
+    return 'لديك سجلات ذكر في $days أيام مختلفة.';
+  }
+
+  @override
+  String zikirmatikLast7Days(Object rounds) {
+    return 'تم إكمال $rounds جولة خلال آخر 7 أيام.';
+  }
+
+  @override
+  String zikirmatikMostCompleted(Object phrase, Object rounds) {
+    return 'الأكثر إكمالًا: «$phrase» ($rounds جولة).';
+  }
+
+  @override
+  String get zikirmatikCompleted => 'مكتملة';
+
+  @override
+  String get zikirmatikTotalCounter => 'العداد الكلي';
+
+  @override
+  String get healingAmbientForest => 'صوت الغابة';
+
+  @override
+  String get healingAmbientFire => 'صوت النار';
+
+  @override
+  String get healingAmbientCosmic => 'صوت الكون';
+
+  @override
+  String get healingAmbientInshirah => 'سورة الشرح';
+
+  @override
+  String get healingSleepOff => 'متوقف';
+
+  @override
+  String get healingSleepRemaining => 'المتبقي ';
+
+  @override
+  String healingSleepMinutes(Object m) {
+    return '$m دقيقة';
+  }
+
+  @override
+  String get healingInfoTitle => 'معلومات';
+
+  @override
+  String get healingInfoBody =>
+      'هذا القسم للاسترخاء والتأمل وليس بديلاً عن العلاج الطبي. يُنصح بالاستماع بصوت منخفض. أوقفه إذا شعرت بعدم الارتياح.';
+
+  @override
+  String get healingInfoOk => 'حسنًا';
+
+  @override
+  String get healingFrequenciesTitle => 'الترددات العلاجية';
+
+  @override
+  String get healingAmbientSound => 'صوت الخلفية';
+
+  @override
+  String get healingPresets => 'إعدادات مسبقة';
+
+  @override
+  String get healingFrequencyTone => 'نغمة التردد (Hz)';
+
+  @override
+  String get healingAmbient => 'الخلفية';
+
+  @override
+  String get healingSleepTimer => 'مؤقت النوم';
+
+  @override
+  String get healingInshirahLocked =>
+      'عناصر التحكم بالتردد مقفلة في وضع الشرح.';
+
+  @override
+  String get healingAllFrequencies => 'كل الترددات';
+
+  @override
+  String get healingPresetFocus => 'تركيز';
+
+  @override
+  String get healingPresetSleep => 'نوم';
+
+  @override
+  String get healingAmbientForestShort => 'غابة';
+
+  @override
+  String get healingAmbientFireShort => 'نار';
+
+  @override
+  String get healingAmbientCosmicShort => 'كون';
+
+  @override
+  String get healingAmbientInshirahShort => 'الشرح';
+
+  @override
+  String get healingAmbientChoose => 'اختر صوت الخلفية';
+
+  @override
+  String get healingSleepCancel => 'إلغاء';
+
+  @override
+  String get healingSleepStopAfter => 'بعد كم دقيقة يتوقف؟';
+
+  @override
+  String get healingSleepTimerOff => 'المؤقت متوقف';
+
+  @override
+  String get healingFreq174Short => 'تردد علاجي';
+
+  @override
+  String get healingFreq285Short => 'الصبر والثبات';
+
+  @override
+  String get healingFreq396Short => 'تجدد';
+
+  @override
+  String get healingFreq417Short => 'قوة داخلية';
+
+  @override
+  String get healingFreq528Short => 'سكينة';
+
+  @override
+  String get healingFreq639Short => 'تزكية';
+
+  @override
+  String get healingFreq741Short => 'تفكر';
+
+  @override
+  String get healingFreq852Short => 'سكينة عميقة';
+
+  @override
+  String get healingFreq174Heading => '174 هرتز - شفاء واسترخاء';
+
+  @override
+  String get healingFreq285Heading => '285 هرتز - صبر وثبات';
+
+  @override
+  String get healingFreq396Heading => '396 هرتز - بركة وبداية';
+
+  @override
+  String get healingFreq417Heading => '417 هرتز - قوة داخلية وإيمان';
+
+  @override
+  String get healingFreq528Heading => '528 هرتز - سكينة وهدوء';
+
+  @override
+  String get healingFreq639Heading => '639 هرتز - تزكية وتنقية';
+
+  @override
+  String get healingFreq741Heading => '741 هرتز - تفكر وتركيز';
+
+  @override
+  String get healingFreq852Heading => '852 هرتز - سكينة (طمأنينة عميقة)';
+
+  @override
+  String get healingFreq174Body =>
+      'اتجه إلى السكون عند التعب الجسدي والروحي؛ الشفاء من الله.';
+
+  @override
+  String get healingFreq285Body =>
+      'تليين القلب وقت الشدة؛ الاستمرار بالتوكل على الله.';
+
+  @override
+  String get healingFreq396Body => 'فتح صفحة جديدة؛ دعاء للتوبة وطلب المغفرة.';
+
+  @override
+  String get healingFreq417Body =>
+      'تقوية القلب؛ تجديد الإيمان وتذكّر الاستقامة.';
+
+  @override
+  String get healingFreq528Body => 'سكون القلب؛ تنفّس بالشكر والتسليم.';
+
+  @override
+  String get healingFreq639Body =>
+      'الابتعاد عن الأفكار التي تكدّر القلب؛ طلب المغفرة.';
+
+  @override
+  String get healingFreq741Body =>
+      'التركيز على الآيات والخلق؛ جمع الذهن المشتت.';
+
+  @override
+  String get healingFreq852Body => 'سكينة تشرح الصدر؛ الالتجاء إلى رحمة الله.';
+
+  @override
+  String get appleSignInCanceled => 'تم إلغاء تسجيل الدخول بحساب Apple.';
+
+  @override
+  String get appleSignInNotAuthorized =>
+      'حساب Apple غير مصرح به. تحقق من إذن تسجيل الدخول باستخدام Apple من إعدادات iPhone > Apple ID > تسجيل الدخول والأمان.';
+
+  @override
+  String get appleSignInProviderDisabled =>
+      'يبدو أن موفر تسجيل الدخول عبر Apple معطل في وحدة تحكم Firebase.';
+
+  @override
+  String get appleSignInInvalidCredential =>
+      'بيانات مصادقة Apple غير صالحة. تحقق من Bundle ID وإمكانيات تسجيل الدخول عبر Apple في Xcode/Firebase.';
+
+  @override
+  String get appleSignInNetworkFailed =>
+      'تعذر إكمال تسجيل الدخول عبر Apple بسبب اتصال الشبكة.';
+
+  @override
+  String get settingsMenuPremiumTitle => 'أرين بريميوم';
+
+  @override
+  String get settingsMenuPremiumSubtitle =>
+      'أسعار الإطلاق وتجربة خالية من الإعلانات';
+
+  @override
+  String get settingsMenuWidgetsTitle => 'مركز الأدوات';
+
+  @override
+  String get settingsMenuWidgetsSubtitle => 'معلومات الاستخدام وأداة التتبع';
+
+  @override
+  String get supportProductNotReady =>
+      'معلومات المنتج ليست جاهزة بعد. يرجى المحاولة مرة أخرى.';
+
+  @override
+  String get supportThanksTitle => 'شكراً لك! 🙏';
+
+  @override
+  String get supportThanksBody =>
+      'دعمك قيم جداً لأرين. بهذه المساهمة، سنستمر في تقديم تجربة أفضل.';
+
+  @override
+  String get commonOk => 'حسناً';
+
+  @override
+  String get supportPageTitle => 'ادعم أرين';
+
+  @override
+  String get supportTierSmallTitle => 'دعم صغير';
+
+  @override
+  String get supportTierSmallDesc => 'ساهم في التطوير بدعم يعادل قهوة.';
+
+  @override
+  String get supportTierMediumTitle => 'دعم متوسط';
+
+  @override
+  String get supportTierMediumDesc => 'تسريع تطوير محتوى وميزات جديدة.';
+
+  @override
+  String get supportTierLargeTitle => 'دعم كبير';
+
+  @override
+  String get supportTierLargeDesc =>
+      'قدم مساهمة قوية في التطور طويل الأمد لأرين.';
+
+  @override
+  String get supportPackagesDisclaimer =>
+      'تعمل حزم الدعم كمنتجات متجر لمرة واحدة. وهي منفصلة عن اشتراك بريميوم.';
+
+  @override
+  String get supportHeaderTitle => 'قف مع أرين';
+
+  @override
+  String get supportHeaderDesc =>
+      'ليست تبرعاً، بل حزم دعم لمرة واحدة متوافقة مع قواعد المتجر. تساعدنا على تنمية التجربة الخالية من الإعلانات والمميزة للتطبيق.';
+
+  @override
+  String get languageChangeFailed =>
+      'تعذر تغيير اللغة. يرجى المحاولة مرة أخرى.';
+
+  @override
+  String get differentLocation => 'أنت في موقع مختلف';
+
+  @override
+  String updatePrayerTimesForCity(Object city) {
+    return 'هل يجب تحديث أوقات الصلاة لـ $city؟';
+  }
+
+  @override
+  String get rememberThisChoice => 'تذكر هذا الخيار، لا تسأل مرة أخرى';
+
+  @override
+  String get keepCurrentLocation => 'احتفاظ';
+
+  @override
+  String get updateLocation => 'تحديث';
+
+  @override
+  String get sealYourIntention => 'اختم نيتك';
+
+  @override
+  String get sealIntentionInfo =>
+      'التفاصيل التي شاركتها للتو جزء من هذه البداية؛ اضغط مطولًا لتثبيت نيتك.';
+
+  @override
+  String get touchAndHoldWhenReady => 'عندما تكون مستعدًا، المس واستمر بالضغط.';
+
+  @override
+  String get youAreAlmostThere => 'أنت قريب جدًا!';
+
+  @override
+  String get promiseSealed => 'تهانينا، تم ختم عهدك!';
+
+  @override
+  String get touchAndHoldToContinue => 'المس الشاشة واستمر بالضغط\nللمتابعة…';
+
+  @override
+  String get skipWithArrow => 'تخطَّ ➔';
+
+  @override
+  String get redirecting => 'جارٍ التوجيه...';
+
+  @override
+  String get keepGoing => 'تابع...';
+
+  @override
+  String get premiumLoadingWait =>
+      'جاري تحميل حالة القسط. يرجى المحاولة مرة أخرى قريباً.';
+
+  @override
+  String get secondAlarmPremiumFeature => 'ميزة الإنذار الثاني للقسط';
+
+  @override
+  String get secondAlarmAdWatchText =>
+      'لتمكين إنذار الأذان الثاني في الاستخدام المجاني، تتم مشاهدة إعلان قصير. مستخدمو القسط لا يرون هذا القفل.';
+
+  @override
+  String get giveUp => 'تخلى';
+
+  @override
+  String get openAfterAd => 'افتح بعد الإعلان';
+
+  @override
+  String get reflection => 'انعكاس';
+
+  @override
+  String yesterdayPrayerSummary(Object avg, Object weekday, Object yDone) {
+    return 'أمس · $weekday · $yDone/5  ·  متوسط آخر 7 أيام $avg/5';
+  }
+
+  @override
+  String get weeklyView => 'عرض أسبوعي';
+
+  @override
+  String daysDoneSummary(Object done) {
+    return '$done/7 أيام';
+  }
+
+  @override
+  String get inspirationAndAwareness => 'الإلهام والوعي';
+
+  @override
+  String get shortBreaksForTruth => 'فترات راحة قصيرة للحقيقة والوعي';
+
+  @override
+  String get insightCommentStrong =>
+      'إيقاعك قوي جداً مؤخراً؛ يبدو أن قلبك متوافق مع النظام. استمر.';
+
+  @override
+  String get insightCommentPerfect =>
+      'خمس مرات اكتملت أمس — لقد قضيت يوماً قريباً من ربك. يمكنك الاستمرار بنفس النية اليوم.';
+
+  @override
+  String get insightCommentZero =>
+      'ربما لم يتم تسجيل الأمس أو التحقق منه بعد. حتى بصلاة واحدة اليوم، يمكنك إعادة رسم الخط.';
+
+  @override
+  String get insightCommentLow =>
+      'المتوسط منخفض هذا الأسبوع؛ هذا طبيعي — يرتفع بالتأمل والخطوات الصغيرة. صلاة واحدة إضافية تحدث فرقاً كبيراً.';
+
+  @override
+  String insightCommentGood(Object count) {
+    return 'تم تحديد $count/5 صلوات أمس؛ من الممكن إكمال التوازن بصلاة أو صلاتين اليوم.';
+  }
+
+  @override
+  String get insightCommentDefault =>
+      'بيانات الأيام الماضية هي مرآة لك: رحمة في الأجزاء المفقودة، وامتنان في الأجزاء المكتملة.';
 }
