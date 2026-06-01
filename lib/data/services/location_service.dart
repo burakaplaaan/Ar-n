@@ -228,7 +228,7 @@ class LocationService {
           await _resolveDistrictIdFromPlacemark(p);
         } else {
           // TR dışına çıkıldıysa eski ilçe ID'si yanıltıcı; sıfırla.
-          final oldCountry = _prefs.getString(_countryPrefKey) ?? '';
+          final oldCountry = (_prefs.get(_countryKey) as String?) ?? '';
           if (oldCountry.toUpperCase() == 'TR' || oldCountry.toUpperCase() == 'TURKEY') {
             await saveDistrictId(null);
           }

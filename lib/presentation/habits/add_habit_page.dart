@@ -45,7 +45,7 @@ class _AddHabitPageState extends ConsumerState<AddHabitPage>
       l10n.addHabitUnitGlasses,
       l10n.addHabitUnitSets,
       l10n.addHabitUnitLaps,
-      l10n.addHabitUnitPercent,
+      '%',
     ];
   }
 
@@ -104,18 +104,18 @@ class _AddHabitPageState extends ConsumerState<AddHabitPage>
 
   int get _maxAmountForUnit {
     if (!mounted) return 99;
-    return _getUnit(context) == AppLocalizations.of(context)!.addHabitUnitPercent ? 100 : 99;
+    return _getUnit(context) == '%' ? 100 : 99;
   }
 
   int _trackingKindForUnit(String u, BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    if (u == l10n.addHabitUnitPercent) return 2;
+    if (u == '%') return 2;
     if (u == l10n.addHabitUnitMinutes || u == l10n.addHabitUnitHours) return 1;
     return 0;
   }
 
   void _onUnitChanged(int index, BuildContext context) {
-    final maxA = _getWheelUnits(context)[index] == AppLocalizations.of(context)!.addHabitUnitPercent ? 100 : 99;
+    final maxA = _getWheelUnits(context)[index] == '%' ? 100 : 99;
     final current = _amount;
     if (current > maxA && _amountController.hasClients) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -135,11 +135,11 @@ class _AddHabitPageState extends ConsumerState<AddHabitPage>
     final l10n = AppLocalizations.of(context)!;
     switch (_repeatCycle.clamp(0, 2)) {
       case 1:
-        return l10n.addHabitSummaryWeekly.replaceAll('{amount}', '$_amount').replaceAll('{unit}', unit);
+        return l10n.addHabitSummaryWeekly(_amount, unit);
       case 2:
-        return l10n.addHabitSummaryMonthly.replaceAll('{amount}', '$_amount').replaceAll('{unit}', unit);
+        return l10n.addHabitSummaryMonthly(_amount, unit);
       default:
-        return l10n.addHabitSummaryDaily.replaceAll('{amount}', '$_amount').replaceAll('{unit}', unit);
+        return l10n.addHabitSummaryDaily(_amount, unit);
     }
   }
 
@@ -250,7 +250,7 @@ class _AddHabitPageState extends ConsumerState<AddHabitPage>
             emoji: _type == HabitType.bad ? '◆' : '▲',
             note: _noteController.text.trim(),
             customTarget: target.clamp(1, 999999),
-            customUnit: kind == 2 ? AppLocalizations.of(context)!.addHabitUnitPercent : unit,
+            customUnit: kind == 2 ? '%' : unit,
             customTrackingKind: kind,
             customFlexible: false,
             customMinTarget: 0,
@@ -271,7 +271,7 @@ class _AddHabitPageState extends ConsumerState<AddHabitPage>
     final isGelisim = _type == HabitType.good;
     final l10n = AppLocalizations.of(context)!;
     final nameLabel = isGelisim ? l10n.addHabitGrowthName : l10n.addHabitPurificationName;
-    final categoryLabel = isGelisim ? l10n.addHabitGrowth : l10n.addHabitPurification;
+    final categoryLabel = isGelisim ? l10n.habitsGrowth : l10n.habitsPurification;
     final light = ArinShellBackground.isLight(context);
 
     return Scaffold(

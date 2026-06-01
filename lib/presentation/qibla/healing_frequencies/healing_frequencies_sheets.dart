@@ -91,6 +91,7 @@ class _AmbientSheetState extends State<_AmbientSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final bottom = MediaQuery.paddingOf(context).bottom;
     final chips = _chips(context);
     return Padding(
@@ -239,6 +240,7 @@ class _SleepTimerSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final bottom = MediaQuery.paddingOf(context).bottom;
     return Padding(
       padding: EdgeInsets.only(bottom: bottom + 8),

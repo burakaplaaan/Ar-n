@@ -177,7 +177,7 @@ class _HabitCalendarPageState extends ConsumerState<HabitCalendarPage> {
             child: Padding(
               padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
               child: Text(
-                l10n.habitCalendarToday.replaceAll('{date}', DateTime.now().displayDateTr),
+                l10n.habitCalendarToday(DateTime.now().displayDateTr),
                 style: AppTextStyles.labelSmall.copyWith(
                   color: AppColors.shellOnCanvasSecondary(context),
                   letterSpacing: 0.2,
@@ -312,9 +312,10 @@ class _HabitCalendarPageState extends ConsumerState<HabitCalendarPage> {
                       ),
                       const SizedBox(width: 10),
                       Text(
-                        l10n.habitCalendarMonthNote
-                            .replaceAll('{month}', _focusedDay.fullMonthTr)
-                            .replaceAll('{year}', '${_focusedDay.year}'),
+                        l10n.habitCalendarMonthNote(
+                          _focusedDay.fullMonthTr,
+                          _focusedDay.year,
+                        ),
                         style: AppTextStyles.titleSmall.copyWith(
                           color: AppColors.shellOnCanvasPrimary(context),
                           fontWeight: FontWeight.w700,
@@ -425,9 +426,7 @@ class _HabitCalendarPageState extends ConsumerState<HabitCalendarPage> {
         }
         if (n > 0) {
           lines.add(
-            l10n.habitCalendarQuitInsight
-                .replaceAll('{title}', h.title)
-                .replaceAll('{n}', '$n'),
+            l10n.habitCalendarQuitInsight(n, h.title),
           );
         }
         continue;
@@ -447,10 +446,7 @@ class _HabitCalendarPageState extends ConsumerState<HabitCalendarPage> {
         }
         if (anyPrayer > 0) {
           lines.add(
-            l10n.habitCalendarPrayerInsight
-                .replaceAll('{title}', h.title)
-                .replaceAll('{anyPrayer}', '$anyPrayer')
-                .replaceAll('{fullFive}', '$fullFive'),
+            l10n.habitCalendarPrayerInsight(h.title, anyPrayer, fullFive),
           );
         }
         continue;
@@ -476,17 +472,12 @@ class _HabitCalendarPageState extends ConsumerState<HabitCalendarPage> {
         if (n > 0) {
           final periodLabel = h.customRepeatCycle == 1 ? l10n.habitCalendarWeekLabel : l10n.habitCalendarMonthLabel;
           lines.add(
-            l10n.habitCalendarCustomInsightPeriod
-                .replaceAll('{title}', h.title)
-                .replaceAll('{n}', '$n')
-                .replaceAll('{periodLabel}', periodLabel),
+            l10n.habitCalendarCustomInsightPeriod(h.title, n, periodLabel),
           );
         }
       } else if (completedDays > 0) {
         lines.add(
-          l10n.habitCalendarCustomInsightDays
-              .replaceAll('{title}', h.title)
-              .replaceAll('{completedDays}', '$completedDays'),
+          l10n.habitCalendarCustomInsightDays(completedDays, h.title),
         );
       }
     }

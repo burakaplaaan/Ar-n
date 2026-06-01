@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:arin/l10n/app_localizations.dart';
 
+import '../../core/constants/app_colors.dart';
 import '../../core/ads/admob_ids.dart';
 import '../../data/models/inspiration_card_model.dart';
 import '../../data/services/ad_gate_service.dart';
@@ -450,7 +451,7 @@ class _ViewerError extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Text(
-              l10n.inspireLoadFailedBody,
+              l10n.asyncErrorDefaultMessage,
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: Colors.white.withValues(alpha: 0.7),
@@ -462,7 +463,7 @@ class _ViewerError extends StatelessWidget {
               FilledButton.icon(
                 onPressed: onRetry,
                 icon: const Icon(Icons.refresh_rounded, size: 18),
-                label: Text(l10n.inspireLoadRetry),
+                label: Text(l10n.asyncErrorRetryAction),
                 style: FilledButton.styleFrom(
                   backgroundColor: AppColors.emeraldMid,
                   foregroundColor: Colors.white,

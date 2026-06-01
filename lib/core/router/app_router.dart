@@ -9,8 +9,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../analytics/arin_analytics.dart';
 import '../providers/shared_preferences_provider.dart';
 import 'app_router_refresh.dart';
-
-final GlobalKey<NavigatorState> rootNavigatorKey = GlobalKey<NavigatorState>();
 import '../../presentation/onboarding/onboarding_page.dart';
 import '../../presentation/shared/providers/user_profile_providers.dart';
 import '../../presentation/onboarding/onboarding_survey_page.dart';
@@ -54,6 +52,8 @@ import '../../presentation/premium/premium_page.dart';
 import '../../presentation/shared/providers/auth_providers.dart';
 import '../../presentation/shared/providers/willpower_hub_nav_provider.dart';
 import '../../presentation/shared/widgets/arin_shell.dart';
+
+final GlobalKey<NavigatorState> rootNavigatorKey = GlobalKey<NavigatorState>();
 
 abstract final class AppRoutes {
   static const String onboarding = '/onboarding';

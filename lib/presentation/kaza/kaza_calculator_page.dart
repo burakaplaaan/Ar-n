@@ -492,7 +492,9 @@ class _KazaCalculatorPageState extends ConsumerState<KazaCalculatorPage> {
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            AppLocalizations.of(context)!.kazaCalcPubertyNote.replaceAll('{minPuberty}', '$minPuberty'),
+                            AppLocalizations.of(
+                              context,
+                            )!.kazaCalcPubertyNote(minPuberty),
                             textAlign: TextAlign.center,
                             style: AppTextStyles.labelSmall.copyWith(
                               color: AppColors.textOnDarkMuted
@@ -618,10 +620,10 @@ class _LiveCalculationSummary extends StatelessWidget {
 
     final l10n = AppLocalizations.of(context)!;
     final hayizLine = r.hayizExemptDays > 0
-        ? l10n.kazaCalcLiveHayiz.replaceAll('{days}', '${r.hayizExemptDays}')
+        ? l10n.kazaCalcLiveHayiz(r.hayizExemptDays)
         : '';
     final appliedNote = r.prayedFullDaysInput != r.prayedFullDaysApplied
-        ? l10n.kazaCalcLiveApplied.replaceAll('{applied}', '${r.prayedFullDaysApplied}')
+        ? l10n.kazaCalcLiveApplied(r.prayedFullDaysApplied)
         : '';
 
     return Container(
@@ -647,12 +649,19 @@ class _LiveCalculationSummary extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            l10n.kazaCalcLiveCalendarDays.replaceAll('{days}', '${r.inclusiveCalendarDays}') +
+            l10n.kazaCalcLiveCalendarDays(r.inclusiveCalendarDays) +
             hayizLine +
-            l10n.kazaCalcLiveLiableDays.replaceAll('{days}', '${r.effectiveLiableDays}') +
-            l10n.kazaCalcLiveOwed.replaceAll('{perDay}', '${KazaCalculator.prayersPerLiableDay}').replaceAll('{total}', '${r.totalPrayersOwed}') +
-            l10n.kazaCalcLiveCredited.replaceAll('{perDay}', '${KazaCalculator.prayersPerLiableDay}').replaceAll('{credited}', '${r.prayersCredited}').replaceAll('{appliedNote}', appliedNote) +
-            l10n.kazaCalcLiveRemaining.replaceAll('{remaining}', '${r.remainingPrayers}'),
+            l10n.kazaCalcLiveLiableDays(r.effectiveLiableDays) +
+            l10n.kazaCalcLiveOwed(
+              KazaCalculator.prayersPerLiableDay,
+              r.totalPrayersOwed,
+            ) +
+            l10n.kazaCalcLiveCredited(
+              KazaCalculator.prayersPerLiableDay,
+              r.prayersCredited,
+              appliedNote,
+            ) +
+            l10n.kazaCalcLiveRemaining(r.remainingPrayers),
             style: AppTextStyles.bodySmall.copyWith(
               color: AppColors.creamBase.withValues(alpha: 0.92),
               height: 1.48,
