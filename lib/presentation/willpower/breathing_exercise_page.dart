@@ -15,6 +15,7 @@ import '../../core/router/app_router.dart';
 import 'breathing_bottom_nav_provider.dart';
 import 'breathing_haptics.dart';
 import 'breathing_heartbeat_audio.dart';
+import '../shared/widgets/arin_back_button.dart';
 
 part 'breathing_exercise_visuals.dart';
 
@@ -48,6 +49,9 @@ class _BreathingExercisePageState extends ConsumerState<BreathingExercisePage>
   late AnimationController _introExitController;
   late AnimationController _completeEnterController;
   late final BreathingHeartbeatAudio _heartbeatAudio;
+  Timer? _phaseTransitionTimer;
+  Timer? _phaseTickTimer;
+  DateTime? _phaseEndsAt;
   bool _isDisposing = false;
 
   int get _phaseIndex => _phase.index;
@@ -58,8 +62,7 @@ class _BreathingExercisePageState extends ConsumerState<BreathingExercisePage>
     _heartbeatAudio = BreathingHeartbeatAudio();
     unawaited(_heartbeatAudio.prepare());
     unawaited(BreathingHaptics.init());
-    _scaleController = AnimationController(vsync: this)
-      ..addStatusListener(_onScaleStatus);
+    _scaleController = AnimationController(vsync: this);
     // `AnimatedBuilder` zaten `_pulseController`'ı dinliyor (bkz. orb
     // builder) → addListener(setState) eklemesi tüm Scaffold'u her frame
     // yeniden build ettiriyordu. Orb rebuild'leri lokalde kalsın.
@@ -83,33 +86,6 @@ class _BreathingExercisePageState extends ConsumerState<BreathingExercisePage>
       vsync: this,
       duration: const Duration(milliseconds: 460),
     );
-  }
-
-  void _onScaleStatus(AnimationStatus status) {
-    if (!mounted || _isDisposing) return;
-    if (status != AnimationStatus.completed) return;
-
-    if (_phase == _BreathPhase.exhale) {
-      _cycleDone++;
-      if (_cycleDone >= _maxCycles) {
-        if (!mounted || _isDisposing) return;
-        setState(() => _sessionComplete = true);
-        _pulseController.stop();
-        _heartbeatAudio.stop();
-        _idleMotionController.repeat();
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (mounted) {
-            _completeEnterController.forward(from: 0);
-          }
-        });
-        return;
-      }
-    }
-
-    final next = (_phaseIndex + 1) % 3;
-    if (!mounted || _isDisposing) return;
-    setState(() => _phase = _BreathPhase.values[next]);
-    _startPhase();
   }
 
   void _onIntroStartTap() {
@@ -138,6 +114,7 @@ class _BreathingExercisePageState extends ConsumerState<BreathingExercisePage>
 
   void _resetToIntro() {
     ref.read(breathingBottomNavHiddenProvider.notifier).state = false;
+    _cancelPhaseTimers();
     _scaleController.stop();
     _pulseController.stop();
     _heartbeatAudio.stop();
@@ -153,11 +130,20 @@ class _BreathingExercisePageState extends ConsumerState<BreathingExercisePage>
   }
 
   void _startPhase() {
+    _cancelPhaseTimers();
     _heartbeatAudio.stop();
-    _scaleController.removeListener(_pulseListener);
     _pulseController.stop();
 
     final dur = Duration(seconds: _phaseDurations[_phaseIndex]);
+    _phaseEndsAt = DateTime.now().add(dur);
+    _phaseTransitionTimer = Timer(dur, _handlePhaseElapsed);
+    _phaseTickTimer = Timer.periodic(const Duration(milliseconds: 200), (_) {
+      if (!mounted || _isDisposing || _intro || _sessionComplete) {
+        _cancelPhaseTimers();
+        return;
+      }
+      setState(() {});
+    });
     _scaleController.duration = dur;
 
     switch (_phase) {
@@ -177,7 +163,6 @@ class _BreathingExercisePageState extends ConsumerState<BreathingExercisePage>
         );
         _scaleController.forward(from: 0);
         _pulseController.repeat(reverse: true);
-        _scaleController.addListener(_pulseListener);
         _heartbeatAudio.startSlowingRhythm(
           holdSeconds: _phaseDurations[_phaseIndex],
           shouldContinue: () =>
@@ -199,9 +184,38 @@ class _BreathingExercisePageState extends ConsumerState<BreathingExercisePage>
     }
   }
 
-  void _pulseListener() {
-    if (!mounted || _isDisposing) return;
-    setState(() {});
+  void _handlePhaseElapsed() {
+    if (!mounted || _isDisposing || _intro || _sessionComplete) return;
+    if (_phase == _BreathPhase.exhale) {
+      _cycleDone++;
+      if (_cycleDone >= _maxCycles) {
+        setState(() {
+          _sessionComplete = true;
+          _phaseEndsAt = null;
+        });
+        _cancelPhaseTimers();
+        _pulseController.stop();
+        _heartbeatAudio.stop();
+        _idleMotionController.repeat();
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) {
+            _completeEnterController.forward(from: 0);
+          }
+        });
+        return;
+      }
+    }
+
+    final next = (_phaseIndex + 1) % 3;
+    setState(() => _phase = _BreathPhase.values[next]);
+    _startPhase();
+  }
+
+  void _cancelPhaseTimers() {
+    _phaseTransitionTimer?.cancel();
+    _phaseTransitionTimer = null;
+    _phaseTickTimer?.cancel();
+    _phaseTickTimer = null;
   }
 
   double get _displayScale {
@@ -239,10 +253,9 @@ class _BreathingExercisePageState extends ConsumerState<BreathingExercisePage>
   @override
   void dispose() {
     _isDisposing = true;
+    _cancelPhaseTimers();
     ref.read(breathingBottomNavHiddenProvider.notifier).state = false;
     _heartbeatAudio.dispose();
-    _scaleController.removeStatusListener(_onScaleStatus);
-    _scaleController.removeListener(_pulseListener);
     _scaleController.dispose();
     _pulseController.dispose();
     _idleMotionController.dispose();
@@ -354,33 +367,18 @@ class _BreathingExercisePageState extends ConsumerState<BreathingExercisePage>
   }
 
   Widget _buildBackButton() {
-    return Material(
-      color: Colors.white.withValues(alpha: 0.08),
-      shape: const CircleBorder(),
-      clipBehavior: Clip.antiAlias,
-      child: InkWell(
-        onTap: () => _exitBreathing(context),
-        child: const SizedBox(
-          width: 38,
-          height: 38,
-          child: Icon(
-            Icons.arrow_back_rounded,
-            size: 20,
-            color: Color(0xE8FFFFFF),
-          ),
-        ),
-      ),
+    return ArinBackButton(
+      onPressed: () => _exitBreathing(context),
     );
   }
 
   void _exitBreathing(BuildContext context) {
     if (!mounted || _isDisposing) return;
     _isDisposing = true;
+    _cancelPhaseTimers();
     BreathingHaptics.lightTap();
     ref.read(breathingBottomNavHiddenProvider.notifier).state = false;
     _heartbeatAudio.stop();
-    _scaleController.removeStatusListener(_onScaleStatus);
-    _scaleController.removeListener(_pulseListener);
     _scaleController.stop();
     _pulseController.stop();
     final nav = Navigator.of(context);
@@ -404,10 +402,14 @@ class _BreathingExercisePageState extends ConsumerState<BreathingExercisePage>
       animation: Listenable.merge([_scaleController, _pulseController]),
       builder: (context, _) {
         final total = _phaseDurations[_phaseIndex];
-        final showSec = (total * (1 - _scaleController.value)).ceil().clamp(
-          1,
-          total,
-        );
+        final now = DateTime.now();
+        final end = _phaseEndsAt;
+        final showSec = end == null
+            ? (total * (1 - _scaleController.value)).ceil().clamp(1, total)
+            : ((end.difference(now).inMilliseconds / 1000).ceil()).clamp(
+                1,
+                total,
+              );
         return Padding(
           padding: const EdgeInsets.fromLTRB(56, 2, 12, 0),
           child: Column(

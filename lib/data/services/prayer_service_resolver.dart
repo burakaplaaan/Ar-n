@@ -293,8 +293,6 @@ final prayerServiceResolverProvider = Provider<PrayerServiceResolver>((ref) {
   return resolver;
 });
 
-class _AladhanServiceForResolverProvider {}
-
 /// `aladhanServiceProvider` `prayer_time_providers.dart`'ta da tanımlı;
 /// dairesel import'tan kaçınmak için burada küçük bir forward-provider
 /// tutup üst katman yeniden kullanır.

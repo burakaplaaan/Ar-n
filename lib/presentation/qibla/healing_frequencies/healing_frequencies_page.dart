@@ -9,12 +9,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../core/constants/app_colors.dart';
-import '../../../core/localization/locale_text.dart';
 import 'healing_audio_notifier.dart';
 import 'healing_daily_comfort_entries.dart';
 import '../../shared/providers/quote_pool_content_providers.dart';
 import 'healing_freq_catalog.dart';
 import 'healing_frequencies_sheets.dart';
+import '../../shared/widgets/arin_back_button.dart';
 
 import 'package:arin/l10n/app_localizations.dart';
 
@@ -240,16 +240,9 @@ class _HealingFrequenciesPageState extends ConsumerState<HealingFrequenciesPage>
                   padding: const EdgeInsets.fromLTRB(8, 4, 8, 0),
                   child: Row(
                     children: [
-                      IconButton(
-                        onPressed: () {
-                          HapticFeedback.lightImpact();
-                          Navigator.of(context).maybePop();
-                        },
-                        icon: const Icon(Icons.close_rounded),
-                        color: Colors.white.withValues(alpha: 0.9),
-                        style: IconButton.styleFrom(
-                          backgroundColor: Colors.white.withValues(alpha: 0.06),
-                        ),
+                      ArinBackButton(
+                        onPressed: () => Navigator.of(context).maybePop(),
+                        icon: Icons.close_rounded,
                       ),
                       Expanded(
                         child: Column(

@@ -383,9 +383,10 @@ class _ArinAppState extends ConsumerState<ArinApp> with WidgetsBindingObserver {
             // Eşleştirme tamamlandıktan sonra premium durumunu yenile ki
             // yeni açılan/önbellekte olmayan entitlement devreye girsin.
             ref.invalidate(premiumEntitlementProvider);
-          }).catchError(
-            (e) => debugPrint('PurchaseService.loginUser failed: $e'),
-          ),
+          }).catchError((e) {
+            debugPrint('PurchaseService.loginUser failed: $e');
+            return null;
+          }),
         );
         if (!isFirebaseReady) return;
         final prefs = ref.read(sharedPreferencesProvider);
@@ -469,8 +470,12 @@ class _ArinAppState extends ConsumerState<ArinApp> with WidgetsBindingObserver {
       builder: (context, child) {
         if (child == null) return const SizedBox.shrink();
         final mq = MediaQuery.of(context);
+        final localeBasedDirection =
+            Directionality.of(context) == TextDirection.rtl
+            ? TextDirection.rtl
+            : TextDirection.ltr;
         return Directionality(
-          textDirection: TextDirection.ltr,
+          textDirection: localeBasedDirection,
           child: MediaQuery(
             data: mq.copyWith(
               textScaler: mq.textScaler.clamp(

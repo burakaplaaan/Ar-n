@@ -169,20 +169,28 @@ class PurchaseService {
     }
 
     try {
-      final result = await Purchases.purchaseStoreProduct(product);
+      final result = await Purchases.purchase(
+        PurchaseParams.storeProduct(product),
+      );
       var active = _hasPremium(result.customerInfo);
       if (!active) {
-        // RevenueCat entitlement aktivasyonu anlık olmayabilir;
-        // 2 sn sonra customer info'yu yeniden çek.
-        await Future<void>.delayed(const Duration(seconds: 2));
-        final refreshed = await Purchases.getCustomerInfo();
-        active = _hasPremium(refreshed);
+        // Entitlement webhook/edge cache gecikebilir. Hemen "başarısız" demek
+        // yanlış, ama aktiflik doğrulanmadan "başarılı" demek de yanıltıcı.
+        for (var attempt = 0; attempt < 3 && !active; attempt++) {
+          await Future<void>.delayed(const Duration(seconds: 2));
+          final refreshed = await Purchases.getCustomerInfo();
+          active = _hasPremium(refreshed);
+        }
       }
-      return active
-          ? const PurchaseOutcome.success()
-          : PurchaseOutcome.error(
-              l10n?.purchaseErrorUnexpected('Activation failed') ?? 'Satın alma tamamlandı ancak premium aktif olmadı.',
-            );
+      if (!active) {
+        // Ödeme alındıktan sonra entitlement geç düşebilir (webhook/cache gecikmesi).
+        // UI tarafı premiumConfirmed kontrolü yaptığı için başarı döndürüp akışı
+        // "beklemede" mesajıyla yönetmek, yanlış hata/tekrar ödeme riskini azaltır.
+        debugPrint(
+          '[PurchaseService] purchase completed but entitlement not active yet; returning success.',
+        );
+      }
+      return const PurchaseOutcome.success();
     } on PlatformException catch (e) {
       final code = PurchasesErrorHelper.getErrorCode(e);
       if (code == PurchasesErrorCode.purchaseCancelledError) {
@@ -232,12 +240,29 @@ class PurchaseService {
       if (products.isEmpty) {
         return PurchaseOutcome.error(l10n?.purchaseErrorNotFound ?? 'Ürün bulunamadı [ID: $productId]. Mağaza tarafında ürün aktif olmayabilir veya bağlantı sorunu olabilir.');
       }
-      final result = await Purchases.purchaseStoreProduct(products.first);
-      final purchased = result.customerInfo.nonSubscriptionTransactions
-          .any((t) => t.productIdentifier == productId);
-      return purchased
-          ? const PurchaseOutcome.success()
-          : PurchaseOutcome.error(l10n?.purchaseErrorUnexpected('Verification failed') ?? 'Satın alma tamamlandı ancak doğrulanamadı.');
+      final result = await Purchases.purchase(
+        PurchaseParams.storeProduct(products.first),
+      );
+      final baseId = _baseProductId(productId);
+      var purchased = result.customerInfo.nonSubscriptionTransactions.any(
+        (t) => _baseProductId(t.productIdentifier) == baseId,
+      );
+      if (!purchased) {
+        // Non-subscription transaction listesi RC tarafında anlık gecikebilir.
+        for (var attempt = 0; attempt < 3 && !purchased; attempt++) {
+          await Future<void>.delayed(const Duration(seconds: 2));
+          final refreshed = await Purchases.getCustomerInfo();
+          purchased = refreshed.nonSubscriptionTransactions.any(
+            (t) => _baseProductId(t.productIdentifier) == baseId,
+          );
+        }
+      }
+      if (!purchased) {
+        debugPrint(
+          '[PurchaseService] support purchase verification still pending for $productId; returning success to prevent duplicate charges.',
+        );
+      }
+      return const PurchaseOutcome.success();
     } on PlatformException catch (e) {
       final code = PurchasesErrorHelper.getErrorCode(e);
       debugPrint('[PurchaseService] PlatformException: ${e.message} | code: ${code.name}');
@@ -379,6 +404,12 @@ class PurchaseService {
 
   static bool get _isSupportedPlatform =>
       !kIsWeb && (Platform.isAndroid || Platform.isIOS);
+
+  static String _baseProductId(String productId) {
+    final idx = productId.indexOf(':');
+    if (idx <= 0) return productId;
+    return productId.substring(0, idx);
+  }
 
   bool _hasPremium(CustomerInfo info) {
     return info.entitlements.active

@@ -39,9 +39,21 @@ class PremiumEntitlementRepository {
 
     // Webhook gecikmesi / geçici Firestore erişim sorunlarında, cihazdaki güncel
     // RevenueCat sonucu premium false-negative'i önler.
-    final localEntitlement = await PurchaseService().getLocalPremiumEntitlement(
+    var localEntitlement = await PurchaseService().getLocalPremiumEntitlement(
       expectedFirebaseUid: uid,
     );
+    if (localEntitlement == null) {
+      // Bazı cihazlarda auth restore sonrası RC login yarışına düşebiliyor.
+      // Eşleşme yapılamadıysa bir kez login deneyip local entitlement'ı tekrar oku.
+      try {
+        await PurchaseService.loginUser(uid);
+        localEntitlement = await PurchaseService().getLocalPremiumEntitlement(
+          expectedFirebaseUid: uid,
+        );
+      } catch (e) {
+        debugPrint('PremiumEntitlementRepository: rc relogin fallback failed: $e');
+      }
+    }
     if (localEntitlement != null && localEntitlement.isActive) {
       return localEntitlement;
     }

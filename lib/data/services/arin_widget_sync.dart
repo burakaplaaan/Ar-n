@@ -44,7 +44,6 @@ abstract final class ArinWidgetSync {
   static const _forcedWidgetLocale = 'tr';
   static final RegExp _arabicChars = RegExp(r'[\u0600-\u06FF]');
   static Future<bool>? _appGroupFuture;
-  static bool _appGroupReady = false;
 
   /// Uygulama açılışında (deferred startup) bir kez çağrılır. AppGroup
   /// hazırlığı paralelde başlasın ki widget yazımı sırasında bekletme
@@ -640,7 +639,6 @@ abstract final class ArinWidgetSync {
     final future = HomeWidget.setAppGroupId('group.com.arin.arin')
         .timeout(const Duration(seconds: 4))
         .then((_) {
-          _appGroupReady = true;
           return true;
         })
         .catchError((Object e, StackTrace st) {

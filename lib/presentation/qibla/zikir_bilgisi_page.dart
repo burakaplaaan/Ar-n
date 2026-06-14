@@ -7,7 +7,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:share_plus/share_plus.dart';
 
-import '../../core/localization/locale_text.dart';
 import '../../core/share/platform_channel_share_errors.dart';
 import '../../core/providers/shared_preferences_provider.dart';
 import '../../data/models/zikir_matik_record.dart';
@@ -64,13 +63,6 @@ int _dailyReflectionIndex() {
   final i = day.difference(origin).inDays.abs() % _kZikirDailyReflections.length;
   return i;
 }
-
-String _zbtr(
-  BuildContext context, {
-  required String tr,
-  required String en,
-  required String ar,
-}) => trEnAr(context, tr: tr, en: en, ar: ar);
 
 List<String> _zikirDailyReflections(BuildContext context) {
   final l10n = AppLocalizations.of(context)!;

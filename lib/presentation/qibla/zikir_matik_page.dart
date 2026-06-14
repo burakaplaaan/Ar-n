@@ -14,12 +14,12 @@ import 'package:vibration/vibration.dart';
 
 import 'package:arin/l10n/app_localizations.dart';
 import '../../core/analytics/arin_analytics.dart';
-import '../../core/localization/locale_text.dart';
 import '../../core/providers/shared_preferences_provider.dart';
 import '../../data/models/zikir_matik_tur_log.dart';
 import '../../data/repositories/zikir_matik_repository.dart';
 import 'zikir_bilgisi_page.dart';
 import '../shared/widgets/tasbeeh_zikirmatik_device_frame.dart';
+import '../shared/widgets/arin_back_button.dart';
 
 part 'zikir_matik_phrase_widgets.dart';
 part 'zikir_matik_target_sheet.dart';
@@ -55,13 +55,6 @@ abstract final class _ZikirmatikColors {
   /// Diyalog yüzeyi (açık arka planda okunaklı koyu panel).
   static const Color dialogSurface = Color(0xFF3D5050);
 }
-
-String _ztr(
-  BuildContext context, {
-  required String tr,
-  required String en,
-  required String ar,
-}) => trEnAr(context, tr: tr, en: en, ar: ar);
 
 List<String> _zikirPresetPhrases(BuildContext context) {
   final code = Localizations.localeOf(context).languageCode.toLowerCase();
@@ -655,13 +648,8 @@ class _ZikirMatikPageState extends ConsumerState<ZikirMatikPage>
                 padding: const EdgeInsets.fromLTRB(4, 2, 8, 0),
                 child: Row(
                   children: [
-                    IconButton(
+                    ArinBackButton(
                       onPressed: () => Navigator.of(context).maybePop(),
-                      icon: const Icon(
-                        Icons.arrow_back_ios_new_rounded,
-                        color: _ZikirmatikColors.labelMuted,
-                        size: 22,
-                      ),
                     ),
                     const Spacer(),
                     const SizedBox(width: 48),

@@ -1388,7 +1388,7 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get settingsPrivacyThirdPartyBody =>
-      'Arin; oturum açma, bildirimler ve veri eşitleme için Firebase servislerini, reklamlar için Google AdMob\'u, abonelik yönetimi için RevenueCat\'i ve namaz vakitleri için Aladhan/Diyanet API\'lerini kullanır.';
+      'Arin; oturum açma, bildirimler ve veri eşitleme için Firebase servislerini (Authentication, Firestore), kullanım analizi ve çökme tanılama için Firebase Analytics/Crashlytics\'i, reklamlar için Google AdMob\'u, abonelik ve uygulama içi satın alma doğrulaması için RevenueCat\'i ve namaz vakitleri için Aladhan/Diyanet API\'lerini kullanır.';
 
   @override
   String get settingsPrivacyControlsTitle => 'Kullanıcı kontrolü';

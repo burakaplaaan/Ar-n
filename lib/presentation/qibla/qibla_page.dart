@@ -22,6 +22,7 @@ import '../../core/constants/app_colors.dart';
 import '../../core/router/app_router.dart';
 import '../../core/theme/arin_shell_background.dart';
 import '../../data/services/qibla_compass_controller.dart';
+import '../shared/widgets/arin_back_button.dart';
 
 import 'package:arin/l10n/app_localizations.dart';
 
@@ -261,29 +262,14 @@ class _TopBar extends StatelessWidget {
       child: Row(
         children: [
           if (canGoBack)
-            GestureDetector(
-              onTap: () {
-                HapticFeedback.selectionClick();
+            ArinBackButton(
+              onPressed: () {
                 if (exitToHomeOnBack) {
                   context.go(AppRoutes.home);
                 } else {
                   context.pop();
                 }
               },
-              child: Container(
-                width: 38,
-                height: 38,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color:  btnBg,
-                  border: Border.all(color: btnBorder),
-                ),
-                child: Icon(
-                  Icons.arrow_back_ios_new_rounded,
-                  size: 15,
-                  color: dimColor,
-                ),
-              ),
             )
           else
             const SizedBox(width: 38),

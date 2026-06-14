@@ -1393,7 +1393,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settingsPrivacyThirdPartyBody =>
-      'Arin uses Firebase services for sign-in, sync, and notifications, Google AdMob for ads, RevenueCat for subscriptions, and Aladhan/Diyanet APIs for prayer times.';
+      'Arin uses Firebase services (Authentication, Firestore) for sign-in, notifications, and sync, Firebase Analytics/Crashlytics for analytics and crash diagnostics, Google AdMob for ads, RevenueCat for subscription and in-app purchase verification, and Aladhan/Diyanet APIs for prayer times.';
 
   @override
   String get settingsPrivacyControlsTitle => 'User control';

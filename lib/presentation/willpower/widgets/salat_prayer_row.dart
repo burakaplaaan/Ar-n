@@ -79,14 +79,9 @@ class SalatPrayerRow extends ConsumerWidget {
 
     final prayers = salat.getPrayers(habitId, storageDay);
 
-    // Vakit penceresi kısıtlaması şimdilik devre dışı: kullanıcı günün
-    // herhangi bir vaktinde geçmiş/gelecek namazları işaretleyebilir.
-    const bool applyVakitWindow = false;
-
     final triSize = compact ? 12.0 : 20.0;
 
     bool inWindow(int i) {
-      if (!applyVakitWindow) return true;
       return prayerAsync.maybeWhen(
         data: (pt) {
           // Bugünün vakitleri yoksa (eski önbellek / gün kayması): güvenli tarafta tümü kilitli.

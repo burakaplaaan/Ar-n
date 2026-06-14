@@ -315,7 +315,7 @@ class ArinPrayerNotificationReceiver : BroadcastReceiver() {
 class ArinPrayerNotificationBootReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         val action = intent.action ?: return
-        val isTimeSet = action == Intent.ACTION_TIME_SET
+        val isTimeSet = action == "android.intent.action.TIME_SET"
         val isTimeChanged = action == Intent.ACTION_TIME_CHANGED
         val isTimezoneChanged = action == Intent.ACTION_TIMEZONE_CHANGED
         if (action == Intent.ACTION_BOOT_COMPLETED ||

@@ -256,10 +256,6 @@ class MainActivity : FlutterActivity() {
             }
     }
 
-    companion object {
-        const val EXTRA_WIDGET_KIND = "arin_widget_kind"
-    }
-
     // ─────────────────────────────────────────────────────────────────────
     // Stories derin paylaşımı — ortak helper.
     //

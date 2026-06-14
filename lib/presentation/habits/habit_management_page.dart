@@ -9,7 +9,6 @@ import 'package:arin/l10n/app_localizations.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_text_styles.dart';
 import '../../core/constants/willpower_templates.dart';
-import '../../core/localization/locale_text.dart';
 import '../../core/router/app_router.dart';
 import '../../data/models/habit_model.dart';
 import '../kaza/kaza_tracking_provider.dart';

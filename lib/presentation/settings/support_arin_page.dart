@@ -29,6 +29,20 @@ class _SupportArinPageState extends ConsumerState<SupportArinPage> {
   final Map<String, String> _priceByProductId = <String, String>{};
   Timer? _productRetryTimer;
 
+  String _normalizeProductId(String productId) {
+    final idx = productId.indexOf(':');
+    if (idx <= 0) return productId;
+    return productId.substring(0, idx);
+  }
+
+  Future<void> _retryLoadProductsNow() async {
+    if (_busyProductId != null) return;
+    _productRetryTimer?.cancel();
+    if (!mounted) return;
+    setState(() => _loadingProducts = true);
+    await _loadSupportProducts();
+  }
+
   @override
   void initState() {
     super.initState();
@@ -58,10 +72,16 @@ class _SupportArinPageState extends ConsumerState<SupportArinPage> {
       _loadingProducts = false;
       _availableProductIds
         ..clear()
-        ..addAll(prices.keys);
+        ..addAll(
+          prices.keys.map(_normalizeProductId).where((id) => id.isNotEmpty),
+        );
       _priceByProductId
         ..clear()
-        ..addAll(prices);
+        ..addEntries(
+          prices.entries.map(
+            (e) => MapEntry(_normalizeProductId(e.key), e.value),
+          ),
+        );
     });
     if (prices.isEmpty) {
       _productRetryTimer?.cancel();
@@ -95,7 +115,7 @@ class _SupportArinPageState extends ConsumerState<SupportArinPage> {
 
   Future<void> _startPurchase(String productId) async {
     if (_busyProductId != null) return;
-    if (_loadingProducts || !_availableProductIds.contains(productId)) {
+    if (_loadingProducts || !_availableProductIds.contains(_normalizeProductId(productId))) {
       final l10n = AppLocalizations.of(context)!;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -108,13 +128,21 @@ class _SupportArinPageState extends ConsumerState<SupportArinPage> {
     setState(() => _busyProductId = productId);
 
     final service = ref.read(purchaseServiceProvider);
-    final outcome = await service.purchaseSupportProduct(productId);
+    final outcome = await service.purchaseSupportProduct(
+      productId,
+      l10n: AppLocalizations.of(context)!,
+    );
 
     if (!mounted) return;
     setState(() => _busyProductId = null);
 
     switch (outcome) {
       case PurchaseOutcome _ when outcome.isSuccess:
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(AppLocalizations.of(context)!.premiumLoadingWait),
+          ),
+        );
         _showSuccessDialog();
       case PurchaseOutcome _ when outcome.isCancelled:
         break;
@@ -178,15 +206,15 @@ class _SupportArinPageState extends ConsumerState<SupportArinPage> {
             icon: Icons.local_cafe_rounded,
             title: l10n.supportTierSmallTitle,
             subtitle: l10n.supportTierSmallDesc,
-            price:
-                _priceByProductId[RevenueCatIds.smallSupportProductId] ??
-                '₺49,99',
+            price: _priceByProductId[RevenueCatIds.smallSupportProductId],
             productId: RevenueCatIds.smallSupportProductId,
             isBusy: _busyProductId == RevenueCatIds.smallSupportProductId,
             anyBusy: _busyProductId != null,
             isEnabled:
                 !_loadingProducts &&
-                _availableProductIds.contains(RevenueCatIds.smallSupportProductId),
+                _availableProductIds.contains(
+                  _normalizeProductId(RevenueCatIds.smallSupportProductId),
+                ),
             onTap: () => _startPurchase(RevenueCatIds.smallSupportProductId),
           ),
           const SizedBox(height: 12),
@@ -194,16 +222,16 @@ class _SupportArinPageState extends ConsumerState<SupportArinPage> {
             icon: Icons.favorite_rounded,
             title: l10n.supportTierMediumTitle,
             subtitle: l10n.supportTierMediumDesc,
-            price:
-                _priceByProductId[RevenueCatIds.mediumSupportProductId] ??
-                '₺149,99',
+            price: _priceByProductId[RevenueCatIds.mediumSupportProductId],
             productId: RevenueCatIds.mediumSupportProductId,
             highlighted: true,
             isBusy: _busyProductId == RevenueCatIds.mediumSupportProductId,
             anyBusy: _busyProductId != null,
             isEnabled:
                 !_loadingProducts &&
-                _availableProductIds.contains(RevenueCatIds.mediumSupportProductId),
+                _availableProductIds.contains(
+                  _normalizeProductId(RevenueCatIds.mediumSupportProductId),
+                ),
             onTap: () => _startPurchase(RevenueCatIds.mediumSupportProductId),
           ),
           const SizedBox(height: 12),
@@ -211,18 +239,36 @@ class _SupportArinPageState extends ConsumerState<SupportArinPage> {
             icon: Icons.workspace_premium_rounded,
             title: l10n.supportTierLargeTitle,
             subtitle: l10n.supportTierLargeDesc,
-            price:
-                _priceByProductId[RevenueCatIds.largeSupportProductId] ??
-                '₺349,99',
+            price: _priceByProductId[RevenueCatIds.largeSupportProductId],
             productId: RevenueCatIds.largeSupportProductId,
             isBusy: _busyProductId == RevenueCatIds.largeSupportProductId,
             anyBusy: _busyProductId != null,
             isEnabled:
                 !_loadingProducts &&
-                _availableProductIds.contains(RevenueCatIds.largeSupportProductId),
+                _availableProductIds.contains(
+                  _normalizeProductId(RevenueCatIds.largeSupportProductId),
+                ),
             onTap: () => _startPurchase(RevenueCatIds.largeSupportProductId),
           ),
           const SizedBox(height: 16),
+          if (_priceByProductId.length < 3) ...[
+            _SupportProductsLoadingCard(
+              loading: _loadingProducts,
+              onRetry: _retryLoadProductsNow,
+            ),
+            const SizedBox(height: 10),
+          ],
+          if (_priceByProductId.length < 3)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 10),
+              child: Text(
+                l10n.supportProductNotReady,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: isDark ? Colors.white60 : AppColors.textMuted,
+                ),
+              ),
+            ),
           Builder(
             builder: (context) {
               final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -354,7 +400,7 @@ class _SupportCard extends StatelessWidget {
   final IconData icon;
   final String title;
   final String subtitle;
-  final String price;
+  final String? price;
   final String productId;
   final bool isBusy;
   final bool anyBusy;
@@ -435,9 +481,9 @@ class _SupportCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 12),
                 Align(
-                  alignment: Alignment.centerRight,
+                  alignment: AlignmentDirectional.centerEnd,
                   child: FilledButton(
-                    onPressed: anyBusy || !isEnabled ? null : onTap,
+                    onPressed: anyBusy || !isEnabled || price == null ? null : onTap,
                     style: FilledButton.styleFrom(
                       backgroundColor:
                           highlighted
@@ -460,7 +506,10 @@ class _SupportCard extends StatelessWidget {
                                   color: Color(0xFF07110B),
                                 ),
                               )
-                            : Text(price),
+                            : Text(
+                                price ??
+                                    AppLocalizations.of(context)!.supportProductNotReady,
+                              ),
                   ),
                 ),
               ],
@@ -504,7 +553,7 @@ class _SupportCard extends StatelessWidget {
           ),
           const SizedBox(width: 12),
           FilledButton(
-            onPressed: anyBusy || !isEnabled ? null : onTap,
+            onPressed: anyBusy || !isEnabled || price == null ? null : onTap,
             style: FilledButton.styleFrom(
               backgroundColor:
                   highlighted ? AppColors.goldAccent : AppColors.accentNeonGreen,
@@ -522,12 +571,65 @@ class _SupportCard extends StatelessWidget {
                       color: Color(0xFF07110B),
                     ),
                   )
-                : Text(price),
+                : Text(
+                    price ?? AppLocalizations.of(context)!.supportProductNotReady,
+                  ),
           ),
         ],
       ),
     );
       },
+    );
+  }
+}
+
+class _SupportProductsLoadingCard extends StatelessWidget {
+  const _SupportProductsLoadingCard({
+    required this.loading,
+    required this.onRetry,
+  });
+
+  final bool loading;
+  final Future<void> Function() onRetry;
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final l10n = AppLocalizations.of(context)!;
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: isDark ? Colors.white.withValues(alpha: 0.08) : AppColors.creamSurface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: isDark ? Colors.white.withValues(alpha: 0.14) : AppColors.creamDark,
+        ),
+      ),
+      child: Row(
+        children: [
+          if (loading)
+            const SizedBox(
+              width: 18,
+              height: 18,
+              child: CircularProgressIndicator(strokeWidth: 2),
+            )
+          else
+            const Icon(Icons.info_outline_rounded, color: AppColors.goldAccent),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              l10n.supportProductNotReady,
+              style: TextStyle(
+                color: isDark ? Colors.white70 : AppColors.textSecondary,
+              ),
+            ),
+          ),
+          TextButton(
+            onPressed: loading ? null : () => onRetry(),
+            child: Text(l10n.asyncErrorRetryAction),
+          ),
+        ],
+      ),
     );
   }
 }

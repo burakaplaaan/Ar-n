@@ -20,6 +20,8 @@ class AdMobService {
   static final Map<String, int> _cooldownUntil = <String, int>{};
 
   static Future<void>? _initializeFuture;
+  static bool _consentFlowCompleted = false;
+  static bool _canRequestAds = false;
 
   static Future<void> initialize() {
     return _initializeFuture ??= _initialize();
@@ -27,11 +29,44 @@ class AdMobService {
 
   static Future<void> _initialize() async {
     try {
+      await _updateConsentStatus();
+      if (!_canRequestAds) {
+        debugPrint('══ ARIN ══ AdMob init skipped: consent not granted yet');
+        return;
+      }
       await MobileAds.instance.initialize();
       debugPrint('══ ARIN ══ AdMob initialized');
     } catch (e) {
+      _canRequestAds = false;
       debugPrint('══ ARIN ══ AdMob init failed (sessiz): $e');
     }
+  }
+
+  static Future<void> _updateConsentStatus() async {
+    if (_consentFlowCompleted) return;
+    final completer = Completer<void>();
+    ConsentInformation.instance.requestConsentInfoUpdate(
+      ConsentRequestParameters(),
+      () async {
+        try {
+          await ConsentForm.loadAndShowConsentFormIfRequired((_) {});
+          _canRequestAds = await ConsentInformation.instance.canRequestAds();
+        } catch (e) {
+          debugPrint('══ ARIN ══ AdMob consent form failed (sessiz): $e');
+          _canRequestAds = false;
+        } finally {
+          _consentFlowCompleted = true;
+          if (!completer.isCompleted) completer.complete();
+        }
+      },
+      (error) {
+        debugPrint('══ ARIN ══ AdMob consent info update failed (sessiz): $error');
+        _canRequestAds = false;
+        _consentFlowCompleted = true;
+        if (!completer.isCompleted) completer.complete();
+      },
+    );
+    await completer.future;
   }
 
   /// Belirli ad unit için cooldown aktifse true.
@@ -54,6 +89,8 @@ class AdMobService {
   Future<bool> showInterstitial(ArinAdUnit unit) async {
     final adUnitId = AdMobIds.unitId(unit);
     if (adUnitId == null) return false;
+    await initialize();
+    if (!_canRequestAds) return false;
     if (_isInCooldown(adUnitId)) {
       debugPrint('AdMob interstitial: cooldown aktif, istek atlanıyor');
       return false;
@@ -64,7 +101,6 @@ class AdMobService {
     var waitingForLoad = true;
     Timer? loadTimer;
     try {
-      await initialize();
       loadTimer = Timer(_loadTimeout, () {
         if (!waitingForLoad || completer.isCompleted) return;
         active = false;
@@ -132,6 +168,8 @@ class AdMobService {
   Future<bool> showRewarded(ArinAdUnit unit) async {
     final adUnitId = AdMobIds.unitId(unit);
     if (adUnitId == null) return false;
+    await initialize();
+    if (!_canRequestAds) return false;
     if (_isInCooldown(adUnitId)) {
       debugPrint('AdMob rewarded: cooldown aktif, istek atlanıyor');
       return false;
@@ -143,7 +181,6 @@ class AdMobService {
     Timer? loadTimer;
     var earnedReward = false;
     try {
-      await initialize();
       loadTimer = Timer(_loadTimeout, () {
         if (!waitingForLoad || completer.isCompleted) return;
         active = false;

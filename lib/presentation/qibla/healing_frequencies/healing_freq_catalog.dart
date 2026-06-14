@@ -2,8 +2,6 @@
 
 import 'package:flutter/widgets.dart';
 
-import '../../../core/localization/locale_text.dart';
-
 import 'package:arin/l10n/app_localizations.dart';
 
 /// Hub kartında gösterilen kısa rol etiketi (büyük daire altı).

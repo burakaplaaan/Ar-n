@@ -14,7 +14,6 @@ import 'package:geolocator/geolocator.dart';
 import 'package:hive/hive.dart';
 import '../../core/utils/hive_boxes.dart';
 import '../../core/router/app_router.dart';
-import '../../core/constants/app_colors.dart';
 import 'diyanet_district_matcher.dart';
 
 /// GPS ile tespit edilen şehir, kaydedilen şehirden farklıysa döner.

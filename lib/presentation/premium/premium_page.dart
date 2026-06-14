@@ -97,6 +97,14 @@ class _PremiumPageState extends ConsumerState<PremiumPage> {
     }
   }
 
+  Future<void> _retryLoadProductsNow() async {
+    if (_busyProductId != null) return;
+    _productRetryTimer?.cancel();
+    if (!mounted) return;
+    setState(() => _loadingProducts = true);
+    await _loadPremiumProducts();
+  }
+
   Future<void> _openExternalUrl(String rawUrl) async {
     final l10n = AppLocalizations.of(context)!;
     try {
@@ -133,12 +141,11 @@ class _PremiumPageState extends ConsumerState<PremiumPage> {
       try {
         await PurchaseService.loginUser(user.uid);
       } catch (e) {
-        if (!mounted) return;
-        messenger.showSnackBar(
-          SnackBar(
-            content: Text(l10n.premiumAccountLinkError),
-          ),
-        );
+        if (mounted) {
+          messenger.showSnackBar(
+            SnackBar(content: Text(l10n.premiumAccountLinkError)),
+          );
+        }
         return;
       }
     }
@@ -154,11 +161,23 @@ class _PremiumPageState extends ConsumerState<PremiumPage> {
       if (result.isSuccess) {
         // Premium aktif: Firestore'u yenile ve başarı sayfası/mesajı göster.
         ref.invalidate(premiumEntitlementProvider);
-        await ref.read(premiumEntitlementProvider.future);
+        var entitlement = await ref.read(premiumEntitlementProvider.future);
+        if (!entitlement.isActive) {
+          await Future<void>.delayed(const Duration(seconds: 3));
+          ref.invalidate(premiumEntitlementProvider);
+          entitlement = await ref.read(premiumEntitlementProvider.future);
+        }
+        final localActive = await ref.read(purchaseServiceProvider).isPremiumLocally();
+        final premiumConfirmed = entitlement.isActive || localActive;
+        if (!premiumConfirmed && mounted) {
+          messenger.showSnackBar(SnackBar(content: Text(l10n.premiumLoadingWait)));
+        }
         if (mounted && ref.read(authUserProvider).asData?.value == null) {
           await _maybePromptAccountLinkAfterPurchase();
         }
-        await _showSuccessDialog();
+        if (premiumConfirmed) {
+          await _showSuccessDialog();
+        }
       } else if (!result.isCancelled) {
         final msg = result.userMessage;
         if (msg != null) {
@@ -257,12 +276,11 @@ class _PremiumPageState extends ConsumerState<PremiumPage> {
       try {
         await PurchaseService.loginUser(user.uid);
       } catch (e) {
-        if (!mounted) return;
-        messenger.showSnackBar(
-          SnackBar(
-            content: Text(l10n.premiumAccountLinkError),
-          ),
-        );
+        if (mounted) {
+          messenger.showSnackBar(
+            SnackBar(content: Text(l10n.premiumAccountLinkError)),
+          );
+        }
         return;
       }
     }
@@ -383,7 +401,7 @@ class _PremiumPageState extends ConsumerState<PremiumPage> {
         isPremium == true && activeProductId.startsWith(PremiumPage.monthlyProductId);
     final signedIn = ref.watch(authUserProvider).asData?.value != null;
 
-    // Android'de mağazadan gerçek fiyatlar; iOS'ta hardcoded değerler kullanılır.
+    // Android/iOS'ta mağazadan gerçek fiyatlar kullanılır.
     final prices = ref.watch(_premiumPricesProvider).asData?.value ?? {};
     final providerPriceByBaseId = <String, String>{
       for (final entry in prices.entries)
@@ -491,45 +509,56 @@ class _PremiumPageState extends ConsumerState<PremiumPage> {
                             const _SignInRequiredNotice(),
                             const SizedBox(height: 14),
                           ],
-                          if (yearlyPrice != null) ...[
-                            _PlanCard(
-                              title: l10n.premiumYearlyPlanTitle,
-                              badge: hasYearly ? null : l10n.premiumMostAdvantageousBadge,
-                              oldPrice: null, // Hardcoded oldPrice was removed
-                              price: yearlyPrice,
-                              subline: l10n.premiumYearlyPlanSubtitle,
-                              productId: PremiumPage.yearlyProductId,
-                              highlighted: !hasYearly,
-                              isOwned: hasYearly,
-                              enabled:
-                                  (!isPremium || hasMonthly) &&
-                                  (!_loadingProducts &&
-                                      _containsProduct(PremiumPage.yearlyProductId)),
-                              buttonLabel: hasMonthly ? l10n.premiumSwitchToYearly : null,
-                              busy: _busyProductId == PremiumPage.yearlyProductId,
-                              onPressed: () =>
-                                  _startPurchase(PremiumPage.yearlyProductId),
+                          if (yearlyPrice == null || monthlyPrice == null) ...[
+                            _ProductsLoadingCard(
+                              loading: _loadingProducts,
+                              onRetry: _retryLoadProductsNow,
                             ),
                             const SizedBox(height: 12),
                           ],
-                          if (monthlyPrice != null)
-                            _PlanCard(
-                              title: l10n.premiumMonthlyPlanTitle,
-                              oldPrice: null, // Hardcoded oldPrice was removed
-                              price: monthlyPrice,
-                              subline: l10n.premiumMonthlyPlanSubtitle,
-                              productId: PremiumPage.monthlyProductId,
-                              highlighted: false,
-                              isOwned: hasMonthly,
-                              // Herhangi bir premium varsa aylık devre dışı.
-                              enabled:
-                                  !isPremium &&
-                                  (!_loadingProducts &&
-                                      _containsProduct(PremiumPage.monthlyProductId)),
-                              busy: _busyProductId == PremiumPage.monthlyProductId,
-                              onPressed: () =>
-                                  _startPurchase(PremiumPage.monthlyProductId),
-                            ),
+                          _PlanCard(
+                            title: l10n.premiumYearlyPlanTitle,
+                            badge: hasYearly ? null : l10n.premiumMostAdvantageousBadge,
+                            oldPrice: null,
+                            price: yearlyPrice ?? '---',
+                            subline: l10n.premiumYearlyPlanSubtitle,
+                            productId: PremiumPage.yearlyProductId,
+                            highlighted: !hasYearly,
+                            isOwned: hasYearly,
+                            enabled:
+                                yearlyPrice != null &&
+                                (!isPremium || hasMonthly) &&
+                                (!_loadingProducts &&
+                                    _containsProduct(PremiumPage.yearlyProductId)),
+                            buttonLabel: hasMonthly ? l10n.premiumSwitchToYearly : null,
+                            busy: _busyProductId == PremiumPage.yearlyProductId,
+                            productReady:
+                                yearlyPrice != null &&
+                                _containsProduct(PremiumPage.yearlyProductId),
+                            currentlyPremium: isPremium == true,
+                            onPressed: () => _startPurchase(PremiumPage.yearlyProductId),
+                          ),
+                          const SizedBox(height: 12),
+                          _PlanCard(
+                            title: l10n.premiumMonthlyPlanTitle,
+                            oldPrice: null,
+                            price: monthlyPrice ?? '---',
+                            subline: l10n.premiumMonthlyPlanSubtitle,
+                            productId: PremiumPage.monthlyProductId,
+                            highlighted: false,
+                            isOwned: hasMonthly,
+                            enabled:
+                                monthlyPrice != null &&
+                                !isPremium &&
+                                (!_loadingProducts &&
+                                    _containsProduct(PremiumPage.monthlyProductId)),
+                            busy: _busyProductId == PremiumPage.monthlyProductId,
+                            productReady:
+                                monthlyPrice != null &&
+                                _containsProduct(PremiumPage.monthlyProductId),
+                            currentlyPremium: isPremium == true,
+                            onPressed: () => _startPurchase(PremiumPage.monthlyProductId),
+                          ),
                           const SizedBox(height: 18),
                         ],
                         Text(
@@ -830,6 +859,57 @@ class _SignInRequiredNotice extends StatelessWidget {
   }
 }
 
+class _ProductsLoadingCard extends StatelessWidget {
+  const _ProductsLoadingCard({
+    required this.loading,
+    required this.onRetry,
+  });
+
+  final bool loading;
+  final Future<void> Function() onRetry;
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final l10n = AppLocalizations.of(context)!;
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: isDark ? Colors.white.withValues(alpha: 0.08) : AppColors.creamSurface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: isDark ? Colors.white.withValues(alpha: 0.14) : AppColors.creamDark,
+        ),
+      ),
+      child: Row(
+        children: [
+          if (loading)
+            const SizedBox(
+              width: 18,
+              height: 18,
+              child: CircularProgressIndicator(strokeWidth: 2),
+            )
+          else
+            const Icon(Icons.info_outline_rounded, color: AppColors.goldAccent),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              l10n.premiumProductNotReadyError,
+              style: TextStyle(
+                color: isDark ? Colors.white70 : AppColors.textSecondary,
+              ),
+            ),
+          ),
+          TextButton(
+            onPressed: loading ? null : () => onRetry(),
+            child: Text(l10n.asyncErrorRetryAction),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 enum _PremiumAuth { google, apple }
 
 class _PremiumSignInSheet extends StatelessWidget {
@@ -951,6 +1031,8 @@ class _PlanCard extends StatelessWidget {
     this.badge,
     this.isOwned = false,
     this.buttonLabel,
+    this.productReady = true,
+    this.currentlyPremium = false,
   });
 
   final String title;
@@ -967,6 +1049,8 @@ class _PlanCard extends StatelessWidget {
   final bool isOwned;
   /// Varsayılan buton metnini override eder (örn. "Yıllığa geç").
   final String? buttonLabel;
+  final bool productReady;
+  final bool currentlyPremium;
 
   @override
   Widget build(BuildContext context) {
@@ -1123,7 +1207,11 @@ class _PlanCard extends StatelessWidget {
                           ? AppLocalizations.of(context)!.premiumActivePlanButton
                           : (enabled
                                 ? (buttonLabel ?? AppLocalizations.of(context)!.premiumStartWithLaunchPrice)
-                                : AppLocalizations.of(context)!.premiumIsActiveButton),
+                                : (productReady
+                                      ? (currentlyPremium
+                                            ? AppLocalizations.of(context)!.premiumIsActiveButton
+                                            : AppLocalizations.of(context)!.premiumProductNotReadyError)
+                                      : AppLocalizations.of(context)!.premiumProductNotReadyError)),
                       style: const TextStyle(fontWeight: FontWeight.w900),
                     ),
             ),

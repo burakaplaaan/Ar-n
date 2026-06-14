@@ -73,13 +73,12 @@ android {
 
     buildTypes {
         release {
-            // key.properties varsa upload key, yoksa debug key (flutter run --release
-            // dev akışını korumak için). Mağaza build'i her zaman key.properties ile.
-            signingConfig = if (hasReleaseKeystore) {
-                signingConfigs.getByName("release")
-            } else {
-                signingConfigs.getByName("debug")
+            // Mağaza güvenliği: release build yalnızca upload keystore ile imzalanır.
+            // key.properties yoksa build'i bilinçli olarak fail ederiz.
+            check(hasReleaseKeystore) {
+                "Release signing requires android/key.properties (upload keystore)."
             }
+            signingConfig = signingConfigs.getByName("release")
             // Release'de R8 aktif → proguard-rules.pro generic signature’ı
             // korur, flutter_local_notifications Gson hatasını önler.
             isMinifyEnabled = true

@@ -673,7 +673,7 @@
   "settingsPrivacyStorageTitle": "Saklama ve süre",
   "settingsPrivacyStorageBody": "Alışkanlık, zikir ve tercih verilerinin büyük kısmı cihazınızda tutulur. Hesapla giriş yaparsanız seçili veriler Firebase servisleriyle eşitlenebilir. Veriler, uygulama içinden silene veya hesabınızı kaldırana kadar saklanır.",
   "settingsPrivacyThirdPartyTitle": "Üçüncü taraf servisler",
-  "settingsPrivacyThirdPartyBody": "Arin; oturum açma, bildirimler ve veri eşitleme için Firebase servislerini, reklamlar için Google AdMob'u, abonelik yönetimi için RevenueCat'i ve namaz vakitleri için Aladhan/Diyanet API'lerini kullanır.",
+  "settingsPrivacyThirdPartyBody": "Arin; oturum açma, bildirimler ve veri eşitleme için Firebase servislerini (Authentication, Firestore), kullanım analizi ve çökme tanılama için Firebase Analytics/Crashlytics'i, reklamlar için Google AdMob'u, abonelik ve uygulama içi satın alma doğrulaması için RevenueCat'i ve namaz vakitleri için Aladhan/Diyanet API'lerini kullanır.",
   "settingsPrivacyControlsTitle": "Kullanıcı kontrolü",
   "settingsPrivacyControlsBody": "Konum ve bildirim izinlerini cihaz ayarlarından kapatabilir, Ayarlar ekranından çıkış yapabilir veya hesabınızı ve yerel verilerinizi silebilirsiniz.",
   "settingsPrivacyChildrenTitle": "Çocukların gizliliği",

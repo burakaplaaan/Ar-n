@@ -1152,7 +1152,7 @@
   "settingsPrivacyStorageTitle": "Storage and retention",
   "settingsPrivacyStorageBody": "Most habit, zikr, and preference data is stored on your device. If you sign in, selected data may be synced with Firebase services. Data is kept until you delete it in the app or remove your account.",
   "settingsPrivacyThirdPartyTitle": "Third-party services",
-  "settingsPrivacyThirdPartyBody": "Arin uses Firebase services for sign-in, sync, and notifications, Google AdMob for ads, RevenueCat for subscriptions, and Aladhan/Diyanet APIs for prayer times.",
+  "settingsPrivacyThirdPartyBody": "Arin uses Firebase services (Authentication, Firestore) for sign-in, notifications, and sync, Firebase Analytics/Crashlytics for analytics and crash diagnostics, Google AdMob for ads, RevenueCat for subscription and in-app purchase verification, and Aladhan/Diyanet APIs for prayer times.",
   "settingsPrivacyControlsTitle": "User control",
   "settingsPrivacyControlsBody": "You can disable location and notification permissions from device settings, sign out from Settings, or delete your account and local data.",
   "settingsPrivacyChildrenTitle": "Children's privacy",

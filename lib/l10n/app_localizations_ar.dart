@@ -1384,7 +1384,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get settingsPrivacyThirdPartyBody =>
-      'تستخدم Arin خدمات Firebase لتسجيل الدخول والمزامنة والإشعارات، وGoogle AdMob للإعلانات، وRevenueCat للاشتراكات، وواجهات برمجة تطبيقات Aladhan/Diyanet لمواقيت الصلاة.';
+      'تستخدم Arin خدمات Firebase (Authentication وFirestore) لتسجيل الدخول والإشعارات والمزامنة، وFirebase Analytics/Crashlytics للتحليلات وتشخيص الأعطال، وGoogle AdMob للإعلانات، وRevenueCat للتحقق من الاشتراكات وعمليات الشراء داخل التطبيق، وواجهات Aladhan/Diyanet لمواقيت الصلاة.';
 
   @override
   String get settingsPrivacyControlsTitle => 'تحكم المستخدم';
@@ -3759,7 +3759,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get premiumCountdownNotice =>
-      'هذا السعر صالح لفترة محدودة. افتح premium بأفضل سعر قبل انتهاء الإطلاق.';
+      'هذا السعر صالح لفترة محدودة. فعّل Premium بأفضل سعر قبل انتهاء الإطلاق.';
 
   @override
   String get premiumBenefitAdFree => 'استخدام بدون إعلانات';
@@ -4335,14 +4335,14 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get premiumLoadingWait =>
-      'جاري تحميل حالة القسط. يرجى المحاولة مرة أخرى قريباً.';
+      'يتم تفعيل Premium. يرجى المحاولة مرة أخرى بعد لحظات.';
 
   @override
-  String get secondAlarmPremiumFeature => 'ميزة الإنذار الثاني للقسط';
+  String get secondAlarmPremiumFeature => 'ميزة الإنذار الثاني لـ Premium';
 
   @override
   String get secondAlarmAdWatchText =>
-      'لتمكين إنذار الأذان الثاني في الاستخدام المجاني، تتم مشاهدة إعلان قصير. مستخدمو القسط لا يرون هذا القفل.';
+      'لتفعيل إنذار الأذان الثاني في الاستخدام المجاني، تتم مشاهدة إعلان قصير. مستخدمو Premium لا يرون هذا القفل.';
 
   @override
   String get giveUp => 'تخلى';

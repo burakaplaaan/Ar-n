@@ -7,7 +7,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_text_styles.dart';
 import 'package:arin/l10n/app_localizations.dart';
-import '../../core/localization/locale_text.dart';
 import '../../core/router/app_router.dart';
 import '../../data/models/habit_model.dart';
 import '../../data/services/habit_cloud_sync_service.dart';

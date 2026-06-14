@@ -10,7 +10,6 @@ import 'package:go_router/go_router.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_text_styles.dart';
 import 'package:arin/l10n/app_localizations.dart';
-import '../../core/localization/locale_text.dart';
 import '../../core/router/app_router.dart';
 import '../../data/models/habit_model.dart';
 import '../../data/services/habit_cloud_sync_service.dart';
@@ -22,11 +21,6 @@ class HabitsPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    String t({
-      required String tr,
-      required String en,
-      required String ar,
-    }) => trEnAr(context, tr: tr, en: en, ar: ar);
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final summary = ref.watch(habitSummaryProvider);
     final goodHabits = summary.where((s) => s.habit.type == HabitType.good).toList();
