@@ -242,7 +242,6 @@ class _HealingFrequenciesPageState extends ConsumerState<HealingFrequenciesPage>
                     children: [
                       ArinBackButton(
                         onPressed: () => Navigator.of(context).maybePop(),
-                        icon: Icons.close_rounded,
                       ),
                       Expanded(
                         child: Column(

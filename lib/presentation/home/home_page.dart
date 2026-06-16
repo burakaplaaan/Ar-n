@@ -22,6 +22,7 @@ import '../shared/providers/auth_providers.dart';
 import '../shared/providers/premium_providers.dart';
 import '../shared/providers/prayer_time_providers.dart';
 import '../shared/providers/user_profile_providers.dart';
+import '../shared/widgets/ornate_frame.dart';
 import 'widgets/daily_namaz_wisdom_card.dart';
 import 'widgets/home_namaz_ritual_section.dart';
 
@@ -155,44 +156,77 @@ class _HeaderSection extends ConsumerWidget {
     // amber vurguyla göstereceğiz, namaz kaçmasın.
     final urgentFajr = ref.watch(nextPrayerUrgentFajrProvider);
 
+    final ornament = isDarkShell
+        ? AppColors.ornamentGold
+        : AppColors.ornamentGoldDeep;
     final titleC = isDarkShell ? Colors.white : AppColors.emeraldDark;
-    final subtitleC = isDarkShell
-        ? Colors.white.withValues(alpha: 0.55)
-        : AppColors.textSecondary;
     final badgeTextC = isDarkShell
         ? Colors.white.withValues(alpha: 0.95)
         : AppColors.emeraldDark;
 
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Expanded(
-          child: Column(
+    return Container(
+      padding: const EdgeInsets.fromLTRB(14, 10, 10, 10),
+      child: Stack(
+        children: [
+          Positioned(
+            left: -10,
+            bottom: -18,
+            child: IgnorePointer(
+              child: Icon(
+                Icons.mosque_rounded,
+                size: 112,
+                color: isDarkShell
+                    ? Colors.white.withValues(alpha: 0.06)
+                    : AppColors.emeraldDark.withValues(alpha: 0.08),
+              ),
+            ),
+          ),
+          Positioned(
+            left: 8,
+            top: 6,
+            child: IgnorePointer(
+              child: Icon(
+                Icons.nightlight_round,
+                size: 16,
+                color: ornament.withValues(
+                  alpha: isDarkShell ? 0.34 : 0.45,
+                ),
+              ),
+            ),
+          ),
+          Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                greeting,
-                style: TextStyle(
-                  color: titleC,
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: -0.5,
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      greeting,
+                      style: TextStyle(
+                        fontFamily: 'Georgia',
+                        color: titleC,
+                        fontSize: 28,
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: -0.5,
+                      ).copyWith(
+                        fontFamilyFallback: const ['Times New Roman', 'serif'],
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      userName,
+                      style: TextStyle(
+                        color: ornament.withValues(alpha: 0.8),
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
                 ),
               ),
-              const SizedBox(height: 6),
-              Text(
-                userName,
-                style: TextStyle(
-                  color: subtitleC,
-                  fontSize: 20,
-                  fontWeight: FontWeight.w500,
-                ),
-                overflow: TextOverflow.ellipsis,
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(width: 12),
+              const SizedBox(width: 12),
         Column(
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
@@ -205,16 +239,10 @@ class _HeaderSection extends ConsumerWidget {
                   padding:
                       const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                   decoration: BoxDecoration(
-                    color: (isPremium
-                            ? AppColors.goldAccent
-                            : AppColors.accentNeonGreen)
-                        .withValues(alpha: 0.15),
+                    color: ornament.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(20),
                     border: Border.all(
-                      color: (isPremium
-                              ? AppColors.goldAccent
-                              : AppColors.accentNeonGreen)
-                          .withValues(alpha: 0.45),
+                      color: ornament.withValues(alpha: 0.45),
                     ),
                   ),
                   child: Row(
@@ -222,9 +250,7 @@ class _HeaderSection extends ConsumerWidget {
                     children: [
                       Icon(
                         Icons.workspace_premium_rounded,
-                        color: isPremium
-                            ? AppColors.goldAccent
-                            : AppColors.accentNeonGreen,
+                        color: ornament,
                         size: 16,
                       ),
                       const SizedBox(width: 4),
@@ -262,98 +288,111 @@ class _HeaderSection extends ConsumerWidget {
                           _humanRemaining(remaining, l10n),
                         ),
                   excludeSemantics: true,
-                  child: Container(
-                    width: 124,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 10,
-                      vertical: 12,
-                    ),
-                    decoration: BoxDecoration(
-                      color: urgentFajr
-                          ? (isDarkShell
-                                ? const Color(
-                                    0xFF2A1710,
-                                  ).withValues(alpha: 0.92)
-                                : const Color(
-                                    0xFFFFF3E0,
-                                  ).withValues(alpha: 0.96))
-                          : (isDarkShell
-                                ? AppColors.homeCardSurface.withValues(
-                                    alpha: 0.85,
-                                  )
-                                : Colors.white.withValues(alpha: 0.92)),
-                      borderRadius: BorderRadius.circular(18),
-                      border: Border.all(
-                        color: urgentFajr
-                            ? const Color(0xFFFFA726).withValues(alpha: 0.75)
-                            : AppColors.accentNeonGreen.withValues(alpha: 0.45),
-                        width: urgentFajr ? 1.5 : 1,
+                  child: OrnateFrame(
+                    borderRadius: 20,
+                    inset: 5,
+                    armLength: 11,
+                    bottomAccent: true,
+                    child: Container(
+                      width: 124,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 12,
                       ),
-                      boxShadow: [
-                        BoxShadow(
+                      decoration: BoxDecoration(
+                        color: urgentFajr
+                            ? (isDarkShell
+                                  ? const Color(
+                                      0xFF2A1710,
+                                    ).withValues(alpha: 0.92)
+                                  : const Color(
+                                      0xFFFFF3E0,
+                                    ).withValues(alpha: 0.96))
+                            : (isDarkShell
+                                  ? AppColors.homeCardSurface.withValues(
+                                      alpha: 0.85,
+                                    )
+                                  : Colors.white.withValues(alpha: 0.92)),
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(
                           color: urgentFajr
-                              ? const Color(0xFFFFA726).withValues(alpha: 0.22)
-                              : AppColors.accentGlowGreen.withValues(
-                                  alpha: 0.12,
-                                ),
-                          blurRadius: 18,
-                          offset: const Offset(0, 6),
+                              ? const Color(0xFFFFA726).withValues(alpha: 0.75)
+                              : ornament.withValues(alpha: 0.56),
+                          width: urgentFajr ? 1.5 : 1,
                         ),
-                      ],
-                    ),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          urgentFajr
-                              ? l10n.homePrayerUrgentBadge
-                              : l10n.homePrayerNextBadge,
-                          style: TextStyle(
+                        boxShadow: [
+                          BoxShadow(
                             color: urgentFajr
-                                ? const Color(0xFFFFB74D)
-                                : (isDarkShell
-                                      ? Colors.white.withValues(alpha: 0.55)
-                                      : AppColors.textSecondary),
-                            fontSize: 10,
-                            fontWeight: FontWeight.w700,
-                            letterSpacing: urgentFajr ? 0.4 : 0,
+                                ? const Color(0xFFFFA726).withValues(alpha: 0.22)
+                                : ornament.withValues(alpha: 0.18),
+                            blurRadius: 18,
+                            offset: const Offset(0, 6),
                           ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          nextName,
-                          style: TextStyle(
-                            color: urgentFajr
-                                ? const Color(0xFFFFCC80)
-                                : (isDarkShell
-                                      ? Colors.white.withValues(alpha: 0.85)
-                                      : AppColors.emeraldDark),
-                            fontSize: 11,
-                            fontWeight: FontWeight.w600,
-                          ),
-                          textAlign: TextAlign.center,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        const SizedBox(height: 6),
-                        FittedBox(
-                          fit: BoxFit.scaleDown,
-                          alignment: Alignment.center,
-                          child: Text(
-                            remaining.countdownText,
-                            maxLines: 1,
-                            softWrap: false,
+                        ],
+                      ),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            urgentFajr
+                                ? l10n.homePrayerUrgentBadge
+                                : l10n.homePrayerNextBadge,
                             style: TextStyle(
                               color: urgentFajr
-                                  ? const Color(0xFFFFA726)
-                                  : AppColors.accentNeonGreen,
-                              fontSize: 17,
-                              fontWeight: FontWeight.bold,
-                              letterSpacing: -0.5,
+                                  ? const Color(0xFFFFB74D)
+                                  : (isDarkShell
+                                        ? Colors.white.withValues(alpha: 0.55)
+                                        : AppColors.textSecondary),
+                              fontSize: 10,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: urgentFajr ? 0.4 : 0,
                             ),
                           ),
-                        ),
-                      ],
+                          const SizedBox(height: 4),
+                          Text(
+                            nextName,
+                            style: TextStyle(
+                              color: urgentFajr
+                                  ? const Color(0xFFFFCC80)
+                                  : (isDarkShell
+                                        ? Colors.white.withValues(alpha: 0.85)
+                                        : AppColors.emeraldDark),
+                              fontSize: 11,
+                              fontWeight: FontWeight.w600,
+                            ),
+                            textAlign: TextAlign.center,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          const SizedBox(height: 6),
+                          FittedBox(
+                            fit: BoxFit.scaleDown,
+                            alignment: Alignment.center,
+                            child: Text(
+                              remaining.countdownText,
+                              maxLines: 1,
+                              softWrap: false,
+                              style: TextStyle(
+                                color: urgentFajr
+                                    ? const Color(0xFFFFA726)
+                                    : AppColors.accentNeonGreen,
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                                letterSpacing: -0.5,
+                                shadows: [
+                                  Shadow(
+                                    color: (urgentFajr
+                                            ? const Color(0xFFFFA726)
+                                            : AppColors.accentNeonGreen)
+                                        .withValues(alpha: 0.4),
+                                    blurRadius: 8,
+                                  )
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -362,7 +401,10 @@ class _HeaderSection extends ConsumerWidget {
           ],
         ),
       ],
-    );
+    ),
+  ],
+),
+);
   }
 
   /// Erişilebilirlik için "01:23:45" yerine "1 saat 23 dakika" gibi okunabilir
@@ -464,13 +506,17 @@ class _PrayerTimesList extends StatelessWidget {
                   color: accent.withValues(alpha: 0.95),
                 ),
                 const SizedBox(width: 8),
-                Text(
-                  l10n.homePrayerTimesTitle,
-                  style: TextStyle(
-                    color: titleC,
-                    fontSize: 13,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: 0.2,
+                Expanded(
+                  child: Text(
+                    l10n.homePrayerTimesTitle,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      color: titleC,
+                      fontSize: 13,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 0.2,
+                    ),
                   ),
                 ),
               ],
@@ -482,22 +528,28 @@ class _PrayerTimesList extends StatelessWidget {
               meta: meta,
               isDarkShell: isDarkShell,
             ),
-            const SizedBox(height: 12),
-            ...model.orderedPrayers.asMap().entries.map((e) {
-              final p = e.value;
-              final isNext = p.name == nextName;
-              return Padding(
-                padding: EdgeInsets.only(
-                  bottom: e.key == model.orderedPrayers.length - 1 ? 0 : 6,
-                ),
-                child: _PrayerTimeRow(
+            const SizedBox(height: 14),
+            GridView.builder(
+              itemCount: model.orderedPrayers.length,
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 3,
+                mainAxisSpacing: 11,
+                crossAxisSpacing: 11,
+                childAspectRatio: 0.92,
+              ),
+              itemBuilder: (context, i) {
+                final p = model.orderedPrayers[i];
+                return _PrayerTimeRow(
+                  index: i,
                   name: p.name,
                   time: p.time,
-                  isNext: isNext,
+                  isNext: p.name == nextName,
                   isDarkShell: isDarkShell,
-                ),
-              );
-            }),
+                );
+              },
+            ),
           ],
         ),
       ),
@@ -506,117 +558,177 @@ class _PrayerTimesList extends StatelessWidget {
 }
 
 class _PrayerTimeRow extends StatelessWidget {
+  final int index;
   final String name;
   final String time;
   final bool isNext;
   final bool isDarkShell;
 
   const _PrayerTimeRow({
+    required this.index,
     required this.name,
     required this.time,
     required this.isNext,
     required this.isDarkShell,
   });
 
+  IconData _iconForPrayer() {
+    switch (index) {
+      case 0:
+        return Icons.wb_twilight_outlined;
+      case 1:
+        return Icons.wb_sunny_outlined;
+      case 2:
+        return Icons.sunny;
+      case 3:
+        return Icons.brightness_medium_outlined;
+      case 4:
+        return Icons.wb_twilight;
+      default:
+        return Icons.nightlight_round;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     const accent = AppColors.accentNeonGreen;
     final borderColor = isNext
-        ? accent.withValues(alpha: 0.75)
-        : accent.withValues(alpha: isDarkShell ? 0.22 : 0.28);
+        ? accent.withValues(alpha: 0.78)
+        : accent.withValues(alpha: isDarkShell ? 0.2 : 0.3);
     final bg = isNext
-        ? AppColors.accentGlowGreen.withValues(alpha: 0.12)
+        ? AppColors.accentGlowGreen.withValues(alpha: isDarkShell ? 0.16 : 0.2)
         : (isDarkShell
-              ? AppColors.homeCardSurface.withValues(alpha: 0.55)
-              : AppColors.creamMist.withValues(alpha: 0.65));
+              ? AppColors.homeCardSurface.withValues(alpha: 0.52)
+              : AppColors.creamMist.withValues(alpha: 0.72));
     final nameC = isDarkShell
-        ? Colors.white.withValues(alpha: isNext ? 1.0 : 0.88)
-        : AppColors.emeraldDark.withValues(alpha: isNext ? 1.0 : 0.88);
+        ? Colors.white.withValues(alpha: isNext ? 0.98 : 0.82)
+        : AppColors.emeraldDark.withValues(alpha: isNext ? 0.95 : 0.8);
     final timeMuted = isDarkShell
-        ? Colors.white.withValues(alpha: 0.75)
-        : AppColors.textSecondary;
+        ? Colors.white.withValues(alpha: 0.8)
+        : AppColors.textSecondary.withValues(alpha: 0.9);
+    // Çok hafif kahverengi/bronz vurgu — yeşil paleti bozmadan sıcaklık katar.
+    final ornament = isDarkShell
+        ? AppColors.ornamentGold
+        : AppColors.ornamentGoldDeep;
+    final iconColor = isNext
+        ? accent
+        : ornament.withValues(alpha: isDarkShell ? 0.62 : 0.7);
 
     return Container(
       decoration: BoxDecoration(
-        color: bg,
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [
+            bg.withValues(alpha: isNext ? 0.95 : 0.9),
+            bg.withValues(alpha: isNext ? 0.72 : 0.62),
+          ],
+        ),
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: borderColor, width: isNext ? 1.5 : 1),
+        border: Border.all(
+          color: isNext
+              ? borderColor
+              : Color.lerp(borderColor, ornament, 0.35)!.withValues(
+                  alpha: isDarkShell ? 0.3 : 0.4,
+                ),
+          width: isNext ? 1.35 : 0.95,
+        ),
         boxShadow: isNext
             ? [
                 BoxShadow(
-                  color: AppColors.accentGlowGreen.withValues(alpha: 0.16),
-                  blurRadius: 12,
-                  offset: const Offset(0, 4),
+                  color: AppColors.accentGlowGreen.withValues(alpha: 0.14),
+                  blurRadius: 10,
+                  spreadRadius: 0.2,
+                  offset: const Offset(0, 3),
                 ),
               ]
             : null,
       ),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        child: Row(
+        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 12),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Container(
-              width: 32,
-              height: 32,
+              width: 30,
+              height: 30,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 color: isNext
-                    ? accent.withValues(alpha: 0.18)
-                    : (isDarkShell
-                          ? Colors.white.withValues(alpha: 0.05)
-                          : accent.withValues(alpha: 0.08)),
+                    ? accent.withValues(alpha: 0.14)
+                    : ornament.withValues(alpha: isDarkShell ? 0.1 : 0.12),
                 border: Border.all(
                   color: isNext
                       ? accent.withValues(alpha: 0.4)
-                      : accent.withValues(alpha: isDarkShell ? 0.08 : 0.18),
+                      : ornament.withValues(alpha: isDarkShell ? 0.32 : 0.4),
+                  width: 0.9,
                 ),
               ),
-              child: Icon(
-                Icons.schedule_rounded,
-                color: isNext
-                    ? accent
-                    : accent.withValues(alpha: isDarkShell ? 0.35 : 0.45),
-                size: 16,
+              child: Center(
+                child: Icon(_iconForPrayer(), color: iconColor, size: 16),
               ),
             ),
-            const SizedBox(width: 10),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    name,
-                    style: TextStyle(
-                      color: nameC,
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600,
-                    ),
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Text(
+                  name,
+                  textAlign: TextAlign.center,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    color: nameC,
+                    fontSize: 11.5,
+                    fontWeight: FontWeight.w600,
+                    letterSpacing: 0.1,
                   ),
-                  if (isNext)
-                    Padding(
-                      padding: const EdgeInsets.only(top: 2),
-                      child: Text(
-                        l10n.homePrayerNextRowHint,
-                        style: TextStyle(
-                          color: accent.withValues(alpha: 0.85),
-                          fontSize: 10,
-                          fontWeight: FontWeight.w600,
-                        ),
+                ),
+                if (isNext)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 1),
+                    child: Text(
+                      l10n.homePrayerNextRowHint,
+                      textAlign: TextAlign.center,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: accent.withValues(alpha: 0.88),
+                        fontSize: 8,
+                        fontWeight: FontWeight.w600,
+                        height: 1.1,
                       ),
                     ),
-                ],
-              ),
+                  )
+                else
+                  Padding(
+                    padding: const EdgeInsets.only(top: 4),
+                    child: Container(
+                      width: 14,
+                      height: 1.5,
+                      decoration: BoxDecoration(
+                        color: ornament.withValues(
+                          alpha: isDarkShell ? 0.38 : 0.5,
+                        ),
+                        borderRadius: BorderRadius.circular(1),
+                      ),
+                    ),
+                  ),
+              ],
             ),
-            if (isNext) const SizedBox(width: 4),
-            Text(
-              time,
-              style: TextStyle(
-                color: isNext ? accent : timeMuted,
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                letterSpacing: -0.4,
+            FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Text(
+                time,
+                maxLines: 1,
+                style: TextStyle(
+                  color: isNext ? accent : timeMuted,
+                  fontSize: 17,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: -0.3,
+                ),
               ),
             ),
           ],
@@ -677,31 +789,41 @@ class _PrayerTimesSkeleton extends StatelessWidget {
                   color: accent.withValues(alpha: 0.95),
                 ),
                 const SizedBox(width: 8),
-                Text(
-                  l10n.homePrayerTimesTitle,
-                  style: TextStyle(
-                    color: isDark
-                        ? Colors.white.withValues(alpha: 0.92)
-                        : AppColors.emeraldDark,
-                    fontSize: 13,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: 0.2,
+                Expanded(
+                  child: Text(
+                    l10n.homePrayerTimesTitle,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      color: isDark
+                          ? Colors.white.withValues(alpha: 0.92)
+                          : AppColors.emeraldDark,
+                      fontSize: 13,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 0.2,
+                    ),
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 22),
-            ...List.generate(
-              5,
-              (i) => Padding(
-                padding: EdgeInsets.only(bottom: i < 4 ? 6 : 0),
-                child: Container(
-                  height: 48,
+            const SizedBox(height: 14),
+            GridView.builder(
+              itemCount: 6,
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 3,
+                mainAxisSpacing: 11,
+                crossAxisSpacing: 11,
+                childAspectRatio: 0.92,
+              ),
+              itemBuilder: (context, i) {
+                return Container(
                   decoration: BoxDecoration(
                     color: AppColors.homeCardSurface.withValues(alpha: 0.5),
                     borderRadius: BorderRadius.circular(14),
                     border: Border.all(
-                      color: Colors.white.withValues(alpha: 0.06),
+                      color: Colors.white.withValues(alpha: 0.08),
                     ),
                   ),
                   child: Center(
@@ -716,8 +838,8 @@ class _PrayerTimesSkeleton extends StatelessWidget {
                           )
                         : const SizedBox.shrink(),
                   ),
-                ),
-              ),
+                );
+              },
             ),
           ],
         ),

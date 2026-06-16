@@ -6,6 +6,7 @@ import 'package:arin/l10n/app_localizations.dart';
 import '../../core/ads/admob_ids.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/router/app_router.dart';
+import '../../data/services/admob_service.dart';
 import '../../data/services/widget_access_service.dart';
 import '../shared/providers/admob_providers.dart';
 import '../shared/providers/premium_providers.dart';
@@ -27,16 +28,21 @@ class _WidgetUnlockPageState extends ConsumerState<WidgetUnlockPage> {
     final l10n = AppLocalizations.of(context)!;
     setState(() => _busy = true);
     try {
-      final ok = await ref
+      final result = await ref
           .read(adMobServiceProvider)
-          .showRewarded(ArinAdUnit.rewardedUnlock);
+          .showRewardedDetailed(ArinAdUnit.rewardedUnlock);
       if (!mounted) return;
-      if (!ok) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(l10n.widgetUnlockAdLoadFailed),
-          ),
-        );
+      if (result != RewardedAdResult.rewarded) {
+        // Kullanıcı reklamı erken kapattıysa (notRewarded) "yüklenemedi"
+        // mesajı yanıltıcı olur; yalnızca gerçek yükleme/gösterim hatasında
+        // bilgilendir.
+        if (result != RewardedAdResult.notRewarded) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(l10n.widgetUnlockAdLoadFailed),
+            ),
+          );
+        }
         return;
       }
       final service = ref.read(widgetAccessServiceProvider);
@@ -50,6 +56,7 @@ class _WidgetUnlockPageState extends ConsumerState<WidgetUnlockPage> {
         ArinWidgetAccessKind.prayer => l10n.widgetUnlockPrayerTitle,
         ArinWidgetAccessKind.combo => l10n.widgetUnlockComboTitle,
         ArinWidgetAccessKind.tracking => l10n.widgetUnlockTrackingTitle,
+        ArinWidgetAccessKind.zikir => l10n.widgetUnlockZikirTitle,
       };
 
       ScaffoldMessenger.of(context).showSnackBar(
@@ -96,6 +103,7 @@ class _WidgetUnlockPageState extends ConsumerState<WidgetUnlockPage> {
       ArinWidgetAccessKind.prayer => l10n.widgetUnlockPrayerTitle,
       ArinWidgetAccessKind.combo => l10n.widgetUnlockComboTitle,
       ArinWidgetAccessKind.tracking => l10n.widgetUnlockTrackingTitle,
+      ArinWidgetAccessKind.zikir => l10n.widgetUnlockZikirTitle,
     };
 
     return Scaffold(

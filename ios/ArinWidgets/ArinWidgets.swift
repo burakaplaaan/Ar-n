@@ -1347,7 +1347,10 @@ struct TrackingProvider: TimelineProvider {
         .trimmingCharacters(in: .whitespacesAndNewlines),
        !prefix.isEmpty {
       let start = Date(timeIntervalSince1970: epochMs / 1000.0)
-      let days = max(0, Calendar.current.dateComponents([.day], from: start, to: Date()).day ?? 0)
+      // 1-tabanlı sayaç: başlanan ilk gün "1. gün". Android/Flutter
+      // (TrackingWidgetService / ArinTrackingWidgetProvider) ile aynı olması
+      // için +1 eklenir.
+      let days = max(0, Calendar.current.dateComponents([.day], from: start, to: Date()).day ?? 0) + 1
       value = "\(prefix) \(days). gün"
     } else {
       value = u?.string(forKey: "arin_tracking_value")?
@@ -1448,6 +1451,199 @@ struct ArinTrackingWidget: Widget {
   }
 }
 
+// MARK: - Zikirmatik
+
+struct ZikirEntry: TimelineEntry {
+  let date: Date
+  let phrase: String
+  let count: String
+}
+
+struct ZikirProvider: TimelineProvider {
+  func placeholder(in context: Context) -> ZikirEntry {
+    ZikirEntry(
+      date: Date(),
+      phrase: localizedWidgetText(tr: "Sübhanallah"),
+      count: "33"
+    )
+  }
+
+  func getSnapshot(in context: Context, completion: @escaping (ZikirEntry) -> Void) {
+    if context.isPreview {
+      completion(
+        ZikirEntry(
+          date: Date(),
+          phrase: localizedWidgetText(tr: "Sübhanallah"),
+          count: "33"
+        )
+      )
+      return
+    }
+    completion(loadEntry())
+  }
+
+  func getTimeline(in context: Context, completion: @escaping (Timeline<ZikirEntry>) -> Void) {
+    recordWidgetFirstUse("zikir")
+    let entry = loadEntry()
+    let now = Date()
+    // Zikir uygulamadan güncellenir.
+    let next = [now.addingTimeInterval(3600), widgetGateRefreshDate("zikir")].compactMap { $0 }.min() ?? now.addingTimeInterval(3600)
+    completion(Timeline(entries: [entry], policy: .after(next)))
+  }
+
+  private func loadEntry() -> ZikirEntry {
+    if widgetLocked("zikir") {
+      return ZikirEntry(
+        date: Date(),
+        phrase: "🔒",
+        count: ""
+      )
+    }
+    
+    let u = suite()
+    let enabled = u?.string(forKey: "arin_zikir_enabled") == "1"
+    if !enabled {
+      return ZikirEntry(
+        date: Date(),
+        phrase: localizedWidgetText(tr: "Zikir seçilmedi"),
+        count: ""
+      )
+    }
+
+    let rawPhrase = u?.string(forKey: "arin_zikir_phrase")?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+    let rawCount = u?.string(forKey: "arin_zikir_count")?.trimmingCharacters(in: .whitespacesAndNewlines) ?? "0"
+
+    return ZikirEntry(
+      date: Date(),
+      phrase: rawPhrase.isEmpty ? localizedWidgetText(tr: "Zikir") : rawPhrase,
+      count: rawCount
+    )
+  }
+}
+
+struct ZikirWidgetView: View {
+  var entry: ZikirProvider.Entry
+  @Environment(\.widgetFamily) private var family
+  @Environment(\.colorScheme) private var colorScheme
+
+  private var primaryTextColor: Color {
+    colorScheme == .dark ? Color(red: 0.88, green: 0.90, blue: 0.93) : .white
+  }
+
+  private var secondaryTextColor: Color {
+    primaryTextColor.opacity(0.86)
+  }
+
+  private var textShadowOpacity: Double {
+    colorScheme == .dark ? 0.34 : 0.52
+  }
+
+  private var isLocked: Bool {
+    entry.phrase == "🔒"
+  }
+
+  var body: some View {
+    if isLocked {
+      LockedWidgetView(family: family, kindId: "zikir")
+    } else {
+      if family == .accessoryRectangular {
+        accessoryLayout
+      } else {
+        expandedLayout
+      }
+    }
+  }
+
+  // Kilit ekranındaki (Lock Screen) çok dar yatay görünüm
+  private var accessoryLayout: some View {
+    HStack(spacing: 6) {
+      Image(systemName: "circle.hexagonpath.fill")
+        .font(.system(size: 20))
+        .foregroundStyle(secondaryTextColor)
+      
+      VStack(alignment: .leading, spacing: 1) {
+        if !entry.phrase.isEmpty {
+          Text(entry.phrase)
+            .font(.system(size: 10, weight: .medium))
+            .foregroundStyle(secondaryTextColor)
+            .lineLimit(1)
+            .minimumScaleFactor(0.6)
+        }
+        if !entry.count.isEmpty {
+          Text(entry.count)
+            .font(.system(size: 16, weight: .bold, design: .rounded))
+            .foregroundStyle(primaryTextColor)
+            .lineLimit(1)
+            .minimumScaleFactor(0.6)
+        }
+      }
+    }
+    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
+    .padding(.horizontal, 4)
+    .shadow(color: .black.opacity(textShadowOpacity), radius: 2.0, x: 0, y: 1)
+  }
+
+  // Ana ekrandaki (Home Screen) normal şeffaf görünüm
+  private var expandedLayout: some View {
+    HStack(alignment: .center, spacing: 12) {
+      Image(systemName: "circle.hexagonpath.fill")
+        .resizable()
+        .scaledToFit()
+        .frame(width: 36, height: 36)
+        .foregroundStyle(secondaryTextColor)
+
+      VStack(alignment: .leading, spacing: 2) {
+        if !entry.phrase.isEmpty {
+          Text(entry.phrase)
+            .font(.system(size: 13, weight: .medium))
+            .foregroundStyle(secondaryTextColor)
+            .lineLimit(1)
+            .minimumScaleFactor(0.6)
+        }
+        
+        if !entry.count.isEmpty {
+          Text(entry.count)
+            .font(.system(size: 26, weight: .bold, design: .rounded))
+            .foregroundStyle(primaryTextColor)
+            .lineLimit(1)
+            .minimumScaleFactor(0.6)
+        }
+      }
+      .frame(maxWidth: .infinity, alignment: .leading)
+      
+      // Sağdaki tıklama yuvarlağı
+      Circle()
+        .fill(Color(red: 0.24, green: 0.32, blue: 0.31).opacity(0.7))
+        .frame(width: 44, height: 44)
+        .overlay(
+          Circle()
+            .fill(Color.white.opacity(0.8))
+            .frame(width: 10, height: 10)
+        )
+    }
+    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
+    .padding(.horizontal, 10)
+    .shadow(color: .black.opacity(textShadowOpacity), radius: 2.6, x: 0, y: 1)
+  }
+}
+
+struct ArinZikirWidget: Widget {
+  let kind: String = "ArinZikirWidget"
+
+  var body: some WidgetConfiguration {
+    StaticConfiguration(kind: kind, provider: ZikirProvider()) { entry in
+      ZikirWidgetView(entry: entry)
+        .arinTransparentWidgetSurface()
+        .widgetURL(URL(string: entry.phrase == "🔒"
+          ? "arin://widget/zikir?homeWidget=true&lock=1"
+          : "arin://widget/zikir?homeWidget=true"))
+    }
+    .configurationDisplayName(localizedWidgetText(tr: "ARIN — Zikirmatik"))
+    .description(localizedWidgetText(tr: "Aktif zikir ve sayaç."))
+    .supportedFamilies([.systemSmall, .systemMedium, .accessoryRectangular])
+  }
+}
+
 @main
 struct ArinWidgetsBundle: WidgetBundle {
   var body: some Widget {
@@ -1455,5 +1651,6 @@ struct ArinWidgetsBundle: WidgetBundle {
     ArinPrayerWidget()
     ArinComboWidget()
     ArinTrackingWidget()
+    ArinZikirWidget()
   }
 }

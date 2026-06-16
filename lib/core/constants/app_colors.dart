@@ -103,6 +103,16 @@ abstract final class AppColors {
   /// Gold / Amber Vurgu
   static const Color goldAccent = Color(0xFFFFD700);
 
+  // ─── Süsleme / Ornament (sıcak "kahve rengi" altın-bronz) ────────────
+  /// Koyu shell üzeri kart süslemesi — köşe motifleri ve ince çerçeve.
+  /// Sıcak mat altın-bronz; neon yeşil ile birlikte premium "kahve rengi
+  /// detay" hissini verir.
+  static const Color ornamentGold = Color(0xFFB88E47);
+
+  /// Açık (krem) tema üzeri süsleme — krem zeminde okunması için daha koyu
+  /// bronz ton.
+  static const Color ornamentGoldDeep = Color(0xFF9D7438);
+
   /// İyileştirici Frekanslar — teal vurgu (mock)
   static const Color healingTeal = Color(0xFF26C6DA);
 

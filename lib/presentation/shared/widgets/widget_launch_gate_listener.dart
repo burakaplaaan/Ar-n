@@ -2,10 +2,13 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:home_widget/home_widget.dart';
 
 import '../../../core/router/app_router.dart';
 import '../../../data/services/widget_access_service.dart';
+import '../../qibla/qibla_hub_navigator_key.dart';
+import '../../qibla/qibla_hub_page.dart';
 import '../providers/premium_providers.dart';
 import '../providers/widget_access_providers.dart';
 
@@ -23,7 +26,12 @@ class _WidgetLaunchGateListenerState
     extends ConsumerState<WidgetLaunchGateListener>
     with WidgetsBindingObserver {
   StreamSubscription<Uri?>? _clickSub;
-  bool _gatePageOpen = false;
+
+  /// Şu anda açık olan kilit/reklam sayfasının widget türü. `null` ise açık
+  /// sayfa yok. Eski tek `bool` bayrak, bir sayfa açıkken gelen ikinci widget
+  /// dokunuşunu sessizce yutuyordu (yalnızca uygulama tamamen kapatılınca
+  /// sıfırlanıyordu); bu yüzden ikinci widget reklam sayfasına gitmiyordu.
+  ArinWidgetAccessKind? _openGateKind;
 
   @override
   void initState() {
@@ -88,27 +96,88 @@ class _WidgetLaunchGateListenerState
   }
 
   Future<void> _handleKind(ArinWidgetAccessKind kind) async {
-    if (!mounted || _gatePageOpen) return;
+    if (!mounted) return;
+    // Aynı widget'ın kilit sayfası zaten açıksa tekrar değerlendirme.
+    if (_openGateKind == kind) return;
     final service = ref.read(widgetAccessServiceProvider);
     final premium = await ref.read(premiumEntitlementProvider.future);
     final state = await service.stateFor(kind, isPremium: premium.isActive);
-    if (!mounted || state.allowed) return;
-    await _openUnlockPage(kind);
+    if (!mounted) return;
+    if (!state.allowed) {
+      await _openUnlockPage(kind);
+      return;
+    }
+    // Erişim açık: Zikirmatik widget'ına dokunmak uygulamayı doğrudan
+    // Zikirmatik sayfasına götürür (diğer widget'lar yalnızca uygulamayı açar).
+    if (kind == ArinWidgetAccessKind.zikir) {
+      _openZikirPage();
+    }
+  }
+
+  /// Kıble sekmesine geçip iç Navigator üzerinden Zikirmatik aracını açar.
+  void _openZikirPage() {
+    final router = ref.read(appRouterProvider);
+    router.go(AppRoutes.qibla);
+    // Sekme kökü (QiblaHubPage) iç Navigator'ını kurana kadar (özellikle soğuk
+    // başlangıçta) birkaç yüz ms gerekebilir; artan gecikmelerle retry ediyoruz.
+    var attempts = 0;
+    void tryPush() {
+      if (!mounted) return;
+      final nav = qiblaHubNavigatorKey.currentState;
+      if (nav == null) {
+        if (attempts < 25) {
+          attempts++;
+          Future<void>.delayed(const Duration(milliseconds: 120), tryPush);
+        }
+        return;
+      }
+      nav.popUntil((r) => r.isFirst);
+      nav.pushNamed(QiblaHubRoutes.zikir);
+    }
+
+    WidgetsBinding.instance.addPostFrameCallback((_) => tryPush());
   }
 
   Future<void> _openUnlockPage(ArinWidgetAccessKind kind) async {
-    if (!mounted || _gatePageOpen) return;
-    _gatePageOpen = true;
+    if (!mounted) return;
+    // Aynı widget için sayfa zaten açıksa hiçbir şey yapma.
+    if (_openGateKind == kind) return;
+
+    // `WidgetLaunchGateListener`, `MaterialApp.router`'ın `builder` callback'i
+    // içinde yer aldığından local `context` GoRouter ancestor'ını göremez;
+    // `GoRouter.of(context)` null patlatır. Bu yüzden router instance'ını
+    // doğrudan Riverpod provider'dan okuyup `push` ediyoruz.
+    final router = ref.read(appRouterProvider);
+
+    // Başka bir widget'ın kilit sayfası açıkken yeni bir widget'a dokunulduysa
+    // önce açık sayfayı kapat; aksi halde kullanıcı ikinci widget için reklam
+    // sayfasını hiç göremiyordu (istek sessizce düşüyordu).
+    //
+    // Yalnızca EN ÜSTTEKİ rota gerçekten bir widget-unlock sayfasıysa pop
+    // edilir. Aksi halde (örn. kullanıcı kilit sayfasından "Premium'a geç" ile
+    // premium'a gitmişse) kör bir `pop()` yanlış sayfayı kapatırdı; bu durumda
+    // yeni kilit sayfası mevcut yığının üzerine push edilir.
+    if (_openGateKind != null &&
+        router.canPop() &&
+        _isWidgetUnlockTop(router)) {
+      router.pop();
+    }
+
+    _openGateKind = kind;
     try {
-      // `WidgetLaunchGateListener`, `MaterialApp.router`'ın `builder` callback'i
-      // içinde yer aldığından local `context` GoRouter ancestor'ını göremez;
-      // `GoRouter.of(context)` null patlatır. Bu yüzden router instance'ını
-      // doğrudan Riverpod provider'dan okuyup `push` ediyoruz.
-      final router = ref.read(appRouterProvider);
       await router.push(AppRoutes.widgetUnlock(kind.id));
     } finally {
-      _gatePageOpen = false;
+      // Yalnızca bu kind hâlâ açık görünüyorsa temizle. Araya farklı bir kind
+      // push edildiyse (`_openGateKind` değişmişse) onun finally'si üstlenir.
+      if (_openGateKind == kind) _openGateKind = null;
     }
+  }
+
+  /// Router yığınının en üstündeki rotanın bir widget-unlock sayfası olup
+  /// olmadığını döndürür. Yanlış pop'ları (örn. üstte premium varken) önler.
+  bool _isWidgetUnlockTop(GoRouter router) {
+    final path = router.routeInformationProvider.value.uri.path;
+    return path.startsWith('/widget-unlock/');
   }
 
   @override

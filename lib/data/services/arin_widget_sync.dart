@@ -32,10 +32,21 @@ abstract final class ArinWidgetKeys {
   static const trackingStartEpochMs = 'arin_tracking_start_epoch_ms';
   static const trackingDayPrefix = 'arin_tracking_day_prefix';
 
+  // Zikirmatik widget. `zikirCount` kümülatif toplam = TEK paylaşılan otorite;
+  // hem uygulama hem native +1 butonu bu değeri okuyup yazar. round/tur/target
+  // yalnızca gösterim + uygulamada kaldığın yerden devam için taşınır.
+  static const zikirEnabled = 'arin_zikir_enabled';
+  static const zikirPhrase = 'arin_zikir_phrase';
+  static const zikirCount = 'arin_zikir_count';
+  static const zikirRound = 'arin_zikir_round';
+  static const zikirTur = 'arin_zikir_tur';
+  static const zikirTarget = 'arin_zikir_target';
+
   static const widgetGateQuoteLocked = 'arin_widget_gate_quote_locked';
   static const widgetGatePrayerLocked = 'arin_widget_gate_prayer_locked';
   static const widgetGateComboLocked = 'arin_widget_gate_combo_locked';
   static const widgetGateTrackingLocked = 'arin_widget_gate_tracking_locked';
+  static const widgetGateZikirLocked = 'arin_widget_gate_zikir_locked';
   static const widgetGatePremium = 'arin_widget_gate_premium';
   static const widgetGateLockNote = 'arin_widget_gate_lock_note';
 }
@@ -63,15 +74,19 @@ abstract final class ArinWidgetSync {
       'com.arin.arin.ArinComboWidgetProvider';
   static const androidTrackingProviderClass =
       'com.arin.arin.ArinTrackingWidgetProvider';
+  static const androidZikirProviderClass =
+      'com.arin.arin.ArinZikirWidgetProvider';
   static const iOSQuoteWidgetName = 'ArinQuoteWidget';
   static const iOSPrayerWidgetName = 'ArinPrayerWidget';
   static const iOSComboWidgetName = 'ArinComboWidget';
   static const iOSTrackingWidgetName = 'ArinTrackingWidget';
+  static const iOSZikirWidgetName = 'ArinZikirWidget';
 
   static const _androidQuote = androidQuoteProviderClass;
   static const _androidPrayer = androidPrayerProviderClass;
   static const _androidCombo = androidComboProviderClass;
   static const _androidTracking = androidTrackingProviderClass;
+  static const _androidZikir = androidZikirProviderClass;
 
   static String _widgetQuotePreferredLineBreaks(String t) => t;
 
@@ -261,6 +276,72 @@ abstract final class ArinWidgetSync {
     }
   }
 
+  /// Zikirmatik widget'ı: aktif oturumu (zikir + sayaç) widget'a yansıtır.
+  /// `count` kümülatif toplam (paylaşılan otorite); round/tur/target gösterim
+  /// ve uygulamada kaldığın yerden devam için taşınır.
+  static Future<void> pushZikir({
+    required String phrase,
+    required int count,
+    required int round,
+    required int tur,
+    required int target,
+  }) async {
+    if (kIsWeb) return;
+    try {
+      if (!await _ensureAppGroupReady()) return;
+      await HomeWidget.saveWidgetData<String>(ArinWidgetKeys.zikirEnabled, '1');
+      await HomeWidget.saveWidgetData<String>(
+        ArinWidgetKeys.zikirPhrase,
+        phrase.trim(),
+      );
+      await HomeWidget.saveWidgetData<String>(
+        ArinWidgetKeys.zikirCount,
+        '${count < 0 ? 0 : count}',
+      );
+      await HomeWidget.saveWidgetData<String>(
+        ArinWidgetKeys.zikirRound,
+        '${round < 0 ? 0 : round}',
+      );
+      await HomeWidget.saveWidgetData<String>(
+        ArinWidgetKeys.zikirTur,
+        '${tur < 1 ? 1 : tur}',
+      );
+      await HomeWidget.saveWidgetData<String>(
+        ArinWidgetKeys.zikirTarget,
+        '${target < 1 ? 1 : target}',
+      );
+      await HomeWidget.updateWidget(
+        qualifiedAndroidName: _androidZikir,
+        iOSName: iOSZikirWidgetName,
+      );
+    } catch (e, st) {
+      debugPrint('ArinWidgetSync.pushZikir: $e\n$st');
+    }
+  }
+
+  static Future<void> clearZikir() async {
+    if (kIsWeb) return;
+    try {
+      if (!await _ensureAppGroupReady()) return;
+      for (final k in const <String>[
+        ArinWidgetKeys.zikirEnabled,
+        ArinWidgetKeys.zikirPhrase,
+        ArinWidgetKeys.zikirCount,
+        ArinWidgetKeys.zikirRound,
+        ArinWidgetKeys.zikirTur,
+        ArinWidgetKeys.zikirTarget,
+      ]) {
+        await HomeWidget.saveWidgetData<String>(k, '');
+      }
+      await HomeWidget.updateWidget(
+        qualifiedAndroidName: _androidZikir,
+        iOSName: iOSZikirWidgetName,
+      );
+    } catch (e, st) {
+      debugPrint('ArinWidgetSync.clearZikir: $e\n$st');
+    }
+  }
+
   static Future<void> pushWidgetGateStates({
     required Map<String, bool> lockedByKind,
     required Map<String, DateTime?> trialUntilByKind,
@@ -282,6 +363,7 @@ abstract final class ArinWidgetSync {
       await save(ArinWidgetKeys.widgetGatePrayerLocked, 'prayer');
       await save(ArinWidgetKeys.widgetGateComboLocked, 'combo');
       await save(ArinWidgetKeys.widgetGateTrackingLocked, 'tracking');
+      await save(ArinWidgetKeys.widgetGateZikirLocked, 'zikir');
       await HomeWidget.saveWidgetData<String>(
         ArinWidgetKeys.widgetGatePremium,
         isPremium ? '1' : '0',
@@ -295,6 +377,7 @@ abstract final class ArinWidgetSync {
         'prayer',
         'combo',
         'tracking',
+        'zikir',
       ]) {
         await HomeWidget.saveWidgetData<String>(
           'arin_widget_gate_${kind}_trial_until_ms',
@@ -320,6 +403,10 @@ abstract final class ArinWidgetSync {
       await HomeWidget.updateWidget(
         qualifiedAndroidName: _androidTracking,
         iOSName: iOSTrackingWidgetName,
+      );
+      await HomeWidget.updateWidget(
+        qualifiedAndroidName: _androidZikir,
+        iOSName: iOSZikirWidgetName,
       );
     } catch (e, st) {
       debugPrint('ArinWidgetSync.pushWidgetGateStates: $e\n$st');
@@ -590,16 +677,29 @@ abstract final class ArinWidgetSync {
         ArinWidgetKeys.trackingMode,
         ArinWidgetKeys.trackingStartEpochMs,
         ArinWidgetKeys.trackingDayPrefix,
+        ArinWidgetKeys.zikirEnabled,
+        ArinWidgetKeys.zikirPhrase,
+        ArinWidgetKeys.zikirCount,
+        ArinWidgetKeys.zikirRound,
+        ArinWidgetKeys.zikirTur,
+        ArinWidgetKeys.zikirTarget,
         ArinWidgetKeys.widgetGateQuoteLocked,
         ArinWidgetKeys.widgetGatePrayerLocked,
         ArinWidgetKeys.widgetGateComboLocked,
         ArinWidgetKeys.widgetGateTrackingLocked,
+        ArinWidgetKeys.widgetGateZikirLocked,
         ArinWidgetKeys.widgetGatePremium,
         ArinWidgetKeys.widgetGateLockNote,
       ]) {
         await HomeWidget.saveWidgetData<String>(k, '');
       }
-      for (final kind in const ['quote', 'prayer', 'combo', 'tracking']) {
+      for (final kind in const [
+        'quote',
+        'prayer',
+        'combo',
+        'tracking',
+        'zikir',
+      ]) {
         await HomeWidget.saveWidgetData<String>('arin_widget_first_use_ms_$kind', '');
         await HomeWidget.saveWidgetData<String>('arin_widget_gate_${kind}_trial_until_ms', '');
         await HomeWidget.saveWidgetData<String>('arin_widget_gate_${kind}_unlock_until_ms', '');
@@ -619,6 +719,10 @@ abstract final class ArinWidgetSync {
       await HomeWidget.updateWidget(
         qualifiedAndroidName: _androidTracking,
         iOSName: iOSTrackingWidgetName,
+      );
+      await HomeWidget.updateWidget(
+        qualifiedAndroidName: _androidZikir,
+        iOSName: iOSZikirWidgetName,
       );
     } catch (e, st) {
       debugPrint('ArinWidgetSync.clearAll: $e\n$st');

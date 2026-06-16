@@ -134,36 +134,6 @@ class _NotificationsSettingsPageState
     }
   }
 
-  Color _chipColor(bool ok, bool onDark) {
-    if (_loading) {
-      return onDark
-          ? Colors.white.withValues(alpha: 0.12)
-          : AppColors.emeraldDark.withValues(alpha: 0.12);
-    }
-    if (ok) {
-      return onDark
-          ? Colors.white.withValues(alpha: 0.07)
-          : AppColors.emeraldDark.withValues(alpha: 0.08);
-    }
-    return onDark
-        ? Colors.white.withValues(alpha: 0.09)
-        : AppColors.goldAccent.withValues(alpha: 0.14);
-  }
-
-  Color _chipFg(bool ok, bool onDark) {
-    if (_loading) {
-      return onDark ? AppColors.textOnDarkMuted : AppColors.textMuted;
-    }
-    if (ok) {
-      return onDark
-          ? Colors.white.withValues(alpha: 0.8)
-          : AppColors.emeraldDark.withValues(alpha: 0.86);
-    }
-    return onDark
-        ? Colors.white.withValues(alpha: 0.78)
-        : AppColors.emeraldDark.withValues(alpha: 0.78);
-  }
-
   static String _formatClock(int minutesFromMidnight) {
     final h = minutesFromMidnight ~/ 60;
     final m = minutesFromMidnight % 60;
@@ -349,8 +319,6 @@ class _NotificationsSettingsPageState
                             loading: _loading,
                             pendingCount: _pendingCount,
                             notificationLabel: _notificationLabel(),
-                            chipColor: _chipColor,
-                            chipFg: _chipFg,
                             onOpenOsSettings: _openOsSettings,
                             onRequestExactAlarm: _requestExactAlarm,
                             onRequestBattery: _requestBatteryExemption,

@@ -627,6 +627,10 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
           DecoratedBox(decoration: ArinShellBackground.decoration(context)),
           ArinShellBackground.bubbleLayer(context),
           CustomScrollView(
+            // Alt sayfaya (ör. Hakkında) girip dönünce shell PageView yeniden
+            // kurulduğu için sayfa state'i sıfırlanır; PageStorageKey kaydırma
+            // konumunu route'un kalıcı PageStorage bucket'ında saklayıp geri yükler.
+            key: const PageStorageKey<String>('settingsScroll'),
             physics: const BouncingScrollPhysics(
               parent: AlwaysScrollableScrollPhysics(),
             ),

@@ -5,10 +5,9 @@ import 'package:flutter/foundation.dart';
 enum ArinAdUnit { exploreInterstitial, rewardedUnlock }
 
 abstract final class AdMobIds {
-  /// Tüm non-release build'lerde test reklam kullanılır.
-  /// iOS release'te gerçek reklam göstermek için false olmalı.
-  /// Android release için ayrı bir politika anahtarı vardır:
-  /// [kForceAndroidReleaseTestAds].
+  /// iOS'ta non-release build'lerde test reklam kullanılır.
+  /// Android tarafında gerçek reklam akışı test edilebilsin diye test ID'si
+  /// yalnızca açıkça zorlandığında kullanılır.
   ///
   /// Ne zaman `false` yapacaksın (iOS release için):
   ///   1. AdMob Console → Apps → Arın → Status: Ready (yeşil tik)
@@ -23,9 +22,10 @@ abstract final class AdMobIds {
   static String? unitId(ArinAdUnit unit) {
     if (kIsWeb) return null;
 
-    final isReleaseAndroid = kReleaseMode && Platform.isAndroid;
+    final isAndroid = Platform.isAndroid;
+    final isReleaseAndroid = kReleaseMode && isAndroid;
     final useTestIds =
-        !kReleaseMode ||
+        (!kReleaseMode && !isAndroid) ||
         kForceTestAds ||
         (isReleaseAndroid && kForceAndroidReleaseTestAds);
 

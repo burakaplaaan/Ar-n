@@ -90,7 +90,11 @@ class ArinComboWidgetProvider : HomeWidgetProvider() {
                 remMs > DEADLINE_GUARD_MS
 
         val openApp = Intent(context, MainActivity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+            // SINGLE_TOP: arka plandaki singleTop MainActivity'ye yeni intent
+            // onNewIntent ile ulaşsın (güncel kind/lock iletilsin).
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or
+                Intent.FLAG_ACTIVITY_CLEAR_TOP or
+                Intent.FLAG_ACTIVITY_SINGLE_TOP
             putExtra(MainActivity.EXTRA_WIDGET_KIND, "combo")
             if (locked) {
                 putExtra(MainActivity.EXTRA_WIDGET_LOCK, "1")

@@ -1464,6 +1464,7 @@
   "widgetUnlockPrayerTitle": "أداة وقت الصلاة",
   "widgetUnlockComboTitle": "أداة الاقتباس + الصلاة",
   "widgetUnlockTrackingTitle": "أداة التتبع",
+  "widgetUnlockZikirTitle": "أداة المسبحة",
   "widgetUnlockAdLoadFailed": "تعذر تحميل الإعلان الآن، يرجى المحاولة مرة أخرى لاحقًا.",
   "widgetUnlockSuccessTitle": "تم فتح {title} لمدة 24 ساعة! 🎉",
   "@widgetUnlockSuccessTitle": {

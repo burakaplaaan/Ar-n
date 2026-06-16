@@ -3088,6 +3088,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get widgetUnlockTrackingTitle => 'أداة التتبع';
 
   @override
+  String get widgetUnlockZikirTitle => 'أداة المسبحة';
+
+  @override
   String get widgetUnlockAdLoadFailed =>
       'تعذر تحميل الإعلان الآن، يرجى المحاولة مرة أخرى لاحقًا.';
 

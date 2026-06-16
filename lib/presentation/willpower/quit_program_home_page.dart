@@ -1068,7 +1068,11 @@ class _TerakkiTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final displayDays = clockStarted ? elapsedDays : 0;
+    // Büyük daire sayacı 1-tabanlı gösterilir (başlanan ilk gün "1") ve böylece
+    // takip widget'ındaki "1. gün" ile birebir uyumlu olur. `elapsedDays`
+    // (geçen tam gün, 0-tabanlı) iyileşme yüzdesi/milestone mantığında ve
+    // "Tam gün" istatistiğinde kullanıldığından çekirdek değer değişmez.
+    final displayDays = clockStarted ? elapsedDays + 1 : 0;
     return ListView(
       padding: const EdgeInsets.fromLTRB(20, 12, 20, 36),
       children: [

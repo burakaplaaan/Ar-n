@@ -24,6 +24,7 @@ import 'package:flutter/services.dart';
 import 'package:geolocator/geolocator.dart';
 
 import '../../core/router/app_router.dart';
+import 'location_service.dart';
 
 const _compassChannel = EventChannel('com.arin.arin/rotation_compass');
 const _geomagChannel  = MethodChannel('com.arin.arin/compass_geomagnetic');
@@ -104,22 +105,57 @@ class QiblaCompassController {
 
   // ── API: AlAdhan Qibla bearing ───────────────────────────────────────────
 
-  /// AlAdhan REST API'den Qibla yönünü alır.
-  /// Başarısız olursa lokal Haversine hesabını döner (hiç hata fırlatmaz).
-  Future<double> _fetchQiblaFromApi(double lat, double lng) async {
+  /// AlAdhan REST API ile Qibla yönünü arka planda iyileştirir. Kritik yol
+  /// DEĞİL: yerel Haversine hesabı zaten geçerli bir değer verir, bu çağrı
+  /// yalnızca varsa daha hassas resmi değerle günceller. İnternet yoksa ya da
+  /// API başarısızsa sessizce yerel hesapta kalır; asla hata fırlatmaz.
+  Future<void> _refineQiblaFromApi(double lat, double lng) async {
     try {
       final resp = await _dio.get<Map<String, dynamic>>(
         'https://api.aladhan.com/v1/qibla/$lat/$lng',
       );
-      final data = resp.data?['data'] as Map<String, dynamic>?;
-      final dir  = data?['direction'];
-      if (dir != null) {
-        return (dir as num).toDouble() % 360;
+      if (_disposed) return;
+      final data = resp.data?['data'];
+      final dir  = (data is Map) ? data['direction'] : null;
+      if (dir is num) {
+        _qiblaFromNorth = dir.toDouble() % 360;
       }
     } catch (_) {
-      // API erişilemez — lokal hesaba düş.
+      // API erişilemez — lokal hesap geçerli kalır.
     }
-    return bearingToKaaba(lat, lng);
+  }
+
+  // ── Konum çözümleme (internet/GPS fix olmadan da çalışır) ─────────────────
+
+  /// Kademeli yedek: canlı GPS → OS'in son bilinen konumu → Hive'daki kayıtlı
+  /// koordinat. İnternet yokken canlı fix (yalnızca GPS'e kalır) zaman aşımına
+  /// düşebilir; bu durumda önbellekteki konumla pusula yine de çalışır.
+  Future<({double lat, double lon})?> _resolvePosition() async {
+    try {
+      final p = await Geolocator.getCurrentPosition(
+        locationSettings: const LocationSettings(
+          accuracy: LocationAccuracy.medium,
+          // Online'da fix saniyeler içinde gelir; offline'da GPS'e kalır.
+          // 6 sn üst sınır: internetsizken kullanıcı uzun süre beklemeden
+          // son bilinen / kayıtlı koordinata düşülür.
+          timeLimit: Duration(seconds: 6),
+        ),
+      );
+      return (lat: p.latitude, lon: p.longitude);
+    } catch (_) {
+      // Canlı fix alınamadı (offline/iç mekân/timeout) — yedeklere düş.
+    }
+    if (_disposed) return null;
+
+    try {
+      final last = await Geolocator.getLastKnownPosition();
+      if (last != null) return (lat: last.latitude, lon: last.longitude);
+    } catch (_) {
+      // OS son konumu veremedi — uygulama önbelleğine düş.
+    }
+    if (_disposed) return null;
+
+    return LocationService.cachedCoordinates();
   }
 
   // ── Lokal yedek hesap ────────────────────────────────────────────────────
@@ -137,12 +173,12 @@ class QiblaCompassController {
 
   // ── Manyetik deklinasyonu Kotlin'e gönder ────────────────────────────────
 
-  static Future<void> _syncDeclination(Position p) async {
+  static Future<void> _syncDeclination(double lat, double lon) async {
     try {
       await _geomagChannel.invokeMethod<double>('update', {
-        'latitude':  p.latitude,
-        'longitude': p.longitude,
-        'altitude':  p.altitude,
+        'latitude':  lat,
+        'longitude': lon,
+        'altitude':  0.0,
       });
     } catch (_) {
       // Başarısızlık kabul edilebilir; sensor manyetik north'a göre devam eder.
@@ -195,28 +231,23 @@ class QiblaCompassController {
       return false;
     }
 
-    // GPS konumu.
-    Position pos;
-    try {
-      pos = await Geolocator.getCurrentPosition(
-        locationSettings: const LocationSettings(
-          accuracy: LocationAccuracy.medium,
-          timeLimit: Duration(seconds: 12),
-        ),
-      );
-    } catch (e) {
-      if (_disposed) return false;
-      _out.addError(e);
+    // Konum: canlı GPS → son bilinen → kayıtlı koordinat (offline'da çalışır).
+    final pos = await _resolvePosition();
+    if (_disposed) return false;
+    if (pos == null) {
+      _out.addError(Exception('location_unavailable'));
       return false;
     }
-    if (_disposed) return false;
 
-    // AlAdhan API (veya lokal fallback) ile Qibla yönü.
-    _qiblaFromNorth = await _fetchQiblaFromApi(pos.latitude, pos.longitude);
-    if (_disposed) return false;
+    // Kıble yönünü ÖNCE yerel hesapla — internet beklemeden pusula çalışsın.
+    _qiblaFromNorth = bearingToKaaba(pos.lat, pos.lon);
+
+    // AlAdhan API'yi arka planda dener; başarılıysa değeri hassaslaştırır.
+    // Kritik yol değil; offline'da sessizce yerel hesapta kalır.
+    unawaited(_refineQiblaFromApi(pos.lat, pos.lon));
 
     // Deklinasyonu Kotlin'e gönder (async, critical path değil).
-    _syncDeclination(pos);
+    unawaited(_syncDeclination(pos.lat, pos.lon));
 
     // Native pusula stream'ini başlat.
     _compassSub = _compassChannel.receiveBroadcastStream().listen(

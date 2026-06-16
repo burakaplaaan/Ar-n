@@ -15,4 +15,9 @@
     <string name="widget_combo_description">Arin — quote and prayer times</string>
     <string name="widget_tracking_title">Arin · Tracking</string>
     <string name="widget_tracking_description">Arin — habit and purification tracking</string>
+    <string name="widget_zikir_title">Arin · Dhikr</string>
+    <string name="widget_zikir_description">Arin — dhikr counter</string>
+    <string name="widget_zikir_phrase_fallback">Dhikr</string>
+    <string name="widget_zikir_select_prompt">Tap to choose a dhikr</string>
+    <string name="widget_lock_tap_to_unlock">Tap to unlock</string>
 </resources>

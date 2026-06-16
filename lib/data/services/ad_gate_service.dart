@@ -6,6 +6,7 @@ enum AdGatePlacement {
   widgetPrayer,
   widgetCombo,
   widgetTracking,
+  widgetZikir,
   exploreSwipe,
   prayerSecondAlarm,
   zikirSession,
@@ -26,6 +27,8 @@ extension AdGatePlacementKeys on AdGatePlacement {
         return 'widget_combo';
       case AdGatePlacement.widgetTracking:
         return 'widget_tracking';
+      case AdGatePlacement.widgetZikir:
+        return 'widget_zikir';
       case AdGatePlacement.exploreSwipe:
         return 'explore_swipe';
       case AdGatePlacement.prayerSecondAlarm:
@@ -100,6 +103,7 @@ class AdGateService {
       case AdGatePlacement.widgetPrayer:
       case AdGatePlacement.widgetCombo:
       case AdGatePlacement.widgetTracking:
+      case AdGatePlacement.widgetZikir:
       case AdGatePlacement.prayerSecondAlarm:
         return _isUnlocked(placement)
             ? AdGateDecision.allowedFree
@@ -205,7 +209,8 @@ class AdGateService {
       AdGatePlacement.widgetQuote ||
       AdGatePlacement.widgetPrayer ||
       AdGatePlacement.widgetCombo ||
-      AdGatePlacement.widgetTracking => widgetUnlockDuration,
+      AdGatePlacement.widgetTracking ||
+      AdGatePlacement.widgetZikir => widgetUnlockDuration,
       AdGatePlacement.prayerSecondAlarm => secondAlarmUnlockDuration,
       AdGatePlacement.exploreSwipe => exploreInterstitialCooldown,
       AdGatePlacement.zikirSession ||
@@ -240,6 +245,7 @@ class AdGateService {
         placement == AdGatePlacement.widgetPrayer ||
         placement == AdGatePlacement.widgetCombo ||
         placement == AdGatePlacement.widgetTracking ||
+        placement == AdGatePlacement.widgetZikir ||
         placement == AdGatePlacement.lockScreenWidget;
   }
 

@@ -69,6 +69,19 @@ class LocationService {
   double? get savedLon => _prefs.get(_lonKey) as double?;
   int? get savedDistrictId => _prefs.get(_districtIdKey) as int?;
 
+  /// İnternet/GPS fix olmadan (ör. kıble pusulası) son bilinen koordinatı
+  /// senkron döndürür. Box açık değilse ya da hiç konum kaydı yoksa `null`.
+  /// Namaz vakitleri için daha önce kaydedilmiş GPS koordinatını yeniden kullanır.
+  static ({double lat, double lon})? cachedCoordinates() {
+    if (!Hive.isBoxOpen(HiveBoxes.preferences)) return null;
+    final box = Hive.box<dynamic>(HiveBoxes.preferences);
+    // num? → toDouble: yedek/import yoluyla int yazılmış olsa bile TypeError atmaz.
+    final lat = (box.get(_latKey) as num?)?.toDouble();
+    final lon = (box.get(_lonKey) as num?)?.toDouble();
+    if (lat == null || lon == null) return null;
+    return (lat: lat, lon: lon);
+  }
+
   /// Konum güncelleme tercihi. Olası değerler: [LocationUpdatePref].
   String get locationUpdatePref =>
       (_prefs.get(_locationUpdatePrefKey) as String?) ??

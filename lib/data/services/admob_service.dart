@@ -1,3 +1,4 @@
+import 'dart:io' show Platform;
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
@@ -7,6 +8,8 @@ import '../../core/ads/admob_ids.dart';
 
 class AdMobService {
   static const Duration _loadTimeout = Duration(seconds: 12);
+  static const String _androidTestDeviceIdsDefine =
+      'ARIN_ANDROID_TEST_DEVICE_IDS';
 
   /// Belirli ad unit için kısa-devre soğuma süresi. AdMob load'u
   /// "Account not approved" / "no fill" gibi kalıcı bir hata döndüğünde
@@ -29,6 +32,15 @@ class AdMobService {
 
   static Future<void> _initialize() async {
     try {
+      final internalTrafficSafe = await _configureAndroidInternalTestDevices();
+      if (!internalTrafficSafe) {
+        _canRequestAds = false;
+        debugPrint(
+          '══ ARIN ══ AdMob init blocked: Android non-release requires '
+          '--dart-define=$_androidTestDeviceIdsDefine=id1,id2',
+        );
+        return;
+      }
       await _updateConsentStatus();
       if (!_canRequestAds) {
         debugPrint('══ ARIN ══ AdMob init skipped: consent not granted yet');
@@ -40,6 +52,28 @@ class AdMobService {
       _canRequestAds = false;
       debugPrint('══ ARIN ══ AdMob init failed (sessiz): $e');
     }
+  }
+
+  static Future<bool> _configureAndroidInternalTestDevices() async {
+    if (!Platform.isAndroid || kReleaseMode) return true;
+    final raw = const String.fromEnvironment(
+      _androidTestDeviceIdsDefine,
+      defaultValue: '',
+    ).trim();
+    if (raw.isEmpty) {
+      return false;
+    }
+    final ids = raw
+        .split(',')
+        .map((e) => e.trim())
+        .where((e) => e.isNotEmpty)
+        .toList(growable: false);
+    if (ids.isEmpty) return false;
+    await MobileAds.instance.updateRequestConfiguration(
+      RequestConfiguration(testDeviceIds: ids),
+    );
+    debugPrint('══ ARIN ══ AdMob Android test devices configured: ${ids.length}');
+    return true;
   }
 
   static Future<void> _updateConsentStatus() async {
@@ -165,17 +199,50 @@ class AdMobService {
     return completer.future;
   }
 
-  Future<bool> showRewarded(ArinAdUnit unit) async {
-    final adUnitId = AdMobIds.unitId(unit);
-    if (adUnitId == null) return false;
-    await initialize();
-    if (!_canRequestAds) return false;
-    if (_isInCooldown(adUnitId)) {
-      debugPrint('AdMob rewarded: cooldown aktif, istek atlanıyor');
-      return false;
-    }
+  /// Ödüllü reklam denemesinin sonucu. `loadFailed` geçici (no-fill/şebeke)
+  /// hatasıdır ve yeniden denenebilir; diğer sonuçlar terminaldir.
+  static const _rewardedRetryDelay = Duration(milliseconds: 800);
+  static const _rewardedMaxAttempts = 3;
 
-    final completer = Completer<bool>();
+  /// Kullanıcının BİLEREK istediği ödüllü reklam (widget kilidi açma).
+  ///
+  /// `true` yalnızca kullanıcı ödülü kazandığında döner. Çağıranların yalnızca
+  /// "ödül kazanıldı mı?" bilgisine ihtiyacı varsa bunu kullanır. Yükleme
+  /// hatası ile kullanıcının reklamı erken kapatmasını ayırt etmek gerekirse
+  /// [showRewardedDetailed] tercih edilmeli.
+  Future<bool> showRewarded(ArinAdUnit unit) async {
+    final result = await showRewardedDetailed(unit);
+    return result == RewardedAdResult.rewarded;
+  }
+
+  /// [showRewarded]'in ayrıntılı sürümü.
+  ///
+  /// Interstitial'daki 10 dk soğuma BURADA UYGULANMAZ: tek bir geçici "no fill"
+  /// kullanıcıyı 10 dk boyunca "daha sonra tekrar dene"ye kilitliyordu. Bunun
+  /// yerine geçici yükleme hatalarında kısa aralıklarla birkaç kez yeniden
+  /// denenir; yalnızca tüm denemeler tükenirse [RewardedAdResult.loadFailed]
+  /// döner. Kullanıcı reklamı erken kapatırsa [RewardedAdResult.notRewarded]
+  /// döner (bu bir hata değildir; "yüklenemedi" mesajı gösterilmemeli).
+  Future<RewardedAdResult> showRewardedDetailed(ArinAdUnit unit) async {
+    final adUnitId = AdMobIds.unitId(unit);
+    if (adUnitId == null) return RewardedAdResult.loadFailed;
+    await initialize();
+    if (!_canRequestAds) return RewardedAdResult.loadFailed;
+
+    for (var attempt = 0; attempt < _rewardedMaxAttempts; attempt++) {
+      final outcome = await _loadAndShowRewarded(adUnitId);
+      if (outcome != RewardedAdResult.loadFailed) {
+        return outcome;
+      }
+      if (attempt < _rewardedMaxAttempts - 1) {
+        await Future<void>.delayed(_rewardedRetryDelay);
+      }
+    }
+    return RewardedAdResult.loadFailed;
+  }
+
+  Future<RewardedAdResult> _loadAndShowRewarded(String adUnitId) async {
+    final completer = Completer<RewardedAdResult>();
     var active = true;
     var waitingForLoad = true;
     Timer? loadTimer;
@@ -185,8 +252,7 @@ class AdMobService {
         if (!waitingForLoad || completer.isCompleted) return;
         active = false;
         debugPrint('AdMob rewarded load timed out');
-        _markCooldown(adUnitId);
-        _completeOnce(completer, false);
+        _completeOnceOutcome(completer, RewardedAdResult.loadFailed);
       });
       await RewardedAd.load(
         adUnitId: adUnitId,
@@ -202,12 +268,17 @@ class AdMobService {
             ad.fullScreenContentCallback = FullScreenContentCallback(
               onAdDismissedFullScreenContent: (ad) {
                 ad.dispose();
-                _completeOnce(completer, earnedReward);
+                _completeOnceOutcome(
+                  completer,
+                  earnedReward
+                      ? RewardedAdResult.rewarded
+                      : RewardedAdResult.notRewarded,
+                );
               },
               onAdFailedToShowFullScreenContent: (ad, error) {
                 debugPrint('AdMob rewarded show failed: $error');
                 ad.dispose();
-                _completeOnce(completer, false);
+                _completeOnceOutcome(completer, RewardedAdResult.showFailed);
               },
             );
             try {
@@ -221,21 +292,23 @@ class AdMobService {
                     .catchError((Object e) {
                       debugPrint('AdMob rewarded show future failed: $e');
                       ad.dispose();
-                      _completeOnce(completer, false);
+                      _completeOnceOutcome(
+                        completer,
+                        RewardedAdResult.showFailed,
+                      );
                     }),
               );
             } catch (e) {
               debugPrint('AdMob rewarded show threw: $e');
               ad.dispose();
-              _completeOnce(completer, false);
+              _completeOnceOutcome(completer, RewardedAdResult.showFailed);
             }
           },
           onAdFailedToLoad: (error) {
             waitingForLoad = false;
             loadTimer?.cancel();
             debugPrint('AdMob rewarded load failed: $error');
-            _markCooldown(adUnitId);
-            _completeOnce(completer, false);
+            _completeOnceOutcome(completer, RewardedAdResult.loadFailed);
           },
         ),
       );
@@ -243,8 +316,7 @@ class AdMobService {
       waitingForLoad = false;
       loadTimer?.cancel();
       debugPrint('AdMob rewarded load threw: $e');
-      _markCooldown(adUnitId);
-      _completeOnce(completer, false);
+      _completeOnceOutcome(completer, RewardedAdResult.loadFailed);
     }
     return completer.future;
   }
@@ -252,4 +324,20 @@ class AdMobService {
   void _completeOnce(Completer<bool> completer, bool value) {
     if (!completer.isCompleted) completer.complete(value);
   }
+
+  void _completeOnceOutcome(
+    Completer<RewardedAdResult> completer,
+    RewardedAdResult value,
+  ) {
+    if (!completer.isCompleted) completer.complete(value);
+  }
 }
+
+/// Ödüllü reklam denemesinin sonucu.
+///
+/// - [rewarded]: kullanıcı reklamı tamamladı ve ödülü kazandı.
+/// - [notRewarded]: reklam gösterildi ama kullanıcı ödülü kazanmadan kapattı.
+/// - [loadFailed]: reklam yüklenemedi (no-fill/şebeke/timeout) — tüm denemeler
+///   tükendi.
+/// - [showFailed]: reklam yüklendi ama gösterilemedi.
+enum RewardedAdResult { rewarded, notRewarded, loadFailed, showFailed }

@@ -3101,6 +3101,9 @@ class AppLocalizationsTr extends AppLocalizations {
   String get widgetUnlockTrackingTitle => 'Takip Widgetı';
 
   @override
+  String get widgetUnlockZikirTitle => 'Zikirmatik Widgetı';
+
+  @override
   String get widgetUnlockAdLoadFailed =>
       'Reklam şu an yüklenemedi, daha sonra tekrar dene.';
 

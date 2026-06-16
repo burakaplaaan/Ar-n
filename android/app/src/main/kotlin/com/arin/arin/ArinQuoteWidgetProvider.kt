@@ -50,7 +50,12 @@ class ArinQuoteWidgetProvider : HomeWidgetProvider() {
         )
         val locked = isWidgetLocked(widgetData, "quote")
         val openApp = Intent(context, MainActivity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+            // SINGLE_TOP: uygulama arka plandayken (singleTop MainActivity) widget'a
+            // dokunulduğunda yeni intent onNewIntent ile teslim edilsin; aksi halde
+            // bazı durumlarda görev sadece öne alınıp güncel kind/lock iletilmiyordu.
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or
+                Intent.FLAG_ACTIVITY_CLEAR_TOP or
+                Intent.FLAG_ACTIVITY_SINGLE_TOP
             putExtra(MainActivity.EXTRA_WIDGET_KIND, "quote")
             if (locked) {
                 putExtra(MainActivity.EXTRA_WIDGET_LOCK, "1")

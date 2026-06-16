@@ -37,7 +37,11 @@ class ArinTrackingWidgetProvider : HomeWidgetProvider() {
         val locked = isWidgetLocked(widgetData, "tracking")
         val entry = if (locked) null else loadEntry(widgetData)
         val openApp = Intent(context, MainActivity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+            // SINGLE_TOP: arka plandaki singleTop MainActivity'ye yeni intent
+            // onNewIntent ile ulaşsın (güncel kind/lock iletilsin).
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or
+                Intent.FLAG_ACTIVITY_CLEAR_TOP or
+                Intent.FLAG_ACTIVITY_SINGLE_TOP
             putExtra(MainActivity.EXTRA_WIDGET_KIND, "tracking")
             if (locked) {
                 putExtra(MainActivity.EXTRA_WIDGET_LOCK, "1")
@@ -100,9 +104,11 @@ class ArinTrackingWidgetProvider : HomeWidgetProvider() {
             val start = widgetData.getString(KEY_START_EPOCH, null)?.toLongOrNull()
             val prefix = widgetData.getString(KEY_DAY_PREFIX, null)?.trim().orEmpty()
             if (start != null && start > 0L && prefix.isNotEmpty()) {
+                // 1-tabanlı sayaç: başlanan ilk gün "1. gün". Flutter tarafıyla
+                // (TrackingWidgetService) birebir aynı olması için +1.
                 val days = TimeUnit.MILLISECONDS.toDays(
                     (System.currentTimeMillis() - start).coerceAtLeast(0L),
-                )
+                ) + 1
                 "$prefix $days. gün"
             } else {
                 widgetData.getString(KEY_VALUE, null)?.trim().orEmpty()

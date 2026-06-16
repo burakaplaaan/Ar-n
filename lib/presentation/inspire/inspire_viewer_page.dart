@@ -14,6 +14,7 @@ import '../../data/services/ad_gate_service.dart';
 import '../shared/providers/ad_gate_providers.dart';
 import '../shared/providers/admob_providers.dart';
 import '../shared/providers/premium_providers.dart';
+import '../shared/widgets/arin_back_button.dart';
 import '../shared/widgets/arin_skeleton.dart';
 import 'explore_bgm_controller.dart';
 import 'inspiration_catalog_provider.dart';
@@ -286,24 +287,16 @@ class _ViewerBodyState extends ConsumerState<_ViewerBody> {
             },
           ),
         ),
-        SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(4, 2, 8, 0),
-            child: Row(
-              children: [
-                Material(
-                  color: Colors.black.withValues(alpha: 0.4),
-                  shape: const CircleBorder(),
-                  clipBehavior: Clip.antiAlias,
-                  child: IconButton(
-                    onPressed: () => context.pop(),
-                    icon: const Icon(Icons.arrow_back_ios_new_rounded),
-                    color: Colors.white,
-                    iconSize: 20,
-                    tooltip: AppLocalizations.of(context)!.viewerBackAction,
-                  ),
-                ),
-              ],
+        Align(
+          alignment: Alignment.topLeft,
+          child: SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(4, 2, 8, 0),
+              child: ArinBackButton(
+                onPressed: () => context.pop(),
+                semanticLabel: AppLocalizations.of(context)!.viewerBackAction,
+                variant: ArinBackButtonVariant.overlaySubtle,
+              ),
             ),
           ),
         ),

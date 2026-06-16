@@ -3107,6 +3107,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get widgetUnlockTrackingTitle => 'Tracking Widget';
 
   @override
+  String get widgetUnlockZikirTitle => 'Dhikr Counter Widget';
+
+  @override
   String get widgetUnlockAdLoadFailed =>
       'The ad could not be loaded right now, please try again later.';
 

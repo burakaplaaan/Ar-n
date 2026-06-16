@@ -1779,6 +1779,7 @@ class _BuildTab extends ConsumerWidget {
         .toList();
 
     return CustomScrollView(
+      key: const PageStorageKey<String>('willpowerBuildScroll'),
       physics: const AlwaysScrollableScrollPhysics(
         parent: BouncingScrollPhysics(),
       ),
@@ -2260,6 +2261,7 @@ class _QuitTab extends ConsumerWidget {
     );
 
     return CustomScrollView(
+      key: const PageStorageKey<String>('willpowerQuitScroll'),
       physics: const AlwaysScrollableScrollPhysics(
         parent: BouncingScrollPhysics(),
       ),

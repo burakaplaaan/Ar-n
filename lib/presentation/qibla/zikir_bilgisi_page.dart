@@ -12,6 +12,7 @@ import '../../core/providers/shared_preferences_provider.dart';
 import '../../data/models/zikir_matik_record.dart';
 import '../../data/models/zikir_matik_tur_log.dart';
 import '../../data/repositories/zikir_matik_repository.dart';
+import '../shared/widgets/arin_back_button.dart';
 
 import 'package:arin/l10n/app_localizations.dart';
 
@@ -363,10 +364,8 @@ class _ZikirBilgisiPageState extends ConsumerState<ZikirBilgisiPage>
                 padding: const EdgeInsets.fromLTRB(8, 4, 8, 8),
                 child: Row(
                   children: [
-                    IconButton(
+                    ArinBackButton(
                       onPressed: () => Navigator.of(context).pop(),
-                      icon: const Icon(Icons.arrow_back_ios_new_rounded,
-                          color: _Zc.labelMuted, size: 22),
                     ),
                     Expanded(
                       child: Row(

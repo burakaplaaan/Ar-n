@@ -82,6 +82,9 @@ class _QiblaPageState extends State<QiblaPage> {
       } else {
         if (mounted) _hasError.value = true;
       }
+    }).catchError((_) {
+      // start() beklenmedik bir hata atarsa unhandled future olmasın.
+      if (mounted && _compass == c) _hasError.value = true;
     });
   }
 
@@ -244,35 +247,21 @@ class _TopBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final canGoBack = context.canPop() || exitToHomeOnBack;
-    final light     = ArinShellBackground.isLight(context);
-
-    final dimColor = light
-        ? AppColors.textSecondary
-        : Colors.white.withValues(alpha: 0.55);
-    final btnBg = light
-        ? AppColors.emeraldFaint.withValues(alpha: 0.50)
-        : Colors.white.withValues(alpha: 0.07);
-    final btnBorder = light
-        ? AppColors.emeraldMid.withValues(alpha: 0.30)
-        : Colors.white.withValues(alpha: 0.13);
+    final light = ArinShellBackground.isLight(context);
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
       child: Row(
         children: [
-          if (canGoBack)
-            ArinBackButton(
-              onPressed: () {
-                if (exitToHomeOnBack) {
-                  context.go(AppRoutes.home);
-                } else {
-                  context.pop();
-                }
-              },
-            )
-          else
-            const SizedBox(width: 38),
+          ArinBackButton(
+            onPressed: () {
+              if (exitToHomeOnBack) {
+                context.go(AppRoutes.home);
+              } else {
+                Navigator.of(context).maybePop();
+              }
+            },
+          ),
 
           Expanded(
             child: ValueListenableBuilder<bool>(
@@ -311,7 +300,7 @@ class _TopBar extends StatelessWidget {
             ),
           ),
 
-          const SizedBox(width: 38),
+          const SizedBox(width: 48),
         ],
       ),
     );

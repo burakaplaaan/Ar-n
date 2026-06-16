@@ -195,7 +195,10 @@ abstract final class TrackingWidgetService {
         subtitle: 'Gün sayacı ve günlük motivasyon',
         snapshot: TrackingWidgetSnapshot(
           title: title,
-          value: '$prefix ${habitRepo.elapsedQuitDays(h.id)}. gün',
+          // Sayaç 1-tabanlı gösterilir: başlanan ilk gün "1. gün". `elapsedQuitDays`
+          // (geçen tam gün, 0-tabanlı) iyileşme yüzdesi ve milestone mantığında
+          // kullanıldığından değiştirilmez; yalnızca etikete +1 eklenir.
+          value: '$prefix ${habitRepo.elapsedQuitDays(h.id) + 1}. gün',
           note: _quoteFor(kind, today),
           quotes: _quotesFor(kind),
           mode: 'quit_days',
@@ -216,7 +219,8 @@ abstract final class TrackingWidgetService {
           subtitle: 'Arınma gün sayacı',
           snapshot: TrackingWidgetSnapshot(
             title: title,
-            value: 'Temiz $days. gün',
+            // 1-tabanlı: başlanan ilk gün "Temiz 1. gün".
+            value: 'Temiz ${days + 1}. gün',
             note: _quoteFor(_QuoteKind.customQuit, today),
             quotes: _quotesFor(_QuoteKind.customQuit),
             mode: 'quit_days',

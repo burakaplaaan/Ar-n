@@ -1464,6 +1464,7 @@
   "widgetUnlockPrayerTitle": "Namaz Vakti Widgetı",
   "widgetUnlockComboTitle": "Söz + Namaz Widgetı",
   "widgetUnlockTrackingTitle": "Takip Widgetı",
+  "widgetUnlockZikirTitle": "Zikirmatik Widgetı",
   "widgetUnlockAdLoadFailed": "Reklam şu an yüklenemedi, daha sonra tekrar dene.",
   "widgetUnlockSuccessTitle": "{title} 24 saat açıldı! 🎉",
   "@widgetUnlockSuccessTitle": {

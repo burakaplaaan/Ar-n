@@ -5492,6 +5492,12 @@ abstract class AppLocalizations {
   /// **'Takip Widgetı'**
   String get widgetUnlockTrackingTitle;
 
+  /// No description provided for @widgetUnlockZikirTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Zikirmatik Widgetı'**
+  String get widgetUnlockZikirTitle;
+
   /// No description provided for @widgetUnlockAdLoadFailed.
   ///
   /// In tr, this message translates to:

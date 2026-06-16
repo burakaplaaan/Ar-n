@@ -13,13 +13,15 @@ enum ArinWidgetAccessKind {
   quote,
   prayer,
   combo,
-  tracking;
+  tracking,
+  zikir;
 
   String get id => switch (this) {
     ArinWidgetAccessKind.quote => 'quote',
     ArinWidgetAccessKind.prayer => 'prayer',
     ArinWidgetAccessKind.combo => 'combo',
     ArinWidgetAccessKind.tracking => 'tracking',
+    ArinWidgetAccessKind.zikir => 'zikir',
   };
 
   AdGatePlacement get placement => switch (this) {
@@ -27,6 +29,7 @@ enum ArinWidgetAccessKind {
     ArinWidgetAccessKind.prayer => AdGatePlacement.widgetPrayer,
     ArinWidgetAccessKind.combo => AdGatePlacement.widgetCombo,
     ArinWidgetAccessKind.tracking => AdGatePlacement.widgetTracking,
+    ArinWidgetAccessKind.zikir => AdGatePlacement.widgetZikir,
   };
 
   static ArinWidgetAccessKind? fromId(String? id) {

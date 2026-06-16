@@ -151,6 +151,14 @@ class _WidgetCenterPageState extends ConsumerState<WidgetCenterPage> {
                       subtitle:
                           'Günlük söz ve sıradaki namaz vaktini aynı küçük alanda gösterir.',
                     ),
+                    const SizedBox(height: 10),
+                    _InfoTile(
+                      onDark: onDark,
+                      icon: Icons.fingerprint_rounded,
+                      title: 'Zikirmatik Widgetı',
+                      subtitle:
+                          'Ana ekrandan "+" ile zikir çekersin; sayaç uygulamayla eş zamanlı. Tek dokunuş zikirmatik sayfasını açar.',
+                    ),
                     const SizedBox(height: 24),
                     _SectionTitle('Takip widgetı', muted: muted),
                     const SizedBox(height: 10),

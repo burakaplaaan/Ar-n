@@ -181,6 +181,7 @@ class _InspireExplorePageState extends ConsumerState<InspireExplorePage> {
                   : AppColors.homeGradientTop,
               onRefresh: _onRefresh,
               child: CustomScrollView(
+                key: const PageStorageKey<String>('inspireExploreScroll'),
                 physics: const BouncingScrollPhysics(
                   parent: AlwaysScrollableScrollPhysics(),
                 ),

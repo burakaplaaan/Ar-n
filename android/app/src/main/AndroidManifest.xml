@@ -140,6 +140,20 @@
                 android:name="android.appwidget.provider"
                 android:resource="@xml/arin_tracking_widget_info" />
         </receiver>
+        <!-- Zikirmatik widget -->
+        <receiver
+            android:name=".ArinZikirWidgetProvider"
+            android:exported="true"
+            android:label="@string/widget_zikir_title">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="com.arin.arin.action.ZIKIR_WIDGET_TICK" />
+                <action android:name="com.arin.arin.action.ZIKIR_WIDGET_REFRESH" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/arin_zikir_widget_info" />
+        </receiver>
 
         <!-- Namaz bildirimleri: gecikmiş alarm teslimlerini native tarafta
              filtreler. İnternet/Doze/OEM sonrası bayat "1 dk/5 dk kaldı"

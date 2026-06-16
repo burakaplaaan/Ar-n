@@ -17,6 +17,7 @@ import '../../core/analytics/arin_analytics.dart';
 import '../../core/providers/shared_preferences_provider.dart';
 import '../../data/models/zikir_matik_tur_log.dart';
 import '../../data/repositories/zikir_matik_repository.dart';
+import '../../data/services/zikir_widget_service.dart';
 import 'zikir_bilgisi_page.dart';
 import '../shared/widgets/tasbeeh_zikirmatik_device_frame.dart';
 import '../shared/widgets/arin_back_button.dart';
@@ -98,7 +99,7 @@ class ZikirMatikPage extends ConsumerStatefulWidget {
 }
 
 class _ZikirMatikPageState extends ConsumerState<ZikirMatikPage>
-    with TickerProviderStateMixin {
+    with TickerProviderStateMixin, WidgetsBindingObserver {
   ZikirMatikRepository? _repo;
 
   static const _uuid = Uuid();
@@ -145,6 +146,7 @@ class _ZikirMatikPageState extends ConsumerState<ZikirMatikPage>
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _phraseAnim = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 2600),
@@ -171,6 +173,7 @@ class _ZikirMatikPageState extends ConsumerState<ZikirMatikPage>
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     // Bekleyen debounce varsa kaybetmeden flush et — sayfadan çıkarken
     // son tap yazıldığından emin olalım.
     if (_persistDebounce?.isActive == true) {
@@ -181,6 +184,112 @@ class _ZikirMatikPageState extends ConsumerState<ZikirMatikPage>
     _phraseAnim.dispose();
     _cardIntro.dispose();
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    if (!_sessionReady) return;
+    // Uygulama foreground'a dönünce widget'tan gelen "+1" tıklarını oturuma
+    // adapte et (kullanıcı widget'ta sayıp sayfaya girince kaldığı yerden
+    // devam edebilsin).
+    if (state == AppLifecycleState.resumed) {
+      unawaited(_reconcileWithWidget());
+    } else if (state == AppLifecycleState.paused ||
+        state == AppLifecycleState.inactive) {
+      // Arka plana geçmeden önce bekleyen tap'leri kaybetmeden yaz/ilet.
+      // `pushSession` merge yaptığından bayat yazım widget sayacını düşürmez.
+      if (_persistDebounce?.isActive == true) {
+        _persistDebounce?.cancel();
+        _persistDebounce = null;
+        unawaited(_persist());
+      }
+    }
+  }
+
+  /// Widget'ın yazdığı kümülatif toplamı okuyup oturumu kaldığı yerden devam
+  /// edecek şekilde günceller; değişiklik yoksa mevcut oturumu widget'a basar.
+  Future<void> _reconcileWithWidget() async {
+    if (_repo == null) return;
+    final widgetTotal = await ZikirWidgetService.readWidgetTotal();
+    if (!mounted) return;
+    if (widgetTotal == null) {
+      // Okuma başarısız/boş → widget sayacını düşürme riskine girme.
+      unawaited(_pushToWidget());
+      return;
+    }
+    final prevTotal = _total;
+    final prevRound = _round;
+    final prevTur = _tur;
+    final target = _target;
+    final rec = ZikirWidgetService.reconcile(
+      sessionTotal: prevTotal,
+      sessionRound: prevRound,
+      sessionTur: prevTur,
+      target: target,
+      widgetTotal: widgetTotal,
+    );
+    if (rec.total == prevTotal && rec.round == prevRound && rec.tur == prevTur) {
+      unawaited(_pushToWidget());
+      return;
+    }
+    setState(() {
+      _total = rec.total;
+      _round = rec.round;
+      _tur = rec.tur;
+    });
+    await _persist();
+    // Widget'ta tamamlanan turlar için tur log + analytics'i geriye doldur
+    // (uygulama içi tur tamamlama ile tutarlı kalsın).
+    await _backfillWidgetTurs(
+      prevTotal: prevTotal,
+      prevRound: prevRound,
+      prevTur: prevTur,
+      target: target,
+    );
+  }
+
+  Future<void> _backfillWidgetTurs({
+    required int prevTotal,
+    required int prevRound,
+    required int prevTur,
+    required int target,
+  }) async {
+    if (target < 1) return;
+    final delta = _total - prevTotal;
+    if (delta <= 0) return;
+    final combinedRound = prevRound + delta;
+    final tursCompleted = combinedRound ~/ target;
+    if (tursCompleted <= 0) return;
+    final repo = _repo;
+    if (repo == null) return;
+    final now = DateTime.now().millisecondsSinceEpoch;
+    for (var k = 0; k < tursCompleted; k++) {
+      final completedTur = prevTur + k;
+      final totalAtEvent = prevTotal + (target - prevRound) + k * target;
+      await repo.appendTurLog(
+        ZikirMatikTurLog(
+          id: _uuid.v4(),
+          phrase: _phrase,
+          completedTur: completedTur,
+          target: target,
+          totalCountAtEvent: totalAtEvent,
+          recordedAtMillis: now,
+        ),
+      );
+      unawaited(ArinAnalytics.zikirComplete(target));
+    }
+  }
+
+  Future<void> _pushToWidget({bool reset = false}) {
+    return ZikirWidgetService.pushSession(
+      phrase: _phrase,
+      total: _total,
+      round: _round,
+      tur: _tur,
+      target: _target,
+      allowDecrease: reset,
+    );
   }
 
   void _loadSession() {
@@ -206,9 +315,10 @@ class _ZikirMatikPageState extends ConsumerState<ZikirMatikPage>
         _persist();
       }
     }
+    unawaited(_reconcileWithWidget());
   }
 
-  Future<void> _persist() async {
+  Future<void> _persist({bool resetPush = false}) async {
     final r = _repo;
     if (r == null) return;
     await r.saveSession(
@@ -218,6 +328,7 @@ class _ZikirMatikPageState extends ConsumerState<ZikirMatikPage>
       phrase: _phrase,
       target: _target,
     );
+    unawaited(_pushToWidget(reset: resetPush));
   }
 
   void _reloadCustomPhrases() {
@@ -459,7 +570,8 @@ class _ZikirMatikPageState extends ConsumerState<ZikirMatikPage>
         _round = 0;
         _tur = 1;
       });
-      await _persist();
+      // Sıfırlama widget sayacını da düşürmeli (allowDecrease).
+      await _persist(resetPush: true);
     }
   }
 

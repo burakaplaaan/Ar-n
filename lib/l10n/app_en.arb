@@ -1464,6 +1464,7 @@
   "widgetUnlockPrayerTitle": "Prayer Time Widget",
   "widgetUnlockComboTitle": "Quote + Prayer Widget",
   "widgetUnlockTrackingTitle": "Tracking Widget",
+  "widgetUnlockZikirTitle": "Dhikr Counter Widget",
   "widgetUnlockAdLoadFailed": "The ad could not be loaded right now, please try again later.",
   "widgetUnlockSuccessTitle": "{title} unlocked for 24 hours! 🎉",
   "@widgetUnlockSuccessTitle": {

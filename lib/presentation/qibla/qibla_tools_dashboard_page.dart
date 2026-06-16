@@ -39,6 +39,7 @@ class QiblaToolsDashboardPage extends StatelessWidget {
       child: ArinShellBackground.buildLayered(
         context,
         child: CustomScrollView(
+          key: const PageStorageKey<String>('qiblaToolsScroll'),
           physics: const BouncingScrollPhysics(),
           slivers: [
             SliverSafeArea(

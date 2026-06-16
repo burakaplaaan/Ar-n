@@ -7,7 +7,6 @@ import 'package:arin/l10n/app_localizations.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_text_styles.dart';
 import '../../../core/theme/arin_shell_background.dart';
-import '../../../core/localization/locale_text.dart';
 import '../../shared/providers/habit_providers.dart';
 import '../../shared/providers/prayer_time_providers.dart';
 import '../salat_providers.dart';
@@ -81,61 +80,31 @@ class SalatPrayerRow extends ConsumerWidget {
 
     final triSize = compact ? 12.0 : 20.0;
 
-    bool inWindow(int i) {
-      return prayerAsync.maybeWhen(
-        data: (pt) {
-          // Bugünün vakitleri yoksa (eski önbellek / gün kayması): güvenli tarafta tümü kilitli.
-          if (!pt.matchesCalendarDay(today)) return false;
-          final tickDay = pt.salatTickCalendarDay(now);
-          return pt.isSalatIndexInMarkingWindow(i, now, tickDay);
-        },
-        // Yüklenene veya hata düzelene kadar tik yok — aksi halde tüm vakitler açılıyordu.
-        orElse: () => false,
-      );
-    }
+    // Vakit penceresi kısıtı kaldırıldı: kullanıcı dilediği vakti (gün içinde
+    // önce ya da sonra) serbestçe işaretleyip kaldırabilir.
+    //
+    // Tek istisna canlı satırdır (day == null): vakitler yüklenip BUGÜNE
+    // eşleşene kadar yazmayı bekletiriz. Aksi halde gece yarısı ile fajr arası,
+    // vakitler henüz gelmeden tiklenirse storageDay yanlış güne (salatTickCalendarDay
+    // dün derken) bugüne düşüp tik kayboluyormuş gibi görünebilir. Takvim satırı
+    // (day != null) vakitlerden bağımsızdır; her zaman düzenlenebilir.
+    final bool tappable = day != null ||
+        prayerAsync.maybeWhen(
+          data: (pt) => pt.matchesCalendarDay(today),
+          orElse: () => false,
+        );
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: List.generate(5, (i) {
         final done = prayers[i];
-        final canMark = inWindow(i);
-        // Sadece o anki vakit penceresinde tik verilip kaldırılabilir; geçmiş vakitler kilitli.
-        final tappable = canMark;
 
         return Expanded(
           child: Material(
             color: Colors.transparent,
             child: InkWell(
-              onTap: !tappable
-                  ? () {
-                      final msg = done
-                          ? trEnAr(
-                              context,
-                              tr: 'Geçmiş vakitlerin tikini kaldıramazsın; sadece sıradaki vakitte tik ekleyip çıkarabilirsin.',
-                              en: 'You cannot remove ticks from past prayers; you can only mark/unmark in the current prayer window.',
-                              ar: 'لا يمكنك إزالة العلامات من الصلوات الماضية؛ يمكنك وضع/إزالة العلامة فقط في نافذة الصلاة الحالية.',
-                            )
-                          : trEnAr(
-                              context,
-                              tr: 'Bu vakit için tik, o namazın girişinden sonraki vakit başlayana kadar (yatsıda imsâke kadar) verilebilir.',
-                              en: 'You can mark this prayer from its start time until the next prayer begins (for Isha until Imsak).',
-                              ar: 'يمكنك وضع علامة لهذه الصلاة من وقت دخولها حتى تبدأ الصلاة التالية (وبالنسبة للعشاء حتى الإمساك).',
-                            );
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(
-                            msg,
-                            style: TextStyle(
-                              color: AppColors.creamBase.withValues(alpha: 0.92),
-                            ),
-                          ),
-                          backgroundColor: AppColors.anthraciteMid,
-                          behavior: SnackBarBehavior.floating,
-                          duration: const Duration(seconds: 2),
-                        ),
-                      );
-                    }
-                  : () async {
+              onTap: tappable
+                  ? () async {
                       await salat.setPrayer(
                         habitId,
                         storageDay,
@@ -144,7 +113,8 @@ class SalatPrayerRow extends ConsumerWidget {
                         habitRepo,
                       );
                       ref.read(habitSummaryProvider.notifier).refresh();
-                    },
+                    }
+                  : null,
               borderRadius: BorderRadius.circular(10),
               child: ConstrainedBox(
                 constraints: BoxConstraints(
