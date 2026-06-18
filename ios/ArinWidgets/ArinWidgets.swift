@@ -5,6 +5,7 @@
 
 import SwiftUI
 import WidgetKit
+import AppIntents
 
 private let kGroupId = "group.com.arin.arin"
 private let kQuoteTimelineFutureLimit = 28
@@ -1453,6 +1454,56 @@ struct ArinTrackingWidget: Widget {
 
 // MARK: - Zikirmatik
 
+private enum ZikirWidgetKeys {
+  static let enabled = "arin_zikir_enabled"
+  static let count = "arin_zikir_count"
+  static let round = "arin_zikir_round"
+  static let tur = "arin_zikir_tur"
+  static let target = "arin_zikir_target"
+}
+
+@available(iOSApplicationExtension 17.0, *)
+struct IncrementZikirIntent: AppIntent {
+  static var title: LocalizedStringResource = "Zikri Artır"
+  static var description = IntentDescription("Zikirmatik sayacını 1 artırır.")
+  static var openAppWhenRun: Bool = false
+
+  func perform() async throws -> some IntentResult {
+    guard let u = suite() else { return .result() }
+    // Kilitliyse sayma; kullanıcı önce widget'ı açmalı.
+    if widgetLocked("zikir") { return .result() }
+
+    let total = Int(u.string(forKey: ZikirWidgetKeys.count) ?? "") ?? 0
+    var round = Int(u.string(forKey: ZikirWidgetKeys.round) ?? "") ?? 0
+    var tur = Int(u.string(forKey: ZikirWidgetKeys.tur) ?? "") ?? 1
+    let target = max(1, Int(u.string(forKey: ZikirWidgetKeys.target) ?? "") ?? 33)
+
+    let newTotal = min(999_999, total + 1)
+    round += 1
+    if round >= target {
+      round = 0
+      tur += 1
+    }
+
+    // Sayaç verisini yaz. Widget ilk kez buradan kullanılıyorsa "seçili"
+    // duruma geç ki kilit ekranı "zikir seçilmedi" yerine sayacı göstersin;
+    // uygulama foreground'a dönünce bu toplamı okuyup oturumu eşitler.
+    u.set("1", forKey: ZikirWidgetKeys.enabled)
+    let phrase = u.string(forKey: "arin_zikir_phrase")?
+      .trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+    if phrase.isEmpty {
+      u.set("Sübhanallah", forKey: "arin_zikir_phrase")
+    }
+    u.set(String(target), forKey: ZikirWidgetKeys.target)
+    u.set(String(newTotal), forKey: ZikirWidgetKeys.count)
+    u.set(String(round), forKey: ZikirWidgetKeys.round)
+    u.set(String(tur), forKey: ZikirWidgetKeys.tur)
+
+    WidgetCenter.shared.reloadTimelines(ofKind: "ArinZikirWidget")
+    return .result()
+  }
+}
+
 struct ZikirEntry: TimelineEntry {
   let date: Date
   let phrase: String
@@ -1542,88 +1593,164 @@ struct ZikirWidgetView: View {
     entry.phrase == "🔒"
   }
 
+  private var openURL: URL? {
+    URL(string: "arin://widget/zikir?homeWidget=true")
+  }
+
+  private var lockURL: URL? {
+    URL(string: "arin://widget/zikir?homeWidget=true&lock=1")
+  }
+
   var body: some View {
     if isLocked {
+      // Kilitli: dokunma uygulamayı açar (widget düzeyinde widgetURL yok,
+      // bu yüzden link'i doğrudan burada veriyoruz).
       LockedWidgetView(family: family, kindId: "zikir")
+        .widgetURL(lockURL)
+    } else if family == .accessoryRectangular {
+      accessoryLayout
     } else {
-      if family == .accessoryRectangular {
-        accessoryLayout
-      } else {
-        expandedLayout
+      expandedLayout
+    }
+  }
+
+  // Kilit ekranı (Lock Screen): solda zikir + sayaç, sağda +1 butonu.
+  // iOS 17+ kilit ekranı widget'ları da Button(intent:) destekler; basınca
+  // anlık sayar. iOS 16'da etkileşim yok → tüm alan uygulamayı açar.
+  @ViewBuilder
+  private var accessoryLayout: some View {
+    if #available(iOSApplicationExtension 17.0, *) {
+      HStack(spacing: 8) {
+        Link(destination: openURL ?? URL(string: "arin://widget/zikir")!) {
+          accessoryInfo
+            .frame(maxWidth: .infinity, alignment: .leading)
+        }
+        .buttonStyle(.plain)
+        Button(intent: IncrementZikirIntent()) {
+          accessoryPlus
+        }
+        .buttonStyle(.plain)
+      }
+      .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
+      .padding(.horizontal, 4)
+      .shadow(color: .black.opacity(textShadowOpacity), radius: 2.0, x: 0, y: 1)
+    } else {
+      accessoryInfo
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
+        .padding(.horizontal, 4)
+        .shadow(color: .black.opacity(textShadowOpacity), radius: 2.0, x: 0, y: 1)
+        .widgetURL(openURL)
+    }
+  }
+
+  private var accessoryInfo: some View {
+    VStack(alignment: .leading, spacing: 1) {
+      if !entry.phrase.isEmpty {
+        Text(entry.phrase)
+          .font(.system(size: 11, weight: .medium))
+          .foregroundStyle(secondaryTextColor)
+          .lineLimit(1)
+          .minimumScaleFactor(0.6)
+      }
+      if !entry.count.isEmpty {
+        Text(entry.count)
+          .font(.system(size: 18, weight: .bold, design: .rounded))
+          .foregroundStyle(primaryTextColor)
+          .lineLimit(1)
+          .minimumScaleFactor(0.6)
       }
     }
   }
 
-  // Kilit ekranındaki (Lock Screen) çok dar yatay görünüm
-  private var accessoryLayout: some View {
-    HStack(spacing: 6) {
-      Image(systemName: "circle.hexagonpath.fill")
-        .font(.system(size: 20))
-        .foregroundStyle(secondaryTextColor)
-      
-      VStack(alignment: .leading, spacing: 1) {
-        if !entry.phrase.isEmpty {
-          Text(entry.phrase)
-            .font(.system(size: 10, weight: .medium))
-            .foregroundStyle(secondaryTextColor)
-            .lineLimit(1)
-            .minimumScaleFactor(0.6)
-        }
-        if !entry.count.isEmpty {
-          Text(entry.count)
-            .font(.system(size: 16, weight: .bold, design: .rounded))
-            .foregroundStyle(primaryTextColor)
-            .lineLimit(1)
-            .minimumScaleFactor(0.6)
-        }
+  private var accessoryPlus: some View {
+    ZStack {
+      Circle()
+        .strokeBorder(primaryTextColor.opacity(0.55), lineWidth: 1.5)
+      Image(systemName: "plus")
+        .font(.system(size: 16, weight: .bold))
+        .foregroundStyle(primaryTextColor)
+    }
+    .frame(width: 34, height: 34)
+  }
+
+  // Ana ekran (Home Screen): solda zikir + sayaç (Link → sayfayı açar),
+  // en sağda +1 butonu (Button intent → anlık sayar).
+  //
+  // ÖNEMLİ: Widget düzeyinde `widgetURL` KULLANMIYORUZ. widgetURL tüm yüzeyi
+  // tek bir link yapıp `Button(intent:)` dokunuşlarını yutuyordu. Bunun yerine
+  // her bölgeye ayrı gesture: sol alana açma intent'i, sağ butona +1 intent'i.
+  private var expandedLayout: some View {
+    HStack(alignment: .center, spacing: 10) {
+      openArea
+
+      incrementButton
+    }
+    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
+    .padding(.horizontal, 12)
+    .shadow(color: .black.opacity(textShadowOpacity), radius: 2.6, x: 0, y: 1)
+  }
+
+  // En sağdaki +1 butonu. iOS 17+ etkileşimli (anlık sayar); eski sürümde
+  // Link ile uygulamayı açar (etkileşimli widget yok).
+  @ViewBuilder
+  private var incrementButton: some View {
+    if #available(iOSApplicationExtension 17.0, *) {
+      Button(intent: IncrementZikirIntent()) {
+        plusCircle
+      }
+      .buttonStyle(.plain)
+    } else {
+      Link(destination: openURL ?? URL(string: "arin://widget/zikir")!) {
+        plusCircle
+      }
+      .buttonStyle(.plain)
+    }
+  }
+
+  // Açma alanı her zaman Link: URL şeması uygulamayı güvenilir açar. (Widget
+  // Button(intent:) iOS 17'de arka planda çalışır, uygulamayı öne getirmez.)
+  // Gelen URL'yi SceneDelegate yakalayıp App Group'a yazar; Flutter Zikirmatik
+  // sayfasına yönlendirir.
+  private var openArea: some View {
+    Link(destination: openURL ?? URL(string: "arin://widget/zikir")!) {
+      infoStack
+    }
+    .buttonStyle(.plain)
+  }
+
+  private var infoStack: some View {
+    VStack(alignment: .leading, spacing: 2) {
+      if !entry.phrase.isEmpty {
+        Text(entry.phrase)
+          .font(.system(size: 13, weight: .semibold))
+          .foregroundStyle(secondaryTextColor)
+          .lineLimit(1)
+          .minimumScaleFactor(0.6)
+      }
+
+      if !entry.count.isEmpty {
+        Text(entry.count)
+          .font(.system(size: 32, weight: .bold, design: .rounded))
+          .foregroundStyle(primaryTextColor)
+          .lineLimit(1)
+          .minimumScaleFactor(0.6)
       }
     }
     .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
-    .padding(.horizontal, 4)
-    .shadow(color: .black.opacity(textShadowOpacity), radius: 2.0, x: 0, y: 1)
+    .contentShape(Rectangle())
   }
 
-  // Ana ekrandaki (Home Screen) normal şeffaf görünüm
-  private var expandedLayout: some View {
-    HStack(alignment: .center, spacing: 12) {
-      Image(systemName: "circle.hexagonpath.fill")
-        .resizable()
-        .scaledToFit()
-        .frame(width: 36, height: 36)
-        .foregroundStyle(secondaryTextColor)
-
-      VStack(alignment: .leading, spacing: 2) {
-        if !entry.phrase.isEmpty {
-          Text(entry.phrase)
-            .font(.system(size: 13, weight: .medium))
-            .foregroundStyle(secondaryTextColor)
-            .lineLimit(1)
-            .minimumScaleFactor(0.6)
-        }
-        
-        if !entry.count.isEmpty {
-          Text(entry.count)
-            .font(.system(size: 26, weight: .bold, design: .rounded))
-            .foregroundStyle(primaryTextColor)
-            .lineLimit(1)
-            .minimumScaleFactor(0.6)
-        }
-      }
-      .frame(maxWidth: .infinity, alignment: .leading)
-      
-      // Sağdaki tıklama yuvarlağı
+  private var plusCircle: some View {
+    ZStack {
       Circle()
-        .fill(Color(red: 0.24, green: 0.32, blue: 0.31).opacity(0.7))
-        .frame(width: 44, height: 44)
-        .overlay(
-          Circle()
-            .fill(Color.white.opacity(0.8))
-            .frame(width: 10, height: 10)
-        )
+        .fill(Color(red: 0.24, green: 0.32, blue: 0.31).opacity(0.82))
+      Circle()
+        .strokeBorder(primaryTextColor.opacity(0.28), lineWidth: 1)
+      Image(systemName: "plus")
+        .font(.system(size: 22, weight: .bold))
+        .foregroundStyle(primaryTextColor)
     }
-    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
-    .padding(.horizontal, 10)
-    .shadow(color: .black.opacity(textShadowOpacity), radius: 2.6, x: 0, y: 1)
+    .frame(width: 52, height: 52)
   }
 }
 
@@ -1632,11 +1759,10 @@ struct ArinZikirWidget: Widget {
 
   var body: some WidgetConfiguration {
     StaticConfiguration(kind: kind, provider: ZikirProvider()) { entry in
+      // widgetURL'i bilerek vermiyoruz: tıklama yönetimi view içinde Link +
+      // Button(intent:) ile bölge bazlı yapılıyor (widgetURL butonu yutuyordu).
       ZikirWidgetView(entry: entry)
         .arinTransparentWidgetSurface()
-        .widgetURL(URL(string: entry.phrase == "🔒"
-          ? "arin://widget/zikir?homeWidget=true&lock=1"
-          : "arin://widget/zikir?homeWidget=true"))
     }
     .configurationDisplayName(localizedWidgetText(tr: "ARIN — Zikirmatik"))
     .description(localizedWidgetText(tr: "Aktif zikir ve sayaç."))

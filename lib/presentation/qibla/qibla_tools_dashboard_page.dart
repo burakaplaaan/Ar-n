@@ -5,10 +5,8 @@ import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:arin/l10n/app_localizations.dart';
 
-import '../../core/router/app_router.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/theme/arin_shell_background.dart';
-import '../shared/widgets/arin_back_button.dart';
 import '../shared/widgets/qibla_nav_icon.dart';
 import '../shared/widgets/zikirmatik_silhouette_icon.dart';
 import 'qibla_hub_page.dart';
@@ -48,14 +46,6 @@ class QiblaToolsDashboardPage extends StatelessWidget {
                 padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
                 sliver: SliverList(
                   delegate: SliverChildListDelegate([
-                    Row(
-                      children: [
-                        ArinBackButton(
-                          onPressed: () => context.go(AppRoutes.home),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 16),
                     _QiblaCompassFeatureCard(
                       onDark: onDark,
                       accent: accent,

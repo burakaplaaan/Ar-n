@@ -218,7 +218,10 @@ class _HeaderSection extends ConsumerWidget {
                       userName,
                       style: TextStyle(
                         color: ornament.withValues(alpha: 0.8),
-                        fontSize: 16,
+                        fontSize:
+                            Theme.of(context).platform == TargetPlatform.iOS
+                            ? 18
+                            : 16,
                         fontWeight: FontWeight.w500,
                       ),
                       overflow: TextOverflow.ellipsis,

@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart' show TargetPlatform, defaultTargetPlatform, kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -26,6 +27,7 @@ class _WidgetLaunchGateListenerState
     extends ConsumerState<WidgetLaunchGateListener>
     with WidgetsBindingObserver {
   StreamSubscription<Uri?>? _clickSub;
+  static const _pendingWidgetLaunchUriKey = 'arin_pending_widget_launch_uri';
 
   /// Şu anda açık olan kilit/reklam sayfasının widget türü. `null` ise açık
   /// sayfa yok. Eski tek `bool` bayrak, bir sayfa açıkken gelen ikinci widget
@@ -39,6 +41,7 @@ class _WidgetLaunchGateListenerState
     WidgetsBinding.instance.addObserver(this);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       unawaited(_consumeAndroidLaunch());
+      unawaited(_consumePendingIntentLaunch());
       unawaited(_consumeHomeWidgetLaunch());
     });
     _clickSub = HomeWidget.widgetClicked.listen((uri) {
@@ -57,6 +60,7 @@ class _WidgetLaunchGateListenerState
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
       unawaited(_consumeAndroidLaunch());
+      unawaited(_consumePendingIntentLaunch());
     }
   }
 
@@ -74,6 +78,38 @@ class _WidgetLaunchGateListenerState
   Future<void> _consumeHomeWidgetLaunch() async {
     final uri = await HomeWidget.initiallyLaunchedFromHomeWidget();
     await _handleUri(uri);
+  }
+
+  /// iOS native `SceneDelegate` widget derin linkini (`arin://widget/...`) App
+  /// Group'a `arin_pending_widget_launch_uri` olarak yazar. Bu uygulama UIScene
+  /// tabanlı olduğundan `home_widget` plugin'inin URL yakalama yolu (eski
+  /// `UIApplicationDelegate` metotları) hiç tetiklenmez; bu yüzden açma
+  /// sinyalini bu App Group anahtarı üzerinden alıyoruz.
+  ///
+  /// KRİTİK: Açılışta App Group henüz `setAppGroupId` ile bağlanmamış olabilir
+  /// (`primeAppGroup` fire-and-forget). O yüzden okumadan ÖNCE App Group'u
+  /// garanti altına alıyoruz; ayrıca cold-launch yarışına karşı kısa retry.
+  Future<void> _consumePendingIntentLaunch() async {
+    if (kIsWeb || defaultTargetPlatform != TargetPlatform.iOS) return;
+    try {
+      await HomeWidget.setAppGroupId('group.com.arin.arin');
+    } catch (_) {
+      // App Group bağlanamadıysa okuma zaten null döner; sessizce çık.
+    }
+    for (var attempt = 0; attempt < 6; attempt++) {
+      final raw = await HomeWidget.getWidgetData<String>(
+        _pendingWidgetLaunchUriKey,
+      );
+      if (raw != null && raw.isNotEmpty) {
+        // Tekrar tetiklenmesin diye anahtarı hemen temizle.
+        await HomeWidget.saveWidgetData<String>(_pendingWidgetLaunchUriKey, '');
+        final uri = Uri.tryParse(raw);
+        await _handleUri(uri);
+        return;
+      }
+      if (!mounted) return;
+      await Future<void>.delayed(const Duration(milliseconds: 120));
+    }
   }
 
   Future<void> _handleUri(Uri? uri) async {
