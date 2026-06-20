@@ -164,6 +164,21 @@ class _HeaderSection extends ConsumerWidget {
         ? Colors.white.withValues(alpha: 0.95)
         : AppColors.emeraldDark;
 
+    // Android'de selamlama başlığı dar/iri-fontlu cihazlarda 28px sabit punto
+    // ile sığmayıp 2-3 satıra kırılıyor ve sayaç kartıyla çakışıyordu. iOS
+    // (App Store'da onaylı) yerleşimine DOKUNMUYORUZ; yalnızca Android'de
+    // FittedBox ile tek satıra sığdırıp tutarlı hale getiriyoruz.
+    final isAndroid = Theme.of(context).platform == TargetPlatform.android;
+    final greetingStyle = TextStyle(
+      fontFamily: 'Georgia',
+      color: titleC,
+      fontSize: 28,
+      fontWeight: FontWeight.w600,
+      letterSpacing: -0.5,
+    ).copyWith(
+      fontFamilyFallback: const ['Times New Roman', 'serif'],
+    );
+
     return Container(
       padding: const EdgeInsets.fromLTRB(14, 10, 10, 10),
       child: Stack(
@@ -201,18 +216,23 @@ class _HeaderSection extends ConsumerWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      greeting,
-                      style: TextStyle(
-                        fontFamily: 'Georgia',
-                        color: titleC,
-                        fontSize: 28,
-                        fontWeight: FontWeight.w600,
-                        letterSpacing: -0.5,
-                      ).copyWith(
-                        fontFamilyFallback: const ['Times New Roman', 'serif'],
-                      ),
-                    ),
+                    if (isAndroid)
+                      // scaleDown: sığmazsa fontu küçültür, asla 28px üstüne
+                      // çıkmaz → her Android cihazda tek satır, çakışma yok.
+                      FittedBox(
+                        fit: BoxFit.scaleDown,
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          greeting,
+                          maxLines: 1,
+                          softWrap: false,
+                          overflow: TextOverflow.visible,
+                          textScaler: TextScaler.noScaling,
+                          style: greetingStyle,
+                        ),
+                      )
+                    else
+                      Text(greeting, style: greetingStyle),
                     const SizedBox(height: 6),
                     Text(
                       userName,
@@ -471,7 +491,7 @@ class _PrayerTimesList extends StatelessWidget {
       borderRadius: BorderRadius.circular(22),
       child: Container(
         width: double.infinity,
-        padding: const EdgeInsets.fromLTRB(18, 16, 18, 16),
+        padding: const EdgeInsets.fromLTRB(12, 16, 12, 16),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(22),
           gradient: LinearGradient(
@@ -532,26 +552,33 @@ class _PrayerTimesList extends StatelessWidget {
               isDarkShell: isDarkShell,
             ),
             const SizedBox(height: 14),
-            GridView.builder(
-              itemCount: model.orderedPrayers.length,
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 3,
-                mainAxisSpacing: 11,
-                crossAxisSpacing: 11,
-                childAspectRatio: 0.92,
+            // Vakit kutuları sabit en/boy oranlı; cihazda büyük sistem yazı
+            // ölçeği seçiliyse hücre içeriği (ikon + ad + "Sıradaki vakit" +
+            // saat) kutuya sığmayıp üst üste biniyordu. Bu gridi sabit ölçekle
+            // render ederek her cihazda aynı, taşmasız görünmesini sağlıyoruz.
+            MediaQuery.withClampedTextScaling(
+              maxScaleFactor: 1.0,
+              child: GridView.builder(
+                itemCount: model.orderedPrayers.length,
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 3,
+                  mainAxisSpacing: 8,
+                  crossAxisSpacing: 8,
+                  childAspectRatio: 0.81,
+                ),
+                itemBuilder: (context, i) {
+                  final p = model.orderedPrayers[i];
+                  return _PrayerTimeRow(
+                    index: i,
+                    name: p.name,
+                    time: p.time,
+                    isNext: p.name == nextName,
+                    isDarkShell: isDarkShell,
+                  );
+                },
               ),
-              itemBuilder: (context, i) {
-                final p = model.orderedPrayers[i];
-                return _PrayerTimeRow(
-                  index: i,
-                  name: p.name,
-                  time: p.time,
-                  isNext: p.name == nextName,
-                  isDarkShell: isDarkShell,
-                );
-              },
             ),
           ],
         ),
@@ -649,14 +676,14 @@ class _PrayerTimeRow extends StatelessWidget {
             : null,
       ),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 12),
+        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 13),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Container(
-              width: 30,
-              height: 30,
+              width: 32,
+              height: 32,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 color: isNext
@@ -670,7 +697,7 @@ class _PrayerTimeRow extends StatelessWidget {
                 ),
               ),
               child: Center(
-                child: Icon(_iconForPrayer(), color: iconColor, size: 16),
+                child: Icon(_iconForPrayer(), color: iconColor, size: 17),
               ),
             ),
             Column(
@@ -691,7 +718,7 @@ class _PrayerTimeRow extends StatelessWidget {
                 ),
                 if (isNext)
                   Padding(
-                    padding: const EdgeInsets.only(top: 1),
+                    padding: const EdgeInsets.only(top: 2),
                     child: Text(
                       l10n.homePrayerNextRowHint,
                       textAlign: TextAlign.center,
@@ -728,7 +755,7 @@ class _PrayerTimeRow extends StatelessWidget {
                 maxLines: 1,
                 style: TextStyle(
                   color: isNext ? accent : timeMuted,
-                  fontSize: 17,
+                  fontSize: 18,
                   fontWeight: FontWeight.w700,
                   letterSpacing: -0.3,
                 ),
@@ -754,7 +781,7 @@ class _PrayerTimesSkeleton extends StatelessWidget {
       borderRadius: BorderRadius.circular(22),
       child: Container(
         width: double.infinity,
-        padding: const EdgeInsets.fromLTRB(18, 16, 18, 16),
+        padding: const EdgeInsets.fromLTRB(12, 16, 12, 16),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(22),
           gradient: LinearGradient(
@@ -816,9 +843,9 @@ class _PrayerTimesSkeleton extends StatelessWidget {
               physics: const NeverScrollableScrollPhysics(),
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 3,
-                mainAxisSpacing: 11,
-                crossAxisSpacing: 11,
-                childAspectRatio: 0.92,
+                mainAxisSpacing: 8,
+                crossAxisSpacing: 8,
+                childAspectRatio: 0.81,
               ),
               itemBuilder: (context, i) {
                 return Container(

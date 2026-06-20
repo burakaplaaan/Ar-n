@@ -7,6 +7,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:arin/l10n/app_localizations.dart';
+import 'package:wakelock_plus/wakelock_plus.dart';
 
 import '../../core/analytics/arin_analytics.dart';
 import '../../core/constants/app_colors.dart';
@@ -59,6 +60,12 @@ class _BreathingExercisePageState extends ConsumerState<BreathingExercisePage>
   @override
   void initState() {
     super.initState();
+    // Nefes egzersizi pasif izlenen bir seans: kullanıcı ekrana dokunmadan
+    // dakikalarca nefes ritmini takip eder. Ekran uyku zamanlayıcısına
+    // bırakılırsa görselleştirme/kalp sesi ortasında ekran kararır
+    // (kullanıcı geri bildirimi). Seans boyunca ekranı uyanık tut; sayfadan
+    // çıkışta [dispose] içinde mutlaka serbest bırakılır.
+    _enableWakelock();
     _heartbeatAudio = BreathingHeartbeatAudio();
     unawaited(_heartbeatAudio.prepare());
     unawaited(BreathingHaptics.init());
@@ -254,6 +261,7 @@ class _BreathingExercisePageState extends ConsumerState<BreathingExercisePage>
   void dispose() {
     _isDisposing = true;
     _cancelPhaseTimers();
+    _disableWakelock();
     ref.read(breathingBottomNavHiddenProvider.notifier).state = false;
     _heartbeatAudio.dispose();
     _scaleController.dispose();
@@ -263,6 +271,33 @@ class _BreathingExercisePageState extends ConsumerState<BreathingExercisePage>
     _introExitController.dispose();
     _completeEnterController.dispose();
     super.dispose();
+  }
+
+  /// Ekranı seans boyunca uyanık tutar. Hata sessizce yutulur — wakelock
+  /// kritik değil; başarısız olursa egzersiz yine de çalışır (yalnızca ekran
+  /// sistem zamanlayıcısıyla kararabilir).
+  ///
+  /// ÖNEMLİ: Doğru serbest bırakma, bu sayfanın gerçek bir route olmasına
+  /// (IndexedStack / keep-alive branch DEĞİL) ve uygulamadaki TEK WakelockPlus
+  /// tüketicisi olmasına dayanır. `WakelockPlus` global bir bayraktır
+  /// (ref-count yok); ileride başka bir ekran da kullanırsa veya bu sayfa
+  /// offscreen'de canlı tutulursa serbest bırakma mantığı gözden geçirilmeli.
+  void _enableWakelock() {
+    unawaited(
+      WakelockPlus.enable().catchError(
+        (Object e) => debugPrint('══ ARIN ══ breathing wakelock enable: $e'),
+      ),
+    );
+  }
+
+  /// Wakelock'u serbest bırakır. Sayfadan her çıkışta (seans bitti, geri
+  /// tuşu, sekme değişimi) çağrılır; aksi halde ekran açık kalıp pil yer.
+  void _disableWakelock() {
+    unawaited(
+      WakelockPlus.disable().catchError(
+        (Object e) => debugPrint('══ ARIN ══ breathing wakelock disable: $e'),
+      ),
+    );
   }
 
   @override
