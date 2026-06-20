@@ -271,7 +271,10 @@ class HomeNamazRitualSection extends ConsumerWidget {
                           ],
                         ),
                         const SizedBox(height: 12),
-                        SalatPrayerRow(habitId: salatId, compact: true),
+                        SalatPrayerRow(
+                          habitId: salatId,
+                          compact: true,
+                        ),
                       ],
                     ),
                   ),

@@ -43,6 +43,7 @@ class SalatPrayerRow extends ConsumerWidget {
     required this.habitId,
     this.compact = false,
     this.day,
+    this.firstPrayerLabelOverride,
   });
 
   final String habitId;
@@ -51,11 +52,14 @@ class SalatPrayerRow extends ConsumerWidget {
   /// Varsayılan: bugün.
   final DateTime? day;
 
+  /// İlk vakit (imsak) etiketini bu satıra özel değiştirmek için.
+  final String? firstPrayerLabelOverride;
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
     final prayerLabels = <String>[
-      l10n.prayerNameImsak,
+      firstPrayerLabelOverride ?? l10n.prayerNameImsak,
       l10n.prayerNameDhuhr,
       l10n.prayerNameAsr,
       l10n.prayerNameMaghrib,
