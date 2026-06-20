@@ -18,6 +18,7 @@ import '../../../core/constants/app_text_styles.dart';
 import '../../../core/providers/shared_preferences_provider.dart';
 import '../../../data/services/arin_local_notifications_plugin.dart';
 import '../../../data/services/ad_gate_service.dart';
+import '../../../data/services/admob_service.dart';
 import '../../../data/services/location_service.dart';
 import '../../../data/services/prayer_notification_android_uri.dart';
 import '../../../data/services/prayer_notification_scheduler.dart';
@@ -338,6 +339,10 @@ class _NamazAdhanReminderCardState
       isPremium: false,
     );
     if (decision.allowed) return true;
+    // Premium olmayan kullanıcı ödüllü reklam izleyecek; diyalog okunurken
+    // ödüllü reklam arka planda yüklensin ki "izle"ye basınca anında açılsın.
+    // (2. alarm geçiş reklamı göstermez → yalnızca ödüllü ısıtılır.)
+    AdMobService.preloadRewarded();
     final accepted = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(

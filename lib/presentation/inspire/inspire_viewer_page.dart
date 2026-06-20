@@ -11,6 +11,7 @@ import '../../core/constants/app_colors.dart';
 import '../../core/ads/admob_ids.dart';
 import '../../data/models/inspiration_card_model.dart';
 import '../../data/services/ad_gate_service.dart';
+import '../../data/services/admob_service.dart';
 import '../shared/providers/ad_gate_providers.dart';
 import '../shared/providers/admob_providers.dart';
 import '../shared/providers/premium_providers.dart';
@@ -108,6 +109,7 @@ class _ViewerBodyState extends ConsumerState<_ViewerBody> {
   bool _adGateShowing = false;
   int _pendingExploreAdGateViews = 0;
   bool _initialPrecacheDone = false;
+  bool _warmedAds = false;
 
   /// Sol kenar “geri” jesti: sağa doğru sürükleme mesafesi (px).
   double _edgeSwipeDx = 0;
@@ -199,6 +201,13 @@ class _ViewerBodyState extends ConsumerState<_ViewerBody> {
           _pendingExploreAdGateViews += 1;
           await Future<void>.delayed(const Duration(milliseconds: 250));
           continue;
+        }
+        // Premium OLMAYAN kullanıcı için keşfet geçiş reklamını arka planda
+        // bir kez ısıt; ilk gösterim anında hazır olsun. (Keşfet yalnızca
+        // geçiş reklamı gösterir → yalnızca interstitial ısıtılır.)
+        if (!isPremium && !_warmedAds) {
+          _warmedAds = true;
+          AdMobService.preloadInterstitial();
         }
         final shouldShow = await adGate
             .recordExploreViewAndShouldShowAd(isPremium: isPremium);

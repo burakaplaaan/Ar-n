@@ -24,6 +24,29 @@ class WidgetUnlockPage extends ConsumerStatefulWidget {
 class _WidgetUnlockPageState extends ConsumerState<WidgetUnlockPage> {
   bool _busy = false;
 
+  @override
+  void initState() {
+    super.initState();
+    // Kullanıcı bu ekranda büyük olasılıkla "Reklam izle"ye basacak; ödüllü
+    // reklamı şimdiden arka planda ısıt ki tıklandığında ANINDA açılsın.
+    // Yalnızca premium OLMAYAN kullanıcı için: bu sayfa normalde sadece
+    // premium olmayanlara açılır, ama native `lock=1` derin bağlantısı
+    // premium/trial uyumsuzluğunda premium kullanıcıyı da buraya
+    // getirebildiğinden, boşa reklam isteği üretmemek için entitlement'ı
+    // doğruladıktan sonra ısıtıyoruz.
+    _maybeWarmRewarded();
+  }
+
+  Future<void> _maybeWarmRewarded() async {
+    try {
+      final entitlement = await ref.read(premiumEntitlementProvider.future);
+      if (!mounted || entitlement.isActive) return;
+      AdMobService.preloadRewarded();
+    } catch (_) {
+      // Entitlement okunamadı: belirsizken reklam ısıtmayı atla (fail-safe).
+    }
+  }
+
   Future<void> _watchAd(BuildContext context) async {
     final l10n = AppLocalizations.of(context)!;
     setState(() => _busy = true);
