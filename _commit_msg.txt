@@ -1,9 +1,0 @@
-fix: resolve android layout issues and onboarding flow bugs
-
-- home_page.dart: Fix greeting text wrapping on Android with FittedBox
-- home_page.dart: Redesign prayer grid with larger boxes and fixed aspect ratio to prevent overflow
-- app_prepare_page.dart: Prompt location permission explicitly before warmup race condition
-- breathing_exercise_page.dart: Add wakelock_plus to prevent screen sleep during sessions
-- pubspec: bump version to 1.1.0+30, add wakelock_plus
-
-Co-authored-by: Cursor <cursoragent@cursor.com>
