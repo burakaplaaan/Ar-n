@@ -33,6 +33,8 @@ import 'data/services/app_notification_channel_prefs.dart';
 import 'data/services/arin_local_notifications_plugin.dart';
 import 'data/services/admob_service.dart';
 import 'data/services/arin_widget_sync.dart';
+import 'data/services/background_location_task.dart';
+import 'data/services/location_service.dart';
 import 'data/services/purchase_service.dart';
 import 'data/services/diyanet_district_matcher.dart';
 import 'data/services/fcm_token_service.dart';
@@ -391,6 +393,12 @@ Future<void> _runDeferredStartup(SharedPreferences prefs) async {
           return PurchaseService.initialize(firebaseUid: uid);
         }(),
       );
+
+      // Uygulama kapalıyken şehir değişimi kontrolü (WorkManager/BGTaskScheduler).
+      // Yalnızca kullanıcı "arka planda otomatik güncelle"yi açıp "Her Zaman
+      // İzin Ver" verdiyse fiilen bir şey yapar; aksi halde no-op'tur — bu
+      // yüzden her açılışta senkronize etmek güvenlidir.
+      unawaited(BackgroundLocationTask.syncSchedule(LocationService()));
     }
   }
 

@@ -4339,6 +4339,26 @@ class AppLocalizationsEn extends AppLocalizations {
   String get updateLocation => 'Update';
 
   @override
+  String get settingsBackgroundLocationTitle =>
+      'Update automatically in the background';
+
+  @override
+  String get settingsBackgroundLocationSubtitle =>
+      'When on, prayer times update by themselves as soon as your city changes, without opening the app.';
+
+  @override
+  String get settingsBackgroundLocationPermissionDenied =>
+      'For background updates, set location permission to \"Allow all the time\" in your phone settings.';
+
+  @override
+  String get settingsBackgroundLocationEnabledMessage =>
+      'Background automatic updates turned on.';
+
+  @override
+  String get settingsBackgroundLocationDisabledMessage =>
+      'Background automatic updates turned off.';
+
+  @override
   String get sealYourIntention => 'Seal your intention';
 
   @override

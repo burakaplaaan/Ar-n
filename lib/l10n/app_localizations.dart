@@ -7680,6 +7680,36 @@ abstract class AppLocalizations {
   /// **'Güncelle'**
   String get updateLocation;
 
+  /// No description provided for @settingsBackgroundLocationTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Arka planda otomatik güncelle'**
+  String get settingsBackgroundLocationTitle;
+
+  /// No description provided for @settingsBackgroundLocationSubtitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Açıksa uygulamayı hiç açmadan, şehir değişince namaz vakitleri kendiliğinden güncellenir.'**
+  String get settingsBackgroundLocationSubtitle;
+
+  /// No description provided for @settingsBackgroundLocationPermissionDenied.
+  ///
+  /// In tr, this message translates to:
+  /// **'Arka planda güncelleme için telefon ayarlarından konum iznini \"Her Zaman İzin Ver\" yapmalısın.'**
+  String get settingsBackgroundLocationPermissionDenied;
+
+  /// No description provided for @settingsBackgroundLocationEnabledMessage.
+  ///
+  /// In tr, this message translates to:
+  /// **'Arka planda otomatik güncelleme açıldı.'**
+  String get settingsBackgroundLocationEnabledMessage;
+
+  /// No description provided for @settingsBackgroundLocationDisabledMessage.
+  ///
+  /// In tr, this message translates to:
+  /// **'Arka planda otomatik güncelleme kapatıldı.'**
+  String get settingsBackgroundLocationDisabledMessage;
+
   /// No description provided for @sealYourIntention.
   ///
   /// In tr, this message translates to:

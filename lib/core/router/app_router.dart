@@ -96,9 +96,18 @@ abstract final class AppRoutes {
     return '/habits/will/breathing?programId=$programId';
   }
 
-  static String willNamaz(String habitId, {bool fromGelisimSetup = false}) {
-    if (!fromGelisimSetup) return '/habits/will/namaz/$habitId';
-    return '/habits/will/namaz/$habitId?from=gelisim_setup';
+  static String willNamaz(
+    String habitId, {
+    bool fromGelisimSetup = false,
+    String? returnOrigin,
+  }) {
+    final query = <String, String>{};
+    if (fromGelisimSetup) query['from'] = 'gelisim_setup';
+    if (returnOrigin != null && returnOrigin.isNotEmpty) {
+      query['origin'] = returnOrigin;
+    }
+    final uri = Uri(path: '/habits/will/namaz/$habitId', queryParameters: query);
+    return uri.toString();
   }
 
   /// Kaza namazı — hesap ve takip (cihaz içi).
@@ -376,11 +385,14 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                   final id = state.pathParameters['habitId']!;
                   final fromGelisimSetup =
                       state.uri.queryParameters['from'] == 'gelisim_setup';
+                  final returnOrigin =
+                      state.uri.queryParameters['origin'] ?? 'habits';
                   return _page(
                     state,
                     NamazProgramPage(
                       habitId: id,
                       showHomeVisibilityHint: fromGelisimSetup,
+                      returnOrigin: returnOrigin,
                     ),
                   );
                 },

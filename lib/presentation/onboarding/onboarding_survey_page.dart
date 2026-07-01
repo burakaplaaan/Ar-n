@@ -16,6 +16,7 @@ import 'package:permission_handler/permission_handler.dart';
 import '../../core/analytics/arin_analytics.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_text_styles.dart';
+import '../../core/constants/profile_prefs_keys.dart';
 import '../../core/providers/shared_preferences_provider.dart';
 import '../../core/router/app_router.dart';
 import '../../data/services/arin_local_notifications_plugin.dart';
@@ -304,21 +305,26 @@ class _OnboardingSurveyPageState extends ConsumerState<OnboardingSurveyPage> {
     if (_finishing) return;
     setState(() => _finishing = true);
     try {
+      final normalizedName = _nameController.text.trim();
+      final hasCustomName = normalizedName.isNotEmpty;
       await ref
           .read(userProfileProvider.notifier)
           .saveProfile(
-            name: _nameController.text.trim().isNotEmpty
-                ? _nameController.text.trim()
-                : null,
+            name: hasCustomName ? normalizedName : null,
             gender: _selectedGender == null
                 ? null
-                : (_genderIdByLabel(context)[_selectedGender!] ?? _selectedGender),
+                : (_genderIdByLabel(context)[_selectedGender!] ??
+                      _selectedGender),
             moodTags: _toStableIds(_selectedMoods, _moodIdByLabel(context)),
-            sectorTags: _toStableIds(_selectedSectors, _sectorIdByLabel(context)),
+            sectorTags: _toStableIds(
+              _selectedSectors,
+              _sectorIdByLabel(context),
+            ),
             needTags: _toStableIds(_selectedNeeds, _needIdByLabel(context)),
           );
 
       final prefs = ref.read(sharedPreferencesProvider);
+      await prefs.setBool(profileNameLockedByUserKey, hasCustomName);
       await prefs.setBool('onboarding_completed', true);
       // Funnel bitti — tamamlananlar için kritik ölçü.
       unawaited(ArinAnalytics.log('onboarding_complete'));

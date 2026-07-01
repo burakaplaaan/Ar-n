@@ -4309,6 +4309,25 @@ class AppLocalizationsAr extends AppLocalizations {
   String get updateLocation => 'تحديث';
 
   @override
+  String get settingsBackgroundLocationTitle => 'التحديث التلقائي في الخلفية';
+
+  @override
+  String get settingsBackgroundLocationSubtitle =>
+      'عند التفعيل، تُحدَّث مواقيت الصلاة تلقائيًا فور تغيّر مدينتك دون الحاجة لفتح التطبيق.';
+
+  @override
+  String get settingsBackgroundLocationPermissionDenied =>
+      'للتحديث في الخلفية، يجب ضبط إذن الموقع على \"السماح دائمًا\" من إعدادات هاتفك.';
+
+  @override
+  String get settingsBackgroundLocationEnabledMessage =>
+      'تم تفعيل التحديث التلقائي في الخلفية.';
+
+  @override
+  String get settingsBackgroundLocationDisabledMessage =>
+      'تم إيقاف التحديث التلقائي في الخلفية.';
+
+  @override
   String get sealYourIntention => 'اختم نيتك';
 
   @override

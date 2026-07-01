@@ -22,10 +22,12 @@ class NamazIbadetOnboarding extends ConsumerStatefulWidget {
     super.key,
     required this.habitId,
     required this.onClose,
+    required this.onCompleted,
   });
 
   final String habitId;
   final VoidCallback onClose;
+  final Future<void> Function() onCompleted;
 
   @override
   ConsumerState<NamazIbadetOnboarding> createState() =>
@@ -38,6 +40,7 @@ class _NamazIbadetOnboardingState extends ConsumerState<NamazIbadetOnboarding> {
   int _pageIndex = 0;
   bool _completed = false;
   bool _closing = false;
+  bool _finishing = false;
 
   double _shellBottomReserve(BuildContext context) {
     return ArinShellLayout.bottomContentPadding(context);
@@ -54,6 +57,7 @@ class _NamazIbadetOnboardingState extends ConsumerState<NamazIbadetOnboarding> {
   }
 
   Future<void> _next() async {
+    if (_finishing) return;
     final l10n = AppLocalizations.of(context)!;
     if (_pageIndex == 1) {
       final t = _commitment.text.trim();
@@ -79,6 +83,7 @@ class _NamazIbadetOnboardingState extends ConsumerState<NamazIbadetOnboarding> {
   }
 
   Future<void> _back() async {
+    if (_finishing) return;
     if (_pageIndex == 0) {
       _closeIncomplete();
       return;
@@ -90,7 +95,7 @@ class _NamazIbadetOnboardingState extends ConsumerState<NamazIbadetOnboarding> {
   }
 
   void _closeIncomplete() {
-    if (_closing || _completed) return;
+    if (_closing || _completed || _finishing) return;
     _closing = true;
     widget.onClose();
   }
@@ -127,6 +132,7 @@ class _NamazIbadetOnboardingState extends ConsumerState<NamazIbadetOnboarding> {
       canPop: false,
       onPopInvokedWithResult: (didPop, result) {
         if (didPop) return;
+        if (_finishing) return;
         if (_pageIndex > 0) {
           unawaited(_back());
           return;
@@ -140,7 +146,7 @@ class _NamazIbadetOnboardingState extends ConsumerState<NamazIbadetOnboarding> {
           elevation: 0,
           leading: IconButton(
             icon: Icon(Icons.arrow_back_rounded, color: appBarFg),
-            onPressed: _back,
+            onPressed: _finishing ? null : _back,
           ),
           title: Text(
             l10n.namazIbadetPrepTitle,
@@ -206,16 +212,37 @@ class _NamazIbadetOnboardingState extends ConsumerState<NamazIbadetOnboarding> {
                       encourageWhileHolding:
                           l10n.namazIbadetSealEncourageHolding,
                       onCompleted: () async {
-                        await ref
-                            .read(habitSummaryProvider.notifier)
-                            .completeQuitOnboarding(
-                              habitId: widget.habitId,
-                              commitmentText: _commitment.text.trim(),
-                            );
-                        await ref
-                            .read(salatTrackingVisibleOnHomeProvider.notifier)
-                            .enableFromGelisim();
-                        _completed = true;
+                        if (_finishing || _completed) return;
+                        setState(() => _finishing = true);
+                        try {
+                          await ref
+                              .read(habitSummaryProvider.notifier)
+                              .completeQuitOnboarding(
+                                habitId: widget.habitId,
+                                commitmentText: _commitment.text.trim(),
+                              );
+                          final updatedHabit = ref
+                              .read(habitRepositoryProvider)
+                              .getById(widget.habitId);
+                          if (updatedHabit == null ||
+                              !updatedHabit.onboardingCompleted ||
+                              updatedHabit.commitmentText.trim().isEmpty) {
+                            throw StateError('Namaz onboarding state invalid');
+                          }
+                          await ref
+                              .read(salatTrackingVisibleOnHomeProvider.notifier)
+                              .enableFromGelisim();
+                          _completed = true;
+                          await widget.onCompleted();
+                        } catch (_) {
+                          if (!mounted) return;
+                          setState(() => _finishing = false);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(l10n.surveySummarySaveError),
+                            ),
+                          );
+                        }
                       },
                     ),
                   ),
@@ -241,7 +268,7 @@ class _NamazIbadetOnboardingState extends ConsumerState<NamazIbadetOnboarding> {
                   child: Row(
                     children: [
                       TextButton.icon(
-                        onPressed: _back,
+                        onPressed: _finishing ? null : _back,
                         icon: Icon(
                           Icons.arrow_back_rounded,
                           size: 18,
@@ -257,7 +284,7 @@ class _NamazIbadetOnboardingState extends ConsumerState<NamazIbadetOnboarding> {
                       ),
                       const Spacer(),
                       FilledButton.icon(
-                        onPressed: _next,
+                        onPressed: _finishing ? null : _next,
                         icon: const Icon(Icons.arrow_forward_rounded, size: 18),
                         style: FilledButton.styleFrom(
                           backgroundColor: AppColors.accentNeonGreen,

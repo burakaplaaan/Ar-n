@@ -407,6 +407,12 @@ class _NamazAdhanReminderCardState
     final accent = onLight
         ? AppColors.accentGreenOnLight
         : AppColors.accentNeonGreen;
+    final warmBronze = onLight
+        ? const Color(0xFF8B5E3C)
+        : const Color(0xFFC9A074);
+    final warmBronzeSoft = onLight
+        ? const Color(0xFFB07F52)
+        : const Color(0xFF8A6645);
     final primaryText = onLight ? AppColors.emeraldDark : AppColors.creamBase;
     final secondaryText = onLight
         ? AppColors.textSecondary
@@ -427,8 +433,24 @@ class _NamazAdhanReminderCardState
     if (widget.compact) {
       return Material(
         color: Colors.transparent,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 4),
+        child: Container(
+          padding: const EdgeInsets.fromLTRB(10, 8, 6, 8),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16),
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                accent.withValues(alpha: onLight ? 0.05 : 0.06),
+                warmBronzeSoft.withValues(alpha: onLight ? 0.07 : 0.09),
+              ],
+            ),
+            border: Border.all(
+              color: Color.lerp(accent, warmBronze, 0.5)!.withValues(
+                alpha: onLight ? 0.28 : 0.22,
+              ),
+            ),
+          ),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
@@ -441,15 +463,16 @@ class _NamazAdhanReminderCardState
                   splashColor: accent.withValues(alpha: 0.1),
                   child: Padding(
                     padding: const EdgeInsets.symmetric(
-                      vertical: 8,
-                      horizontal: 4,
+                      vertical: 6,
+                      horizontal: 2,
                     ),
                     child: Row(
                       children: [
-                        Icon(
-                          Icons.notifications_active_outlined,
-                          color: accent.withValues(alpha: 0.88),
-                          size: 22,
+                        _ReminderCrescentGlyph(
+                          active: displayOn,
+                          accent: accent,
+                          bronze: warmBronze,
+                          bronzeSoft: warmBronzeSoft,
                         ),
                         const SizedBox(width: 12),
                         Expanded(
@@ -464,7 +487,21 @@ class _NamazAdhanReminderCardState
                                   letterSpacing: -0.2,
                                 ),
                               ),
-                              const SizedBox(height: 3),
+                              const SizedBox(height: 4),
+                              Container(
+                                height: 1.5,
+                                width: 24,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(999),
+                                  gradient: LinearGradient(
+                                    colors: [
+                                      warmBronze.withValues(alpha: 0.6),
+                                      warmBronzeSoft.withValues(alpha: 0.0),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 4),
                               Text(
                                 displayOn
                                     ? _reminderCardSubtitle(l10n)
@@ -488,7 +525,9 @@ class _NamazAdhanReminderCardState
                   onPressed: () => _openPrayerSoundPicker(prefs),
                   icon: Icon(
                     Icons.graphic_eq_rounded,
-                    color: accent.withValues(alpha: 0.88),
+                    color: Color.lerp(accent, warmBronze, 0.3)!.withValues(
+                      alpha: 0.9,
+                    ),
                     size: 22,
                   ),
                 ),
@@ -713,5 +752,86 @@ class _NamazAdhanReminderCardState
         .animate()
         .fadeIn(duration: 380.ms, curve: Curves.easeOutCubic)
         .slideY(begin: 0.04, duration: 380.ms, curve: Curves.easeOutCubic);
+  }
+}
+
+/// Vakit bildirimi madalyonu: yeşil→bronz ışıltılı halka içinde hilal motifi.
+/// Açıkken sıcak bir parıltı, üstte küçük bir zil rozetiyle "bildirim" anlamı verir.
+class _ReminderCrescentGlyph extends StatelessWidget {
+  const _ReminderCrescentGlyph({
+    required this.active,
+    required this.accent,
+    required this.bronze,
+    required this.bronzeSoft,
+  });
+
+  final bool active;
+  final Color accent;
+  final Color bronze;
+  final Color bronzeSoft;
+
+  @override
+  Widget build(BuildContext context) {
+    final ringColor = Color.lerp(accent, bronze, 0.45)!;
+    return SizedBox(
+      width: 44,
+      height: 44,
+      child: Stack(
+        clipBehavior: Clip.none,
+        alignment: Alignment.center,
+        children: [
+          Container(
+            width: 44,
+            height: 44,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  accent.withValues(alpha: active ? 0.22 : 0.12),
+                  bronzeSoft.withValues(alpha: active ? 0.26 : 0.16),
+                ],
+              ),
+              border: Border.all(
+                color: ringColor.withValues(alpha: active ? 0.6 : 0.4),
+                width: 1.1,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: (active ? accent : bronzeSoft).withValues(
+                    alpha: active ? 0.28 : 0.16,
+                  ),
+                  blurRadius: active ? 12 : 8,
+                  spreadRadius: active ? 0.5 : 0,
+                ),
+              ],
+            ),
+            child: Icon(
+              Icons.nightlight_round,
+              size: 21,
+              color: Color.lerp(accent, bronze, active ? 0.3 : 0.45)!
+                  .withValues(alpha: active ? 0.95 : 0.78),
+            ),
+          ),
+          Positioned(
+            top: 1,
+            right: 1,
+            child: Container(
+              padding: const EdgeInsets.all(2.5),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: bronze.withValues(alpha: active ? 0.95 : 0.55),
+              ),
+              child: Icon(
+                Icons.notifications_active_rounded,
+                size: 9,
+                color: Colors.white.withValues(alpha: active ? 0.95 : 0.75),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }

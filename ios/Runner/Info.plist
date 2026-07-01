@@ -128,5 +128,17 @@
 		</array>
 		<key>UIStatusBarHidden</key>
 		<false/>
+		<!-- BGTaskScheduler: uygulama kapalıyken düşük sıklıkta ("processing")
+		     arka plan konum kontrolü. Frekans ios/Runner/AppDelegate.swift
+		     içinde WorkmanagerPlugin.registerPeriodicTask ile ayarlanır;
+		     Info.plist'teki kimlik burada birebir aynı olmalı. -->
+		<key>UIBackgroundModes</key>
+		<array>
+			<string>processing</string>
+		</array>
+		<key>BGTaskSchedulerPermittedIdentifiers</key>
+		<array>
+			<string>com.arin.arin.locationSync</string>
+		</array>
 	</dict>
 </plist>

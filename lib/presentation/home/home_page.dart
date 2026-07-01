@@ -11,6 +11,8 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:arin/l10n/app_localizations.dart';
 
 import '../../core/constants/app_colors.dart';
+import '../../core/constants/profile_prefs_keys.dart';
+import '../../core/providers/shared_preferences_provider.dart';
 import '../../core/router/app_router.dart';
 import '../../core/theme/arin_shell_background.dart';
 import '../../core/extensions/date_extensions.dart';
@@ -138,13 +140,21 @@ class _HeaderSection extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
     final profileName = ref.watch(userProfileProvider).name?.trim();
+    final prefs = ref.watch(sharedPreferencesProvider);
+    final hasNameLockPreference = prefs.containsKey(profileNameLockedByUserKey);
+    final isProfileNameLockedByUser = hasNameLockPreference
+        ? (prefs.getBool(profileNameLockedByUserKey) ?? false)
+        : (profileName != null && profileName.isNotEmpty);
     final authName = ref
         .watch(authUserProvider)
         .asData
         ?.value
         ?.displayName
         ?.trim();
-    final userName = (profileName != null && profileName.isNotEmpty)
+    final userName =
+        (isProfileNameLockedByUser &&
+            profileName != null &&
+            profileName.isNotEmpty)
         ? profileName
         : (authName != null && authName.isNotEmpty)
         ? authName
@@ -175,9 +185,7 @@ class _HeaderSection extends ConsumerWidget {
       fontSize: 28,
       fontWeight: FontWeight.w600,
       letterSpacing: -0.5,
-    ).copyWith(
-      fontFamilyFallback: const ['Times New Roman', 'serif'],
-    );
+    ).copyWith(fontFamilyFallback: const ['Times New Roman', 'serif']);
 
     return Container(
       padding: const EdgeInsets.fromLTRB(14, 10, 10, 10),
@@ -203,9 +211,7 @@ class _HeaderSection extends ConsumerWidget {
               child: Icon(
                 Icons.nightlight_round,
                 size: 16,
-                color: ornament.withValues(
-                  alpha: isDarkShell ? 0.34 : 0.45,
-                ),
+                color: ornament.withValues(alpha: isDarkShell ? 0.34 : 0.45),
               ),
             ),
           ),
@@ -250,184 +256,196 @@ class _HeaderSection extends ConsumerWidget {
                 ),
               ),
               const SizedBox(width: 12),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: [
-            Material(
-              color: Colors.transparent,
-              child: InkWell(
-                borderRadius: BorderRadius.circular(20),
-                onTap: () => context.push(AppRoutes.premium),
-                child: Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                  decoration: BoxDecoration(
-                    color: ornament.withValues(alpha: 0.15),
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(
-                      color: ornament.withValues(alpha: 0.45),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(20),
+                      onTap: () => context.push(AppRoutes.premium),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 5,
+                        ),
+                        decoration: BoxDecoration(
+                          color: ornament.withValues(alpha: 0.15),
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(
+                            color: ornament.withValues(alpha: 0.45),
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              Icons.workspace_premium_rounded,
+                              color: ornament,
+                              size: 16,
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              isPremium ? 'PREMIUM' : 'Premium',
+                              style: TextStyle(
+                                color: badgeTextC,
+                                fontSize: 11,
+                                fontWeight: FontWeight.w700,
+                                letterSpacing: 0.5,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
                   ),
-                  child: Row(
+                  const SizedBox(height: 10),
+                  Row(
                     mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      Icon(
-                        Icons.workspace_premium_rounded,
-                        color: ornament,
-                        size: 16,
-                      ),
-                      const SizedBox(width: 4),
-                      Text(
-                        isPremium ? 'PREMIUM' : 'Premium',
-                        style: TextStyle(
-                          color: badgeTextC,
-                          fontSize: 11,
-                          fontWeight: FontWeight.w700,
-                          letterSpacing: 0.5,
+                      // Namaz sayacı kartı — TalkBack/VoiceOver kullanıcısı tek
+                      // cümle duyuyor: "Sıradaki namaz İkindi, kalan 1 saat 23
+                      // dakika". FittedBox içinde ayrı ayrı okutmak yerine
+                      // Semantics.container ile merge ediyoruz.
+                      Semantics(
+                        container: true,
+                        label: urgentFajr
+                            ? l10n.homePrayerUrgentSemanticsLabel(
+                                _humanRemaining(remaining, l10n),
+                              )
+                            : l10n.homePrayerNextSemanticsLabel(
+                                nextName,
+                                _humanRemaining(remaining, l10n),
+                              ),
+                        excludeSemantics: true,
+                        child: OrnateFrame(
+                          borderRadius: 20,
+                          inset: 5,
+                          armLength: 11,
+                          bottomAccent: true,
+                          child: Container(
+                            width: 124,
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 12,
+                            ),
+                            decoration: BoxDecoration(
+                              color: urgentFajr
+                                  ? (isDarkShell
+                                        ? const Color(
+                                            0xFF2A1710,
+                                          ).withValues(alpha: 0.92)
+                                        : const Color(
+                                            0xFFFFF3E0,
+                                          ).withValues(alpha: 0.96))
+                                  : (isDarkShell
+                                        ? AppColors.homeCardSurface.withValues(
+                                            alpha: 0.85,
+                                          )
+                                        : Colors.white.withValues(alpha: 0.92)),
+                              borderRadius: BorderRadius.circular(20),
+                              border: Border.all(
+                                color: urgentFajr
+                                    ? const Color(
+                                        0xFFFFA726,
+                                      ).withValues(alpha: 0.75)
+                                    : ornament.withValues(alpha: 0.56),
+                                width: urgentFajr ? 1.5 : 1,
+                              ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: urgentFajr
+                                      ? const Color(
+                                          0xFFFFA726,
+                                        ).withValues(alpha: 0.22)
+                                      : ornament.withValues(alpha: 0.18),
+                                  blurRadius: 18,
+                                  offset: const Offset(0, 6),
+                                ),
+                              ],
+                            ),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  urgentFajr
+                                      ? l10n.homePrayerUrgentBadge
+                                      : l10n.homePrayerNextBadge,
+                                  style: TextStyle(
+                                    color: urgentFajr
+                                        ? const Color(0xFFFFB74D)
+                                        : (isDarkShell
+                                              ? Colors.white.withValues(
+                                                  alpha: 0.55,
+                                                )
+                                              : AppColors.textSecondary),
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w700,
+                                    letterSpacing: urgentFajr ? 0.4 : 0,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  nextName,
+                                  style: TextStyle(
+                                    color: urgentFajr
+                                        ? const Color(0xFFFFCC80)
+                                        : (isDarkShell
+                                              ? Colors.white.withValues(
+                                                  alpha: 0.85,
+                                                )
+                                              : AppColors.emeraldDark),
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                  textAlign: TextAlign.center,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                const SizedBox(height: 6),
+                                FittedBox(
+                                  fit: BoxFit.scaleDown,
+                                  alignment: Alignment.center,
+                                  child: Text(
+                                    remaining.countdownText,
+                                    maxLines: 1,
+                                    softWrap: false,
+                                    style: TextStyle(
+                                      color: urgentFajr
+                                          ? const Color(0xFFFFA726)
+                                          : AppColors.accentNeonGreen,
+                                      fontSize: 24,
+                                      fontWeight: FontWeight.bold,
+                                      letterSpacing: -0.5,
+                                      shadows: [
+                                        Shadow(
+                                          color:
+                                              (urgentFajr
+                                                      ? const Color(0xFFFFA726)
+                                                      : AppColors
+                                                            .accentNeonGreen)
+                                                  .withValues(alpha: 0.4),
+                                          blurRadius: 8,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
                         ),
                       ),
                     ],
                   ),
-                ),
+                ],
               ),
-            ),
-            const SizedBox(height: 10),
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                // Namaz sayacı kartı — TalkBack/VoiceOver kullanıcısı tek
-                // cümle duyuyor: "Sıradaki namaz İkindi, kalan 1 saat 23
-                // dakika". FittedBox içinde ayrı ayrı okutmak yerine
-                // Semantics.container ile merge ediyoruz.
-                Semantics(
-                  container: true,
-                  label: urgentFajr
-                      ? l10n.homePrayerUrgentSemanticsLabel(
-                          _humanRemaining(remaining, l10n),
-                        )
-                      : l10n.homePrayerNextSemanticsLabel(
-                          nextName,
-                          _humanRemaining(remaining, l10n),
-                        ),
-                  excludeSemantics: true,
-                  child: OrnateFrame(
-                    borderRadius: 20,
-                    inset: 5,
-                    armLength: 11,
-                    bottomAccent: true,
-                    child: Container(
-                      width: 124,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 12,
-                      ),
-                      decoration: BoxDecoration(
-                        color: urgentFajr
-                            ? (isDarkShell
-                                  ? const Color(
-                                      0xFF2A1710,
-                                    ).withValues(alpha: 0.92)
-                                  : const Color(
-                                      0xFFFFF3E0,
-                                    ).withValues(alpha: 0.96))
-                            : (isDarkShell
-                                  ? AppColors.homeCardSurface.withValues(
-                                      alpha: 0.85,
-                                    )
-                                  : Colors.white.withValues(alpha: 0.92)),
-                        borderRadius: BorderRadius.circular(20),
-                        border: Border.all(
-                          color: urgentFajr
-                              ? const Color(0xFFFFA726).withValues(alpha: 0.75)
-                              : ornament.withValues(alpha: 0.56),
-                          width: urgentFajr ? 1.5 : 1,
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: urgentFajr
-                                ? const Color(0xFFFFA726).withValues(alpha: 0.22)
-                                : ornament.withValues(alpha: 0.18),
-                            blurRadius: 18,
-                            offset: const Offset(0, 6),
-                          ),
-                        ],
-                      ),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            urgentFajr
-                                ? l10n.homePrayerUrgentBadge
-                                : l10n.homePrayerNextBadge,
-                            style: TextStyle(
-                              color: urgentFajr
-                                  ? const Color(0xFFFFB74D)
-                                  : (isDarkShell
-                                        ? Colors.white.withValues(alpha: 0.55)
-                                        : AppColors.textSecondary),
-                              fontSize: 10,
-                              fontWeight: FontWeight.w700,
-                              letterSpacing: urgentFajr ? 0.4 : 0,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            nextName,
-                            style: TextStyle(
-                              color: urgentFajr
-                                  ? const Color(0xFFFFCC80)
-                                  : (isDarkShell
-                                        ? Colors.white.withValues(alpha: 0.85)
-                                        : AppColors.emeraldDark),
-                              fontSize: 11,
-                              fontWeight: FontWeight.w600,
-                            ),
-                            textAlign: TextAlign.center,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          const SizedBox(height: 6),
-                          FittedBox(
-                            fit: BoxFit.scaleDown,
-                            alignment: Alignment.center,
-                            child: Text(
-                              remaining.countdownText,
-                              maxLines: 1,
-                              softWrap: false,
-                              style: TextStyle(
-                                color: urgentFajr
-                                    ? const Color(0xFFFFA726)
-                                    : AppColors.accentNeonGreen,
-                                fontSize: 24,
-                                fontWeight: FontWeight.bold,
-                                letterSpacing: -0.5,
-                                shadows: [
-                                  Shadow(
-                                    color: (urgentFajr
-                                            ? const Color(0xFFFFA726)
-                                            : AppColors.accentNeonGreen)
-                                        .withValues(alpha: 0.4),
-                                    blurRadius: 8,
-                                  )
-                                ],
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ],
-    ),
-  ],
-),
-);
+            ],
+          ),
+        ],
+      ),
+    );
   }
 
   /// Erişilebilirlik için "01:23:45" yerine "1 saat 23 dakika" gibi okunabilir
@@ -474,9 +492,7 @@ class _PrayerTimesList extends StatelessWidget {
     final now = DateTime.now();
     final next = model.nextPrayer(now);
     final nextName = next?.name;
-    final dateLabel = DateFormat.yMMMd(
-      Localizations.localeOf(context).toLanguageTag(),
-    ).format(now);
+    final dateLabel = _safeDateLabel(context, now);
 
     final meta = isDarkShell
         ? Colors.white.withValues(alpha: 0.45)
@@ -585,6 +601,31 @@ class _PrayerTimesList extends StatelessWidget {
       ),
     );
   }
+
+  /// Bazı Android locale etiketlerinde (özellikle uzantılı BCP-47 tag'leri)
+  /// `intl` formatter istisna atabiliyor ve kart subtree'sini boş bırakabiliyor.
+  /// Bu nedenle tarih etiketini kademeli fallback ile üretip bu katmanda
+  /// istisna çıkmasını engelliyoruz.
+  String _safeDateLabel(BuildContext context, DateTime now) {
+    final locale = Localizations.localeOf(context);
+    final tag = locale.toLanguageTag();
+    try {
+      return DateFormat.yMMMd(tag).format(now);
+    } catch (_) {
+      try {
+        return DateFormat.yMMMd(locale.languageCode).format(now);
+      } catch (_) {
+        try {
+          return DateFormat.yMMMd().format(now);
+        } catch (_) {
+          final dd = now.day.toString().padLeft(2, '0');
+          final mm = now.month.toString().padLeft(2, '0');
+          final yyyy = now.year.toString();
+          return '$dd.$mm.$yyyy';
+        }
+      }
+    }
+  }
 }
 
 class _PrayerTimeRow extends StatelessWidget {
@@ -659,9 +700,11 @@ class _PrayerTimeRow extends StatelessWidget {
         border: Border.all(
           color: isNext
               ? borderColor
-              : Color.lerp(borderColor, ornament, 0.35)!.withValues(
-                  alpha: isDarkShell ? 0.3 : 0.4,
-                ),
+              : Color.lerp(
+                  borderColor,
+                  ornament,
+                  0.35,
+                )!.withValues(alpha: isDarkShell ? 0.3 : 0.4),
           width: isNext ? 1.35 : 0.95,
         ),
         boxShadow: isNext

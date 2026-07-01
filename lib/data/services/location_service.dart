@@ -318,6 +318,73 @@ class LocationService {
     }
   }
 
+  /// Yalnızca izin DURUMUNU kontrol eder, asla istemez. WorkManager/BGTaskScheduler
+  /// arka plan izolatında Activity/UIViewController olmadığı için izin diyaloğu
+  /// gösterilemez — `always` değilse arka plan görevi sessizce hiçbir şey yapmaz.
+  Future<bool> hasAlwaysLocationPermission() async {
+    try {
+      final permission = await Geolocator.checkPermission();
+      return permission == LocationPermission.always;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  /// [detectLocationChange] ile aynı işi yapar ama **hiçbir izin istemez** ve
+  /// **hiçbir UI göstermez** — yalnızca arka plan (uygulama tamamen kapalı)
+  /// görevinden çağrılmalıdır. İzin `always` değilse, konum servisleri kapalıysa
+  /// veya herhangi bir adım başarısız olursa sessizce `null` döner.
+  Future<LocationChangeResult?> detectLocationChangeHeadless() async {
+    _syncGeneration++;
+    _syncInProgress = false;
+    try {
+      if (!await hasAlwaysLocationPermission()) return null;
+      if (!await Geolocator.isLocationServiceEnabled()) return null;
+
+      final pos = await Geolocator.getCurrentPosition(
+        locationSettings: const LocationSettings(
+          accuracy: LocationAccuracy.low,
+          timeLimit: Duration(seconds: 20),
+        ),
+      );
+
+      final marks = await placemarkFromCoordinates(
+        pos.latitude,
+        pos.longitude,
+      );
+      if (marks.isEmpty) return null;
+      final p = marks.first;
+
+      final newCity = _pickCityName(p);
+      if (newCity == null || newCity.isEmpty) return null;
+      if (_isSameCity(newCity, savedCity)) return null;
+
+      final newCountry = _countryForAladhan(p);
+      int? newDistrictId;
+      if ((p.isoCountryCode?.toUpperCase() ?? '') == 'TR') {
+        await DiyanetDistrictMatcher.loadOnce();
+        final ilceAdi = p.subAdministrativeArea?.trim().isNotEmpty == true
+            ? p.subAdministrativeArea
+            : p.locality;
+        final match = DiyanetDistrictMatcher.match(
+          ilAdi: p.administrativeArea,
+          ilceAdi: ilceAdi,
+        );
+        newDistrictId = match?.id;
+      }
+
+      return LocationChangeResult(
+        newCity: newCity,
+        newCountry: newCountry,
+        newDistrictId: newDistrictId,
+        lat: pos.latitude,
+        lon: pos.longitude,
+      );
+    } catch (_) {
+      return null;
+    }
+  }
+
   /// [detectLocationChange]'in sonucunu Hive'a kalıcı olarak yazar.
   Future<void> applyLocationChange(LocationChangeResult result) async {
     _syncGeneration++;

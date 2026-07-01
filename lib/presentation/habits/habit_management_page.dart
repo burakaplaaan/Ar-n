@@ -25,53 +25,62 @@ class HabitManagementPage extends ConsumerStatefulWidget {
 class _HabitManagementPageState extends ConsumerState<HabitManagementPage> {
   /// 0 Namaz, 1 Kaza takibi, 2 Özel rutin
   int? _selected;
+  bool _saving = false;
 
   void _setSelection(int i) => setState(() => _selected = i);
 
   Future<void> _onSave(BuildContext context) async {
+    if (_saving) return;
     final sel = _selected;
     if (sel == null) return;
-
-    if (sel == 0) {
-      final summary = ref.read(habitSummaryProvider);
-      HabitModel? salatHabit;
-      for (final e in summary) {
-        if (e.habit.templateId == WillpowerTemplates.salatDaily &&
-            !e.habit.isArchived) {
-          salatHabit = e.habit;
-          break;
+    setState(() => _saving = true);
+    try {
+      if (sel == 0) {
+        final summary = ref.read(habitSummaryProvider);
+        HabitModel? salatHabit;
+        for (final e in summary) {
+          if (e.habit.templateId == WillpowerTemplates.salatDaily &&
+              !e.habit.isArchived) {
+            salatHabit = e.habit;
+            break;
+          }
         }
+        final h = salatHabit ??
+            await ref.read(habitSummaryProvider.notifier).createFromTemplate(
+                  templateId: WillpowerTemplates.salatDaily,
+                  title: AppLocalizations.of(context)!.mgmtDailyPrayers,
+                  type: HabitType.good,
+                  emoji: '🕌',
+                  onboardingCompleted: false,
+                );
+        if (!context.mounted) return;
+        await context.push(
+          AppRoutes.willNamaz(
+            h.id,
+            fromGelisimSetup: true,
+            returnOrigin: 'habits',
+          ),
+        );
+        return;
       }
-      final h = salatHabit ??
-          await ref.read(habitSummaryProvider.notifier).createFromTemplate(
-                templateId: WillpowerTemplates.salatDaily,
-                title: AppLocalizations.of(context)!.mgmtDailyPrayers,
-                type: HabitType.good,
-                emoji: '🕌',
-                onboardingCompleted: false,
-              );
-      if (!context.mounted) return;
-      context.push(
-        AppRoutes.willNamaz(h.id, fromGelisimSetup: true),
-      );
-      return;
-    }
 
-    if (sel == 1) {
-      await ref.read(kazaTrackingProvider.notifier).enableGelisimHubCard();
-      if (context.mounted) {
-        context.push(AppRoutes.kazaCalculator);
+      if (sel == 1) {
+        await ref.read(kazaTrackingProvider.notifier).enableGelisimHubCard();
+        if (context.mounted) {
+          await context.push(AppRoutes.kazaCalculator);
+        }
+        return;
       }
-      return;
+      await context.push(AppRoutes.addHabit, extra: HabitType.good);
+    } finally {
+      if (mounted) setState(() => _saving = false);
     }
-
-    await context.push(AppRoutes.addHabit, extra: HabitType.good);
   }
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final canSave = _selected != null;
+    final canSave = _selected != null && !_saving;
 
     return Scaffold(
       backgroundColor: Colors.transparent,

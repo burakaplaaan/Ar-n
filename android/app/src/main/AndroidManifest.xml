@@ -22,10 +22,17 @@
         android:maxSdkVersion="32" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <!-- Uygulama kapalıyken/arka planda WorkManager ile şehir değişimi kontrolü.
+         Yalnızca kullanıcı Ayarlar'dan "arka planda otomatik güncelle"yi açıp
+         "Her Zaman İzin Ver"i onaylarsa fiilen kullanılır; aksi halde arka
+         plan görevi konuma dokunmadan sessizce çıkar. -->
+    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
     <application
         android:label="@string/app_name"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/ic_launcher"
+        android:allowBackup="false"
+        android:fullBackupContent="false">
         <activity
             android:name=".MainActivity"
             android:exported="true"

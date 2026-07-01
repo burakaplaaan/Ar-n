@@ -4327,6 +4327,25 @@ class AppLocalizationsTr extends AppLocalizations {
   String get updateLocation => 'Güncelle';
 
   @override
+  String get settingsBackgroundLocationTitle => 'Arka planda otomatik güncelle';
+
+  @override
+  String get settingsBackgroundLocationSubtitle =>
+      'Açıksa uygulamayı hiç açmadan, şehir değişince namaz vakitleri kendiliğinden güncellenir.';
+
+  @override
+  String get settingsBackgroundLocationPermissionDenied =>
+      'Arka planda güncelleme için telefon ayarlarından konum iznini \"Her Zaman İzin Ver\" yapmalısın.';
+
+  @override
+  String get settingsBackgroundLocationEnabledMessage =>
+      'Arka planda otomatik güncelleme açıldı.';
+
+  @override
+  String get settingsBackgroundLocationDisabledMessage =>
+      'Arka planda otomatik güncelleme kapatıldı.';
+
+  @override
   String get sealYourIntention => 'Niyetini mühürle';
 
   @override

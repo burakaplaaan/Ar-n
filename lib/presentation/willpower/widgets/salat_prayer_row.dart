@@ -55,11 +55,28 @@ class SalatPrayerRow extends ConsumerWidget {
   /// İlk vakit (imsak) etiketini bu satıra özel değiştirmek için.
   final String? firstPrayerLabelOverride;
 
+  String _defaultFirstPrayerLabel(BuildContext context) {
+    final code = Localizations.localeOf(context).languageCode.toLowerCase();
+    if (code.startsWith('tr')) return 'Sabah';
+    if (code.startsWith('ar')) return 'الفجر';
+    return 'Fajr';
+  }
+
+  DateTime _fallbackStorageDay(DateTime now) {
+    final cal = DateTime(now.year, now.month, now.day);
+    // Vakitler yüklenemediyse gece yarısı-imsak arası için eski davranışa
+    // yakın kal: yatsı → sabah aralığını önceki salat gününe yaz. 08:00
+    // muhafazakâr eşik; gerçek sabah sınırı kışın 06:00'ı aşabildiği için
+    // vakitler sonradan yüklenince tiklerin "kaybolmuş" görünmesini azaltır.
+    if (now.hour < 8) return cal.subtract(const Duration(days: 1));
+    return cal;
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
     final prayerLabels = <String>[
-      firstPrayerLabelOverride ?? l10n.prayerNameImsak,
+      firstPrayerLabelOverride ?? _defaultFirstPrayerLabel(context),
       l10n.prayerNameDhuhr,
       l10n.prayerNameAsr,
       l10n.prayerNameMaghrib,
@@ -67,7 +84,6 @@ class SalatPrayerRow extends ConsumerWidget {
     ];
     final onLight = ArinShellBackground.isLight(context);
     final now = DateTime.now();
-    final today = DateTime(now.year, now.month, now.day);
     final salat = ref.watch(salatLogRepositoryProvider);
     final habitRepo = ref.read(habitRepositoryProvider);
     final prayerAsync = ref.watch(prayerTimesProvider);
@@ -77,7 +93,7 @@ class SalatPrayerRow extends ConsumerWidget {
         ? DateTime(day!.year, day!.month, day!.day)
         : prayerAsync.maybeWhen(
             data: (pt) => pt.salatTickCalendarDay(now),
-            orElse: () => today,
+            orElse: () => _fallbackStorageDay(now),
           );
 
     final prayers = salat.getPrayers(habitId, storageDay);
@@ -85,18 +101,8 @@ class SalatPrayerRow extends ConsumerWidget {
     final triSize = compact ? 12.0 : 20.0;
 
     // Vakit penceresi kısıtı kaldırıldı: kullanıcı dilediği vakti (gün içinde
-    // önce ya da sonra) serbestçe işaretleyip kaldırabilir.
-    //
-    // Tek istisna canlı satırdır (day == null): vakitler yüklenip BUGÜNE
-    // eşleşene kadar yazmayı bekletiriz. Aksi halde gece yarısı ile fajr arası,
-    // vakitler henüz gelmeden tiklenirse storageDay yanlış güne (salatTickCalendarDay
-    // dün derken) bugüne düşüp tik kayboluyormuş gibi görünebilir. Takvim satırı
-    // (day != null) vakitlerden bağımsızdır; her zaman düzenlenebilir.
-    final bool tappable = day != null ||
-        prayerAsync.maybeWhen(
-          data: (pt) => pt.matchesCalendarDay(today),
-          orElse: () => false,
-        );
+    // önce ya da sonra) serbestçe işaretleyip kaldırabilir. Vakit servisi
+    // yüklenemezse de üçgenler kilitlenmez.
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -107,18 +113,16 @@ class SalatPrayerRow extends ConsumerWidget {
           child: Material(
             color: Colors.transparent,
             child: InkWell(
-              onTap: tappable
-                  ? () async {
-                      await salat.setPrayer(
-                        habitId,
-                        storageDay,
-                        i,
-                        !done,
-                        habitRepo,
-                      );
-                      ref.read(habitSummaryProvider.notifier).refresh();
-                    }
-                  : null,
+              onTap: () async {
+                await salat.setPrayer(
+                  habitId,
+                  storageDay,
+                  i,
+                  !done,
+                  habitRepo,
+                );
+                ref.read(habitSummaryProvider.notifier).refresh();
+              },
               borderRadius: BorderRadius.circular(10),
               child: ConstrainedBox(
                 constraints: BoxConstraints(
@@ -141,10 +145,10 @@ class SalatPrayerRow extends ConsumerWidget {
                                   : AppColors.accentNeonGreen)
                               : (onLight
                                   ? AppColors.emeraldDark.withValues(
-                                      alpha: tappable ? 0.38 : 0.2,
+                                      alpha: 0.38,
                                     )
                                   : AppColors.creamBase.withValues(
-                                      alpha: tappable ? 0.28 : 0.12,
+                                      alpha: 0.28,
                                     )),
                           filled: done,
                         ),
@@ -166,10 +170,10 @@ class SalatPrayerRow extends ConsumerWidget {
                                   .withValues(alpha: 0.95)
                               : (onLight
                                   ? AppColors.textSecondary.withValues(
-                                      alpha: tappable ? 1.0 : 0.55,
+                                      alpha: 1.0,
                                     )
                                   : AppColors.textOnDarkMuted.withValues(
-                                      alpha: tappable ? 1.0 : 0.45,
+                                      alpha: 1.0,
                                     )),
                           fontWeight: FontWeight.w600,
                           fontSize: compact ? 8 : 11,

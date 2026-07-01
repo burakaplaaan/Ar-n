@@ -1,15 +1,25 @@
 import Flutter
 import CoreLocation
 import UIKit
+import workmanager_apple
 
 @main
 @objc class AppDelegate: FlutterAppDelegate, FlutterImplicitEngineDelegate {
   private var compassStreamHandler: ArinCompassStreamHandler?
 
+  // Şehir değişimi arka plan kontrolü: BGTaskScheduler kimliği Info.plist'teki
+  // `BGTaskSchedulerPermittedIdentifiers` ile ve Dart tarafındaki
+  // `BackgroundLocationTask.taskId` ile birebir aynı olmalı. Frekans yalnızca
+  // bir öneridir — iOS gerçek çalıştırma sıklığına kullanım alışkanlığına göre
+  // kendi karar verir.
   override func application(
     _ application: UIApplication,
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
   ) -> Bool {
+    WorkmanagerPlugin.registerPeriodicTask(
+      withIdentifier: "com.arin.arin.locationSync",
+      frequency: NSNumber(value: 3 * 60 * 60)
+    )
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
   }
 

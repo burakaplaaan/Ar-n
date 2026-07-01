@@ -27,10 +27,12 @@ class NamazProgramPage extends ConsumerStatefulWidget {
     super.key,
     required this.habitId,
     this.showHomeVisibilityHint = false,
+    this.returnOrigin = 'habits',
   });
 
   final String habitId;
   final bool showHomeVisibilityHint;
+  final String returnOrigin;
 
   @override
   ConsumerState<NamazProgramPage> createState() => _NamazProgramPageState();
@@ -38,6 +40,7 @@ class NamazProgramPage extends ConsumerStatefulWidget {
 
 class _NamazProgramPageState extends ConsumerState<NamazProgramPage> {
   bool _didShowHomeVisibilityHint = false;
+  bool _routeTransitioning = false;
 
   @override
   void initState() {
@@ -70,21 +73,36 @@ class _NamazProgramPageState extends ConsumerState<NamazProgramPage> {
         (!h.onboardingCompleted || h.commitmentText.trim().isEmpty);
   }
 
-  void _goToGelisimHub() {
+  void _goToOrigin({bool force = false}) {
     if (!mounted) return;
+    if (_routeTransitioning && !force) return;
+    _routeTransitioning = true;
+    if (widget.returnOrigin == 'home') {
+      context.go(AppRoutes.home);
+      return;
+    }
     context.go(AppRoutes.habitsGelisimTab);
   }
 
   Future<void> _cancelIncompleteSetup(HabitModel habit) async {
     if (!widget.showHomeVisibilityHint || !_needsIbadetOnboarding(habit)) {
-      _goToGelisimHub();
+      _goToOrigin();
       return;
     }
-    await ref.read(habitRepositoryProvider).deletePermanently(habit.id);
+    if (_routeTransitioning) return;
+    _routeTransitioning = true;
+    try {
+      await ref.read(habitRepositoryProvider).deletePermanently(habit.id);
+    } catch (e) {
+      debugPrint('Namaz incomplete setup delete failed: $e');
+      _routeTransitioning = false;
+      _goToOrigin();
+      return;
+    }
     ref.read(habitSummaryProvider.notifier).refresh();
     await ref.read(salatTrackingVisibleOnHomeProvider.notifier).disable();
     if (!mounted) return;
-    context.go(AppRoutes.home);
+    _goToOrigin(force: true);
   }
 
   Future<void> _celebrateIfNeeded() async {
@@ -117,7 +135,7 @@ class _NamazProgramPageState extends ConsumerState<NamazProgramPage> {
           elevation: 0,
           leading: IconButton(
             icon: const Icon(Icons.close_rounded, color: AppColors.creamBase),
-            onPressed: _goToGelisimHub,
+            onPressed: _goToOrigin,
           ),
         ),
         body: Center(
@@ -135,6 +153,10 @@ class _NamazProgramPageState extends ConsumerState<NamazProgramPage> {
       return NamazIbadetOnboarding(
         habitId: habit.id,
         onClose: () => unawaited(_cancelIncompleteSetup(habit)),
+        onCompleted: () async {
+          if (!mounted) return;
+          _goToOrigin();
+        },
       );
     }
 
@@ -171,7 +193,7 @@ class _NamazProgramPageState extends ConsumerState<NamazProgramPage> {
                   child: Row(
                     children: [
                       TextButton(
-                        onPressed: _goToGelisimHub,
+                        onPressed: _goToOrigin,
                         child: Text(
                           l10n.commonClose,
                           style: AppTextStyles.labelLarge.copyWith(

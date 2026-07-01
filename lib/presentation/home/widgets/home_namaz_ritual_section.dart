@@ -48,10 +48,18 @@ class HomeNamazRitualSection extends ConsumerWidget {
               .read(salatTrackingVisibleOnHomeProvider.notifier)
               .enableFromGelisim();
           if (!context.mounted) return;
-          context.push(AppRoutes.willNamaz(habit.id));
+          context.push(
+            AppRoutes.willNamaz(habit.id, returnOrigin: 'home'),
+          );
           return;
         }
-        context.push(AppRoutes.willNamaz(habit.id, fromGelisimSetup: true));
+        context.push(
+          AppRoutes.willNamaz(
+            habit.id,
+            fromGelisimSetup: true,
+            returnOrigin: 'home',
+          ),
+        );
         return;
       }
       context.go(AppRoutes.habitsGelisimTab);
@@ -64,6 +72,10 @@ class HomeNamazRitualSection extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
     final onLight = Theme.of(context).brightness == Brightness.light;
+    final warmBrown = onLight ? const Color(0xFF8B5E3C) : const Color(0xFFC59B6D);
+    final warmBrownSoft = onLight
+        ? const Color(0xFFC9A27A)
+        : const Color(0xFF8A6545);
     final summary = ref.watch(habitSummaryProvider);
     final visibleOnHome = ref.watch(salatTrackingVisibleOnHomeProvider);
     final setupBusy = ref.watch(_homeSalatSetupBusyProvider);
@@ -104,13 +116,22 @@ class HomeNamazRitualSection extends ConsumerWidget {
                     ],
                   ),
                   border: Border.all(
-                    color: AppColors.accentNeonGreen.withValues(alpha: 0.35),
+                    color: Color.lerp(
+                      AppColors.accentNeonGreen,
+                      warmBrown,
+                      0.35,
+                    )!.withValues(alpha: 0.45),
                   ),
                   boxShadow: [
                     BoxShadow(
                       color: AppColors.accentGlowGreen.withValues(alpha: 0.12),
                       blurRadius: 20,
                       offset: const Offset(0, 8),
+                    ),
+                    BoxShadow(
+                      color: warmBrownSoft.withValues(alpha: 0.12),
+                      blurRadius: 18,
+                      offset: const Offset(0, 6),
                     ),
                   ],
                 ),
@@ -120,20 +141,22 @@ class HomeNamazRitualSection extends ConsumerWidget {
                       padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: AppColors.accentNeonGreen.withValues(
-                          alpha: 0.14,
-                        ),
+                        color: Color.lerp(
+                          AppColors.accentNeonGreen,
+                          warmBrownSoft,
+                          0.45,
+                        )!.withValues(alpha: 0.16),
                         border: Border.all(
-                          color: AppColors.accentNeonGreen.withValues(
-                            alpha: 0.4,
-                          ),
+                          color: warmBrown.withValues(alpha: 0.45),
                         ),
                       ),
                       child: Icon(
                         Icons.mosque_outlined,
-                        color: AppColors.accentNeonGreen.withValues(
-                          alpha: 0.95,
-                        ),
+                        color: Color.lerp(
+                          AppColors.accentNeonGreen,
+                          warmBrown,
+                          0.35,
+                        )!.withValues(alpha: 0.95),
                         size: 22,
                       ),
                     ),
@@ -142,16 +165,34 @@ class HomeNamazRitualSection extends ConsumerWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            l10n.homeNamazSetupTitle,
-                            style: TextStyle(
-                              color: onLight
-                                  ? AppColors.emeraldDark
-                                  : Colors.white.withValues(alpha: 0.95),
-                              fontSize: 14,
-                              fontWeight: FontWeight.w800,
-                              letterSpacing: -0.2,
-                            ),
+                          Row(
+                            children: [
+                              Transform.rotate(
+                                angle: 0.7853981633974483,
+                                child: Container(
+                                  width: 6,
+                                  height: 6,
+                                  decoration: BoxDecoration(
+                                    color: warmBrown.withValues(alpha: 0.7),
+                                    borderRadius: BorderRadius.circular(1.5),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 7),
+                              Flexible(
+                                child: Text(
+                                  l10n.homeNamazSetupTitle,
+                                  style: TextStyle(
+                                    color: onLight
+                                        ? AppColors.emeraldDark
+                                        : Colors.white.withValues(alpha: 0.95),
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w800,
+                                    letterSpacing: -0.2,
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                           const SizedBox(height: 4),
                           Text(
@@ -201,12 +242,21 @@ class HomeNamazRitualSection extends ConsumerWidget {
                 ? Colors.white.withValues(alpha: 0.92)
                 : AppColors.homeCardSurface.withValues(alpha: 0.72),
             border: Border.all(
-              color: AppColors.accentNeonGreen.withValues(alpha: 0.32),
+              color: Color.lerp(
+                AppColors.accentNeonGreen,
+                warmBrown,
+                0.3,
+              )!.withValues(alpha: 0.42),
             ),
             boxShadow: [
               BoxShadow(
                 color: AppColors.accentGlowGreen.withValues(alpha: 0.1),
                 blurRadius: 18,
+                offset: const Offset(0, 6),
+              ),
+              BoxShadow(
+                color: warmBrownSoft.withValues(alpha: 0.12),
+                blurRadius: 16,
                 offset: const Offset(0, 6),
               ),
             ],
@@ -215,10 +265,28 @@ class HomeNamazRitualSection extends ConsumerWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              Container(
+                height: 2,
+                margin: const EdgeInsets.symmetric(horizontal: 14),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(999),
+                  gradient: LinearGradient(
+                    begin: Alignment.centerLeft,
+                    end: Alignment.centerRight,
+                    colors: [
+                      warmBrownSoft.withValues(alpha: 0.0),
+                      warmBrown.withValues(alpha: 0.5),
+                      warmBrownSoft.withValues(alpha: 0.0),
+                    ],
+                  ),
+                ),
+              ),
               Material(
                 color: Colors.transparent,
                 child: InkWell(
-                  onTap: () => context.push(AppRoutes.willNamaz(salatId!)),
+                  onTap: () => context.push(
+                    AppRoutes.willNamaz(salatId!, returnOrigin: 'home'),
+                  ),
                   child: Padding(
                     padding: const EdgeInsets.fromLTRB(14, 12, 14, 8),
                     child: Column(
@@ -230,16 +298,51 @@ class HomeNamazRitualSection extends ConsumerWidget {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(
-                                    l10n.homeNamazTrackingTitle,
-                                    style: TextStyle(
-                                      color: onLight
-                                          ? AppColors.emeraldDark
-                                          : Colors.white.withValues(
-                                              alpha: 0.92,
+                                  Row(
+                                    children: [
+                                      Transform.rotate(
+                                        angle: 0.7853981633974483,
+                                        child: Container(
+                                          width: 6,
+                                          height: 6,
+                                          decoration: BoxDecoration(
+                                            color: warmBrown.withValues(
+                                              alpha: 0.7,
                                             ),
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w800,
+                                            borderRadius:
+                                                BorderRadius.circular(1.5),
+                                          ),
+                                        ),
+                                      ),
+                                      const SizedBox(width: 7),
+                                      Flexible(
+                                        child: Text(
+                                          l10n.homeNamazTrackingTitle,
+                                          style: TextStyle(
+                                            color: onLight
+                                                ? AppColors.emeraldDark
+                                                : Colors.white.withValues(
+                                                    alpha: 0.92,
+                                                  ),
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w800,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 5),
+                                  Container(
+                                    height: 1.5,
+                                    width: 26,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(999),
+                                      gradient: LinearGradient(
+                                        colors: [
+                                          warmBrown.withValues(alpha: 0.55),
+                                          warmBrownSoft.withValues(alpha: 0.0),
+                                        ],
+                                      ),
                                     ),
                                   ),
                                   const SizedBox(height: 3),
@@ -262,11 +365,15 @@ class HomeNamazRitualSection extends ConsumerWidget {
                             Icon(
                               Icons.chevron_right_rounded,
                               size: 20,
-                              color: onLight
-                                  ? AppColors.textSecondary.withValues(
-                                      alpha: 0.7,
-                                    )
-                                  : Colors.white.withValues(alpha: 0.35),
+                              color: Color.lerp(
+                                onLight
+                                    ? AppColors.textSecondary.withValues(
+                                        alpha: 0.7,
+                                      )
+                                    : Colors.white.withValues(alpha: 0.35),
+                                warmBrown,
+                                0.4,
+                              ),
                             ),
                           ],
                         ),
