@@ -4346,6 +4346,19 @@ class AppLocalizationsTr extends AppLocalizations {
       'Arka planda otomatik güncelleme kapatıldı.';
 
   @override
+  String get backgroundLocationDisclosureTitle => 'Arka Planda Konum Kullanımı';
+
+  @override
+  String get backgroundLocationDisclosureBody =>
+      '\"Her Zaman İzin Ver\"i onaylarsan Arın, konumunu uygulama kapalıyken bile arka planda düşük sıklıkla kontrol eder. Bu sayede şehir değiştiğinde namaz vakitlerin, kıble yönün ve namaz bildirimlerin uygulamayı açmana gerek kalmadan otomatik güncellenir. Konum verin yalnızca cihazında işlenir; reklam veya analiz için asla kullanılmaz.';
+
+  @override
+  String get backgroundLocationDisclosureDecline => 'Vazgeç';
+
+  @override
+  String get backgroundLocationDisclosureAccept => 'Devam Et';
+
+  @override
   String get sealYourIntention => 'Niyetini mühürle';
 
   @override

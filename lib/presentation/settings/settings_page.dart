@@ -14,7 +14,6 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
 import '../../app.dart';
@@ -29,7 +28,6 @@ import '../../core/router/app_router_refresh.dart';
 import '../../core/theme/arin_shell_background.dart';
 import '../../l10n/app_localizations.dart';
 import '../../core/providers/shared_preferences_provider.dart';
-import '../../data/services/background_location_task.dart';
 import '../../data/services/habit_cloud_sync_service.dart';
 import '../../data/services/inspiration_engagement_sync_service.dart';
 import '../../data/services/local_data_wipe_service.dart';
@@ -56,8 +54,6 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
   bool _locationLoading = false;
   bool _oauthBusy = false;
   bool _accountDeleteBusy = false;
-  late bool _backgroundLocationEnabled;
-  bool _backgroundLocationBusy = false;
 
   @override
   void initState() {
@@ -66,8 +62,6 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
     final raw = loc.savedCity;
     final display = matchTurkeyProvinceExact(raw) ?? raw;
     _cityController = TextEditingController(text: display);
-    _backgroundLocationEnabled =
-        loc.locationUpdatePref == LocationUpdatePref.alwaysUpdate;
   }
 
   @override
@@ -138,53 +132,6 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(l10n.settingsProvinceUpdatedMessage(picked.il))),
     );
-  }
-
-  /// "Arka planda otomatik güncelle" anahtarı. Açılırken Android 10+'ta
-  /// "Her Zaman İzin Ver" konum izni istenir (yalnızca ön plan izni yeterli
-  /// değil — WorkManager/BGTaskScheduler görevleri uygulama kapalıyken
-  /// çalışır). İzin verilmezse tercih `ask`'e geri döner ve kullanıcı
-  /// bilgilendirilir.
-  Future<void> _onToggleBackgroundLocation(bool enable) async {
-    if (_backgroundLocationBusy) return;
-    setState(() => _backgroundLocationBusy = true);
-    final loc = ref.read(locationServiceProvider);
-    final l10n = AppLocalizations.of(context)!;
-    try {
-      if (enable) {
-        var status = await Permission.locationAlways.status;
-        if (!status.isGranted) {
-          status = await Permission.locationAlways.request();
-        }
-        if (!status.isGranted) {
-          if (!mounted) return;
-          setState(() => _backgroundLocationEnabled = false);
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(l10n.settingsBackgroundLocationPermissionDenied),
-            ),
-          );
-          return;
-        }
-        await loc.setLocationUpdatePref(LocationUpdatePref.alwaysUpdate);
-        await BackgroundLocationTask.syncSchedule(loc);
-        if (!mounted) return;
-        setState(() => _backgroundLocationEnabled = true);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(l10n.settingsBackgroundLocationEnabledMessage)),
-        );
-      } else {
-        await loc.setLocationUpdatePref(LocationUpdatePref.ask);
-        await BackgroundLocationTask.syncSchedule(loc);
-        if (!mounted) return;
-        setState(() => _backgroundLocationEnabled = false);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(l10n.settingsBackgroundLocationDisabledMessage)),
-        );
-      }
-    } finally {
-      if (mounted) setState(() => _backgroundLocationBusy = false);
-    }
   }
 
   Future<void> _signOut() async {
@@ -768,9 +715,6 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                         onProvinceSelected: _onProvinceSelected,
                         onPickDistrict: _onDistrictSelected,
                         onDetect: _detectLocation,
-                        backgroundLocationEnabled: _backgroundLocationEnabled,
-                        backgroundLocationBusy: _backgroundLocationBusy,
-                        onToggleBackgroundLocation: _onToggleBackgroundLocation,
                       ).animate().fadeIn(delay: 220.ms),
                       const SizedBox(height: 28),
                       _SectionLabel(
@@ -1410,9 +1354,6 @@ class _LocationCard extends StatefulWidget {
     required this.onProvinceSelected,
     required this.onPickDistrict,
     required this.onDetect,
-    required this.backgroundLocationEnabled,
-    required this.backgroundLocationBusy,
-    required this.onToggleBackgroundLocation,
   });
 
   final bool onDark;
@@ -1421,9 +1362,6 @@ class _LocationCard extends StatefulWidget {
   final Future<void> Function(String province) onProvinceSelected;
   final Future<void> Function() onPickDistrict;
   final Future<void> Function() onDetect;
-  final bool backgroundLocationEnabled;
-  final bool backgroundLocationBusy;
-  final Future<void> Function(bool enable) onToggleBackgroundLocation;
 
   @override
   State<_LocationCard> createState() => _LocationCardState();
@@ -1604,54 +1542,6 @@ class _LocationCardState extends State<_LocationCard> {
                   onLongPress: widget.onDetect,
                 ),
               ),
-            ],
-          ),
-          const SizedBox(height: 14),
-          Divider(height: 1, color: border),
-          const SizedBox(height: 14),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      l10n.settingsBackgroundLocationTitle,
-                      style: GoogleFonts.plusJakartaSans(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                        color: onDark ? Colors.white : AppColors.textPrimary,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      l10n.settingsBackgroundLocationSubtitle,
-                      style: GoogleFonts.plusJakartaSans(
-                        fontSize: 12,
-                        height: 1.35,
-                        color: onDark
-                            ? AppColors.textOnDarkMuted
-                            : AppColors.textMuted,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(width: 12),
-              widget.backgroundLocationBusy
-                  ? const SizedBox(
-                      width: 24,
-                      height: 24,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
-                  : Switch(
-                      value: widget.backgroundLocationEnabled,
-                      onChanged: (v) => widget.onToggleBackgroundLocation(v),
-                      activeThumbColor: onDark
-                          ? AppColors.accentNeonGreen
-                          : AppColors.emeraldDark,
-                    ),
             ],
           ),
         ],

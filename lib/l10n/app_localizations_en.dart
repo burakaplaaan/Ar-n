@@ -4359,6 +4359,19 @@ class AppLocalizationsEn extends AppLocalizations {
       'Background automatic updates turned off.';
 
   @override
+  String get backgroundLocationDisclosureTitle => 'Background Location Use';
+
+  @override
+  String get backgroundLocationDisclosureBody =>
+      'If you allow \"Allow all the time\", Arın checks your location in the background at a low frequency, even when the app is closed. This lets prayer times, qibla direction, and prayer notifications update automatically when your city changes, without opening the app. Your location data is processed only on your device and is never used for ads or analytics.';
+
+  @override
+  String get backgroundLocationDisclosureDecline => 'Cancel';
+
+  @override
+  String get backgroundLocationDisclosureAccept => 'Continue';
+
+  @override
   String get sealYourIntention => 'Seal your intention';
 
   @override

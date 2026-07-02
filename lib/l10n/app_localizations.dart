@@ -7710,6 +7710,30 @@ abstract class AppLocalizations {
   /// **'Arka planda otomatik güncelleme kapatıldı.'**
   String get settingsBackgroundLocationDisabledMessage;
 
+  /// No description provided for @backgroundLocationDisclosureTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Arka Planda Konum Kullanımı'**
+  String get backgroundLocationDisclosureTitle;
+
+  /// No description provided for @backgroundLocationDisclosureBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'\"Her Zaman İzin Ver\"i onaylarsan Arın, konumunu uygulama kapalıyken bile arka planda düşük sıklıkla kontrol eder. Bu sayede şehir değiştiğinde namaz vakitlerin, kıble yönün ve namaz bildirimlerin uygulamayı açmana gerek kalmadan otomatik güncellenir. Konum verin yalnızca cihazında işlenir; reklam veya analiz için asla kullanılmaz.'**
+  String get backgroundLocationDisclosureBody;
+
+  /// No description provided for @backgroundLocationDisclosureDecline.
+  ///
+  /// In tr, this message translates to:
+  /// **'Vazgeç'**
+  String get backgroundLocationDisclosureDecline;
+
+  /// No description provided for @backgroundLocationDisclosureAccept.
+  ///
+  /// In tr, this message translates to:
+  /// **'Devam Et'**
+  String get backgroundLocationDisclosureAccept;
+
   /// No description provided for @sealYourIntention.
   ///
   /// In tr, this message translates to:

@@ -18,7 +18,9 @@ import '../../data/models/prayer_times_model.dart';
 import '../../data/services/app_local_notification_scheduler.dart';
 import '../../data/services/app_notification_channel_prefs.dart';
 import '../../data/services/arin_local_notifications_plugin.dart';
+import '../../data/services/background_location_task.dart';
 import '../../data/services/local_notification_permission_gate.dart';
+import '../../data/services/location_service.dart';
 import '../../data/services/prayer_reminder_prefs.dart';
 import '../../data/services/prayer_service_resolver.dart';
 import '../shared/providers/prayer_time_providers.dart';
@@ -40,11 +42,16 @@ class _NotificationsSettingsPageState
   NotificationPermissionSnapshot? _snapshot;
   int _pendingCount = 0;
   bool _loading = true;
+  late bool _backgroundLocationEnabled;
+  bool _backgroundLocationBusy = false;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    final loc = ref.read(locationServiceProvider);
+    _backgroundLocationEnabled =
+        loc.locationUpdatePref == LocationUpdatePref.alwaysUpdate;
     _refreshDiagnostics();
   }
 
@@ -115,6 +122,87 @@ class _NotificationsSettingsPageState
     if (confirmed != true) return;
     await requestIgnoreBatteryOptimizations();
     if (mounted) await _refreshDiagnostics();
+  }
+
+  /// Google Play "Arka Planda Konum" politikası — sistem izin penceresinden
+  /// ÖNCE, uygulama içinde ayrı bir "prominent disclosure" gösterilmesini
+  /// zorunlu kılıyor. Kullanıcı bu ekranda "Devam Et" demeden sistem izni
+  /// hiç istenmez.
+  Future<bool> _confirmBackgroundLocationDisclosure() async {
+    final l10n = AppLocalizations.of(context)!;
+    final result = await showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (dialogCtx) => AlertDialog(
+        title: Text(l10n.backgroundLocationDisclosureTitle),
+        content: Text(l10n.backgroundLocationDisclosureBody),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogCtx).pop(false),
+            child: Text(l10n.backgroundLocationDisclosureDecline),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(dialogCtx).pop(true),
+            child: Text(l10n.backgroundLocationDisclosureAccept),
+          ),
+        ],
+      ),
+    );
+    return result == true;
+  }
+
+  /// "Arka planda otomatik güncelle" anahtarı. Açılırken önce yukarıdaki
+  /// disclosure gösterilir, kullanıcı onaylarsa Android 10+'ta "Her Zaman
+  /// İzin Ver" konum izni istenir (yalnızca ön plan izni yeterli değil —
+  /// WorkManager/BGTaskScheduler görevleri uygulama kapalıyken çalışır).
+  /// İzin verilmezse tercih `ask`'e geri döner ve kullanıcı bilgilendirilir.
+  Future<void> _onToggleBackgroundLocation(bool enable) async {
+    if (_backgroundLocationBusy) return;
+    setState(() => _backgroundLocationBusy = true);
+    final loc = ref.read(locationServiceProvider);
+    final l10n = AppLocalizations.of(context)!;
+    try {
+      if (enable) {
+        final agreed = await _confirmBackgroundLocationDisclosure();
+        if (!agreed) {
+          if (!mounted) return;
+          setState(() => _backgroundLocationEnabled = false);
+          return;
+        }
+        if (!mounted) return;
+        var status = await Permission.locationAlways.status;
+        if (!status.isGranted) {
+          status = await Permission.locationAlways.request();
+        }
+        if (!status.isGranted) {
+          if (!mounted) return;
+          setState(() => _backgroundLocationEnabled = false);
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(l10n.settingsBackgroundLocationPermissionDenied),
+            ),
+          );
+          return;
+        }
+        await loc.setLocationUpdatePref(LocationUpdatePref.alwaysUpdate);
+        await BackgroundLocationTask.syncSchedule(loc);
+        if (!mounted) return;
+        setState(() => _backgroundLocationEnabled = true);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(l10n.settingsBackgroundLocationEnabledMessage)),
+        );
+      } else {
+        await loc.setLocationUpdatePref(LocationUpdatePref.ask);
+        await BackgroundLocationTask.syncSchedule(loc);
+        if (!mounted) return;
+        setState(() => _backgroundLocationEnabled = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(l10n.settingsBackgroundLocationDisabledMessage)),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _backgroundLocationBusy = false);
+    }
   }
 
   String _notificationLabel() {
@@ -352,6 +440,46 @@ class _NotificationsSettingsPageState
                         context.push(AppRoutes.settingsNotificationsPrayer);
                       },
                     ),
+                    const SizedBox(height: 12),
+                    _NtfGlassCard(
+                          onDark: onDark,
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Expanded(
+                                child: _NtfSwitchRow(
+                                  onDark: onDark,
+                                  title: l10n.settingsBackgroundLocationTitle,
+                                  subtitle:
+                                      l10n.settingsBackgroundLocationSubtitle,
+                                  value: _backgroundLocationEnabled,
+                                  onChanged: _backgroundLocationBusy
+                                      ? (_) {}
+                                      : (v) => _onToggleBackgroundLocation(v),
+                                ),
+                              ),
+                              if (_backgroundLocationBusy) ...[
+                                const SizedBox(width: 12),
+                                const SizedBox(
+                                  width: 18,
+                                  height: 18,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                  ),
+                                ),
+                              ],
+                            ],
+                          ),
+                        )
+                        .animate()
+                        .fadeIn(delay: 110.ms)
+                        .slideX(
+                          begin: 0.02,
+                          end: 0,
+                          delay: 110.ms,
+                          duration: 420.ms,
+                          curve: Curves.easeOutCubic,
+                        ),
                     const SizedBox(height: 26),
                     _SectionLabel(
                       text: l10n.notificationsSectionArinma,

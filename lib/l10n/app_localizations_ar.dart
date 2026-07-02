@@ -4328,6 +4328,19 @@ class AppLocalizationsAr extends AppLocalizations {
       'تم إيقاف التحديث التلقائي في الخلفية.';
 
   @override
+  String get backgroundLocationDisclosureTitle => 'استخدام الموقع في الخلفية';
+
+  @override
+  String get backgroundLocationDisclosureBody =>
+      'إذا وافقت على \"السماح دائمًا\"، يتحقق Arın من موقعك في الخلفية بتردد منخفض حتى عند إغلاق التطبيق. هذا يتيح تحديث مواقيت الصلاة واتجاه القبلة وتنبيهات الصلاة تلقائيًا عند تغيّر مدينتك دون الحاجة لفتح التطبيق. تُعالج بيانات موقعك على جهازك فقط ولا تُستخدم أبدًا للإعلانات أو التحليلات.';
+
+  @override
+  String get backgroundLocationDisclosureDecline => 'إلغاء';
+
+  @override
+  String get backgroundLocationDisclosureAccept => 'متابعة';
+
+  @override
   String get sealYourIntention => 'اختم نيتك';
 
   @override
