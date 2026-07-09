@@ -2,13 +2,19 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-    <!-- Arın uygulaması üçüncü taraf SDK'ları üzerinden reklam/izleme yapmaz.
-         Apple, üçüncü parti domain'leri ATT izni alınmadan çağırıyorsa burada
-         listelenmesini bekler. Bizim kullanımımızda böyle bir akış yok. -->
+    <!-- Meta App Events (facebook_app_events) reklam performansı ölçümü için
+         ATT izniyle IDFA toplar ve Meta'ya iletir — bu Apple'ın tanımıyla
+         "tracking" sayılır. App Store Connect → App Privacy'de
+         "Data Used to Track You" bölümü bu beyanla eşleşmeli. -->
     <key>NSPrivacyTracking</key>
-    <false/>
+    <true/>
     <key>NSPrivacyTrackingDomains</key>
-    <array/>
+    <array>
+        <string>graph.facebook.com</string>
+        <string>connect.facebook.net</string>
+        <string>fbcdn.net</string>
+        <string>facebook.com</string>
+    </array>
 
     <!-- Apple'ın "Required Reason API" kuralı (Mayıs 2024+): aşağıdaki sistem
          API'leri reddedilmemek için mutlaka nedenle beyan edilmeli. Firebase,
@@ -170,6 +176,37 @@
             <key>NSPrivacyCollectedDataTypePurposes</key>
             <array>
                 <string>NSPrivacyCollectedDataTypePurposeAppFunctionality</string>
+            </array>
+        </dict>
+        <!-- Meta App Events (reklam ölçümü): ATT izni verilirse cihaz reklam
+             kimliği (IDFA) Meta'ya iletilir; reklam performansı optimizasyonu
+             (AEM) için kullanılır. Kullanıcıya bağlı değildir. -->
+        <dict>
+            <key>NSPrivacyCollectedDataType</key>
+            <string>NSPrivacyCollectedDataTypeDeviceID</string>
+            <key>NSPrivacyCollectedDataTypeLinked</key>
+            <false/>
+            <key>NSPrivacyCollectedDataTypeTracking</key>
+            <true/>
+            <key>NSPrivacyCollectedDataTypePurposes</key>
+            <array>
+                <string>NSPrivacyCollectedDataTypePurposeThirdPartyAdvertising</string>
+                <string>NSPrivacyCollectedDataTypePurposeDeveloperAdvertising</string>
+            </array>
+        </dict>
+        <!-- Premium/destek satın alma tutarı ve para birimi, reklam
+             optimizasyonu (dönüşüm ölçümü) için Meta'ya iletilir. -->
+        <dict>
+            <key>NSPrivacyCollectedDataType</key>
+            <string>NSPrivacyCollectedDataTypePurchaseHistory</string>
+            <key>NSPrivacyCollectedDataTypeLinked</key>
+            <false/>
+            <key>NSPrivacyCollectedDataTypeTracking</key>
+            <true/>
+            <key>NSPrivacyCollectedDataTypePurposes</key>
+            <array>
+                <string>NSPrivacyCollectedDataTypePurposeThirdPartyAdvertising</string>
+                <string>NSPrivacyCollectedDataTypePurposeDeveloperAdvertising</string>
             </array>
         </dict>
     </array>

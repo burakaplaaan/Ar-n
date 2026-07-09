@@ -73,9 +73,11 @@ class ArinQuoteWidgetProvider : HomeWidgetProvider() {
         for (widgetId in appWidgetIds) {
             val views = RemoteViews(context.packageName, R.layout.arin_quote_widget)
             if (locked) {
+                views.setViewVisibility(R.id.widget_quote_content, View.GONE)
                 views.setViewVisibility(R.id.widget_lock_overlay, View.VISIBLE)
             } else {
                 views.setViewVisibility(R.id.widget_lock_overlay, View.GONE)
+                views.setViewVisibility(R.id.widget_quote_content, View.VISIBLE)
                 views.setTextViewText(R.id.widget_quote_text, quote.text)
                 views.setTextViewText(R.id.widget_quote_source, quote.source)
                 views.setViewVisibility(

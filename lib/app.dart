@@ -1,6 +1,7 @@
 // lib/app.dart
 
 import 'dart:async';
+import 'dart:io' show Platform;
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
@@ -26,6 +27,7 @@ import 'data/services/location_service.dart';
 import 'data/services/prayer_notification_scheduler.dart';
 import 'data/services/prayer_reminder_prefs.dart';
 import 'data/services/purchase_service.dart';
+import 'data/services/admob_service.dart';
 import 'data/services/global_widget_lock_service.dart';
 import 'data/services/widget_quote_override_service.dart';
 import 'l10n/app_localizations.dart';
@@ -233,6 +235,17 @@ class _ArinAppState extends ConsumerState<ArinApp> with WidgetsBindingObserver {
       try {
         final premium = await ref.read(premiumEntitlementProvider.future);
         await WidgetAccessService(prefs).syncAll(isPremium: premium.isActive);
+        // Android: widget kilidi açma reklamı yalnızca kullanıcı kilit
+        // ekranına gidip "Reklam izle"ye bastığında yükleniyordu — bu, cold
+        // (anlık) yükleme için çok kısa bir hazırlık süresi bırakıp sık sık
+        // "yüklenemedi" hatasına yol açıyordu. Her uygulama açılışı/resume'da
+        // erkenden ısıtarak, kullanıcı düğmeye bastığında reklamın zaten
+        // hazır (preloaded) olma ihtimalini büyük ölçüde artırıyoruz.
+        // iOS'ta reklam akışı zaten sorunsuz çalıştığı için bu değişikliğe
+        // dokunulmuyor.
+        if (Platform.isAndroid && !premium.isActive) {
+          AdMobService.preloadRewarded();
+        }
       } catch (e) {
         debugPrint('Widget access sync failed: $e');
         // Hata durumunda (internet yok, vb) isPremium: false diyerek kilitleri devreye

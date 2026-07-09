@@ -42,6 +42,21 @@
 		<false/>
 		<key>FirebaseCrashlyticsCollectionEnabled</key>
 		<false/>
+		<!-- Meta App Events (iOS AEM). Client Token boşsa SDK ölçüm yapmaz;
+		     değeri developers.facebook.com → Ayarlar → Gelişmiş'ten alıp
+		     hem buraya hem lib/core/constants/meta_ads_ids.dart'a yaz. -->
+		<key>FacebookAppID</key>
+		<string>4451380661797719</string>
+		<key>FacebookClientToken</key>
+		<string>c150203bf357ef5e115b4012e9c55b98</string>
+		<key>FacebookDisplayName</key>
+		<string>Arın</string>
+		<key>FacebookAutoLogAppEventsEnabled</key>
+		<true/>
+		<key>FacebookAdvertiserIDCollectionEnabled</key>
+		<true/>
+		<key>NSUserTrackingUsageDescription</key>
+		<string>Reklam performansını ölçmek ve sana daha uygun içerik sunmak için cihaz reklam kimliği kullanılır. İzin vermezsen uygulama normal çalışmaya devam eder.</string>
 		<key>CFBundleURLTypes</key>
 		<array>
 			<dict>
@@ -58,6 +73,14 @@
 				<key>CFBundleURLSchemes</key>
 				<array>
 					<string>arin</string>
+				</array>
+			</dict>
+			<dict>
+				<key>CFBundleTypeRole</key>
+				<string>Editor</string>
+				<key>CFBundleURLSchemes</key>
+				<array>
+					<string>fb4451380661797719</string>
 				</array>
 			</dict>
 		</array>

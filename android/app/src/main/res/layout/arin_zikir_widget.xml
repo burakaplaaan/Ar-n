@@ -76,24 +76,29 @@
         android:padding="8dp"
         android:visibility="gone">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:fontFamily="sans-serif"
-            android:text="🔒"
-            android:textSize="22sp" />
+        <ImageView
+            android:layout_width="26dp"
+            android:layout_height="26dp"
+            android:contentDescription="@null"
+            android:scaleType="fitCenter"
+            android:src="@drawable/ic_widget_lock"
+            android:tint="@color/widget_quote_text_white" />
 
         <TextView
             android:id="@+id/widget_lock_note"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
+            android:layout_marginTop="5dp"
             android:ellipsize="end"
             android:fontFamily="sans-serif-medium"
             android:gravity="center"
             android:maxLines="1"
+            android:shadowColor="#99000000"
+            android:shadowDx="0"
+            android:shadowDy="1"
+            android:shadowRadius="3"
             android:text="Açmak için dokunun"
-            android:textColor="#CC1A1A1A"
+            android:textColor="@color/widget_quote_text_white"
             android:textSize="11sp" />
     </LinearLayout>
 </FrameLayout>

@@ -3,6 +3,7 @@
 // RevenueCat üzerinden abonelik yönetimi.
 // Tüm platform farkları bu katmanda gizlenir; UI sadece bu servisi çağırır.
 
+import 'dart:async';
 import 'dart:io' show Platform;
 
 import 'package:flutter/foundation.dart';
@@ -10,6 +11,7 @@ import 'package:flutter/services.dart' show PlatformException;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 
+import '../../core/analytics/meta_app_events.dart';
 import '../../core/constants/revenuecat_ids.dart';
 import '../../l10n/app_localizations.dart';
 import '../models/premium_entitlement.dart';
@@ -190,6 +192,7 @@ class PurchaseService {
           '[PurchaseService] purchase completed but entitlement not active yet; returning success.',
         );
       }
+      _logMetaSubscription(product, result.customerInfo);
       return const PurchaseOutcome.success();
     } on PlatformException catch (e) {
       final code = PurchasesErrorHelper.getErrorCode(e);
@@ -262,6 +265,7 @@ class PurchaseService {
           '[PurchaseService] support purchase verification still pending for $productId; returning success to prevent duplicate charges.',
         );
       }
+      _logMetaPurchase(products.first, result.customerInfo);
       return const PurchaseOutcome.success();
     } on PlatformException catch (e) {
       final code = PurchasesErrorHelper.getErrorCode(e);
@@ -457,5 +461,40 @@ class PurchaseService {
       }
     }
     return _isConfigured;
+  }
+
+  void _logMetaSubscription(StoreProduct product, CustomerInfo info) {
+    final orderId = info.originalAppUserId.isNotEmpty
+        ? '${info.originalAppUserId}_${product.identifier}_${DateTime.now().millisecondsSinceEpoch}'
+        : '${product.identifier}_${DateTime.now().millisecondsSinceEpoch}';
+    unawaited(
+      MetaAppEvents.logSubscribe(
+        price: product.price,
+        currency: product.currencyCode,
+        orderId: orderId,
+      ),
+    );
+    unawaited(
+      MetaAppEvents.logPurchase(
+        amount: product.price,
+        currency: product.currencyCode,
+        orderId: orderId,
+        parameters: {'fb_content_id': product.identifier},
+      ),
+    );
+  }
+
+  void _logMetaPurchase(StoreProduct product, CustomerInfo info) {
+    final orderId = info.originalAppUserId.isNotEmpty
+        ? '${info.originalAppUserId}_${product.identifier}_${DateTime.now().millisecondsSinceEpoch}'
+        : '${product.identifier}_${DateTime.now().millisecondsSinceEpoch}';
+    unawaited(
+      MetaAppEvents.logPurchase(
+        amount: product.price,
+        currency: product.currencyCode,
+        orderId: orderId,
+        parameters: {'fb_content_id': product.identifier},
+      ),
+    );
   }
 }

@@ -13,6 +13,7 @@
     android:paddingBottom="9dp">
 
     <LinearLayout
+        android:id="@+id/widget_prayer_content"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="top|center_horizontal"
@@ -97,5 +98,45 @@
             android:maxLines="1"
             android:textColor="@color/widget_text_muted"
             android:textSize="7sp" />
+    </LinearLayout>
+
+    <!-- Kilit overlay: locked=true olduğunda VISIBLE, içeriğin ÜSTÜNDE görünür.
+         Arka plan tamamen şeffaf (iOS widget'ı ile aynı davranış). -->
+    <LinearLayout
+        android:id="@+id/widget_lock_overlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:background="@drawable/widget_lock_overlay_bg"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:padding="6dp"
+        android:visibility="gone">
+
+        <ImageView
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:contentDescription="@null"
+            android:scaleType="fitCenter"
+            android:src="@drawable/ic_widget_lock"
+            android:tint="@color/widget_quote_text_white" />
+
+        <TextView
+            android:id="@+id/widget_lock_note"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:ellipsize="end"
+            android:fontFamily="sans-serif-medium"
+            android:gravity="center"
+            android:maxLines="1"
+            android:shadowColor="#99000000"
+            android:shadowDx="0"
+            android:shadowDy="1"
+            android:shadowRadius="3"
+            android:text="Açmak için dokunun"
+            android:textColor="@color/widget_quote_text_white"
+            android:textSize="10sp" />
+
     </LinearLayout>
 </FrameLayout>

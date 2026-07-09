@@ -13,41 +13,8 @@
     android:paddingEnd="8dp"
     android:paddingBottom="6dp">
 
-    <!-- Kilit overlay -->
     <LinearLayout
-        android:id="@+id/widget_lock_overlay"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_gravity="center"
-        android:background="@drawable/widget_lock_overlay_bg"
-        android:gravity="center"
-        android:orientation="vertical"
-        android:padding="8dp"
-        android:visibility="gone">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:fontFamily="sans-serif"
-            android:text="🔒"
-            android:textSize="22sp" />
-
-        <TextView
-            android:id="@+id/widget_lock_note"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:ellipsize="end"
-            android:fontFamily="sans-serif-medium"
-            android:gravity="center"
-            android:maxLines="1"
-            android:text="Açmak için dokunun"
-            android:textColor="#CC1A1A1A"
-            android:textSize="11sp" />
-
-    </LinearLayout>
-
-    <LinearLayout
+        android:id="@+id/widget_combo_content"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
@@ -161,5 +128,45 @@
             android:textSize="15sp"
             android:textStyle="bold"
             tools:text="İnşirah, 5" />
+    </LinearLayout>
+
+    <!-- Kilit overlay: locked=true olduğunda VISIBLE, içeriğin ÜSTÜNDE görünür.
+         Arka plan tamamen şeffaf (iOS widget'ı ile aynı davranış). -->
+    <LinearLayout
+        android:id="@+id/widget_lock_overlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:background="@drawable/widget_lock_overlay_bg"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:padding="8dp"
+        android:visibility="gone">
+
+        <ImageView
+            android:layout_width="26dp"
+            android:layout_height="26dp"
+            android:contentDescription="@null"
+            android:scaleType="fitCenter"
+            android:src="@drawable/ic_widget_lock"
+            android:tint="@color/widget_quote_text_white" />
+
+        <TextView
+            android:id="@+id/widget_lock_note"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:ellipsize="end"
+            android:fontFamily="sans-serif-medium"
+            android:gravity="center"
+            android:maxLines="1"
+            android:shadowColor="#99000000"
+            android:shadowDx="0"
+            android:shadowDy="1"
+            android:shadowRadius="3"
+            android:text="Açmak için dokunun"
+            android:textColor="@color/widget_quote_text_white"
+            android:textSize="11sp" />
+
     </LinearLayout>
 </FrameLayout>

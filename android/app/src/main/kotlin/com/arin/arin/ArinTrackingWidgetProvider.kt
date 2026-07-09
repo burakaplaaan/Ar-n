@@ -59,9 +59,11 @@ class ArinTrackingWidgetProvider : HomeWidgetProvider() {
         for (widgetId in appWidgetIds) {
             val views = RemoteViews(context.packageName, R.layout.arin_tracking_widget)
             if (locked) {
+                views.setViewVisibility(R.id.widget_tracking_content, View.GONE)
                 views.setViewVisibility(R.id.widget_lock_overlay, View.VISIBLE)
             } else {
                 views.setViewVisibility(R.id.widget_lock_overlay, View.GONE)
+                views.setViewVisibility(R.id.widget_tracking_content, View.VISIBLE)
                 val e = entry!!
                 views.setTextViewText(R.id.widget_tracking_title, e.title)
                 views.setTextViewText(R.id.widget_tracking_value, e.value)

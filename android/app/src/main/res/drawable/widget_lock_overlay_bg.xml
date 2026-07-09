@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- iOS widget'ı ile aynı davranış: kilit overlay'i tamamen şeffaf, sadece
+     beyaz kilit ikonu ve gölgeli yazı görünür, beyaz "kart" gösterilmez. -->
 <shape xmlns:android="http://schemas.android.com/apk/res/android">
-    <solid android:color="#CCFFFFFF" />
-    <corners android:radius="18dp" />
+    <solid android:color="@android:color/transparent" />
 </shape>

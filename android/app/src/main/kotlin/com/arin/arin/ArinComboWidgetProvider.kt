@@ -112,12 +112,14 @@ class ArinComboWidgetProvider : HomeWidgetProvider() {
         for (widgetId in appWidgetIds) {
             val views = RemoteViews(context.packageName, R.layout.arin_combo_widget)
             if (locked) {
+                views.setViewVisibility(R.id.widget_combo_content, View.GONE)
                 views.setViewVisibility(R.id.widget_lock_overlay, View.VISIBLE)
                 views.setOnClickPendingIntent(R.id.widget_combo_root, contentPi)
                 appWidgetManager.updateAppWidget(widgetId, views)
                 continue
             }
             views.setViewVisibility(R.id.widget_lock_overlay, View.GONE)
+            views.setViewVisibility(R.id.widget_combo_content, View.VISIBLE)
             val safeNextName = if (scheduleExpired) {
                 "Güncelle"
             } else if (forceTurkish) {

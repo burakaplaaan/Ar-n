@@ -18,6 +18,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'app.dart';
 import 'core/analytics/arin_analytics.dart';
+import 'core/analytics/meta_app_events.dart';
 import 'core/debug/arin_error_reporting.dart';
 import 'core/firebase/firebase_bootstrap.dart';
 import 'core/services/arin_review_prompter.dart';
@@ -375,6 +376,15 @@ Future<void> _runDeferredStartup(SharedPreferences prefs) async {
 
   if (!kIsWeb) {
     if (Platform.isAndroid || Platform.isIOS) {
+      // Meta App Events + iOS ATT — AEM / install attribution.
+      // AdMob'dan önce; ATT diyaloğu reklam SDK'sından bağımsız çıksın.
+      unawaited(
+        Future<void>.delayed(
+          const Duration(seconds: 2),
+          MetaAppEvents.initialize,
+        ),
+      );
+
       unawaited(
         Future<void>.delayed(
           const Duration(seconds: 6),

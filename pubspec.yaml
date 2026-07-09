@@ -1,7 +1,7 @@
 name: arin
 description: "Arın - İslami Yaşam, Alışkanlık ve Odaklanma Asistanı"
 publish_to: 'none'
-version: 1.1.1+35
+version: 1.1.2+40
 
 environment:
   sdk: '>=3.8.0 <4.0.0'
@@ -108,6 +108,8 @@ dependencies:
   cloud_functions: ^6.2.0
   purchases_flutter: ^10.1.0
   wakelock_plus: ^1.5.2
+  facebook_app_events: ^0.30.2
+  app_tracking_transparency: ^2.0.7
 
 dev_dependencies:
   flutter_test:

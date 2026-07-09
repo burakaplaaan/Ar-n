@@ -5,6 +5,11 @@
          tanımlamak native Google Sign-In akışının kimlik doğrulayıcıyı çözmesine yardımcı olur. -->
     <string name="default_web_client_id">746942620456-lm0rg914v26s3u2io9pif08vu24jfor0.apps.googleusercontent.com</string>
     <string name="app_name">Arın</string>
+    <!-- Meta App Events. Client Token: developers.facebook.com → Ayarlar → Gelişmiş.
+         REPLACE_META_CLIENT_TOKEN yerine gerçek token yazılmalı. -->
+    <string name="facebook_app_id">4451380661797719</string>
+    <string name="facebook_client_token">c150203bf357ef5e115b4012e9c55b98</string>
+    <string name="fb_login_protocol_scheme">fb4451380661797719</string>
     <string name="widget_description">Günlük söz ve kaynak — Arın</string>
     <string name="widget_quote_description">Arın — günlük söz</string>
     <string name="widget_prayer_description">Arın — namaz vakitleri</string>

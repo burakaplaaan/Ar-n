@@ -108,12 +108,14 @@ class ArinPrayerWidgetProvider : HomeWidgetProvider() {
         for (widgetId in appWidgetIds) {
             val views = RemoteViews(context.packageName, R.layout.arin_prayer_widget)
             if (locked) {
+                views.setViewVisibility(R.id.widget_prayer_content, View.GONE)
                 views.setViewVisibility(R.id.widget_lock_overlay, View.VISIBLE)
                 views.setOnClickPendingIntent(R.id.widget_prayer_root, contentPi)
                 appWidgetManager.updateAppWidget(widgetId, views)
                 continue
             }
             views.setViewVisibility(R.id.widget_lock_overlay, View.GONE)
+            views.setViewVisibility(R.id.widget_prayer_content, View.VISIBLE)
             val safeNextName = if (scheduleExpired) {
                 "Güncelle"
             } else if (forceTurkish) {
