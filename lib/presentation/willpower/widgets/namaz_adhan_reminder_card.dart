@@ -35,7 +35,7 @@ part 'namaz_adhan_reminder_sheets.dart';
 String _prayerSlotLabel(AppLocalizations l10n, int i) {
   switch (i) {
     case 0:
-      return l10n.prayerNameImsak;
+      return l10n.localeName.startsWith('tr') ? 'Sabah' : l10n.prayerNameImsak;
     case 1:
       return l10n.prayerNameSunrise;
     case 2:
