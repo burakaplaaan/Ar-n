@@ -32,7 +32,8 @@ class OnboardingSurveyPage extends ConsumerStatefulWidget {
       _OnboardingSurveyPageState();
 }
 
-class _OnboardingSurveyPageState extends ConsumerState<OnboardingSurveyPage> {
+class _OnboardingSurveyPageState extends ConsumerState<OnboardingSurveyPage>
+    with WidgetsBindingObserver {
   final PageController _pageController = PageController();
   int _currentIndex = 0;
 
@@ -40,6 +41,7 @@ class _OnboardingSurveyPageState extends ConsumerState<OnboardingSurveyPage> {
   bool _includeNotificationStep = true;
   bool _finishing = false;
   bool _notificationPermissionEnabled = false;
+  bool _refreshPermissionAfterSettingsReturn = false;
 
   final TextEditingController _nameController = TextEditingController();
   final FocusNode _nameFocus = FocusNode();
@@ -175,6 +177,7 @@ class _OnboardingSurveyPageState extends ConsumerState<OnboardingSurveyPage> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     unawaited(_bootstrapSurvey());
   }
 
@@ -198,10 +201,26 @@ class _OnboardingSurveyPageState extends ConsumerState<OnboardingSurveyPage> {
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _nameFocus.dispose();
     _nameController.dispose();
     _pageController.dispose();
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state != AppLifecycleState.resumed ||
+        !_refreshPermissionAfterSettingsReturn) {
+      return;
+    }
+    _refreshPermissionAfterSettingsReturn = false;
+    unawaited(_finishSettingsPermissionRefresh());
+  }
+
+  Future<void> _finishSettingsPermissionRefresh() async {
+    await FcmTokenService.markBroadcastPermissionPromptHandled();
+    await _refreshNotificationPermissionStatus();
   }
 
   void _nextPage() {
@@ -242,6 +261,9 @@ class _OnboardingSurveyPageState extends ConsumerState<OnboardingSurveyPage> {
     final l10n = AppLocalizations.of(context)!;
     if (_permissionRequestInFlight) return;
     if (_notificationPermissionEnabled) {
+      await FcmTokenService.markBroadcastPermissionPromptHandled();
+      await FcmTokenService.resumeBroadcastSubscriptionIfAuthorized();
+      if (!mounted) return;
       _nextPage();
       return;
     }
@@ -251,6 +273,10 @@ class _OnboardingSurveyPageState extends ConsumerState<OnboardingSurveyPage> {
         arinLocalNotificationsPlugin,
         policy: LocalNotificationPermissionPolicy.full,
       );
+      await FcmTokenService.markBroadcastPermissionPromptHandled();
+      if (ok) {
+        await FcmTokenService.resumeBroadcastSubscriptionIfAuthorized();
+      }
       if (!mounted) return;
 
       // Battery optimization dialog'u (Android'de Samsung/Xiaomi için önemli).
@@ -281,7 +307,6 @@ class _OnboardingSurveyPageState extends ConsumerState<OnboardingSurveyPage> {
 
       if (ok) {
         setState(() => _notificationPermissionEnabled = true);
-        unawaited(FcmTokenService.requestBroadcastPermissions());
         _nextPage();
       } else {
         setState(() => _notificationPermissionEnabled = false);
@@ -992,8 +1017,12 @@ class _OnboardingSurveyPageState extends ConsumerState<OnboardingSurveyPage> {
           const SizedBox(height: 10),
           TextButton(
             onPressed: () async {
-              await openAppSettings();
-              await _refreshNotificationPermissionStatus();
+              _refreshPermissionAfterSettingsReturn = true;
+              final opened = await openAppSettings();
+              if (!opened) {
+                _refreshPermissionAfterSettingsReturn = false;
+                await _refreshNotificationPermissionStatus();
+              }
             },
             child: Text(
               l10n.surveyNotificationOpenSettings,
@@ -1001,7 +1030,7 @@ class _OnboardingSurveyPageState extends ConsumerState<OnboardingSurveyPage> {
             ),
           ),
           TextButton(
-            onPressed: () {
+            onPressed: () async {
               // "Atla" sessizce geçersiz: Arın'ın ana özelliği namaz ezanı
               // bildirimleri. Kullanıcı farkına varmadan geçip uygulamayı
               // "bozuk" sanmasın diye uzun bir snackbar + aksiyon tuşu.
@@ -1017,6 +1046,8 @@ class _OnboardingSurveyPageState extends ConsumerState<OnboardingSurveyPage> {
                   ),
                 ),
               );
+              await FcmTokenService.markBroadcastPermissionPromptHandled();
+              if (!mounted) return;
               setState(() => _notificationPermissionEnabled = false);
               _nextPage();
             },

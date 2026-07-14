@@ -31,6 +31,7 @@ import '../../presentation/kaza/kaza_tracker_page.dart';
 import '../../presentation/qibla/qibla_hub_page.dart';
 import '../../presentation/settings/admin_content_page.dart';
 import '../../presentation/settings/admin_notifications_page.dart';
+import '../../presentation/settings/admin_performance_page.dart';
 import '../../presentation/settings/settings_page.dart';
 import '../../presentation/settings/widget_unlock_page.dart';
 import '../../data/services/widget_access_service.dart';
@@ -106,7 +107,10 @@ abstract final class AppRoutes {
     if (returnOrigin != null && returnOrigin.isNotEmpty) {
       query['origin'] = returnOrigin;
     }
-    final uri = Uri(path: '/habits/will/namaz/$habitId', queryParameters: query);
+    final uri = Uri(
+      path: '/habits/will/namaz/$habitId',
+      queryParameters: query,
+    );
     return uri.toString();
   }
 
@@ -134,6 +138,9 @@ abstract final class AppRoutes {
   /// Admin → Bildirim yönetimi (havuz + otomatik + manuel yayınlar).
   static const String settingsAdminNotifications =
       '/settings/admin/notifications';
+
+  /// Admin → İçerik, bildirim ve widget performansı.
+  static const String settingsAdminPerformance = '/settings/admin/performance';
 
   /// Ayarlar → Bildirimler.
   static const String settingsNotifications = '/settings/notifications';
@@ -286,8 +293,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: AppRoutes.momentVerse,
-        pageBuilder: (context, state) =>
-            _page(state, const MomentVersePage()),
+        pageBuilder: (context, state) => _page(state, const MomentVersePage()),
       ),
       ShellRoute(
         builder: (context, state, child) => ArinShell(child: child),
@@ -459,6 +465,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                     pageBuilder: (context, state) =>
                         _page(state, const AdminNotificationsPage()),
                   ),
+                  GoRoute(
+                    path: 'performance',
+                    pageBuilder: (context, state) =>
+                        _page(state, const AdminPerformancePage()),
+                  ),
                 ],
               ),
               GoRoute(
@@ -606,7 +617,6 @@ class _ErrorRedirectHomeState extends State<_ErrorRedirectHome> {
   }
 
   @override
-  Widget build(BuildContext context) => const Scaffold(
-        backgroundColor: Color(0xFF071815),
-      );
+  Widget build(BuildContext context) =>
+      const Scaffold(backgroundColor: Color(0xFF071815));
 }

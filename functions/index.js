@@ -11,6 +11,8 @@
 
 const { onSchedule } = require("firebase-functions/v2/scheduler");
 const { onCall, HttpsError, onRequest } = require("firebase-functions/v2/https");
+const { onDocumentWritten } = require("firebase-functions/v2/firestore");
+const crypto = require("crypto");
 const { initializeApp } = require("firebase-admin/app");
 const {
   getFirestore,
@@ -220,6 +222,680 @@ async function assertCallerIsAdmin(req) {
 
   throw new HttpsError("permission-denied", "Sadece admin tetikleyebilir.");
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Ürün performans metrikleri — yalnızca anonim kurulum hash'i ve sayısal
+// aggregate'ler tutulur. E-posta, UID, içerik metni ve konum yazılmaz.
+// ─────────────────────────────────────────────────────────────────────────────
+
+const _kMetricEvents = new Set([
+  "content_view",
+  "content_like",
+  "content_save",
+  "widget_active",
+  "widget_first_use",
+  "widget_churned",
+  "widget_returned",
+  "widget_unlock",
+]);
+const _kWidgetKinds = new Set([
+  "quote",
+  "prayer",
+  "combo",
+  "tracking",
+  "zikir",
+]);
+
+function _istanbulDayKey(ms = Date.now()) {
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone: "Europe/Istanbul",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(new Date(ms));
+  const values = Object.fromEntries(
+    parts.filter((part) => part.type !== "literal")
+      .map((part) => [part.type, part.value]),
+  );
+  return `${values.year}-${values.month}-${values.day}`;
+}
+
+function _validatedInstallHash(rawInstallId) {
+  const value = String(rawInstallId || "").trim();
+  if (!/^[A-Za-z0-9_-]{16,128}$/.test(value)) {
+    throw new HttpsError("invalid-argument", "Geçersiz kurulum kimliği.");
+  }
+  return crypto.createHash("sha256").update(value).digest("hex");
+}
+
+function _validatedCardId(rawCardId) {
+  const value = String(rawCardId || "").trim();
+  if (!value || value.length > 160 || value.includes("/")) {
+    throw new HttpsError("invalid-argument", "Geçersiz içerik kimliği.");
+  }
+  return value;
+}
+
+function _validatedWidgetKind(rawKind) {
+  const value = String(rawKind || "").trim();
+  if (!_kWidgetKinds.has(value)) {
+    throw new HttpsError("invalid-argument", "Geçersiz widget türü.");
+  }
+  return value;
+}
+
+function _dedupeId(parts) {
+  return crypto
+    .createHash("sha256")
+    .update(parts.join("|"))
+    .digest("hex");
+}
+
+function _metricShardId(installHash) {
+  return String(parseInt(installHash.substring(0, 4), 16) % 20)
+    .padStart(2, "0");
+}
+
+function _dailyMetricRef(db, dayKey, installHash) {
+  const shardId = _metricShardId(installHash);
+  return db.collection("admin_metric_daily_shards")
+    .doc(`${dayKey}_${shardId}`);
+}
+
+function _rateLimitRef(db, dayKey, installHash, scope) {
+  return db.collection("admin_metric_rate_limits")
+    .doc(`${dayKey}_${installHash}_${scope}`);
+}
+
+function _applyRateLimit(tx, snapshot, ref, limit) {
+  const count = Number(snapshot.data()?.count) || 0;
+  if (count >= limit) {
+    throw new HttpsError(
+      "resource-exhausted",
+      "Günlük metrik kotası aşıldı.",
+    );
+  }
+  tx.set(ref, {
+    count: FieldValue.increment(1),
+    expiresAt: Timestamp.fromMillis(Date.now() + 3 * 86400000),
+    updatedAt: FieldValue.serverTimestamp(),
+  }, { merge: true });
+}
+
+let _contentCatalogCache = { expiresAtMs: 0, ids: new Set() };
+async function _assertKnownContentCard(db, cardId) {
+  const now = Date.now();
+  if (now >= _contentCatalogCache.expiresAtMs) {
+    const snap = await db.collection("app_public").doc("inspiration_cards").get();
+    const rawItems = snap.data()?.items;
+    const ids = new Set();
+    if (Array.isArray(rawItems)) {
+      for (const item of rawItems) {
+        const id = String(item?.id || "").trim();
+        if (id) ids.add(id);
+      }
+    }
+    _contentCatalogCache = {
+      expiresAtMs: now + 5 * 60 * 1000,
+      ids,
+    };
+  }
+  if (!_contentCatalogCache.ids.has(cardId)) {
+    throw new HttpsError("not-found", "İçerik kataloğunda kart bulunamadı.");
+  }
+}
+
+async function _createNotificationDelivery(db, {
+  source,
+  poolItemId,
+  title,
+  body,
+  sentAtMs,
+  isTest = false,
+}) {
+  const audienceSnap = await db
+    .collection("admin_metric_audience_members")
+    .where("expiresAt", ">=", Timestamp.now())
+    .count()
+    .get();
+  const audienceEstimate = audienceSnap.data().count;
+  const ref = db.collection("admin_ntf_deliveries").doc();
+  await ref.set({
+    deliveryId: ref.id,
+    source,
+    poolItemId: poolItemId || null,
+    title: String(title || "").slice(0, 180),
+    body: String(body || "").slice(0, 500),
+    sentAtMs,
+    isTest: isTest === true,
+    audienceEstimate,
+    topic: "broadcast_all",
+    status: "preparing",
+    createdAt: FieldValue.serverTimestamp(),
+  });
+  return ref;
+}
+
+exports.syncAnalyticsAudience = onCall(
+  {
+    region: "europe-west1",
+    memory: "256MiB",
+    enforceAppCheck: true,
+  },
+  async (req) => {
+    const installHash = _validatedInstallHash(req.data?.installId);
+    const active = req.data?.active === true;
+    const platform = ["android", "ios"].includes(req.data?.platform)
+      ? req.data.platform
+      : "other";
+    const db = getFirestore();
+    const memberRef = db
+      .collection("admin_metric_audience_members")
+      .doc(installHash);
+    const dayKey = _istanbulDayKey();
+    const rateRef = _rateLimitRef(db, dayKey, installHash, "audience");
+
+    await db.runTransaction(async (tx) => {
+      const rateSnap = await tx.get(rateRef);
+      _applyRateLimit(tx, rateSnap, rateRef, 100);
+      tx.set(memberRef, {
+        active,
+        platform,
+        expiresAt: Timestamp.fromMillis(
+          active ? Date.now() + 35 * 86400000 : Date.now(),
+        ),
+        lastSeenAt: FieldValue.serverTimestamp(),
+      }, { merge: true });
+    });
+    return { ok: true };
+  },
+);
+
+exports.recordNotificationClick = onCall(
+  {
+    region: "europe-west1",
+    memory: "256MiB",
+    enforceAppCheck: true,
+  },
+  async (req) => {
+    const installHash = _validatedInstallHash(req.data?.installId);
+    const deliveryId = String(req.data?.deliveryId || "").trim();
+    if (!/^[A-Za-z0-9_-]{8,128}$/.test(deliveryId)) {
+      throw new HttpsError("invalid-argument", "Geçersiz bildirim kimliği.");
+    }
+
+    const db = getFirestore();
+    const deliveryRef = db.collection("admin_ntf_deliveries").doc(deliveryId);
+    const clickRef = deliveryRef.collection("clicks").doc(installHash);
+    const clickShardRef = db
+      .collection("admin_ntf_delivery_click_shards")
+      .doc(`${deliveryId}_${_metricShardId(installHash)}`);
+    const dayKey = _istanbulDayKey();
+    const dailyRef = _dailyMetricRef(db, dayKey, installHash);
+    const rateRef = _rateLimitRef(db, dayKey, installHash, "notification");
+    let counted = false;
+
+    await db.runTransaction(async (tx) => {
+      const [deliverySnap, clickSnap, rateSnap] = await Promise.all([
+        tx.get(deliveryRef),
+        tx.get(clickRef),
+        tx.get(rateRef),
+      ]);
+      if (!deliverySnap.exists) {
+        throw new HttpsError("not-found", "Bildirim kaydı bulunamadı.");
+      }
+      if (clickSnap.exists) return;
+      _applyRateLimit(tx, rateSnap, rateRef, 100);
+      counted = true;
+      tx.create(clickRef, {
+        clickedAt: FieldValue.serverTimestamp(),
+      });
+      tx.set(clickShardRef, {
+        deliveryId,
+        shardId: _metricShardId(installHash),
+        clicks: FieldValue.increment(1),
+        updatedAt: FieldValue.serverTimestamp(),
+      }, { merge: true });
+      tx.set(dailyRef, {
+        dayKey,
+        shardId: _metricShardId(installHash),
+        notifications: {
+          clicks: FieldValue.increment(1),
+        },
+        updatedAt: FieldValue.serverTimestamp(),
+      }, { merge: true });
+    });
+    return { ok: true, counted };
+  },
+);
+
+exports.recordProductMetric = onCall(
+  {
+    region: "europe-west1",
+    memory: "256MiB",
+    enforceAppCheck: true,
+  },
+  async (req) => {
+    const event = String(req.data?.event || "").trim();
+    if (!_kMetricEvents.has(event)) {
+      throw new HttpsError("invalid-argument", "Desteklenmeyen metrik.");
+    }
+    const installHash = _validatedInstallHash(req.data?.installId);
+    const dayKey = _istanbulDayKey();
+    const db = getFirestore();
+    const dailyRef = _dailyMetricRef(db, dayKey, installHash);
+    const installRef = db
+      .collection("admin_widget_installations")
+      .doc(installHash);
+    const widgetSummaryRef = db
+      .collection("admin_widget_summary")
+      .doc("current");
+
+    let entity = "all";
+    let cardId = null;
+    let kind = null;
+    if (event.startsWith("content_")) {
+      cardId = _validatedCardId(req.data?.cardId);
+      await _assertKnownContentCard(db, cardId);
+      entity = cardId;
+    }
+    if (event === "widget_first_use" || event === "widget_unlock") {
+      kind = _validatedWidgetKind(req.data?.kind);
+      entity = kind;
+    }
+    const dedupeRef = db.collection("admin_metric_event_dedupe").doc(
+      _dedupeId([dayKey, event, installHash, entity]),
+    );
+    const rateRef = _rateLimitRef(db, dayKey, installHash, "product");
+    let counted = false;
+    let accepted = false;
+
+    await db.runTransaction(async (tx) => {
+      const reads = [tx.get(dedupeRef), tx.get(rateRef)];
+      if (event.startsWith("widget_")) reads.push(tx.get(installRef));
+      const snapshots = await Promise.all(reads);
+      const dedupeSnap = snapshots[0];
+      const rateSnap = snapshots[1];
+      if (dedupeSnap.exists) {
+        accepted = true;
+        return;
+      }
+
+      const installSnap = event.startsWith("widget_") ? snapshots[2] : null;
+      const installData = installSnap?.data() || {};
+      if (event === "widget_first_use" &&
+          installData.kinds?.[kind]?.firstSeenAt != null) {
+        accepted = true;
+        return;
+      }
+      if (event === "widget_active" &&
+          (!installSnap?.exists || installData.firstSeenAt == null)) {
+        return;
+      }
+      if (event === "widget_churned") {
+        if (!installSnap?.exists) return;
+        if (installData.status === "churned") {
+          accepted = true;
+          return;
+        }
+      }
+      if (event === "widget_returned" &&
+          installData.status !== "churned") {
+        if (installData.status === "active" &&
+            installData.returnedAt != null) {
+          accepted = true;
+        }
+        return;
+      }
+
+      _applyRateLimit(tx, rateSnap, rateRef, 300);
+      counted = true;
+      accepted = true;
+      tx.create(dedupeRef, {
+        event,
+        dayKey,
+        entity,
+        expiresAt: Timestamp.fromMillis(Date.now() + 120 * 86400000),
+        createdAt: FieldValue.serverTimestamp(),
+      });
+
+      const dailyUpdate = {
+        dayKey,
+        shardId: _metricShardId(installHash),
+        updatedAt: FieldValue.serverTimestamp(),
+      };
+      if (event.startsWith("content_")) {
+        const metric = event.substring("content_".length);
+        dailyUpdate.content = {
+          [metric + "s"]: FieldValue.increment(1),
+        };
+        const contentRef = db.collection("admin_content_metric_shards").doc(
+          `${_dedupeId([cardId]).substring(0, 24)}_` +
+          _metricShardId(installHash),
+        );
+        tx.set(contentRef, {
+          cardId,
+          shardId: _metricShardId(installHash),
+          [metric + "s"]: FieldValue.increment(1),
+          lastEventAt: FieldValue.serverTimestamp(),
+        }, { merge: true });
+      } else if (event === "widget_active") {
+        dailyUpdate.widgets = {
+          activeUsers: FieldValue.increment(1),
+        };
+        const finalWidgetActiveUpdate = {
+          lastActiveAt: FieldValue.serverTimestamp(),
+          updatedAt: FieldValue.serverTimestamp(),
+        };
+        if (installSnap?.data()?.status !== "churned") {
+          finalWidgetActiveUpdate.status = "active";
+        }
+        tx.set(installRef, finalWidgetActiveUpdate, { merge: true });
+        const activeSummaryShardRef = db
+          .collection("admin_widget_summary_shards")
+          .doc(_metricShardId(installHash));
+        tx.set(activeSummaryShardRef, {
+          shardId: _metricShardId(installHash),
+          activeUserDays: FieldValue.increment(1),
+          updatedAt: FieldValue.serverTimestamp(),
+        }, { merge: true });
+      } else if (event === "widget_first_use") {
+        const firstEver = installSnap?.exists !== true;
+        dailyUpdate.widgets = {
+          firstUses: FieldValue.increment(1),
+          newUsers: FieldValue.increment(firstEver ? 1 : 0),
+          byKind: {
+            [kind]: {
+              firstUses: FieldValue.increment(1),
+            },
+          },
+        };
+        tx.set(installRef, {
+          firstSeenAt: installSnap?.data()?.firstSeenAt ||
+            FieldValue.serverTimestamp(),
+          lastActiveAt: FieldValue.serverTimestamp(),
+          status: installSnap?.data()?.status === "churned" ?
+            "churned" : "active",
+          kinds: {
+            [kind]: {
+              firstSeenAt: FieldValue.serverTimestamp(),
+            },
+          },
+          updatedAt: FieldValue.serverTimestamp(),
+        }, { merge: true });
+        tx.set(widgetSummaryRef, {
+          totalEverUsers: firstEver ? FieldValue.increment(1) :
+            FieldValue.increment(0),
+          updatedAt: FieldValue.serverTimestamp(),
+        }, { merge: true });
+      } else if (event === "widget_churned") {
+        dailyUpdate.widgets = {
+          churned: FieldValue.increment(1),
+        };
+        tx.set(installRef, {
+          status: "churned",
+          churnedAt: FieldValue.serverTimestamp(),
+          updatedAt: FieldValue.serverTimestamp(),
+        }, { merge: true });
+        tx.set(widgetSummaryRef, {
+          currentChurned: FieldValue.increment(1),
+          totalChurned: FieldValue.increment(1),
+          updatedAt: FieldValue.serverTimestamp(),
+        }, { merge: true });
+      } else if (event === "widget_returned") {
+        dailyUpdate.widgets = {
+          returned: FieldValue.increment(1),
+        };
+        tx.set(installRef, {
+          status: "active",
+          returnedAt: FieldValue.serverTimestamp(),
+          lastActiveAt: FieldValue.serverTimestamp(),
+          updatedAt: FieldValue.serverTimestamp(),
+        }, { merge: true });
+        tx.set(widgetSummaryRef, {
+          currentChurned: FieldValue.increment(-1),
+          totalReturned: FieldValue.increment(1),
+          updatedAt: FieldValue.serverTimestamp(),
+        }, { merge: true });
+      } else if (event === "widget_unlock") {
+        dailyUpdate.widgets = {
+          unlocks: FieldValue.increment(1),
+          byKind: {
+            [kind]: {
+              unlocks: FieldValue.increment(1),
+            },
+          },
+        };
+        tx.set(widgetSummaryRef, {
+          totalUnlocks: FieldValue.increment(1),
+          updatedAt: FieldValue.serverTimestamp(),
+        }, { merge: true });
+      }
+      tx.set(dailyRef, dailyUpdate, { merge: true });
+    });
+    return { ok: true, counted, accepted };
+  },
+);
+
+exports.getAdminPerformance = onCall(
+  {
+    region: "europe-west1",
+    memory: "512MiB",
+    enforceAppCheck: true,
+  },
+  async (req) => {
+    await assertCallerIsAdmin(req);
+    const requestedDays = Number(req.data?.days);
+    const days = requestedDays === 30 ? 30 : 7;
+    const now = Date.now();
+    const fromMs = now - (days - 1) * 86400000;
+    const fromDay = _istanbulDayKey(fromMs);
+    const db = getFirestore();
+
+    const [
+      dailySnap,
+      deliveriesSnap,
+      contentSnap,
+      widgetSummarySnap,
+      audienceSnap,
+      active7Snap,
+      active30Snap,
+      inspireCatalogSnap,
+      widgetSummaryShardsSnap,
+    ] = await Promise.all([
+      db.collection("admin_metric_daily_shards")
+        .where("dayKey", ">=", fromDay)
+        .orderBy("dayKey")
+        .get(),
+      db.collection("admin_ntf_deliveries")
+        .orderBy("sentAtMs", "desc")
+        .limit(50)
+        .get(),
+      db.collection("admin_content_metric_shards")
+        .get(),
+      db.collection("admin_widget_summary").doc("current").get(),
+      db.collection("admin_metric_audience_members")
+        .where("expiresAt", ">=", Timestamp.now())
+        .count()
+        .get(),
+      db.collection("admin_widget_installations")
+        .where("lastActiveAt", ">=", Timestamp.fromMillis(now - 7 * 86400000))
+        .count()
+        .get(),
+      db.collection("admin_widget_installations")
+        .where("lastActiveAt", ">=", Timestamp.fromMillis(now - 30 * 86400000))
+        .count()
+        .get(),
+      db.collection("app_public").doc("inspiration_cards").get(),
+      db.collection("admin_widget_summary_shards").get(),
+    ]);
+
+    const deliveryClickTotals = new Map();
+    const deliveryIds = deliveriesSnap.docs.map((doc) => doc.id);
+    for (let i = 0; i < deliveryIds.length; i += 30) {
+      const chunk = deliveryIds.slice(i, i + 30);
+      if (chunk.length === 0) continue;
+      const shardSnap = await db
+        .collection("admin_ntf_delivery_click_shards")
+        .where("deliveryId", "in", chunk)
+        .get();
+      for (const shard of shardSnap.docs) {
+        const data = shard.data();
+        const id = String(data.deliveryId || "");
+        deliveryClickTotals.set(
+          id,
+          (deliveryClickTotals.get(id) || 0) + (Number(data.clicks) || 0),
+        );
+      }
+    }
+
+    const contentLabels = new Map();
+    const rawItems = inspireCatalogSnap.data()?.items;
+    if (Array.isArray(rawItems)) {
+      for (const item of rawItems) {
+        const id = String(item?.id || "").trim();
+        if (!id) continue;
+        contentLabels.set(id, String(item?.tr || "").trim().slice(0, 120));
+      }
+    }
+    const contentTotals = new Map();
+    for (const doc of contentSnap.docs) {
+      const data = doc.data();
+      const cardId = String(data.cardId || "").trim();
+      if (!cardId) continue;
+      const current = contentTotals.get(cardId) || {
+        id: cardId,
+        label: contentLabels.get(cardId) || "",
+        views: 0,
+        likes: 0,
+        saves: 0,
+      };
+      current.views += Number(data.views) || 0;
+      current.likes += Number(data.likes) || 0;
+      current.saves += Number(data.saves) || 0;
+      contentTotals.set(cardId, current);
+    }
+    const topContent = [...contentTotals.values()]
+      .sort((a, b) => b.views - a.views)
+      .slice(0, 30);
+    const activeUserDays = widgetSummaryShardsSnap.docs.reduce(
+      (sum, doc) => sum + (Number(doc.data().activeUserDays) || 0),
+      0,
+    );
+
+    return {
+      days,
+      generatedAtMs: now,
+      daily: dailySnap.docs.map((doc) => ({
+        id: doc.id,
+        content: doc.data().content || {},
+        notifications: doc.data().notifications || {},
+        widgets: doc.data().widgets || {},
+      })),
+      deliveries: deliveriesSnap.docs.map((doc) => {
+        const data = doc.data();
+        return {
+          id: doc.id,
+          source: data.source || "",
+          title: data.title || "",
+          body: data.body || "",
+          sentAtMs: Number(data.sentAtMs) || 0,
+          isTest: data.isTest === true,
+          audienceEstimate: Number(data.audienceEstimate) || 0,
+          uniqueClicks: deliveryClickTotals.get(doc.id) || 0,
+          status: data.status || "",
+        };
+      }),
+      content: topContent,
+      widgets: {
+        totalEverUsers:
+          Number(widgetSummarySnap.data()?.totalEverUsers) || 0,
+        currentChurned:
+          Math.max(0, Number(widgetSummarySnap.data()?.currentChurned) || 0),
+        totalChurned:
+          Number(widgetSummarySnap.data()?.totalChurned) || 0,
+        totalReturned:
+          Number(widgetSummarySnap.data()?.totalReturned) || 0,
+        totalUnlocks:
+          Number(widgetSummarySnap.data()?.totalUnlocks) || 0,
+        activeUserDays,
+        active7: active7Snap.data().count,
+        active30: active30Snap.data().count,
+      },
+      notificationAudience: audienceSnap.data().count,
+    };
+  },
+);
+
+// ─────────────────────────────────────────────────────────────────────────────
+// syncGlobalWidgetLock — app_public/widget_global_lock değiştiğinde görünür
+// bildirim üretmeden tüm cihazlara yeni override durumunu yollar.
+//
+// Mesaj bir revision taşır. FCM teslim sırası garanti etmediği için istemci
+// daha eski revision'ı reddeder; retry/duplicate teslimler idempotent kalır.
+// Premium istisnası cihazdaki native widget provider tarafından uygulanır.
+// ─────────────────────────────────────────────────────────────────────────────
+exports.syncGlobalWidgetLock = onDocumentWritten(
+  {
+    document: "app_public/widget_global_lock",
+    region: "europe-west1",
+    memory: "256MiB",
+    retry: true,
+  },
+  async (event) => {
+    const before = event.data?.before;
+    const after = event.data?.after;
+    // Silme işlemi beklenmeyen toplu unlock üretmemeli. Kilit yalnızca açıkça
+    // `locked: false` yazılarak kaldırılır.
+    if (after?.exists !== true) return;
+    const previousLocked =
+      before?.exists === true && before.data()?.locked === true;
+    const locked = after.data()?.locked === true;
+
+    // Not/audit alanı gibi kilit durumunu değiştirmeyen yazılar push üretmesin.
+    if (before?.exists === true && after?.exists === true &&
+        previousLocked === locked) {
+      return;
+    }
+
+    const storedRevision = Number(after?.data()?.revision);
+    if (!Number.isSafeInteger(storedRevision) || storedRevision <= 0) {
+      console.warn("[WidgetGlobalLock] revision eksik/geçersiz, push atlandı");
+      return;
+    }
+    const revision = storedRevision;
+    const note = String(after.data()?.note || "").trim().slice(0, 500);
+
+    const messageId = await getMessaging().send({
+      topic: "widget_gate_all",
+      data: {
+        type: "widget_global_lock",
+        locked: locked ? "1" : "0",
+        revision: String(revision),
+        note,
+      },
+      android: {
+        priority: "high",
+        ttl: 24 * 60 * 60 * 1000,
+      },
+      apns: {
+        headers: {
+          "apns-push-type": "background",
+          "apns-priority": "5",
+        },
+        payload: {
+          aps: {
+            contentAvailable: true,
+          },
+        },
+      },
+    });
+
+    console.log(
+      `[WidgetGlobalLock] locked=${locked} revision=${revision} messageId=${messageId}`,
+    );
+  },
+);
 
 exports.sendScheduledNotifications = onSchedule(
   {
@@ -445,6 +1121,13 @@ exports.sendScheduledNotifications = onSchedule(
       }
 
       const expiresAtMs = nowMs + 5 * 60 * 1000;
+      const deliveryRef = await _createNotificationDelivery(db, {
+        source: "auto",
+        poolItemId: plan.itemId,
+        title: ntfTitle,
+        body: ntfBody,
+        sentAtMs: nowMs,
+      });
       try {
         await db
           .collection("admin_ntf_config")
@@ -458,29 +1141,46 @@ exports.sendScheduledNotifications = onSchedule(
             clockStr,
             sentAtMs: nowMs,
             expiresAtMs,
+            deliveryId: deliveryRef.id,
           });
       } catch (err) {
         console.error("[Havuz] current_moment yazılamadı:", err);
       }
 
-      await messaging.send({
-        topic: "broadcast_all",
-        notification: { title: ntfTitle, body: ntfBody },
-        data: {
-          type: "moment_verse",
-          sentAtMs: String(nowMs),
-        },
-        android: {
-          notification: {
-            channelId: "arin_ntf_broadcast",
-            priority: "high",
-            defaultSound: true,
+      let fcmMessageId;
+      try {
+        fcmMessageId = await messaging.send({
+          topic: "broadcast_all",
+          notification: { title: ntfTitle, body: ntfBody },
+          data: {
+            type: "moment_verse",
+            sentAtMs: String(nowMs),
+            deliveryId: deliveryRef.id,
           },
-        },
-        apns: {
-          payload: { aps: { sound: "default" } },
-        },
-      });
+          android: {
+            notification: {
+              channelId: "arin_ntf_broadcast",
+              priority: "high",
+              defaultSound: true,
+            },
+          },
+          apns: {
+            payload: { aps: { sound: "default" } },
+          },
+        });
+      } catch (err) {
+        await deliveryRef.set({
+          status: "failed",
+          error: String(err?.message || err).slice(0, 300),
+          failedAt: FieldValue.serverTimestamp(),
+        }, { merge: true }).catch(() => {});
+        throw err;
+      }
+      await deliveryRef.set({
+        status: "sent",
+        fcmMessageId,
+        sentAt: FieldValue.serverTimestamp(),
+      }, { merge: true });
 
       // Planı kapat
       await planRef.set(
@@ -576,6 +1276,14 @@ exports.sendMomentVerseNow = onCall(
       ntfBody = teaserTexts[Math.floor(Math.random() * teaserTexts.length)];
     }
 
+    const deliveryRef = await _createNotificationDelivery(db, {
+      source: "manual",
+      poolItemId,
+      title: ntfTitle,
+      body: ntfBody,
+      sentAtMs: nowMs,
+    });
+
     // current_moment dokümanını yaz — kullanıcı tıkladığında MomentVersePage
     // bu dökümanı okuyup süre kontrolü yapacak.
     try {
@@ -591,6 +1299,7 @@ exports.sendMomentVerseNow = onCall(
           clockStr: clockStr,
           sentAtMs: nowMs,
           expiresAtMs: expiresAtMs,
+          deliveryId: deliveryRef.id,
         });
     } catch (err) {
       console.error("[ManualSend] current_moment yazılamadı:", err);
@@ -598,12 +1307,13 @@ exports.sendMomentVerseNow = onCall(
     }
 
     try {
-      await messaging.send({
+      const fcmMessageId = await messaging.send({
         topic: "broadcast_all",
         notification: { title: ntfTitle, body: ntfBody },
         data: {
           type: "moment_verse",
           sentAtMs: String(nowMs),
+          deliveryId: deliveryRef.id,
         },
         android: {
           notification: {
@@ -616,7 +1326,17 @@ exports.sendMomentVerseNow = onCall(
           payload: { aps: { sound: "default" } },
         },
       });
+      await deliveryRef.set({
+        status: "sent",
+        fcmMessageId,
+        sentAt: FieldValue.serverTimestamp(),
+      }, { merge: true });
     } catch (err) {
+      await deliveryRef.set({
+        status: "failed",
+        error: String(err?.message || err).slice(0, 300),
+        failedAt: FieldValue.serverTimestamp(),
+      }, { merge: true }).catch(() => {});
       console.error("[ManualSend] FCM gönderim hatası:", err);
       throw new HttpsError("internal", `FCM gönderilemedi: ${err.message || err}`);
     }
@@ -648,6 +1368,7 @@ exports.sendMomentVerseNow = onCall(
       expiresAtMs: expiresAtMs,
       title: ntfTitle,
       body: ntfBody,
+      deliveryId: deliveryRef.id,
     };
   }
 );
@@ -760,6 +1481,15 @@ exports.sendTestNotification = onCall(
         : "Bu bir test bildirimidir.";
     }
 
+    const deliveryRef = await _createNotificationDelivery(db, {
+      source: "test",
+      poolItemId,
+      title: ntfTitle,
+      body: ntfBody,
+      sentAtMs: nowMs,
+      isTest: true,
+    });
+
     // current_moment dökümanı — kullanıcı bildirime tıklarsa MomentVersePage
     // bu içeriği gösterir.
     try {
@@ -776,6 +1506,7 @@ exports.sendTestNotification = onCall(
           sentAtMs: nowMs,
           expiresAtMs,
           isTest: true,
+          deliveryId: deliveryRef.id,
         });
     } catch (err) {
       console.error("[Test] current_moment yazılamadı:", err);
@@ -783,13 +1514,14 @@ exports.sendTestNotification = onCall(
     }
 
     try {
-      await messaging.send({
+      const fcmMessageId = await messaging.send({
         topic: "broadcast_all",
         notification: { title: ntfTitle, body: ntfBody },
         data: {
           type: "moment_verse",
           sentAtMs: String(nowMs),
           isTest: "true",
+          deliveryId: deliveryRef.id,
         },
         android: {
           notification: {
@@ -802,7 +1534,17 @@ exports.sendTestNotification = onCall(
           payload: { aps: { sound: "default" } },
         },
       });
+      await deliveryRef.set({
+        status: "sent",
+        fcmMessageId,
+        sentAt: FieldValue.serverTimestamp(),
+      }, { merge: true });
     } catch (err) {
+      await deliveryRef.set({
+        status: "failed",
+        error: String(err?.message || err).slice(0, 300),
+        failedAt: FieldValue.serverTimestamp(),
+      }, { merge: true }).catch(() => {});
       console.error("[Test] FCM gönderim hatası:", err);
       throw new HttpsError(
         "internal",
@@ -821,6 +1563,7 @@ exports.sendTestNotification = onCall(
       expiresAtMs,
       title: ntfTitle,
       body: ntfBody,
+      deliveryId: deliveryRef.id,
     };
   }
 );

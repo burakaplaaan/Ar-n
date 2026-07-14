@@ -14,5 +14,5 @@ $define = "--dart-define=GOOGLE_OAUTH_WEB_CLIENT_ID=$cid"
 if ($Mode -eq "debug") {
   flutter build apk --debug $define
 } else {
-  flutter build apk --release $define
+  flutter build apk --release --tree-shake-icons $define
 }

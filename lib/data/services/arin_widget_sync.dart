@@ -2,10 +2,11 @@
 
 import 'dart:async';
 import 'dart:convert';
-import 'dart:io' show Platform;
+import 'dart:io' show File, FileLock, FileMode, Platform, RandomAccessFile;
 
 import 'package:flutter/foundation.dart';
 import 'package:home_widget/home_widget.dart';
+import 'package:path_provider/path_provider.dart';
 
 import '../models/prayer_times_model.dart';
 import 'location_service.dart';
@@ -49,12 +50,15 @@ abstract final class ArinWidgetKeys {
   static const widgetGateZikirLocked = 'arin_widget_gate_zikir_locked';
   static const widgetGatePremium = 'arin_widget_gate_premium';
   static const widgetGateLockNote = 'arin_widget_gate_lock_note';
+  static const widgetGateGlobalLocked = 'arin_widget_gate_global_locked';
+  static const widgetGateGlobalRevision = 'arin_widget_gate_global_revision';
 }
 
 abstract final class ArinWidgetSync {
   static const _forcedWidgetLocale = 'tr';
   static final RegExp _arabicChars = RegExp(r'[\u0600-\u06FF]');
   static Future<bool>? _appGroupFuture;
+  static Future<void> _nativeGateMutationTail = Future<void>.value();
 
   /// Uygulama açılışında (deferred startup) bir kez çağrılır. AppGroup
   /// hazırlığı paralelde başlasın ki widget yazımı sırasında bekletme
@@ -347,6 +351,8 @@ abstract final class ArinWidgetSync {
     required Map<String, DateTime?> trialUntilByKind,
     required Map<String, DateTime?> unlockUntilByKind,
     required bool isPremium,
+    required bool globalLocked,
+    required int globalLockRevision,
     String lockNote = '',
   }) async {
     if (kIsWeb) return;
@@ -358,6 +364,13 @@ abstract final class ArinWidgetSync {
           lockedByKind[kind] == true ? '1' : '0',
         );
       }
+
+      final globalStateCurrent = await _saveGlobalLockOverrideIfCurrent(
+        locked: globalLocked,
+        revision: globalLockRevision,
+        lockNote: lockNote,
+      );
+      if (!globalStateCurrent) return;
 
       await save(ArinWidgetKeys.widgetGateQuoteLocked, 'quote');
       await save(ArinWidgetKeys.widgetGatePrayerLocked, 'prayer');
@@ -411,6 +424,137 @@ abstract final class ArinWidgetSync {
     } catch (e, st) {
       debugPrint('ArinWidgetSync.pushWidgetGateStates: $e\n$st');
     }
+  }
+
+  /// Sessiz FCM mesajından gelen global override'ı sürüm sırasını koruyarak
+  /// uygular. Premium istisnası native provider'larda değerlendirilir.
+  ///
+  /// Aynı revision tekrar uygulanabilir: önceki denemede veri yazılıp provider
+  /// refresh'i yarıda kaldıysa tekrar teslim edilen FCM mesajı iyileştirir.
+  static Future<void> applyGlobalLockOverride({
+    required bool locked,
+    required int revision,
+    required String lockNote,
+  }) async {
+    if (kIsWeb || revision <= 0) return;
+    if (!await _ensureAppGroupReady()) return;
+
+    final applied = await _saveGlobalLockOverrideIfCurrent(
+      locked: locked,
+      revision: revision,
+      lockNote: lockNote,
+    );
+    if (!applied) return;
+    await _updateAllWidgets();
+  }
+
+  /// Background FCM isolate'ının yazdığı native/App Group durumunu foreground
+  /// Flutter isolate'ına taşımak için okunabilir snapshot döndürür.
+  static Future<({bool locked, int revision, String note})?>
+  readGlobalLockOverride() async {
+    if (kIsWeb || !await _ensureAppGroupReady()) return null;
+    return _serializedNativeGateMutation(() async {
+      final revisionRaw = await HomeWidget.getWidgetData<String>(
+        ArinWidgetKeys.widgetGateGlobalRevision,
+      );
+      final revision = int.tryParse(revisionRaw ?? '') ?? 0;
+      if (revision <= 0) return null;
+      final lockedRaw = await HomeWidget.getWidgetData<String>(
+        ArinWidgetKeys.widgetGateGlobalLocked,
+      );
+      final note = await HomeWidget.getWidgetData<String>(
+        ArinWidgetKeys.widgetGateLockNote,
+      );
+      return (locked: lockedRaw == '1', revision: revision, note: note ?? '');
+    });
+  }
+
+  static Future<bool> _saveGlobalLockOverrideIfCurrent({
+    required bool locked,
+    required int revision,
+    required String lockNote,
+  }) async {
+    return _serializedNativeGateMutation(() async {
+      final currentRaw = await HomeWidget.getWidgetData<String>(
+        ArinWidgetKeys.widgetGateGlobalRevision,
+      );
+      final currentRevision = int.tryParse(currentRaw ?? '') ?? 0;
+      if (revision < currentRevision ||
+          (revision <= 0 && currentRevision > 0)) {
+        return false;
+      }
+
+      await HomeWidget.saveWidgetData<String>(
+        ArinWidgetKeys.widgetGateGlobalLocked,
+        locked ? '1' : '0',
+      );
+      await HomeWidget.saveWidgetData<String>(
+        ArinWidgetKeys.widgetGateLockNote,
+        locked ? lockNote.trim() : '',
+      );
+      if (revision > 0) {
+        await HomeWidget.saveWidgetData<String>(
+          ArinWidgetKeys.widgetGateGlobalRevision,
+          '$revision',
+        );
+      }
+      return true;
+    });
+  }
+
+  /// Background ve foreground FCM isolate'ları aynı HomeWidget/App Group
+  /// deposuna yazabilir. Dart kuyruğu aynı isolate'ı, OS dosya kilidi ise
+  /// isolate'lar arası read-check-write bölümünü sıralar.
+  static Future<T> _serializedNativeGateMutation<T>(
+    Future<T> Function() action,
+  ) async {
+    final previous = _nativeGateMutationTail;
+    final release = Completer<void>();
+    _nativeGateMutationTail = release.future;
+    await previous;
+
+    RandomAccessFile? lockFile;
+    try {
+      final support = await getApplicationSupportDirectory();
+      lockFile = await File(
+        '${support.path}${Platform.pathSeparator}.arin_widget_gate.lock',
+      ).open(mode: FileMode.append);
+      await lockFile.lock(FileLock.exclusive);
+      return await action();
+    } finally {
+      if (lockFile != null) {
+        try {
+          await lockFile.unlock();
+        } catch (_) {}
+        await lockFile.close();
+      }
+      release.complete();
+    }
+  }
+
+  static Future<void> _updateAllWidgets() async {
+    await Future.wait([
+      HomeWidget.updateWidget(
+        qualifiedAndroidName: _androidQuote,
+        iOSName: iOSQuoteWidgetName,
+      ),
+      HomeWidget.updateWidget(
+        qualifiedAndroidName: _androidPrayer,
+        iOSName: iOSPrayerWidgetName,
+      ),
+      HomeWidget.updateWidget(
+        qualifiedAndroidName: _androidCombo,
+        iOSName: iOSComboWidgetName,
+      ),
+      HomeWidget.updateWidget(
+        qualifiedAndroidName: _androidTracking,
+        iOSName: iOSTrackingWidgetName,
+      ),
+      HomeWidget.updateWidget(
+        qualifiedAndroidName: _androidZikir,
+        iOSName: iOSZikirWidgetName,
+      ),
+    ]);
   }
 
   static ({DateTime startsAt, String text, String source})? _currentQuoteEntry(
@@ -659,6 +803,9 @@ abstract final class ArinWidgetSync {
       // clearAll oturum kapanışı / hesap silme akışından geliyor; burada
       // bir kerelik bekleyebiliriz çünkü ana açılış path'inde değil.
       if (!await _ensureAppGroupReady()) return;
+      // Global lock kullanıcı hesabına değil uygulama kurulumuna aittir.
+      // widgetGateGlobalLocked/revision bilerek temizlenmez; aksi halde çıkış
+      // yapmak acil global kilidi yerel olarak aşabilirdi.
       for (final k in const <String>[
         ArinWidgetKeys.quoteText,
         ArinWidgetKeys.quoteSource,
@@ -700,9 +847,22 @@ abstract final class ArinWidgetSync {
         'tracking',
         'zikir',
       ]) {
-        await HomeWidget.saveWidgetData<String>('arin_widget_first_use_ms_$kind', '');
-        await HomeWidget.saveWidgetData<String>('arin_widget_gate_${kind}_trial_until_ms', '');
-        await HomeWidget.saveWidgetData<String>('arin_widget_gate_${kind}_unlock_until_ms', '');
+        await HomeWidget.saveWidgetData<String>(
+          'arin_widget_first_use_ms_$kind',
+          '',
+        );
+        await HomeWidget.saveWidgetData<String>(
+          'arin_widget_last_render_ms_$kind',
+          '',
+        );
+        await HomeWidget.saveWidgetData<String>(
+          'arin_widget_gate_${kind}_trial_until_ms',
+          '',
+        );
+        await HomeWidget.saveWidgetData<String>(
+          'arin_widget_gate_${kind}_unlock_until_ms',
+          '',
+        );
       }
       await HomeWidget.updateWidget(
         qualifiedAndroidName: _androidQuote,

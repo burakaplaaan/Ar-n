@@ -168,9 +168,14 @@ Future<bool?> _openPerPrayerReminderList(
 }
 
 class NamazAdhanReminderCard extends ConsumerStatefulWidget {
-  const NamazAdhanReminderCard({super.key, this.compact = false});
+  const NamazAdhanReminderCard({
+    super.key,
+    this.compact = false,
+    this.notificationSupportedOverride,
+  });
 
   final bool compact;
+  final bool? notificationSupportedOverride;
 
   @override
   ConsumerState<NamazAdhanReminderCard> createState() =>
@@ -181,6 +186,10 @@ class _NamazAdhanReminderCardState
     extends ConsumerState<NamazAdhanReminderCard> {
   /// null = SharedPreferences değerini kullan (Riverpod prefs nesnesi değişmediği için senkron için gerekli).
   bool? _enabledOverride;
+
+  bool get _supported =>
+      widget.notificationSupportedOverride ??
+      PrayerNotificationScheduler.supported;
 
   bool _effectiveEnabled(SharedPreferences prefs) =>
       _enabledOverride ?? PrayerReminderPrefs.isEnabled(prefs);
@@ -195,7 +204,7 @@ class _NamazAdhanReminderCardState
   /// Aç: izin → tekerlek → Tamam’da kaydet. İptal’da kapat.
   Future<void> _turnOnWithPicker(SharedPreferences prefs) async {
     HapticFeedback.selectionClick();
-    if (!PrayerNotificationScheduler.supported) return;
+    if (!_supported) return;
     final l10n = AppLocalizations.of(context)!;
 
     final ok = await PrayerNotificationScheduler.requestPermissions();
@@ -251,7 +260,7 @@ class _NamazAdhanReminderCardState
   }
 
   Future<void> _openPrayerSoundPicker(SharedPreferences prefs) async {
-    if (!PrayerNotificationScheduler.supported) return;
+    if (!_supported) return;
     await PrayerReminderPrefs.ensurePerPrayerPrefsReady(prefs);
     if (!mounted) return;
     final applied = await showModalBottomSheet<bool>(
@@ -321,13 +330,11 @@ class _NamazAdhanReminderCardState
     final entitlementAsync = ref.read(premiumEntitlementProvider);
     if (entitlementAsync.isLoading || entitlementAsync.hasError) {
       if (!mounted) return false;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          AppLocalizations.of(context)!.premiumLoadingWait,
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(AppLocalizations.of(context)!.premiumLoadingWait),
         ),
-      ),
-    );
+      );
       return false;
     }
     final entitlement = await ref.read(premiumEntitlementProvider.future);
@@ -347,9 +354,7 @@ class _NamazAdhanReminderCardState
       context: context,
       builder: (ctx) => AlertDialog(
         title: Text(AppLocalizations.of(ctx)!.secondAlarmPremiumFeature),
-        content: Text(
-          AppLocalizations.of(ctx)!.secondAlarmAdWatchText,
-        ),
+        content: Text(AppLocalizations.of(ctx)!.secondAlarmAdWatchText),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
@@ -446,9 +451,11 @@ class _NamazAdhanReminderCardState
               ],
             ),
             border: Border.all(
-              color: Color.lerp(accent, warmBronze, 0.5)!.withValues(
-                alpha: onLight ? 0.28 : 0.22,
-              ),
+              color: Color.lerp(
+                accent,
+                warmBronze,
+                0.5,
+              )!.withValues(alpha: onLight ? 0.28 : 0.22),
             ),
           ),
           child: Row(
@@ -456,7 +463,7 @@ class _NamazAdhanReminderCardState
             children: [
               Expanded(
                 child: InkWell(
-                  onTap: displayOn && PrayerNotificationScheduler.supported
+                  onTap: displayOn && _supported
                       ? () => _changeMinutesOnly(prefs)
                       : null,
                   borderRadius: BorderRadius.circular(14),
@@ -519,25 +526,40 @@ class _NamazAdhanReminderCardState
                   ),
                 ),
               ),
-              if (displayOn && PrayerNotificationScheduler.supported)
+              if (displayOn && _supported)
                 IconButton(
                   tooltip: l10n.prayerSoundPickerTitle,
                   onPressed: () => _openPrayerSoundPicker(prefs),
                   icon: Icon(
                     Icons.graphic_eq_rounded,
-                    color: Color.lerp(accent, warmBronze, 0.3)!.withValues(
-                      alpha: 0.9,
-                    ),
+                    color: Color.lerp(
+                      accent,
+                      warmBronze,
+                      0.3,
+                    )!.withValues(alpha: 0.9),
                     size: 22,
                   ),
                 ),
-              Switch.adaptive(
-                value: displayOn,
-                activeThumbColor: accent,
-                materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                onChanged: PrayerNotificationScheduler.supported
-                    ? _onCompactSwitch
-                    : null,
+              Semantics(
+                container: true,
+                label: l10n.reminderPrayerNotificationTitle,
+                toggled: displayOn,
+                enabled: _supported,
+                onTap: _supported ? () => _onCompactSwitch(!displayOn) : null,
+                excludeSemantics: true,
+                child: SizedBox(
+                  key: const Key('prayer-notification-toggle'),
+                  width: 52,
+                  height: 48,
+                  child: Center(
+                    child: Switch.adaptive(
+                      value: displayOn,
+                      activeThumbColor: accent,
+                      materialTapTargetSize: MaterialTapTargetSize.padded,
+                      onChanged: _supported ? _onCompactSwitch : null,
+                    ),
+                  ),
+                ),
               ),
             ],
           ),
@@ -590,7 +612,7 @@ class _NamazAdhanReminderCardState
                   ),
                 ],
               ),
-              if (PrayerNotificationScheduler.supported) ...[
+              if (_supported) ...[
                 const SizedBox(height: 10),
                 Material(
                   color: tileSurface,
@@ -627,7 +649,7 @@ class _NamazAdhanReminderCardState
                   ),
                 ),
               ],
-              if (!PrayerNotificationScheduler.supported) ...[
+              if (!_supported) ...[
                 const SizedBox(height: 10),
                 Text(
                   l10n.reminderLocalNotificationUnavailable,
@@ -654,7 +676,7 @@ class _NamazAdhanReminderCardState
                           Padding(
                             padding: const EdgeInsets.only(top: 4),
                             child: InkWell(
-                              onTap: PrayerNotificationScheduler.supported
+                              onTap: _supported
                                   ? () => _changeMinutesOnly(prefs)
                                   : null,
                               borderRadius: BorderRadius.circular(8),
@@ -677,13 +699,11 @@ class _NamazAdhanReminderCardState
                   Switch.adaptive(
                     value: displayOn,
                     activeThumbColor: accent,
-                    onChanged: PrayerNotificationScheduler.supported
-                        ? _onFullSwitch
-                        : null,
+                    onChanged: _supported ? _onFullSwitch : null,
                   ),
                 ],
               ),
-              if (displayOn && PrayerNotificationScheduler.supported) ...[
+              if (displayOn && _supported) ...[
                 const SizedBox(height: 10),
                 Text(
                   l10n.reminderTwoAlertsPerPrayer,
@@ -810,8 +830,11 @@ class _ReminderCrescentGlyph extends StatelessWidget {
             child: Icon(
               Icons.nightlight_round,
               size: 21,
-              color: Color.lerp(accent, bronze, active ? 0.3 : 0.45)!
-                  .withValues(alpha: active ? 0.95 : 0.78),
+              color: Color.lerp(
+                accent,
+                bronze,
+                active ? 0.3 : 0.45,
+              )!.withValues(alpha: active ? 0.95 : 0.78),
             ),
           ),
           Positioned(

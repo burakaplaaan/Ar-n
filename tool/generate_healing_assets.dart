@@ -14,7 +14,10 @@ void main(List<String> args) {
   tonesDir.createSync(recursive: true);
   ambiDir.createSync(recursive: true);
 
-  const sr = 44100;
+  // Tonların en yükseği 852 Hz; 16 kHz PCM, dalga biçimini ve kesintisiz
+  // döngüyü korurken 44.1 kHz'e göre dosya boyutunu %64 azaltır.
+  const toneSr = 16000;
+
   /// Tam saniye × tam Hz ⇒ tam sayıda sinüs periyodu; döngü sınırı daha seyrek (özellikle iOS’ta
   /// `seek(0)` ile yeniden başlama tıklaması daha az duyulur). ~10 sn mono ≈ 0.88 MB (SoundPool üst sınırına yakın).
   const toneSec = 10;
@@ -22,7 +25,7 @@ void main(List<String> args) {
     final path = File('${tonesDir.path}/tone_${hz}hz.wav');
     path.writeAsBytesSync(
       _sineWav(
-        sr: sr,
+        sr: toneSr,
         hz: hz.toDouble(),
         seconds: toneSec,
         peak: _tonePeakForHz(hz),
@@ -33,10 +36,13 @@ void main(List<String> args) {
 
   if (tonesOnly) return;
 
+  // Ambiyanslarda 22.05 kHz, telefon hoparlörü/kulaklık kullanımı için yeterli
+  // bant genişliği sunar ve PCM döngü davranışını değiştirmeden boyutu yarılar.
+  const ambiSr = 22050;
   const ambiSec = 4;
-  _writeAmbi(ambiDir, 'forest', _rainAmbience(sr, ambiSec), sr);
-  _writeAmbi(ambiDir, 'fire', _natureAmbience(sr, ambiSec), sr);
-  _writeAmbi(ambiDir, 'evren', _huzurPad(sr, ambiSec), sr);
+  _writeAmbi(ambiDir, 'forest', _rainAmbience(ambiSr, ambiSec), ambiSr);
+  _writeAmbi(ambiDir, 'fire', _natureAmbience(ambiSr, ambiSec), ambiSr);
+  _writeAmbi(ambiDir, 'evren', _huzurPad(ambiSr, ambiSec), ambiSr);
 
   // Eski dosyalar.
   final legacy = File('${ambiDir.path}/ambi_minimal.wav');

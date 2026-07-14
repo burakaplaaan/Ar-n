@@ -29,6 +29,7 @@ import 'data/services/prayer_reminder_prefs.dart';
 import 'data/services/purchase_service.dart';
 import 'data/services/admob_service.dart';
 import 'data/services/global_widget_lock_service.dart';
+import 'data/services/widget_global_lock_push_service.dart';
 import 'data/services/widget_quote_override_service.dart';
 import 'l10n/app_localizations.dart';
 import 'data/services/habit_cloud_sync_service.dart';
@@ -36,6 +37,7 @@ import 'data/services/inspiration_engagement_sync_service.dart';
 import 'data/services/tracking_widget_service.dart';
 import 'data/services/user_cloud_backup_service.dart';
 import 'data/services/widget_access_service.dart';
+import 'data/services/widget_metrics_service.dart';
 import 'data/repositories/salat_log_repository.dart';
 import 'presentation/inspire/explore_bgm_controller.dart';
 import 'presentation/inspire/inspiration_engagement_provider.dart';
@@ -124,7 +126,9 @@ class _ArinAppState extends ConsumerState<ArinApp> with WidgetsBindingObserver {
     await AppLocalNotificationScheduler.rescheduleAll(
       prefs,
       pools: pools,
-      prayerTimes: (upcomingDays != null && upcomingDays.isNotEmpty) ? upcomingDays.first : prayerTimes,
+      prayerTimes: (upcomingDays != null && upcomingDays.isNotEmpty)
+          ? upcomingDays.first
+          : prayerTimes,
       upcomingDays: upcomingDays,
     );
   }
@@ -221,20 +225,24 @@ class _ArinAppState extends ConsumerState<ArinApp> with WidgetsBindingObserver {
       if (PrayerReminderPrefs.isEnabled(prefs)) {
         await PrayerNotificationScheduler.promptLocalNotificationPermissions();
       }
-      
+
       // Her resume'da premium state'in eskimesini engellemek için provider'ı invalidate edip
       // widget gate'leri (2 dakikalık throttle'a takılmadan) anlık tazeliyoruz.
       ref.invalidate(premiumEntitlementProvider);
-      
+
       await _maybeOneTimeWidgetQuoteRefreshAfterAdminEdit();
       try {
+        // Uzun yaşayan preference cache'ini yenile; ardından background FCM
+        // isolate'ının App Group/HomeWidget'a yazdığı revision'ı foreground
+        // kuyruğuna al.
+        await prefs.reload();
+        await WidgetGlobalLockPushService.reconcileFromWidgetCache(prefs);
         await GlobalWidgetLockService.applyIfDue(prefs);
       } catch (e) {
         debugPrint('Global widget lock sync failed: $e');
       }
       try {
         final premium = await ref.read(premiumEntitlementProvider.future);
-        await WidgetAccessService(prefs).syncAll(isPremium: premium.isActive);
         // Android: widget kilidi açma reklamı yalnızca kullanıcı kilit
         // ekranına gidip "Reklam izle"ye bastığında yükleniyordu — bu, cold
         // (anlık) yükleme için çok kısa bir hazırlık süresi bırakıp sık sık
@@ -246,6 +254,20 @@ class _ArinAppState extends ConsumerState<ArinApp> with WidgetsBindingObserver {
         if (Platform.isAndroid && !premium.isActive) {
           AdMobService.preloadRewarded();
         }
+        // Native widget senkronizasyonu hata verse bile reklam preload'u
+        // yukarıda başlatılmış olsun; iki bağımsız işi birbirine bağlama.
+        final widgetAccess = WidgetAccessService(prefs);
+        final widgetStates = await widgetAccess.syncAll(
+          isPremium: premium.isActive,
+        );
+        unawaited(
+          WidgetMetricsService.reconcile(
+            prefs: prefs,
+            accessService: widgetAccess,
+            states: widgetStates,
+            isPremium: premium.isActive,
+          ),
+        );
       } catch (e) {
         debugPrint('Widget access sync failed: $e');
         // Hata durumunda (internet yok, vb) isPremium: false diyerek kilitleri devreye
@@ -351,6 +373,9 @@ class _ArinAppState extends ConsumerState<ArinApp> with WidgetsBindingObserver {
       return;
     }
     if (state == AppLifecycleState.resumed) {
+      // Kullanıcı Android/iOS sistem ayarlarında bildirim iznini değiştirmiş
+      // olabilir; görünür yayın topic üyeliğini izinle yeniden uzlaştır.
+      unawaited(FcmTokenService.syncBroadcastSubscriptionIfAuthorized());
       // Scheduler'lar 30 sn soğutma uygular; kullanıcı dakikalar içinde
       // uygulamayı tekrar tekrar açarsa yaklaşmakta olan bir alarm iptal edilip
       // yeniden kuyruğa alınarak kaçırılmaz. Ayarlar sayfası toggle'ında
@@ -392,14 +417,16 @@ class _ArinAppState extends ConsumerState<ArinApp> with WidgetsBindingObserver {
         // RC kimliğini Firebase UID ile eşleştir ki webhook/restore akışı
         // anonim kullanıcıya düşmesin.
         unawaited(
-          PurchaseService.loginUser(user.uid).then((_) {
-            // Eşleştirme tamamlandıktan sonra premium durumunu yenile ki
-            // yeni açılan/önbellekte olmayan entitlement devreye girsin.
-            ref.invalidate(premiumEntitlementProvider);
-          }).catchError((e) {
-            debugPrint('PurchaseService.loginUser failed: $e');
-            return null;
-          }),
+          PurchaseService.loginUser(user.uid)
+              .then((_) {
+                // Eşleştirme tamamlandıktan sonra premium durumunu yenile ki
+                // yeni açılan/önbellekte olmayan entitlement devreye girsin.
+                ref.invalidate(premiumEntitlementProvider);
+              })
+              .catchError((e) {
+                debugPrint('PurchaseService.loginUser failed: $e');
+                return null;
+              }),
         );
         if (!isFirebaseReady) return;
         final prefs = ref.read(sharedPreferencesProvider);
@@ -498,7 +525,8 @@ class _ArinAppState extends ConsumerState<ArinApp> with WidgetsBindingObserver {
             ),
             child: GlobalEdgeSwipeBack(
               onBackRequested: () async {
-                final currentPath = router.routeInformationProvider.value.uri.path;
+                final currentPath =
+                    router.routeInformationProvider.value.uri.path;
                 final onQiblaStack =
                     currentPath == AppRoutes.qibla ||
                     currentPath.startsWith('${AppRoutes.qibla}/');

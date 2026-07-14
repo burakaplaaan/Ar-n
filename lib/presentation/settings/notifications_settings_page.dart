@@ -19,6 +19,7 @@ import '../../data/services/app_local_notification_scheduler.dart';
 import '../../data/services/app_notification_channel_prefs.dart';
 import '../../data/services/arin_local_notifications_plugin.dart';
 import '../../data/services/background_location_task.dart';
+import '../../data/services/fcm_token_service.dart';
 import '../../data/services/local_notification_permission_gate.dart';
 import '../../data/services/location_service.dart';
 import '../../data/services/prayer_reminder_prefs.dart';
@@ -44,6 +45,7 @@ class _NotificationsSettingsPageState
   bool _loading = true;
   late bool _backgroundLocationEnabled;
   bool _backgroundLocationBusy = false;
+  bool _syncBroadcastAfterSettingsReturn = false;
 
   @override
   void initState() {
@@ -64,8 +66,17 @@ class _NotificationsSettingsPageState
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
-      _refreshDiagnostics();
+      final shouldSync = _syncBroadcastAfterSettingsReturn;
+      _syncBroadcastAfterSettingsReturn = false;
+      _refreshAfterResume(shouldSync: shouldSync);
     }
+  }
+
+  Future<void> _refreshAfterResume({required bool shouldSync}) async {
+    if (shouldSync) {
+      await FcmTokenService.syncBroadcastSubscriptionIfAuthorized();
+    }
+    await _refreshDiagnostics();
   }
 
   /// Üç iznin durumunu + AlarmManager kuyruk sayısını aynı turda toplar.
@@ -86,8 +97,12 @@ class _NotificationsSettingsPageState
 
   Future<void> _openOsSettings() async {
     HapticFeedback.selectionClick();
-    await openAppSettings();
-    if (mounted) await _refreshDiagnostics();
+    _syncBroadcastAfterSettingsReturn = true;
+    final opened = await openAppSettings();
+    if (!opened) {
+      _syncBroadcastAfterSettingsReturn = false;
+      if (mounted) await _refreshDiagnostics();
+    }
   }
 
   Future<void> _requestExactAlarm() async {
@@ -95,6 +110,7 @@ class _NotificationsSettingsPageState
     await requestLocalNotificationRuntimePermissions(
       arinLocalNotificationsPlugin,
     );
+    await FcmTokenService.syncBroadcastSubscriptionIfAuthorized();
     if (mounted) await _refreshDiagnostics();
   }
 

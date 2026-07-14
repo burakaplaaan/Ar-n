@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../core/analytics/arin_analytics.dart';
 import '../../core/providers/shared_preferences_provider.dart';
 import '../../data/services/inspiration_engagement_sync_service.dart';
+import '../../data/services/product_metrics_service.dart';
 
 const _kSaved = 'inspire_saved_ids';
 const _kLiked = 'inspire_liked_ids';
@@ -36,6 +37,7 @@ class InspirationSavedNotifier extends StateNotifier<List<String>> {
     // event gerekmiyor — panelde toplam kaydedilen sayısı ayrı metriktir.
     if (!wasSaved) {
       unawaited(ArinAnalytics.kesfetSave());
+      unawaited(ProductMetricsService.contentSave(id));
     }
   }
 
@@ -50,9 +52,9 @@ class InspirationSavedNotifier extends StateNotifier<List<String>> {
 
 final inspirationSavedIdsProvider =
     StateNotifierProvider<InspirationSavedNotifier, List<String>>((ref) {
-  final prefs = ref.watch(sharedPreferencesProvider);
-  return InspirationSavedNotifier(prefs);
-});
+      final prefs = ref.watch(sharedPreferencesProvider);
+      return InspirationSavedNotifier(prefs);
+    });
 
 class InspirationLikedNotifier extends StateNotifier<Set<String>> {
   InspirationLikedNotifier(this._prefs) : super(_read(_prefs));
@@ -77,12 +79,13 @@ class InspirationLikedNotifier extends StateNotifier<Set<String>> {
     unawaited(InspirationEngagementSyncService.pushFromPrefs(_prefs));
     if (!wasLiked) {
       unawaited(ArinAnalytics.kesfetLike());
+      unawaited(ProductMetricsService.contentLike(id));
     }
   }
 }
 
 final inspirationLikedIdsProvider =
     StateNotifierProvider<InspirationLikedNotifier, Set<String>>((ref) {
-  final prefs = ref.watch(sharedPreferencesProvider);
-  return InspirationLikedNotifier(prefs);
-});
+      final prefs = ref.watch(sharedPreferencesProvider);
+      return InspirationLikedNotifier(prefs);
+    });

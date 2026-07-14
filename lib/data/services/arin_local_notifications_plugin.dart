@@ -28,7 +28,8 @@ void registerLocalNotificationTapHandler(
 void _dispatchLocalNotificationTap(NotificationResponse response) {
   final payload = response.payload;
   if (payload == null || payload.isEmpty) return;
-  final handler = _localTapHandlers[payload];
+  final handler =
+      _localTapHandlers[payload] ?? _localTapHandlers[payload.split('|').first];
   if (handler == null) {
     debugPrint(
       '══ ARIN LocalNtf ══ payload="$payload" için handler yok; atlanıyor',
@@ -36,6 +37,16 @@ void _dispatchLocalNotificationTap(NotificationResponse response) {
     return;
   }
   handler(payload);
+}
+
+/// Uygulama tamamen kapalıyken yerel bildirime dokunularak açıldıysa payload'ı
+/// bir kez normal handler tablosuna yollar.
+Future<void> dispatchInitialLocalNotificationTap() async {
+  final details = await arinLocalNotificationsPlugin
+      .getNotificationAppLaunchDetails();
+  if (details?.didNotificationLaunchApp != true) return;
+  final response = details?.notificationResponse;
+  if (response != null) _dispatchLocalNotificationTap(response);
 }
 
 /// İdempotent: birden fazla çağrıda yalnızca bir kez [initialize] edilir.
@@ -48,10 +59,7 @@ Future<void> initializeArinLocalNotificationsPlugin() async {
     requestSoundPermission: false,
   );
   await arinLocalNotificationsPlugin.initialize(
-    const InitializationSettings(
-      android: androidInit,
-      iOS: iosInit,
-    ),
+    const InitializationSettings(android: androidInit, iOS: iosInit),
     onDidReceiveNotificationResponse: _dispatchLocalNotificationTap,
   );
   _arinLocalNotificationsPluginInitialized = true;

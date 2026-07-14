@@ -129,9 +129,11 @@ private func recordWidgetFirstUse(_ kind: String) {
   let u = suite()
   let key = "arin_widget_first_use_ms_\(kind)"
   let existing = Double(u?.string(forKey: key) ?? "") ?? 0
-  if existing > 0 { return }
   let nowMs = Date().timeIntervalSince1970 * 1000.0
-  u?.set(String(nowMs), forKey: key)
+  u?.set(String(nowMs), forKey: "arin_widget_last_render_ms_\(kind)")
+  if existing <= 0 {
+    u?.set(String(nowMs), forKey: key)
+  }
 }
 
 private func widgetFirstUseMs(_ kind: String) -> Double {
@@ -142,6 +144,7 @@ private func widgetFirstUseMs(_ kind: String) -> Double {
 private func widgetLocked(_ kind: String) -> Bool {
   let u = suite()
   if u?.string(forKey: "arin_widget_gate_premium") == "1" { return false }
+  if u?.string(forKey: "arin_widget_gate_global_locked") == "1" { return true }
   let nowMs = Date().timeIntervalSince1970 * 1000.0
   let unlockUntilMs = Double(u?.string(forKey: "arin_widget_gate_\(kind)_unlock_until_ms") ?? "") ?? 0
   if unlockUntilMs > nowMs { return false }

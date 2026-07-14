@@ -135,6 +135,45 @@ service cloud.firestore {
       allow delete: if isDeveloper();
     }
 
+    // Ürün performansı yalnız Cloud Functions üzerinden yazılır ve okunur.
+    // Ham anonim kurulum hash'leri istemci/admin uygulamasına açılmaz.
+    match /admin_metric_daily_shards/{docId} {
+      allow read, write: if false;
+    }
+    match /admin_content_metric_shards/{docId} {
+      allow read, write: if false;
+    }
+    match /admin_widget_summary/{docId} {
+      allow read, write: if false;
+    }
+    match /admin_widget_summary_shards/{docId} {
+      allow read, write: if false;
+    }
+    match /admin_widget_installations/{docId} {
+      allow read, write: if false;
+    }
+    match /admin_metric_audience/{docId} {
+      allow read, write: if false;
+    }
+    match /admin_metric_audience_members/{docId} {
+      allow read, write: if false;
+    }
+    match /admin_metric_event_dedupe/{docId} {
+      allow read, write: if false;
+    }
+    match /admin_metric_rate_limits/{docId} {
+      allow read, write: if false;
+    }
+    match /admin_ntf_deliveries/{deliveryId} {
+      allow read, write: if false;
+      match /clicks/{installHash} {
+        allow read, write: if false;
+      }
+    }
+    match /admin_ntf_delivery_click_shards/{docId} {
+      allow read, write: if false;
+    }
+
     // Genel app_public belgeleri (quotes_bundle, widget_override vb.)
     match /app_public/{docId} {
       allow read: if true;

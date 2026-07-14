@@ -25,6 +25,7 @@ import '../shared/providers/premium_providers.dart';
 import '../shared/providers/prayer_time_providers.dart';
 import '../shared/providers/user_profile_providers.dart';
 import '../shared/widgets/ornate_frame.dart';
+import '../willpower/widgets/namaz_adhan_reminder_card.dart';
 import 'widgets/daily_namaz_wisdom_card.dart';
 import 'widgets/home_namaz_ritual_section.dart';
 
@@ -114,7 +115,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                         const SizedBox(height: 12),
                         const HomeNamazRitualSection(),
                         const SizedBox(height: 12),
-                        const _PrayerTimesBlock(),
+                        const HomePrayerTimesBlock(),
                         SizedBox(height: 72 + bottomPad),
                       ],
                     ),
@@ -464,19 +465,40 @@ class _HeaderSection extends ConsumerWidget {
 
 // ─── Namaz vakitleri ─────────────────────────────────────────────────────────
 
-class _PrayerTimesBlock extends ConsumerWidget {
-  const _PrayerTimesBlock();
+class HomePrayerTimesBlock extends ConsumerWidget {
+  const HomePrayerTimesBlock({
+    super.key,
+    this.prayerTimesOverride,
+    this.notificationSupportedOverride,
+  });
+
+  /// Widget testlerinde veri/yükleniyor/hata durumlarını ağ ve konum
+  /// servislerinden bağımsız doğrulamak için kullanılır.
+  final AsyncValue<PrayerTimesModel>? prayerTimesOverride;
+  final bool? notificationSupportedOverride;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final async = ref.watch(prayerTimesProvider);
-    return async.when(
-      data: (pt) => _PrayerTimesList(
-        model: pt,
-        isDarkShell: !ArinShellBackground.isLight(context),
-      ),
-      loading: () => const _PrayerTimesSkeleton(),
-      error: (_, __) => const _PrayerTimesError(),
+    final AsyncValue<PrayerTimesModel> async =
+        prayerTimesOverride ?? ref.watch(prayerTimesProvider);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        NamazAdhanReminderCard(
+          key: const Key('home-prayer-notification-card'),
+          compact: true,
+          notificationSupportedOverride: notificationSupportedOverride,
+        ),
+        const SizedBox(height: 12),
+        async.when(
+          data: (pt) => _PrayerTimesList(
+            model: pt,
+            isDarkShell: !ArinShellBackground.isLight(context),
+          ),
+          loading: () => const _PrayerTimesSkeleton(),
+          error: (_, __) => const _PrayerTimesError(),
+        ),
+      ],
     );
   }
 }

@@ -1,5 +1,5 @@
-// Namaz bildirimi ses seçenekleri — Android raw + iOS bundle + önizleme asset yolu.
-// Kaynak: Freesound CC0 önizleme MP3’lerinden kırpılmış WAV (tool/audio_trim).
+// Namaz bildirimi ses seçenekleri — Android raw + iOS bundle + sıkıştırılmış önizleme.
+// Kaynak: Freesound CC0 önizleme MP3’lerinden kırpılmış sesler (tool/audio_trim).
 
 /// Tek seçenek: kanal kimliği (Android O+), ham kaynak adı, iOS dosya adı, önizleme.
 class PrayerNtfSoundOption {
@@ -47,7 +47,7 @@ abstract final class PrayerNotificationSounds {
       channelName: 'Adhan Turkish tone',
       androidRawBaseName: 'prayer_ntf_adhan_turkish',
       iosWavFileName: 'prayer_ntf_adhan_turkish.wav',
-      previewAssetRelativePath: 'sounds/prayer/prayer_ntf_adhan_turkish.wav',
+      previewAssetRelativePath: 'sounds/prayer/prayer_ntf_adhan_turkish.mp3',
     ),
     PrayerNtfSoundOption(
       channelId: 'arin_ntf_s2_v7',
@@ -55,7 +55,7 @@ abstract final class PrayerNotificationSounds {
       channelName: 'Adhan Dubai tone',
       androidRawBaseName: 'prayer_ntf_adhan_dubai',
       iosWavFileName: 'prayer_ntf_adhan_dubai.wav',
-      previewAssetRelativePath: 'sounds/prayer/prayer_ntf_adhan_dubai.wav',
+      previewAssetRelativePath: 'sounds/prayer/prayer_ntf_adhan_dubai.mp3',
     ),
     PrayerNtfSoundOption(
       channelId: 'arin_ntf_s3_v7',
@@ -63,7 +63,7 @@ abstract final class PrayerNotificationSounds {
       channelName: 'Ambient flute tone',
       androidRawBaseName: 'prayer_ntf_ambient_flute',
       iosWavFileName: 'prayer_ntf_ambient_flute.wav',
-      previewAssetRelativePath: 'sounds/prayer/prayer_ntf_ambient_flute.wav',
+      previewAssetRelativePath: 'sounds/prayer/prayer_ntf_ambient_flute.mp3',
     ),
     PrayerNtfSoundOption(
       channelId: 'arin_ntf_s4_v7',
@@ -72,7 +72,7 @@ abstract final class PrayerNotificationSounds {
       androidRawBaseName: 'prayer_ntf_ambient_piano_guitar',
       iosWavFileName: 'prayer_ntf_ambient_piano_guitar.wav',
       previewAssetRelativePath:
-          'sounds/prayer/prayer_ntf_ambient_piano_guitar.wav',
+          'sounds/prayer/prayer_ntf_ambient_piano_guitar.mp3',
     ),
     PrayerNtfSoundOption(
       channelId: 'arin_ntf_s5_v7',
@@ -80,7 +80,7 @@ abstract final class PrayerNotificationSounds {
       channelName: 'Ambient ethereal tone',
       androidRawBaseName: 'prayer_ntf_ambient_ethereal',
       iosWavFileName: 'prayer_ntf_ambient_ethereal.wav',
-      previewAssetRelativePath: 'sounds/prayer/prayer_ntf_ambient_ethereal.wav',
+      previewAssetRelativePath: 'sounds/prayer/prayer_ntf_ambient_ethereal.mp3',
     ),
   ];
 
@@ -99,7 +99,9 @@ abstract final class PrayerNotificationSounds {
       case 'system':
         return localeCode == 'ar'
             ? 'الصوت الافتراضي للهاتف'
-            : (localeCode == 'en' ? 'Phone default sound' : 'Telefonun varsayılan sesi');
+            : (localeCode == 'en'
+                  ? 'Phone default sound'
+                  : 'Telefonun varsayılan sesi');
       case 'adhanTurkish':
         return localeCode == 'ar'
             ? 'أذان تركي'

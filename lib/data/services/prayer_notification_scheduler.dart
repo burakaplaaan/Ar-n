@@ -20,7 +20,6 @@ import 'local_notification_permission_gate.dart';
 import 'location_service.dart';
 import 'app_local_notification_scheduler.dart';
 import 'arin_local_notifications_plugin.dart';
-import 'prayer_catalog_sound_materializer.dart';
 import 'prayer_notification_android_uri.dart';
 import 'prayer_notification_sounds.dart';
 import 'prayer_reminder_prefs.dart';
@@ -193,9 +192,6 @@ abstract final class PrayerNotificationScheduler {
         .resolvePlatformSpecificImplementation<
           AndroidFlutterLocalNotificationsPlugin
         >();
-    if (Platform.isIOS) {
-      await PrayerCatalogSoundMaterializer.ensureMaterialized();
-    }
     if (Platform.isAndroid) {
       // Eski sürüm kanalları (v4–v6) silinmezse sistem yanlış/kısa sese kilitlenir.
       const legacyIds = <String>[
@@ -909,9 +905,6 @@ abstract final class PrayerNotificationScheduler {
           iOS: const DarwinNotificationDetails(presentSound: true),
         );
       }
-    }
-    if (soundIndex > 0 && Platform.isIOS) {
-      await PrayerCatalogSoundMaterializer.ensureMaterialized();
     }
     final soundOpt = PrayerNotificationSounds.optionForIndex(soundIndex);
     AndroidNotificationSound? androidSound;

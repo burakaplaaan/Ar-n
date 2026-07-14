@@ -4,4 +4,4 @@
 
 Set-Location $PSScriptRoot\..
 $cid = "746942620456-lm0rg914v26s3u2io9pif08vu24jfor0.apps.googleusercontent.com"
-flutter build appbundle --release --dart-define=GOOGLE_OAUTH_WEB_CLIENT_ID=$cid
+flutter build appbundle --release --tree-shake-icons --dart-define=GOOGLE_OAUTH_WEB_CLIENT_ID=$cid

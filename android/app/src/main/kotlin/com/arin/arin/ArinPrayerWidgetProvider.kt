@@ -327,8 +327,11 @@ class ArinPrayerWidgetProvider : HomeWidgetProvider() {
     private fun recordFirstUse(widgetData: SharedPreferences, kind: String) {
         val key = "arin_widget_first_use_ms_$kind"
         val existing = widgetData.getString(key, null)?.toLongOrNull() ?: 0L
-        if (existing > 0L) return
-        widgetData.edit().putString(key, System.currentTimeMillis().toString()).apply()
+        val now = System.currentTimeMillis().toString()
+        val editor = widgetData.edit()
+            .putString("arin_widget_last_render_ms_$kind", now)
+        if (existing <= 0L) editor.putString(key, now)
+        editor.apply()
     }
 
     private fun firstUseMs(widgetData: SharedPreferences, kind: String): Long {
@@ -338,6 +341,7 @@ class ArinPrayerWidgetProvider : HomeWidgetProvider() {
 
     private fun isWidgetLocked(widgetData: SharedPreferences, kind: String): Boolean {
         if (widgetData.getString(KEY_GATE_PREMIUM, null) == "1") return false
+        if (widgetData.getString(KEY_GATE_GLOBAL_LOCKED, null) == "1") return true
         val now = System.currentTimeMillis()
         val unlockUntil = widgetData.getString("arin_widget_gate_${kind}_unlock_until_ms", null)
             ?.toLongOrNull() ?: 0L
@@ -434,6 +438,7 @@ class ArinPrayerWidgetProvider : HomeWidgetProvider() {
         private const val KEY_LOCALE = "arin_widget_locale"
         private const val KEY_GATE_LOCKED = "arin_widget_gate_prayer_locked"
         private const val KEY_GATE_PREMIUM = "arin_widget_gate_premium"
+        private const val KEY_GATE_GLOBAL_LOCKED = "arin_widget_gate_global_locked"
         private const val WIDGET_TRIAL_DURATION_MS = 24L * 60L * 60L * 1000L
 
         private const val ACTION_TICK = "com.arin.arin.action.PRAYER_WIDGET_TICK"

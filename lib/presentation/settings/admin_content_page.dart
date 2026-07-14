@@ -364,6 +364,9 @@ class _AdminContentPageState extends ConsumerState<AdminContentPage>
         'unlockedAt': locked ? null : FieldValue.serverTimestamp(),
         'lockedBy': FirebaseAuth.instance.currentUser?.uid,
         'note': note,
+        // FCM teslim sırası garanti edilmez. Atomik sayaç sayesinde cihazlar
+        // gecikmiş eski kilit/aç mesajlarını güvenle reddeder.
+        'revision': FieldValue.increment(1),
         'updatedAt': FieldValue.serverTimestamp(),
       }, SetOptions(merge: true));
       await _writeAdminAudit(
@@ -379,7 +382,9 @@ class _AdminContentPageState extends ConsumerState<AdminContentPage>
       await GlobalWidgetLockService.applyIfDue(prefs, force: true);
       try {
         final entitlement = await ref.read(premiumEntitlementProvider.future);
-        await WidgetAccessService(prefs).syncAll(isPremium: entitlement.isActive);
+        await WidgetAccessService(
+          prefs,
+        ).syncAll(isPremium: entitlement.isActive);
       } catch (_) {
         // Hata durumunda mevcut durumu koru, downgrade etme.
       }
@@ -2425,6 +2430,11 @@ class _AdminContentPageState extends ConsumerState<AdminContentPage>
         foregroundColor: Colors.white,
         iconTheme: const IconThemeData(color: Colors.white),
         actions: [
+          IconButton(
+            tooltip: 'İçerik Performansı',
+            icon: const Icon(Icons.insights_rounded),
+            onPressed: () => context.push(AppRoutes.settingsAdminPerformance),
+          ),
           IconButton(
             tooltip: 'Bildirim Yönetimi',
             icon: const Icon(Icons.notifications_active_rounded),

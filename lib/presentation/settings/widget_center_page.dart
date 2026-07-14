@@ -580,73 +580,164 @@ class _HowToAddBanner extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final titleColor = onDark
-        ? Colors.white.withValues(alpha: 0.9)
-        : AppColors.emeraldDark;
-    final muted = onDark ? AppColors.textOnDarkMuted : AppColors.textSecondary;
-    final fill = onDark
-        ? AppColors.cardSurface.withValues(alpha: 0.38)
-        : Colors.white.withValues(alpha: 0.62);
-    final border = onDark
-        ? Colors.white.withValues(alpha: 0.07)
-        : AppColors.creamDark.withValues(alpha: 0.45);
+        ? const Color(0xFFFFF4E6)
+        : const Color(0xFF4A2C1A);
+    final muted = onDark ? const Color(0xFFD8C0A7) : const Color(0xFF79583D);
+    final accent = onDark ? AppColors.ornamentGold : AppColors.ornamentGoldDeep;
+    final badgeText = onDark
+        ? const Color(0xFFFFE1A8)
+        : const Color(0xFF4A2A16);
+    final gradient = onDark
+        ? const [Color(0xFF3A281D), Color(0xFF211914)]
+        : const [Color(0xFFFFF2DF), Color(0xFFF1D7B5)];
 
     return Material(
       color: Colors.transparent,
       child: InkWell(
         onTap: () => _open(context),
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(18),
         child: Ink(
-          padding: const EdgeInsets.fromLTRB(15, 13, 13, 13),
           decoration: BoxDecoration(
-            color: fill,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: border),
+            gradient: LinearGradient(
+              colors: gradient,
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            borderRadius: BorderRadius.circular(18),
+            border: Border.all(color: accent.withValues(alpha: 0.72)),
+            boxShadow: [
+              BoxShadow(
+                color: const Color(
+                  0xFF6B3F20,
+                ).withValues(alpha: onDark ? 0.3 : 0.18),
+                blurRadius: 18,
+                offset: const Offset(0, 7),
+              ),
+            ],
           ),
-          child: Row(
+          child: Stack(
             children: [
-              Container(
-                width: 36,
-                height: 36,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: AppColors.accentNeonGreen.withValues(alpha: 0.12),
-                ),
-                child: Icon(
-                  Icons.lock_clock_rounded,
-                  size: 20,
-                  color: AppColors.accentNeonGreen.withValues(alpha: 0.9),
+              Positioned(
+                right: -18,
+                top: -24,
+                child: Container(
+                  width: 86,
+                  height: 86,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: accent.withValues(alpha: 0.08),
+                    border: Border.all(color: accent.withValues(alpha: 0.12)),
+                  ),
                 ),
               ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+              Padding(
+                padding: const EdgeInsets.fromLTRB(14, 14, 12, 14),
+                child: Row(
                   children: [
-                    Text(
-                      'Kilit ekranına nasıl eklenir?',
-                      style: GoogleFonts.plusJakartaSans(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w700,
-                        color: titleColor,
-                        letterSpacing: -0.2,
+                    Container(
+                      width: 44,
+                      height: 44,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(14),
+                        color: accent.withValues(alpha: 0.16),
+                        border: Border.all(
+                          color: accent.withValues(alpha: 0.52),
+                        ),
+                      ),
+                      child: Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          Icon(
+                            Icons.smartphone_rounded,
+                            size: 25,
+                            color: accent,
+                          ),
+                          Positioned(
+                            right: 7,
+                            bottom: 7,
+                            child: Container(
+                              padding: const EdgeInsets.all(2),
+                              decoration: BoxDecoration(
+                                color: onDark
+                                    ? const Color(0xFF2B2018)
+                                    : const Color(0xFFF8E7D0),
+                                shape: BoxShape.circle,
+                              ),
+                              child: Icon(
+                                Icons.add_rounded,
+                                size: 10,
+                                color: accent,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                    const SizedBox(height: 2),
-                    Text(
-                      'Arın widgetını kilit ekranına yerleştirme',
-                      style: GoogleFonts.plusJakartaSans(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w500,
-                        color: muted,
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 7,
+                              vertical: 3,
+                            ),
+                            decoration: BoxDecoration(
+                              color: accent.withValues(alpha: 0.14),
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: Text(
+                              'ADIM ADIM REHBER',
+                              style: GoogleFonts.plusJakartaSans(
+                                fontSize: 10,
+                                fontWeight: FontWeight.w800,
+                                color: badgeText,
+                                letterSpacing: 0.5,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 6),
+                          Text(
+                            'Kilit ekranına nasıl eklenir?',
+                            style: GoogleFonts.plusJakartaSans(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w800,
+                              color: titleColor,
+                              letterSpacing: -0.25,
+                            ),
+                          ),
+                          const SizedBox(height: 3),
+                          Text(
+                            'iPhone ve Android için görselli kurulumu aç',
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: GoogleFonts.plusJakartaSans(
+                              fontSize: 11,
+                              height: 1.35,
+                              fontWeight: FontWeight.w500,
+                              color: muted,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 6),
+                    Container(
+                      width: 30,
+                      height: 30,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: accent.withValues(alpha: 0.15),
+                      ),
+                      child: Icon(
+                        Icons.arrow_forward_rounded,
+                        color: accent,
+                        size: 17,
                       ),
                     ),
                   ],
                 ),
-              ),
-              Icon(
-                Icons.chevron_right_rounded,
-                color: muted.withValues(alpha: 0.6),
-                size: 22,
               ),
             ],
           ),
@@ -678,11 +769,16 @@ class _HowToSheetState extends State<_HowToSheet>
       length: 2,
       vsync: this,
       initialIndex: Platform.isIOS ? 0 : 1,
-    );
+    )..addListener(_handleTabChange);
+  }
+
+  void _handleTabChange() {
+    if (mounted) setState(() {});
   }
 
   @override
   void dispose() {
+    _tabs.removeListener(_handleTabChange);
     _tabs.dispose();
     super.dispose();
   }
@@ -740,13 +836,17 @@ class _HowToSheetState extends State<_HowToSheet>
                     ),
                   ),
                   const SizedBox(width: 12),
-                  Text(
-                    'Kilit ekranı widget rehberi',
-                    style: GoogleFonts.plusJakartaSans(
-                      fontSize: 17,
-                      fontWeight: FontWeight.w800,
-                      letterSpacing: -0.4,
-                      color: titleColor,
+                  Expanded(
+                    child: Text(
+                      'Kilit ekranı widget rehberi',
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 17,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: -0.4,
+                        color: titleColor,
+                      ),
                     ),
                   ),
                 ],
@@ -755,10 +855,7 @@ class _HowToSheetState extends State<_HowToSheet>
             const SizedBox(height: 16),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 22),
-              child: _PlatformTabBar(
-                controller: _tabs,
-                onDark: onDark,
-              ),
+              child: _PlatformTabBar(controller: _tabs, onDark: onDark),
             ),
             const SizedBox(height: 4),
             Expanded(
@@ -766,12 +863,12 @@ class _HowToSheetState extends State<_HowToSheet>
                 controller: _tabs,
                 children: [
                   _StepList(
-                    controller: controller,
+                    controller: _tabs.index == 0 ? controller : null,
                     onDark: onDark,
                     sections: _iosLockScreenSteps,
                   ),
                   _StepList(
-                    controller: controller,
+                    controller: _tabs.index == 1 ? controller : null,
                     onDark: onDark,
                     sections: _androidLockScreenSteps,
                   ),
@@ -788,10 +885,7 @@ class _HowToSheetState extends State<_HowToSheet>
 // ─── Platform tab bar ────────────────────────────────────────────────────────
 
 class _PlatformTabBar extends StatelessWidget {
-  const _PlatformTabBar({
-    required this.controller,
-    required this.onDark,
-  });
+  const _PlatformTabBar({required this.controller, required this.onDark});
 
   final TabController controller;
   final bool onDark;
@@ -808,44 +902,46 @@ class _PlatformTabBar extends StatelessWidget {
         ? Colors.white.withValues(alpha: 0.96)
         : AppColors.emeraldDark;
     final unselectedColor = onDark
-        ? Colors.white.withValues(alpha: 0.38)
-        : AppColors.textSecondary.withValues(alpha: 0.6);
+        ? Colors.white.withValues(alpha: 0.78)
+        : AppColors.emeraldDark;
 
-    return Container(
-      height: 40,
-      decoration: BoxDecoration(
-        color: bg,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: TabBar(
-        controller: controller,
-        indicator: BoxDecoration(
-          color: selectedBg,
-          borderRadius: BorderRadius.circular(10),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: onDark ? 0.25 : 0.08),
-              blurRadius: 8,
-              offset: const Offset(0, 2),
-            ),
+    return ConstrainedBox(
+      constraints: const BoxConstraints(minHeight: 48),
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: bg,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: TabBar(
+          controller: controller,
+          indicator: BoxDecoration(
+            color: selectedBg,
+            borderRadius: BorderRadius.circular(10),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: onDark ? 0.25 : 0.08),
+                blurRadius: 8,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+          indicatorSize: TabBarIndicatorSize.tab,
+          dividerColor: Colors.transparent,
+          labelColor: selectedColor,
+          unselectedLabelColor: unselectedColor,
+          labelStyle: GoogleFonts.plusJakartaSans(
+            fontSize: 13,
+            fontWeight: FontWeight.w700,
+          ),
+          unselectedLabelStyle: GoogleFonts.plusJakartaSans(
+            fontSize: 13,
+            fontWeight: FontWeight.w600,
+          ),
+          tabs: const [
+            Tab(text: 'iOS'),
+            Tab(text: 'Android'),
           ],
         ),
-        indicatorSize: TabBarIndicatorSize.tab,
-        dividerColor: Colors.transparent,
-        labelColor: selectedColor,
-        unselectedLabelColor: unselectedColor,
-        labelStyle: GoogleFonts.plusJakartaSans(
-          fontSize: 13,
-          fontWeight: FontWeight.w700,
-        ),
-        unselectedLabelStyle: GoogleFonts.plusJakartaSans(
-          fontSize: 13,
-          fontWeight: FontWeight.w600,
-        ),
-        tabs: const [
-          Tab(text: 'iOS'),
-          Tab(text: 'Android'),
-        ],
       ),
     );
   }
@@ -860,7 +956,7 @@ class _StepList extends StatelessWidget {
     required this.sections,
   });
 
-  final ScrollController controller;
+  final ScrollController? controller;
   final bool onDark;
   final List<_StepSection> sections;
 
@@ -1126,23 +1222,23 @@ const _androidLockScreenSteps = [
     steps: [
       _Step(
         icon: Icons.info_outline_rounded,
-        title: 'Kilit ekranı menüsü markaya göre değişir',
+        title: 'Önce cihaz desteğini kontrol et',
         subtitle:
-            'Pixel, Samsung ve Xiaomi kilit ekranı araç takımı ekleme yolu farklı olabilir.',
+            'Android\'de üçüncü taraf kilit ekranı widgetları her sürüm ve markada desteklenmez. Ayarlarda "Kilit ekranı widgetları" seçeneği yoksa Arın\'ı ana ekrana ekleyebilirsin.',
         imagePath: 'assets/images/widget_guide/android_lock_1.png',
       ),
       _Step(
         icon: Icons.lock_outline_rounded,
-        title: 'Kilit ekranına uzun bas, "Özelleştir"e dokun',
+        title: 'Destekleniyorsa kilit ekranı ayarlarını aç',
         subtitle:
-            'Genelde kilit ekranında uzun basıp Düzenle veya benzeri seçeneği kullanırsın.',
+            'Ayarlar > Kilit ekranı bölümündeki Widgetlar veya Araçlar seçeneğini kullan. Menü adı Samsung, Xiaomi, Pixel ve diğer cihazlarda değişebilir.',
         imagePath: 'assets/images/widget_guide/android_lock_2.png',
       ),
       _Step(
         icon: Icons.widgets_outlined,
-        title: "Listeden Arın'ı seç ve ekle",
+        title: "Listede görünüyorsa Arın'ı seç",
         subtitle:
-            "Listeden Arın uygulamasını bul; söz, namaz veya takip widgetını seçip konumunu ayarla.",
+            "Cihazın üçüncü taraf widgetları destekliyorsa Arın'ı bul; söz, namaz veya takip widgetını seçip konumunu ayarla.",
         imagePath: 'assets/images/widget_guide/android_lock_3.png',
       ),
       _Step(

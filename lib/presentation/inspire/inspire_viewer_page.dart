@@ -12,6 +12,7 @@ import '../../core/ads/admob_ids.dart';
 import '../../data/models/inspiration_card_model.dart';
 import '../../data/services/ad_gate_service.dart';
 import '../../data/services/admob_service.dart';
+import '../../data/services/product_metrics_service.dart';
 import '../shared/providers/ad_gate_providers.dart';
 import '../shared/providers/admob_providers.dart';
 import '../shared/providers/premium_providers.dart';
@@ -121,8 +122,14 @@ class _ViewerBodyState extends ConsumerState<_ViewerBody> {
     _settledPage = safe;
     _pc = PageController(initialPage: safe, viewportFraction: 1);
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      _recordView(safe);
       _maybeShowExploreAdGate();
     });
+  }
+
+  void _recordView(int index) {
+    if (index < 0 || index >= widget.cards.length) return;
+    unawaited(ProductMetricsService.contentView(widget.cards[index].id));
   }
 
   @override
@@ -209,8 +216,9 @@ class _ViewerBodyState extends ConsumerState<_ViewerBody> {
           _warmedAds = true;
           AdMobService.preloadInterstitial();
         }
-        final shouldShow = await adGate
-            .recordExploreViewAndShouldShowAd(isPremium: isPremium);
+        final shouldShow = await adGate.recordExploreViewAndShouldShowAd(
+          isPremium: isPremium,
+        );
         if (!mounted) return;
         if (!shouldShow) continue;
 
@@ -263,6 +271,7 @@ class _ViewerBodyState extends ConsumerState<_ViewerBody> {
           ),
           onPageChanged: (page) {
             _settledPage = page;
+            _recordView(page);
             _precacheNeighbors(page);
             _maybeShowExploreAdGate();
           },
@@ -382,7 +391,6 @@ class _InstagramLikePageScrollPhysics extends PageScrollPhysics {
     );
   }
 }
-
 
 class _ViewerEmpty extends StatelessWidget {
   const _ViewerEmpty({required this.onClose});

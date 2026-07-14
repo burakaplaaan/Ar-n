@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:arin/l10n/app_localizations.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../core/ads/admob_ids.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/router/app_router.dart';
 import '../../data/services/admob_service.dart';
 import '../../data/services/widget_access_service.dart';
+import '../../data/services/widget_metrics_service.dart';
 import '../shared/providers/admob_providers.dart';
 import '../shared/providers/premium_providers.dart';
 import '../shared/providers/widget_access_providers.dart';
@@ -54,16 +56,14 @@ class _WidgetUnlockPageState extends ConsumerState<WidgetUnlockPage> {
       final result = await ref
           .read(adMobServiceProvider)
           .showRewardedDetailed(ArinAdUnit.rewardedUnlock);
-      if (!mounted) return;
+      if (!context.mounted) return;
       if (result != RewardedAdResult.rewarded) {
         // Kullanıcı reklamı erken kapattıysa (notRewarded) "yüklenemedi"
         // mesajı yanıltıcı olur; yalnızca gerçek yükleme/gösterim hatasında
         // bilgilendir.
         if (result != RewardedAdResult.notRewarded) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(l10n.widgetUnlockAdLoadFailed),
-            ),
+            SnackBar(content: Text(l10n.widgetUnlockAdLoadFailed)),
           );
         }
         return;
@@ -71,9 +71,17 @@ class _WidgetUnlockPageState extends ConsumerState<WidgetUnlockPage> {
       final service = ref.read(widgetAccessServiceProvider);
       await service.recordRewardedUnlock(widget.kind);
       final premium = await ref.read(premiumEntitlementProvider.future);
-      await service.syncAll(isPremium: premium.isActive);
-      if (!mounted) return;
-      
+      final states = await service.syncAll(isPremium: premium.isActive);
+      await WidgetMetricsService.recordRewardedUnlock(widget.kind);
+      final prefs = await SharedPreferences.getInstance();
+      await WidgetMetricsService.reconcile(
+        prefs: prefs,
+        accessService: service,
+        states: states,
+        isPremium: premium.isActive,
+      );
+      if (!context.mounted) return;
+
       final kindTitle = switch (widget.kind) {
         ArinWidgetAccessKind.quote => l10n.widgetUnlockQuoteTitle,
         ArinWidgetAccessKind.prayer => l10n.widgetUnlockPrayerTitle,
@@ -99,12 +107,19 @@ class _WidgetUnlockPageState extends ConsumerState<WidgetUnlockPage> {
     setState(() => _busy = true);
     try {
       await context.push(AppRoutes.premium);
-      if (!mounted) return;
+      if (!context.mounted) return;
       final entitlement = await ref.read(premiumEntitlementProvider.future);
       if (entitlement.isActive) {
         final service = ref.read(widgetAccessServiceProvider);
-        await service.syncAll(isPremium: true);
-        if (!mounted) return;
+        final states = await service.syncAll(isPremium: true);
+        final prefs = await SharedPreferences.getInstance();
+        await WidgetMetricsService.reconcile(
+          prefs: prefs,
+          accessService: service,
+          states: states,
+          isPremium: true,
+        );
+        if (!context.mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(l10n.widgetUnlockPremiumSuccess),
@@ -172,10 +187,7 @@ class _WidgetUnlockPageState extends ConsumerState<WidgetUnlockPage> {
                           ),
                         ),
                         alignment: Alignment.center,
-                        child: const Text(
-                          '🔒',
-                          style: TextStyle(fontSize: 36),
-                        ),
+                        child: const Text('🔒', style: TextStyle(fontSize: 36)),
                       ),
                       const SizedBox(height: 24),
                       Text(

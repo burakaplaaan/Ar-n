@@ -1,6 +1,6 @@
 /**
  * Proje kökünden: cd tool/audio_trim && npm install && node trim_notification_assets.mjs
- * sound_candidates içindeki CC0 önizleme MP3'leri kırpar; raw / iOS / assets'e aynı WAV yazar.
+ * CC0 kaynakları kırpar; Android/iOS için uyumlu WAV, Flutter önizlemesi için MP3 yazar.
  */
 import { execFileSync } from 'child_process';
 import fs from 'fs';
@@ -76,7 +76,7 @@ for (const [rel, seconds, outName] of jobs) {
     '-acodec',
     'pcm_s16le',
     '-ar',
-    '44100',
+    '32000',
     '-ac',
     '1',
     outRaw,
@@ -84,6 +84,27 @@ for (const [rel, seconds, outName] of jobs) {
   console.log('ffmpeg', outName, seconds + 's');
   execFileSync(ffmpeg, args, { stdio: 'inherit' });
   fs.copyFileSync(outRaw, path.join(iosDir, outName));
-  fs.copyFileSync(outRaw, path.join(assetDir, outName));
+  const previewName = outName.replace(/\.wav$/i, '.mp3');
+  const previewOut = path.join(assetDir, previewName);
+  execFileSync(
+    ffmpeg,
+    [
+      '-y',
+      '-i',
+      outRaw,
+      '-acodec',
+      'libmp3lame',
+      '-b:a',
+      '96k',
+      '-ar',
+      '32000',
+      '-ac',
+      '1',
+      previewOut,
+    ],
+    { stdio: 'inherit' },
+  );
+  const legacyAssetWav = path.join(assetDir, outName);
+  if (fs.existsSync(legacyAssetWav)) fs.unlinkSync(legacyAssetWav);
   console.log('OK', outName);
 }

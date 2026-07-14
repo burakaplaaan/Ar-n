@@ -53,6 +53,9 @@ Future<void> main() async {
   await runZonedGuarded(
     () async {
       WidgetsFlutterBinding.ensureInitialized();
+      // Data-only FCM mesajlarının uygulama kapalıyken de işlenebilmesi için
+      // callback runApp'ten önce kaydedilmelidir.
+      FcmTokenService.registerBackgroundHandler();
       setupArinErrorReporting();
       await _runApp();
     },
@@ -202,7 +205,9 @@ class _BootstrapSplash extends StatelessWidget {
                         shape: BoxShape.circle,
                         color: const Color(0xFF9BE7C3).withValues(alpha: 0.12),
                         border: Border.all(
-                          color: const Color(0xFF9BE7C3).withValues(alpha: 0.45),
+                          color: const Color(
+                            0xFF9BE7C3,
+                          ).withValues(alpha: 0.45),
                           width: 1.4,
                         ),
                       ),
@@ -385,24 +390,28 @@ Future<void> _runDeferredStartup(SharedPreferences prefs) async {
         ),
       );
 
-      unawaited(
-        Future<void>.delayed(
-          const Duration(seconds: 6),
-          AdMobService.initialize,
-        ),
-      );
+      if (Platform.isAndroid) {
+        // Android widget kilidi ödüllü reklamı uygulama açılır açılmaz
+        // isteyebilir. SDK'yı geciktirmeden hazırlayarak ilk gösterimi iOS'taki
+        // hazır reklam davranışına yaklaştır; iOS başlangıç sırasına dokunma.
+        unawaited(AdMobService.initialize());
+      } else {
+        unawaited(
+          Future<void>.delayed(
+            const Duration(seconds: 6),
+            AdMobService.initialize,
+          ),
+        );
+      }
 
       // RevenueCat: abonelik SDK'sını Firebase UID ile başlat.
       // Gecikme olmadan başlatılır; satın alma ekranı açılmadan önce hazır olsun.
-      unawaited(
-        () async {
-          final uid =
-              isFirebaseReady
-                  ? FirebaseAuth.instance.currentUser?.uid
-                  : null;
-          return PurchaseService.initialize(firebaseUid: uid);
-        }(),
-      );
+      unawaited(() async {
+        final uid = isFirebaseReady
+            ? FirebaseAuth.instance.currentUser?.uid
+            : null;
+        return PurchaseService.initialize(firebaseUid: uid);
+      }());
 
       // Uygulama kapalıyken şehir değişimi kontrolü (WorkManager/BGTaskScheduler).
       // Yalnızca kullanıcı "arka planda otomatik güncelle"yi açıp "Her Zaman
@@ -416,14 +425,20 @@ Future<void> _runDeferredStartup(SharedPreferences prefs) async {
   // refresh sırasında bekleme yapmasın diye.
   ArinWidgetSync.primeAppGroup();
 
-  // FCM topic kaydı — kullanıcı bildirim iznini henüz vermediyse sistem
-  // izin diyaloğu açar. 4 saniyelik gecikme sonrası çalışır ki uygulama
-  // tam yüklendikten sonra diyalog gösterilsin.
+  // FCM dinleyicilerini ve mevcut izinlere ait topic kayıtlarını hazırla.
   if (isFirebaseReady) {
     unawaited(FcmTokenService.initIfNeeded());
   }
 
   await Future<void>.delayed(const Duration(seconds: 4));
+
+  // Onboarding'i geçmiş mevcut kullanıcılarda bildirim izni hiç
+  // kararlaştırılmadıysa Android 13+ / iOS sistem diyaloğunu uygulama tamamen
+  // açıldıktan sonra bir kez göster. İzinli kullanıcıların topic kaydı da
+  // idempotent olarak onarılır; reddedilmiş izin yeniden sorulmaz.
+  if (isFirebaseReady) {
+    unawaited(FcmTokenService.requestBroadcastPermissionIfNeeded());
+  }
 
   // Eski namaz vakti cache'ini BİR KEZ temizle — Aladhan `school=1` (Hanafi)
   // ile kaydedilmiş ve İkindi'yi 1 saat ileri atan bozuk entry'leri kökten

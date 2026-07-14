@@ -8,11 +8,13 @@ Proje kökünde çalıştır: `dart run tool/generate_healing_assets.dart`
 
 tones/tone_*Hz.wav
   Yerel üretim: `dart run tool/generate_healing_assets.dart`
-  Kısa sinüs döngüleri. `generate_healing_assets.dart` içindeki `toneAmp` ambiyansla birlikte duyulacak şekilde ayarlanır;
+  16 kHz mono PCM kısa sinüs döngüleri. Bu örnekleme hızı en yüksek 852 Hz tonu kayıpsız temsil eder,
+  kesintisiz WAV döngüsünü korur ve 44.1 kHz'e göre dosya boyutunu azaltır.
+  `generate_healing_assets.dart` içindeki ton seviyesi ambiyansla birlikte duyulacak şekilde ayarlanır;
   uzun süre dinlerken kulak rahatlığı için uygulama içi “Frekans tonu” slider’ını düşük tutun.
 
 ambi/ambi_*.wav
-  `dart run tool/generate_healing_assets.dart` ile üretilen döngüler: orman, ateş, evren (pad yer tutucu).
+  22.05 kHz mono PCM döngüler: orman, ateş, evren (pad yer tutucu).
   Gerçek ambiyans için `tool/seamless_loop_wav.dart` ile WAV veya MP3 kaynağından 60 sn döngü üretin.
 
 Gerçek kayıt nereden? (telif / lisans)
@@ -29,11 +31,12 @@ Evren ambiyansı (ör. Freesound CC BY 4.0 — atıf zorunlu)
   1) Freesound’a giriş yapıp MP3’ü indirin → `tool/incoming_evren.mp3`
   2) Uygulama içi kullanım için atıf metnini (ör. Ayarlar / kredi bölümü) saklayın; CC BY 4.0 gerektirir.
   3) Ortadan 60 sn + 2 sn döngü crossfade:
-     dart run tool/seamless_loop_wav.dart --input=tool/incoming_evren.mp3 --output=assets/sounds/healing/ambi/ambi_evren.wav --seconds=60 --crossfade-ms=2000 --skip-start-sec=0 --segment=center
+     dart run tool/seamless_loop_wav.dart --input=tool/incoming_evren.mp3 --output=assets/sounds/healing/ambi/ambi_evren.wav --sample-rate=22050 --seconds=60 --crossfade-ms=2000 --skip-start-sec=0 --segment=center
 
 `seamless_loop_wav.dart` parametreleri
   --input=...        WAV (PCM 16 LE), MP3 veya AIFF/AIFC (PCM 16 BE, SSND)
   --output=...       Çıkış mono WAV
+  --sample-rate=22050   Çıkış örnekleme hızı; boyut optimizasyonunu korumak için varsayılan 22050
   --seconds=60       Kesit süresi
   --crossfade-ms=2000   Döngü başı/sonu birleşiminde raised-cosine (önerilen 2000)
   --mid-crossfade-ms=0  >0 ise: çıktıyı iki yarıya böler (ör. 30+30 sn), ortada bu süreyle yumuşak birleştirir
@@ -44,11 +47,11 @@ Evren ambiyansı (ör. Freesound CC BY 4.0 — atıf zorunlu)
 Ateş (şömine) — ör. Freesound silencyo CC … (sayfadan lisansı doğrulayın)
   https://freesound.org/people/silencyo/sounds/81801/
   Ortadan 60 sn, döngü 2 sn, ortada (≈30 sn) ek 2 sn geçiş:
-     dart run tool/seamless_loop_wav.dart --input=tool/incoming_fire.aiff --output=assets/sounds/healing/ambi/ambi_fire.wav --seconds=60 --crossfade-ms=2000 --mid-crossfade-ms=2000 --skip-start-sec=0 --segment=center
+     dart run tool/seamless_loop_wav.dart --input=tool/incoming_fire.aiff --output=assets/sounds/healing/ambi/ambi_fire.wav --sample-rate=22050 --seconds=60 --crossfade-ms=2000 --mid-crossfade-ms=2000 --skip-start-sec=0 --segment=center
 
 Orman ambiyansı (örnek: Freesound audiomirage — 850140; sayfada lisansı kontrol edin; NC ise ticari uygulamada kullanılamaz)
   https://freesound.org/people/audiomirage/sounds/850140/
   Ortadan 60 sn + 2 sn döngü:
-     dart run tool/seamless_loop_wav.dart --input=tool/incoming_forest.wav --output=assets/sounds/healing/ambi/ambi_forest.wav --seconds=60 --crossfade-ms=2000 --skip-start-sec=0 --segment=center
+     dart run tool/seamless_loop_wav.dart --input=tool/incoming_forest.wav --output=assets/sounds/healing/ambi/ambi_forest.wav --sample-rate=22050 --seconds=60 --crossfade-ms=2000 --skip-start-sec=0 --segment=center
 
 Tıbbi iddia yoktur; bu özellik rahatlama amaçlıdır.

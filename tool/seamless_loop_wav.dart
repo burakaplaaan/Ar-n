@@ -1,5 +1,6 @@
 // 60 sn (veya --seconds) kesip döngü birleşiminde raised-cosine crossfade uygular.
-// Giriş: WAV (PCM 16 LE), MP3, AIFF/AIFC (PCM 16 BE, SSND). Çıkış: mono 16-bit WAV.
+// Giriş: WAV (PCM 16 LE), MP3, AIFF/AIFC (PCM 16 BE, SSND).
+// Çıkış: varsayılan 22.05 kHz mono 16-bit WAV (--sample-rate ile değiştirilebilir).
 // Örnek (ortadan 60 sn, döngü 2 sn; ortada 30 sn birleşiminde ek yumuşatma):
 //   dart run tool/seamless_loop_wav.dart --input=...aiff --output=.../ambi_fire.wav --seconds=60 --crossfade-ms=2000 --mid-crossfade-ms=2000 --skip-start-sec=0 --segment=center
 
@@ -17,10 +18,15 @@ void main(List<String> args) {
   final seconds = int.tryParse(opts['seconds'] ?? '60') ?? 60;
   final crossfadeMs = int.tryParse(opts['crossfade-ms'] ?? '2000') ?? 2000;
   final midCrossfadeMs = int.tryParse(opts['mid-crossfade-ms'] ?? '0') ?? 0;
-  final skipStartSec =
-      double.tryParse(opts['skip-start-sec'] ?? '0') ?? 0.0;
+  final skipStartSec = double.tryParse(opts['skip-start-sec'] ?? '0') ?? 0.0;
   final edgeMs = int.tryParse(opts['edge-ms'] ?? '0') ?? 0;
   final segment = (opts['segment'] ?? 'start').toLowerCase();
+  final requestedSampleRate =
+      int.tryParse(opts['sample-rate'] ?? '22050') ?? 22050;
+  if (requestedSampleRate < 8000 || requestedSampleRate > 48000) {
+    stderr.writeln('--sample-rate 8000–48000 aralığında olmalı.');
+    exit(1);
+  }
 
   final input = File(inputPath);
   if (!input.existsSync()) {
@@ -33,30 +39,41 @@ void main(List<String> args) {
 
   final bytes = input.readAsBytesSync();
   final lower = inputPath.toLowerCase();
-  late final Int16List mono;
-  late final int sr;
+  late final Int16List decodedMono;
+  late final int sourceSampleRate;
 
   if (lower.endsWith('.mp3')) {
     final decoded = _decodeMp3ToMono(bytes);
-    mono = decoded.samples;
-    sr = decoded.sampleRate;
-  } else if (lower.endsWith('.aiff') || lower.endsWith('.aif') || lower.endsWith('.aifc')) {
+    decodedMono = decoded.samples;
+    sourceSampleRate = decoded.sampleRate;
+  } else if (lower.endsWith('.aiff') ||
+      lower.endsWith('.aif') ||
+      lower.endsWith('.aifc')) {
     final aiff = _parseAiff(bytes);
     if (aiff == null) {
       stderr.writeln('AIFF/AIFC okunamadı (PCM 16, SSND gerekir).');
       exit(1);
     }
-    mono = aiff.samples;
-    sr = aiff.sampleRate;
+    decodedMono = aiff.samples;
+    sourceSampleRate = aiff.sampleRate;
   } else {
     final wav = _parseWav(bytes);
     if (wav == null) {
       stderr.writeln('WAV okunamadı (PCM 16 bit desteklenir).');
       exit(1);
     }
-    mono = _toMonoInt16Le(bytes, wav);
-    sr = wav.sampleRate;
+    decodedMono = _toMonoInt16Le(bytes, wav);
+    sourceSampleRate = wav.sampleRate;
   }
+  if (sourceSampleRate < 8000 || sourceSampleRate > 48000) {
+    stderr.writeln(
+      'Desteklenmeyen kaynak örnekleme hızı: $sourceSampleRate Hz '
+      '(desteklenen: 8000–48000 Hz).',
+    );
+    exit(1);
+  }
+  final mono = _resamplePcm(decodedMono, sourceSampleRate, requestedSampleRate);
+  final sr = requestedSampleRate;
 
   final skipSamples = (skipStartSec * sr)
       .round()
@@ -87,14 +104,7 @@ void main(List<String> args) {
 
   final Int16List seg;
   if (cfMid > 0 && seconds >= 4) {
-    seg = _buildTwoHalvesWithMidJoin(
-      mono,
-      startIdx,
-      want,
-      sr,
-      seconds,
-      cfMid,
-    );
+    seg = _buildTwoHalvesWithMidJoin(mono, startIdx, want, sr, seconds, cfMid);
   } else {
     seg = Int16List(want);
     final available = mono.length - startIdx;
@@ -121,8 +131,66 @@ void main(List<String> args) {
   stderr.writeln(
     'Yazıldı: $outputPath (${seconds}s, loop crossfade=${crossfadeMs}ms, '
     'mid=${midCrossfadeMs}ms, skip=${skipStartSec}s, segment=$segment, '
-    'startSample=$startIdx, mono, ${sr}Hz)',
+    'startSample=$startIdx, mono, ${sr}Hz; source=${sourceSampleRate}Hz)',
   );
+}
+
+/// PCM'i hedef örnekleme hızına çevirir. Küçültmede orana göre genişleyen
+/// Blackman pencereli sinc low-pass; büyütmede doğrusal interpolasyon kullanılır.
+Int16List _resamplePcm(Int16List input, int sourceRate, int targetRate) {
+  if (input.isEmpty || sourceRate == targetRate) {
+    return Int16List.fromList(input);
+  }
+  final outputLength = (input.length * targetRate / sourceRate).round();
+  final out = Int16List(outputLength);
+  final ratio = sourceRate / targetRate;
+
+  if (targetRate > sourceRate) {
+    for (var i = 0; i < outputLength; i++) {
+      final sourcePosition = i * ratio;
+      final left = sourcePosition.floor().clamp(0, input.length - 1);
+      final right = math.min(left + 1, input.length - 1);
+      final fraction = sourcePosition - left;
+      out[i] = (input[left] * (1 - fraction) + input[right] * fraction)
+          .round()
+          .clamp(-32768, 32767);
+    }
+    return out;
+  }
+
+  final radius = math.max(32, (32 * ratio).ceil());
+  final cutoff = (targetRate / sourceRate) * 0.94;
+  for (var i = 0; i < outputLength; i++) {
+    final sourcePosition = i * ratio;
+    final center = sourcePosition.floor();
+    var weightedSum = 0.0;
+    var totalWeight = 0.0;
+    for (
+      var sourceIndex = center - radius + 1;
+      sourceIndex <= center + radius;
+      sourceIndex++
+    ) {
+      if (sourceIndex < 0 || sourceIndex >= input.length) continue;
+      final delta = sourcePosition - sourceIndex;
+      final normalizedDistance = delta.abs() / radius;
+      if (normalizedDistance >= 1) continue;
+      final window =
+          0.42 +
+          0.5 * math.cos(math.pi * normalizedDistance) +
+          0.08 * math.cos(2 * math.pi * normalizedDistance);
+      final sincArgument = delta * cutoff;
+      final sinc = sincArgument.abs() < 1e-12
+          ? 1.0
+          : math.sin(math.pi * sincArgument) / (math.pi * sincArgument);
+      final weight = cutoff * sinc * window;
+      weightedSum += input[sourceIndex] * weight;
+      totalWeight += weight;
+    }
+    if (totalWeight.abs() > 1e-12) {
+      out[i] = (weightedSum / totalWeight).round().clamp(-32768, 32767);
+    }
+  }
+  return out;
 }
 
 /// İki yarım (ör. 30+30 sn) birleşiminde ortada [cfMid] örnek raised-cosine (kaynak 2*half+cf).
@@ -208,7 +276,9 @@ Map<String, String> _parseArgs(List<String> args) {
     }
   }
   if (out.isEmpty) {
-    stderr.writeln('MP3 çözülemedi (dosya bozuk veya ID3 sonrası senk bulunamadı).');
+    stderr.writeln(
+      'MP3 çözülemedi (dosya bozuk veya ID3 sonrası senk bulunamadı).',
+    );
     exit(1);
   }
   return (samples: Int16List.fromList(out), sampleRate: sr);
@@ -281,7 +351,7 @@ double _aiffExt80ToDouble(Uint8List b, int o) {
   final ss0 = ssndStart;
   final ssz = ssndDataSize;
   if (bitsVal != 16 || ch < 1) return null;
-  final sr = rate.round().clamp(8000, 192000);
+  final sr = rate.round();
   final frameBytes = ch * 2;
   final maxFrames = ssz ~/ frameBytes;
   final nFrames = math.min(nf, maxFrames);
@@ -337,8 +407,11 @@ _WavInfo? _parseWav(Uint8List bytes) {
 
   while (off + 8 <= bytes.length) {
     final id = String.fromCharCodes(bytes.sublist(off, off + 4));
-    final size = ByteData.sublistView(bytes, off + 4, off + 8)
-        .getUint32(0, Endian.little);
+    final size = ByteData.sublistView(
+      bytes,
+      off + 4,
+      off + 8,
+    ).getUint32(0, Endian.little);
     final contentStart = off + 8;
     final next = contentStart + size + (size.isOdd ? 1 : 0);
 
@@ -359,10 +432,7 @@ _WavInfo? _parseWav(Uint8List bytes) {
     off = next;
   }
 
-  if (sampleRate == null ||
-      channels == null ||
-      bits == null ||
-      dataSize == 0) {
+  if (sampleRate == null || channels == null || bits == null || dataSize == 0) {
     return null;
   }
   return _WavInfo(
@@ -378,7 +448,11 @@ Int16List _toMonoInt16Le(Uint8List bytes, _WavInfo wav) {
   final frameBytes = wav.channels * 2;
   final nFrames = wav.dataSize ~/ frameBytes;
   final out = Int16List(nFrames);
-  final bd = ByteData.sublistView(bytes, wav.dataOffset, wav.dataOffset + wav.dataSize);
+  final bd = ByteData.sublistView(
+    bytes,
+    wav.dataOffset,
+    wav.dataOffset + wav.dataSize,
+  );
   for (var f = 0; f < nFrames; f++) {
     var sum = 0;
     for (var c = 0; c < wav.channels; c++) {

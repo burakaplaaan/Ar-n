@@ -570,34 +570,6 @@ class AdMobService {
   static const _rewardedRetryDelay = Duration(milliseconds: 800);
   static const _rewardedMaxAttempts = 3;
 
-  /// Android'de on-demand yol daha az tetiklenir (bkz. [_awaitPendingRewardedPreload]
-  /// ve uygulama açılışında erken preload ısıtma), bu yüzden buraya düşen
-  /// gerçek istekler için bir ekstra deneme payı bırakmak toplam bekleme
-  /// süresini önemli ölçüde uzatmadan doluş şansını artırır.
-  static const _rewardedMaxAttemptsAndroid = 4;
-
-  /// Android: devam eden bir preload isteği varsa en fazla bu süre kadar
-  /// sonucunu bekleriz (yeni bir eşzamanlı `RewardedAd.load` göndermek yerine).
-  static const _pendingPreloadWait = Duration(seconds: 10);
-  static const _pendingPreloadPollInterval = Duration(milliseconds: 250);
-
-  /// Devam etmekte olan bir ödüllü reklam preload'u varsa tamamlanmasını
-  /// bekler ve hazır olduğunda gösterir. Preload yoksa, zaman aşımına
-  /// uğrarsa veya sonuç boşsa `null` döner — çağıran on-demand yükleme
-  /// yoluna düşer.
-  Future<RewardedAdResult?> _awaitPendingRewardedPreload() async {
-    if (!_rewardedLoading) return null;
-    final deadline = DateTime.now().add(_pendingPreloadWait);
-    while (_rewardedLoading && DateTime.now().isBefore(deadline)) {
-      await Future<void>.delayed(_pendingPreloadPollInterval);
-    }
-    if (_rewardedLoading) {
-      // Preload hâlâ sürüyor: bekleme payını tükettik, on-demand'e düş.
-      return null;
-    }
-    return _showPreloadedRewarded();
-  }
-
   /// Kullanıcının BİLEREK istediği ödüllü reklam (widget kilidi açma).
   ///
   /// `true` yalnızca kullanıcı ödülü kazandığında döner. Çağıranların yalnızca
@@ -630,34 +602,17 @@ class AdMobService {
         unawaited(_preloadRewarded());
         return preloaded;
       }
-
-      // 1b) Android: hazır reklam yok ama ZATEN devam eden bir preload isteği
-      // varsa (örn. uygulama açılışında tetiklenmiş), onun sonucunu bekle.
-      // Aksi halde aynı ad unit için hem preload hem on-demand olmak üzere
-      // eşzamanlı iki `RewardedAd.load` isteği gönderilir; bu gereksiz ağ
-      // trafiği üretir ve doluş oranını olumsuz etkileyebilir. iOS'ta bu
-      // davranış zaten sorunsuz çalıştığı için değiştirilmiyor.
-      if (Platform.isAndroid) {
-        final fromPending = await _awaitPendingRewardedPreload();
-        if (fromPending != null) {
-          unawaited(_preloadRewarded());
-          return fromPending;
-        }
-      }
     }
 
     // 2) Hazır reklam yok → on-demand yükle (geçici hatalarda retry'lı), sonra
     // bir sonraki sefer için arka planda preload tetikle.
-    final maxAttempts = Platform.isAndroid
-        ? _rewardedMaxAttemptsAndroid
-        : _rewardedMaxAttempts;
-    for (var attempt = 0; attempt < maxAttempts; attempt++) {
+    for (var attempt = 0; attempt < _rewardedMaxAttempts; attempt++) {
       final outcome = await _loadAndShowRewarded(adUnitId);
       if (outcome != RewardedAdResult.loadFailed) {
         unawaited(_preloadRewarded());
         return outcome;
       }
-      if (attempt < maxAttempts - 1) {
+      if (attempt < _rewardedMaxAttempts - 1) {
         await Future<void>.delayed(_rewardedRetryDelay);
       }
     }

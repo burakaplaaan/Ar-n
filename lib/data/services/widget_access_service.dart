@@ -55,6 +55,7 @@ class WidgetAccessService {
         !isPremium && GlobalWidgetLockService.isGloballyLocked(_prefs);
 
     final adGate = AdGateService(_prefs);
+    final normalStates = <ArinWidgetAccessKind, WidgetGateState>{};
     final states = <ArinWidgetAccessKind, WidgetGateState>{};
     for (final kind in ArinWidgetAccessKind.values) {
       final firstSeen = await _readWidgetFirstUse(kind);
@@ -64,25 +65,24 @@ class WidgetAccessService {
       // açmamak için mevcut kilit durumunu koru.
       final effectiveFirstSeen =
           (firstSeen == null && !isPremium && await _readNativeGateLocked(kind))
-              ? DateTime.fromMillisecondsSinceEpoch(0)
-              : firstSeen;
+          ? DateTime.fromMillisecondsSinceEpoch(0)
+          : firstSeen;
 
       final adState = await adGate.widgetStateFor(
         kind.placement,
         isPremium: isPremium,
         firstSeen: effectiveFirstSeen,
       );
+      normalStates[kind] = adState;
       if (globallyLocked) {
-        // Global kilit aktifken reklam unlock'u geçerliyse erişime izin ver.
-        // Trial süresi ise global kilide takılır — reklam izlenmeden açılmaz.
-        final rewardedStillValid =
-            adState.unlockUntil != null &&
-            adState.unlockUntil!.isAfter(DateTime.now());
+        // Acil global override: premium olmayan tüm widget'ları trial veya
+        // reklamla açılmış 24 saatlik hakka bakmadan anında kilitle.
+        // Süreler silinmez; override kalkınca normal durum yeniden hesaplanır.
         states[kind] = WidgetGateState(
-          allowed: rewardedStillValid,
+          allowed: false,
           inTrial: false,
-          unlockUntil: rewardedStillValid ? adState.unlockUntil : null,
-          trialUntil: null,
+          unlockUntil: adState.unlockUntil,
+          trialUntil: adState.trialUntil,
         );
       } else {
         states[kind] = adState;
@@ -93,17 +93,23 @@ class WidgetAccessService {
         : '';
     await ArinWidgetSync.pushWidgetGateStates(
       lockedByKind: {
-        for (final entry in states.entries) entry.key.id: !entry.value.allowed,
+        // Global override ayrı native anahtarda tutulur. Buraya normal erişim
+        // yazılır ki uzaktan unlock yalnızca override'ı kaldırarak trial veya
+        // reklam hakkının o anki doğal sonucuna geri dönebilsin.
+        for (final entry in normalStates.entries)
+          entry.key.id: !entry.value.allowed,
       },
       trialUntilByKind: {
-        for (final entry in states.entries)
+        for (final entry in normalStates.entries)
           entry.key.id: entry.value.trialUntil,
       },
       unlockUntilByKind: {
-        for (final entry in states.entries)
+        for (final entry in normalStates.entries)
           entry.key.id: entry.value.unlockUntil,
       },
       isPremium: isPremium,
+      globalLocked: globallyLocked,
+      globalLockRevision: GlobalWidgetLockService.revision(_prefs),
       lockNote: lockNote,
     );
     return states;
@@ -126,12 +132,11 @@ class WidgetAccessService {
         final unlock = adGate.unlockUntil(kind.placement);
         final unlocked = unlock != null && unlock.isAfter(DateTime.now());
         final globallyLocked = GlobalWidgetLockService.isGloballyLocked(_prefs);
-        // Global kilit + geçersiz unlock → kesinlikle kilitli.
-        if (globallyLocked && !unlocked) {
-          return const WidgetGateState(
+        if (globallyLocked) {
+          return WidgetGateState(
             allowed: false,
             inTrial: false,
-            unlockUntil: null,
+            unlockUntil: unlock,
             trialUntil: null,
           );
         }
@@ -155,20 +160,40 @@ class WidgetAccessService {
     final globallyLocked = GlobalWidgetLockService.isGloballyLocked(_prefs);
     if (!globallyLocked) return adState;
 
-    // Global kilit var: reklam unlock'u geçerliyse erişime izin ver.
-    final rewardedStillValid =
-        adState.unlockUntil != null &&
-        adState.unlockUntil!.isAfter(DateTime.now());
+    // Acil global override: premium olmayan kullanıcı için hiçbir geçici hak
+    // override'ı aşamaz. Hakların süreleri arka planda işlemeye devam eder.
     return WidgetGateState(
-      allowed: rewardedStillValid,
+      allowed: false,
       inTrial: false,
-      unlockUntil: rewardedStillValid ? adState.unlockUntil : null,
-      trialUntil: null,
+      unlockUntil: adState.unlockUntil,
+      trialUntil: adState.trialUntil,
     );
   }
 
   Future<void> recordRewardedUnlock(ArinWidgetAccessKind kind) async {
     await AdGateService(_prefs).recordWidgetRewardedUnlock(kind.placement);
+  }
+
+  /// Native widget'ın ilk kez gerçekten çizildiği zamanı analytics/retention
+  /// katmanına güvenli, salt-okunur şekilde açar.
+  Future<DateTime?> firstUseFor(ArinWidgetAccessKind kind) =>
+      _readWidgetFirstUse(kind);
+
+  /// Native provider'ın en son gerçek render/update heartbeat'i.
+  Future<DateTime?> lastRenderFor(ArinWidgetAccessKind kind) async {
+    if (kIsWeb) return null;
+    try {
+      final raw = await HomeWidget.getWidgetData<String>(
+        'arin_widget_last_render_ms_${kind.id}',
+      );
+      if (raw == null || raw.isEmpty) return null;
+      final ms = int.tryParse(raw) ?? double.tryParse(raw)?.toInt();
+      if (ms == null || ms <= 0) return null;
+      return DateTime.fromMillisecondsSinceEpoch(ms);
+    } catch (e) {
+      debugPrint('WidgetAccessService.lastRenderFor(${kind.id}): $e');
+      return null;
+    }
   }
 
   Future<String?> consumeLaunchedWidgetKind() async {

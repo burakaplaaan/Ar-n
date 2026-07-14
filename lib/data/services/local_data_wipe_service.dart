@@ -18,6 +18,7 @@ import 'arin_widget_sync.dart';
 import 'fcm_token_service.dart';
 import 'prayer_reminder_prefs.dart';
 import 'prayer_user_notification_sound_store.dart';
+import 'product_metrics_service.dart';
 
 abstract final class LocalDataWipeService {
   /// Tüm kullanıcı verilerini siler; profil kutusuna boş profil yazar.
@@ -39,10 +40,22 @@ abstract final class LocalDataWipeService {
     await _clearImportedPrayerSounds(prefs);
     await _clearLegacyHiveBoxes();
 
+    // Anonim bildirim kitle kaydını mevcut kurulum kimliği silinmeden önce
+    // pasifleştir; aksi halde prefs.clear sonrası yeni kimlik üretilir.
+    final previousInstallId = await ProductMetricsService.currentInstallId();
+    final audienceDeactivated = await FcmTokenService.unsubscribeFromBroadcasts(
+      suspendForWipe: true,
+    );
     await prefs.clear();
+    if (!audienceDeactivated && previousInstallId != null) {
+      await ProductMetricsService.preservePendingAudienceDeactivation(
+        previousInstallId,
+      );
+    }
 
-    await Hive.box<UserProfileModel>(HiveBoxes.userProfile)
-        .put('profile', UserProfileModel.empty());
+    await Hive.box<UserProfileModel>(
+      HiveBoxes.userProfile,
+    ).put('profile', UserProfileModel.empty());
 
     await Hive.box<HabitModel>(HiveBoxes.habits).clear();
     await Hive.box<HabitLogModel>(HiveBoxes.habitLogs).clear();
@@ -58,14 +71,12 @@ abstract final class LocalDataWipeService {
     }
 
     await prefs.setBool('onboarding_completed', false);
-    
+
     // Oturum kapandıktan veya hesap silindikten sonra deferred startup işlerinin
     // (AdMob init, FCM init, migrasyonlar vb.) yeni oturumda tekrar çalışabilmesi için
     // flag'i sıfırlıyoruz.
     deferredStartupDone = false;
-    
-    await FcmTokenService.unsubscribeFromBroadcasts();
-    
+
     await _clearFirestoreOfflineCacheSafely();
   }
 
@@ -83,7 +94,9 @@ abstract final class LocalDataWipeService {
     await ArinWidgetSync.clearAll();
   }
 
-  static Future<void> _clearImportedPrayerSounds(SharedPreferences prefs) async {
+  static Future<void> _clearImportedPrayerSounds(
+    SharedPreferences prefs,
+  ) async {
     if (kIsWeb) return;
     for (var slot = 0; slot < PrayerReminderPrefs.slotCount; slot++) {
       try {

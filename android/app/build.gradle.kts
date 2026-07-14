@@ -120,20 +120,6 @@ flutter {
     source = "../.."
 }
 
-// Namaz bildirimi sesleri: flutter_local_notifications `RawResourceAndroidNotificationSound`
-// için dosyaların `res/raw` altında olması gerekir. Kaynak tekilleştirmesi: Flutter asset
-// klasöründen her derlemede kopyalanır (APK’da `R.raw.prayer_ntf_*` bulunmasını garanti eder).
-val copyPrayerNotificationSounds = tasks.register<Copy>("copyPrayerNotificationSounds") {
-    val src = rootProject.projectDir.resolve("../assets/sounds/prayer")
-    from(src)
-    include("prayer_ntf_*.wav")
-    into(layout.projectDirectory.dir("src/main/res/raw"))
-}
-
-tasks.named("preBuild").configure {
-    dependsOn(copyPrayerNotificationSounds)
-}
-
 dependencies {
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")
 }

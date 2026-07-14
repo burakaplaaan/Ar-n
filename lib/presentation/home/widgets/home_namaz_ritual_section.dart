@@ -13,7 +13,6 @@ import '../../shared/providers/habit_providers.dart';
 import '../../shared/providers/prayer_time_providers.dart';
 import '../../willpower/salat_tracking_visibility_provider.dart';
 import '../../willpower/salat_providers.dart';
-import '../../willpower/widgets/namaz_adhan_reminder_card.dart';
 import '../../willpower/widgets/salat_prayer_row.dart';
 
 final _homeSalatSetupBusyProvider = StateProvider.autoDispose<bool>(
@@ -38,8 +37,7 @@ class HomeNamazRitualSection extends ConsumerWidget {
       if (!context.mounted) return;
       if (habit != null) {
         final alreadyComplete =
-            habit.onboardingCompleted &&
-            habit.commitmentText.trim().isNotEmpty;
+            habit.onboardingCompleted && habit.commitmentText.trim().isNotEmpty;
         if (alreadyComplete) {
           // Kurulum daha önce tamamlanmış: ana sayfa görünürlük bayrağını
           // aç ve doğrudan asıl takip sayfasını göster. Onboarding atlanır,
@@ -48,9 +46,7 @@ class HomeNamazRitualSection extends ConsumerWidget {
               .read(salatTrackingVisibleOnHomeProvider.notifier)
               .enableFromGelisim();
           if (!context.mounted) return;
-          context.push(
-            AppRoutes.willNamaz(habit.id, returnOrigin: 'home'),
-          );
+          context.push(AppRoutes.willNamaz(habit.id, returnOrigin: 'home'));
           return;
         }
         context.push(
@@ -72,7 +68,9 @@ class HomeNamazRitualSection extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
     final onLight = Theme.of(context).brightness == Brightness.light;
-    final warmBrown = onLight ? const Color(0xFF8B5E3C) : const Color(0xFFC59B6D);
+    final warmBrown = onLight
+        ? const Color(0xFF8B5E3C)
+        : const Color(0xFFC59B6D);
     final warmBrownSoft = onLight
         ? const Color(0xFFC9A27A)
         : const Color(0xFF8A6545);
@@ -309,8 +307,9 @@ class HomeNamazRitualSection extends ConsumerWidget {
                                             color: warmBrown.withValues(
                                               alpha: 0.7,
                                             ),
-                                            borderRadius:
-                                                BorderRadius.circular(1.5),
+                                            borderRadius: BorderRadius.circular(
+                                              1.5,
+                                            ),
                                           ),
                                         ),
                                       ),
@@ -378,34 +377,10 @@ class HomeNamazRitualSection extends ConsumerWidget {
                           ],
                         ),
                         const SizedBox(height: 12),
-                        SalatPrayerRow(
-                          habitId: salatId,
-                          compact: true,
-                        ),
+                        SalatPrayerRow(habitId: salatId, compact: true),
                       ],
                     ),
                   ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 6,
-                  ),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(14),
-                    color: onLight
-                        ? AppColors.creamSurface.withValues(alpha: 0.9)
-                        : Colors.black.withValues(alpha: 0.22),
-                    border: Border.all(
-                      color: onLight
-                          ? AppColors.creamDark.withValues(alpha: 0.55)
-                          : Colors.white.withValues(alpha: 0.06),
-                    ),
-                  ),
-                  child: const NamazAdhanReminderCard(compact: true),
                 ),
               ),
             ],

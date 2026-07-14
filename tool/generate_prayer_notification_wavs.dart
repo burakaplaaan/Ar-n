@@ -1,14 +1,15 @@
-// Namaz bildirimi için PCM WAV üretir (Android res/raw, iOS Runner, assets/sounds/prayer).
+// Namaz bildirimi için 32 kHz mono PCM WAV üretir (Android res/raw, iOS Runner).
 // Çalıştır: dart run tool/generate_prayer_notification_wavs.dart
 //
-// Gerçek ezan kayıtları için: tool/audio_trim/trim_notification_assets.mjs (ffmpeg + aday MP3).
+// Flutter MP3 önizlemeleri ve gerçek kayıtlar için:
+// tool/audio_trim/trim_notification_assets.mjs (ffmpeg + aday MP3).
 
 import 'dart:io';
 import 'dart:math' as math;
 import 'dart:typed_data';
 
 void main() {
-  const sr = 44100;
+  const sr = 32000;
   const seconds = 2;
   final root = Directory.current;
 
@@ -22,17 +23,14 @@ void main() {
 
   final rawDir = Directory('${root.path}/android/app/src/main/res/raw');
   final iosDir = Directory('${root.path}/ios/Runner');
-  final assetDir = Directory('${root.path}/assets/sounds/prayer');
   rawDir.createSync(recursive: true);
   iosDir.createSync(recursive: true);
-  assetDir.createSync(recursive: true);
 
   for (final j in jobs) {
     final bytes = _sineWav(sr: sr, seconds: seconds, hz: j.hz, peak: j.peak);
     final name = '${j.file}.wav';
     File('${rawDir.path}/$name').writeAsBytesSync(bytes);
     File('${iosDir.path}/$name').writeAsBytesSync(bytes);
-    File('${assetDir.path}/$name').writeAsBytesSync(bytes);
     stderr.writeln('Wrote $name');
   }
 }
