@@ -9,6 +9,7 @@ import 'package:home_widget/home_widget.dart';
 import 'package:path_provider/path_provider.dart';
 
 import '../models/prayer_times_model.dart';
+import 'arin_lock_notification_service.dart';
 import 'location_service.dart';
 import 'prayer_widget_snapshot.dart';
 
@@ -119,6 +120,7 @@ abstract final class ArinWidgetSync {
         qualifiedAndroidName: _androidCombo,
         iOSName: iOSComboWidgetName,
       );
+      unawaited(ArinLockNotificationService.syncAll());
     } catch (e, st) {
       debugPrint('ArinWidgetSync.pushQuote: $e\n$st');
     }
@@ -196,6 +198,7 @@ abstract final class ArinWidgetSync {
         qualifiedAndroidName: _androidCombo,
         iOSName: iOSComboWidgetName,
       );
+      unawaited(ArinLockNotificationService.syncAll());
     } catch (e, st) {
       debugPrint('ArinWidgetSync.pushQuoteSchedule: $e\n$st');
     }
@@ -250,6 +253,7 @@ abstract final class ArinWidgetSync {
         qualifiedAndroidName: _androidTracking,
         iOSName: iOSTrackingWidgetName,
       );
+      unawaited(ArinLockNotificationService.syncAll());
     } catch (e, st) {
       debugPrint('ArinWidgetSync.pushTracking: $e\n$st');
     }
@@ -275,6 +279,7 @@ abstract final class ArinWidgetSync {
         qualifiedAndroidName: _androidTracking,
         iOSName: iOSTrackingWidgetName,
       );
+      unawaited(ArinLockNotificationService.syncAll());
     } catch (e, st) {
       debugPrint('ArinWidgetSync.clearTracking: $e\n$st');
     }
@@ -318,6 +323,7 @@ abstract final class ArinWidgetSync {
         qualifiedAndroidName: _androidZikir,
         iOSName: iOSZikirWidgetName,
       );
+      unawaited(ArinLockNotificationService.syncAll());
     } catch (e, st) {
       debugPrint('ArinWidgetSync.pushZikir: $e\n$st');
     }
@@ -341,6 +347,7 @@ abstract final class ArinWidgetSync {
         qualifiedAndroidName: _androidZikir,
         iOSName: iOSZikirWidgetName,
       );
+      unawaited(ArinLockNotificationService.syncAll());
     } catch (e, st) {
       debugPrint('ArinWidgetSync.clearZikir: $e\n$st');
     }
@@ -629,6 +636,7 @@ abstract final class ArinWidgetSync {
         qualifiedAndroidName: _androidCombo,
         iOSName: iOSComboWidgetName,
       );
+      unawaited(ArinLockNotificationService.syncAll());
     } catch (e, st) {
       debugPrint('ArinWidgetSync.refreshPrayer: $e\n$st');
     }
@@ -717,6 +725,7 @@ abstract final class ArinWidgetSync {
         qualifiedAndroidName: _androidCombo,
         iOSName: iOSComboWidgetName,
       );
+      unawaited(ArinLockNotificationService.syncAll());
     } catch (e, st) {
       debugPrint('ArinWidgetSync.refreshPrayerSchedule: $e\n$st');
     }
@@ -884,6 +893,7 @@ abstract final class ArinWidgetSync {
         qualifiedAndroidName: _androidZikir,
         iOSName: iOSZikirWidgetName,
       );
+      unawaited(ArinLockNotificationService.syncAll());
     } catch (e, st) {
       debugPrint('ArinWidgetSync.clearAll: $e\n$st');
     }

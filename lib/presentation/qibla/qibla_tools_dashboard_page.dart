@@ -13,20 +13,20 @@ import 'qibla_hub_page.dart';
 abstract final class _QiblaHubCardStyle {
   static const double radius = 18;
   static const EdgeInsets padding = EdgeInsets.symmetric(
-    horizontal: 16,
-    vertical: 14,
+    horizontal: 14,
+    vertical: 10,
   );
-  static const double iconCircle = 64;
-  static const double gapIconText = 14;
-  static const double titleSize = 16;
-  static const double subtitleSize = 12.5;
-  static const double formerActionSlotHeight = 28;
+  static const double iconCircle = 52;
+  static const double gapIconText = 12;
+  static const double titleSize = 14.5;
+  static const double subtitleSize = 11.5;
+  static const double formerActionSlotHeight = 0;
   static const double borderW = 1.1;
 }
 
 const double _kDiamondAngle = 0.7853981633974483;
 
-enum _QiblaActionMotif { compass, tasbeeh, breath, frequency }
+enum _QiblaActionMotif { compass, tasbeeh, breath, prayer, frequency }
 
 /// Yeşil paleti bozmadan sıcaklık katan bronz/kahverengi tonlar.
 /// Koyu temada açık bronz, açık temada koyu kahve — kontrast korunur.
@@ -72,7 +72,7 @@ class QiblaToolsDashboardPage extends StatelessWidget {
                         Navigator.of(context).pushNamed(QiblaHubRoutes.compass);
                       },
                     ),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: 10),
                     _QiblaFeatureCard(
                       onDark: onDark,
                       accent: accent,
@@ -84,7 +84,7 @@ class QiblaToolsDashboardPage extends StatelessWidget {
                         Navigator.of(context).pushNamed(QiblaHubRoutes.zikir);
                       },
                     ),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: 10),
                     _QiblaFeatureCard(
                       onDark: onDark,
                       accent: accent,
@@ -98,7 +98,21 @@ class QiblaToolsDashboardPage extends StatelessWidget {
                         ).pushNamed(QiblaHubRoutes.breathing);
                       },
                     ),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: 10),
+                    _QiblaFeatureCard(
+                      onDark: onDark,
+                      accent: accent,
+                      title: l10n.qiblaHubPrayerCircleTitle,
+                      subtitle: l10n.qiblaHubPrayerCircleSubtitle,
+                      motif: _QiblaActionMotif.prayer,
+                      onTap: () {
+                        HapticFeedback.lightImpact();
+                        Navigator.of(
+                          context,
+                        ).pushNamed(QiblaHubRoutes.prayerCircle);
+                      },
+                    ),
+                    const SizedBox(height: 10),
                     _QiblaFeatureCard(
                       onDark: onDark,
                       accent: accent,
@@ -428,7 +442,7 @@ class _QiblaToolGlyph extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (motif == _QiblaActionMotif.tasbeeh) {
-      return const ZikirmatikSilhouetteIcon(size: 36);
+      return const ZikirmatikSilhouetteIcon(size: 30);
     }
 
     return CustomPaint(
@@ -524,6 +538,28 @@ class _QiblaToolGlyphPainter extends CustomPainter {
         canvas.drawPath(middle, bronzeStroke);
         canvas.drawPath(lower, primaryStroke);
         canvas.drawCircle(const Offset(5.1, 18), 1.35, bronzeFill);
+
+      case _QiblaActionMotif.prayer:
+        final leftHand = Path()
+          ..moveTo(6.5, 22.5)
+          ..cubicTo(9.5, 27.5, 14.4, 29, 17.8, 23.2)
+          ..lineTo(17.8, 13.2)
+          ..cubicTo(17.8, 10.8, 15.2, 10.4, 14.5, 12.8)
+          ..lineTo(12.7, 19.2);
+        final rightHand = Path()
+          ..moveTo(29.5, 22.5)
+          ..cubicTo(26.5, 27.5, 21.6, 29, 18.2, 23.2)
+          ..lineTo(18.2, 13.2)
+          ..cubicTo(18.2, 10.8, 20.8, 10.4, 21.5, 12.8)
+          ..lineTo(23.3, 19.2);
+        canvas.drawPath(leftHand, primaryStroke);
+        canvas.drawPath(rightHand, primaryStroke);
+        final heart = Path()
+          ..moveTo(18, 10.7)
+          ..cubicTo(14.7, 7.1, 10.7, 11.8, 18, 17.4)
+          ..cubicTo(25.3, 11.8, 21.3, 7.1, 18, 10.7)
+          ..close();
+        canvas.drawPath(heart, bronzeStroke);
 
       case _QiblaActionMotif.frequency:
         const bars = [
@@ -650,6 +686,23 @@ class _CardMotifPatternPainter extends CustomPainter {
           canvas.drawPath(wave, i == 1 ? bronzePaint : greenPaint);
         }
 
+      case _QiblaActionMotif.prayer:
+        final left = Path()
+          ..moveTo(3.5, 10.8)
+          ..cubicTo(7.2, 15.1, 11.4, 15.4, 13.3, 10.1)
+          ..lineTo(13.3, 4.2);
+        final right = Path()
+          ..moveTo(23.5, 10.8)
+          ..cubicTo(19.8, 15.1, 15.6, 15.4, 13.7, 10.1)
+          ..lineTo(13.7, 4.2);
+        canvas.drawPath(left, greenPaint);
+        canvas.drawPath(right, greenPaint);
+        final heart = Path()
+          ..moveTo(13.5, 5.8)
+          ..cubicTo(10.8, 2.7, 8.2, 6.4, 13.5, 10.2)
+          ..cubicTo(18.8, 6.4, 16.2, 2.7, 13.5, 5.8);
+        canvas.drawPath(heart, bronzePaint);
+
       case _QiblaActionMotif.frequency:
         const heights = [5.0, 10.0, 14.0, 8.0, 12.0, 6.0];
         for (var i = 0; i < heights.length; i++) {
@@ -714,8 +767,8 @@ class _IconRing extends StatelessWidget {
         alignment: Alignment.center,
         children: [
           Container(
-            width: 50,
-            height: 50,
+            width: 41,
+            height: 41,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               border: Border.all(

@@ -28,6 +28,10 @@ abstract final class ProductMetricsService {
   static Future<String?> currentInstallId() =>
       _installId(createIfMissing: false);
 
+  /// App Check korumalı anonim topluluk özellikleri aynı kurulum kimliğini
+  /// kullanır. Kimlik sunucuda SHA-256 ile hash'lenmeden saklanmaz.
+  static Future<String?> getOrCreateInstallId() => _installId();
+
   static Future<void> preservePendingAudienceDeactivation(
     String installId,
   ) async {

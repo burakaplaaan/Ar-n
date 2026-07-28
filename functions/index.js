@@ -376,6 +376,220 @@ async function _createNotificationDelivery(db, {
   return ref;
 }
 
+/**
+ * Havuzdan seçilmiş bir ayeti gerçekten gönderir: delivery kaydı oluşturur,
+ * `current_moment`'ı yazar, FCM push'unu atar ve item'ın `lastSentDate`'ini
+ * günceller. Hem otomatik günlük akış (`sendScheduledNotifications`) hem de
+ * manuel "Bugün gönder" akışı (`scheduleForceSendToday`) bu ortak fonksiyonu
+ * kullanır — davranış (başlık/gövde/kanal/current_moment) tutarlı kalır.
+ *
+ * Item bulunamazsa `{ ok: false }` döner (throw etmez); FCM gönderimi
+ * başarısız olursa delivery "failed" olarak işaretlenip hata fırlatılır.
+ */
+async function _dispatchPoolItemPush(db, messaging, {
+  itemId,
+  sendAtHour,
+  sendAtMin,
+  nowMs,
+  todayStr,
+  source,
+}) {
+  const itemRef = db.collection("admin_ntf_pool").doc(itemId);
+  const itemSnap = await itemRef.get();
+  if (!itemSnap.exists) {
+    return { ok: false, reason: "item-not-found" };
+  }
+
+  const data = itemSnap.data();
+  // clockStr: item'ın kayıtlı hour:minute'i (= surah:ayet); "ayet dönüşüm"
+  // konsepti korunsun diye gerçek gönderim saatiyle örtüşür.
+  const clockStr = `${String(sendAtHour).padStart(2, "0")}:${String(sendAtMin).padStart(2, "0")}`;
+  const hasSurahData = data.surahNumber != null && data.verseNumber != null;
+  const ntfTitle = `Saat ${clockStr}`;
+
+  let ntfBody = (data.notificationBody || "").toString().trim();
+  if (!ntfBody) {
+    const teaserTexts = await loadTeaserTexts(db);
+    ntfBody = teaserTexts[Math.floor(Math.random() * teaserTexts.length)];
+  }
+
+  const expiresAtMs = nowMs + 5 * 60 * 1000;
+  const deliveryRef = await _createNotificationDelivery(db, {
+    source,
+    poolItemId: itemId,
+    title: ntfTitle,
+    body: ntfBody,
+    sentAtMs: nowMs,
+  });
+
+  try {
+    await db
+      .collection("admin_ntf_config")
+      .doc("current_moment")
+      .set({
+        surahNumber: data.surahNumber ?? null,
+        surahName: data.surahName ?? "",
+        verseNumber: data.verseNumber ?? null,
+        verseText: data.text ?? "",
+        ref: data.ref ?? "",
+        clockStr,
+        sentAtMs: nowMs,
+        expiresAtMs,
+        deliveryId: deliveryRef.id,
+      });
+  } catch (err) {
+    console.error(`[${source}] current_moment yazılamadı:`, err);
+  }
+
+  let fcmMessageId;
+  try {
+    fcmMessageId = await messaging.send({
+      topic: "broadcast_all",
+      notification: { title: ntfTitle, body: ntfBody },
+      data: {
+        type: "moment_verse",
+        sentAtMs: String(nowMs),
+        deliveryId: deliveryRef.id,
+      },
+      android: {
+        notification: {
+          channelId: "arin_ntf_broadcast",
+          priority: "high",
+          defaultSound: true,
+        },
+      },
+      apns: {
+        payload: { aps: { sound: "default" } },
+      },
+    });
+  } catch (err) {
+    await deliveryRef.set({
+      status: "failed",
+      error: String(err?.message || err).slice(0, 300),
+      failedAt: FieldValue.serverTimestamp(),
+    }, { merge: true }).catch(() => {});
+    throw err;
+  }
+
+  await deliveryRef.set({
+    status: "sent",
+    fcmMessageId,
+    sentAt: FieldValue.serverTimestamp(),
+  }, { merge: true });
+
+  await itemRef.update({
+    lastSentDate: todayStr,
+    lastSentAt: FieldValue.serverTimestamp(),
+  });
+
+  console.log(
+    `[${source}] Gönderildi ${clockStr}` +
+    `${hasSurahData ? ` (Sure ${data.surahNumber}:${data.verseNumber})` : ""}` +
+    ` — "${String(data.text || "").slice(0, 60)}"`
+  );
+
+  return { ok: true, clockStr, data, deliveryRef, fcmMessageId };
+}
+
+/**
+ * "Bugün gönder" manuel override planını (`admin_ntf_config/today_plan_manual`)
+ * kontrol eder ve saati geldiyse gönderir.
+ *
+ * KASITLI TASARIM: Bu akış günün normal otomatik planından (`today_plan`) ve
+ * global 7 günlük döngü sayacından (`admin_ntf_config/schedule.lastAutoSentDate`)
+ * TAMAMEN bağımsızdır. Ne o sayacı günceller ne de günün normal planını
+ * değiştirir — ikisi kendi takviminde ayrı ayrı devam eder. Böylece admin
+ * "bugün ekstra bir tane at" dediğinde otomatik döngü bozulmaz.
+ */
+async function _processManualForceSendToday(db, messaging, {
+  nowMs,
+  currentMinuteOfDay,
+  todayStr,
+}) {
+  const manualPlanRef = db.collection("admin_ntf_config").doc("today_plan_manual");
+  const manualPlanSnap = await manualPlanRef.get();
+  if (!manualPlanSnap.exists) return;
+  const manualPlan = manualPlanSnap.data();
+  if (!manualPlan || manualPlan.date !== todayStr || manualPlan.sent === true) {
+    return;
+  }
+
+  const manualMinuteOfDay =
+    typeof manualPlan.sendAtMinuteOfDay === "number"
+      ? manualPlan.sendAtMinuteOfDay
+      : (Number(manualPlan.sendAtHour) * 60 + Number(manualPlan.sendAtMin));
+  const gracePeriod = 3;
+
+  if (currentMinuteOfDay < manualMinuteOfDay) {
+    console.log(
+      `[Manuel] Bugün gönder bekleniyor. Plan: ${manualMinuteOfDay} dk, şu an: ${currentMinuteOfDay} dk.`
+    );
+    return;
+  }
+
+  if (currentMinuteOfDay > manualMinuteOfDay + gracePeriod) {
+    await manualPlanRef.set(
+      { sent: true, missedAt: FieldValue.serverTimestamp() },
+      { merge: true }
+    );
+    console.log(
+      "[Manuel] Bugün gönder penceresi geçti (muhtemelen fonksiyon bir süre çalışmadı). Plan kapatıldı."
+    );
+    return;
+  }
+
+  // Aynı dakikada paralel scheduler instance'larında çift gönderimi engelle
+  // (otomatik akıştaki claim mekanizmasıyla aynı desen, ayrı bir claim dokümanı).
+  const claimRef = db.collection("admin_ntf_config").doc("today_plan_manual_claim");
+  const claimOk = await db.runTransaction(async (tx) => {
+    const claimSnap = await tx.get(claimRef);
+    const claim = claimSnap.exists ? claimSnap.data() || {} : {};
+    const claimedAtMs = Number(claim.claimedAtMs || 0);
+    const claimPlanDate = String(claim.planDate || "");
+    const claimPlanItemId = String(claim.planItemId || "");
+    const stillFresh = nowMs - claimedAtMs < _kNotificationClaimTtlMs;
+    const alreadyClaimed =
+      stillFresh &&
+      claimPlanDate === todayStr &&
+      claimPlanItemId === String(manualPlan.itemId || "");
+    if (alreadyClaimed) return false;
+    tx.set(
+      claimRef,
+      {
+        planDate: todayStr,
+        planItemId: String(manualPlan.itemId || ""),
+        claimedAtMs: nowMs,
+        claimedAt: FieldValue.serverTimestamp(),
+      },
+      { merge: true },
+    );
+    return true;
+  });
+  if (!claimOk) {
+    console.log("[Manuel] Manuel plan claim başka instance tarafından alındı, atlandı.");
+    return;
+  }
+
+  const result = await _dispatchPoolItemPush(db, messaging, {
+    itemId: manualPlan.itemId,
+    sendAtHour: manualPlan.sendAtHour,
+    sendAtMin: manualPlan.sendAtMin,
+    nowMs,
+    todayStr,
+    source: "manual_today",
+  });
+
+  if (!result.ok) {
+    console.error("[Manuel] Manuel planlanan item bulunamadı:", manualPlan.itemId);
+    await manualPlanRef.set({ sent: true }, { merge: true });
+    return;
+  }
+
+  // NOT: `admin_ntf_config/schedule.lastAutoSentDate` KASITLI olarak
+  // güncellenmiyor — bkz. fonksiyon başındaki tasarım notu.
+  await manualPlanRef.set({ sent: true, sentAtMs: nowMs }, { merge: true });
+}
+
 exports.syncAnalyticsAudience = onCall(
   {
     region: "europe-west1",
@@ -930,6 +1144,19 @@ exports.sendScheduledNotifications = onSchedule(
     // ve seçilen item tam kendi saatinde (06:12 → 06:12'de) ateşlenir.
 
     try {
+      // ── 0. Manuel "Bugün gönder" override'ı ────────────────────────────────
+      // Bu, aşağıdaki global 7 günlük döngüden tamamen bağımsız çalışır; bir
+      // hata olsa da normal otomatik akışı etkilememesi için ayrı try/catch.
+      try {
+        await _processManualForceSendToday(db, messaging, {
+          nowMs,
+          currentMinuteOfDay,
+          todayStr,
+        });
+      } catch (err) {
+        console.error("[Manuel] Bugün gönder işlenirken hata:", err);
+      }
+
       // ── 1. Config ──────────────────────────────────────────────────────────
       const configSnap = await db
         .collection("admin_ntf_config")
@@ -1094,93 +1321,20 @@ exports.sendScheduledNotifications = onSchedule(
         return;
       }
 
-      const itemSnap = await db
-        .collection("admin_ntf_pool")
-        .doc(plan.itemId)
-        .get();
+      const result = await _dispatchPoolItemPush(db, messaging, {
+        itemId: plan.itemId,
+        sendAtHour: plan.sendAtHour,
+        sendAtMin: plan.sendAtMin,
+        nowMs,
+        todayStr,
+        source: "auto",
+      });
 
-      if (!itemSnap.exists) {
+      if (!result.ok) {
         console.error("[Havuz] Planlanan item bulunamadı:", plan.itemId);
         await planRef.set({ sent: true }, { merge: true });
         return;
       }
-
-      const data = itemSnap.data();
-
-      // clockStr: plan'a kaydedilen saat (= item'ın hour:minute = surah:ayet).
-      // Gerçek gönderim saatiyle örtüşür — "ayet dönüşüm" konsepti korunur.
-      const clockStr = `${String(plan.sendAtHour).padStart(2, "0")}:${String(plan.sendAtMin).padStart(2, "0")}`;
-
-      const hasSurahData = data.surahNumber != null && data.verseNumber != null;
-      const ntfTitle = `Saat ${clockStr}`;
-
-      let ntfBody = (data.notificationBody || "").toString().trim();
-      if (!ntfBody) {
-        const teaserTexts = await loadTeaserTexts(db);
-        ntfBody = teaserTexts[Math.floor(Math.random() * teaserTexts.length)];
-      }
-
-      const expiresAtMs = nowMs + 5 * 60 * 1000;
-      const deliveryRef = await _createNotificationDelivery(db, {
-        source: "auto",
-        poolItemId: plan.itemId,
-        title: ntfTitle,
-        body: ntfBody,
-        sentAtMs: nowMs,
-      });
-      try {
-        await db
-          .collection("admin_ntf_config")
-          .doc("current_moment")
-          .set({
-            surahNumber: data.surahNumber ?? null,
-            surahName: data.surahName ?? "",
-            verseNumber: data.verseNumber ?? null,
-            verseText: data.text ?? "",
-            ref: data.ref ?? "",
-            clockStr,
-            sentAtMs: nowMs,
-            expiresAtMs,
-            deliveryId: deliveryRef.id,
-          });
-      } catch (err) {
-        console.error("[Havuz] current_moment yazılamadı:", err);
-      }
-
-      let fcmMessageId;
-      try {
-        fcmMessageId = await messaging.send({
-          topic: "broadcast_all",
-          notification: { title: ntfTitle, body: ntfBody },
-          data: {
-            type: "moment_verse",
-            sentAtMs: String(nowMs),
-            deliveryId: deliveryRef.id,
-          },
-          android: {
-            notification: {
-              channelId: "arin_ntf_broadcast",
-              priority: "high",
-              defaultSound: true,
-            },
-          },
-          apns: {
-            payload: { aps: { sound: "default" } },
-          },
-        });
-      } catch (err) {
-        await deliveryRef.set({
-          status: "failed",
-          error: String(err?.message || err).slice(0, 300),
-          failedAt: FieldValue.serverTimestamp(),
-        }, { merge: true }).catch(() => {});
-        throw err;
-      }
-      await deliveryRef.set({
-        status: "sent",
-        fcmMessageId,
-        sentAt: FieldValue.serverTimestamp(),
-      }, { merge: true });
 
       // Planı kapat
       await planRef.set(
@@ -1188,23 +1342,11 @@ exports.sendScheduledNotifications = onSchedule(
         { merge: true }
       );
 
-      // Item'ın son gönderim tarihini güncelle
-      await itemSnap.ref.update({
-        lastSentDate: todayStr,
-        lastSentAt: FieldValue.serverTimestamp(),
-      });
-
       // Global timer'ı güncelle
       await db
         .collection("admin_ntf_config")
         .doc("schedule")
         .set({ lastAutoSentDate: todayStr }, { merge: true });
-
-      console.log(
-        `[Havuz] Gönderildi ${clockStr}` +
-        `${hasSurahData ? ` (Sure ${data.surahNumber}:${data.verseNumber})` : ""}` +
-        ` — "${String(data.text || "").slice(0, 60)}"`
-      );
     } catch (err) {
       console.error("[Havuz] Hata:", err);
     }
@@ -1369,6 +1511,109 @@ exports.sendMomentVerseNow = onCall(
       title: ntfTitle,
       body: ntfBody,
       deliveryId: deliveryRef.id,
+    };
+  }
+);
+
+// ─────────────────────────────────────────────────────────────────────────────
+// scheduleForceSendToday — admin panelinden tetiklenen "Bugün gönder" isteği.
+//
+// `sendMomentVerseNow`'dan farkı: anında göndermez. Havuzdaki etkin ayetler
+// arasından bugün için saati henüz geçmemiş EN YAKIN olanı seçer ve
+// `admin_ntf_config/today_plan_manual` dokümanına yazar; o saat gelince
+// `sendScheduledNotifications` (bkz. `_processManualForceSendToday`) bunu
+// otomatik olarak gönderir — cihazda beklerken kapatmaya gerek yoktur.
+//
+// Bu akış global 7 günlük döngüden (`admin_ntf_config/schedule`) ve günün
+// normal otomatik planından (`today_plan`) TAMAMEN bağımsızdır: ne o
+// döngünün sayacını sıfırlar ne de günün normal planını değiştirir; ikisi
+// kendi takviminde ayrı devam eder. minRepeatDays cooldown'u da kasıtlı
+// olarak bypass eder (bu bilinçli bir manuel gönderim isteğidir).
+//
+// Yetki: yalnızca admin.
+// ─────────────────────────────────────────────────────────────────────────────
+exports.scheduleForceSendToday = onCall(
+  {
+    region: "europe-west1",
+    memory: "256MiB",
+  },
+  async (req) => {
+    await assertCallerIsAdmin(req);
+
+    const db = getFirestore();
+    const nowMs = Date.now();
+    const istNow = new Date(
+      new Date(nowMs).toLocaleString("en-US", { timeZone: "Europe/Istanbul" })
+    );
+    const todayStr = `${istNow.getFullYear()}-${String(istNow.getMonth() + 1).padStart(2, "0")}-${String(istNow.getDate()).padStart(2, "0")}`;
+    const currentMinuteOfDay = istNow.getHours() * 60 + istNow.getMinutes();
+
+    const manualPlanRef = db.collection("admin_ntf_config").doc("today_plan_manual");
+    const existingSnap = await manualPlanRef.get();
+    const existing = existingSnap.exists ? existingSnap.data() : null;
+    if (existing && existing.date === todayStr && existing.sent !== true) {
+      throw new HttpsError(
+        "already-exists",
+        "Bugün için zaten beklemede bir manuel gönderim var."
+      );
+    }
+
+    const poolSnap = await db
+      .collection("admin_ntf_pool")
+      .where("enabled", "==", true)
+      .get();
+    if (poolSnap.empty) {
+      throw new HttpsError("failed-precondition", "Havuzda etkin ayet yok.");
+    }
+
+    const upcoming = poolSnap.docs
+      .map((doc) => {
+        const d = doc.data();
+        const h = Number(d.hour);
+        const m = Number(d.minute);
+        return { doc, data: d, h, m, minuteOfDay: h * 60 + m };
+      })
+      .filter(
+        (it) =>
+          Number.isFinite(it.h) &&
+          Number.isFinite(it.m) &&
+          it.minuteOfDay > currentMinuteOfDay,
+      )
+      .sort((a, b) => a.minuteOfDay - b.minuteOfDay);
+
+    if (upcoming.length === 0) {
+      throw new HttpsError(
+        "failed-precondition",
+        "Bugün için saati henüz geçmemiş uygun ayet kalmadı.",
+      );
+    }
+
+    const chosen = upcoming[0];
+    const email = (req.auth.token && req.auth.token.email) || "";
+
+    await manualPlanRef.set({
+      date: todayStr,
+      itemId: chosen.doc.id,
+      sendAtHour: chosen.h,
+      sendAtMin: chosen.m,
+      sendAtMinuteOfDay: chosen.minuteOfDay,
+      sent: false,
+      requestedAt: FieldValue.serverTimestamp(),
+      requestedBy: email,
+    });
+
+    console.log(
+      `[Manuel] Bugün gönder planlandı: itemId=${chosen.doc.id}, saat=` +
+      `${String(chosen.h).padStart(2, "0")}:${String(chosen.m).padStart(2, "0")}`
+    );
+
+    return {
+      ok: true,
+      itemId: chosen.doc.id,
+      sendAtHour: chosen.h,
+      sendAtMin: chosen.m,
+      surahName: chosen.data.surahName || "",
+      text: chosen.data.text || "",
     };
   }
 );
@@ -1903,3 +2148,1232 @@ exports.cleanupDeletedUserData = onSchedule(
     }
   },
 );
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Dua Halkası — App Check korumalı, kurulum-kimliğine göre anonim topluluk.
+//
+// İstemci koleksiyonlara doğrudan yazamaz. Metin/PII kontrolü, tekil "dua
+// ettim", sayaç ve 24 saatlik ömür yalnız Cloud Functions üzerinden yönetilir.
+// ─────────────────────────────────────────────────────────────────────────────
+const _kPrayerRequestTtlMs = 24 * 60 * 60 * 1000;
+const _kPrayerDeviceTtlMs = 45 * 24 * 60 * 60 * 1000;
+const _kPrayerRewardProofTtlMs = 15 * 60 * 1000;
+const _kPrayerPolicyVersion = 1;
+// AdMob SSV callback `ad_unit` alanında tam `ca-app-pub-.../...` değeri değil,
+// reklam biriminin yalnızca sayısal son bölümü gönderilir.
+const _kRewardedAdUnitIds = new Set([
+  "4189851009",
+  "3207941824",
+]);
+const _kPrayerCategories = new Set([
+  "health",
+  "family",
+  "peace",
+  "education",
+  "work",
+  "general",
+]);
+
+function _validatedPrayerLocale(raw) {
+  const value = String(raw || "").trim().toLowerCase();
+  return ["tr", "en", "ar"].includes(value) ? value : "tr";
+}
+
+function _validatedPrayerCategory(raw) {
+  const value = String(raw || "").trim().toLowerCase();
+  if (!_kPrayerCategories.has(value)) {
+    throw new HttpsError("invalid-argument", "Geçersiz dua kategorisi.");
+  }
+  return value;
+}
+
+function _validatedPrayerRequestId(raw) {
+  const value = String(raw || "").trim();
+  if (!/^[A-Za-z0-9_-]{16,128}$/.test(value)) {
+    throw new HttpsError("invalid-argument", "Geçersiz istek kimliği.");
+  }
+  return value;
+}
+
+function _validatedPrayerDocumentId(raw) {
+  const value = String(raw || "").trim();
+  if (!/^[a-f0-9]{32}$/.test(value)) {
+    throw new HttpsError("invalid-argument", "Geçersiz dua kimliği.");
+  }
+  return value;
+}
+
+function _validatedPrayerProofId(raw) {
+  const value = String(raw || "").trim();
+  if (!/^[A-Za-z0-9]{20,64}$/.test(value)) {
+    throw new HttpsError("invalid-argument", "Geçersiz ödül kanıtı.");
+  }
+  return value;
+}
+
+function _assertPrayerPolicyAccepted(rawVersion) {
+  if (Number(rawVersion) !== _kPrayerPolicyVersion) {
+    throw new HttpsError(
+      "failed-precondition",
+      "Topluluk kurallarını kabul etmeniz gerekiyor.",
+    );
+  }
+  return _kPrayerPolicyVersion;
+}
+
+function _assertPrayerAuth(req) {
+  if (!req.auth?.uid) {
+    throw new HttpsError(
+      "unauthenticated",
+      "Dua Halkası için güvenli oturum oluşturulamadı.",
+    );
+  }
+  return String(req.auth.uid);
+}
+
+function _prayerAuthHash(uid) {
+  return crypto.createHash("sha256").update(`auth:${uid}`).digest("hex");
+}
+
+function _prayerSessionMatchesInstall(uid, claimedInstall, installHash) {
+  if (!String(uid).startsWith("prayer_")) return true;
+  return uid === `prayer_${installHash.substring(0, 48)}` &&
+    claimedInstall === installHash;
+}
+
+function _validatedPrayerBindingSecretHash(raw) {
+  const value = String(raw || "").trim();
+  if (!/^[A-Za-z0-9_-]{32,128}$/.test(value)) {
+    throw new HttpsError(
+      "invalid-argument",
+      "Geçersiz kurulum güvenlik anahtarı.",
+    );
+  }
+  return crypto.createHash("sha256")
+    .update(`prayer-binding:${value}`)
+    .digest("hex");
+}
+
+function _prayerInstallationRef(db, installHash) {
+  // v1 kayıtlarında binding secret yoktu. Güvensiz "ilk gelen secret'ı yazar"
+  // migrasyonu yerine temiz bir v2 namespace kullanılır; feature henüz genel
+  // yayına çıkmadığı için eski test binding'leri bilinçli olarak geçersizdir.
+  return db.collection("prayer_installations").doc(`v2_${installHash}`);
+}
+
+async function _assertPrayerInstallationBinding(db, req, installHash) {
+  const uid = _assertPrayerAuth(req);
+  const bindingSecretHash = _validatedPrayerBindingSecretHash(
+    req.data?.bindingSecret,
+  );
+  const isPrayerSession = uid.startsWith("prayer_");
+  if (isPrayerSession) {
+    const claimedInstall = String(
+      req.auth?.token?.prayerInstallation || "",
+    );
+    if (!_prayerSessionMatchesInstall(uid, claimedInstall, installHash)) {
+      throw new HttpsError(
+        "permission-denied",
+        "Dua Halkası oturumu bu kuruluma ait değil.",
+      );
+    }
+  }
+  const authHash = _prayerAuthHash(uid);
+  const ref = _prayerInstallationRef(db, installHash);
+  await db.runTransaction(async (tx) => {
+    const snap = await tx.get(ref);
+    const now = Date.now();
+    const expiresAt = Timestamp.fromMillis(now + 180 * 86400000);
+    if (!snap.exists) {
+      tx.create(ref, {
+        authHash,
+        bindingSecretHash,
+        createdAt: FieldValue.serverTimestamp(),
+        updatedAt: FieldValue.serverTimestamp(),
+        expiresAt,
+      });
+      return;
+    }
+    const data = snap.data() || {};
+    const storedSecretHash = String(data.bindingSecretHash || "");
+    if (storedSecretHash !== bindingSecretHash) {
+      throw new HttpsError(
+        "permission-denied",
+        "Bu kurulumun güvenlik anahtarı doğrulanamadı.",
+      );
+    }
+    if (data.authHash !== authHash) {
+      // Aynı fiziksel kurulum daha sonra Google/Apple hesabına bağlanabilir
+      // veya hesaptan çıkıp deterministik prayer_* oturumuna dönebilir.
+      // installHash yüksek entropili yerel sırdır; App Check + doğrulanmış auth
+      // ile gelen bu geçişe izin verilir. prayer_* token'ları yukarıda ayrıca
+      // uid + custom-claim ile installHash'e kriptografik olarak bağlanır.
+      const previous = Array.isArray(data.previousAuthHashes)
+        ? data.previousAuthHashes.filter((value) =>
+          typeof value === "string" && value.length === 64)
+        : [];
+      if (typeof data.authHash === "string" && data.authHash.length === 64) {
+        previous.push(data.authHash);
+      }
+      tx.update(ref, {
+        authHash,
+        bindingSecretHash,
+        previousAuthHashes: [...new Set(previous)].slice(-4),
+        authRotatedAt: FieldValue.serverTimestamp(),
+        updatedAt: FieldValue.serverTimestamp(),
+        expiresAt,
+      });
+      return;
+    }
+    const storedExpiryMs = data.expiresAt?.toMillis?.() || 0;
+    if (storedExpiryMs < now + 30 * 86400000) {
+      tx.update(ref, {
+        updatedAt: FieldValue.serverTimestamp(),
+        expiresAt,
+      });
+    }
+  });
+  return authHash;
+}
+
+function _prayerIpHash(req) {
+  const forwarded = String(req.rawRequest?.headers?.["x-forwarded-for"] || "");
+  const ip = forwarded.split(",")[0].trim() ||
+    String(req.rawRequest?.ip || "unknown");
+  return crypto.createHash("sha256").update(`ip:${ip}`).digest("hex");
+}
+
+function _premiumRecordActive(data) {
+  if (data?.active !== true) return false;
+  const expiresAt = data?.expiresAt;
+  return expiresAt == null || (expiresAt?.toMillis?.() || 0) > Date.now();
+}
+
+async function _isPrayerPremiumCaller(db, req) {
+  const uid = _assertPrayerAuth(req);
+  const direct = await db.collection("premium_entitlements").doc(uid).get();
+  if (_premiumRecordActive(direct.data())) return true;
+  const email = String(req.auth?.token?.email || "").trim().toLowerCase();
+  if (!email) return false;
+  const invite = await db.collection("premium_invites").doc(email).get();
+  return _premiumRecordActive(invite.data());
+}
+
+// JS `\b` word-boundary is ASCII-only: it does not treat Turkish letters
+// (ç, ö, ı, ş, ğ, ü) as word characters. That silently breaks `\bword\b`
+// matching whenever `word` starts or ends with one of those letters (e.g.
+// "ödeme", "piç", "apartmanı" would never match). This builds an equivalent
+// boundary using Unicode letter/number/underscore classes so the forbidden
+// word list is enforced correctly regardless of script.
+function _turkishSafeWordListPattern(words) {
+  const escaped = words.map((w) => w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
+  return new RegExp(
+    `(?<![\\p{L}\\p{N}_])(?:${escaped.join("|")})(?![\\p{L}\\p{N}_])`,
+    "iu",
+  );
+}
+
+function _validatedPrayerText(raw) {
+  const value = String(raw || "")
+    .replace(/\s+/g, " ")
+    .trim();
+  if (value.length < 8 || value.length > 420) {
+    throw new HttpsError(
+      "invalid-argument",
+      "Dua talebi 8–420 karakter arasında olmalıdır.",
+    );
+  }
+  const forbiddenPatterns = [
+    /https?:\/\/|www\./i,
+    /\bTR\d{24}\b/i,
+    /\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/i,
+    /(?:^|\s)@[A-Za-z0-9_.-]{2,}/,
+    /(?:\+?\d[\d\s().-]{7,}\d)/,
+    _turkishSafeWordListPattern([
+      "iban", "whatsapp", "telegram", "instagram", "telefon", "phone",
+      "ödeme", "payment",
+    ]),
+    _turkishSafeWordListPattern([
+      "adresim", "address", "sokak", "mahallesi", "caddesi", "apartmanı",
+    ]),
+    _turkishSafeWordListPattern([
+      "orospu", "sikik", "sikeyim", "sik", "amına", "piç", "ibne", "kahpe",
+      "fuck", "bitch", "nigger", "cunt", "whore", "faggot",
+      "قحبة", "كس", "شرموطة", "منيوك", "كافر",
+    ]),
+  ];
+  if (forbiddenPatterns.some((pattern) => pattern.test(value))) {
+    throw new HttpsError(
+      "invalid-argument",
+      "İletişim, ödeme veya bağlantı bilgisi paylaşmayın.",
+    );
+  }
+  return value;
+}
+
+function _prayerWindowKey(nowMs = Date.now()) {
+  return Math.floor(nowMs / (5 * 60 * 1000));
+}
+
+async function _assertPrayerWriteRate(db, ownerHash, scope, limit) {
+  const windowKey = _prayerWindowKey();
+  const ref = db.collection("prayer_rate_limits")
+    .doc(`${ownerHash}_${scope}_${windowKey}`);
+  await db.runTransaction(async (tx) => {
+    const snap = await tx.get(ref);
+    const count = Number(snap.data()?.count) || 0;
+    if (count >= limit) {
+      throw new HttpsError(
+        "resource-exhausted",
+        "Çok hızlı işlem yapıldı. Kısa süre sonra tekrar deneyin.",
+      );
+    }
+    tx.set(ref, {
+      count: FieldValue.increment(1),
+      expiresAt: Timestamp.fromMillis(Date.now() + 24 * 60 * 60 * 1000),
+      updatedAt: FieldValue.serverTimestamp(),
+    }, { merge: true });
+  });
+}
+
+async function _assertPrayerCallerRates(db, req, installHash, scope, limit) {
+  const authHash = await _assertPrayerInstallationBinding(
+    db,
+    req,
+    installHash,
+  );
+  const ipHash = _prayerIpHash(req);
+  await Promise.all([
+    _assertPrayerWriteRate(db, authHash, `${scope}_auth`, limit),
+    _assertPrayerWriteRate(db, installHash, `${scope}_install`, limit),
+    _assertPrayerWriteRate(db, ipHash, `${scope}_ip`, limit * 3),
+  ]);
+  return authHash;
+}
+
+let _adMobVerifierKeysCache = { expiresAtMs: 0, keys: new Map() };
+async function _adMobVerifierKey(keyId) {
+  const now = Date.now();
+  if (now >= _adMobVerifierKeysCache.expiresAtMs) {
+    const response = await fetch(
+      "https://www.gstatic.com/admob/reward/verifier-keys.json",
+    );
+    if (!response.ok) {
+      throw new Error(`AdMob verifier keys HTTP ${response.status}`);
+    }
+    const body = await response.json();
+    const keys = new Map();
+    for (const item of Array.isArray(body?.keys) ? body.keys : []) {
+      if (item?.keyId != null && item?.pem) {
+        keys.set(String(item.keyId), String(item.pem));
+      }
+    }
+    _adMobVerifierKeysCache = {
+      expiresAtMs: now + 60 * 60 * 1000,
+      keys,
+    };
+  }
+  return _adMobVerifierKeysCache.keys.get(String(keyId)) || null;
+}
+
+function _verifyAdMobSsvSignature(rawQuery, pem) {
+  try {
+    const signatureMarker = "&signature=";
+    const signatureIndex = String(rawQuery || "").lastIndexOf(signatureMarker);
+    if (signatureIndex <= 0 || !pem) return false;
+    const signedContent = rawQuery.substring(0, signatureIndex);
+    const params = new URLSearchParams(rawQuery);
+    const signature = String(params.get("signature") || "");
+    if (!signature) return false;
+    return crypto.verify(
+      "sha256",
+      Buffer.from(signedContent, "utf8"),
+      pem,
+      Buffer.from(signature, "base64url"),
+    );
+  } catch (_) {
+    return false;
+  }
+}
+
+function _decodePrayerRewardCustomData(raw) {
+  try {
+    const decoded = Buffer.from(String(raw || ""), "base64url")
+      .toString("utf8");
+    const data = JSON.parse(decoded);
+    if (data?.version !== 1) return null;
+    return { proofId: _validatedPrayerProofId(data?.proofId) };
+  } catch (_) {
+    return null;
+  }
+}
+
+function _validatedPrayerCursorMs(raw) {
+  const value = Number(raw);
+  return Number.isSafeInteger(value) && value > 0 ? value : null;
+}
+
+function _isPrayerMilestone(count) {
+  return Number.isInteger(count) && count > 0 && count % 5 === 0;
+}
+
+function _prayerNotificationJobId(documentId, count) {
+  return `${documentId}_${count}`;
+}
+
+function _prayerNotificationCopy(locale, count) {
+  if (locale === "ar") {
+    return {
+      title: "حلقة الدعاء",
+      body: `${count} أشخاص شاركوا دعاءك.`,
+    };
+  }
+  if (locale === "en") {
+    return {
+      title: "Prayer Circle",
+      body: `${count} people joined your prayer.`,
+    };
+  }
+  return {
+    title: "Dua Halkası",
+    body: `${count} kişi dua talebine eşlik etti.`,
+  };
+}
+
+const _kPrayerNotificationMaxAttempts = 12;
+
+async function _deliverPrayerNotificationJob(jobRef) {
+  const db = getFirestore();
+  let job = null;
+  const claimed = await db.runTransaction(async (tx) => {
+    const snap = await tx.get(jobRef);
+    if (!snap.exists || snap.data()?.status !== "pending") return false;
+    const data = snap.data() || {};
+    const claimedUntilMs = data.claimedUntil?.toMillis?.() || 0;
+    if (claimedUntilMs > Date.now()) return false;
+    const expiresAtMs = data.expiresAt?.toMillis?.() || 0;
+    const attemptsSoFar = Number(data.attempts) || 0;
+    if (
+      (expiresAtMs && expiresAtMs <= Date.now()) ||
+      attemptsSoFar >= _kPrayerNotificationMaxAttempts
+    ) {
+      tx.update(jobRef, {
+        status: "expired",
+        claimedUntil: null,
+        updatedAt: FieldValue.serverTimestamp(),
+      });
+      return false;
+    }
+    job = data;
+    tx.update(jobRef, {
+      status: "pending",
+      claimedUntil: Timestamp.fromMillis(Date.now() + 2 * 60 * 1000),
+      attempts: FieldValue.increment(1),
+      updatedAt: FieldValue.serverTimestamp(),
+    });
+    return true;
+  });
+  if (!claimed || !job) return false;
+
+  const ownerHash = String(job.ownerHash || "");
+  const deviceRef = db.collection("prayer_devices").doc(ownerHash);
+  try {
+    const deviceSnap = await deviceRef.get();
+    const device = deviceSnap.data() || {};
+    const token = String(device.token || "");
+    const tokenExpiryMs = device.expiresAt?.toMillis?.() || 0;
+    if (!token || tokenExpiryMs <= Date.now()) {
+      await jobRef.set({
+        status: "pending",
+        waitingReason: "device_unavailable",
+        claimedUntil: Timestamp.fromMillis(Date.now() + 15 * 60 * 1000),
+        updatedAt: FieldValue.serverTimestamp(),
+      }, { merge: true });
+      return false;
+    }
+    const count = Number(job.count) || 0;
+    const locale = _validatedPrayerLocale(device.locale || job.locale);
+    const copy = _prayerNotificationCopy(locale, count);
+    const messageId = await getMessaging().send({
+      token,
+      notification: copy,
+      data: {
+        type: "prayer_circle",
+        requestId: String(job.requestId || ""),
+        count: String(count),
+      },
+      android: {
+        notification: {
+          channelId: "arin_prayer_circle",
+          priority: "high",
+          defaultSound: true,
+        },
+      },
+      apns: { payload: { aps: { sound: "default" } } },
+    });
+    await jobRef.set({
+      status: "sent",
+      messageId,
+      claimedUntil: null,
+      sentAt: FieldValue.serverTimestamp(),
+      updatedAt: FieldValue.serverTimestamp(),
+    }, { merge: true });
+    return true;
+  } catch (error) {
+    const code = String(error?.code || "");
+    if (
+      code.includes("registration-token-not-registered") ||
+      code.includes("invalid-registration-token")
+    ) {
+      await deviceRef.delete().catch(() => {});
+    }
+    await jobRef.set({
+      status: "pending",
+      claimedUntil: Timestamp.fromMillis(
+        Date.now() +
+          Math.min(60, Math.max(1, Number(job.attempts) || 1)) * 60 * 1000,
+      ),
+      lastError: String(error?.message || error).slice(0, 300),
+      updatedAt: FieldValue.serverTimestamp(),
+    }, { merge: true }).catch(() => {});
+    console.error("[PrayerCircle] notification job failed:", error);
+    return false;
+  }
+}
+
+exports.createPrayerSession = onCall(
+  {
+    region: "europe-west1",
+    memory: "256MiB",
+    enforceAppCheck: true,
+  },
+  async (req) => {
+    const installHash = _validatedInstallHash(req.data?.installId);
+    const bindingSecretHash = _validatedPrayerBindingSecretHash(
+      req.data?.bindingSecret,
+    );
+    const db = getFirestore();
+    const ipHash = _prayerIpHash(req);
+    await Promise.all([
+      _assertPrayerWriteRate(db, installHash, "session_install", 5),
+      _assertPrayerWriteRate(db, ipHash, "session_ip", 30),
+    ]);
+    const installationRef = _prayerInstallationRef(db, installHash);
+    await db.runTransaction(async (tx) => {
+      const snap = await tx.get(installationRef);
+      const expiresAt = Timestamp.fromMillis(Date.now() + 180 * 86400000);
+      if (!snap.exists) {
+        tx.create(installationRef, {
+          bindingSecretHash,
+          createdAt: FieldValue.serverTimestamp(),
+          updatedAt: FieldValue.serverTimestamp(),
+          expiresAt,
+        });
+        return;
+      }
+      if (snap.data()?.bindingSecretHash !== bindingSecretHash) {
+        throw new HttpsError(
+          "permission-denied",
+          "Bu kurulumun güvenlik anahtarı doğrulanamadı.",
+        );
+      }
+      tx.update(installationRef, {
+        updatedAt: FieldValue.serverTimestamp(),
+        expiresAt,
+      });
+    });
+    const uid = `prayer_${installHash.substring(0, 48)}`;
+    const customToken = await getAuth().createCustomToken(uid, {
+      prayerInstallation: installHash,
+    });
+    return { ok: true, customToken };
+  },
+);
+
+exports.checkPrayerPremium = onCall(
+  {
+    region: "europe-west1",
+    memory: "256MiB",
+    enforceAppCheck: true,
+  },
+  async (req) => {
+    const installHash = _validatedInstallHash(req.data?.installId);
+    const db = getFirestore();
+    await _assertPrayerInstallationBinding(db, req, installHash);
+    return { ok: true, premium: await _isPrayerPremiumCaller(db, req) };
+  },
+);
+
+exports.beginPrayerSubmission = onCall(
+  {
+    region: "europe-west1",
+    memory: "256MiB",
+    enforceAppCheck: true,
+  },
+  async (req) => {
+    const uid = _assertPrayerAuth(req);
+    const ownerHash = _validatedInstallHash(req.data?.installId);
+    const requestId = _validatedPrayerRequestId(req.data?.requestId);
+    const policyVersion = _assertPrayerPolicyAccepted(
+      req.data?.policyVersion,
+    );
+    const text = _validatedPrayerText(req.data?.text);
+    const category = _validatedPrayerCategory(req.data?.category);
+    const locale = _validatedPrayerLocale(req.data?.locale);
+    const db = getFirestore();
+    const authHash = await _assertPrayerCallerRates(
+      db,
+      req,
+      ownerHash,
+      "begin",
+      20,
+    );
+    if (await _isPrayerPremiumCaller(db, req)) {
+      return { ok: true, premium: true };
+    }
+
+    const proofRef = db.collection("prayer_reward_proofs").doc();
+    const nowMs = Date.now();
+    const expiresAtMs = nowMs + _kPrayerRewardProofTtlMs;
+    await proofRef.set({
+      ownerHash,
+      authHash,
+      authUid: uid,
+      requestId,
+      text,
+      category,
+      locale,
+      policyVersion,
+      policyAcceptedAt: Timestamp.fromMillis(nowMs),
+      status: "pending",
+      createdAt: Timestamp.fromMillis(nowMs),
+      expiresAt: Timestamp.fromMillis(expiresAtMs),
+    });
+    const customData = Buffer.from(JSON.stringify({
+      version: 1,
+      proofId: proofRef.id,
+    }), "utf8").toString("base64url");
+    return {
+      ok: true,
+      premium: false,
+      proofId: proofRef.id,
+      customData,
+      expiresAtMs,
+    };
+  },
+);
+
+exports.rewardedAdSsv = onRequest(
+  {
+    region: "europe-west1",
+    memory: "256MiB",
+  },
+  async (req, res) => {
+    try {
+      if (req.method !== "GET") {
+        res.status(405).send("Method Not Allowed");
+        return;
+      }
+      const rawQuery = String(req.originalUrl || "").split("?").slice(1)
+        .join("?");
+      const signature = String(req.query.signature || "");
+      const keyId = String(req.query.key_id || "");
+      const pem = await _adMobVerifierKey(keyId);
+      if (!pem || !signature) {
+        res.status(400).send("Unknown verifier key");
+        return;
+      }
+      const verified = _verifyAdMobSsvSignature(rawQuery, pem);
+      if (!verified) {
+        console.warn("[PrayerCircle SSV] invalid signature");
+        res.status(400).send("Invalid signature");
+        return;
+      }
+
+      const adUnit = String(req.query.ad_unit || "");
+      const transactionId = String(req.query.transaction_id || "");
+      const timestampMs = Number(req.query.timestamp);
+      const reward = _decodePrayerRewardCustomData(req.query.custom_data);
+      if (!reward) {
+        // Aynı rewarded unit widget gibi başka yüzeylerde de kullanılır.
+        res.status(200).send("Ignored");
+        return;
+      }
+      if (
+        !_kRewardedAdUnitIds.has(adUnit) ||
+        !/^[A-Za-z0-9_-]{8,256}$/.test(transactionId) ||
+        !Number.isSafeInteger(timestampMs) ||
+        Math.abs(Date.now() - timestampMs) > 24 * 60 * 60 * 1000
+      ) {
+        res.status(400).send("Invalid reward data");
+        return;
+      }
+
+      const db = getFirestore();
+      const proofRef = db.collection("prayer_reward_proofs")
+        .doc(reward.proofId);
+      const transactionRef = db.collection("prayer_reward_transactions")
+        .doc(crypto.createHash("sha256").update(transactionId).digest("hex"));
+      await db.runTransaction(async (tx) => {
+        const [proofSnap, transactionSnap] = await Promise.all([
+          tx.get(proofRef),
+          tx.get(transactionRef),
+        ]);
+        if (transactionSnap.exists) return;
+        if (!proofSnap.exists) {
+          throw new Error("Reward proof not found");
+        }
+        const proof = proofSnap.data() || {};
+        const proofExpiryMs = proof.expiresAt?.toMillis?.() || 0;
+        if (
+          proof.status !== "pending" ||
+          proofExpiryMs <= Date.now()
+        ) {
+          throw new Error("Reward proof mismatch or expired");
+        }
+        tx.create(transactionRef, {
+          proofId: reward.proofId,
+          expiresAt: Timestamp.fromMillis(Date.now() + 30 * 86400000),
+          createdAt: FieldValue.serverTimestamp(),
+        });
+        tx.update(proofRef, {
+          status: "rewarded",
+          transactionHash: transactionRef.id,
+          rewardedAt: FieldValue.serverTimestamp(),
+        });
+      });
+      res.status(200).send("OK");
+    } catch (error) {
+      console.error("[PrayerCircle SSV] failed:", error);
+      res.status(500).send("Retry");
+    }
+  },
+);
+
+exports.registerPrayerDevice = onCall(
+  {
+    region: "europe-west1",
+    memory: "256MiB",
+    enforceAppCheck: true,
+  },
+  async (req) => {
+    _assertPrayerAuth(req);
+    const ownerHash = _validatedInstallHash(req.data?.installId);
+    const db = getFirestore();
+    await _assertPrayerInstallationBinding(db, req, ownerHash);
+    const token = String(req.data?.token || "").trim();
+    if (token.length < 32 || token.length > 4096) {
+      throw new HttpsError("invalid-argument", "Geçersiz bildirim kimliği.");
+    }
+    const platform = ["android", "ios"].includes(req.data?.platform)
+      ? req.data.platform
+      : "other";
+    await db.collection("prayer_devices").doc(ownerHash).set({
+      token,
+      platform,
+      locale: _validatedPrayerLocale(req.data?.locale),
+      expiresAt: Timestamp.fromMillis(Date.now() + _kPrayerDeviceTtlMs),
+      updatedAt: FieldValue.serverTimestamp(),
+    }, { merge: true });
+    const pendingJobs = await db.collection("prayer_notification_jobs")
+      .where("ownerHash", "==", ownerHash)
+      .where("status", "==", "pending")
+      .limit(20)
+      .get();
+    for (const job of pendingJobs.docs) {
+      await job.ref.set({
+        claimedUntil: Timestamp.fromMillis(0),
+        updatedAt: FieldValue.serverTimestamp(),
+      }, { merge: true });
+      await _deliverPrayerNotificationJob(job.ref);
+    }
+    return { ok: true };
+  },
+);
+
+exports.listPrayerRequests = onCall(
+  {
+    region: "europe-west1",
+    memory: "256MiB",
+    enforceAppCheck: true,
+  },
+  async (req) => {
+    _assertPrayerAuth(req);
+    const installHash = _validatedInstallHash(req.data?.installId);
+    const db = getFirestore();
+    await _assertPrayerInstallationBinding(db, req, installHash);
+    const cursorMs = _validatedPrayerCursorMs(req.data?.cursorExpiresAtMs);
+    const focusRequestId = req.data?.focusRequestId == null
+      ? null
+      : _validatedPrayerDocumentId(req.data.focusRequestId);
+    const mineOnly = req.data?.mineOnly === true;
+    const now = Timestamp.now();
+    let query = mineOnly
+      ? db.collection("prayer_request_owners")
+        .where("ownerHash", "==", installHash)
+        .where("expiresAt", ">", now)
+        .orderBy("expiresAt", "desc")
+        .orderBy(FieldPath.documentId(), "desc")
+        .limit(40)
+      : db.collection("prayer_requests")
+        .where("status", "==", "active")
+        .where("expiresAt", ">", now)
+        .orderBy("expiresAt", "desc")
+        .orderBy(FieldPath.documentId(), "desc")
+        .limit(40);
+    if (cursorMs) {
+      const cursorRequestId = _validatedPrayerDocumentId(
+        req.data?.cursorRequestId,
+      );
+      query = query.startAfter(
+        Timestamp.fromMillis(cursorMs),
+        cursorRequestId,
+      );
+    }
+    const snap = await query.get();
+    const ownRequestIds = new Set(
+      mineOnly ? snap.docs.map((doc) => doc.id) : [],
+    );
+    let resultDocs = [...snap.docs];
+    if (mineOnly && resultDocs.length > 0) {
+      const requestRefs = resultDocs.map((owner) =>
+        db.collection("prayer_requests").doc(owner.id));
+      resultDocs = (await db.getAll(...requestRefs)).filter((doc) => {
+        const data = doc.data() || {};
+        return doc.exists &&
+          data.status === "active" &&
+          (data.expiresAt?.toMillis?.() || 0) > Date.now();
+      });
+    }
+    if (!mineOnly && focusRequestId && !cursorMs &&
+        !resultDocs.some((doc) => doc.id === focusRequestId)) {
+      const focus = await db.collection("prayer_requests")
+        .doc(focusRequestId)
+        .get();
+      const focusData = focus.data() || {};
+      if (
+        focus.exists &&
+        focusData.status === "active" &&
+        (focusData.expiresAt?.toMillis?.() || 0) > Date.now()
+      ) {
+        resultDocs.unshift(focus);
+      }
+    }
+    const items = resultDocs.map((doc) => {
+      const data = doc.data() || {};
+      return {
+        id: doc.id,
+        text: String(data.text || "").slice(0, 420),
+        category: _validatedPrayerCategory(data.category),
+        prayerCount: Math.max(0, Number(data.prayerCount) || 0),
+        createdAtMs: data.createdAt?.toMillis?.() || 0,
+        expiresAtMs: data.expiresAt?.toMillis?.() || 0,
+        isMine: ownRequestIds.has(doc.id),
+      };
+    }).sort((a, b) =>
+      b.expiresAtMs - a.expiresAtMs || b.id.localeCompare(a.id));
+    const last = snap.docs[snap.docs.length - 1];
+    return {
+      ok: true,
+      items,
+      nextCursorExpiresAtMs: snap.size === 40
+        ? last?.data()?.expiresAt?.toMillis?.() || null
+        : null,
+      nextCursorRequestId: snap.size === 40 ? last?.id || null : null,
+    };
+  },
+);
+
+exports.reportPrayerRequest = onCall(
+  {
+    region: "europe-west1",
+    memory: "256MiB",
+    enforceAppCheck: true,
+  },
+  async (req) => {
+    _assertPrayerAuth(req);
+    const installHash = _validatedInstallHash(req.data?.installId);
+    const documentId = _validatedPrayerDocumentId(req.data?.requestId);
+    const db = getFirestore();
+    const authHash = await _assertPrayerCallerRates(
+      db,
+      req,
+      installHash,
+      "report",
+      10,
+    );
+    const requestRef = db.collection("prayer_requests").doc(documentId);
+    const ownerRef = db.collection("prayer_request_owners").doc(documentId);
+    const installReportRef = requestRef.collection("reports")
+      .doc(`i_${installHash}`);
+    const authReportRef = requestRef.collection("reports")
+      .doc(`a_${authHash}`);
+    let reported = false;
+    let alreadyReported = false;
+    let hidden = false;
+    await db.runTransaction(async (tx) => {
+      const [requestSnap, ownerSnap, installReport, authReport] =
+        await Promise.all([
+          tx.get(requestRef),
+          tx.get(ownerRef),
+          tx.get(installReportRef),
+          tx.get(authReportRef),
+        ]);
+      if (!requestSnap.exists || !ownerSnap.exists) {
+        throw new HttpsError("not-found", "Dua talebi bulunamadı.");
+      }
+      const owner = ownerSnap.data() || {};
+      if (owner.ownerHash === installHash || owner.authHash === authHash) {
+        throw new HttpsError(
+          "failed-precondition",
+          "Kendi talebinizi bildiremezsiniz.",
+        );
+      }
+      if (installReport.exists || authReport.exists) {
+        alreadyReported = true;
+        return;
+      }
+      const data = requestSnap.data() || {};
+      if (
+        data.status !== "active" ||
+        (data.expiresAt?.toMillis?.() || 0) <= Date.now()
+      ) {
+        throw new HttpsError("failed-precondition", "Dua talebinin süresi doldu.");
+      }
+      reported = true;
+      const reportCount = (Number(data.reportCount) || 0) + 1;
+      hidden = reportCount >= 10;
+      const reportData = {
+        createdAt: FieldValue.serverTimestamp(),
+        expiresAt: data.expiresAt,
+      };
+      tx.create(installReportRef, reportData);
+      tx.create(authReportRef, reportData);
+      tx.update(requestRef, {
+        reportCount,
+        status: hidden ? "review" : "active",
+      });
+    });
+    return { ok: true, reported: reported || alreadyReported, hidden };
+  },
+);
+
+exports.createPrayerRequest = onCall(
+  {
+    region: "europe-west1",
+    memory: "256MiB",
+    enforceAppCheck: true,
+  },
+  async (req) => {
+    const uid = _assertPrayerAuth(req);
+    const ownerHash = _validatedInstallHash(req.data?.installId);
+    const requestId = _validatedPrayerRequestId(req.data?.requestId);
+    const policyVersion = _assertPrayerPolicyAccepted(
+      req.data?.policyVersion,
+    );
+    const db = getFirestore();
+    const authHash = await _assertPrayerCallerRates(
+      db,
+      req,
+      ownerHash,
+      "create",
+      20,
+    );
+    const premium = await _isPrayerPremiumCaller(db, req);
+    const proofId = premium
+      ? null
+      : _validatedPrayerProofId(req.data?.proofId);
+
+    const documentId = _dedupeId([ownerHash, requestId]).substring(0, 32);
+    const requestRef = db.collection("prayer_requests").doc(documentId);
+    const ownerRef = db.collection("prayer_request_owners").doc(documentId);
+    const proofRef = proofId
+      ? db.collection("prayer_reward_proofs").doc(proofId)
+      : null;
+    const nowMs = Date.now();
+    const expiresAtMs = nowMs + _kPrayerRequestTtlMs;
+    let created = false;
+
+    await db.runTransaction(async (tx) => {
+      const [existing, proofSnap] = await Promise.all([
+        tx.get(requestRef),
+        proofRef ? tx.get(proofRef) : Promise.resolve(null),
+      ]);
+      if (existing.exists) return;
+      let text;
+      let category;
+      let locale;
+      if (premium) {
+        text = _validatedPrayerText(req.data?.text);
+        category = _validatedPrayerCategory(req.data?.category);
+        locale = _validatedPrayerLocale(req.data?.locale);
+      } else {
+        if (!proofSnap?.exists) {
+          throw new HttpsError(
+            "failed-precondition",
+            "Reklam ödülü henüz doğrulanmadı.",
+          );
+        }
+        const proof = proofSnap.data() || {};
+        const proofExpiryMs = proof.expiresAt?.toMillis?.() || 0;
+        if (
+          proof.status !== "rewarded" ||
+          proof.ownerHash !== ownerHash ||
+          proof.authHash !== authHash ||
+          proof.authUid !== uid ||
+          proof.requestId !== requestId ||
+          proof.policyVersion !== policyVersion ||
+          proofExpiryMs <= nowMs
+        ) {
+          throw new HttpsError(
+            "failed-precondition",
+            "Reklam ödülü henüz doğrulanmadı.",
+          );
+        }
+        text = _validatedPrayerText(proof.text);
+        category = _validatedPrayerCategory(proof.category);
+        locale = _validatedPrayerLocale(proof.locale);
+      }
+      created = true;
+      tx.create(requestRef, {
+        id: documentId,
+        text,
+        category,
+        locale,
+        prayerCount: 0,
+        status: "active",
+        createdAt: Timestamp.fromMillis(nowMs),
+        expiresAt: Timestamp.fromMillis(expiresAtMs),
+      });
+      tx.create(ownerRef, {
+        ownerHash,
+        authHash,
+        policyVersion,
+        policyAcceptedAt: Timestamp.fromMillis(nowMs),
+        createdAt: Timestamp.fromMillis(nowMs),
+        expiresAt: Timestamp.fromMillis(expiresAtMs),
+      });
+      if (proofRef) {
+        tx.update(proofRef, {
+          status: "consumed",
+          consumedAt: FieldValue.serverTimestamp(),
+          requestDocumentId: documentId,
+        });
+      }
+    });
+
+    return {
+      ok: true,
+      created,
+      id: documentId,
+      expiresAtMs,
+    };
+  },
+);
+
+exports.prayForRequest = onCall(
+  {
+    region: "europe-west1",
+    memory: "256MiB",
+    enforceAppCheck: true,
+  },
+  async (req) => {
+    _assertPrayerAuth(req);
+    const installHash = _validatedInstallHash(req.data?.installId);
+    const documentId = _validatedPrayerDocumentId(req.data?.requestId);
+    const db = getFirestore();
+    const authHash = await _assertPrayerCallerRates(
+      db,
+      req,
+      installHash,
+      "pray",
+      120,
+    );
+
+    const requestRef = db.collection("prayer_requests").doc(documentId);
+    const ownerRef = db.collection("prayer_request_owners").doc(documentId);
+    const installReactionRef = requestRef.collection("reactions")
+      .doc(`i_${installHash}`);
+    const authReactionRef = requestRef.collection("reactions")
+      .doc(`a_${authHash}`);
+    let counted = false;
+    let count = 0;
+    let ownerHash = "";
+    let locale = "tr";
+    let notificationJobRef = null;
+
+    await db.runTransaction(async (tx) => {
+      const [
+        requestSnap,
+        ownerSnap,
+        installReactionSnap,
+        authReactionSnap,
+      ] = await Promise.all([
+        tx.get(requestRef),
+        tx.get(ownerRef),
+        tx.get(installReactionRef),
+        tx.get(authReactionRef),
+      ]);
+      if (!requestSnap.exists || !ownerSnap.exists) {
+        throw new HttpsError("not-found", "Dua talebi bulunamadı.");
+      }
+      const data = requestSnap.data() || {};
+      const expiryMs = data.expiresAt?.toMillis?.() || 0;
+      if (data.status !== "active" || expiryMs <= Date.now()) {
+        throw new HttpsError("failed-precondition", "Dua talebinin süresi doldu.");
+      }
+      ownerHash = String(ownerSnap.data()?.ownerHash || "");
+      const ownerAuthHash = String(ownerSnap.data()?.authHash || "");
+      locale = _validatedPrayerLocale(data.locale);
+      if (ownerHash === installHash || ownerAuthHash === authHash) {
+        throw new HttpsError(
+          "failed-precondition",
+          "Kendi dua talebinize eşlik edemezsiniz.",
+        );
+      }
+      count = Number(data.prayerCount) || 0;
+      if (installReactionSnap.exists || authReactionSnap.exists) return;
+      counted = true;
+      count += 1;
+      const reactionData = {
+        createdAt: FieldValue.serverTimestamp(),
+        expiresAt: data.expiresAt,
+      };
+      tx.create(installReactionRef, reactionData);
+      tx.create(authReactionRef, reactionData);
+      tx.update(requestRef, { prayerCount: FieldValue.increment(1) });
+      if (_isPrayerMilestone(count)) {
+        notificationJobRef = db.collection("prayer_notification_jobs")
+          .doc(_prayerNotificationJobId(documentId, count));
+        tx.create(notificationJobRef, {
+          requestId: documentId,
+          ownerHash,
+          locale,
+          count,
+          status: "pending",
+          attempts: 0,
+          claimedUntil: Timestamp.fromMillis(0),
+          createdAt: FieldValue.serverTimestamp(),
+          expiresAt: Timestamp.fromMillis(Date.now() + 7 * 86400000),
+        });
+      }
+    });
+
+    if (notificationJobRef) {
+      await _deliverPrayerNotificationJob(notificationJobRef);
+    }
+
+    return { ok: true, counted, prayerCount: count };
+  },
+);
+
+exports.deletePrayerRequest = onCall(
+  {
+    region: "europe-west1",
+    memory: "256MiB",
+    enforceAppCheck: true,
+  },
+  async (req) => {
+    _assertPrayerAuth(req);
+    const ownerHash = _validatedInstallHash(req.data?.installId);
+    const documentId = _validatedPrayerDocumentId(req.data?.requestId);
+    const db = getFirestore();
+    await _assertPrayerInstallationBinding(db, req, ownerHash);
+    const requestRef = db.collection("prayer_requests").doc(documentId);
+    const ownerRef = db.collection("prayer_request_owners").doc(documentId);
+    const ownerSnap = await ownerRef.get();
+    if (!ownerSnap.exists || ownerSnap.data()?.ownerHash !== ownerHash) {
+      throw new HttpsError("permission-denied", "Bu talebi silemezsiniz.");
+    }
+    await _deleteCollectionInBatches(requestRef.collection("reactions"));
+    await _deleteCollectionInBatches(requestRef.collection("reports"));
+    await Promise.all([requestRef.delete(), ownerRef.delete()]);
+    return { ok: true };
+  },
+);
+
+exports.deliverPrayerNotifications = onSchedule(
+  {
+    schedule: "every 1 minutes",
+    timeZone: "Europe/Istanbul",
+    memory: "256MiB",
+    region: "europe-west1",
+  },
+  async () => {
+    const snap = await getFirestore().collection("prayer_notification_jobs")
+      .where("status", "==", "pending")
+      .where("claimedUntil", "<=", Timestamp.now())
+      .orderBy("claimedUntil")
+      .limit(100)
+      .get();
+    for (const job of snap.docs) {
+      await _deliverPrayerNotificationJob(job.ref);
+    }
+  },
+);
+
+exports.cleanupExpiredPrayerRequests = onSchedule(
+  {
+    schedule: "every 15 minutes",
+    timeZone: "Europe/Istanbul",
+    memory: "256MiB",
+    region: "europe-west1",
+  },
+  async () => {
+    const db = getFirestore();
+    let deleted = 0;
+    while (true) {
+      const snap = await db.collection("prayer_requests")
+        .where("expiresAt", "<=", Timestamp.now())
+        .limit(200)
+        .get();
+      if (snap.empty) break;
+      for (const doc of snap.docs) {
+        await _deleteCollectionInBatches(doc.ref.collection("reactions"));
+        await _deleteCollectionInBatches(doc.ref.collection("reports"));
+        await Promise.all([
+          db.collection("prayer_request_owners").doc(doc.id).delete()
+            .catch(() => {}),
+          doc.ref.delete(),
+        ]);
+        deleted += 1;
+      }
+      if (snap.size < 200) break;
+    }
+    if (deleted > 0) {
+      console.log(`[PrayerCircle] expired deleted=${deleted}`);
+    }
+  },
+);
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Test-only export surface — exposes pure Dua Halkası (Prayer Circle) helper
+// functions for unit testing without touching Firestore/FCM. This is a plain
+// object (not a function), so the Firebase CLI's trigger-discovery step
+// (which only recognizes `onCall`/`onSchedule`/`onRequest`/`onDocumentWritten`
+// wrapped exports) ignores it entirely — it is never deployed as a Cloud
+// Function and has zero effect on production behavior or the deployed export
+// surface. Do not add DB/network-touching functions here.
+// ─────────────────────────────────────────────────────────────────────────────
+if (process.env.NODE_ENV === "test") {
+  exports._testables = {
+    validatedPrayerText: _validatedPrayerText,
+    validatedPrayerCategory: _validatedPrayerCategory,
+    validatedPrayerLocale: _validatedPrayerLocale,
+    validatedPrayerRequestId: _validatedPrayerRequestId,
+    validatedPrayerDocumentId: _validatedPrayerDocumentId,
+    validatedPrayerProofId: _validatedPrayerProofId,
+    decodePrayerRewardCustomData: _decodePrayerRewardCustomData,
+    dedupeId: _dedupeId,
+    prayerNotificationCopy: _prayerNotificationCopy,
+    isPrayerMilestone: _isPrayerMilestone,
+    prayerNotificationJobId: _prayerNotificationJobId,
+    validatedPrayerCursorMs: _validatedPrayerCursorMs,
+    assertPrayerAuth: _assertPrayerAuth,
+    prayerSessionMatchesInstall: _prayerSessionMatchesInstall,
+    validatedPrayerBindingSecretHash: _validatedPrayerBindingSecretHash,
+    premiumRecordActive: _premiumRecordActive,
+    verifyAdMobSsvSignature: _verifyAdMobSsvSignature,
+    assertPrayerPolicyAccepted: _assertPrayerPolicyAccepted,
+  };
+}

@@ -116,6 +116,15 @@ abstract final class FcmTokenService {
     _navigate(AppRoutes.momentVerse);
   }
 
+  static void _openPrayerCircle({String? requestId}) {
+    final normalized = requestId?.trim();
+    _navigate(
+      normalized == null || normalized.isEmpty
+          ? AppRoutes.prayerCircle
+          : AppRoutes.prayerCircleRequest(normalized),
+    );
+  }
+
   static Future<bool> _queueAudienceSync({required bool active}) {
     final completer = Completer<bool>();
     _audienceSyncTail = _audienceSyncTail
@@ -169,6 +178,10 @@ abstract final class FcmTokenService {
           final parts = payload.split('|');
           _openMomentVerse(deliveryId: parts.length > 1 ? parts[1] : null);
         });
+        registerLocalNotificationTapHandler('prayer_circle', (payload) {
+          final parts = payload.split('|');
+          _openPrayerCircle(requestId: parts.length > 1 ? parts[1] : null);
+        });
         _localTapHandlerRegistered = true;
       }
       if (!_initialLocalNotificationChecked) {
@@ -182,6 +195,8 @@ abstract final class FcmTokenService {
         _initialMessageChecked = true;
         if (initial != null && initial.data['type'] == 'moment_verse') {
           _openMomentVerse(deliveryId: initial.data['deliveryId']?.toString());
+        } else if (initial?.data['type'] == 'prayer_circle') {
+          _openPrayerCircle(requestId: initial?.data['requestId']?.toString());
         }
       }
 
@@ -191,6 +206,10 @@ abstract final class FcmTokenService {
             if (message.data['type'] == 'moment_verse') {
               _openMomentVerse(
                 deliveryId: message.data['deliveryId']?.toString(),
+              );
+            } else if (message.data['type'] == 'prayer_circle') {
+              _openPrayerCircle(
+                requestId: message.data['requestId']?.toString(),
               );
             }
           });
@@ -252,15 +271,18 @@ abstract final class FcmTokenService {
     if (ntf == null) return;
     if (defaultTargetPlatform != TargetPlatform.android) return;
     try {
+      final isPrayerCircle = message.data['type'] == 'prayer_circle';
       await arinLocalNotificationsPlugin.show(
         DateTime.now().millisecondsSinceEpoch.remainder(1 << 31),
         ntf.title,
         ntf.body,
-        const NotificationDetails(
+        NotificationDetails(
           android: AndroidNotificationDetails(
-            'arin_ntf_broadcast',
-            'Ayet Bildirimleri',
-            channelDescription: 'Günlük ayet ve anlık bildirimler',
+            isPrayerCircle ? 'arin_prayer_circle' : 'arin_ntf_broadcast',
+            isPrayerCircle ? 'Dua Halkası' : 'Ayet Bildirimleri',
+            channelDescription: isPrayerCircle
+                ? 'Dua taleplerine eşlik bildirimleri'
+                : 'Günlük ayet ve anlık bildirimler',
             importance: Importance.high,
             priority: Priority.high,
             playSound: true,
@@ -268,7 +290,9 @@ abstract final class FcmTokenService {
         ),
         payload: [
           message.data['type']?.toString() ?? '',
-          message.data['deliveryId']?.toString() ?? '',
+          isPrayerCircle
+              ? message.data['requestId']?.toString() ?? ''
+              : message.data['deliveryId']?.toString() ?? '',
         ].join('|'),
       );
     } catch (e) {
@@ -330,7 +354,16 @@ abstract final class FcmTokenService {
           playSound: true,
         ),
       );
-      debugPrint('══ ARIN FCM ══ arin_ntf_broadcast kanalı hazır');
+      await android.createNotificationChannel(
+        const AndroidNotificationChannel(
+          'arin_prayer_circle',
+          'Dua Halkası',
+          description: 'Dua taleplerine eşlik bildirimleri',
+          importance: Importance.high,
+          playSound: true,
+        ),
+      );
+      debugPrint('══ ARIN FCM ══ bildirim kanalları hazır');
     } on PlatformException catch (e) {
       debugPrint('══ ARIN FCM ══ broadcast kanalı oluşturulamadı: $e');
     }

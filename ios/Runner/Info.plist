@@ -30,12 +30,11 @@
 		<string>746942620456-lm0rg914v26s3u2io9pif08vu24jfor0.apps.googleusercontent.com</string>
 		<key>GADApplicationIdentifier</key>
 		<string>$(GAD_APPLICATION_IDENTIFIER)</string>
-		<!-- Firebase collection native startup'ta kapalı başlar.
-		     Dart tarafında onboarding tamamlandıktan / mevcut kullanıcıda
-		     bootstrap bittikten sonra ArinAnalytics.enable() ve Crashlytics
-		     collection enable edilir. Bu sayede ilk kurulumda native SDK
-		     Crashlytics settings / Analytics config network istekleriyle
-		     yeşil splash'ı uzatmaz. Reversible anahtarlar kullanıyoruz. -->
+		<!-- Firebase collection ilk kurulumda kapalı başlar. Dart tarafında
+		     onboarding tamamlandıktan sonra ArinAnalytics.enable() native
+		     collection'ı kalıcı olarak açar; sonraki açılışlarda kullanıcı zaten
+		     onboarding'i tamamlamıştır. Crashlytics de bootstrap sonrasında
+		     etkinleştirilir. Böylece ilk kurulum splash kritik yolu korunur. -->
 		<key>FIREBASE_ANALYTICS_COLLECTION_ENABLED</key>
 		<string>$(FIREBASE_ANALYTICS_COLLECTION_ENABLED)</string>
 		<key>FirebaseAutomaticScreenReportingEnabled</key>
@@ -51,12 +50,15 @@
 		<string>c150203bf357ef5e115b4012e9c55b98</string>
 		<key>FacebookDisplayName</key>
 		<string>Arın</string>
+		<!-- Native başlangıçta event ve IDFA kapalıdır. Dart tarafı kimliksiz
+		     install/activate ölçümünü açar; IDFA yalnızca onboarding sonrasında
+		     alınan ATT izni authorized ise etkinleştirilir. -->
 		<key>FacebookAutoLogAppEventsEnabled</key>
-		<true/>
+		<false/>
 		<key>FacebookAdvertiserIDCollectionEnabled</key>
-		<true/>
+		<false/>
 		<key>NSUserTrackingUsageDescription</key>
-		<string>Reklam performansını ölçmek ve sana daha uygun içerik sunmak için cihaz reklam kimliği kullanılır. İzin vermezsen uygulama normal çalışmaya devam eder.</string>
+		<string>Reklam kampanyalarının performansını ölçmek için cihaz reklam kimliği kullanılır. İzin vermezsen uygulama normal çalışmaya devam eder.</string>
 		<key>CFBundleURLTypes</key>
 		<array>
 			<dict>

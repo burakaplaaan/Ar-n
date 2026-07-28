@@ -1696,8 +1696,24 @@
   "qiblaCompassGettingLocation": "Getting location…",
   "qiblaCompassInitError": "Location or compass\ncould not be initialized",
   "qiblaCompassRetry": "Retry",
-  "qiblaCompassAligned": "Aligned to Qibla",
+  "qiblaCompassAligned": "You are facing the Kaaba",
   "qiblaCompassDeviation": "deviation",
+  "qiblaCompassDistanceKm": "{distance} km to the Kaaba",
+  "@qiblaCompassDistanceKm": {
+    "placeholders": {
+      "distance": {}
+    }
+  },
+  "qiblaCompassDistanceM": "{distance} m to the Kaaba",
+  "@qiblaCompassDistanceM": {
+    "placeholders": {
+      "distance": {}
+    }
+  },
+  "qiblaCompassProximityFar": "The heart's compass never strays",
+  "qiblaCompassProximityApproaching": "Every step is an invitation to Him",
+  "qiblaCompassProximityMecca": "You are in the blessed lands of the Haramain",
+  "qiblaCompassProximityHaram": "You stand before the Kaaba, may your prayers be accepted",
   "qiblaCompassStabilizing": "Stabilizing measurement",
   "qiblaCompassGuidanceTiltTitle": "Hold phone flat",
   "qiblaCompassGuidanceTiltBody": "Use compass horizontally. Direction won't lock if held upright, sideways, or upside down.",
@@ -1706,7 +1722,7 @@
   "qiblaCompassGuidanceUnstableTitle": "Magnetic field unstable",
   "qiblaCompassGuidanceUnstableBody": "Move away from laptops, magnets, metal tables, and magnetic cases.",
   "qiblaCompassGuidanceGoodTitle": "Measurement ready",
-  "qiblaCompassGuidanceGoodBody": "Hold phone flat, turn slowly to Qibla. Green badge lights up when stable.",
+  "qiblaCompassGuidanceGoodBody": "Hold phone flat, turn slowly to Qibla. A golden glow appears when aligned.",
   "qiblaCompassNorth": "N",
   "qiblaCompassEast": "E",
   "qiblaCompassSouth": "S",
@@ -1870,5 +1886,79 @@
   "insightCommentZero": "Yesterday might not have been recorded or checked yet. Even with a single prayer today, you can redraw the line.",
   "insightCommentLow": "The average is low this week; this is normal — it rises with reflection and small steps. One more prayer makes a big difference.",
   "insightCommentGood": "{count}/5 prayers marked yesterday; it's possible to complete the balance with one or two prayers today.",
-  "insightCommentDefault": "Past days' data is a mirror for you: mercy in the missing parts, gratitude in the completed ones."
+  "insightCommentDefault": "Past days' data is a mirror for you: mercy in the missing parts, gratitude in the completed ones.",
+  "qiblaHubPrayerCircleTitle": "Prayer Circle",
+  "qiblaHubPrayerCircleSubtitle": "Share a prayer request and join with sincerity",
+  "prayerCircleTitle": "Prayer Circle",
+  "prayerCircleHeroTitle": "Join a prayer wholeheartedly",
+  "prayerCircleHeroBody": "Anonymous prayer requests meet here. Let us quietly say amen to one another's intentions.",
+  "prayerCircleTwentyFourHours": "Each request remains for 24 hours",
+  "prayerCircleAll": "Prayer circle",
+  "prayerCircleMine": "My prayers",
+  "prayerCircleCreate": "Send a prayer request",
+  "prayerCircleEmptyTitle": "The circle is waiting for a prayer",
+  "prayerCircleEmptyBody": "Share the first prayer request and begin this circle of kindness.",
+  "prayerCircleMineEmptyTitle": "You have no prayer requests yet",
+  "prayerCircleMineEmptyBody": "Share your intention anonymously; it will remain here for 24 hours.",
+  "prayerCircleLoadFailed": "The prayer circle could not load",
+  "prayerCircleTryAgain": "Try again",
+  "prayerCircleComposeTitle": "Write your prayer request",
+  "prayerCircleComposeBody": "Share a brief, sincere intention without personal information.",
+  "prayerCircleHint": "For example: Please pray for my family's health and peace…",
+  "prayerCircleCategory": "Intention",
+  "prayerCircleCategoryGeneral": "General",
+  "prayerCircleCategoryHealth": "Health",
+  "prayerCircleCategoryFamily": "Family",
+  "prayerCircleCategoryPeace": "Peace",
+  "prayerCircleCategoryEducation": "Education",
+  "prayerCircleCategoryWork": "Work & provision",
+  "prayerCirclePrivacyNote": "For your safety, do not share names, phone numbers, social media, payment details, or links. Automated checks and user reports are used, but you remain responsible for withholding personal information.",
+  "prayerCircleContinue": "Continue to send",
+  "prayerCircleTooShort": "Your prayer request must be at least 8 characters.",
+  "prayerCircleAdGateTitle": "Add your prayer to the circle",
+  "prayerCircleAdGateBody": "Free users watch one short rewarded ad for each request. Premium users never see this ad.",
+  "prayerCircleWatchAd": "Watch ad and send",
+  "prayerCirclePremiumOption": "Send ad-free with Premium",
+  "prayerCircleAdFailed": "The ad is not ready right now. Please try again shortly.",
+  "prayerCircleSent": "Your prayer request joined the circle. May it bring goodness.",
+  "prayerCirclePray": "I prayed",
+  "prayerCirclePrayed": "You joined",
+  "prayerCircleOwnRequest": "Your prayer",
+  "prayerCircleYours": "Your request",
+  "prayerCirclePrayedThanks": "Amen. You joined this prayer wholeheartedly.",
+  "prayerCircleAlreadyPrayed": "You have already joined this prayer.",
+  "prayerCirclePrayerCount": "{count, plural, =0{No one has prayed yet} =1{1 person prayed} other{{count} people prayed}}",
+  "@prayerCirclePrayerCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "prayerCircleHoursLeft": "{hours, plural, =1{1 hr left} other{{hours} hr left}}",
+  "@prayerCircleHoursLeft": {
+    "placeholders": {
+      "hours": {"type": "int"}
+    }
+  },
+  "prayerCircleMinutesLeft": "{minutes, plural, =1{1 min left} other{{minutes} min left}}",
+  "@prayerCircleMinutesLeft": {
+    "placeholders": {
+      "minutes": {"type": "int"}
+    }
+  },
+  "prayerCircleLoadMore": "Load more requests",
+  "prayerCircleReportTitle": "Report this prayer request?",
+  "prayerCircleReportBody": "Reports help keep the circle safe and respectful. We will review this request.",
+  "prayerCircleReportAction": "Report",
+  "prayerCircleReported": "Thank you. This request was reported.",
+  "prayerCircleAcceptRulesLabel": "Your request is shared anonymously and must follow the community rules.",
+  "prayerCircleAcceptRulesRequired": "Please confirm the community rules before sending.",
+  "prayerCircleMoreActions": "More actions",
+  "prayerCircleDeleteTitle": "Remove your prayer request?",
+  "prayerCircleDeleteBody": "The request will be removed from the circle immediately and cannot be restored.",
+  "prayerCircleDeleteAction": "Remove",
+  "prayerCircleCancel": "Cancel",
+  "prayerCircleSlowDown": "You are acting too quickly. Please try again shortly.",
+  "prayerCircleContentRejected": "Check the text and remove personal, contact, or payment information.",
+  "prayerCircleExpired": "This prayer request may have expired.",
+  "prayerCircleGenericError": "The action could not be completed. Check your connection and try again."
 }

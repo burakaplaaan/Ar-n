@@ -1,4 +1,4 @@
-﻿// lib/presentation/shared/widgets/arin_shell.dart
+// lib/presentation/shared/widgets/arin_shell.dart
 
 import 'dart:async';
 import 'dart:math' as math;
@@ -15,6 +15,7 @@ import '../../../core/router/app_router.dart';
 import '../../../data/services/audio_session_coordinator.dart';
 import '../../home/home_page.dart';
 import '../../inspire/inspire_explore_page.dart';
+import '../../qibla/qibla_hub_back_dispatcher.dart';
 import '../../qibla/qibla_hub_page.dart';
 import '../../qibla/qibla_shell_swipe_provider.dart';
 import '../../settings/settings_page.dart';
@@ -176,15 +177,27 @@ class _ArinShellState extends State<ArinShell> {
   void _onSystemBack(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     if (!mounted) return;
+    final path = GoRouterState.of(context).uri.path;
+    final visible = _visibleShellPageIndex();
+    if (dispatchQiblaHubBack(currentPath: path, isQiblaVisible: visible == 1)) {
+      _lastExitBackPressAt = null;
+      return;
+    }
     final router = GoRouter.of(context);
     if (router.canPop()) {
       _lastExitBackPressAt = null;
       router.pop();
       return;
     }
-    final path = GoRouterState.of(context).uri.path;
     final shellRoot = _isShellSwipeRoot(path);
-    final visible = _visibleShellPageIndex();
+
+    // Bildirim/deep-link Dua Halkası'nı nested hub yerine doğrudan GoRouter
+    // rotasıyla açar. Geri, Home'a değil Kıble araç paneline dönmelidir.
+    if (path == AppRoutes.prayerCircle) {
+      _lastExitBackPressAt = null;
+      context.go(AppRoutes.qibla);
+      return;
+    }
 
     // Parmakla sekme kaydırıldıysa path bazen /home kalır; geri önce gerçek sekmeye göre ana sayfaya gitsin.
     if (shellRoot && visible != null && visible != 0) {

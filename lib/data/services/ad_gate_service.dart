@@ -84,7 +84,7 @@ class AdGateService {
 
   final SharedPreferences _prefs;
 
-  static const int exploreSwipeFreeCount = 5;
+  static const int exploreSwipeFreeCount = 12;
   static const Duration widgetTrialDuration = Duration(hours: 24);
   static const Duration widgetUnlockDuration = Duration(hours: 24);
   static const Duration secondAlarmUnlockDuration = Duration(days: 7);
@@ -178,6 +178,10 @@ class AdGateService {
     return !_cooldownActive(AdGatePlacement.exploreSwipe);
   }
 
+  /// Keşfet geçiş reklamı yalnızca kart sayacına bağlıdır — zaman bazlı bir
+  /// soğuma (cooldown) YOKTUR. Kullanıcı her [exploreSwipeFreeCount] kartı
+  /// kaydırdığında, kaç dakika önce reklam gösterilmiş olursa olsun, tekrar
+  /// reklam tetiklenir.
   Future<bool> recordExploreViewAndShouldShowAd({
     required bool isPremium,
   }) async {
@@ -186,7 +190,6 @@ class AdGateService {
 
     final views = (_prefs.getInt(_exploreViewCountKey) ?? 0) + 1;
     await _prefs.setInt(_exploreViewCountKey, views);
-    if (_cooldownActive(AdGatePlacement.exploreSwipe)) return false;
     return views >= exploreSwipeFreeCount;
   }
 
@@ -203,6 +206,13 @@ class AdGateService {
   }
 
   Future<void> recordRewardedUnlock(AdGatePlacement placement) async {
+    await clearPending(placement);
+    if (placement == AdGatePlacement.exploreSwipe) {
+      // Keşfet geçiş reklamı yalnızca kart sayacına bağlıdır; zaman bazlı
+      // bir soğuma yazılmaz — aksi halde ölü/karıştırıcı state kalır.
+      await _prefs.remove(_exploreViewCountKey);
+      return;
+    }
     final now = DateTime.now();
     final duration = switch (placement) {
       AdGatePlacement.lockScreenWidget ||
@@ -217,10 +227,6 @@ class AdGateService {
       AdGatePlacement.healingSession ||
       AdGatePlacement.qiblaSession => sessionAdCooldown,
     };
-    await clearPending(placement);
-    if (placement == AdGatePlacement.exploreSwipe) {
-      await _prefs.remove(_exploreViewCountKey);
-    }
     await _prefs.setString(
       _unlockKey(placement),
       now.add(duration).toIso8601String(),

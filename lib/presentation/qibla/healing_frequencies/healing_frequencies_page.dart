@@ -11,12 +11,64 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../core/constants/app_colors.dart';
 import 'healing_audio_notifier.dart';
 import 'healing_daily_comfort_entries.dart';
+import '../../shared/mixins/review_prompt_on_exit_mixin.dart';
 import '../../shared/providers/quote_pool_content_providers.dart';
 import 'healing_freq_catalog.dart';
 import 'healing_frequencies_sheets.dart';
 import '../../shared/widgets/arin_back_button.dart';
 
 import 'package:arin/l10n/app_localizations.dart';
+
+// Bu hesaplamalar dakikada/saniyede güncellenen değerler (player ilerleme
+// çubuğu, geri sayımlar) — sayfa State'inden ayrı tutuluyor ki yalnızca
+// `_HealingPlayerSection`/`_HealingSleepRow` gibi küçük, izole widget'lar
+// `tickCounter` değişince yeniden build olsun; tüm sayfa değil (aksi halde
+// çalma sırasında saniyede bir tam sayfa rebuild = takılma hissi).
+HealingPreset? _healingActivePreset(int hz) {
+  if (hz == 285) return HealingPreset.focus;
+  if (hz == 528) return HealingPreset.relax;
+  if (hz == 174) return HealingPreset.sleep;
+  return null;
+}
+
+double _healingProgress(HealingAudioState s) {
+  final start = s.playWindowStart;
+  if (start == null) return 0;
+  final elapsed = DateTime.now().difference(start);
+  final total = s.sleepEndsAt != null
+      ? s.sleepEndsAt!.difference(start)
+      : const Duration(minutes: 30);
+  if (total.inMilliseconds <= 0) return 0;
+  return (elapsed.inMilliseconds / total.inMilliseconds).clamp(0.0, 1.0);
+}
+
+String _healingFmtMmSs(Duration d) {
+  if (d.isNegative) return '00:00';
+  final totalSeconds = d.inSeconds;
+  final m = totalSeconds ~/ 60;
+  final sec = totalSeconds % 60;
+  return '${m.toString().padLeft(2, '0')}:${sec.toString().padLeft(2, '0')}';
+}
+
+String _healingRightLabel(HealingAudioState s) {
+  final start = s.playWindowStart;
+  if (start != null && s.sleepEndsAt != null) {
+    return _healingFmtMmSs(s.sleepEndsAt!.difference(start));
+  }
+  return '30:00';
+}
+
+String _healingSleepRowSubtitle(AppLocalizations l10n, HealingAudioState s) {
+  final m = s.selectedSleepMinutes;
+  if (m == null) return l10n.healingSleepOff;
+  if (s.isPlaying && s.sleepEndsAt != null) {
+    final left = s.sleepEndsAt!.difference(DateTime.now());
+    if (!left.isNegative) {
+      return '${l10n.healingSleepRemaining}${_healingFmtMmSs(left)}';
+    }
+  }
+  return l10n.healingSleepMinutes(m);
+}
 
 class HealingFrequenciesPage extends ConsumerStatefulWidget {
   const HealingFrequenciesPage({super.key});
@@ -27,15 +79,17 @@ class HealingFrequenciesPage extends ConsumerStatefulWidget {
 }
 
 class _HealingFrequenciesPageState extends ConsumerState<HealingFrequenciesPage>
-    with WidgetsBindingObserver {
+    with WidgetsBindingObserver, ReviewPromptOnExitMixin {
   @override
   void initState() {
     super.initState();
+    startReviewPromptTracking();
     WidgetsBinding.instance.addObserver(this);
   }
 
   @override
   void dispose() {
+    maybeRequestReviewOnExit();
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
@@ -61,46 +115,6 @@ class _HealingFrequenciesPageState extends ConsumerState<HealingFrequenciesPage>
       default:
         return l10n.healingAmbientForest;
     }
-  }
-
-  String _sleepRowSubtitle(BuildContext context, HealingAudioState s) {
-    final l10n = AppLocalizations.of(context)!;
-    final m = s.selectedSleepMinutes;
-    if (m == null) return l10n.healingSleepOff;
-    if (s.isPlaying && s.sleepEndsAt != null) {
-      final left = s.sleepEndsAt!.difference(DateTime.now());
-      if (!left.isNegative) {
-        return '${l10n.healingSleepRemaining}${_fmtMmSs(left)}';
-      }
-    }
-    return l10n.healingSleepMinutes(m);
-  }
-
-  double _progress(HealingAudioState s) {
-    final start = s.playWindowStart;
-    if (start == null) return 0;
-    final elapsed = DateTime.now().difference(start);
-    final total = s.sleepEndsAt != null
-        ? s.sleepEndsAt!.difference(start)
-        : const Duration(minutes: 30);
-    if (total.inMilliseconds <= 0) return 0;
-    return (elapsed.inMilliseconds / total.inMilliseconds).clamp(0.0, 1.0);
-  }
-
-  String _fmtMmSs(Duration d) {
-    if (d.isNegative) return '00:00';
-    final totalSeconds = d.inSeconds;
-    final m = totalSeconds ~/ 60;
-    final sec = totalSeconds % 60;
-    return '${m.toString().padLeft(2, '0')}:${sec.toString().padLeft(2, '0')}';
-  }
-
-  String _rightLabel(HealingAudioState s) {
-    final start = s.playWindowStart;
-    if (start != null && s.sleepEndsAt != null) {
-      return _fmtMmSs(s.sleepEndsAt!.difference(start));
-    }
-    return '30:00';
   }
 
   Future<void> _pauseIfPlaying() async {
@@ -222,10 +236,32 @@ class _HealingFrequenciesPageState extends ConsumerState<HealingFrequenciesPage>
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final s = ref.watch(healingAudioNotifierProvider);
+    // Yalnızca kullanıcı etkileşimiyle değişen alanları izliyoruz (`select`).
+    // `tickCounter`/`playWindowStart`/`sleepEndsAt` her saniye değiştiği için
+    // tüm state'i burada izlemek sayfanın tamamını (ListView, arka plan,
+    // kartlar...) saniyede bir yeniden build ederdi. Saniyelik güncellemeler
+    // gereken tek yerler (_HealingPlayerSection, _HealingSleepRow) kendi
+    // `ref.watch`'larıyla izole şekilde güncelleniyor.
+    final (
+      :isPlaying,
+      :hz,
+      :ambientKey,
+      :toneVolume01,
+      :ambientVolume01,
+    ) = ref.watch(
+      healingAudioNotifierProvider.select(
+        (s) => (
+          isPlaying: s.isPlaying,
+          hz: s.hz,
+          ambientKey: s.ambientKey,
+          toneVolume01: s.toneVolume01,
+          ambientVolume01: s.ambientVolume01,
+        ),
+      ),
+    );
     final n = ref.read(healingAudioNotifierProvider.notifier);
-    final hz = s.hz;
-    final isInshirah = s.isInshirahMode;
+    final isInshirah = ambientKey == kHealingAmbientInshirah;
+    final activePreset = _healingActivePreset(hz);
     const teal = AppColors.healingTeal;
 
     return Scaffold(
@@ -311,7 +347,7 @@ class _HealingFrequenciesPageState extends ConsumerState<HealingFrequenciesPage>
                       const SizedBox(height: 22),
                       _AmbientRow(
                         label: l10n.healingAmbientSound,
-                        value: _ambientLabel(context, s.ambientKey),
+                        value: _ambientLabel(context, ambientKey),
                         onTap: () async {
                           HapticFeedback.lightImpact();
                           await _pauseIfPlaying();
@@ -341,10 +377,10 @@ class _HealingFrequenciesPageState extends ConsumerState<HealingFrequenciesPage>
                         child: Opacity(
                           opacity: isInshirah ? 0.38 : 1,
                           child: _PresetRow(
-                            active: s.activePreset,
+                            active: activePreset,
                             onPick: (p) async {
                               HapticFeedback.lightImpact();
-                              if (s.activePreset != p) {
+                              if (activePreset != p) {
                                 await _pauseIfPlaying();
                                 if (!mounted) return;
                               }
@@ -354,29 +390,15 @@ class _HealingFrequenciesPageState extends ConsumerState<HealingFrequenciesPage>
                         ),
                       ),
                       const SizedBox(height: 28),
-                      _PlayerBlock(
-                        isPlaying: s.isPlaying,
-                        progress: _progress(s),
-                        left: _fmtMmSs(
-                          s.playWindowStart != null
-                              ? DateTime.now().difference(s.playWindowStart!)
-                              : Duration.zero,
-                        ),
-                        right: _rightLabel(s),
-                        onPlay: () {
-                          HapticFeedback.lightImpact();
-                          n.togglePlay();
-                        },
-                        teal: teal,
-                      ),
+                      const _HealingPlayerSection(teal: teal),
                       const SizedBox(height: 22),
                       _VolumeSlider(
                         icon: Icons.graphic_eq_rounded,
                         label: l10n.healingFrequencyTone,
-                        value: s.toneVolume01,
+                        value: toneVolume01,
                         tint: teal,
-                        trailingPct: '${(s.toneVolume01 * 100).round()}%',
-                        onChanged: s.isPlaying && !isInshirah
+                        trailingPct: '${(toneVolume01 * 100).round()}%',
+                        onChanged: isPlaying && !isInshirah
                             ? n.setToneVolume01
                             : null,
                       ),
@@ -384,23 +406,13 @@ class _HealingFrequenciesPageState extends ConsumerState<HealingFrequenciesPage>
                       _VolumeSlider(
                         icon: Icons.local_fire_department_outlined,
                         label: l10n.healingAmbient,
-                        value: s.ambientVolume01,
+                        value: ambientVolume01,
                         tint: AppColors.healingOrange,
-                        trailingPct: '${(s.ambientVolume01 * 100).round()}%',
+                        trailingPct: '${(ambientVolume01 * 100).round()}%',
                         onChanged: n.setAmbientVolume01,
                       ),
                       const SizedBox(height: 18),
-                      _AmbientRow(
-                        label: l10n.healingSleepTimer,
-                        value: _sleepRowSubtitle(context, s),
-                        onTap: () async {
-                          HapticFeedback.lightImpact();
-                          await _pauseIfPlaying();
-                          if (!mounted) return;
-                          showHealingSleepSheet(this.context, ref);
-                        },
-                        icon: Icons.nightlight_round,
-                      ),
+                      const _HealingSleepRow(),
                       const SizedBox(height: 24),
                       if (isInshirah)
                         Padding(
@@ -672,6 +684,61 @@ class _VerseCard extends ConsumerWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+/// İlerleme çubuğu + geçen/kalan süre — saniyede bir değişen `tickCounter`'a
+/// bağlı tek yer burası olsun diye sayfadan izole edildi (bkz. build()
+/// yorumu). Yalnızca bu küçük widget saniyede bir yeniden build olur.
+class _HealingPlayerSection extends ConsumerWidget {
+  const _HealingPlayerSection({required this.teal});
+
+  final Color teal;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final s = ref.watch(healingAudioNotifierProvider);
+    final n = ref.read(healingAudioNotifierProvider.notifier);
+    return _PlayerBlock(
+      isPlaying: s.isPlaying,
+      progress: _healingProgress(s),
+      left: _healingFmtMmSs(
+        s.playWindowStart != null
+            ? DateTime.now().difference(s.playWindowStart!)
+            : Duration.zero,
+      ),
+      right: _healingRightLabel(s),
+      onPlay: () {
+        HapticFeedback.lightImpact();
+        n.togglePlay();
+      },
+      teal: teal,
+    );
+  }
+}
+
+/// Uyku zamanlayıcısı satırı — kalan süre metni saniyede bir değişir; aynı
+/// izolasyon nedeniyle ayrı bir `ConsumerWidget`.
+class _HealingSleepRow extends ConsumerWidget {
+  const _HealingSleepRow();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
+    final s = ref.watch(healingAudioNotifierProvider);
+    return _AmbientRow(
+      label: l10n.healingSleepTimer,
+      value: _healingSleepRowSubtitle(l10n, s),
+      onTap: () async {
+        HapticFeedback.lightImpact();
+        if (s.isPlaying) {
+          await ref.read(healingAudioNotifierProvider.notifier).pause();
+        }
+        if (!context.mounted) return;
+        showHealingSleepSheet(context, ref);
+      },
+      icon: Icons.nightlight_round,
     );
   }
 }

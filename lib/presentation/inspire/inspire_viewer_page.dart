@@ -13,6 +13,7 @@ import '../../data/models/inspiration_card_model.dart';
 import '../../data/services/ad_gate_service.dart';
 import '../../data/services/admob_service.dart';
 import '../../data/services/product_metrics_service.dart';
+import '../shared/mixins/review_prompt_on_exit_mixin.dart';
 import '../shared/providers/ad_gate_providers.dart';
 import '../shared/providers/admob_providers.dart';
 import '../shared/providers/premium_providers.dart';
@@ -104,7 +105,8 @@ class _ViewerBody extends ConsumerStatefulWidget {
   ConsumerState<_ViewerBody> createState() => _ViewerBodyState();
 }
 
-class _ViewerBodyState extends ConsumerState<_ViewerBody> {
+class _ViewerBodyState extends ConsumerState<_ViewerBody>
+    with ReviewPromptOnExitMixin {
   PageController? _pc;
   late int _settledPage;
   bool _adGateShowing = false;
@@ -118,6 +120,7 @@ class _ViewerBodyState extends ConsumerState<_ViewerBody> {
   @override
   void initState() {
     super.initState();
+    startReviewPromptTracking();
     final safe = widget.initialIndex.clamp(0, widget.cards.length - 1);
     _settledPage = safe;
     _pc = PageController(initialPage: safe, viewportFraction: 1);
@@ -146,6 +149,7 @@ class _ViewerBodyState extends ConsumerState<_ViewerBody> {
 
   @override
   void dispose() {
+    maybeRequestReviewOnExit();
     _pc?.dispose();
     super.dispose();
   }

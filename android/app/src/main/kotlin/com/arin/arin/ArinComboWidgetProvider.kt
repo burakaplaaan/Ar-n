@@ -541,7 +541,10 @@ class ArinComboWidgetProvider : HomeWidgetProvider() {
         val t = raw.trim()
         if (t.isEmpty()) return "İmsak"
         if (containsArabic(t)) return "İmsak"
-        return when (t.lowercase()) {
+        // Türkçe 'İ' düzeltmesi: lowercase() "İkindi" -> "i̇kindi" (birleşik
+        // noktalı i) ürettiği için "ikindi" ile eşleşmiyordu; İ/I önce elle
+        // Türkçe kurala göre indirilir.
+        return when (t.replace('İ', 'i').replace('I', 'ı').lowercase()) {
             "fajr" -> "İmsak"
             "sunrise" -> "Güneş"
             "dhuhr" -> "Öğle"

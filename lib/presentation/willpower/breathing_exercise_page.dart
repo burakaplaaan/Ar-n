@@ -51,7 +51,6 @@ class _BreathingExercisePageState extends ConsumerState<BreathingExercisePage>
   late AnimationController _completeEnterController;
   late final BreathingHeartbeatAudio _heartbeatAudio;
   Timer? _phaseTransitionTimer;
-  Timer? _phaseTickTimer;
   DateTime? _phaseEndsAt;
   bool _isDisposing = false;
 
@@ -144,13 +143,14 @@ class _BreathingExercisePageState extends ConsumerState<BreathingExercisePage>
     final dur = Duration(seconds: _phaseDurations[_phaseIndex]);
     _phaseEndsAt = DateTime.now().add(dur);
     _phaseTransitionTimer = Timer(dur, _handlePhaseElapsed);
-    _phaseTickTimer = Timer.periodic(const Duration(milliseconds: 200), (_) {
-      if (!mounted || _isDisposing || _intro || _sessionComplete) {
-        _cancelPhaseTimers();
-        return;
-      }
-      setState(() {});
-    });
+    // NOT: Önceden burada 200ms'de bir tüm Scaffold'u `setState(() {})` ile
+    // yeniden build eden bir Timer.periodic vardı. Geri sayım metni zaten
+    // `_buildSessionTopOverlay` içinde `_scaleController`/`_pulseController`'ı
+    // dinleyen bir `AnimatedBuilder` ile güncelleniyor (bu controller'lar
+    // faz süresi boyunca her frame tick atıyor, holdIn'de değer sabit kalsa
+    // bile). O periyodik timer tamamen gereksiz saniyede 5 kez tam sayfa
+    // rebuild'e (ve BackdropFilter blur'ının yeniden çizilmesine) yol açıyordu
+    // — kaldırıldı. Sayaç davranışı değişmedi, sadece gereksiz rebuild gitti.
     _scaleController.duration = dur;
 
     switch (_phase) {
@@ -221,8 +221,6 @@ class _BreathingExercisePageState extends ConsumerState<BreathingExercisePage>
   void _cancelPhaseTimers() {
     _phaseTransitionTimer?.cancel();
     _phaseTransitionTimer = null;
-    _phaseTickTimer?.cancel();
-    _phaseTickTimer = null;
   }
 
   double get _displayScale {
@@ -278,9 +276,10 @@ class _BreathingExercisePageState extends ConsumerState<BreathingExercisePage>
   /// sistem zamanlayıcısıyla kararabilir).
   ///
   /// ÖNEMLİ: Doğru serbest bırakma, bu sayfanın gerçek bir route olmasına
-  /// (IndexedStack / keep-alive branch DEĞİL) ve uygulamadaki TEK WakelockPlus
-  /// tüketicisi olmasına dayanır. `WakelockPlus` global bir bayraktır
-  /// (ref-count yok); ileride başka bir ekran da kullanırsa veya bu sayfa
+  /// (IndexedStack / keep-alive branch DEĞİL) dayanır. `WakelockPlus` global
+  /// bir bayraktır (ref-count yok). Diğer tüketici: QiblaPage (kıble hub'ı
+  /// içinde gerçek route). İki sayfa asla aynı anda ekranda olamaz ve ikisi de
+  /// dispose'da bırakır; yeni bir tüketici eklenirse ya da bu sayfalar
   /// offscreen'de canlı tutulursa serbest bırakma mantığı gözden geçirilmeli.
   void _enableWakelock() {
     unawaited(

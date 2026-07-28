@@ -29,6 +29,7 @@ import '../../presentation/habits/habit_calendar_page.dart';
 import '../../presentation/kaza/kaza_calculator_page.dart';
 import '../../presentation/kaza/kaza_tracker_page.dart';
 import '../../presentation/qibla/qibla_hub_page.dart';
+import '../../presentation/qibla/prayer_circle/prayer_circle_page.dart';
 import '../../presentation/settings/admin_content_page.dart';
 import '../../presentation/settings/admin_notifications_page.dart';
 import '../../presentation/settings/admin_performance_page.dart';
@@ -63,6 +64,11 @@ abstract final class AppRoutes {
   static const String home = '/home';
   static const String premium = '/premium';
   static const String qibla = '/qibla';
+  static const String prayerCircle = '/qibla/prayer-circle';
+  static String prayerCircleRequest(String requestId) => Uri(
+    path: prayerCircle,
+    queryParameters: {'request': requestId},
+  ).toString();
   static const String habits = '/habits';
 
   /// Irade hub’ında Arınma sekmesini aç (Gelişim’e sıfırlamayı önler).
@@ -305,6 +311,15 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: AppRoutes.qibla,
             pageBuilder: (context, state) => _page(state, const QiblaHubPage()),
+          ),
+          GoRoute(
+            path: AppRoutes.prayerCircle,
+            pageBuilder: (context, state) => _page(
+              state,
+              PrayerCirclePage(
+                focusRequestId: state.uri.queryParameters['request'],
+              ),
+            ),
           ),
           GoRoute(
             path: AppRoutes.habits,

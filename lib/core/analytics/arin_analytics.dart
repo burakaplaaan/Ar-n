@@ -51,6 +51,11 @@ abstract final class ArinAnalytics {
     }
     try {
       _instance ??= FirebaseAnalytics.instance;
+      // Native config ilk açılış performansı için collection'ı kapalı
+      // başlatıyor. Dart wrapper'ı etkinleştirmek tek başına yeterli değildir;
+      // first_open/session ve özel event'lerin gönderilebilmesi için native
+      // Firebase Analytics collection da açıkça açılmalıdır.
+      await _instance!.setAnalyticsCollectionEnabled(true);
       _observer ??= FirebaseAnalyticsObserver(analytics: _instance!);
       _enabled = true;
       debugPrint('══ ARIN ══ Analytics: enabled.');

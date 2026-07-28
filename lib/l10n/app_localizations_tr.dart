@@ -3854,10 +3854,34 @@ class AppLocalizationsTr extends AppLocalizations {
   String get qiblaCompassRetry => 'Yeniden dene';
 
   @override
-  String get qiblaCompassAligned => 'Kıbleye dönüktür';
+  String get qiblaCompassAligned => 'Yönünüz Kâbe\'ye dönük';
 
   @override
   String get qiblaCompassDeviation => 'sapma';
+
+  @override
+  String qiblaCompassDistanceKm(Object distance) {
+    return 'Kâbe\'ye $distance km';
+  }
+
+  @override
+  String qiblaCompassDistanceM(Object distance) {
+    return 'Kâbe\'ye $distance m';
+  }
+
+  @override
+  String get qiblaCompassProximityFar => 'Kalbin yönü hiç şaşmaz';
+
+  @override
+  String get qiblaCompassProximityApproaching => 'Her adım O\'na bir davettir';
+
+  @override
+  String get qiblaCompassProximityMecca =>
+      'Haremeyn topraklarındasınız, Rabbim kabul etsin';
+
+  @override
+  String get qiblaCompassProximityHaram =>
+      'Kâbe\'nin huzurundasınız, dualarınız kabul olsun';
 
   @override
   String get qiblaCompassStabilizing => 'Ölçüm sabitleniyor';
@@ -3888,7 +3912,7 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get qiblaCompassGuidanceGoodBody =>
-      'Telefonu yatay tut, kıbleye yavaşça dön. Sabitlenince yeşil rozet yanar.';
+      'Telefonu yatay tut, kıbleye yavaşça dön. Hizalanınca altın ışık yanar.';
 
   @override
   String get qiblaCompassNorth => 'K';
@@ -4450,4 +4474,223 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String get insightCommentDefault =>
       'Geçmiş günler verisi senin için bir ayna: eksik kalan yerlerde merhamet, tamamlananlarda şükür.';
+
+  @override
+  String get qiblaHubPrayerCircleTitle => 'Dua Halkası';
+
+  @override
+  String get qiblaHubPrayerCircleSubtitle =>
+      'Dua talebini paylaş, gönülden eşlik et';
+
+  @override
+  String get prayerCircleTitle => 'Dua Halkası';
+
+  @override
+  String get prayerCircleHeroTitle => 'Bir duaya gönülden eşlik et';
+
+  @override
+  String get prayerCircleHeroBody =>
+      'İsimsiz dua talepleri burada buluşur. Birbirimizin niyetine sessizce “âmin” diyelim.';
+
+  @override
+  String get prayerCircleTwentyFourHours => 'Her talep 24 saat halkada kalır';
+
+  @override
+  String get prayerCircleAll => 'Dua halkası';
+
+  @override
+  String get prayerCircleMine => 'Dualarım';
+
+  @override
+  String get prayerCircleCreate => 'Dua talebi gönder';
+
+  @override
+  String get prayerCircleEmptyTitle => 'Halka yeni bir duayı bekliyor';
+
+  @override
+  String get prayerCircleEmptyBody =>
+      'İlk dua talebini paylaşarak bu iyilik halkasını başlatabilirsin.';
+
+  @override
+  String get prayerCircleMineEmptyTitle => 'Henüz bir dua talebin yok';
+
+  @override
+  String get prayerCircleMineEmptyBody =>
+      'Kalbindeki niyeti isimsiz olarak paylaş; talebin 24 saat burada kalsın.';
+
+  @override
+  String get prayerCircleLoadFailed => 'Dua halkası yüklenemedi';
+
+  @override
+  String get prayerCircleTryAgain => 'Tekrar dene';
+
+  @override
+  String get prayerCircleComposeTitle => 'Dua talebini yaz';
+
+  @override
+  String get prayerCircleComposeBody =>
+      'Kısa, içten ve kişisel bilgi içermeyen bir niyet paylaş.';
+
+  @override
+  String get prayerCircleHint =>
+      'Örn. Ailem için sağlık ve huzur duası rica ediyorum…';
+
+  @override
+  String get prayerCircleCategory => 'Niyet konusu';
+
+  @override
+  String get prayerCircleCategoryGeneral => 'Genel';
+
+  @override
+  String get prayerCircleCategoryHealth => 'Sağlık';
+
+  @override
+  String get prayerCircleCategoryFamily => 'Aile';
+
+  @override
+  String get prayerCircleCategoryPeace => 'Huzur';
+
+  @override
+  String get prayerCircleCategoryEducation => 'Eğitim';
+
+  @override
+  String get prayerCircleCategoryWork => 'İş ve rızık';
+
+  @override
+  String get prayerCirclePrivacyNote =>
+      'Güvenliğin için ad, telefon, sosyal medya, ödeme bilgisi veya bağlantı paylaşma. Otomatik kontroller ve kullanıcı bildirimleri uygulanır; kişisel bilgi paylaşmama sorumluluğu sana aittir.';
+
+  @override
+  String get prayerCircleContinue => 'Göndermeye devam et';
+
+  @override
+  String get prayerCircleTooShort => 'Dua talebin en az 8 karakter olmalı.';
+
+  @override
+  String get prayerCircleAdGateTitle => 'Duanı halkaya ekle';
+
+  @override
+  String get prayerCircleAdGateBody =>
+      'Ücretsiz kullanımda her dua talebi için kısa bir ödüllü reklam izlenir. Premium’da reklam gösterilmez.';
+
+  @override
+  String get prayerCircleWatchAd => 'Reklam izle ve gönder';
+
+  @override
+  String get prayerCirclePremiumOption => 'Premium ile reklamsız gönder';
+
+  @override
+  String get prayerCircleAdFailed =>
+      'Reklam şu an hazırlanamadı. Lütfen biraz sonra tekrar dene.';
+
+  @override
+  String get prayerCircleSent =>
+      'Dua talebin halkaya eklendi. Hayra vesile olsun.';
+
+  @override
+  String get prayerCirclePray => 'Dua ettim';
+
+  @override
+  String get prayerCirclePrayed => 'Eşlik ettin';
+
+  @override
+  String get prayerCircleOwnRequest => 'Senin duan';
+
+  @override
+  String get prayerCircleYours => 'Senin talebin';
+
+  @override
+  String get prayerCirclePrayedThanks => 'Âmin. Bu duaya gönülden eşlik ettin.';
+
+  @override
+  String get prayerCircleAlreadyPrayed => 'Bu duaya daha önce eşlik ettin.';
+
+  @override
+  String prayerCirclePrayerCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count kişi dua etti',
+      one: '1 kişi dua etti',
+      zero: 'Henüz dua eden yok',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String prayerCircleHoursLeft(int hours) {
+    String _temp0 = intl.Intl.pluralLogic(
+      hours,
+      locale: localeName,
+      other: '$hours saat kaldı',
+      one: '1 saat kaldı',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String prayerCircleMinutesLeft(int minutes) {
+    String _temp0 = intl.Intl.pluralLogic(
+      minutes,
+      locale: localeName,
+      other: '$minutes dk kaldı',
+      one: '1 dk kaldı',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get prayerCircleLoadMore => 'Daha fazla göster';
+
+  @override
+  String get prayerCircleReportTitle => 'Bu dua talebi bildirilsin mi?';
+
+  @override
+  String get prayerCircleReportBody =>
+      'Bildirimler halkanın güvenli kalmasına yardımcı olur. Talep incelenecektir.';
+
+  @override
+  String get prayerCircleReportAction => 'Bildir';
+
+  @override
+  String get prayerCircleReported => 'Teşekkürler. Talep bildirildi.';
+
+  @override
+  String get prayerCircleAcceptRulesLabel =>
+      'Talebin isimsiz paylaşılır ve topluluk kurallarına uygun olmalı.';
+
+  @override
+  String get prayerCircleAcceptRulesRequired =>
+      'Göndermeden önce topluluk kurallarını onayla.';
+
+  @override
+  String get prayerCircleMoreActions => 'Diğer işlemler';
+
+  @override
+  String get prayerCircleDeleteTitle => 'Dua talebini kaldır?';
+
+  @override
+  String get prayerCircleDeleteBody =>
+      'Talep halkadan hemen kaldırılır ve geri alınamaz.';
+
+  @override
+  String get prayerCircleDeleteAction => 'Kaldır';
+
+  @override
+  String get prayerCircleCancel => 'Vazgeç';
+
+  @override
+  String get prayerCircleSlowDown =>
+      'Çok hızlı işlem yaptın. Kısa süre sonra tekrar dene.';
+
+  @override
+  String get prayerCircleContentRejected =>
+      'Metni kontrol et; kişisel, iletişim veya ödeme bilgisi paylaşma.';
+
+  @override
+  String get prayerCircleExpired => 'Bu dua talebinin süresi dolmuş olabilir.';
+
+  @override
+  String get prayerCircleGenericError =>
+      'İşlem tamamlanamadı. Bağlantını kontrol edip tekrar dene.';
 }

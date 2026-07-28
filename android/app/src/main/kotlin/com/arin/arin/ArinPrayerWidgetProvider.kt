@@ -405,7 +405,10 @@ class ArinPrayerWidgetProvider : HomeWidgetProvider() {
         val t = raw.trim()
         if (t.isEmpty()) return "İmsak"
         if (containsArabic(t)) return "İmsak"
-        return when (t.lowercase()) {
+        // Türkçe 'İ' düzeltmesi: lowercase() "İkindi" -> "i̇kindi" (birleşik
+        // noktalı i) ürettiği için "ikindi" ile eşleşmiyordu; İ/I önce elle
+        // Türkçe kurala göre indirilir.
+        return when (t.replace('İ', 'i').replace('I', 'ı').lowercase()) {
             "fajr" -> "İmsak"
             "sunrise" -> "Güneş"
             "dhuhr" -> "Öğle"
@@ -482,6 +485,9 @@ class ArinWidgetRestoreReceiver : BroadcastReceiver() {
             ArinComboWidgetProvider.requestUpdate(appContext)
             ArinTrackingWidgetProvider.requestUpdate(appContext)
             ArinZikirWidgetProvider.requestUpdate(appContext)
+            // Kilit ekranı bildirimleri AppWidgetProvider'a bağlı değil; boot/saat/
+            // dil değişiminde kendi alarm'larını da burada yeniden kurmamız gerekir.
+            ArinLockNotifications.syncAll(appContext)
         }
     }
 }

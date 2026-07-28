@@ -3841,10 +3841,33 @@ class AppLocalizationsAr extends AppLocalizations {
   String get qiblaCompassRetry => 'إعادة المحاولة';
 
   @override
-  String get qiblaCompassAligned => 'متجه نحو القبلة';
+  String get qiblaCompassAligned => 'أنت متجه نحو الكعبة';
 
   @override
   String get qiblaCompassDeviation => 'انحراف';
+
+  @override
+  String qiblaCompassDistanceKm(Object distance) {
+    return '$distance كم إلى الكعبة';
+  }
+
+  @override
+  String qiblaCompassDistanceM(Object distance) {
+    return '$distance م إلى الكعبة';
+  }
+
+  @override
+  String get qiblaCompassProximityFar => 'بوصلة القلب لا تخطئ طريقها';
+
+  @override
+  String get qiblaCompassProximityApproaching => 'كل خطوة دعوة إليه';
+
+  @override
+  String get qiblaCompassProximityMecca => 'أنتم في أرض الحرمين المباركة';
+
+  @override
+  String get qiblaCompassProximityHaram =>
+      'أنتم في حضرة الكعبة، تقبل الله دعاءكم';
 
   @override
   String get qiblaCompassStabilizing => 'جاري استقرار القياس';
@@ -3875,7 +3898,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get qiblaCompassGuidanceGoodBody =>
-      'امسك الهاتف بشكل مسطح، استدر ببطء نحو القبلة. تضيء الشارة الخضراء عند الاستقرار.';
+      'امسك الهاتف بشكل مسطح، استدر ببطء نحو القبلة. يظهر توهج ذهبي عند المحاذاة.';
 
   @override
   String get qiblaCompassNorth => 'ش';
@@ -4431,4 +4454,232 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get insightCommentDefault =>
       'بيانات الأيام الماضية هي مرآة لك: رحمة في الأجزاء المفقودة، وامتنان في الأجزاء المكتملة.';
+
+  @override
+  String get qiblaHubPrayerCircleTitle => 'حلقة الدعاء';
+
+  @override
+  String get qiblaHubPrayerCircleSubtitle =>
+      'شارك طلب دعاء ورافق الآخرين بإخلاص';
+
+  @override
+  String get prayerCircleTitle => 'حلقة الدعاء';
+
+  @override
+  String get prayerCircleHeroTitle => 'شارك في دعاء من قلبك';
+
+  @override
+  String get prayerCircleHeroBody =>
+      'تجتمع هنا طلبات الدعاء المجهولة. لنقل آمين بهدوء لنوايا بعضنا.';
+
+  @override
+  String get prayerCircleTwentyFourHours =>
+      'يبقى كل طلب في الحلقة لمدة 24 ساعة';
+
+  @override
+  String get prayerCircleAll => 'حلقة الدعاء';
+
+  @override
+  String get prayerCircleMine => 'أدعيتي';
+
+  @override
+  String get prayerCircleCreate => 'إرسال طلب دعاء';
+
+  @override
+  String get prayerCircleEmptyTitle => 'الحلقة تنتظر دعاءً جديدًا';
+
+  @override
+  String get prayerCircleEmptyBody => 'شارك أول طلب دعاء وابدأ حلقة الخير هذه.';
+
+  @override
+  String get prayerCircleMineEmptyTitle => 'ليس لديك طلب دعاء بعد';
+
+  @override
+  String get prayerCircleMineEmptyBody =>
+      'شارك نيتك دون اسم؛ وسيبقى طلبك هنا لمدة 24 ساعة.';
+
+  @override
+  String get prayerCircleLoadFailed => 'تعذر تحميل حلقة الدعاء';
+
+  @override
+  String get prayerCircleTryAgain => 'حاول مجددًا';
+
+  @override
+  String get prayerCircleComposeTitle => 'اكتب طلب الدعاء';
+
+  @override
+  String get prayerCircleComposeBody =>
+      'شارك نية قصيرة وصادقة دون معلومات شخصية.';
+
+  @override
+  String get prayerCircleHint => 'مثال: أرجو الدعاء لعائلتي بالصحة والسكينة…';
+
+  @override
+  String get prayerCircleCategory => 'موضوع النية';
+
+  @override
+  String get prayerCircleCategoryGeneral => 'عام';
+
+  @override
+  String get prayerCircleCategoryHealth => 'الصحة';
+
+  @override
+  String get prayerCircleCategoryFamily => 'العائلة';
+
+  @override
+  String get prayerCircleCategoryPeace => 'السكينة';
+
+  @override
+  String get prayerCircleCategoryEducation => 'التعليم';
+
+  @override
+  String get prayerCircleCategoryWork => 'العمل والرزق';
+
+  @override
+  String get prayerCirclePrivacyNote =>
+      'من أجل سلامتك، لا تشارك الأسماء أو أرقام الهاتف أو حسابات التواصل أو بيانات الدفع أو الروابط. نستخدم فحوصًا آلية وبلاغات المستخدمين، وتبقى مسؤولًا عن عدم نشر معلوماتك الشخصية.';
+
+  @override
+  String get prayerCircleContinue => 'متابعة الإرسال';
+
+  @override
+  String get prayerCircleTooShort => 'يجب ألا يقل طلب الدعاء عن 8 أحرف.';
+
+  @override
+  String get prayerCircleAdGateTitle => 'أضف دعاءك إلى الحلقة';
+
+  @override
+  String get prayerCircleAdGateBody =>
+      'في الاستخدام المجاني يُشاهد إعلان قصير بمكافأة لكل طلب. لا تظهر الإعلانات لمستخدمي Premium.';
+
+  @override
+  String get prayerCircleWatchAd => 'شاهد الإعلان وأرسل';
+
+  @override
+  String get prayerCirclePremiumOption => 'إرسال بلا إعلانات مع Premium';
+
+  @override
+  String get prayerCircleAdFailed =>
+      'الإعلان غير جاهز الآن. حاول مرة أخرى بعد قليل.';
+
+  @override
+  String get prayerCircleSent =>
+      'تمت إضافة طلب دعائك إلى الحلقة. جعله الله سببًا للخير.';
+
+  @override
+  String get prayerCirclePray => 'دعوت له';
+
+  @override
+  String get prayerCirclePrayed => 'شاركت';
+
+  @override
+  String get prayerCircleOwnRequest => 'دعاؤك';
+
+  @override
+  String get prayerCircleYours => 'طلبك';
+
+  @override
+  String get prayerCirclePrayedThanks =>
+      'آمين. لقد شاركت في هذا الدعاء من قلبك.';
+
+  @override
+  String get prayerCircleAlreadyPrayed => 'لقد شاركت في هذا الدعاء من قبل.';
+
+  @override
+  String prayerCirclePrayerCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count شخص دعا',
+      many: '$count شخصًا دعوا',
+      few: '$count أشخاص دعوا',
+      two: 'شخصان دعيا',
+      one: 'شخص واحد دعا',
+      zero: 'لم يدعُ أحد بعد',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String prayerCircleHoursLeft(int hours) {
+    String _temp0 = intl.Intl.pluralLogic(
+      hours,
+      locale: localeName,
+      other: 'متبقي $hours ساعة',
+      many: 'متبقي $hours ساعة',
+      few: 'متبقي $hours ساعات',
+      two: 'متبقي ساعتان',
+      one: 'متبقي ساعة واحدة',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String prayerCircleMinutesLeft(int minutes) {
+    String _temp0 = intl.Intl.pluralLogic(
+      minutes,
+      locale: localeName,
+      other: 'متبقي $minutes دقيقة',
+      many: 'متبقي $minutes دقيقة',
+      few: 'متبقي $minutes دقائق',
+      two: 'متبقيتان دقيقتان',
+      one: 'متبقي دقيقة واحدة',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get prayerCircleLoadMore => 'عرض المزيد';
+
+  @override
+  String get prayerCircleReportTitle => 'هل تريد الإبلاغ عن طلب الدعاء هذا؟';
+
+  @override
+  String get prayerCircleReportBody =>
+      'تساعد البلاغات في إبقاء الحلقة آمنة ومحترمة. سيتم مراجعة هذا الطلب.';
+
+  @override
+  String get prayerCircleReportAction => 'إبلاغ';
+
+  @override
+  String get prayerCircleReported => 'شكرًا لك. تم الإبلاغ عن هذا الطلب.';
+
+  @override
+  String get prayerCircleAcceptRulesLabel =>
+      'يُنشر طلبك بلا اسم ويجب أن يتوافق مع قواعد المجتمع.';
+
+  @override
+  String get prayerCircleAcceptRulesRequired =>
+      'يرجى تأكيد قواعد المجتمع قبل الإرسال.';
+
+  @override
+  String get prayerCircleMoreActions => 'المزيد من الإجراءات';
+
+  @override
+  String get prayerCircleDeleteTitle => 'إزالة طلب الدعاء؟';
+
+  @override
+  String get prayerCircleDeleteBody =>
+      'سيُزال الطلب من الحلقة فورًا ولا يمكن استعادته.';
+
+  @override
+  String get prayerCircleDeleteAction => 'إزالة';
+
+  @override
+  String get prayerCircleCancel => 'إلغاء';
+
+  @override
+  String get prayerCircleSlowDown =>
+      'تجري العمليات بسرعة كبيرة. حاول مرة أخرى بعد قليل.';
+
+  @override
+  String get prayerCircleContentRejected =>
+      'راجع النص واحذف المعلومات الشخصية أو معلومات الاتصال أو الدفع.';
+
+  @override
+  String get prayerCircleExpired => 'ربما انتهت مدة طلب الدعاء هذا.';
+
+  @override
+  String get prayerCircleGenericError =>
+      'تعذر إكمال العملية. تحقق من اتصالك وحاول مجددًا.';
 }

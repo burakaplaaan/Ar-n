@@ -32,7 +32,8 @@
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher"
         android:allowBackup="false"
-        android:fullBackupContent="false">
+        android:fullBackupContent="false"
+        android:enableOnBackInvokedCallback="false">
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -205,6 +206,25 @@
                 <action android:name="android.intent.action.LOCALE_CHANGED" />
                 <action android:name="android.intent.action.QUICKBOOT_POWERON" />
                 <action android:name="com.htc.intent.action.QUICKBOOT_POWERON" />
+            </intent-filter>
+        </receiver>
+
+        <!-- Kilit ekranı bildirim widget'ları: AppWidgetProvider'a bağlı değildir,
+             kendi tick/deadline alarm'larını bu receiver üzerinden alır. -->
+        <receiver
+            android:name=".ArinLockNotificationReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.arin.arin.action.LOCK_NOTIF_TICK_prayer" />
+                <action android:name="com.arin.arin.action.LOCK_NOTIF_TICK_quote" />
+                <action android:name="com.arin.arin.action.LOCK_NOTIF_TICK_combo" />
+                <action android:name="com.arin.arin.action.LOCK_NOTIF_TICK_zikir" />
+                <action android:name="com.arin.arin.action.LOCK_NOTIF_TICK_tracking" />
+                <action android:name="com.arin.arin.action.LOCK_NOTIF_DEADLINE_prayer" />
+                <action android:name="com.arin.arin.action.LOCK_NOTIF_DEADLINE_quote" />
+                <action android:name="com.arin.arin.action.LOCK_NOTIF_DEADLINE_combo" />
+                <action android:name="com.arin.arin.action.LOCK_NOTIF_DEADLINE_zikir" />
+                <action android:name="com.arin.arin.action.LOCK_NOTIF_DEADLINE_tracking" />
             </intent-filter>
         </receiver>
 

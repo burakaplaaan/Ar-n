@@ -3,8 +3,11 @@ package com.arin.arin
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.hardware.GeomagneticField
 import android.media.RingtoneManager
+import android.view.KeyEvent
 import androidx.core.content.FileProvider
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
@@ -20,6 +23,11 @@ class MainActivity : FlutterActivity() {
 
     private var pendingWidgetLaunchKind: String? = null
     private var pendingWidgetLaunchLock: String? = null
+    private var systemBackChannel: MethodChannel? = null
+    private var systemBackDispatchPending = false
+    private var systemBackGeneration = 0L
+    private var systemBackRequestId = 0L
+    private val mainHandler = Handler(Looper.getMainLooper())
 
     override fun onCreate(savedInstanceState: Bundle?) {
         pendingWidgetLaunchKind = intent?.getStringExtra(EXTRA_WIDGET_KIND)
@@ -34,9 +42,70 @@ class MainActivity : FlutterActivity() {
         pendingWidgetLaunchLock = intent.getStringExtra(EXTRA_WIDGET_LOCK)
     }
 
+    @Suppress("DEPRECATION")
+    override fun dispatchKeyEvent(event: KeyEvent): Boolean {
+        if (event.keyCode == KeyEvent.KEYCODE_BACK) {
+            if (event.action == KeyEvent.ACTION_UP && !event.isCanceled) {
+                onBackPressed()
+            }
+            return true
+        }
+        return super.dispatchKeyEvent(event)
+    }
+
+    @Suppress("DEPRECATION")
+    override fun onBackPressed() {
+        val channel = systemBackChannel
+        if (channel == null || systemBackDispatchPending) {
+            if (channel == null) super.onBackPressed()
+            return
+        }
+        systemBackDispatchPending = true
+        val generation = systemBackGeneration
+        val requestId = ++systemBackRequestId
+        var completed = false
+        lateinit var timeout: Runnable
+
+        val complete: (Boolean) -> Unit = complete@{ handled ->
+            if (completed) return@complete
+            completed = true
+            mainHandler.removeCallbacks(timeout)
+            if (generation != systemBackGeneration || requestId != systemBackRequestId) {
+                return@complete
+            }
+            systemBackDispatchPending = false
+            if (!handled && !isFinishing && !isDestroyed) {
+                super@MainActivity.onBackPressed()
+            }
+        }
+        timeout = Runnable { complete(false) }
+        mainHandler.postDelayed(timeout, 1_000L)
+
+        try {
+            channel.invokeMethod("handleBack", null, object : MethodChannel.Result {
+                override fun success(result: Any?) {
+                    complete(result == true)
+                }
+
+                override fun error(code: String, message: String?, details: Any?) {
+                    complete(false)
+                }
+
+                override fun notImplemented() {
+                    complete(false)
+                }
+            })
+        } catch (_: RuntimeException) {
+            complete(false)
+        }
+    }
+
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
         val messenger = flutterEngine.dartExecutor.binaryMessenger
+
+        systemBackGeneration += 1
+        systemBackChannel = MethodChannel(messenger, "com.arin.arin/system_back")
 
         MethodChannel(messenger, "com.arin.arin/widget_launch")
             .setMethodCallHandler { call, result ->
@@ -229,6 +298,21 @@ class MainActivity : FlutterActivity() {
                 }
             }
 
+        // Kilit ekranı bildirim widget'ları: toggle değişince veya
+        // ArinWidgetSync bir push yapınca Flutter bu kanaldan native'i
+        // tetikler (AppWidgetProvider instance'ına bağlı olmadığı için
+        // widget update broadcast'lerine güvenemez).
+        MethodChannel(messenger, "com.arin.arin/lock_notifications")
+            .setMethodCallHandler { call, result ->
+                when (call.method) {
+                    "syncAll" -> {
+                        ArinLockNotifications.syncAll(applicationContext)
+                        result.success(true)
+                    }
+                    else -> result.notImplemented()
+                }
+            }
+
         // ── Pusula (rotation-vector → heading + manyetik deklinasyon) ─────
         EventChannel(messenger, "com.arin.arin/rotation_compass")
             .setStreamHandler(RotationVectorCompassStream(this))
@@ -254,6 +338,14 @@ class MainActivity : FlutterActivity() {
                     else -> result.notImplemented()
                 }
             }
+    }
+
+    override fun cleanUpFlutterEngine(flutterEngine: FlutterEngine) {
+        systemBackGeneration += 1
+        systemBackRequestId += 1
+        systemBackChannel = null
+        systemBackDispatchPending = false
+        super.cleanUpFlutterEngine(flutterEngine)
     }
 
     // ─────────────────────────────────────────────────────────────────────

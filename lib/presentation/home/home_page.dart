@@ -594,8 +594,10 @@ class _PrayerTimesList extends StatelessWidget {
             // ölçeği seçiliyse hücre içeriği (ikon + ad + "Sıradaki vakit" +
             // saat) kutuya sığmayıp üst üste biniyordu. Bu gridi sabit ölçekle
             // render ederek her cihazda aynı, taşmasız görünmesini sağlıyoruz.
-            MediaQuery.withClampedTextScaling(
-              maxScaleFactor: 1.0,
+            MediaQuery(
+              data: MediaQuery.of(
+                context,
+              ).copyWith(textScaler: TextScaler.noScaling),
               child: GridView.builder(
                 itemCount: model.orderedPrayers.length,
                 shrinkWrap: true,

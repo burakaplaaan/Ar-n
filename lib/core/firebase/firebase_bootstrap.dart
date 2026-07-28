@@ -16,12 +16,15 @@ Future<void> bootstrapFirebase() async {
     );
     isFirebaseReady = true;
     if (!kIsWeb) {
+      // Release/profile build'lerde debug provider'ı build flag ile dahi
+      // açılamaz. Store paketleri her zaman gerçek attestation kullanır.
+      const useDebugProvider = kDebugMode;
       try {
         await FirebaseAppCheck.instance.activate(
-          providerAndroid: kDebugMode
+          providerAndroid: useDebugProvider
               ? const AndroidDebugProvider()
               : const AndroidPlayIntegrityProvider(),
-          providerApple: kDebugMode
+          providerApple: useDebugProvider
               ? const AppleDebugProvider()
               : const AppleAppAttestWithDeviceCheckFallbackProvider(),
         );

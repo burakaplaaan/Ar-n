@@ -367,6 +367,18 @@ Future<void> _runDeferredStartup(SharedPreferences prefs) async {
   if (deferredStartupDone) return;
   final onboardingCompleted = _isOnboardingCompletedForStartup(prefs);
 
+  if (!kIsWeb && (Platform.isAndroid || Platform.isIOS)) {
+    // Kurulum attribution'ı onboarding tamamlanmasına bağlama. Bu fonksiyon
+    // ilk görünür frame'den sonra kimliksiz Meta ölçümünü başlatır; ATT sistemi
+    // burada gösterilmez. Eşzamanlı çağrı koruması tekrarları önler.
+    unawaited(MetaAppEvents.initialize());
+    if (onboardingCompleted && Platform.isIOS) {
+      // Önceki kullanıcı etkileşiminden kalan ATT isteği süreç kapanmış olsa
+      // bile kaybolmasın; yalnızca kalıcı pending işareti varsa yeniden denenir.
+      unawaited(MetaAppEvents.retryPendingTrackingAuthorizationIfNeeded());
+    }
+  }
+
   // İlk kurulum/onboarding sırasında WebKit (AdMob), notification migration
   // ve legacy cleanup işleri çalışmasın. Kullanıcı daha ismini yazarken
   // WebContent/Networking process 10+ sn spawn oluyordu; bu da ilk kurulum
@@ -381,15 +393,6 @@ Future<void> _runDeferredStartup(SharedPreferences prefs) async {
 
   if (!kIsWeb) {
     if (Platform.isAndroid || Platform.isIOS) {
-      // Meta App Events + iOS ATT — AEM / install attribution.
-      // AdMob'dan önce; ATT diyaloğu reklam SDK'sından bağımsız çıksın.
-      unawaited(
-        Future<void>.delayed(
-          const Duration(seconds: 2),
-          MetaAppEvents.initialize,
-        ),
-      );
-
       if (Platform.isAndroid) {
         // Android widget kilidi ödüllü reklamı uygulama açılır açılmaz
         // isteyebilir. SDK'yı geciktirmeden hazırlayarak ilk gösterimi iOS'taki

@@ -19,6 +19,7 @@ import '../../data/models/zikir_matik_tur_log.dart';
 import '../../data/repositories/zikir_matik_repository.dart';
 import '../../data/services/zikir_widget_service.dart';
 import 'zikir_bilgisi_page.dart';
+import '../shared/mixins/review_prompt_on_exit_mixin.dart';
 import '../shared/widgets/tasbeeh_zikirmatik_device_frame.dart';
 import '../shared/widgets/arin_back_button.dart';
 
@@ -99,7 +100,10 @@ class ZikirMatikPage extends ConsumerStatefulWidget {
 }
 
 class _ZikirMatikPageState extends ConsumerState<ZikirMatikPage>
-    with TickerProviderStateMixin, WidgetsBindingObserver {
+    with
+        TickerProviderStateMixin,
+        WidgetsBindingObserver,
+        ReviewPromptOnExitMixin {
   ZikirMatikRepository? _repo;
 
   static const _uuid = Uuid();
@@ -146,6 +150,7 @@ class _ZikirMatikPageState extends ConsumerState<ZikirMatikPage>
   @override
   void initState() {
     super.initState();
+    startReviewPromptTracking();
     WidgetsBinding.instance.addObserver(this);
     _phraseAnim = AnimationController(
       vsync: this,
@@ -173,6 +178,7 @@ class _ZikirMatikPageState extends ConsumerState<ZikirMatikPage>
 
   @override
   void dispose() {
+    maybeRequestReviewOnExit();
     WidgetsBinding.instance.removeObserver(this);
     // Bekleyen debounce varsa kaybetmeden flush et — sayfadan çıkarken
     // son tap yazıldığından emin olalım.

@@ -1696,8 +1696,24 @@
   "qiblaCompassGettingLocation": "جاري تحديد الموقع…",
   "qiblaCompassInitError": "تعذر تهيئة\nالموقع أو البوصلة",
   "qiblaCompassRetry": "إعادة المحاولة",
-  "qiblaCompassAligned": "متجه نحو القبلة",
+  "qiblaCompassAligned": "أنت متجه نحو الكعبة",
   "qiblaCompassDeviation": "انحراف",
+  "qiblaCompassDistanceKm": "{distance} كم إلى الكعبة",
+  "@qiblaCompassDistanceKm": {
+    "placeholders": {
+      "distance": {}
+    }
+  },
+  "qiblaCompassDistanceM": "{distance} م إلى الكعبة",
+  "@qiblaCompassDistanceM": {
+    "placeholders": {
+      "distance": {}
+    }
+  },
+  "qiblaCompassProximityFar": "بوصلة القلب لا تخطئ طريقها",
+  "qiblaCompassProximityApproaching": "كل خطوة دعوة إليه",
+  "qiblaCompassProximityMecca": "أنتم في أرض الحرمين المباركة",
+  "qiblaCompassProximityHaram": "أنتم في حضرة الكعبة، تقبل الله دعاءكم",
   "qiblaCompassStabilizing": "جاري استقرار القياس",
   "qiblaCompassGuidanceTiltTitle": "امسك الهاتف بشكل مسطح",
   "qiblaCompassGuidanceTiltBody": "استخدم البوصلة أفقيًا. لن يتم قفل الاتجاه إذا تم الإمساك به بشكل عمودي أو جانبي أو مقلوب.",
@@ -1706,7 +1722,7 @@
   "qiblaCompassGuidanceUnstableTitle": "المجال المغناطيسي غير مستقر",
   "qiblaCompassGuidanceUnstableBody": "ابتعد عن أجهزة الكمبيوتر المحمولة والمغناطيس والطاولات المعدنية والأغطية المغناطيسية.",
   "qiblaCompassGuidanceGoodTitle": "القياس جاهز",
-  "qiblaCompassGuidanceGoodBody": "امسك الهاتف بشكل مسطح، استدر ببطء نحو القبلة. تضيء الشارة الخضراء عند الاستقرار.",
+  "qiblaCompassGuidanceGoodBody": "امسك الهاتف بشكل مسطح، استدر ببطء نحو القبلة. يظهر توهج ذهبي عند المحاذاة.",
   "qiblaCompassNorth": "ش",
   "qiblaCompassEast": "ق",
   "qiblaCompassSouth": "ج",
@@ -1870,5 +1886,79 @@
   "insightCommentZero": "ربما لم يتم تسجيل الأمس أو التحقق منه بعد. حتى بصلاة واحدة اليوم، يمكنك إعادة رسم الخط.",
   "insightCommentLow": "المتوسط منخفض هذا الأسبوع؛ هذا طبيعي — يرتفع بالتأمل والخطوات الصغيرة. صلاة واحدة إضافية تحدث فرقاً كبيراً.",
   "insightCommentGood": "تم تحديد {count}/5 صلوات أمس؛ من الممكن إكمال التوازن بصلاة أو صلاتين اليوم.",
-  "insightCommentDefault": "بيانات الأيام الماضية هي مرآة لك: رحمة في الأجزاء المفقودة، وامتنان في الأجزاء المكتملة."
+  "insightCommentDefault": "بيانات الأيام الماضية هي مرآة لك: رحمة في الأجزاء المفقودة، وامتنان في الأجزاء المكتملة.",
+  "qiblaHubPrayerCircleTitle": "حلقة الدعاء",
+  "qiblaHubPrayerCircleSubtitle": "شارك طلب دعاء ورافق الآخرين بإخلاص",
+  "prayerCircleTitle": "حلقة الدعاء",
+  "prayerCircleHeroTitle": "شارك في دعاء من قلبك",
+  "prayerCircleHeroBody": "تجتمع هنا طلبات الدعاء المجهولة. لنقل آمين بهدوء لنوايا بعضنا.",
+  "prayerCircleTwentyFourHours": "يبقى كل طلب في الحلقة لمدة 24 ساعة",
+  "prayerCircleAll": "حلقة الدعاء",
+  "prayerCircleMine": "أدعيتي",
+  "prayerCircleCreate": "إرسال طلب دعاء",
+  "prayerCircleEmptyTitle": "الحلقة تنتظر دعاءً جديدًا",
+  "prayerCircleEmptyBody": "شارك أول طلب دعاء وابدأ حلقة الخير هذه.",
+  "prayerCircleMineEmptyTitle": "ليس لديك طلب دعاء بعد",
+  "prayerCircleMineEmptyBody": "شارك نيتك دون اسم؛ وسيبقى طلبك هنا لمدة 24 ساعة.",
+  "prayerCircleLoadFailed": "تعذر تحميل حلقة الدعاء",
+  "prayerCircleTryAgain": "حاول مجددًا",
+  "prayerCircleComposeTitle": "اكتب طلب الدعاء",
+  "prayerCircleComposeBody": "شارك نية قصيرة وصادقة دون معلومات شخصية.",
+  "prayerCircleHint": "مثال: أرجو الدعاء لعائلتي بالصحة والسكينة…",
+  "prayerCircleCategory": "موضوع النية",
+  "prayerCircleCategoryGeneral": "عام",
+  "prayerCircleCategoryHealth": "الصحة",
+  "prayerCircleCategoryFamily": "العائلة",
+  "prayerCircleCategoryPeace": "السكينة",
+  "prayerCircleCategoryEducation": "التعليم",
+  "prayerCircleCategoryWork": "العمل والرزق",
+  "prayerCirclePrivacyNote": "من أجل سلامتك، لا تشارك الأسماء أو أرقام الهاتف أو حسابات التواصل أو بيانات الدفع أو الروابط. نستخدم فحوصًا آلية وبلاغات المستخدمين، وتبقى مسؤولًا عن عدم نشر معلوماتك الشخصية.",
+  "prayerCircleContinue": "متابعة الإرسال",
+  "prayerCircleTooShort": "يجب ألا يقل طلب الدعاء عن 8 أحرف.",
+  "prayerCircleAdGateTitle": "أضف دعاءك إلى الحلقة",
+  "prayerCircleAdGateBody": "في الاستخدام المجاني يُشاهد إعلان قصير بمكافأة لكل طلب. لا تظهر الإعلانات لمستخدمي Premium.",
+  "prayerCircleWatchAd": "شاهد الإعلان وأرسل",
+  "prayerCirclePremiumOption": "إرسال بلا إعلانات مع Premium",
+  "prayerCircleAdFailed": "الإعلان غير جاهز الآن. حاول مرة أخرى بعد قليل.",
+  "prayerCircleSent": "تمت إضافة طلب دعائك إلى الحلقة. جعله الله سببًا للخير.",
+  "prayerCirclePray": "دعوت له",
+  "prayerCirclePrayed": "شاركت",
+  "prayerCircleOwnRequest": "دعاؤك",
+  "prayerCircleYours": "طلبك",
+  "prayerCirclePrayedThanks": "آمين. لقد شاركت في هذا الدعاء من قلبك.",
+  "prayerCircleAlreadyPrayed": "لقد شاركت في هذا الدعاء من قبل.",
+  "prayerCirclePrayerCount": "{count, plural, =0{لم يدعُ أحد بعد} =1{شخص واحد دعا} two{شخصان دعيا} few{{count} أشخاص دعوا} many{{count} شخصًا دعوا} other{{count} شخص دعا}}",
+  "@prayerCirclePrayerCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "prayerCircleHoursLeft": "{hours, plural, =1{متبقي ساعة واحدة} two{متبقي ساعتان} few{متبقي {hours} ساعات} many{متبقي {hours} ساعة} other{متبقي {hours} ساعة}}",
+  "@prayerCircleHoursLeft": {
+    "placeholders": {
+      "hours": {"type": "int"}
+    }
+  },
+  "prayerCircleMinutesLeft": "{minutes, plural, =1{متبقي دقيقة واحدة} two{متبقيتان دقيقتان} few{متبقي {minutes} دقائق} many{متبقي {minutes} دقيقة} other{متبقي {minutes} دقيقة}}",
+  "@prayerCircleMinutesLeft": {
+    "placeholders": {
+      "minutes": {"type": "int"}
+    }
+  },
+  "prayerCircleLoadMore": "عرض المزيد",
+  "prayerCircleReportTitle": "هل تريد الإبلاغ عن طلب الدعاء هذا؟",
+  "prayerCircleReportBody": "تساعد البلاغات في إبقاء الحلقة آمنة ومحترمة. سيتم مراجعة هذا الطلب.",
+  "prayerCircleReportAction": "إبلاغ",
+  "prayerCircleReported": "شكرًا لك. تم الإبلاغ عن هذا الطلب.",
+  "prayerCircleAcceptRulesLabel": "يُنشر طلبك بلا اسم ويجب أن يتوافق مع قواعد المجتمع.",
+  "prayerCircleAcceptRulesRequired": "يرجى تأكيد قواعد المجتمع قبل الإرسال.",
+  "prayerCircleMoreActions": "المزيد من الإجراءات",
+  "prayerCircleDeleteTitle": "إزالة طلب الدعاء؟",
+  "prayerCircleDeleteBody": "سيُزال الطلب من الحلقة فورًا ولا يمكن استعادته.",
+  "prayerCircleDeleteAction": "إزالة",
+  "prayerCircleCancel": "إلغاء",
+  "prayerCircleSlowDown": "تجري العمليات بسرعة كبيرة. حاول مرة أخرى بعد قليل.",
+  "prayerCircleContentRejected": "راجع النص واحذف المعلومات الشخصية أو معلومات الاتصال أو الدفع.",
+  "prayerCircleExpired": "ربما انتهت مدة طلب الدعاء هذا.",
+  "prayerCircleGenericError": "تعذر إكمال العملية. تحقق من اتصالك وحاول مجددًا."
 }

@@ -24,6 +24,9 @@
     <string name="widget_zikir_phrase_fallback">Zikir</string>
     <string name="widget_zikir_select_prompt">Zikir seçmek için dokunun</string>
     <string name="widget_lock_tap_to_unlock">Açmak için dokunun</string>
+
+    <string name="lock_notif_channel_name">Kilit ekranı widget\'ları</string>
+    <string name="lock_notif_channel_description">Namaz vakti, söz, zikir ve takip bilgilerini kilit ekranında gösteren kalıcı bildirimler.</string>
     <string name="widget_brand_label">Arın</string>
     <string name="widget_placeholder_quote_source">TALAK 3</string>
     <string name="widget_placeholder_quote">Kim Allah\'a tevekkül\nederse, O ona yeter.</string>

@@ -27,7 +27,7 @@ import '../../core/router/app_router.dart';
 import 'location_service.dart';
 
 const _compassChannel = EventChannel('com.arin.arin/rotation_compass');
-const _geomagChannel  = MethodChannel('com.arin.arin/compass_geomagnetic');
+const _geomagChannel = MethodChannel('com.arin.arin/compass_geomagnetic');
 
 /// Tek bir pusula okuması.
 class QiblaSensorReading {
@@ -41,6 +41,7 @@ class QiblaSensorReading {
     required this.jitter,
     required this.stable,
     required this.guidance,
+    this.distanceKm,
   });
 
   /// Cihazın mevcut yönü — 0..360 derece, kuzeyden saat yönüne (TRUE north).
@@ -67,41 +68,44 @@ class QiblaSensorReading {
 
   /// Kullanıcıya gösterilecek kısa yönlendirme tipi.
   final QiblaGuidance guidance;
+
+  /// Mevcut konumdan Kâbe'ye büyük daire mesafesi (km). Konum çözülemezse null.
+  final double? distanceKm;
 }
 
-enum QiblaGuidance {
-  good,
-  tilt,
-  calibrate,
-  unstable,
-}
+enum QiblaGuidance { good, tilt, calibrate, unstable }
 
 class QiblaCompassController {
   // --- throttle -----------------------------------------------------------
-  static const _emitInterval = Duration(milliseconds: 140);
-  static const _minDeltaDeg  = 0.7;
+  // Yakın hedefte de kadranın basamak basamak değil akıcı ilerlemesi için
+  // sensör verisini ekran yenileme hızına yakın bir tempoda aktar.
+  static const _emitInterval = Duration(milliseconds: 20);
+  static const _minDeltaDeg = 0.3;
 
   // --- Kâbe koordinatları (WGS-84) ----------------------------------------
-  static const double _kLat = 21.4225  * math.pi / 180;
+  static const double _kLat = 21.4225 * math.pi / 180;
   static const double _kLon = 39.82619 * math.pi / 180;
 
   // --- İç durum -----------------------------------------------------------
-  final _out  = StreamController<QiblaSensorReading>.broadcast();
-  final _dio  = Dio(BaseOptions(
-    connectTimeout: const Duration(seconds: 8),
-    receiveTimeout: const Duration(seconds: 8),
-  ));
+  final _out = StreamController<QiblaSensorReading>.broadcast();
+  final _dio = Dio(
+    BaseOptions(
+      connectTimeout: const Duration(seconds: 8),
+      receiveTimeout: const Duration(seconds: 8),
+    ),
+  );
 
   Stream<QiblaSensorReading> get stream => _out.stream;
 
   StreamSubscription<dynamic>? _compassSub;
-  bool   _disposed       = false;
-  bool   _started        = false;
+  bool _disposed = false;
+  bool _started = false;
   double _qiblaFromNorth = 0;
-  double _lastHeading    = double.nan;
+  double? _distanceKm;
+  double _lastHeading = double.nan;
   QiblaGuidance? _lastGuidance;
   bool? _lastStable;
-  DateTime _lastEmitAt   = DateTime.fromMillisecondsSinceEpoch(0);
+  DateTime _lastEmitAt = DateTime.fromMillisecondsSinceEpoch(0);
 
   // ── API: AlAdhan Qibla bearing ───────────────────────────────────────────
 
@@ -116,7 +120,7 @@ class QiblaCompassController {
       );
       if (_disposed) return;
       final data = resp.data?['data'];
-      final dir  = (data is Map) ? data['direction'] : null;
+      final dir = (data is Map) ? data['direction'] : null;
       if (dir is num) {
         _qiblaFromNorth = dir.toDouble() % 360;
       }
@@ -164,11 +168,28 @@ class QiblaCompassController {
   static double bearingToKaaba(double lat, double lon) {
     final latRad = lat * math.pi / 180;
     final lonRad = lon * math.pi / 180;
-    final dLon   = _kLon - lonRad;
-    final y      = math.sin(dLon) * math.cos(_kLat);
-    final x      = math.cos(latRad) * math.sin(_kLat) -
-                   math.sin(latRad) * math.cos(_kLat) * math.cos(dLon);
+    final dLon = _kLon - lonRad;
+    final y = math.sin(dLon) * math.cos(_kLat);
+    final x =
+        math.cos(latRad) * math.sin(_kLat) -
+        math.sin(latRad) * math.cos(_kLat) * math.cos(dLon);
     return (math.atan2(y, x) * 180 / math.pi + 360) % 360;
+  }
+
+  /// Haversine: konum → Kâbe büyük daire mesafesi, km.
+  static double distanceToKaabaKm(double lat, double lon) {
+    const earthRadiusKm = 6371.0;
+    final latRad = lat * math.pi / 180;
+    final lonRad = lon * math.pi / 180;
+    final dLat = _kLat - latRad;
+    final dLon = _kLon - lonRad;
+    final a =
+        math.sin(dLat / 2) * math.sin(dLat / 2) +
+        math.cos(latRad) *
+            math.cos(_kLat) *
+            math.sin(dLon / 2) *
+            math.sin(dLon / 2);
+    return 2 * earthRadiusKm * math.atan2(math.sqrt(a), math.sqrt(1 - a));
   }
 
   // ── Manyetik deklinasyonu Kotlin'e gönder ────────────────────────────────
@@ -176,9 +197,9 @@ class QiblaCompassController {
   static Future<void> _syncDeclination(double lat, double lon) async {
     try {
       await _geomagChannel.invokeMethod<double>('update', {
-        'latitude':  lat,
+        'latitude': lat,
         'longitude': lon,
-        'altitude':  0.0,
+        'altitude': 0.0,
       });
     } catch (_) {
       // Başarısızlık kabul edilebilir; sensor manyetik north'a göre devam eder.
@@ -241,6 +262,7 @@ class QiblaCompassController {
 
     // Kıble yönünü ÖNCE yerel hesapla — internet beklemeden pusula çalışsın.
     _qiblaFromNorth = bearingToKaaba(pos.lat, pos.lon);
+    _distanceKm = distanceToKaabaKm(pos.lat, pos.lon);
 
     // AlAdhan API'yi arka planda dener; başarılıysa değeri hassaslaştırır.
     // Kritik yol değil; offline'da sessizce yerel hesapta kalır.
@@ -257,23 +279,23 @@ class QiblaCompassController {
         final reading = _readingFromNative(raw);
         final h = reading.heading;
 
-        final now     = DateTime.now();
+        final now = DateTime.now();
         final elapsed = now.difference(_lastEmitAt);
         final rawDelta = _lastHeading.isNaN
             ? double.infinity
             : (h - _lastHeading).abs();
         final delta = rawDelta > 180 ? 360 - rawDelta : rawDelta;
-        final stateChanged = _lastGuidance != reading.guidance ||
-            _lastStable != reading.stable;
+        final stateChanged =
+            _lastGuidance != reading.guidance || _lastStable != reading.stable;
 
         if (!stateChanged && elapsed < _emitInterval && delta < _minDeltaDeg) {
           return;
         }
 
-        _lastEmitAt   = now;
-        _lastHeading  = h;
+        _lastEmitAt = now;
+        _lastHeading = h;
         _lastGuidance = reading.guidance;
-        _lastStable   = reading.stable;
+        _lastStable = reading.stable;
         _out.add(reading);
       },
       onError: (Object e) {
@@ -306,6 +328,7 @@ class QiblaCompassController {
         jitter: 0,
         stable: true,
         guidance: QiblaGuidance.good,
+        distanceKm: _distanceKm,
       );
     }
 
@@ -321,6 +344,7 @@ class QiblaCompassController {
       jitter: _asDouble(map['jitter']),
       stable: map['stable'] == true && guidance == QiblaGuidance.good,
       guidance: guidance,
+      distanceKm: _distanceKm,
     );
   }
 

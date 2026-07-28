@@ -1696,8 +1696,24 @@
   "qiblaCompassGettingLocation": "Konum alınıyor…",
   "qiblaCompassInitError": "Konum veya pusula\nbaşlatılamadı",
   "qiblaCompassRetry": "Yeniden dene",
-  "qiblaCompassAligned": "Kıbleye dönüktür",
+  "qiblaCompassAligned": "Yönünüz Kâbe'ye dönük",
   "qiblaCompassDeviation": "sapma",
+  "qiblaCompassDistanceKm": "Kâbe'ye {distance} km",
+  "@qiblaCompassDistanceKm": {
+    "placeholders": {
+      "distance": {}
+    }
+  },
+  "qiblaCompassDistanceM": "Kâbe'ye {distance} m",
+  "@qiblaCompassDistanceM": {
+    "placeholders": {
+      "distance": {}
+    }
+  },
+  "qiblaCompassProximityFar": "Kalbin yönü hiç şaşmaz",
+  "qiblaCompassProximityApproaching": "Her adım O'na bir davettir",
+  "qiblaCompassProximityMecca": "Haremeyn topraklarındasınız, Rabbim kabul etsin",
+  "qiblaCompassProximityHaram": "Kâbe'nin huzurundasınız, dualarınız kabul olsun",
   "qiblaCompassStabilizing": "Ölçüm sabitleniyor",
   "qiblaCompassGuidanceTiltTitle": "Telefonu düz tut",
   "qiblaCompassGuidanceTiltBody": "Pusulayı yatay kullan. Dik, yan veya ters tutuşta yön kilitlenmez.",
@@ -1706,7 +1722,7 @@
   "qiblaCompassGuidanceUnstableTitle": "Manyetik alan kararsız",
   "qiblaCompassGuidanceUnstableBody": "Laptop, mıknatıs, metal masa ve manyetik kılıftan uzaklaş.",
   "qiblaCompassGuidanceGoodTitle": "Ölçüm hazır",
-  "qiblaCompassGuidanceGoodBody": "Telefonu yatay tut, kıbleye yavaşça dön. Sabitlenince yeşil rozet yanar.",
+  "qiblaCompassGuidanceGoodBody": "Telefonu yatay tut, kıbleye yavaşça dön. Hizalanınca altın ışık yanar.",
   "qiblaCompassNorth": "K",
   "qiblaCompassEast": "D",
   "qiblaCompassSouth": "G",
@@ -1870,5 +1886,79 @@
   "insightCommentZero": "Dün kayıt düşmemiş olabilir veya henüz işaretlenmemiş. Bugün tek bir vakitle bile çizgiyi yeniden çizebilirsin.",
   "insightCommentLow": "Bu hafta ortalama düşük; bu normal — tefekkür ve küçük adımlarla yükselir. Bir vakit fazlası büyük fark yaratır.",
   "insightCommentGood": "Dün {count}/5 vakit işaretli; bugün bir iki vakitle dengeyi tamamlamak mümkün.",
-  "insightCommentDefault": "Geçmiş günler verisi senin için bir ayna: eksik kalan yerlerde merhamet, tamamlananlarda şükür."
+  "insightCommentDefault": "Geçmiş günler verisi senin için bir ayna: eksik kalan yerlerde merhamet, tamamlananlarda şükür.",
+  "qiblaHubPrayerCircleTitle": "Dua Halkası",
+  "qiblaHubPrayerCircleSubtitle": "Dua talebini paylaş, gönülden eşlik et",
+  "prayerCircleTitle": "Dua Halkası",
+  "prayerCircleHeroTitle": "Bir duaya gönülden eşlik et",
+  "prayerCircleHeroBody": "İsimsiz dua talepleri burada buluşur. Birbirimizin niyetine sessizce “âmin” diyelim.",
+  "prayerCircleTwentyFourHours": "Her talep 24 saat halkada kalır",
+  "prayerCircleAll": "Dua halkası",
+  "prayerCircleMine": "Dualarım",
+  "prayerCircleCreate": "Dua talebi gönder",
+  "prayerCircleEmptyTitle": "Halka yeni bir duayı bekliyor",
+  "prayerCircleEmptyBody": "İlk dua talebini paylaşarak bu iyilik halkasını başlatabilirsin.",
+  "prayerCircleMineEmptyTitle": "Henüz bir dua talebin yok",
+  "prayerCircleMineEmptyBody": "Kalbindeki niyeti isimsiz olarak paylaş; talebin 24 saat burada kalsın.",
+  "prayerCircleLoadFailed": "Dua halkası yüklenemedi",
+  "prayerCircleTryAgain": "Tekrar dene",
+  "prayerCircleComposeTitle": "Dua talebini yaz",
+  "prayerCircleComposeBody": "Kısa, içten ve kişisel bilgi içermeyen bir niyet paylaş.",
+  "prayerCircleHint": "Örn. Ailem için sağlık ve huzur duası rica ediyorum…",
+  "prayerCircleCategory": "Niyet konusu",
+  "prayerCircleCategoryGeneral": "Genel",
+  "prayerCircleCategoryHealth": "Sağlık",
+  "prayerCircleCategoryFamily": "Aile",
+  "prayerCircleCategoryPeace": "Huzur",
+  "prayerCircleCategoryEducation": "Eğitim",
+  "prayerCircleCategoryWork": "İş ve rızık",
+  "prayerCirclePrivacyNote": "Güvenliğin için ad, telefon, sosyal medya, ödeme bilgisi veya bağlantı paylaşma. Otomatik kontroller ve kullanıcı bildirimleri uygulanır; kişisel bilgi paylaşmama sorumluluğu sana aittir.",
+  "prayerCircleContinue": "Göndermeye devam et",
+  "prayerCircleTooShort": "Dua talebin en az 8 karakter olmalı.",
+  "prayerCircleAdGateTitle": "Duanı halkaya ekle",
+  "prayerCircleAdGateBody": "Ücretsiz kullanımda her dua talebi için kısa bir ödüllü reklam izlenir. Premium’da reklam gösterilmez.",
+  "prayerCircleWatchAd": "Reklam izle ve gönder",
+  "prayerCirclePremiumOption": "Premium ile reklamsız gönder",
+  "prayerCircleAdFailed": "Reklam şu an hazırlanamadı. Lütfen biraz sonra tekrar dene.",
+  "prayerCircleSent": "Dua talebin halkaya eklendi. Hayra vesile olsun.",
+  "prayerCirclePray": "Dua ettim",
+  "prayerCirclePrayed": "Eşlik ettin",
+  "prayerCircleOwnRequest": "Senin duan",
+  "prayerCircleYours": "Senin talebin",
+  "prayerCirclePrayedThanks": "Âmin. Bu duaya gönülden eşlik ettin.",
+  "prayerCircleAlreadyPrayed": "Bu duaya daha önce eşlik ettin.",
+  "prayerCirclePrayerCount": "{count, plural, =0{Henüz dua eden yok} =1{1 kişi dua etti} other{{count} kişi dua etti}}",
+  "@prayerCirclePrayerCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "prayerCircleHoursLeft": "{hours, plural, =1{1 saat kaldı} other{{hours} saat kaldı}}",
+  "@prayerCircleHoursLeft": {
+    "placeholders": {
+      "hours": {"type": "int"}
+    }
+  },
+  "prayerCircleMinutesLeft": "{minutes, plural, =1{1 dk kaldı} other{{minutes} dk kaldı}}",
+  "@prayerCircleMinutesLeft": {
+    "placeholders": {
+      "minutes": {"type": "int"}
+    }
+  },
+  "prayerCircleLoadMore": "Daha fazla göster",
+  "prayerCircleReportTitle": "Bu dua talebi bildirilsin mi?",
+  "prayerCircleReportBody": "Bildirimler halkanın güvenli kalmasına yardımcı olur. Talep incelenecektir.",
+  "prayerCircleReportAction": "Bildir",
+  "prayerCircleReported": "Teşekkürler. Talep bildirildi.",
+  "prayerCircleAcceptRulesLabel": "Talebin isimsiz paylaşılır ve topluluk kurallarına uygun olmalı.",
+  "prayerCircleAcceptRulesRequired": "Göndermeden önce topluluk kurallarını onayla.",
+  "prayerCircleMoreActions": "Diğer işlemler",
+  "prayerCircleDeleteTitle": "Dua talebini kaldır?",
+  "prayerCircleDeleteBody": "Talep halkadan hemen kaldırılır ve geri alınamaz.",
+  "prayerCircleDeleteAction": "Kaldır",
+  "prayerCircleCancel": "Vazgeç",
+  "prayerCircleSlowDown": "Çok hızlı işlem yaptın. Kısa süre sonra tekrar dene.",
+  "prayerCircleContentRejected": "Metni kontrol et; kişisel, iletişim veya ödeme bilgisi paylaşma.",
+  "prayerCircleExpired": "Bu dua talebinin süresi dolmuş olabilir.",
+  "prayerCircleGenericError": "İşlem tamamlanamadı. Bağlantını kontrol edip tekrar dene."
 }

@@ -6,8 +6,8 @@ enum ArinAdUnit { exploreInterstitial, rewardedUnlock }
 
 abstract final class AdMobIds {
   /// iOS'ta non-release build'lerde test reklam kullanılır.
-  /// Android tarafında gerçek reklam akışı test edilebilsin diye test ID'si
-  /// yalnızca açıkça zorlandığında kullanılır.
+  /// Android'de production unit + test-device allowlist kullanılır; böylece
+  /// SSV callback production ad unit kimliğiyle uçtan uca doğrulanabilir.
   ///
   /// Ne zaman `false` yapacaksın (iOS release için):
   ///   1. AdMob Console → Apps → Arın → Status: Ready (yeşil tik)
@@ -16,18 +16,11 @@ abstract final class AdMobIds {
   ///
   /// Test ID'leri her zaman %100 fill rate verir, gelir üretmez ama UX'i
   /// gerçek reklamla aynıdır → kullanıcı hiç fark etmez, log temiz kalır.
-  static const bool kForceTestAds = false;
-  static const bool kForceAndroidReleaseTestAds = false;
-
   static String? unitId(ArinAdUnit unit) {
     if (kIsWeb) return null;
 
     final isAndroid = Platform.isAndroid;
-    final isReleaseAndroid = kReleaseMode && isAndroid;
-    final useTestIds =
-        (!kReleaseMode && !isAndroid) ||
-        kForceTestAds ||
-        (isReleaseAndroid && kForceAndroidReleaseTestAds);
+    final useTestIds = !kReleaseMode && !isAndroid;
 
     if (useTestIds) {
       return switch (unit) {

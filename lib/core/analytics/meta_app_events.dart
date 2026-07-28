@@ -7,43 +7,50 @@ import 'dart:io' show Platform;
 import 'package:app_tracking_transparency/app_tracking_transparency.dart';
 import 'package:facebook_app_events/facebook_app_events.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/widgets.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../constants/meta_ads_ids.dart';
 
 /// Meta reklam ölçümü. Firebase Analytics'ten bağımsızdır.
 abstract final class MetaAppEvents {
+  static const _pendingAttPromptKey = 'arin_meta_att_prompt_pending_v1';
   static final FacebookAppEvents _fb = FacebookAppEvents();
   static bool _ready = false;
-  static bool _attRequested = false;
+  static Future<void>? _initialization;
+  static Future<void>? _attRequest;
+  static bool _retryAttPromptOnResume = false;
 
   static bool get isReady => _ready;
 
-  /// Onboarding bittikten sonra, ilk frame'ler geçtikten sonra çağır.
-  /// iOS'ta ATT diyaloğunu gösterir; IDFA toplama izne göre ayarlanır.
-  static Future<void> initialize() async {
-    if (kIsWeb || _ready) return;
+  /// İlk görünür frame'den sonra kimliksiz ölçümü başlatır.
+  ///
+  /// ATT henüz kararlaştırılmadıysa IDFA kapalı kalır; buna rağmen Meta'nın
+  /// gizlilik korumalı install/activate event'leri onboarding tamamlanmasına
+  /// bağlı olmadan gönderilir. Sistem izin penceresi yalnızca kullanıcı
+  /// onboarding'i bitirdiğinde [requestTrackingAuthorization] ile açılır.
+  static Future<void> initialize() {
+    if (kIsWeb || _ready) return Future<void>.value();
     if (!MetaAdsIds.isConfigured) {
       debugPrint(
         '══ ARIN ══ Meta App Events: Client Token eksik — '
         'lib/core/constants/meta_ads_ids.dart + native config\'e yapıştır.',
       );
-      return;
+      return Future<void>.value();
     }
-    if (!(Platform.isIOS || Platform.isAndroid)) return;
+    if (!(Platform.isIOS || Platform.isAndroid)) return Future<void>.value();
 
+    return _initialization ??= _initializeOnce();
+  }
+
+  static Future<void> _initializeOnce() async {
     try {
-      var attAllowed = true;
-      if (Platform.isIOS) {
-        attAllowed = await _requestAttIfNeeded();
-      }
+      final attAllowed = Platform.isIOS ? await _isTrackingAuthorized() : true;
 
-      await _fb.setAutoLogAppEventsEnabled(true);
-      // iOS'ta IDFA yalnızca ATT authorized ise gelir; yine de flag'i
-      // kullanıcı iznine hizala.
       await _fb.setAdvertiserIdCollectionEnabled(
         Platform.isIOS ? attAllowed : true,
       );
-
+      await _fb.setAutoLogAppEventsEnabled(true);
       await _fb.activateApp();
       _ready = true;
       debugPrint(
@@ -53,30 +60,120 @@ abstract final class MetaAppEvents {
     } catch (e, st) {
       debugPrint('══ ARIN ══ Meta App Events init failed (sessiz): $e');
       debugPrint('$st');
+    } finally {
+      _initialization = null;
     }
   }
 
-  /// `true` = tracking authorized.
-  static Future<bool> _requestAttIfNeeded() async {
-    if (_attRequested) {
-      final status =
-          await AppTrackingTransparency.trackingAuthorizationStatus;
-      return status == TrackingStatus.authorized;
-    }
-    _attRequested = true;
+  /// Kullanıcının onboarding'i tamamlayan aksiyonundan sonra ATT iznini ister.
+  ///
+  /// Uygulama aktif değilse diyaloğu zorlamaz; bir sonraki resume'da tek
+  /// seferlik tekrar dener. İzin reddedilse bile kimliksiz Meta event'leri
+  /// gönderilmeye devam eder.
+  static Future<void> requestTrackingAuthorization() {
+    if (kIsWeb || !Platform.isIOS) return Future<void>.value();
+    _retryAttPromptOnResume = true;
+    return _attRequest ??= _requestTrackingAuthorizationOnce();
+  }
+
+  static Future<void> _requestTrackingAuthorizationOnce() async {
     try {
-      final current =
-          await AppTrackingTransparency.trackingAuthorizationStatus;
-      if (current == TrackingStatus.notDetermined) {
-        // UI settle olsun diye kısa gecikme (Apple önerisi).
-        await Future<void>.delayed(const Duration(milliseconds: 800));
-        final result =
-            await AppTrackingTransparency.requestTrackingAuthorization();
-        return result == TrackingStatus.authorized;
+      await _setAttPromptPending(true);
+      if (!_ready) await initialize();
+      if (!_ready) return;
+
+      var status = await AppTrackingTransparency.trackingAuthorizationStatus;
+      if (status == TrackingStatus.notDetermined) {
+        if (WidgetsBinding.instance.lifecycleState !=
+            AppLifecycleState.resumed) {
+          return;
+        }
+        await Future<void>.delayed(const Duration(milliseconds: 300));
+        if (WidgetsBinding.instance.lifecycleState !=
+            AppLifecycleState.resumed) {
+          return;
+        }
+        status = await AppTrackingTransparency.requestTrackingAuthorization();
       }
-      return current == TrackingStatus.authorized;
+
+      _retryAttPromptOnResume = status == TrackingStatus.notDetermined;
+      await _setAttPromptPending(_retryAttPromptOnResume);
+      await _fb.setAdvertiserIdCollectionEnabled(
+        status == TrackingStatus.authorized,
+      );
+      debugPrint('══ ARIN ══ Meta App Events: ATT $status');
     } catch (e) {
       debugPrint('══ ARIN ══ ATT request failed (sessiz): $e');
+    } finally {
+      _attRequest = null;
+    }
+  }
+
+  /// Kullanıcı etkileşimiyle başlatılmış ancak uygulama kapanması veya
+  /// arka plana geçiş nedeniyle gösterilememiş ATT isteğini geri yükler.
+  static Future<void> retryPendingTrackingAuthorizationIfNeeded() async {
+    if (kIsWeb || !Platform.isIOS) return;
+    if (!await _hasPendingAttPrompt()) return;
+    _retryAttPromptOnResume = true;
+    await requestTrackingAuthorization();
+  }
+
+  /// iOS Ayarlar'da takip izni değiştirildiyse Meta SDK'yı güncel sistem
+  /// izniyle hizalar. Yalnızca daha önce kullanıcı etkileşimiyle başlatılmış
+  /// yarım kalan bir istek varsa ATT diyaloğunu yeniden deneyebilir.
+  static Future<void> syncTrackingAuthorization() async {
+    if (kIsWeb || !Platform.isIOS) return;
+    if (!_ready) await initialize();
+    if (!_ready) return;
+    if (_retryAttPromptOnResume || await _hasPendingAttPrompt()) {
+      await requestTrackingAuthorization();
+      return;
+    }
+    try {
+      final status = await AppTrackingTransparency.trackingAuthorizationStatus;
+      final allowed = status == TrackingStatus.authorized;
+      await _fb.setAdvertiserIdCollectionEnabled(allowed);
+      debugPrint(
+        '══ ARIN ══ Meta App Events: ATT resynced '
+        '(${allowed ? "authorized" : "denied/restricted"})',
+      );
+    } catch (e) {
+      debugPrint('══ ARIN ══ Meta ATT resync failed (sessiz): $e');
+    }
+  }
+
+  static Future<bool> _hasPendingAttPrompt() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      return prefs.getBool(_pendingAttPromptKey) == true;
+    } catch (e) {
+      debugPrint('══ ARIN ══ ATT pending state read failed: $e');
+      return false;
+    }
+  }
+
+  static Future<void> _setAttPromptPending(bool pending) async {
+    _retryAttPromptOnResume = pending;
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      if (pending) {
+        await prefs.setBool(_pendingAttPromptKey, true);
+      } else {
+        await prefs.remove(_pendingAttPromptKey);
+      }
+    } catch (e) {
+      // Kalıcı kayıt başarısız olsa bile mevcut süreçteki güvenli retry
+      // işaretini koru ve ATT akışını bloke etme.
+      debugPrint('══ ARIN ══ ATT pending state persist failed: $e');
+    }
+  }
+
+  static Future<bool> _isTrackingAuthorized() async {
+    try {
+      final status = await AppTrackingTransparency.trackingAuthorizationStatus;
+      return status == TrackingStatus.authorized;
+    } catch (e) {
+      debugPrint('══ ARIN ══ ATT status read failed (sessiz): $e');
       return false;
     }
   }

@@ -14,6 +14,7 @@ import 'qibla_page.dart';
 import 'qibla_tools_dashboard_page.dart';
 import 'qibla_nested_swipe_back.dart';
 import 'qibla_shell_swipe_provider.dart';
+import 'prayer_circle/prayer_circle_page.dart';
 import 'zikir_matik_page.dart';
 import 'healing_frequencies/healing_frequencies_page.dart';
 import '../willpower/breathing_exercise_page.dart';
@@ -24,6 +25,7 @@ abstract final class QiblaHubRoutes {
   static const String zikir = '/zikir';
   static const String breathing = '/breathing';
   static const String healing = '/healing';
+  static const String prayerCircle = '/prayer-circle';
 }
 
 /// [Navigator] gözlemcisi: araç paneli dışına çıkıldığında shell kaydırmayı kilitler.
@@ -137,6 +139,12 @@ class _QiblaHubPageState extends ConsumerState<QiblaHubPage> {
               settings: settings,
               builder: (_) =>
                   const QiblaNestedSwipeBack(child: HealingFrequenciesPage()),
+            );
+          case QiblaHubRoutes.prayerCircle:
+            return _toolRoute(
+              settings: settings,
+              builder: (_) =>
+                  const QiblaNestedSwipeBack(child: PrayerCirclePage()),
             );
           case QiblaHubRoutes.dashboard:
           default:

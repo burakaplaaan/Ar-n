@@ -5,7 +5,8 @@
     "build": "echo 'no build step'",
     "serve": "firebase emulators:start --only functions",
     "deploy": "firebase deploy --only functions",
-    "logs": "firebase functions:log"
+    "logs": "firebase functions:log",
+    "test": "node --test \"test/**/*.test.js\""
   },
   "engines": {
     "node": "20"

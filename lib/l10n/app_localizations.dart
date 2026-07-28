@@ -6839,7 +6839,7 @@ abstract class AppLocalizations {
   /// No description provided for @qiblaCompassAligned.
   ///
   /// In tr, this message translates to:
-  /// **'Kıbleye dönüktür'**
+  /// **'Yönünüz Kâbe\'ye dönük'**
   String get qiblaCompassAligned;
 
   /// No description provided for @qiblaCompassDeviation.
@@ -6847,6 +6847,42 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'sapma'**
   String get qiblaCompassDeviation;
+
+  /// No description provided for @qiblaCompassDistanceKm.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kâbe\'ye {distance} km'**
+  String qiblaCompassDistanceKm(Object distance);
+
+  /// No description provided for @qiblaCompassDistanceM.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kâbe\'ye {distance} m'**
+  String qiblaCompassDistanceM(Object distance);
+
+  /// No description provided for @qiblaCompassProximityFar.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kalbin yönü hiç şaşmaz'**
+  String get qiblaCompassProximityFar;
+
+  /// No description provided for @qiblaCompassProximityApproaching.
+  ///
+  /// In tr, this message translates to:
+  /// **'Her adım O\'na bir davettir'**
+  String get qiblaCompassProximityApproaching;
+
+  /// No description provided for @qiblaCompassProximityMecca.
+  ///
+  /// In tr, this message translates to:
+  /// **'Haremeyn topraklarındasınız, Rabbim kabul etsin'**
+  String get qiblaCompassProximityMecca;
+
+  /// No description provided for @qiblaCompassProximityHaram.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kâbe\'nin huzurundasınız, dualarınız kabul olsun'**
+  String get qiblaCompassProximityHaram;
 
   /// No description provided for @qiblaCompassStabilizing.
   ///
@@ -6899,7 +6935,7 @@ abstract class AppLocalizations {
   /// No description provided for @qiblaCompassGuidanceGoodBody.
   ///
   /// In tr, this message translates to:
-  /// **'Telefonu yatay tut, kıbleye yavaşça dön. Sabitlenince yeşil rozet yanar.'**
+  /// **'Telefonu yatay tut, kıbleye yavaşça dön. Hizalanınca altın ışık yanar.'**
   String get qiblaCompassGuidanceGoodBody;
 
   /// No description provided for @qiblaCompassNorth.
@@ -7889,6 +7925,360 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'Geçmiş günler verisi senin için bir ayna: eksik kalan yerlerde merhamet, tamamlananlarda şükür.'**
   String get insightCommentDefault;
+
+  /// No description provided for @qiblaHubPrayerCircleTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Dua Halkası'**
+  String get qiblaHubPrayerCircleTitle;
+
+  /// No description provided for @qiblaHubPrayerCircleSubtitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Dua talebini paylaş, gönülden eşlik et'**
+  String get qiblaHubPrayerCircleSubtitle;
+
+  /// No description provided for @prayerCircleTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Dua Halkası'**
+  String get prayerCircleTitle;
+
+  /// No description provided for @prayerCircleHeroTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bir duaya gönülden eşlik et'**
+  String get prayerCircleHeroTitle;
+
+  /// No description provided for @prayerCircleHeroBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'İsimsiz dua talepleri burada buluşur. Birbirimizin niyetine sessizce “âmin” diyelim.'**
+  String get prayerCircleHeroBody;
+
+  /// No description provided for @prayerCircleTwentyFourHours.
+  ///
+  /// In tr, this message translates to:
+  /// **'Her talep 24 saat halkada kalır'**
+  String get prayerCircleTwentyFourHours;
+
+  /// No description provided for @prayerCircleAll.
+  ///
+  /// In tr, this message translates to:
+  /// **'Dua halkası'**
+  String get prayerCircleAll;
+
+  /// No description provided for @prayerCircleMine.
+  ///
+  /// In tr, this message translates to:
+  /// **'Dualarım'**
+  String get prayerCircleMine;
+
+  /// No description provided for @prayerCircleCreate.
+  ///
+  /// In tr, this message translates to:
+  /// **'Dua talebi gönder'**
+  String get prayerCircleCreate;
+
+  /// No description provided for @prayerCircleEmptyTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Halka yeni bir duayı bekliyor'**
+  String get prayerCircleEmptyTitle;
+
+  /// No description provided for @prayerCircleEmptyBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'İlk dua talebini paylaşarak bu iyilik halkasını başlatabilirsin.'**
+  String get prayerCircleEmptyBody;
+
+  /// No description provided for @prayerCircleMineEmptyTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Henüz bir dua talebin yok'**
+  String get prayerCircleMineEmptyTitle;
+
+  /// No description provided for @prayerCircleMineEmptyBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kalbindeki niyeti isimsiz olarak paylaş; talebin 24 saat burada kalsın.'**
+  String get prayerCircleMineEmptyBody;
+
+  /// No description provided for @prayerCircleLoadFailed.
+  ///
+  /// In tr, this message translates to:
+  /// **'Dua halkası yüklenemedi'**
+  String get prayerCircleLoadFailed;
+
+  /// No description provided for @prayerCircleTryAgain.
+  ///
+  /// In tr, this message translates to:
+  /// **'Tekrar dene'**
+  String get prayerCircleTryAgain;
+
+  /// No description provided for @prayerCircleComposeTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Dua talebini yaz'**
+  String get prayerCircleComposeTitle;
+
+  /// No description provided for @prayerCircleComposeBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kısa, içten ve kişisel bilgi içermeyen bir niyet paylaş.'**
+  String get prayerCircleComposeBody;
+
+  /// No description provided for @prayerCircleHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Örn. Ailem için sağlık ve huzur duası rica ediyorum…'**
+  String get prayerCircleHint;
+
+  /// No description provided for @prayerCircleCategory.
+  ///
+  /// In tr, this message translates to:
+  /// **'Niyet konusu'**
+  String get prayerCircleCategory;
+
+  /// No description provided for @prayerCircleCategoryGeneral.
+  ///
+  /// In tr, this message translates to:
+  /// **'Genel'**
+  String get prayerCircleCategoryGeneral;
+
+  /// No description provided for @prayerCircleCategoryHealth.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sağlık'**
+  String get prayerCircleCategoryHealth;
+
+  /// No description provided for @prayerCircleCategoryFamily.
+  ///
+  /// In tr, this message translates to:
+  /// **'Aile'**
+  String get prayerCircleCategoryFamily;
+
+  /// No description provided for @prayerCircleCategoryPeace.
+  ///
+  /// In tr, this message translates to:
+  /// **'Huzur'**
+  String get prayerCircleCategoryPeace;
+
+  /// No description provided for @prayerCircleCategoryEducation.
+  ///
+  /// In tr, this message translates to:
+  /// **'Eğitim'**
+  String get prayerCircleCategoryEducation;
+
+  /// No description provided for @prayerCircleCategoryWork.
+  ///
+  /// In tr, this message translates to:
+  /// **'İş ve rızık'**
+  String get prayerCircleCategoryWork;
+
+  /// No description provided for @prayerCirclePrivacyNote.
+  ///
+  /// In tr, this message translates to:
+  /// **'Güvenliğin için ad, telefon, sosyal medya, ödeme bilgisi veya bağlantı paylaşma. Otomatik kontroller ve kullanıcı bildirimleri uygulanır; kişisel bilgi paylaşmama sorumluluğu sana aittir.'**
+  String get prayerCirclePrivacyNote;
+
+  /// No description provided for @prayerCircleContinue.
+  ///
+  /// In tr, this message translates to:
+  /// **'Göndermeye devam et'**
+  String get prayerCircleContinue;
+
+  /// No description provided for @prayerCircleTooShort.
+  ///
+  /// In tr, this message translates to:
+  /// **'Dua talebin en az 8 karakter olmalı.'**
+  String get prayerCircleTooShort;
+
+  /// No description provided for @prayerCircleAdGateTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Duanı halkaya ekle'**
+  String get prayerCircleAdGateTitle;
+
+  /// No description provided for @prayerCircleAdGateBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ücretsiz kullanımda her dua talebi için kısa bir ödüllü reklam izlenir. Premium’da reklam gösterilmez.'**
+  String get prayerCircleAdGateBody;
+
+  /// No description provided for @prayerCircleWatchAd.
+  ///
+  /// In tr, this message translates to:
+  /// **'Reklam izle ve gönder'**
+  String get prayerCircleWatchAd;
+
+  /// No description provided for @prayerCirclePremiumOption.
+  ///
+  /// In tr, this message translates to:
+  /// **'Premium ile reklamsız gönder'**
+  String get prayerCirclePremiumOption;
+
+  /// No description provided for @prayerCircleAdFailed.
+  ///
+  /// In tr, this message translates to:
+  /// **'Reklam şu an hazırlanamadı. Lütfen biraz sonra tekrar dene.'**
+  String get prayerCircleAdFailed;
+
+  /// No description provided for @prayerCircleSent.
+  ///
+  /// In tr, this message translates to:
+  /// **'Dua talebin halkaya eklendi. Hayra vesile olsun.'**
+  String get prayerCircleSent;
+
+  /// No description provided for @prayerCirclePray.
+  ///
+  /// In tr, this message translates to:
+  /// **'Dua ettim'**
+  String get prayerCirclePray;
+
+  /// No description provided for @prayerCirclePrayed.
+  ///
+  /// In tr, this message translates to:
+  /// **'Eşlik ettin'**
+  String get prayerCirclePrayed;
+
+  /// No description provided for @prayerCircleOwnRequest.
+  ///
+  /// In tr, this message translates to:
+  /// **'Senin duan'**
+  String get prayerCircleOwnRequest;
+
+  /// No description provided for @prayerCircleYours.
+  ///
+  /// In tr, this message translates to:
+  /// **'Senin talebin'**
+  String get prayerCircleYours;
+
+  /// No description provided for @prayerCirclePrayedThanks.
+  ///
+  /// In tr, this message translates to:
+  /// **'Âmin. Bu duaya gönülden eşlik ettin.'**
+  String get prayerCirclePrayedThanks;
+
+  /// No description provided for @prayerCircleAlreadyPrayed.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu duaya daha önce eşlik ettin.'**
+  String get prayerCircleAlreadyPrayed;
+
+  /// No description provided for @prayerCirclePrayerCount.
+  ///
+  /// In tr, this message translates to:
+  /// **'{count, plural, =0{Henüz dua eden yok} =1{1 kişi dua etti} other{{count} kişi dua etti}}'**
+  String prayerCirclePrayerCount(int count);
+
+  /// No description provided for @prayerCircleHoursLeft.
+  ///
+  /// In tr, this message translates to:
+  /// **'{hours, plural, =1{1 saat kaldı} other{{hours} saat kaldı}}'**
+  String prayerCircleHoursLeft(int hours);
+
+  /// No description provided for @prayerCircleMinutesLeft.
+  ///
+  /// In tr, this message translates to:
+  /// **'{minutes, plural, =1{1 dk kaldı} other{{minutes} dk kaldı}}'**
+  String prayerCircleMinutesLeft(int minutes);
+
+  /// No description provided for @prayerCircleLoadMore.
+  ///
+  /// In tr, this message translates to:
+  /// **'Daha fazla göster'**
+  String get prayerCircleLoadMore;
+
+  /// No description provided for @prayerCircleReportTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu dua talebi bildirilsin mi?'**
+  String get prayerCircleReportTitle;
+
+  /// No description provided for @prayerCircleReportBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bildirimler halkanın güvenli kalmasına yardımcı olur. Talep incelenecektir.'**
+  String get prayerCircleReportBody;
+
+  /// No description provided for @prayerCircleReportAction.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bildir'**
+  String get prayerCircleReportAction;
+
+  /// No description provided for @prayerCircleReported.
+  ///
+  /// In tr, this message translates to:
+  /// **'Teşekkürler. Talep bildirildi.'**
+  String get prayerCircleReported;
+
+  /// No description provided for @prayerCircleAcceptRulesLabel.
+  ///
+  /// In tr, this message translates to:
+  /// **'Talebin isimsiz paylaşılır ve topluluk kurallarına uygun olmalı.'**
+  String get prayerCircleAcceptRulesLabel;
+
+  /// No description provided for @prayerCircleAcceptRulesRequired.
+  ///
+  /// In tr, this message translates to:
+  /// **'Göndermeden önce topluluk kurallarını onayla.'**
+  String get prayerCircleAcceptRulesRequired;
+
+  /// No description provided for @prayerCircleMoreActions.
+  ///
+  /// In tr, this message translates to:
+  /// **'Diğer işlemler'**
+  String get prayerCircleMoreActions;
+
+  /// No description provided for @prayerCircleDeleteTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Dua talebini kaldır?'**
+  String get prayerCircleDeleteTitle;
+
+  /// No description provided for @prayerCircleDeleteBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'Talep halkadan hemen kaldırılır ve geri alınamaz.'**
+  String get prayerCircleDeleteBody;
+
+  /// No description provided for @prayerCircleDeleteAction.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kaldır'**
+  String get prayerCircleDeleteAction;
+
+  /// No description provided for @prayerCircleCancel.
+  ///
+  /// In tr, this message translates to:
+  /// **'Vazgeç'**
+  String get prayerCircleCancel;
+
+  /// No description provided for @prayerCircleSlowDown.
+  ///
+  /// In tr, this message translates to:
+  /// **'Çok hızlı işlem yaptın. Kısa süre sonra tekrar dene.'**
+  String get prayerCircleSlowDown;
+
+  /// No description provided for @prayerCircleContentRejected.
+  ///
+  /// In tr, this message translates to:
+  /// **'Metni kontrol et; kişisel, iletişim veya ödeme bilgisi paylaşma.'**
+  String get prayerCircleContentRejected;
+
+  /// No description provided for @prayerCircleExpired.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu dua talebinin süresi dolmuş olabilir.'**
+  String get prayerCircleExpired;
+
+  /// No description provided for @prayerCircleGenericError.
+  ///
+  /// In tr, this message translates to:
+  /// **'İşlem tamamlanamadı. Bağlantını kontrol edip tekrar dene.'**
+  String get prayerCircleGenericError;
 }
 
 class _AppLocalizationsDelegate

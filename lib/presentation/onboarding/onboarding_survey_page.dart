@@ -1,11 +1,10 @@
 // lib/presentation/onboarding/onboarding_survey_page.dart
-// İsim → cinsiyet → ruh hali → alan → iç temalar → (bildirim, izin yoksa) → başlangıç özeti.
+// İsim → (bildirim, izin yoksa) → başlangıç özeti.
 // Zümrüt tema, koşullu bildirim adımı, animasyonlar.
 
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 import 'package:arin/l10n/app_localizations.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -46,133 +45,9 @@ class _OnboardingSurveyPageState extends ConsumerState<OnboardingSurveyPage>
   final TextEditingController _nameController = TextEditingController();
   final FocusNode _nameFocus = FocusNode();
 
-  String? _selectedGender;
-  final Set<String> _selectedMoods = {};
-  final Set<String> _selectedSectors = {};
-  final Set<String> _selectedNeeds = {};
-
   static const _surveyAccent = AppColors.emeraldMid;
 
-  int get _pageCount => _includeNotificationStep ? 7 : 6;
-
-  List<String> _moodOptions(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-    return [
-      l10n.moodHappy,
-      l10n.moodCalm,
-      l10n.moodStressed,
-      l10n.moodSad,
-      l10n.moodGrateful,
-      l10n.moodAnxious,
-      l10n.moodMotivated,
-    ];
-  }
-
-  Map<String, String> _moodIdByLabel(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-    return {
-      l10n.surveyDictMoodHappy: 'mood_happy',
-      l10n.surveyDictMoodCalm: 'mood_calm',
-      l10n.surveyDictMoodStressed: 'mood_stressed',
-      l10n.surveyDictMoodSad: 'mood_sad',
-      l10n.surveyDictMoodGrateful: 'mood_grateful',
-      l10n.surveyDictMoodAnxious: 'mood_anxious',
-      l10n.surveyDictMoodMotivated: 'mood_motivated',
-    };
-  }
-
-  Map<String, String> _sectorIdByLabel(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-    return {
-      l10n.surveyDictSectorStudent: 'sector_student',
-      l10n.surveyDictSectorPrivate: 'sector_private',
-      l10n.surveyDictSectorPublic: 'sector_public',
-      l10n.surveyDictSectorBusiness: 'sector_business',
-      l10n.surveyDictSectorTrade: 'sector_trade',
-      l10n.surveyDictSectorHousehold: 'sector_household',
-      l10n.surveyDictSectorOther: 'sector_other',
-    };
-  }
-
-  Map<String, String> _needIdByLabel(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-    return {
-      l10n.surveyDictNeedMotivation: 'need_motivation',
-      l10n.surveyDictNeedSabr: 'need_sabr',
-      l10n.surveyDictNeedShukr: 'need_shukr',
-      l10n.surveyDictNeedTawakkul: 'need_tawakkul',
-      l10n.surveyDictNeedFocus: 'need_focus',
-      l10n.surveyDictNeedHealing: 'need_healing',
-      l10n.surveyDictNeedRizq: 'need_rizq',
-    };
-  }
-
-  Map<String, String> _genderIdByLabel(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-    return {
-      l10n.surveyDictGenderMale: 'gender_male',
-      l10n.surveyDictGenderFemale: 'gender_female',
-    };
-  }
-
-  String _normalizedLookupKey(String value) {
-    return value
-        .trim()
-        .toLowerCase()
-        .replaceAll('ı', 'i')
-        .replaceAll('ğ', 'g')
-        .replaceAll('ü', 'u')
-        .replaceAll('ş', 's')
-        .replaceAll('ö', 'o')
-        .replaceAll('ç', 'c')
-        .replaceAll(RegExp(r'\s+'), ' ');
-  }
-
-  String? _resolveStableId(String value, Map<String, String> map) {
-    final direct = map[value];
-    if (direct != null && direct.isNotEmpty) return direct;
-    final key = _normalizedLookupKey(value);
-    for (final entry in map.entries) {
-      if (_normalizedLookupKey(entry.key) == key) {
-        return entry.value;
-      }
-    }
-    return null;
-  }
-
-  List<String> _toStableIds(Set<String> selected, Map<String, String> map) {
-    return selected
-        .map((v) => _resolveStableId(v, map))
-        .whereType<String>()
-        .toSet()
-        .toList(growable: false);
-  }
-
-  List<String> _sectorOptions(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-    return [
-      l10n.sectorStudent,
-      l10n.sectorPrivate,
-      l10n.sectorPublic,
-      l10n.sectorBusiness,
-      l10n.sectorTrade,
-      l10n.sectorHousehold,
-      l10n.sectorOther,
-    ];
-  }
-
-  List<String> _innerThemeOptions(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-    return [
-      l10n.needMotivation,
-      l10n.needSabr,
-      l10n.needShukr,
-      l10n.needTawakkul,
-      l10n.needFocus,
-      l10n.needHealing,
-      l10n.needRizq,
-    ];
-  }
+  int get _pageCount => _includeNotificationStep ? 3 : 2;
 
   @override
   void initState() {
@@ -336,16 +211,10 @@ class _OnboardingSurveyPageState extends ConsumerState<OnboardingSurveyPage>
           .read(userProfileProvider.notifier)
           .saveProfile(
             name: hasCustomName ? normalizedName : null,
-            gender: _selectedGender == null
-                ? null
-                : (_genderIdByLabel(context)[_selectedGender!] ??
-                      _selectedGender),
-            moodTags: _toStableIds(_selectedMoods, _moodIdByLabel(context)),
-            sectorTags: _toStableIds(
-              _selectedSectors,
-              _sectorIdByLabel(context),
-            ),
-            needTags: _toStableIds(_selectedNeeds, _needIdByLabel(context)),
+            gender: null,
+            moodTags: const [],
+            sectorTags: const [],
+            needTags: const [],
           );
 
       final prefs = ref.read(sharedPreferencesProvider);
@@ -369,42 +238,17 @@ class _OnboardingSurveyPageState extends ConsumerState<OnboardingSurveyPage>
   }
 
   /// PageView.builder için: index → sayfa. Sırasıyla:
-  /// 0 isim, 1 cinsiyet, 2 mood, 3 sector, 4 needs,
-  /// (varsa) 5 bildirim, son: özet. `_pageCount` zaten doğru toplamı
-  /// veriyor. Lazy build sayesinde animasyon/text yükü tek seferde
-  /// inşa edilmiyor; sayfa geçişinde kasma azalıyor.
+  /// 0 isim, (varsa) 1 bildirim, son: özet. `_pageCount` zaten doğru
+  /// toplamı veriyor. Lazy build sayesinde animasyon/text yükü tek
+  /// seferde inşa edilmiyor; sayfa geçişinde kasma azalıyor.
   Widget _buildPageAt(int index) {
-    final l10n = AppLocalizations.of(context)!;
     switch (index) {
       case 0:
         return _buildNameStep();
       case 1:
-        return _buildGenderStep();
-      case 2:
-        return _buildSelectionStep(
-          title: l10n.surveyMoodTitle,
-          subtitle: l10n.surveyMoodSubtitle,
-          options: _moodOptions(context),
-          selected: _selectedMoods,
-        );
-      case 3:
-        return _buildSelectionStep(
-          title: l10n.surveyDailyRhythmTitle,
-          subtitle: l10n.surveyDailyRhythmSubtitle,
-          options: _sectorOptions(context),
-          selected: _selectedSectors,
-        );
-      case 4:
-        return _buildSelectionStep(
-          title: l10n.surveyInnerThemesTitle,
-          subtitle: l10n.surveyInnerThemesSubtitle,
-          options: _innerThemeOptions(context),
-          selected: _selectedNeeds,
-        );
-      case 5:
         if (_includeNotificationStep) return _buildNotificationStep();
         return _buildSummaryStep();
-      case 6:
+      case 2:
         return _buildSummaryStep();
       default:
         return const SizedBox.shrink();
@@ -614,333 +458,6 @@ class _OnboardingSurveyPageState extends ConsumerState<OnboardingSurveyPage>
     );
   }
 
-  Widget _buildGenderStep() {
-    final l10n = AppLocalizations.of(context)!;
-    final name = _nameController.text.trim();
-    final title = name.isNotEmpty
-        ? l10n.onboardingGenderPromptWithName(name)
-        : l10n.surveyGenderTitle;
-
-    return Padding(
-      padding: const EdgeInsets.all(24),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const SizedBox(height: 20),
-          Text(
-            title,
-            style: AppTextStyles.headlineMedium.copyWith(color: Colors.white),
-          ).animate().fadeIn().slideY(begin: 0.08),
-          const SizedBox(height: 8),
-          Text(
-            l10n.surveyGenderSubtitle,
-            style: TextStyle(color: Colors.white.withValues(alpha: 0.5)),
-          ).animate().fadeIn(delay: 80.ms),
-          const SizedBox(height: 36),
-          _genderCard(
-            label: l10n.surveyGenderMale,
-            icon: Icons.man,
-            isSelected: _selectedGender == l10n.surveyGenderMale,
-            onTap: () {
-              HapticFeedback.selectionClick();
-              setState(() => _selectedGender = l10n.surveyGenderMale);
-            },
-            animDelay: 180,
-          ),
-          const SizedBox(height: 14),
-          _genderCard(
-            label: l10n.surveyGenderFemale,
-            icon: Icons.woman,
-            isSelected: _selectedGender == l10n.surveyGenderFemale,
-            onTap: () {
-              HapticFeedback.selectionClick();
-              setState(() => _selectedGender = l10n.surveyGenderFemale);
-            },
-            animDelay: 260,
-          ),
-          const Spacer(),
-          Center(
-            child: TextButton(
-              onPressed: () {
-                setState(() => _selectedGender = null);
-                _nextPage();
-              },
-              child: Text(
-                l10n.surveyGenderDecline,
-                style: TextStyle(color: Colors.white.withValues(alpha: 0.45)),
-              ),
-            ),
-          ),
-          _buildNextButton(text: l10n.surveySave),
-        ],
-      ),
-    );
-  }
-
-  Widget _genderCard({
-    required String label,
-    required IconData icon,
-    required bool isSelected,
-    required VoidCallback onTap,
-    required int animDelay,
-  }) {
-    return GestureDetector(
-          onTap: onTap,
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 220),
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.06),
-              borderRadius: BorderRadius.circular(18),
-              border: Border.all(
-                color: isSelected ? _surveyAccent : Colors.transparent,
-                width: 2,
-              ),
-              boxShadow: isSelected
-                  ? [
-                      BoxShadow(
-                        color: _surveyAccent.withValues(alpha: 0.25),
-                        blurRadius: 12,
-                        spreadRadius: 0,
-                      ),
-                    ]
-                  : null,
-            ),
-            child: Row(
-              children: [
-                Icon(
-                  icon,
-                  color: isSelected ? AppColors.emeraldLight : Colors.white70,
-                ),
-                const SizedBox(width: 16),
-                Text(
-                  label,
-                  style: AppTextStyles.titleMedium.copyWith(
-                    color: Colors.white,
-                  ),
-                ),
-                const Spacer(),
-                if (isSelected)
-                  const Icon(Icons.check_circle, color: AppColors.emeraldLight),
-              ],
-            ),
-          ),
-        )
-        .animate()
-        .fadeIn(delay: animDelay.ms)
-        .slideX(begin: -0.04, curve: Curves.easeOutCubic);
-  }
-
-  Widget _buildSelectionStep({
-    required String title,
-    required String subtitle,
-    required List<String> options,
-    required Set<String> selected,
-  }) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 8, 20, 20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-                title,
-                style: AppTextStyles.headlineMedium.copyWith(
-                  color: Colors.white,
-                  height: 1.2,
-                ),
-              )
-              .animate(key: ValueKey(title))
-              .fadeIn(duration: 400.ms)
-              .slideY(begin: 0.06, curve: Curves.easeOutCubic),
-          const SizedBox(height: 10),
-          Text(
-                subtitle,
-                style: TextStyle(
-                  color: Colors.white.withValues(alpha: 0.52),
-                  height: 1.45,
-                  fontSize: 14.5,
-                ),
-              )
-              .animate(key: ValueKey('$title-sub'))
-              .fadeIn(delay: 70.ms, duration: 400.ms)
-              .slideY(begin: 0.04),
-          const SizedBox(height: 20),
-          Expanded(
-            child: ListView.builder(
-              physics: const BouncingScrollPhysics(),
-              itemCount: options.length,
-              itemBuilder: (context, i) {
-                final opt = options[i];
-                final isOn = selected.contains(opt);
-                return _buildSurveyOptionCard(
-                  label: opt,
-                  isSelected: isOn,
-                  index: i,
-                  onTap: () {
-                    HapticFeedback.lightImpact();
-                    setState(() {
-                      if (isOn) {
-                        selected.remove(opt);
-                      } else {
-                        selected.add(opt);
-                      }
-                    });
-                  },
-                );
-              },
-            ),
-          ),
-          const SizedBox(height: 12),
-          _buildNextButton(),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildSurveyOptionCard({
-    required String label,
-    required bool isSelected,
-    required int index,
-    required VoidCallback onTap,
-  }) {
-    return Padding(
-          padding: const EdgeInsets.only(bottom: 11),
-          child: GestureDetector(
-            onTap: onTap,
-            behavior: HitTestBehavior.opaque,
-            child: AnimatedScale(
-              scale: isSelected ? 1.02 : 1.0,
-              duration: const Duration(milliseconds: 240),
-              curve: Curves.easeOutCubic,
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 260),
-                curve: Curves.easeOutCubic,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(22),
-                  border: Border.all(
-                    width: isSelected ? 1.5 : 1,
-                    color: isSelected
-                        ? AppColors.emeraldLight.withValues(alpha: 0.75)
-                        : Colors.white.withValues(alpha: 0.12),
-                  ),
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: isSelected
-                        ? [
-                            AppColors.emeraldBase.withValues(alpha: 0.55),
-                            AppColors.emeraldDark.withValues(alpha: 0.42),
-                          ]
-                        : [
-                            Colors.white.withValues(alpha: 0.09),
-                            Colors.white.withValues(alpha: 0.04),
-                          ],
-                  ),
-                  boxShadow: isSelected
-                      ? [
-                          BoxShadow(
-                            color: AppColors.emeraldLight.withValues(
-                              alpha: 0.18,
-                            ),
-                            blurRadius: 18,
-                            offset: const Offset(0, 8),
-                          ),
-                        ]
-                      : [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.25),
-                            blurRadius: 8,
-                            offset: const Offset(0, 3),
-                          ),
-                        ],
-                ),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(21),
-                  child: Stack(
-                    children: [
-                      AnimatedPositioned(
-                        duration: const Duration(milliseconds: 260),
-                        curve: Curves.easeOutCubic,
-                        left: 0,
-                        top: 0,
-                        bottom: 0,
-                        width: isSelected ? 5 : 0,
-                        child: const ColoredBox(color: AppColors.emeraldLight),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 18,
-                          vertical: 16,
-                        ),
-                        child: Row(
-                          children: [
-                            AnimatedContainer(
-                              duration: const Duration(milliseconds: 220),
-                              width: 26,
-                              height: 26,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                border: Border.all(
-                                  color: isSelected
-                                      ? AppColors.emeraldLight
-                                      : Colors.white.withValues(alpha: 0.35),
-                                  width: 2,
-                                ),
-                                color: isSelected
-                                    ? AppColors.emeraldLight.withValues(
-                                        alpha: 0.25,
-                                      )
-                                    : Colors.transparent,
-                              ),
-                              child: isSelected
-                                  ? const Icon(
-                                      Icons.check_rounded,
-                                      size: 16,
-                                      color: Colors.white,
-                                    )
-                                  : null,
-                            ),
-                            const SizedBox(width: 14),
-                            Expanded(
-                              child: Text(
-                                label,
-                                style: TextStyle(
-                                  color: Colors.white.withValues(
-                                    alpha: isSelected ? 1 : 0.9,
-                                  ),
-                                  fontWeight: isSelected
-                                      ? FontWeight.w600
-                                      : FontWeight.w500,
-                                  fontSize: 15,
-                                  height: 1.25,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ),
-        )
-        .animate()
-        .fadeIn(
-          delay: (90 + index * 58).ms,
-          duration: 420.ms,
-          curve: Curves.easeOutCubic,
-        )
-        .slideY(
-          begin: 0.14,
-          end: 0,
-          delay: (90 + index * 58).ms,
-          duration: 480.ms,
-          curve: Curves.easeOutCubic,
-        );
-  }
-
   Widget _buildNotificationStep() {
     final l10n = AppLocalizations.of(context)!;
     return Padding(
@@ -1060,12 +577,6 @@ class _OnboardingSurveyPageState extends ConsumerState<OnboardingSurveyPage>
         ],
       ),
     );
-  }
-
-  String _selectionCountLabel(int count) {
-    final l10n = AppLocalizations.of(context)!;
-    if (count <= 0) return l10n.surveySummaryNotProvided;
-    return '$count';
   }
 
   Widget _buildSummaryItem({
@@ -1209,36 +720,12 @@ class _OnboardingSurveyPageState extends ConsumerState<OnboardingSurveyPage>
                                   index: 0,
                                 ),
                                 _buildSummaryItem(
-                                  icon: Icons.favorite_border_rounded,
-                                  label: l10n.surveySummaryItemMood,
-                                  value: _selectionCountLabel(
-                                    _selectedMoods.length,
-                                  ),
-                                  index: 1,
-                                ),
-                                _buildSummaryItem(
-                                  icon: Icons.timeline_rounded,
-                                  label: l10n.surveySummaryItemRhythm,
-                                  value: _selectionCountLabel(
-                                    _selectedSectors.length,
-                                  ),
-                                  index: 2,
-                                ),
-                                _buildSummaryItem(
-                                  icon: Icons.lightbulb_outline_rounded,
-                                  label: l10n.surveySummaryItemThemes,
-                                  value: _selectionCountLabel(
-                                    _selectedNeeds.length,
-                                  ),
-                                  index: 3,
-                                ),
-                                _buildSummaryItem(
                                   icon: Icons.notifications_none_rounded,
                                   label: l10n.surveyNotificationTitle,
                                   value: _notificationPermissionEnabled
                                       ? l10n.surveySummaryItemNotificationOn
                                       : l10n.surveySummaryItemNotificationOff,
-                                  index: 4,
+                                  index: 1,
                                 ),
                               ],
                             ),

@@ -101,6 +101,11 @@ class _AdminNotificationsPageState
   Map<String, dynamic>? _todayPlan;
   bool _todayPlanLoading = false;
 
+  // "Bugün gönder" manuel override planı (today_plan_manual dokümanı)
+  Map<String, dynamic>? _manualPlan;
+  bool _manualPlanLoading = false;
+  bool _forceSendingToday = false;
+
   // Hazır metin havuzu
   List<String> _teasers = const [];
   bool _teasersSaving = false;
@@ -124,6 +129,7 @@ class _AdminNotificationsPageState
     _loadTeasers();
     _loadPool();
     _loadTodayPlan();
+    _loadManualPlan();
   }
 
   @override
@@ -168,6 +174,22 @@ class _AdminNotificationsPageState
       _todayPlan = null;
     } finally {
       if (mounted) setState(() => _todayPlanLoading = false);
+    }
+  }
+
+  Future<void> _loadManualPlan() async {
+    if (!isFirebaseReady) return;
+    setState(() => _manualPlanLoading = true);
+    try {
+      final snap = await FirebaseFirestore.instance
+          .collection(_Col.config)
+          .doc('today_plan_manual')
+          .get(const GetOptions(source: Source.server));
+      _manualPlan = snap.exists ? snap.data() : null;
+    } catch (_) {
+      _manualPlan = null;
+    } finally {
+      if (mounted) setState(() => _manualPlanLoading = false);
     }
   }
 
@@ -453,6 +475,64 @@ class _AdminNotificationsPageState
     }
   }
 
+  /// "Bugün gönder" — havuzdaki etkin ayetler arasından bugün için saati
+  /// henüz geçmemiş EN YAKIN olanı seçip anlık göndermez; o saat gelince
+  /// otomatik gönderilecek şekilde planlar. Global 7 günlük döngüyü ve
+  /// günün normal otomatik planını etkilemez, ayrı devam eder.
+  Future<void> _forceSendToday() async {
+    if (_forceSendingToday) return;
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: _kBgCard,
+        title: const Text('Bugün gönder'),
+        content: const Text(
+          'Havuzdaki etkin ayetler arasından bugün için saati henüz '
+          'geçmemiş en yakın ayet seçilip, o saat gelince TÜM '
+          'kullanıcılara otomatik gönderilecek.\n\n'
+          '7 günlük ana döngü bundan etkilenmez, kendi takviminde ayrı '
+          'devam eder.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Vazgeç'),
+          ),
+          FilledButton(
+            style: FilledButton.styleFrom(
+              backgroundColor: AppColors.accentNeonGreen,
+              foregroundColor: Colors.black,
+            ),
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('Planla'),
+          ),
+        ],
+      ),
+    );
+    if (ok != true) return;
+
+    setState(() => _forceSendingToday = true);
+    try {
+      final callable = FirebaseFunctions.instanceFor(region: _kFunctionsRegion)
+          .httpsCallable('scheduleForceSendToday');
+      final res = await callable.call<Map<String, dynamic>>(<String, dynamic>{});
+      if (res.data['ok'] == true) {
+        final h = (res.data['sendAtHour'] as num?)?.toInt() ?? 0;
+        final m = (res.data['sendAtMin'] as num?)?.toInt() ?? 0;
+        _snack('Planlandı: bugün ${_clockStr(h, m)}\'de gönderilecek.');
+        await _loadManualPlan();
+      } else {
+        _snack('Planlanamadı.', error: true);
+      }
+    } on FirebaseFunctionsException catch (e) {
+      _snack('Hata (${e.code}): ${e.message ?? e.code}', error: true);
+    } catch (e) {
+      _snack('Planlanamadı: $e', error: true);
+    } finally {
+      if (mounted) setState(() => _forceSendingToday = false);
+    }
+  }
+
   Future<void> _sendNow(String docId, String preview) async {
     final ok = await showDialog<bool>(
       context: context,
@@ -602,6 +682,7 @@ class _AdminNotificationsPageState
         child: CustomScrollView(
           slivers: [
             SliverToBoxAdapter(child: _buildSchedulePanel()),
+            SliverToBoxAdapter(child: _buildForceTodayPanel()),
             SliverToBoxAdapter(child: _buildTestPanel()),
             SliverToBoxAdapter(child: _buildTeasersPanel()),
             SliverToBoxAdapter(child: _buildListHeader()),
@@ -875,6 +956,148 @@ class _AdminNotificationsPageState
                       : const Text('Kaydet'),
                 ),
               ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // ── Kart: Bugün gönder (manuel override) ─────────────────────────────────
+
+  /// Manuel plan durumuna göre alt başlık metni + rengi döner.
+  ({String label, Color color}) _forceTodaySubtitle() {
+    if (_manualPlanLoading) {
+      return (label: 'Durum kontrol ediliyor…', color: Colors.white54);
+    }
+    final plan = _manualPlan;
+    final now = DateTime.now();
+    final todayStr =
+        '${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';
+    if (plan == null || plan['date']?.toString() != todayStr) {
+      return (
+        label: 'En yakın uygun saatte gönderilsin — 7 günlük ana döngüyü '
+            'etkilemez.',
+        color: Colors.white.withValues(alpha: 0.55),
+      );
+    }
+    final h = (plan['sendAtHour'] as num?)?.toInt();
+    final m = (plan['sendAtMin'] as num?)?.toInt();
+    final timeStr = (h != null && m != null) ? _clockStr(h, m) : '?';
+    final sent = plan['sent'] as bool? ?? false;
+    final missed = plan['missedAt'] != null;
+    if (sent && missed) {
+      return (
+        label: 'Pencere geçti — $timeStr için planlanmıştı.',
+        color: Colors.orangeAccent,
+      );
+    }
+    if (sent) {
+      return (
+        label: 'Bugün gönderildi ($timeStr).',
+        color: AppColors.accentNeonGreen,
+      );
+    }
+    return (
+      label: 'Bugün $timeStr\'de gönderilecek (manuel, planlandı).',
+      color: Colors.white70,
+    );
+  }
+
+  bool get _forceTodayButtonEnabled {
+    if (_forceSendingToday || _manualPlanLoading) return false;
+    final plan = _manualPlan;
+    if (plan == null) return true;
+    final now = DateTime.now();
+    final todayStr =
+        '${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';
+    if (plan['date']?.toString() != todayStr) return true;
+    return (plan['sent'] as bool?) == true;
+  }
+
+  Widget _buildForceTodayPanel() {
+    final subtitle = _forceTodaySubtitle();
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+      child: Container(
+        padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
+        decoration: BoxDecoration(
+          color: _kBgCard,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(
+            color: AppColors.accentNeonGreen.withValues(alpha: 0.25),
+          ),
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 38,
+              height: 38,
+              decoration: BoxDecoration(
+                color: AppColors.accentNeonGreen.withValues(alpha: 0.15),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: const Icon(
+                Icons.today_rounded,
+                color: AppColors.accentNeonGreen,
+                size: 20,
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Bugün Gönder',
+                    style: GoogleFonts.plusJakartaSans(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w800,
+                      color: Colors.white,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    subtitle.label,
+                    style: TextStyle(fontSize: 11.5, color: subtitle.color),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 8),
+            FilledButton.icon(
+              style: FilledButton.styleFrom(
+                backgroundColor: AppColors.accentNeonGreen,
+                foregroundColor: Colors.black,
+                disabledBackgroundColor:
+                    AppColors.accentNeonGreen.withValues(alpha: 0.25),
+                disabledForegroundColor: Colors.black45,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 10,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+              onPressed: _forceTodayButtonEnabled ? _forceSendToday : null,
+              icon: _forceSendingToday
+                  ? const SizedBox(
+                      width: 14,
+                      height: 14,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: Colors.black,
+                      ),
+                    )
+                  : const Icon(Icons.schedule_send_rounded, size: 16),
+              label: Text(
+                _forceSendingToday ? 'Planlanıyor' : 'Gönder',
+                style: const TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
             ),
           ],
         ),

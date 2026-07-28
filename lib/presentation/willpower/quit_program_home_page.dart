@@ -19,6 +19,7 @@ import '../../core/router/app_router.dart';
 import '../../core/willpower/quit_program_metrics.dart';
 import '../../data/models/habit_model.dart';
 import '../../data/willpower/willpower_content_loader.dart';
+import '../shared/mixins/review_prompt_on_exit_mixin.dart';
 import '../shared/providers/habit_providers.dart';
 import '../shared/providers/willpower_hub_nav_provider.dart';
 import 'widgets/quit_smoking_shared_widgets.dart';
@@ -34,7 +35,7 @@ class QuitProgramHomePage extends ConsumerStatefulWidget {
 }
 
 class _QuitProgramHomePageState extends ConsumerState<QuitProgramHomePage>
-    with SingleTickerProviderStateMixin {
+    with SingleTickerProviderStateMixin, ReviewPromptOnExitMixin {
   late TabController _tabs;
   QuitProgramHomeContent? _homeContent;
   bool _loadingTips = true;
@@ -73,6 +74,7 @@ class _QuitProgramHomePageState extends ConsumerState<QuitProgramHomePage>
   @override
   void initState() {
     super.initState();
+    startReviewPromptTracking();
     _tabs = TabController(length: 2, vsync: this);
     _liveClock = Timer.periodic(const Duration(seconds: 1), (_) {
       if (!mounted) return;
@@ -84,6 +86,7 @@ class _QuitProgramHomePageState extends ConsumerState<QuitProgramHomePage>
 
   @override
   void dispose() {
+    maybeRequestReviewOnExit();
     _liveClock?.cancel();
     _elapsedLiveNotifier.dispose();
     _tabs.dispose();

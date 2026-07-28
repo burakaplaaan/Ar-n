@@ -174,6 +174,48 @@ service cloud.firestore {
       allow read, write: if false;
     }
 
+    // Dua Halkası yalnız App Check + güvenli oturum doğrulayan Cloud Functions
+    // üzerinden okunur/yazılır. Kimlik, tepki, rapor ve cihaz tokenları
+    // istemciye doğrudan açılmaz.
+    match /prayer_requests/{requestId} {
+      allow read, write: if false;
+
+      match /reactions/{installationHash} {
+        allow read, write: if false;
+      }
+      match /reports/{reporterHash} {
+        allow read, write: if false;
+      }
+    }
+
+    match /prayer_request_owners/{requestId} {
+      allow read, write: if false;
+    }
+
+    match /prayer_devices/{installationHash} {
+      allow read, write: if false;
+    }
+
+    match /prayer_rate_limits/{docId} {
+      allow read, write: if false;
+    }
+
+    match /prayer_installations/{installationHash} {
+      allow read, write: if false;
+    }
+
+    match /prayer_reward_proofs/{docId} {
+      allow read, write: if false;
+    }
+
+    match /prayer_reward_transactions/{docId} {
+      allow read, write: if false;
+    }
+
+    match /prayer_notification_jobs/{docId} {
+      allow read, write: if false;
+    }
+
     // Genel app_public belgeleri (quotes_bundle, widget_override vb.)
     match /app_public/{docId} {
       allow read: if true;

@@ -11,7 +11,9 @@ import '../../core/constants/app_colors.dart';
 import '../../core/providers/shared_preferences_provider.dart';
 import '../../core/theme/arin_shell_background.dart';
 import '../../data/repositories/salat_log_repository.dart';
+import '../../data/services/arin_lock_notification_service.dart';
 import '../../data/services/tracking_widget_service.dart';
+import '../../data/services/widget_access_service.dart';
 import '../kaza/kaza_tracking_provider.dart';
 import '../shared/providers/habit_providers.dart';
 import '../shared/widgets/arin_shell_layout.dart';
@@ -126,39 +128,58 @@ class _WidgetCenterPageState extends ConsumerState<WidgetCenterPage> {
                         .fadeIn(duration: 420.ms, delay: 80.ms)
                         .slideY(begin: 0.05, end: 0),
                     const SizedBox(height: 22),
-                    _SectionTitle('Mevcut widgetlar', muted: muted),
-                    const SizedBox(height: 10),
-                    _InfoTile(
-                      onDark: onDark,
-                      icon: Icons.format_quote_rounded,
-                      title: 'Günlük Söz Widgetı',
-                      subtitle:
-                          'Ana ekrana veya kilit ekranına eklenir. Sözler otomatik yenilenir.',
-                    ),
-                    const SizedBox(height: 10),
-                    _InfoTile(
-                      onDark: onDark,
-                      icon: Icons.access_time_rounded,
-                      title: 'Namaz Vakti Widgetı',
-                      subtitle:
-                          'Konumuna göre sıradaki vakti gösterir. Konum değişirse uygulamayı açman yeterli.',
-                    ),
-                    const SizedBox(height: 10),
-                    _InfoTile(
-                      onDark: onDark,
-                      icon: Icons.widgets_outlined,
-                      title: 'Söz + Namaz Widgetı',
-                      subtitle:
-                          'Günlük söz ve sıradaki namaz vaktini aynı küçük alanda gösterir.',
-                    ),
-                    const SizedBox(height: 10),
-                    _InfoTile(
-                      onDark: onDark,
-                      icon: Icons.fingerprint_rounded,
-                      title: 'Zikirmatik Widgetı',
-                      subtitle:
-                          'Ana ekrandan "+" ile zikir çekersin; sayaç uygulamayla eş zamanlı. Tek dokunuş zikirmatik sayfasını açar.',
-                    ),
+                    if (Platform.isIOS) ...[
+                      _SectionTitle('Mevcut widgetlar', muted: muted),
+                      const SizedBox(height: 10),
+                      _InfoTile(
+                        onDark: onDark,
+                        icon: Icons.format_quote_rounded,
+                        title: 'Günlük Söz Widgetı',
+                        subtitle:
+                            'Ana ekrana veya kilit ekranına eklenir. Sözler otomatik yenilenir.',
+                      ),
+                      const SizedBox(height: 10),
+                      _InfoTile(
+                        onDark: onDark,
+                        icon: Icons.access_time_rounded,
+                        title: 'Namaz Vakti Widgetı',
+                        subtitle:
+                            'Konumuna göre sıradaki vakti gösterir. Konum değişirse uygulamayı açman yeterli.',
+                      ),
+                      const SizedBox(height: 10),
+                      _InfoTile(
+                        onDark: onDark,
+                        icon: Icons.widgets_outlined,
+                        title: 'Söz + Namaz Widgetı',
+                        subtitle:
+                            'Günlük söz ve sıradaki namaz vaktini aynı küçük alanda gösterir.',
+                      ),
+                      const SizedBox(height: 10),
+                      _InfoTile(
+                        onDark: onDark,
+                        icon: Icons.fingerprint_rounded,
+                        title: 'Zikirmatik Widgetı',
+                        subtitle:
+                            'Ana ekrandan "+" ile zikir çekersin; sayaç uygulamayla eş zamanlı. Tek dokunuş zikirmatik sayfasını açar.',
+                      ),
+                    ] else ...[
+                      _SectionTitle(
+                        'Kilit ekranı bildirimleri',
+                        muted: muted,
+                      ),
+                      const SizedBox(height: 10),
+                      Text(
+                        'Android\'de kilit ekranına gerçek widget eklenemiyor; bunun yerine seçtiğin bilgiler kalıcı bir bildirim olarak kilit ekranında görünür.',
+                        style: GoogleFonts.plusJakartaSans(
+                          fontSize: 13,
+                          height: 1.45,
+                          color: muted,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      const _LockNotificationToggles(),
+                    ],
                     const SizedBox(height: 24),
                     _SectionTitle('Takip widgetı', muted: muted),
                     const SizedBox(height: 10),
@@ -367,6 +388,167 @@ class _InfoTile extends StatelessWidget {
       title: title,
       subtitle: subtitle,
       trailing: const Icon(Icons.info_outline_rounded, size: 18),
+    );
+  }
+}
+
+// ─── Kilit ekranı bildirim anahtarları (Android) ───────────────────────────
+
+class _LockNotificationToggles extends StatefulWidget {
+  const _LockNotificationToggles();
+
+  @override
+  State<_LockNotificationToggles> createState() =>
+      _LockNotificationTogglesState();
+}
+
+class _LockNotificationTogglesState extends State<_LockNotificationToggles> {
+  Map<ArinWidgetAccessKind, bool>? _states;
+  final _busy = <ArinWidgetAccessKind>{};
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  Future<void> _load() async {
+    final states = await ArinLockNotificationService.readAll();
+    if (!mounted) return;
+    setState(() => _states = states);
+  }
+
+  Future<void> _toggle(ArinWidgetAccessKind kind, bool value) async {
+    final current = _states;
+    if (current == null || _busy.contains(kind)) return;
+    setState(() {
+      _busy.add(kind);
+      _states = {...current, kind: value};
+    });
+    HapticFeedback.selectionClick();
+    try {
+      final ok = await ArinLockNotificationService.setEnabled(kind, value);
+      if (!ok && mounted) {
+        // İzin reddedildi (veya yazma başarısız oldu) — anahtarı eski haline al.
+        setState(() => _states = {...?_states, kind: !value});
+        if (value) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text(
+                'Bildirim izni verilmeden kilit ekranı widget\'ı açılamaz.',
+              ),
+            ),
+          );
+        }
+      }
+    } finally {
+      if (mounted) setState(() => _busy.remove(kind));
+    }
+  }
+
+  static const _order = [
+    ArinWidgetAccessKind.prayer,
+    ArinWidgetAccessKind.quote,
+    ArinWidgetAccessKind.combo,
+    ArinWidgetAccessKind.zikir,
+    ArinWidgetAccessKind.tracking,
+  ];
+
+  (IconData, String, String) _meta(ArinWidgetAccessKind kind) {
+    switch (kind) {
+      case ArinWidgetAccessKind.prayer:
+        return (
+          Icons.access_time_rounded,
+          'Namaz Vakti',
+          'Sıradaki vakti ve geri sayımı kilit ekranında gösterir.',
+        );
+      case ArinWidgetAccessKind.quote:
+        return (
+          Icons.format_quote_rounded,
+          'Günlük Söz',
+          'Günün sözünü kilit ekranında gösterir.',
+        );
+      case ArinWidgetAccessKind.combo:
+        return (
+          Icons.widgets_outlined,
+          'Söz + Namaz',
+          'İkisini tek bildirimde birleştirir.',
+        );
+      case ArinWidgetAccessKind.zikir:
+        return (
+          Icons.fingerprint_rounded,
+          'Zikirmatik',
+          'Aktif zikri ve sayacı kilit ekranında gösterir.',
+        );
+      case ArinWidgetAccessKind.tracking:
+        return (
+          Icons.track_changes_rounded,
+          'Takip',
+          'Seçili gelişim/arınma takibini kilit ekranında gösterir.',
+        );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final onDark = Theme.of(context).brightness == Brightness.dark;
+    final states = _states;
+    if (states == null) {
+      return _LoadingCard(onDark: onDark);
+    }
+    return Column(
+      children: [
+        for (int i = 0; i < _order.length; i++) ...[
+          if (i > 0) const SizedBox(height: 10),
+          _LockNotificationTile(
+            onDark: onDark,
+            meta: _meta(_order[i]),
+            value: states[_order[i]] ?? false,
+            busy: _busy.contains(_order[i]),
+            onChanged: (v) => _toggle(_order[i], v),
+          ),
+        ],
+      ],
+    );
+  }
+}
+
+class _LockNotificationTile extends StatelessWidget {
+  const _LockNotificationTile({
+    required this.onDark,
+    required this.meta,
+    required this.value,
+    required this.busy,
+    required this.onChanged,
+  });
+
+  final bool onDark;
+  final (IconData, String, String) meta;
+  final bool value;
+  final bool busy;
+  final ValueChanged<bool> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    final (icon, title, subtitle) = meta;
+    return _BaseTile(
+      onDark: onDark,
+      icon: icon,
+      title: title,
+      subtitle: subtitle,
+      selected: value,
+      onTap: busy ? null : () => onChanged(!value),
+      trailing: busy
+          ? const SizedBox(
+              width: 20,
+              height: 20,
+              child: CircularProgressIndicator(strokeWidth: 2),
+            )
+          : Switch.adaptive(
+              value: value,
+              activeThumbColor: AppColors.accentNeonGreen,
+              onChanged: onChanged,
+            ),
     );
   }
 }
@@ -709,7 +891,9 @@ class _HowToAddBanner extends StatelessWidget {
                           ),
                           const SizedBox(height: 3),
                           Text(
-                            'iPhone ve Android için görselli kurulumu aç',
+                            Platform.isIOS
+                                ? 'iPhone için görselli kurulumu aç'
+                                : 'Android için görselli kurulumu aç',
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
                             style: GoogleFonts.plusJakartaSans(
@@ -758,31 +942,7 @@ class _HowToSheet extends StatefulWidget {
   State<_HowToSheet> createState() => _HowToSheetState();
 }
 
-class _HowToSheetState extends State<_HowToSheet>
-    with SingleTickerProviderStateMixin {
-  late final TabController _tabs;
-
-  @override
-  void initState() {
-    super.initState();
-    _tabs = TabController(
-      length: 2,
-      vsync: this,
-      initialIndex: Platform.isIOS ? 0 : 1,
-    )..addListener(_handleTabChange);
-  }
-
-  void _handleTabChange() {
-    if (mounted) setState(() {});
-  }
-
-  @override
-  void dispose() {
-    _tabs.removeListener(_handleTabChange);
-    _tabs.dispose();
-    super.dispose();
-  }
-
+class _HowToSheetState extends State<_HowToSheet> {
   @override
   Widget build(BuildContext context) {
     final onDark = widget.onDark;
@@ -852,94 +1012,16 @@ class _HowToSheetState extends State<_HowToSheet>
                 ],
               ),
             ),
-            const SizedBox(height: 16),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 22),
-              child: _PlatformTabBar(controller: _tabs, onDark: onDark),
-            ),
-            const SizedBox(height: 4),
+            const SizedBox(height: 8),
             Expanded(
-              child: TabBarView(
-                controller: _tabs,
-                children: [
-                  _StepList(
-                    controller: _tabs.index == 0 ? controller : null,
-                    onDark: onDark,
-                    sections: _iosLockScreenSteps,
-                  ),
-                  _StepList(
-                    controller: _tabs.index == 1 ? controller : null,
-                    onDark: onDark,
-                    sections: _androidLockScreenSteps,
-                  ),
-                ],
+              child: _StepList(
+                controller: controller,
+                onDark: onDark,
+                sections: Platform.isIOS
+                    ? _iosLockScreenSteps
+                    : _androidLockScreenSteps,
               ),
             ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-// ─── Platform tab bar ────────────────────────────────────────────────────────
-
-class _PlatformTabBar extends StatelessWidget {
-  const _PlatformTabBar({required this.controller, required this.onDark});
-
-  final TabController controller;
-  final bool onDark;
-
-  @override
-  Widget build(BuildContext context) {
-    final bg = onDark
-        ? Colors.white.withValues(alpha: 0.07)
-        : Colors.black.withValues(alpha: 0.06);
-    final selectedBg = onDark
-        ? AppColors.cardSurface.withValues(alpha: 0.9)
-        : Colors.white.withValues(alpha: 0.95);
-    final selectedColor = onDark
-        ? Colors.white.withValues(alpha: 0.96)
-        : AppColors.emeraldDark;
-    final unselectedColor = onDark
-        ? Colors.white.withValues(alpha: 0.78)
-        : AppColors.emeraldDark;
-
-    return ConstrainedBox(
-      constraints: const BoxConstraints(minHeight: 48),
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          color: bg,
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: TabBar(
-          controller: controller,
-          indicator: BoxDecoration(
-            color: selectedBg,
-            borderRadius: BorderRadius.circular(10),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: onDark ? 0.25 : 0.08),
-                blurRadius: 8,
-                offset: const Offset(0, 2),
-              ),
-            ],
-          ),
-          indicatorSize: TabBarIndicatorSize.tab,
-          dividerColor: Colors.transparent,
-          labelColor: selectedColor,
-          unselectedLabelColor: unselectedColor,
-          labelStyle: GoogleFonts.plusJakartaSans(
-            fontSize: 13,
-            fontWeight: FontWeight.w700,
-          ),
-          unselectedLabelStyle: GoogleFonts.plusJakartaSans(
-            fontSize: 13,
-            fontWeight: FontWeight.w600,
-          ),
-          tabs: const [
-            Tab(text: 'iOS'),
-            Tab(text: 'Android'),
           ],
         ),
       ),

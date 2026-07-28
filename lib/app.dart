@@ -6,10 +6,12 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'core/firebase/firebase_bootstrap.dart';
 import 'core/analytics/arin_analytics.dart';
+import 'core/analytics/meta_app_events.dart';
 import 'core/debug/arin_error_reporting.dart';
 import 'core/providers/shared_preferences_provider.dart';
 import 'core/providers/app_locale_provider.dart';
@@ -49,7 +51,7 @@ import 'presentation/shared/providers/user_profile_providers.dart';
 import 'presentation/shared/widgets/global_edge_swipe_back.dart';
 import 'presentation/shared/widgets/location_change_listener.dart';
 import 'presentation/shared/widgets/widget_launch_gate_listener.dart';
-import 'presentation/qibla/qibla_hub_navigator_key.dart';
+import 'presentation/qibla/qibla_hub_back_dispatcher.dart';
 import 'main.dart' show runDeferredStartupIfNeeded;
 
 final themeModeProvider = StateProvider<ThemeMode>((ref) => ThemeMode.dark);
@@ -67,6 +69,8 @@ class ArinApp extends ConsumerStatefulWidget {
 }
 
 class _ArinAppState extends ConsumerState<ArinApp> with WidgetsBindingObserver {
+  static const _systemBackChannel = MethodChannel('com.arin.arin/system_back');
+
   DateTime? _lastForegroundMaintenance;
   bool _postOnboardingStartupScheduled = false;
   bool _foregroundMaintenanceInFlight = false;
@@ -199,6 +203,7 @@ class _ArinAppState extends ConsumerState<ArinApp> with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
+    _systemBackChannel.setMethodCallHandler(_handleNativeSystemBack);
     AdMobService.setRewardedPreloadForeground(true);
     WidgetsBinding.instance.addObserver(this);
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -213,6 +218,23 @@ class _ArinAppState extends ConsumerState<ArinApp> with WidgetsBindingObserver {
       unawaited(_warmRewardedForFreeUser());
       unawaited(_runForegroundMaintenance(initial: true));
     });
+  }
+
+  Future<bool> _handleNativeSystemBack(MethodCall call) async {
+    if (call.method != 'handleBack' || !mounted) return false;
+
+    final router = ref.read(appRouterProvider);
+    final path = router.routerDelegate.currentConfiguration.uri.path;
+    if (path == AppRoutes.prayerCircle) {
+      if (router.canPop()) {
+        router.pop();
+      } else {
+        router.go(AppRoutes.qibla);
+      }
+      return true;
+    }
+    if (dispatchQiblaHubBack(currentPath: path)) return true;
+    return false;
   }
 
   Future<void> _runForegroundMaintenance({required bool initial}) async {
@@ -326,6 +348,11 @@ class _ArinAppState extends ConsumerState<ArinApp> with WidgetsBindingObserver {
     if (_postOnboardingStartupScheduled) return;
     _postOnboardingStartupScheduled = true;
 
+    // Kullanıcının onboarding'i bitiren "Başla" aksiyonu ATT için anlamlı ve
+    // güvenli bağlamdır. Meta'nın kimliksiz install eventi bundan önce zaten
+    // başlatılmıştır; izin yalnızca IDFA eşleşmesini güçlendirir.
+    unawaited(MetaAppEvents.requestTrackingAuthorization());
+
     if (!isFirebaseReady) {
       await bootstrapFirebase();
     }
@@ -374,6 +401,7 @@ class _ArinAppState extends ConsumerState<ArinApp> with WidgetsBindingObserver {
 
   @override
   void dispose() {
+    _systemBackChannel.setMethodCallHandler(null);
     AdMobService.setRewardedPreloadForeground(false);
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
@@ -388,6 +416,8 @@ class _ArinAppState extends ConsumerState<ArinApp> with WidgetsBindingObserver {
       return;
     }
     if (state == AppLifecycleState.resumed) {
+      // Kullanıcı iOS Ayarlar'dan ATT tercihini değiştirmiş olabilir.
+      unawaited(MetaAppEvents.syncTrackingAuthorization());
       AdMobService.markRewardedEligibilityPending();
       ref.invalidate(premiumEntitlementProvider);
       AdMobService.setRewardedPreloadForeground(true);
@@ -563,15 +593,8 @@ class _ArinAppState extends ConsumerState<ArinApp> with WidgetsBindingObserver {
               onBackRequested: () async {
                 final currentPath =
                     router.routeInformationProvider.value.uri.path;
-                final onQiblaStack =
-                    currentPath == AppRoutes.qibla ||
-                    currentPath.startsWith('${AppRoutes.qibla}/');
-                if (onQiblaStack) {
-                  final qiblaNav = qiblaHubNavigatorKey.currentState;
-                  if (qiblaNav != null && qiblaNav.canPop()) {
-                    qiblaNav.pop();
-                    return true;
-                  }
+                if (dispatchQiblaHubBack(currentPath: currentPath)) {
+                  return true;
                 }
                 final rootNav = router.routerDelegate.navigatorKey.currentState;
                 if (rootNav != null && rootNav.canPop()) {

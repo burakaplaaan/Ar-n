@@ -3865,10 +3865,35 @@ class AppLocalizationsEn extends AppLocalizations {
   String get qiblaCompassRetry => 'Retry';
 
   @override
-  String get qiblaCompassAligned => 'Aligned to Qibla';
+  String get qiblaCompassAligned => 'You are facing the Kaaba';
 
   @override
   String get qiblaCompassDeviation => 'deviation';
+
+  @override
+  String qiblaCompassDistanceKm(Object distance) {
+    return '$distance km to the Kaaba';
+  }
+
+  @override
+  String qiblaCompassDistanceM(Object distance) {
+    return '$distance m to the Kaaba';
+  }
+
+  @override
+  String get qiblaCompassProximityFar => 'The heart\'s compass never strays';
+
+  @override
+  String get qiblaCompassProximityApproaching =>
+      'Every step is an invitation to Him';
+
+  @override
+  String get qiblaCompassProximityMecca =>
+      'You are in the blessed lands of the Haramain';
+
+  @override
+  String get qiblaCompassProximityHaram =>
+      'You stand before the Kaaba, may your prayers be accepted';
 
   @override
   String get qiblaCompassStabilizing => 'Stabilizing measurement';
@@ -3899,7 +3924,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get qiblaCompassGuidanceGoodBody =>
-      'Hold phone flat, turn slowly to Qibla. Green badge lights up when stable.';
+      'Hold phone flat, turn slowly to Qibla. A golden glow appears when aligned.';
 
   @override
   String get qiblaCompassNorth => 'N';
@@ -4463,4 +4488,226 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get insightCommentDefault =>
       'Past days\' data is a mirror for you: mercy in the missing parts, gratitude in the completed ones.';
+
+  @override
+  String get qiblaHubPrayerCircleTitle => 'Prayer Circle';
+
+  @override
+  String get qiblaHubPrayerCircleSubtitle =>
+      'Share a prayer request and join with sincerity';
+
+  @override
+  String get prayerCircleTitle => 'Prayer Circle';
+
+  @override
+  String get prayerCircleHeroTitle => 'Join a prayer wholeheartedly';
+
+  @override
+  String get prayerCircleHeroBody =>
+      'Anonymous prayer requests meet here. Let us quietly say amen to one another\'s intentions.';
+
+  @override
+  String get prayerCircleTwentyFourHours => 'Each request remains for 24 hours';
+
+  @override
+  String get prayerCircleAll => 'Prayer circle';
+
+  @override
+  String get prayerCircleMine => 'My prayers';
+
+  @override
+  String get prayerCircleCreate => 'Send a prayer request';
+
+  @override
+  String get prayerCircleEmptyTitle => 'The circle is waiting for a prayer';
+
+  @override
+  String get prayerCircleEmptyBody =>
+      'Share the first prayer request and begin this circle of kindness.';
+
+  @override
+  String get prayerCircleMineEmptyTitle => 'You have no prayer requests yet';
+
+  @override
+  String get prayerCircleMineEmptyBody =>
+      'Share your intention anonymously; it will remain here for 24 hours.';
+
+  @override
+  String get prayerCircleLoadFailed => 'The prayer circle could not load';
+
+  @override
+  String get prayerCircleTryAgain => 'Try again';
+
+  @override
+  String get prayerCircleComposeTitle => 'Write your prayer request';
+
+  @override
+  String get prayerCircleComposeBody =>
+      'Share a brief, sincere intention without personal information.';
+
+  @override
+  String get prayerCircleHint =>
+      'For example: Please pray for my family\'s health and peace…';
+
+  @override
+  String get prayerCircleCategory => 'Intention';
+
+  @override
+  String get prayerCircleCategoryGeneral => 'General';
+
+  @override
+  String get prayerCircleCategoryHealth => 'Health';
+
+  @override
+  String get prayerCircleCategoryFamily => 'Family';
+
+  @override
+  String get prayerCircleCategoryPeace => 'Peace';
+
+  @override
+  String get prayerCircleCategoryEducation => 'Education';
+
+  @override
+  String get prayerCircleCategoryWork => 'Work & provision';
+
+  @override
+  String get prayerCirclePrivacyNote =>
+      'For your safety, do not share names, phone numbers, social media, payment details, or links. Automated checks and user reports are used, but you remain responsible for withholding personal information.';
+
+  @override
+  String get prayerCircleContinue => 'Continue to send';
+
+  @override
+  String get prayerCircleTooShort =>
+      'Your prayer request must be at least 8 characters.';
+
+  @override
+  String get prayerCircleAdGateTitle => 'Add your prayer to the circle';
+
+  @override
+  String get prayerCircleAdGateBody =>
+      'Free users watch one short rewarded ad for each request. Premium users never see this ad.';
+
+  @override
+  String get prayerCircleWatchAd => 'Watch ad and send';
+
+  @override
+  String get prayerCirclePremiumOption => 'Send ad-free with Premium';
+
+  @override
+  String get prayerCircleAdFailed =>
+      'The ad is not ready right now. Please try again shortly.';
+
+  @override
+  String get prayerCircleSent =>
+      'Your prayer request joined the circle. May it bring goodness.';
+
+  @override
+  String get prayerCirclePray => 'I prayed';
+
+  @override
+  String get prayerCirclePrayed => 'You joined';
+
+  @override
+  String get prayerCircleOwnRequest => 'Your prayer';
+
+  @override
+  String get prayerCircleYours => 'Your request';
+
+  @override
+  String get prayerCirclePrayedThanks =>
+      'Amen. You joined this prayer wholeheartedly.';
+
+  @override
+  String get prayerCircleAlreadyPrayed =>
+      'You have already joined this prayer.';
+
+  @override
+  String prayerCirclePrayerCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count people prayed',
+      one: '1 person prayed',
+      zero: 'No one has prayed yet',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String prayerCircleHoursLeft(int hours) {
+    String _temp0 = intl.Intl.pluralLogic(
+      hours,
+      locale: localeName,
+      other: '$hours hr left',
+      one: '1 hr left',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String prayerCircleMinutesLeft(int minutes) {
+    String _temp0 = intl.Intl.pluralLogic(
+      minutes,
+      locale: localeName,
+      other: '$minutes min left',
+      one: '1 min left',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get prayerCircleLoadMore => 'Load more requests';
+
+  @override
+  String get prayerCircleReportTitle => 'Report this prayer request?';
+
+  @override
+  String get prayerCircleReportBody =>
+      'Reports help keep the circle safe and respectful. We will review this request.';
+
+  @override
+  String get prayerCircleReportAction => 'Report';
+
+  @override
+  String get prayerCircleReported => 'Thank you. This request was reported.';
+
+  @override
+  String get prayerCircleAcceptRulesLabel =>
+      'Your request is shared anonymously and must follow the community rules.';
+
+  @override
+  String get prayerCircleAcceptRulesRequired =>
+      'Please confirm the community rules before sending.';
+
+  @override
+  String get prayerCircleMoreActions => 'More actions';
+
+  @override
+  String get prayerCircleDeleteTitle => 'Remove your prayer request?';
+
+  @override
+  String get prayerCircleDeleteBody =>
+      'The request will be removed from the circle immediately and cannot be restored.';
+
+  @override
+  String get prayerCircleDeleteAction => 'Remove';
+
+  @override
+  String get prayerCircleCancel => 'Cancel';
+
+  @override
+  String get prayerCircleSlowDown =>
+      'You are acting too quickly. Please try again shortly.';
+
+  @override
+  String get prayerCircleContentRejected =>
+      'Check the text and remove personal, contact, or payment information.';
+
+  @override
+  String get prayerCircleExpired => 'This prayer request may have expired.';
+
+  @override
+  String get prayerCircleGenericError =>
+      'The action could not be completed. Check your connection and try again.';
 }

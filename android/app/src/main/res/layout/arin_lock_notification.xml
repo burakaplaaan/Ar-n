@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     Kilit ekranı bildirim widget'ı: 5 widget türü için ortak kompakt görünüm.
+
+     TASARIM NOTU: Sistem/OEM bildirim şablonu (özellikle MIUI kilit ekranı)
+     zaten solda büyük bir uygulama ikonu gösteriyor ve karta çok az dikey
+     alan tanıyor. Bu yüzden kendi ikonumuzu KOYMUYORUZ ve içeriği 2 satıra
+     indiriyoruz:
+       notif_title   -> üst satır: başlık + meta bilgi birleşik
+                        (ör. "Günün Sözü · Tâhâ, 46")
+       notif_primary -> alt satır: ana değer (geri sayım / söz / sayaç),
+                        font boyutu ve satır sayısı native tarafta cihaz
+                        genişliğine göre dinamik seçilir.
+     Metin renkleri sistem temasına bağlı (?android:attr/...) — koyu/açık
+     temada otomatik uyum sağlar.
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/notif_root"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingStart="4dp"
+    android:paddingEnd="4dp"
+    android:paddingTop="0dp"
+    android:paddingBottom="0dp"
+    android:background="@android:color/transparent">
+
+    <TextView
+        android:id="@+id/notif_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:includeFontPadding="false"
+        android:maxLines="1"
+        android:ellipsize="end"
+        android:textSize="9sp"
+        android:textStyle="bold"
+        android:textColor="?android:attr/textColorSecondary"
+        android:text="Arın" />
+
+    <Chronometer
+        android:id="@+id/notif_primary"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:includeFontPadding="false"
+        android:maxLines="2"
+        android:ellipsize="end"
+        android:fontFamily="sans-serif-medium"
+        android:textSize="15sp"
+        android:textStyle="bold"
+        android:textColor="?android:attr/textColorPrimary"
+        android:text="—" />
+</LinearLayout>

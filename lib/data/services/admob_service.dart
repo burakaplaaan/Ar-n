@@ -604,7 +604,9 @@ class AdMobService {
 
   /// Önceden yüklenmiş ödüllü reklamı gösterir. Hazır değilse `null` döner
   /// (çağıran on-demand yola düşer).
-  Future<RewardedAdResult?> _showPreloadedRewarded() async {
+  Future<RewardedAdResult?> _showPreloadedRewarded({
+    String? serverSideCustomData,
+  }) async {
     if (!_rewardedReady || _rewardedShowing) return null;
     final ad = _rewardedAd!;
     _rewardedAd = null;
@@ -614,6 +616,18 @@ class AdMobService {
     _rewardedShowing = true;
     final completer = Completer<RewardedAdResult>();
     var earned = false;
+    if (serverSideCustomData != null) {
+      try {
+        await ad.setServerSideOptions(
+          ServerSideVerificationOptions(customData: serverSideCustomData),
+        );
+      } catch (error) {
+        debugPrint('AdMob rewarded SSV options failed: $error');
+        await ad.dispose();
+        _rewardedShowing = false;
+        return RewardedAdResult.showFailed;
+      }
+    }
     ad.fullScreenContentCallback = FullScreenContentCallback(
       onAdDismissedFullScreenContent: (ad) {
         ad.dispose();
@@ -795,7 +809,10 @@ class AdMobService {
   /// denenir; yalnızca tüm denemeler tükenirse [RewardedAdResult.loadFailed]
   /// döner. Kullanıcı reklamı erken kapatırsa [RewardedAdResult.notRewarded]
   /// döner (bu bir hata değildir; "yüklenemedi" mesajı gösterilmemeli).
-  Future<RewardedAdResult> showRewardedDetailed(ArinAdUnit unit) async {
+  Future<RewardedAdResult> showRewardedDetailed(
+    ArinAdUnit unit, {
+    String? serverSideCustomData,
+  }) async {
     final adUnitId = AdMobIds.unitId(unit);
     if (adUnitId == null) return RewardedAdResult.loadFailed;
     await initialize();
@@ -809,7 +826,9 @@ class AdMobService {
 
     // 1) Hazır (preloaded) reklam varsa anında göster, sonra yenisini hazırla.
     if (isUnlockAd) {
-      final preloaded = await _showPreloadedRewarded();
+      final preloaded = await _showPreloadedRewarded(
+        serverSideCustomData: serverSideCustomData,
+      );
       if (preloaded != null) {
         unawaited(_preloadRewarded());
         return preloaded;
@@ -825,7 +844,9 @@ class AdMobService {
           _preloadJoinTimeout,
           onTimeout: () {},
         );
-        final warmed = await _showPreloadedRewarded();
+        final warmed = await _showPreloadedRewarded(
+          serverSideCustomData: serverSideCustomData,
+        );
         if (warmed != null) {
           unawaited(_preloadRewarded());
           return warmed;
@@ -844,6 +865,7 @@ class AdMobService {
       }
       final outcome = await _loadAndShowRewarded(
         adUnitId,
+        serverSideCustomData: serverSideCustomData,
         canShow: isUnlockAd
             ? () =>
                   requestGeneration == _rewardedLoadGeneration &&
@@ -865,6 +887,7 @@ class AdMobService {
 
   Future<RewardedAdResult> _loadAndShowRewarded(
     String adUnitId, {
+    String? serverSideCustomData,
     bool Function()? canShow,
   }) async {
     final completer = Completer<RewardedAdResult>();
@@ -883,7 +906,7 @@ class AdMobService {
         adUnitId: adUnitId,
         request: const AdRequest(),
         rewardedAdLoadCallback: RewardedAdLoadCallback(
-          onAdLoaded: (ad) {
+          onAdLoaded: (ad) async {
             if (!active || (canShow != null && !canShow())) {
               waitingForLoad = false;
               loadTimer?.cancel();
@@ -893,6 +916,20 @@ class AdMobService {
             }
             waitingForLoad = false;
             loadTimer?.cancel();
+            if (serverSideCustomData != null) {
+              try {
+                await ad.setServerSideOptions(
+                  ServerSideVerificationOptions(
+                    customData: serverSideCustomData,
+                  ),
+                );
+              } catch (error) {
+                debugPrint('AdMob rewarded SSV options failed: $error');
+                ad.dispose();
+                _completeOnceOutcome(completer, RewardedAdResult.showFailed);
+                return;
+              }
+            }
             ad.fullScreenContentCallback = FullScreenContentCallback(
               onAdDismissedFullScreenContent: (ad) {
                 ad.dispose();
