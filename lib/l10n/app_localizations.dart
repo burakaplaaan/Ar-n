@@ -5507,8 +5507,8 @@ abstract class AppLocalizations {
   /// No description provided for @widgetUnlockSuccessTitle.
   ///
   /// In tr, this message translates to:
-  /// **'{title} 24 saat açıldı! 🎉'**
-  String widgetUnlockSuccessTitle(Object title);
+  /// **'{hours, plural, =1{{title} 1 saat açıldı! 🎉} other{{title} {hours} saat açıldı! 🎉}}'**
+  String widgetUnlockSuccessTitle(Object title, int hours);
 
   /// No description provided for @widgetUnlockPremiumSuccess.
   ///
@@ -5519,14 +5519,14 @@ abstract class AppLocalizations {
   /// No description provided for @widgetUnlockDescription.
   ///
   /// In tr, this message translates to:
-  /// **'Bu widgetı 24 saat açmak için kısa bir reklam izleyebilirsin. Kalıcı erişim için Premium\'a geç.'**
-  String get widgetUnlockDescription;
+  /// **'{hours, plural, =1{Bu widgetı 1 saat açmak için kısa bir reklam izleyebilirsin. Kalıcı erişim için Premium\'a geç.} other{Bu widgetı {hours} saat açmak için kısa bir reklam izleyebilirsin. Kalıcı erişim için Premium\'a geç.}}'**
+  String widgetUnlockDescription(int hours);
 
   /// No description provided for @widgetUnlockAdButton.
   ///
   /// In tr, this message translates to:
-  /// **'Reklam izle — 24 saat aç'**
-  String get widgetUnlockAdButton;
+  /// **'{hours, plural, =1{Reklam izle — 1 saat aç} other{Reklam izle — {hours} saat aç}}'**
+  String widgetUnlockAdButton(int hours);
 
   /// No description provided for @widgetUnlockPremiumButton.
   ///
@@ -7839,7 +7839,7 @@ abstract class AppLocalizations {
   /// No description provided for @secondAlarmAdWatchText.
   ///
   /// In tr, this message translates to:
-  /// **'Ücretsiz kullanımda 2. ezan alarmını açmak için kısa reklam izlenir. Premium kullanıcılar bu kilidi görmez.'**
+  /// **'Ücretsiz kullanımda 2. ezan alarmını 2 gün açmak için kısa reklam izlenir. Premium kullanıcılar bu kilidi görmez.'**
   String get secondAlarmAdWatchText;
 
   /// No description provided for @giveUp.
@@ -8249,6 +8249,30 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'Kaldır'**
   String get prayerCircleDeleteAction;
+
+  /// No description provided for @prayerCircleAdminDeleteTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu talep yönetici tarafından kaldırılsın mı?'**
+  String get prayerCircleAdminDeleteTitle;
+
+  /// No description provided for @prayerCircleAdminDeleteBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'Uygunsuz içerik olarak kalıcı biçimde kaldırılır ve geri alınamaz.'**
+  String get prayerCircleAdminDeleteBody;
+
+  /// No description provided for @prayerCircleAdminDeleteAction.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yönetici: Kaldır'**
+  String get prayerCircleAdminDeleteAction;
+
+  /// No description provided for @prayerCircleAdminDeleted.
+  ///
+  /// In tr, this message translates to:
+  /// **'Talep yönetici tarafından kaldırıldı.'**
+  String get prayerCircleAdminDeleted;
 
   /// No description provided for @prayerCircleCancel.
   ///

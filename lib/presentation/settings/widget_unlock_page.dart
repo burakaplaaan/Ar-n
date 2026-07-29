@@ -6,8 +6,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../core/ads/admob_ids.dart';
 import '../../core/constants/app_colors.dart';
+import '../../core/providers/shared_preferences_provider.dart';
 import '../../core/router/app_router.dart';
 import '../../data/services/admob_service.dart';
+import '../../data/services/global_widget_lock_service.dart';
 import '../../data/services/widget_access_service.dart';
 import '../../data/services/widget_metrics_service.dart';
 import '../shared/providers/admob_providers.dart';
@@ -37,6 +39,15 @@ class _WidgetUnlockPageState extends ConsumerState<WidgetUnlockPage> {
     // getirebildiğinden, boşa reklam isteği üretmemek için entitlement'ı
     // doğruladıktan sonra ısıtıyoruz.
     _maybeWarmRewarded();
+    _refreshUnlockConfig();
+  }
+
+  Future<void> _refreshUnlockConfig() async {
+    await GlobalWidgetLockService.applyIfDue(
+      ref.read(sharedPreferencesProvider),
+      force: true,
+    );
+    if (mounted) setState(() {});
   }
 
   Future<void> _maybeWarmRewarded() async {
@@ -53,6 +64,15 @@ class _WidgetUnlockPageState extends ConsumerState<WidgetUnlockPage> {
     final l10n = AppLocalizations.of(context)!;
     setState(() => _busy = true);
     try {
+      // Reklam teklifinde gösterilen süre ile ödül kaydında kullanılan süreyi
+      // mümkün olduğunca aynı tutmak için sunucu ayarını gösterimden hemen önce
+      // yenile. Push kaçırılmış olsa bile kullanıcı güncel teklifi görür.
+      await GlobalWidgetLockService.applyIfDue(
+        ref.read(sharedPreferencesProvider),
+        force: true,
+      );
+      if (!context.mounted) return;
+      setState(() {});
       final result = await ref
           .read(adMobServiceProvider)
           .showRewardedDetailed(ArinAdUnit.rewardedUnlock);
@@ -92,7 +112,14 @@ class _WidgetUnlockPageState extends ConsumerState<WidgetUnlockPage> {
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(l10n.widgetUnlockSuccessTitle(kindTitle)),
+          content: Text(
+            l10n.widgetUnlockSuccessTitle(
+              kindTitle,
+              GlobalWidgetLockService.unlockHours(
+                ref.read(sharedPreferencesProvider),
+              ),
+            ),
+          ),
           duration: const Duration(seconds: 4),
         ),
       );
@@ -136,6 +163,9 @@ class _WidgetUnlockPageState extends ConsumerState<WidgetUnlockPage> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final unlockHours = GlobalWidgetLockService.unlockHours(
+      ref.read(sharedPreferencesProvider),
+    );
     final kindTitle = switch (widget.kind) {
       ArinWidgetAccessKind.quote => l10n.widgetUnlockQuoteTitle,
       ArinWidgetAccessKind.prayer => l10n.widgetUnlockPrayerTitle,
@@ -202,7 +232,7 @@ class _WidgetUnlockPageState extends ConsumerState<WidgetUnlockPage> {
                       ),
                       const SizedBox(height: 10),
                       Text(
-                        l10n.widgetUnlockDescription,
+                        l10n.widgetUnlockDescription(unlockHours),
                         style: TextStyle(
                           color: Colors.white.withValues(alpha: 0.65),
                           fontSize: 14,
@@ -225,7 +255,7 @@ class _WidgetUnlockPageState extends ConsumerState<WidgetUnlockPage> {
                                   ),
                                 )
                               : const Icon(Icons.play_circle_outline_rounded),
-                          label: Text(l10n.widgetUnlockAdButton),
+                          label: Text(l10n.widgetUnlockAdButton(unlockHours)),
                           style: FilledButton.styleFrom(
                             backgroundColor: AppColors.emeraldLight,
                             foregroundColor: const Color(0xFF071815),

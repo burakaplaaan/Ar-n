@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/constants/inspiration_assets.dart';
 import '../../core/providers/shared_preferences_provider.dart';
+import '../../data/inspiration/inspiration_content_mixer.dart';
 import '../../data/inspiration/inspiration_fallback_catalog.dart';
 import '../../data/inspiration/inspiration_local_corpus_loader.dart';
 import '../../data/models/inspiration_card_model.dart';
@@ -31,21 +32,22 @@ final inspirationCatalogProvider = FutureProvider<List<InspirationCardModel>>((
     prefs: ref.read(sharedPreferencesProvider),
   );
   final remoteCards = remoteCatalog.cards;
+  final List<InspirationCardModel> cards;
   if (remoteCards.isEmpty && remoteCatalog.bundledSeedVersion >= 1) {
-    return remoteCards;
-  }
-  if (remoteCards.isNotEmpty) {
+    cards = remoteCards;
+  } else if (remoteCards.isNotEmpty) {
     if (remoteCatalog.bundledSeedVersion < 1 && corpus.isNotEmpty) {
-      return _mergeRemoteWithBundledCorpus(remoteCards, corpus);
+      cards = _mergeRemoteWithBundledCorpus(remoteCards, corpus);
+    } else {
+      cards = remoteCards;
     }
-    return remoteCards;
+  } else if (corpus.isNotEmpty) {
+    cards = corpus;
+  } else {
+    cards = indices.map(InspirationFallbackCatalog.cardForImageIndex).toList();
   }
 
-  if (corpus.isNotEmpty) {
-    return corpus;
-  }
-
-  return indices.map(InspirationFallbackCatalog.cardForImageIndex).toList();
+  return InspirationContentMixer.mix(cards: cards, imageIndices: indices);
 });
 
 List<InspirationCardModel> _mergeRemoteWithBundledCorpus(

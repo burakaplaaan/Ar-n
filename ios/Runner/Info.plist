@@ -50,13 +50,13 @@
 		<string>c150203bf357ef5e115b4012e9c55b98</string>
 		<key>FacebookDisplayName</key>
 		<string>Arın</string>
-		<!-- Native başlangıçta event ve IDFA kapalıdır. Dart tarafı kimliksiz
-		     install/activate ölçümünü açar; IDFA yalnızca onboarding sonrasında
-		     alınan ATT izni authorized ise etkinleştirilir. -->
+		<!-- Install/launch eventleri Flutter bootstrap'ını beklemeden native SDK
+		     açılışında gönderilir. FBSDK 18, IDFA erişimini sistem ATT durumuyla
+		     sınırlar; Dart tarafı da onboarding sonrası tercihi yeniden hizalar. -->
 		<key>FacebookAutoLogAppEventsEnabled</key>
-		<false/>
+		<true/>
 		<key>FacebookAdvertiserIDCollectionEnabled</key>
-		<false/>
+		<true/>
 		<key>NSUserTrackingUsageDescription</key>
 		<string>Reklam kampanyalarının performansını ölçmek için cihaz reklam kimliği kullanılır. İzin vermezsen uygulama normal çalışmaya devam eder.</string>
 		<key>CFBundleURLTypes</key>

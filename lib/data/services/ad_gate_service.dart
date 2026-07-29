@@ -1,5 +1,7 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'global_widget_lock_service.dart';
+
 enum AdGatePlacement {
   lockScreenWidget,
   widgetQuote,
@@ -86,7 +88,9 @@ class AdGateService {
 
   static const int exploreSwipeFreeCount = 12;
   static const Duration widgetTrialDuration = Duration(hours: 24);
-  static const Duration widgetUnlockDuration = Duration(hours: 24);
+  static const Duration _legacyWidgetUnlockDuration = Duration(
+    hours: GlobalWidgetLockService.legacyUnlockHours,
+  );
   static const Duration secondAlarmUnlockDuration = Duration(days: 7);
   static const Duration sessionAdCooldown = Duration(hours: 12);
   static const Duration exploreInterstitialCooldown = Duration(minutes: 6);
@@ -132,6 +136,7 @@ class AdGateService {
     DateTime? firstSeen,
   }) async {
     assert(_isWidgetPlacement(placement));
+    await reconcileWidgetUnlockDeadline(placement);
     if (isPremium) {
       return const WidgetGateState(
         allowed: true,
@@ -165,6 +170,65 @@ class AdGateService {
   Future<void> recordWidgetRewardedUnlock(AdGatePlacement placement) {
     assert(_isWidgetPlacement(placement));
     return recordRewardedUnlock(placement);
+  }
+
+  /// Geçerli uzaktan süreyi hâlen aktif olan turun kalıcı bitişine uygular.
+  /// Bir kez dolmuş tur değiştirilmez; böylece sonraki süre artışı eski bir
+  /// reklam hakkını yeniden canlandıramaz.
+  Future<void> reconcileWidgetUnlockDeadline(AdGatePlacement placement) async {
+    assert(_isWidgetPlacement(placement));
+    final raw = _prefs.getString(_unlockKey(placement));
+    final storedUntil = raw == null ? null : DateTime.tryParse(raw);
+    if (storedUntil == null || !storedUntil.isAfter(DateTime.now())) return;
+
+    final startedAt = unlockStartedAt(placement);
+    if (startedAt == null) return;
+    final effectiveUntil = startedAt.add(
+      Duration(hours: GlobalWidgetLockService.unlockHours(_prefs)),
+    );
+    if (effectiveUntil == storedUntil) return;
+    await _prefs.setString(
+      _unlockKey(placement),
+      effectiveUntil.toIso8601String(),
+    );
+  }
+
+  /// Background FCM isolate'ının native/App Group deposunda kesinleştirdiği
+  /// tur başlangıç/bitişlerini foreground SharedPreferences'a taşır.
+  Future<void> reconcileWidgetUnlockSnapshot({
+    required Map<String, int> startedAtMsByKind,
+    required Map<String, int> untilMsByKind,
+  }) async {
+    for (final entry in const <String, AdGatePlacement>{
+      'quote': AdGatePlacement.widgetQuote,
+      'prayer': AdGatePlacement.widgetPrayer,
+      'combo': AdGatePlacement.widgetCombo,
+      'tracking': AdGatePlacement.widgetTracking,
+      'zikir': AdGatePlacement.widgetZikir,
+    }.entries) {
+      final nativeStartedAtMs = startedAtMsByKind[entry.key] ?? 0;
+      final nativeUntilMs = untilMsByKind[entry.key] ?? 0;
+      if (nativeStartedAtMs <= 0 || nativeUntilMs <= 0) continue;
+
+      final localStartedAt = unlockStartedAt(entry.value);
+      final nativeStartedAt = DateTime.fromMillisecondsSinceEpoch(
+        nativeStartedAtMs,
+      );
+      // Foreground'da daha sonra izlenmiş yeni reklam turunu eski background
+      // snapshot'ıyla geri alma.
+      if (localStartedAt != null &&
+          localStartedAt.millisecondsSinceEpoch > nativeStartedAtMs) {
+        continue;
+      }
+      await _prefs.setString(
+        _unlockStartedAtKey(entry.value),
+        nativeStartedAt.toIso8601String(),
+      );
+      await _prefs.setString(
+        _unlockKey(entry.value),
+        DateTime.fromMillisecondsSinceEpoch(nativeUntilMs).toIso8601String(),
+      );
+    }
   }
 
   bool shouldShowExploreAd({
@@ -220,13 +284,21 @@ class AdGateService {
       AdGatePlacement.widgetPrayer ||
       AdGatePlacement.widgetCombo ||
       AdGatePlacement.widgetTracking ||
-      AdGatePlacement.widgetZikir => widgetUnlockDuration,
+      AdGatePlacement.widgetZikir => Duration(
+        hours: GlobalWidgetLockService.unlockHours(_prefs),
+      ),
       AdGatePlacement.prayerSecondAlarm => secondAlarmUnlockDuration,
       AdGatePlacement.exploreSwipe => exploreInterstitialCooldown,
       AdGatePlacement.zikirSession ||
       AdGatePlacement.healingSession ||
       AdGatePlacement.qiblaSession => sessionAdCooldown,
     };
+    if (_isWidgetPlacement(placement)) {
+      await _prefs.setString(
+        _unlockStartedAtKey(placement),
+        now.toIso8601String(),
+      );
+    }
     await _prefs.setString(
       _unlockKey(placement),
       now.add(duration).toIso8601String(),
@@ -235,8 +307,36 @@ class AdGateService {
 
   DateTime? unlockUntil(AdGatePlacement placement) {
     final raw = _prefs.getString(_unlockKey(placement));
-    if (raw == null || raw.isEmpty) return null;
-    return DateTime.tryParse(raw);
+    final storedUntil = raw == null || raw.isEmpty
+        ? null
+        : DateTime.tryParse(raw);
+    if (!_isWidgetPlacement(placement)) {
+      return storedUntil;
+    }
+    // Süresi daha önce dolmuş bir tur, admin süreyi daha sonra artırdığında
+    // yeniden açılmamalı. Yalnızca hâlen aktif turlar yeniden hesaplanır.
+    if (storedUntil != null && !storedUntil.isAfter(DateTime.now())) {
+      return storedUntil;
+    }
+    final startedAt = unlockStartedAt(placement);
+    if (startedAt == null) return null;
+    return startedAt.add(
+      Duration(hours: GlobalWidgetLockService.unlockHours(_prefs)),
+    );
+  }
+
+  DateTime? unlockStartedAt(AdGatePlacement placement) {
+    final rawStart = _prefs.getString(_unlockStartedAtKey(placement));
+    final parsedStart = rawStart == null ? null : DateTime.tryParse(rawStart);
+    if (parsedStart != null) return parsedStart;
+
+    // Eski sürümler yalnızca 24 saatlik bitiş zamanını saklıyordu. İlk uzaktan
+    // süre değişiminde mevcut turun başlangıcını bu eski bitişten güvenli biçimde
+    // türet; böylece 24 -> N saat değişikliği mevcut kullanıcılara da uygulanır.
+    if (!_isWidgetPlacement(placement)) return null;
+    final rawUntil = _prefs.getString(_unlockKey(placement));
+    final legacyUntil = rawUntil == null ? null : DateTime.tryParse(rawUntil);
+    return legacyUntil?.subtract(_legacyWidgetUnlockDuration);
   }
 
   bool _isUnlocked(AdGatePlacement placement) {
@@ -257,6 +357,9 @@ class AdGateService {
 
   String _unlockKey(AdGatePlacement placement) =>
       'ad_gate_${placement.key}_unlock_until';
+
+  String _unlockStartedAtKey(AdGatePlacement placement) =>
+      'ad_gate_${placement.key}_unlock_started_at';
 
   String _pendingKey(AdGatePlacement placement) =>
       'ad_gate_${placement.key}_pending';

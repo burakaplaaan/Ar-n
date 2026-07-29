@@ -1466,15 +1466,26 @@
   "widgetUnlockTrackingTitle": "Takip Widgetı",
   "widgetUnlockZikirTitle": "Zikirmatik Widgetı",
   "widgetUnlockAdLoadFailed": "Reklam şu an yüklenemedi, daha sonra tekrar dene.",
-  "widgetUnlockSuccessTitle": "{title} 24 saat açıldı! 🎉",
+  "widgetUnlockSuccessTitle": "{hours, plural, =1{{title} 1 saat açıldı! 🎉} other{{title} {hours} saat açıldı! 🎉}}",
   "@widgetUnlockSuccessTitle": {
     "placeholders": {
-      "title": {}
+      "title": {},
+      "hours": {"type": "int"}
     }
   },
   "widgetUnlockPremiumSuccess": "Premium aktif! Tüm widgetlar açıldı. 🎉",
-  "widgetUnlockDescription": "Bu widgetı 24 saat açmak için kısa bir reklam izleyebilirsin. Kalıcı erişim için Premium'a geç.",
-  "widgetUnlockAdButton": "Reklam izle — 24 saat aç",
+  "widgetUnlockDescription": "{hours, plural, =1{Bu widgetı 1 saat açmak için kısa bir reklam izleyebilirsin. Kalıcı erişim için Premium'a geç.} other{Bu widgetı {hours} saat açmak için kısa bir reklam izleyebilirsin. Kalıcı erişim için Premium'a geç.}}",
+  "@widgetUnlockDescription": {
+    "placeholders": {
+      "hours": {"type": "int"}
+    }
+  },
+  "widgetUnlockAdButton": "{hours, plural, =1{Reklam izle — 1 saat aç} other{Reklam izle — {hours} saat aç}}",
+  "@widgetUnlockAdButton": {
+    "placeholders": {
+      "hours": {"type": "int"}
+    }
+  },
   "widgetUnlockPremiumButton": "Premium'a geç",
   "widgetUnlockCancelButton": "Şimdi değil",
   "purchaseErrorNotFound": "Ürün bulunamadı. İnternet bağlantınızı kontrol edin.",
@@ -1872,7 +1883,7 @@
   "keepGoing": "Devam et...",
   "premiumLoadingWait": "Premium durumu yükleniyor. Lütfen kısa bir süre sonra tekrar deneyin.",
   "secondAlarmPremiumFeature": "2. alarm premium özelliği",
-  "secondAlarmAdWatchText": "Ücretsiz kullanımda 2. ezan alarmını açmak için kısa reklam izlenir. Premium kullanıcılar bu kilidi görmez.",
+  "secondAlarmAdWatchText": "Ücretsiz kullanımda 2. ezan alarmını 2 gün açmak için kısa reklam izlenir. Premium kullanıcılar bu kilidi görmez.",
   "giveUp": "Vazgeç",
   "openAfterAd": "Reklam sonrası aç",
   "reflection": "Yansıma",
@@ -1956,6 +1967,10 @@
   "prayerCircleDeleteTitle": "Dua talebini kaldır?",
   "prayerCircleDeleteBody": "Talep halkadan hemen kaldırılır ve geri alınamaz.",
   "prayerCircleDeleteAction": "Kaldır",
+  "prayerCircleAdminDeleteTitle": "Bu talep yönetici tarafından kaldırılsın mı?",
+  "prayerCircleAdminDeleteBody": "Uygunsuz içerik olarak kalıcı biçimde kaldırılır ve geri alınamaz.",
+  "prayerCircleAdminDeleteAction": "Yönetici: Kaldır",
+  "prayerCircleAdminDeleted": "Talep yönetici tarafından kaldırıldı.",
   "prayerCircleCancel": "Vazgeç",
   "prayerCircleSlowDown": "Çok hızlı işlem yaptın. Kısa süre sonra tekrar dene.",
   "prayerCircleContentRejected": "Metni kontrol et; kişisel, iletişim veya ödeme bilgisi paylaşma.",

@@ -137,18 +137,22 @@
                 <string>NSPrivacyCollectedDataTypePurposeAppFunctionality</string>
             </array>
         </dict>
-        <!-- Firebase Analytics: ekran açılışı ve buton/özellik kullanımı gibi
-             kişisel içerik taşımayan olaylar. Reklam takibi için kullanılmaz. -->
+        <!-- Firebase Analytics ürün etkileşimleri ile Meta App Events
+             install/launch/onboarding dönüşümleri. Meta olayları reklam
+             ölçümü ve optimizasyonunda kullanılabildiği için birleşik beyan
+             tracking ve advertising amaçlarını da kapsar. -->
         <dict>
             <key>NSPrivacyCollectedDataType</key>
             <string>NSPrivacyCollectedDataTypeProductInteraction</string>
             <key>NSPrivacyCollectedDataTypeLinked</key>
             <false/>
             <key>NSPrivacyCollectedDataTypeTracking</key>
-            <false/>
+            <true/>
             <key>NSPrivacyCollectedDataTypePurposes</key>
             <array>
                 <string>NSPrivacyCollectedDataTypePurposeAnalytics</string>
+                <string>NSPrivacyCollectedDataTypePurposeThirdPartyAdvertising</string>
+                <string>NSPrivacyCollectedDataTypePurposeDeveloperAdvertising</string>
             </array>
         </dict>
         <!-- Firebase Crashlytics: çökme olduğunda hata tanılama için raporlanır. -->

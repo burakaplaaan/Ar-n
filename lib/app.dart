@@ -349,9 +349,10 @@ class _ArinAppState extends ConsumerState<ArinApp> with WidgetsBindingObserver {
     _postOnboardingStartupScheduled = true;
 
     // Kullanıcının onboarding'i bitiren "Başla" aksiyonu ATT için anlamlı ve
-    // güvenli bağlamdır. Meta'nın kimliksiz install eventi bundan önce zaten
-    // başlatılmıştır; izin yalnızca IDFA eşleşmesini güçlendirir.
-    unawaited(MetaAppEvents.requestTrackingAuthorization());
+    // güvenli bağlamdır. Native Meta SDK install/launch eventini daha önce
+    // otomatik yollar; burada izin durumu ve tek seferlik registration
+    // dönüşümü tamamlanır.
+    unawaited(MetaAppEvents.completeOnboardingAttribution());
 
     if (!isFirebaseReady) {
       await bootstrapFirebase();

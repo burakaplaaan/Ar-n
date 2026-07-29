@@ -14,6 +14,7 @@ import '../../../core/theme/arin_shell_background.dart';
 import '../../../data/services/admob_service.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../shared/providers/admob_providers.dart';
+import '../../shared/providers/auth_providers.dart';
 import '../../shared/providers/premium_providers.dart';
 import '../../shared/widgets/arin_back_button.dart';
 import '../../shared/widgets/arin_shell_layout.dart';
@@ -150,7 +151,7 @@ class _PrayerFeedNotifier extends StateNotifier<_PrayerFeedState> {
     final updated = state.requests
         .map(
           (request) => request.id == requestId
-              ? request.copyWith(prayerCount: prayerCount)
+              ? request.copyWith(prayerCount: prayerCount, isPrayed: true)
               : request,
         )
         .toList(growable: false);
@@ -229,6 +230,7 @@ class _PrayerCirclePageState extends ConsumerState<PrayerCirclePage> {
     final feed = _view == _PrayerView.mine ? mineFeed : circleFeed;
     final requests = feed.requests;
     final visible = requests;
+    final isAdmin = ref.watch(isCurrentUserAdminProvider).asData?.value ?? false;
 
     // ArinShell'in yüzen alt navigasyon çubuğu bu sayfanın kendi Scaffold'undan
     // habersiz; Scaffold'un varsayılan FAB kenar boşluğu bu ölçüyle üst üste
@@ -366,7 +368,8 @@ class _PrayerCirclePageState extends ConsumerState<PrayerCirclePage> {
                                         _prayedThisSession.contains(
                                           request.id,
                                         ) ||
-                                        request.isMine,
+                                        request.isMine ||
+                                        request.isPrayed,
                                     busy: _pendingPrayerIds.contains(
                                       request.id,
                                     ),
@@ -377,6 +380,10 @@ class _PrayerCirclePageState extends ConsumerState<PrayerCirclePage> {
                                     onReport: request.isMine
                                         ? null
                                         : () => _reportRequest(request),
+                                    onAdminDelete:
+                                        isAdmin && !request.isMine
+                                        ? () => _adminDeleteRequest(request)
+                                        : null,
                                   );
                                 },
                               ),
@@ -641,7 +648,8 @@ class _PrayerCirclePageState extends ConsumerState<PrayerCirclePage> {
   Future<void> _prayFor(PrayerCircleRequest request) async {
     if (_pendingPrayerIds.contains(request.id) ||
         _prayedThisSession.contains(request.id) ||
-        request.isMine) {
+        request.isMine ||
+        request.isPrayed) {
       return;
     }
     HapticFeedback.selectionClick();
@@ -690,6 +698,44 @@ class _PrayerCirclePageState extends ConsumerState<PrayerCirclePage> {
     setState(() => _pendingPrayerIds.add(request.id));
     try {
       await ref.read(_prayerCircleRepositoryProvider).deleteRequest(request.id);
+      await ref.read(_prayerFeedProvider(_feedQuery(_view)).notifier).refresh();
+    } catch (error) {
+      if (mounted) _showMessage(_friendlyError(error));
+    } finally {
+      if (mounted) setState(() => _pendingPrayerIds.remove(request.id));
+    }
+  }
+
+  Future<void> _adminDeleteRequest(PrayerCircleRequest request) async {
+    final l10n = AppLocalizations.of(context)!;
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l10n.prayerCircleAdminDeleteTitle),
+        content: Text(l10n.prayerCircleAdminDeleteBody),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: Text(l10n.prayerCircleCancel),
+          ),
+          FilledButton(
+            style: FilledButton.styleFrom(
+              backgroundColor: Theme.of(context).colorScheme.error,
+            ),
+            onPressed: () => Navigator.pop(context, true),
+            child: Text(l10n.prayerCircleAdminDeleteAction),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !mounted) return;
+    setState(() => _pendingPrayerIds.add(request.id));
+    try {
+      await ref
+          .read(_prayerCircleRepositoryProvider)
+          .adminDeleteRequest(request.id);
+      if (!mounted) return;
+      _showMessage(l10n.prayerCircleAdminDeleted);
       await ref.read(_prayerFeedProvider(_feedQuery(_view)).notifier).refresh();
     } catch (error) {
       if (mounted) _showMessage(_friendlyError(error));
@@ -1037,6 +1083,7 @@ class _PrayerRequestCard extends StatelessWidget {
     required this.onPray,
     required this.onDelete,
     required this.onReport,
+    this.onAdminDelete,
   });
 
   final PrayerCircleRequest request;
@@ -1046,6 +1093,7 @@ class _PrayerRequestCard extends StatelessWidget {
   final VoidCallback onPray;
   final VoidCallback? onDelete;
   final VoidCallback? onReport;
+  final VoidCallback? onAdminDelete;
 
   @override
   Widget build(BuildContext context) {
@@ -1105,7 +1153,7 @@ class _PrayerRequestCard extends StatelessWidget {
                   ),
                 ),
               ),
-              if (onDelete != null || onReport != null)
+              if (onDelete != null || onReport != null || onAdminDelete != null)
                 PopupMenuButton<String>(
                   tooltip: l10n.prayerCircleMoreActions,
                   padding: EdgeInsets.zero,
@@ -1116,6 +1164,7 @@ class _PrayerRequestCard extends StatelessWidget {
                   onSelected: (value) {
                     if (value == 'delete') onDelete?.call();
                     if (value == 'report') onReport?.call();
+                    if (value == 'admin_delete') onAdminDelete?.call();
                   },
                   itemBuilder: (_) => [
                     if (onDelete != null)
@@ -1127,6 +1176,17 @@ class _PrayerRequestCard extends StatelessWidget {
                       PopupMenuItem(
                         value: 'report',
                         child: Text(l10n.prayerCircleReportAction),
+                      ),
+                    if (onAdminDelete != null)
+                      PopupMenuItem(
+                        value: 'admin_delete',
+                        child: Text(
+                          l10n.prayerCircleAdminDeleteAction,
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.error,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
                       ),
                   ],
                 ),

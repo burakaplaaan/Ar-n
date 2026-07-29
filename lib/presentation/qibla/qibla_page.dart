@@ -54,6 +54,7 @@ const _textDim = Color(0x9EFFFFFF); // beyaz %62
 // ─── Hizalanma eşikleri (hysteresis) ────────────────────────────────────────
 const _alignInDeg = 5.0;
 const _alignOutDeg = 9.0;
+const _directFollowOutDeg = 15.0;
 
 // ─── Mesafe eşikleri (km) — manevi mesaj kademeleri ─────────────────────────
 const _tierHaramKm = 1.0; // Mescid-i Haram çevresi
@@ -205,6 +206,17 @@ class _QiblaPageState extends State<QiblaPage> {
     }
 
     final smoothHeadingDeg = _normalizeDeg(_smoothAngle! * 180 / math.pi);
+    final rawHeadingDeg = _normalizeDeg(_contAngle! * 180 / math.pi);
+    final rawDelta = _angleDeltaDeg(q, rawHeadingDeg);
+    // Yalnız görsel kadran, son 15° içinde native-filtreli sensör açısına
+    // kesintisiz yaklaşır ve 5° içinde onu doğrudan izler. Böylece hedefteki
+    // EMA kuyruğu ağır çekim gibi görünmez; ölçüm, eşik ve haptic zamanlaması
+    // aşağıdaki özgün yumuşatılmış açıyla tamamen aynı kalır.
+    final directFollow =
+        ((_directFollowOutDeg - rawDelta) / (_directFollowOutDeg - _alignInDeg))
+            .clamp(0.0, 1.0);
+    final displayAngle =
+        _smoothAngle! + (_contAngle! - _smoothAngle!) * directFollow;
     final delta = _angleDeltaDeg(q, smoothHeadingDeg);
     final signed = _signedAngleDeltaDeg(q, smoothHeadingDeg);
     final canAlign = r.stable && r.guidance == QiblaGuidance.good;
@@ -221,7 +233,7 @@ class _QiblaPageState extends State<QiblaPage> {
     }
     _prevAligned = nowAligned;
 
-    _dialAngle.value = _smoothAngle!;
+    _dialAngle.value = displayAngle;
     _qiblaDeg.value = q;
     _deltaDeg.value = delta;
     _signedDelta.value = signed;

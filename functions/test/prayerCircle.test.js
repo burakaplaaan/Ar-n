@@ -433,3 +433,13 @@ test("premiumRecordActive: treats missing expiresAt as active-forever, but rejec
   assert.equal(t.premiumRecordActive({ active: true, expiresAt: future }), true);
   assert.equal(t.premiumRecordActive({ active: true, expiresAt: past }), false);
 });
+
+test("normalizedWidgetUnlockHours: accepts only integer hours from 1 through 72", () => {
+  assert.equal(t.normalizedWidgetUnlockHours(1), 1);
+  assert.equal(t.normalizedWidgetUnlockHours(72), 72);
+  assert.equal(t.normalizedWidgetUnlockHours(0), 24);
+  assert.equal(t.normalizedWidgetUnlockHours(73), 24);
+  assert.equal(t.normalizedWidgetUnlockHours(2.5), 24);
+  assert.equal(t.normalizedWidgetUnlockHours("2"), 24);
+  assert.equal(t.normalizedWidgetUnlockHours(null), 24);
+});

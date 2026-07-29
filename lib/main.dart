@@ -373,9 +373,10 @@ Future<void> _runDeferredStartup(SharedPreferences prefs) async {
     // burada gösterilmez. Eşzamanlı çağrı koruması tekrarları önler.
     unawaited(MetaAppEvents.initialize());
     if (onboardingCompleted && Platform.isIOS) {
-      // Önceki kullanıcı etkileşiminden kalan ATT isteği süreç kapanmış olsa
-      // bile kaybolmasın; yalnızca kalıcı pending işareti varsa yeniden denenir.
-      unawaited(MetaAppEvents.retryPendingTrackingAuthorizationIfNeeded());
+      // ATT akışı eklenmeden önce onboarding'i tamamlamış mevcut kullanıcılar
+      // `notDetermined` durumunda kalmasın. Sistem diyaloğu yalnızca bu durumda
+      // bir kez görünür; kararı olan kullanıcılarda sadece SDK durumu hizalanır.
+      unawaited(MetaAppEvents.requestTrackingAuthorization());
     }
   }
 

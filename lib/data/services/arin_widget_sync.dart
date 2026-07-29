@@ -10,6 +10,7 @@ import 'package:path_provider/path_provider.dart';
 
 import '../models/prayer_times_model.dart';
 import 'arin_lock_notification_service.dart';
+import 'global_widget_lock_service.dart';
 import 'location_service.dart';
 import 'prayer_widget_snapshot.dart';
 
@@ -53,6 +54,7 @@ abstract final class ArinWidgetKeys {
   static const widgetGateLockNote = 'arin_widget_gate_lock_note';
   static const widgetGateGlobalLocked = 'arin_widget_gate_global_locked';
   static const widgetGateGlobalRevision = 'arin_widget_gate_global_revision';
+  static const widgetGateUnlockHours = 'arin_widget_gate_unlock_hours';
 }
 
 abstract final class ArinWidgetSync {
@@ -357,77 +359,71 @@ abstract final class ArinWidgetSync {
     required Map<String, bool> lockedByKind,
     required Map<String, DateTime?> trialUntilByKind,
     required Map<String, DateTime?> unlockUntilByKind,
+    required Map<String, DateTime?> unlockStartedAtByKind,
     required bool isPremium,
     required bool globalLocked,
     required int globalLockRevision,
+    required int unlockHours,
     String lockNote = '',
   }) async {
     if (kIsWeb) return;
     try {
       if (!await _ensureAppGroupReady()) return;
-      Future<void> save(String key, String kind) {
-        return HomeWidget.saveWidgetData<String>(
-          key,
-          lockedByKind[kind] == true ? '1' : '0',
-        );
-      }
+      final stateCurrent = await _serializedNativeGateMutation(() async {
+        final globalStateCurrent =
+            await _saveGlobalLockOverrideIfCurrentUnlocked(
+              locked: globalLocked,
+              revision: globalLockRevision,
+              lockNote: lockNote,
+              unlockHours: unlockHours,
+            );
+        if (!globalStateCurrent) return false;
 
-      final globalStateCurrent = await _saveGlobalLockOverrideIfCurrent(
-        locked: globalLocked,
-        revision: globalLockRevision,
-        lockNote: lockNote,
-      );
-      if (!globalStateCurrent) return;
+        Future<void> saveLocked(String key, String kind) {
+          return HomeWidget.saveWidgetData<String>(
+            key,
+            lockedByKind[kind] == true ? '1' : '0',
+          );
+        }
 
-      await save(ArinWidgetKeys.widgetGateQuoteLocked, 'quote');
-      await save(ArinWidgetKeys.widgetGatePrayerLocked, 'prayer');
-      await save(ArinWidgetKeys.widgetGateComboLocked, 'combo');
-      await save(ArinWidgetKeys.widgetGateTrackingLocked, 'tracking');
-      await save(ArinWidgetKeys.widgetGateZikirLocked, 'zikir');
-      await HomeWidget.saveWidgetData<String>(
-        ArinWidgetKeys.widgetGatePremium,
-        isPremium ? '1' : '0',
-      );
-      await HomeWidget.saveWidgetData<String>(
-        ArinWidgetKeys.widgetGateLockNote,
-        lockNote,
-      );
-      for (final kind in const <String>[
-        'quote',
-        'prayer',
-        'combo',
-        'tracking',
-        'zikir',
-      ]) {
+        await saveLocked(ArinWidgetKeys.widgetGateQuoteLocked, 'quote');
+        await saveLocked(ArinWidgetKeys.widgetGatePrayerLocked, 'prayer');
+        await saveLocked(ArinWidgetKeys.widgetGateComboLocked, 'combo');
+        await saveLocked(ArinWidgetKeys.widgetGateTrackingLocked, 'tracking');
+        await saveLocked(ArinWidgetKeys.widgetGateZikirLocked, 'zikir');
         await HomeWidget.saveWidgetData<String>(
-          'arin_widget_gate_${kind}_trial_until_ms',
-          '${trialUntilByKind[kind]?.millisecondsSinceEpoch ?? 0}',
+          ArinWidgetKeys.widgetGatePremium,
+          isPremium ? '1' : '0',
         );
         await HomeWidget.saveWidgetData<String>(
-          'arin_widget_gate_${kind}_unlock_until_ms',
-          '${unlockUntilByKind[kind]?.millisecondsSinceEpoch ?? 0}',
+          ArinWidgetKeys.widgetGateLockNote,
+          globalLocked ? lockNote.trim() : '',
         );
-      }
-      await HomeWidget.updateWidget(
-        qualifiedAndroidName: _androidQuote,
-        iOSName: iOSQuoteWidgetName,
-      );
-      await HomeWidget.updateWidget(
-        qualifiedAndroidName: _androidPrayer,
-        iOSName: iOSPrayerWidgetName,
-      );
-      await HomeWidget.updateWidget(
-        qualifiedAndroidName: _androidCombo,
-        iOSName: iOSComboWidgetName,
-      );
-      await HomeWidget.updateWidget(
-        qualifiedAndroidName: _androidTracking,
-        iOSName: iOSTrackingWidgetName,
-      );
-      await HomeWidget.updateWidget(
-        qualifiedAndroidName: _androidZikir,
-        iOSName: iOSZikirWidgetName,
-      );
+        for (final kind in const <String>[
+          'quote',
+          'prayer',
+          'combo',
+          'tracking',
+          'zikir',
+        ]) {
+          await HomeWidget.saveWidgetData<String>(
+            'arin_widget_gate_${kind}_trial_until_ms',
+            '${trialUntilByKind[kind]?.millisecondsSinceEpoch ?? 0}',
+          );
+          await HomeWidget.saveWidgetData<String>(
+            'arin_widget_gate_${kind}_unlock_until_ms',
+            '${unlockUntilByKind[kind]?.millisecondsSinceEpoch ?? 0}',
+          );
+          await HomeWidget.saveWidgetData<String>(
+            'arin_widget_gate_${kind}_unlock_started_at_ms',
+            '${unlockStartedAtByKind[kind]?.millisecondsSinceEpoch ?? 0}',
+          );
+        }
+        await _saveGlobalLockRevision(globalLockRevision);
+        return true;
+      });
+      if (!stateCurrent) return;
+      await _updateAllWidgets();
     } catch (e, st) {
       debugPrint('ArinWidgetSync.pushWidgetGateStates: $e\n$st');
     }
@@ -442,6 +438,7 @@ abstract final class ArinWidgetSync {
     required bool locked,
     required int revision,
     required String lockNote,
+    required int unlockHours,
   }) async {
     if (kIsWeb || revision <= 0) return;
     if (!await _ensureAppGroupReady()) return;
@@ -450,6 +447,7 @@ abstract final class ArinWidgetSync {
       locked: locked,
       revision: revision,
       lockNote: lockNote,
+      unlockHours: unlockHours,
     );
     if (!applied) return;
     await _updateAllWidgets();
@@ -457,7 +455,16 @@ abstract final class ArinWidgetSync {
 
   /// Background FCM isolate'ının yazdığı native/App Group durumunu foreground
   /// Flutter isolate'ına taşımak için okunabilir snapshot döndürür.
-  static Future<({bool locked, int revision, String note})?>
+  static Future<
+    ({
+      bool locked,
+      int revision,
+      String note,
+      int unlockHours,
+      Map<String, int> unlockStartedAtMsByKind,
+      Map<String, int> unlockUntilMsByKind,
+    })?
+  >
   readGlobalLockOverride() async {
     if (kIsWeb || !await _ensureAppGroupReady()) return null;
     return _serializedNativeGateMutation(() async {
@@ -472,7 +479,40 @@ abstract final class ArinWidgetSync {
       final note = await HomeWidget.getWidgetData<String>(
         ArinWidgetKeys.widgetGateLockNote,
       );
-      return (locked: lockedRaw == '1', revision: revision, note: note ?? '');
+      final unlockHoursRaw = await HomeWidget.getWidgetData<String>(
+        ArinWidgetKeys.widgetGateUnlockHours,
+      );
+      final parsedUnlockHours = int.tryParse(unlockHoursRaw ?? '');
+      final unlockHours =
+          GlobalWidgetLockService.isValidUnlockHours(parsedUnlockHours)
+          ? parsedUnlockHours!
+          : GlobalWidgetLockService.defaultUnlockHours;
+      final unlockStartedAtMsByKind = <String, int>{};
+      final unlockUntilMsByKind = <String, int>{};
+      for (final kind in const <String>[
+        'quote',
+        'prayer',
+        'combo',
+        'tracking',
+        'zikir',
+      ]) {
+        final startedAtRaw = await HomeWidget.getWidgetData<String>(
+          'arin_widget_gate_${kind}_unlock_started_at_ms',
+        );
+        final untilRaw = await HomeWidget.getWidgetData<String>(
+          'arin_widget_gate_${kind}_unlock_until_ms',
+        );
+        unlockStartedAtMsByKind[kind] = int.tryParse(startedAtRaw ?? '') ?? 0;
+        unlockUntilMsByKind[kind] = int.tryParse(untilRaw ?? '') ?? 0;
+      }
+      return (
+        locked: lockedRaw == '1',
+        revision: revision,
+        note: note ?? '',
+        unlockHours: unlockHours,
+        unlockStartedAtMsByKind: unlockStartedAtMsByKind,
+        unlockUntilMsByKind: unlockUntilMsByKind,
+      );
     });
   }
 
@@ -480,33 +520,99 @@ abstract final class ArinWidgetSync {
     required bool locked,
     required int revision,
     required String lockNote,
+    required int unlockHours,
   }) async {
     return _serializedNativeGateMutation(() async {
-      final currentRaw = await HomeWidget.getWidgetData<String>(
-        ArinWidgetKeys.widgetGateGlobalRevision,
+      final applied = await _saveGlobalLockOverrideIfCurrentUnlocked(
+        locked: locked,
+        revision: revision,
+        lockNote: lockNote,
+        unlockHours: unlockHours,
       );
-      final currentRevision = int.tryParse(currentRaw ?? '') ?? 0;
-      if (revision < currentRevision ||
-          (revision <= 0 && currentRevision > 0)) {
-        return false;
-      }
-
-      await HomeWidget.saveWidgetData<String>(
-        ArinWidgetKeys.widgetGateGlobalLocked,
-        locked ? '1' : '0',
-      );
-      await HomeWidget.saveWidgetData<String>(
-        ArinWidgetKeys.widgetGateLockNote,
-        locked ? lockNote.trim() : '',
-      );
-      if (revision > 0) {
-        await HomeWidget.saveWidgetData<String>(
-          ArinWidgetKeys.widgetGateGlobalRevision,
-          '$revision',
-        );
-      }
+      if (!applied) return false;
+      await _saveGlobalLockRevision(revision);
       return true;
     });
+  }
+
+  /// Çağıran `_serializedNativeGateMutation` kilidini tutmalıdır. Revision bu
+  /// işlemde yazılmaz; tüm ilişkili native anahtarlar tamamlandıktan sonra
+  /// commit işareti olarak en son yazılır.
+  static Future<bool> _saveGlobalLockOverrideIfCurrentUnlocked({
+    required bool locked,
+    required int revision,
+    required String lockNote,
+    required int unlockHours,
+  }) async {
+    final currentRaw = await HomeWidget.getWidgetData<String>(
+      ArinWidgetKeys.widgetGateGlobalRevision,
+    );
+    final currentRevision = int.tryParse(currentRaw ?? '') ?? 0;
+    if (revision < currentRevision ||
+        (revision <= 0 && currentRevision > 0) ||
+        unlockHours < 1 ||
+        unlockHours > 72) {
+      return false;
+    }
+
+    final previousHoursRaw = await HomeWidget.getWidgetData<String>(
+      ArinWidgetKeys.widgetGateUnlockHours,
+    );
+    // Saat anahtarı yoksa kayıt eski sürümden kalmıştır; o dönem 24 saatti.
+    final previousHours =
+        int.tryParse(previousHoursRaw ?? '') ??
+        GlobalWidgetLockService.legacyUnlockHours;
+    final nowMs = DateTime.now().millisecondsSinceEpoch;
+    for (final kind in const <String>[
+      'quote',
+      'prayer',
+      'combo',
+      'tracking',
+      'zikir',
+    ]) {
+      final startedAtKey = 'arin_widget_gate_${kind}_unlock_started_at_ms';
+      final untilKey = 'arin_widget_gate_${kind}_unlock_until_ms';
+      final startedAtRaw = await HomeWidget.getWidgetData<String>(startedAtKey);
+      final untilRaw = await HomeWidget.getWidgetData<String>(untilKey);
+      final previousUntil = int.tryParse(untilRaw ?? '') ?? 0;
+      if (previousUntil > 0 && previousUntil <= nowMs) {
+        continue;
+      }
+      var startedAt = int.tryParse(startedAtRaw ?? '') ?? 0;
+      if (startedAt <= 0 && previousUntil > 0) {
+        startedAt =
+            previousUntil - Duration(hours: previousHours).inMilliseconds;
+        await HomeWidget.saveWidgetData<String>(startedAtKey, '$startedAt');
+      }
+      if (startedAt > 0) {
+        await HomeWidget.saveWidgetData<String>(
+          untilKey,
+          '${startedAt + Duration(hours: unlockHours).inMilliseconds}',
+        );
+      }
+    }
+    await HomeWidget.saveWidgetData<String>(
+      ArinWidgetKeys.widgetGateUnlockHours,
+      '$unlockHours',
+    );
+    await HomeWidget.saveWidgetData<String>(
+      ArinWidgetKeys.widgetGateGlobalLocked,
+      locked ? '1' : '0',
+    );
+    await HomeWidget.saveWidgetData<String>(
+      ArinWidgetKeys.widgetGateLockNote,
+      locked ? lockNote.trim() : '',
+    );
+    return true;
+  }
+
+  static Future<void> _saveGlobalLockRevision(int revision) async {
+    if (revision > 0) {
+      await HomeWidget.saveWidgetData<String>(
+        ArinWidgetKeys.widgetGateGlobalRevision,
+        '$revision',
+      );
+    }
   }
 
   /// Background ve foreground FCM isolate'ları aynı HomeWidget/App Group
@@ -526,7 +632,10 @@ abstract final class ArinWidgetSync {
       lockFile = await File(
         '${support.path}${Platform.pathSeparator}.arin_widget_gate.lock',
       ).open(mode: FileMode.append);
-      await lockFile.lock(FileLock.exclusive);
+      // Foreground ve background FCM isolate'ları çakıştığında yeni revision
+      // düşürülmemeli; kilit boşalana kadar bekleyip ardından revision kontrolü
+      // aynı critical section içinde yeniden yapılır.
+      await lockFile.lock(FileLock.blockingExclusive);
       return await action();
     } finally {
       if (lockFile != null) {

@@ -15,10 +15,13 @@ import '../constants/meta_ads_ids.dart';
 /// Meta reklam ölçümü. Firebase Analytics'ten bağımsızdır.
 abstract final class MetaAppEvents {
   static const _pendingAttPromptKey = 'arin_meta_att_prompt_pending_v1';
+  static const _registrationLoggedKey =
+      'arin_meta_onboarding_registration_logged_v1';
   static final FacebookAppEvents _fb = FacebookAppEvents();
   static bool _ready = false;
   static Future<void>? _initialization;
   static Future<void>? _attRequest;
+  static Future<void>? _onboardingCompletion;
   static bool _retryAttPromptOnResume = false;
 
   static bool get isReady => _ready;
@@ -50,8 +53,17 @@ abstract final class MetaAppEvents {
       await _fb.setAdvertiserIdCollectionEnabled(
         Platform.isIOS ? attAllowed : true,
       );
-      await _fb.setAutoLogAppEventsEnabled(true);
-      await _fb.activateApp();
+      if (Platform.isIOS) {
+        // StoreKit install/launch/purchase/subscription olaylarının tek kaynağı
+        // native FBSDK auto-log'dur.
+        await _fb.setAutoLogAppEventsEnabled(true);
+      } else {
+        // RevenueCat Android, Billing 8 kullanıyor; FBSDK 18 auto-IAP yalnız
+        // Billing 2–7'yi destekliyor. Çift/eksik purchase üretmemek için
+        // Android'de auto-log kapalı, activate ve purchase olayları manueldir.
+        await _fb.setAutoLogAppEventsEnabled(false);
+        await _fb.activateApp();
+      }
       _ready = true;
       debugPrint(
         '══ ARIN ══ Meta App Events: ready'
@@ -62,6 +74,56 @@ abstract final class MetaAppEvents {
       debugPrint('$st');
     } finally {
       _initialization = null;
+    }
+  }
+
+  /// Onboarding tamamlandığında ATT kararını alır ve kayıt dönüşümünü yalnızca
+  /// bir kez Meta'ya yollar. Native SDK install/launch olaylarını otomatik
+  /// toplar; bu event ise reklamdan gelen kullanıcının onboarding'i gerçekten
+  /// tamamladığını ölçmek ve kampanya optimizasyonunu güçlendirmek içindir.
+  static Future<void> completeOnboardingAttribution() {
+    if (kIsWeb || !(Platform.isIOS || Platform.isAndroid)) {
+      return Future<void>.value();
+    }
+    return _onboardingCompletion ??= _completeOnboardingAttributionOnce();
+  }
+
+  static Future<void> _completeOnboardingAttributionOnce() async {
+    try {
+      if (Platform.isIOS) {
+        await requestTrackingAuthorization();
+      }
+      if (!_ready) await initialize();
+      if (!_ready) return;
+
+      final prefs = await SharedPreferences.getInstance();
+      if (prefs.getBool(_registrationLoggedKey) == true) return;
+
+      // Meta App Events event-id ile deduplication sunmadığı için at-most-once
+      // semantiği kullanılır. Marker önce yazılır; native log çağrısı senkron
+      // hata verirse geri alınır. Başarılı log'dan sonraki flush yalnızca
+      // best-effort'tür; SDK kendi kalıcı kuyruğunu ayrıca gönderir.
+      final markerSaved = await prefs.setBool(_registrationLoggedKey, true);
+      if (!markerSaved) {
+        debugPrint('══ ARIN ══ Meta registration marker kaydedilemedi');
+        return;
+      }
+      try {
+        await _fb.logCompletedRegistration(registrationMethod: 'onboarding');
+      } catch (_) {
+        await prefs.remove(_registrationLoggedKey);
+        rethrow;
+      }
+      try {
+        await _fb.flush();
+      } catch (e) {
+        debugPrint('══ ARIN ══ Meta registration flush deferred: $e');
+      }
+      debugPrint('══ ARIN ══ Meta App Events: onboarding registered');
+    } catch (e) {
+      debugPrint('══ ARIN ══ Meta onboarding attribution failed (sessiz): $e');
+    } finally {
+      _onboardingCompletion = null;
     }
   }
 
@@ -178,34 +240,12 @@ abstract final class MetaAppEvents {
     }
   }
 
-  /// Premium / destek satın alma sonrası.
-  static Future<void> logPurchase({
-    required double amount,
-    required String currency,
-    String? orderId,
-    Map<String, dynamic>? parameters,
-  }) async {
-    if (!_ready) return;
-    try {
-      await _fb.logPurchase(
-        amount: amount,
-        currency: currency,
-        parameters: {
-          if (orderId != null && orderId.isNotEmpty) 'fb_order_id': orderId,
-          ...?parameters,
-        },
-      );
-    } catch (e) {
-      debugPrint('══ ARIN ══ Meta logPurchase failed (sessiz): $e');
-    }
-  }
-
-  static Future<void> logSubscribe({
+  static Future<void> logAndroidSubscribe({
     required double price,
     required String currency,
     required String orderId,
   }) async {
-    if (!_ready) return;
+    if (!_ready || !Platform.isAndroid) return;
     try {
       await _fb.logSubscribe(
         price: price,
@@ -213,7 +253,28 @@ abstract final class MetaAppEvents {
         orderId: orderId,
       );
     } catch (e) {
-      debugPrint('══ ARIN ══ Meta logSubscribe failed (sessiz): $e');
+      debugPrint('══ ARIN ══ Meta Android logSubscribe failed (sessiz): $e');
+    }
+  }
+
+  /// Android Billing 8 satın almaları FBSDK 18 auto-IAP kapsamı dışında olduğu
+  /// için yalnız Android manuel Purchase gönderir. iOS StoreKit eventleri
+  /// native auto-log tarafından tek kaynak olarak yönetilir.
+  static Future<void> logAndroidPurchase({
+    required double amount,
+    required String currency,
+    required String orderId,
+    required String productId,
+  }) async {
+    if (!_ready || !Platform.isAndroid) return;
+    try {
+      await _fb.logPurchase(
+        amount: amount,
+        currency: currency,
+        parameters: {'fb_order_id': orderId, 'fb_content_id': productId},
+      );
+    } catch (e) {
+      debugPrint('══ ARIN ══ Meta Android logPurchase failed (sessiz): $e');
     }
   }
 

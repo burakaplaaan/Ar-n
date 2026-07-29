@@ -1466,15 +1466,26 @@
   "widgetUnlockTrackingTitle": "أداة التتبع",
   "widgetUnlockZikirTitle": "أداة المسبحة",
   "widgetUnlockAdLoadFailed": "تعذر تحميل الإعلان الآن، يرجى المحاولة مرة أخرى لاحقًا.",
-  "widgetUnlockSuccessTitle": "تم فتح {title} لمدة 24 ساعة! 🎉",
+  "widgetUnlockSuccessTitle": "{hours, plural, =1{تم فتح {title} لمدة ساعة واحدة! 🎉} =2{تم فتح {title} لمدة ساعتين! 🎉} few{تم فتح {title} لمدة {hours} ساعات! 🎉} other{تم فتح {title} لمدة {hours} ساعة! 🎉}}",
   "@widgetUnlockSuccessTitle": {
     "placeholders": {
-      "title": {}
+      "title": {},
+      "hours": {"type": "int"}
     }
   },
   "widgetUnlockPremiumSuccess": "النسخة المميزة نشطة! تم فتح جميع الأدوات. 🎉",
-  "widgetUnlockDescription": "يمكنك مشاهدة إعلان قصير لفتح هذه الأداة لمدة 24 ساعة. قم بالترقية إلى النسخة المميزة للوصول الدائم.",
-  "widgetUnlockAdButton": "مشاهدة إعلان — الفتح لمدة 24 ساعة",
+  "widgetUnlockDescription": "{hours, plural, =1{يمكنك مشاهدة إعلان قصير لفتح هذه الأداة لمدة ساعة واحدة. قم بالترقية إلى النسخة المميزة للوصول الدائم.} =2{يمكنك مشاهدة إعلان قصير لفتح هذه الأداة لمدة ساعتين. قم بالترقية إلى النسخة المميزة للوصول الدائم.} few{يمكنك مشاهدة إعلان قصير لفتح هذه الأداة لمدة {hours} ساعات. قم بالترقية إلى النسخة المميزة للوصول الدائم.} other{يمكنك مشاهدة إعلان قصير لفتح هذه الأداة لمدة {hours} ساعة. قم بالترقية إلى النسخة المميزة للوصول الدائم.}}",
+  "@widgetUnlockDescription": {
+    "placeholders": {
+      "hours": {"type": "int"}
+    }
+  },
+  "widgetUnlockAdButton": "{hours, plural, =1{مشاهدة إعلان — الفتح لمدة ساعة واحدة} =2{مشاهدة إعلان — الفتح لمدة ساعتين} few{مشاهدة إعلان — الفتح لمدة {hours} ساعات} other{مشاهدة إعلان — الفتح لمدة {hours} ساعة}}",
+  "@widgetUnlockAdButton": {
+    "placeholders": {
+      "hours": {"type": "int"}
+    }
+  },
   "widgetUnlockPremiumButton": "الترقية إلى النسخة المميزة",
   "widgetUnlockCancelButton": "ليس الآن",
   "purchaseErrorNotFound": "لم يتم العثور على المنتج. يرجى التحقق من اتصالك بالإنترنت.",
@@ -1872,7 +1883,7 @@
   "keepGoing": "تابع...",
   "premiumLoadingWait": "يتم تفعيل Premium. يرجى المحاولة مرة أخرى بعد لحظات.",
   "secondAlarmPremiumFeature": "ميزة الإنذار الثاني لـ Premium",
-  "secondAlarmAdWatchText": "لتفعيل إنذار الأذان الثاني في الاستخدام المجاني، تتم مشاهدة إعلان قصير. مستخدمو Premium لا يرون هذا القفل.",
+  "secondAlarmAdWatchText": "لتفعيل إنذار الأذان الثاني لمدة يومين في الاستخدام المجاني، تتم مشاهدة إعلان قصير. مستخدمو Premium لا يرون هذا القفل.",
   "giveUp": "تخلى",
   "openAfterAd": "افتح بعد الإعلان",
   "reflection": "انعكاس",
@@ -1956,6 +1967,10 @@
   "prayerCircleDeleteTitle": "إزالة طلب الدعاء؟",
   "prayerCircleDeleteBody": "سيُزال الطلب من الحلقة فورًا ولا يمكن استعادته.",
   "prayerCircleDeleteAction": "إزالة",
+  "prayerCircleAdminDeleteTitle": "هل تريد إزالة هذا الطلب كمسؤول؟",
+  "prayerCircleAdminDeleteBody": "سيُحذف نهائيًا باعتباره محتوى غير لائق ولا يمكن استعادته.",
+  "prayerCircleAdminDeleteAction": "المسؤول: إزالة",
+  "prayerCircleAdminDeleted": "تمت إزالة الطلب من قبل أحد المسؤولين.",
   "prayerCircleCancel": "إلغاء",
   "prayerCircleSlowDown": "تجري العمليات بسرعة كبيرة. حاول مرة أخرى بعد قليل.",
   "prayerCircleContentRejected": "راجع النص واحذف المعلومات الشخصية أو معلومات الاتصال أو الدفع.",

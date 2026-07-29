@@ -117,6 +117,8 @@ class _AdminContentPageState extends ConsumerState<AdminContentPage>
   Map<String, dynamic>? _globalLockDoc;
   final TextEditingController _globalLockNoteController =
       TextEditingController();
+  final TextEditingController _widgetUnlockHoursController =
+      TextEditingController(text: '24');
   bool _premiumLoading = false;
   String? _premiumError;
   List<_PremiumGrantRow> _premiumEntitlements = const [];
@@ -177,6 +179,7 @@ class _AdminContentPageState extends ConsumerState<AdminContentPage>
     _widgetOverrideSourceController.dispose();
     _widgetOverrideHoursController.dispose();
     _globalLockNoteController.dispose();
+    _widgetUnlockHoursController.dispose();
     super.dispose();
   }
 
@@ -335,6 +338,10 @@ class _AdminContentPageState extends ConsumerState<AdminContentPage>
       final data = snap.data();
       _globalLockDoc = data;
       _globalLockNoteController.text = data?['note']?.toString() ?? '';
+      final unlockHoursValue = data?['unlockHours'];
+      final unlockHours = unlockHoursValue is int ? unlockHoursValue : null;
+      _widgetUnlockHoursController.text =
+          '${GlobalWidgetLockService.isValidUnlockHours(unlockHours) ? unlockHours : GlobalWidgetLockService.defaultUnlockHours}';
       _globalLockLoaded = true;
     } catch (e) {
       _globalLockError = _friendlyAdminError(
@@ -398,6 +405,57 @@ class _AdminContentPageState extends ConsumerState<AdminContentPage>
       final msg = _friendlyAdminError(
         e,
         fallback: 'Global kilit kaydedilemedi.',
+      );
+      if (mounted) setState(() => _globalLockError = msg);
+      _snack(msg);
+    } finally {
+      if (mounted) setState(() => _globalLockSaving = false);
+    }
+  }
+
+  Future<void> _saveWidgetUnlockHours() async {
+    if (!isFirebaseReady || !_isAdminVerified || _globalLockSaving) return;
+    final unlockHours = int.tryParse(_widgetUnlockHoursController.text.trim());
+    if (!GlobalWidgetLockService.isValidUnlockHours(unlockHours)) {
+      _snack('Süre 1 ile 72 saat arasında olmalıdır.');
+      return;
+    }
+    setState(() {
+      _globalLockSaving = true;
+      _globalLockError = null;
+    });
+    try {
+      final docRef = FirebaseFirestore.instance
+          .collection(GlobalWidgetLockService.collection)
+          .doc(GlobalWidgetLockService.documentId);
+      await docRef.set({
+        'unlockHours': unlockHours,
+        'revision': FieldValue.increment(1),
+        'updatedAt': FieldValue.serverTimestamp(),
+      }, SetOptions(merge: true));
+      await _writeAdminAudit(
+        action: 'Widget açık kalma süresi güncellendi',
+        targetType: 'app_public',
+        targetId: GlobalWidgetLockService.documentId,
+        details: {'unlockHours': unlockHours},
+      );
+      final prefs = ref.read(sharedPreferencesProvider);
+      await GlobalWidgetLockService.applyIfDue(prefs, force: true);
+      try {
+        final entitlement = await ref.read(premiumEntitlementProvider.future);
+        await WidgetAccessService(
+          prefs,
+        ).syncAll(isPremium: entitlement.isActive);
+      } catch (_) {
+        // Sunucuya kayıt başarılıysa yerel senkron sonraki lifecycle turunda
+        // yeniden denenecektir.
+      }
+      _snack('Widgetlar reklamdan sonra $unlockHours saat açık kalacak.');
+      await _loadGlobalLock();
+    } catch (e) {
+      final msg = _friendlyAdminError(
+        e,
+        fallback: 'Widget açık kalma süresi kaydedilemedi.',
       );
       if (mounted) setState(() => _globalLockError = msg);
       _snack(msg);
@@ -2632,9 +2690,11 @@ class _AdminContentPageState extends ConsumerState<AdminContentPage>
       globalLockError: _globalLockError,
       globalLockDoc: _globalLockDoc,
       globalLockNoteController: _globalLockNoteController,
+      widgetUnlockHoursController: _widgetUnlockHoursController,
       onGlobalLockRefresh: _loadGlobalLock,
       onGlobalLock: () => _saveGlobalLock(locked: true),
       onGlobalUnlock: () => _saveGlobalLock(locked: false),
+      onWidgetUnlockHoursSave: _saveWidgetUnlockHours,
     );
   }
 

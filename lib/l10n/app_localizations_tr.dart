@@ -3108,8 +3108,14 @@ class AppLocalizationsTr extends AppLocalizations {
       'Reklam şu an yüklenemedi, daha sonra tekrar dene.';
 
   @override
-  String widgetUnlockSuccessTitle(Object title) {
-    return '$title 24 saat açıldı! 🎉';
+  String widgetUnlockSuccessTitle(Object title, int hours) {
+    String _temp0 = intl.Intl.pluralLogic(
+      hours,
+      locale: localeName,
+      other: '$title $hours saat açıldı! 🎉',
+      one: '$title 1 saat açıldı! 🎉',
+    );
+    return '$_temp0';
   }
 
   @override
@@ -3117,11 +3123,28 @@ class AppLocalizationsTr extends AppLocalizations {
       'Premium aktif! Tüm widgetlar açıldı. 🎉';
 
   @override
-  String get widgetUnlockDescription =>
-      'Bu widgetı 24 saat açmak için kısa bir reklam izleyebilirsin. Kalıcı erişim için Premium\'a geç.';
+  String widgetUnlockDescription(int hours) {
+    String _temp0 = intl.Intl.pluralLogic(
+      hours,
+      locale: localeName,
+      other:
+          'Bu widgetı $hours saat açmak için kısa bir reklam izleyebilirsin. Kalıcı erişim için Premium\'a geç.',
+      one:
+          'Bu widgetı 1 saat açmak için kısa bir reklam izleyebilirsin. Kalıcı erişim için Premium\'a geç.',
+    );
+    return '$_temp0';
+  }
 
   @override
-  String get widgetUnlockAdButton => 'Reklam izle — 24 saat aç';
+  String widgetUnlockAdButton(int hours) {
+    String _temp0 = intl.Intl.pluralLogic(
+      hours,
+      locale: localeName,
+      other: 'Reklam izle — $hours saat aç',
+      one: 'Reklam izle — 1 saat aç',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get widgetUnlockPremiumButton => 'Premium\'a geç';
@@ -4420,7 +4443,7 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get secondAlarmAdWatchText =>
-      'Ücretsiz kullanımda 2. ezan alarmını açmak için kısa reklam izlenir. Premium kullanıcılar bu kilidi görmez.';
+      'Ücretsiz kullanımda 2. ezan alarmını 2 gün açmak için kısa reklam izlenir. Premium kullanıcılar bu kilidi görmez.';
 
   @override
   String get giveUp => 'Vazgeç';
@@ -4675,6 +4698,21 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get prayerCircleDeleteAction => 'Kaldır';
+
+  @override
+  String get prayerCircleAdminDeleteTitle =>
+      'Bu talep yönetici tarafından kaldırılsın mı?';
+
+  @override
+  String get prayerCircleAdminDeleteBody =>
+      'Uygunsuz içerik olarak kalıcı biçimde kaldırılır ve geri alınamaz.';
+
+  @override
+  String get prayerCircleAdminDeleteAction => 'Yönetici: Kaldır';
+
+  @override
+  String get prayerCircleAdminDeleted =>
+      'Talep yönetici tarafından kaldırıldı.';
 
   @override
   String get prayerCircleCancel => 'Vazgeç';

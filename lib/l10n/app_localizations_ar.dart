@@ -3095,8 +3095,16 @@ class AppLocalizationsAr extends AppLocalizations {
       'تعذر تحميل الإعلان الآن، يرجى المحاولة مرة أخرى لاحقًا.';
 
   @override
-  String widgetUnlockSuccessTitle(Object title) {
-    return 'تم فتح $title لمدة 24 ساعة! 🎉';
+  String widgetUnlockSuccessTitle(Object title, int hours) {
+    String _temp0 = intl.Intl.pluralLogic(
+      hours,
+      locale: localeName,
+      other: 'تم فتح $title لمدة $hours ساعة! 🎉',
+      few: 'تم فتح $title لمدة $hours ساعات! 🎉',
+      two: 'تم فتح $title لمدة ساعتين! 🎉',
+      one: 'تم فتح $title لمدة ساعة واحدة! 🎉',
+    );
+    return '$_temp0';
   }
 
   @override
@@ -3104,11 +3112,34 @@ class AppLocalizationsAr extends AppLocalizations {
       'النسخة المميزة نشطة! تم فتح جميع الأدوات. 🎉';
 
   @override
-  String get widgetUnlockDescription =>
-      'يمكنك مشاهدة إعلان قصير لفتح هذه الأداة لمدة 24 ساعة. قم بالترقية إلى النسخة المميزة للوصول الدائم.';
+  String widgetUnlockDescription(int hours) {
+    String _temp0 = intl.Intl.pluralLogic(
+      hours,
+      locale: localeName,
+      other:
+          'يمكنك مشاهدة إعلان قصير لفتح هذه الأداة لمدة $hours ساعة. قم بالترقية إلى النسخة المميزة للوصول الدائم.',
+      few:
+          'يمكنك مشاهدة إعلان قصير لفتح هذه الأداة لمدة $hours ساعات. قم بالترقية إلى النسخة المميزة للوصول الدائم.',
+      two:
+          'يمكنك مشاهدة إعلان قصير لفتح هذه الأداة لمدة ساعتين. قم بالترقية إلى النسخة المميزة للوصول الدائم.',
+      one:
+          'يمكنك مشاهدة إعلان قصير لفتح هذه الأداة لمدة ساعة واحدة. قم بالترقية إلى النسخة المميزة للوصول الدائم.',
+    );
+    return '$_temp0';
+  }
 
   @override
-  String get widgetUnlockAdButton => 'مشاهدة إعلان — الفتح لمدة 24 ساعة';
+  String widgetUnlockAdButton(int hours) {
+    String _temp0 = intl.Intl.pluralLogic(
+      hours,
+      locale: localeName,
+      other: 'مشاهدة إعلان — الفتح لمدة $hours ساعة',
+      few: 'مشاهدة إعلان — الفتح لمدة $hours ساعات',
+      two: 'مشاهدة إعلان — الفتح لمدة ساعتين',
+      one: 'مشاهدة إعلان — الفتح لمدة ساعة واحدة',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get widgetUnlockPremiumButton => 'الترقية إلى النسخة المميزة';
@@ -4400,7 +4431,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get secondAlarmAdWatchText =>
-      'لتفعيل إنذار الأذان الثاني في الاستخدام المجاني، تتم مشاهدة إعلان قصير. مستخدمو Premium لا يرون هذا القفل.';
+      'لتفعيل إنذار الأذان الثاني لمدة يومين في الاستخدام المجاني، تتم مشاهدة إعلان قصير. مستخدمو Premium لا يرون هذا القفل.';
 
   @override
   String get giveUp => 'تخلى';
@@ -4664,6 +4695,20 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get prayerCircleDeleteAction => 'إزالة';
+
+  @override
+  String get prayerCircleAdminDeleteTitle => 'هل تريد إزالة هذا الطلب كمسؤول؟';
+
+  @override
+  String get prayerCircleAdminDeleteBody =>
+      'سيُحذف نهائيًا باعتباره محتوى غير لائق ولا يمكن استعادته.';
+
+  @override
+  String get prayerCircleAdminDeleteAction => 'المسؤول: إزالة';
+
+  @override
+  String get prayerCircleAdminDeleted =>
+      'تمت إزالة الطلب من قبل أحد المسؤولين.';
 
   @override
   String get prayerCircleCancel => 'إلغاء';

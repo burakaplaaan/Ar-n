@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:math';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
@@ -8,7 +7,8 @@ import '../models/inspiration_card_model.dart';
 import '../models/inspiration_content_kind.dart';
 
 /// Yerel JSON korpusu: `assets/data/inspiration/{verses,quotes,hadiths}.json`
-/// — [InspirationCardModel] listesine çevrilir; arka plan görselleri [indices] ile döngüsel eşlenir.
+/// — [InspirationCardModel] listesine çevrilir. Bağımsız arka plan ve tipografi
+/// eşlemesi katalog katmanındaki `InspirationContentMixer` tarafından yapılır.
 abstract final class InspirationLocalCorpusLoader {
   static const _versesAsset = 'assets/data/inspiration/verses.json';
   static const _quotesAsset = 'assets/data/inspiration/quotes.json';
@@ -45,10 +45,7 @@ abstract final class InspirationLocalCorpusLoader {
       return v;
     }
 
-    void addFrom(
-      List<dynamic> rows,
-      InspirationContentKind defaultKind,
-    ) {
+    void addFrom(List<dynamic> rows, InspirationContentKind defaultKind) {
       for (final raw in rows) {
         if (raw is! Map<String, dynamic>) continue;
         final card = _parseRow(raw, nextIndex(), defaultKind);
@@ -62,12 +59,16 @@ abstract final class InspirationLocalCorpusLoader {
 
     if (out.isEmpty) return out;
 
-    _assignRandomBackgrounds(out, indices);
-
     if (kDebugMode) {
-      final v = out.where((c) => c.contentKind == InspirationContentKind.verse).length;
-      final q = out.where((c) => c.contentKind == InspirationContentKind.quote).length;
-      final h = out.where((c) => c.contentKind == InspirationContentKind.hadith).length;
+      final v = out
+          .where((c) => c.contentKind == InspirationContentKind.verse)
+          .length;
+      final q = out
+          .where((c) => c.contentKind == InspirationContentKind.quote)
+          .length;
+      final h = out
+          .where((c) => c.contentKind == InspirationContentKind.hadith)
+          .length;
       debugPrint(
         'InspirationLocalCorpusLoader: ${out.length} kart (âyet: $v, söz: $q, hadis: $h), '
         '${indices.length} arka plan görseli.',
@@ -75,21 +76,6 @@ abstract final class InspirationLocalCorpusLoader {
     }
 
     return out;
-  }
-
-  /// Her metin kartına, havuzdaki tüm görsellerden rastgele (kararlı olmayan) bir arka plan.
-  static void _assignRandomBackgrounds(
-    List<InspirationCardModel> cards,
-    List<int> indices,
-  ) {
-    if (indices.isEmpty) return;
-    final pool = List<int>.from(indices)..shuffle(Random());
-    for (var i = 0; i < cards.length; i++) {
-      cards[i] = cards[i].copyWith(
-        imageIndex: pool[i % pool.length],
-        useLightTextOnImage: true,
-      );
-    }
   }
 
   static Future<List<dynamic>> _tryLoadListAsset(String path) async {

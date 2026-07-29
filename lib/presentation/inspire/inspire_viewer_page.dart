@@ -21,6 +21,7 @@ import '../shared/widgets/arin_back_button.dart';
 import '../shared/widgets/arin_skeleton.dart';
 import 'explore_bgm_controller.dart';
 import 'inspiration_catalog_provider.dart';
+import 'inspiration_search.dart';
 import 'inspire_viewer_session_provider.dart';
 import 'widgets/inspiration_slide.dart';
 
@@ -42,13 +43,39 @@ class InspireViewerPage extends ConsumerStatefulWidget {
 }
 
 class _InspireViewerPageState extends ConsumerState<InspireViewerPage> {
+  late final StateController<InspireViewerDeckExtra?> _deckSessionController;
+  InspireViewerDeckExtra? _ownedDeckSession;
+
+  @override
+  void initState() {
+    super.initState();
+    _deckSessionController = ref.read(
+      inspireViewerDeckSessionProvider.notifier,
+    );
+    final session = _deckSessionController.state;
+    if (session != null &&
+        widget.deckOverride != null &&
+        identical(session.cards, widget.deckOverride)) {
+      _ownedDeckSession = session;
+    }
+  }
+
+  @override
+  void dispose() {
+    final ownedSession = _ownedDeckSession;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (ownedSession != null &&
+          identical(_deckSessionController.state, ownedSession)) {
+        _deckSessionController.state = null;
+      }
+    });
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
-    final session = ref.watch(inspireViewerDeckSessionProvider);
-    final override = widget.deckOverride ?? session?.cards;
-    final initial = widget.deckOverride != null
-        ? widget.initialIndex
-        : (session?.initialIndex ?? widget.initialIndex);
+    final override = widget.deckOverride;
+    final initial = widget.initialIndex;
 
     if (override != null) {
       if (override.isEmpty) {

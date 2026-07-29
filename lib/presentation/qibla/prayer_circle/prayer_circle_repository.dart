@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -19,6 +20,7 @@ class PrayerCircleRequest {
     required this.createdAt,
     required this.expiresAt,
     required this.isMine,
+    this.isPrayed = false,
   });
 
   final String id;
@@ -29,9 +31,15 @@ class PrayerCircleRequest {
   final DateTime expiresAt;
   final bool isMine;
 
+  /// Bu cihaz/hesap daha önce bu talebe eşlik etti mi — sunucudan değil,
+  /// yerel `_prayedKey` önbelleğinden gelir (bkz. [PrayerCircleRepository]).
+  /// Uygulama yeniden başlatıldığında "Dua ettim" butonunun gereksiz yere
+  /// tekrar aktif görünmesini engeller.
+  final bool isPrayed;
+
   Duration get remaining => expiresAt.difference(DateTime.now());
 
-  PrayerCircleRequest copyWith({int? prayerCount}) {
+  PrayerCircleRequest copyWith({int? prayerCount, bool? isPrayed}) {
     return PrayerCircleRequest(
       id: id,
       text: text,
@@ -40,6 +48,7 @@ class PrayerCircleRequest {
       createdAt: createdAt,
       expiresAt: expiresAt,
       isMine: isMine,
+      isPrayed: isPrayed ?? this.isPrayed,
     );
   }
 }
@@ -88,8 +97,14 @@ class PrayerCircleRepository {
   static const _functionsRegion = 'europe-west1';
   static const _mineKey = 'arin_prayer_circle_request_ids_v1';
   static const _reportedKey = 'arin_prayer_circle_reported_ids_v1';
+  static const _prayedKey = 'arin_prayer_circle_prayed_ids_v1';
   static const _bindingSecretKey = 'arin_prayer_circle_binding_secret_v1';
   static const _policyVersion = 1;
+
+  /// Talepler sunucuda 24 saatte silindiği için yerel "eşlik ettim"
+  /// önbelleğini bir süre sonra (tampon payıyla) temizliyoruz; aksi halde
+  /// cihazda süresi dolmuş id'ler sonsuza kadar birikir.
+  static const _prayedRetention = Duration(hours: 48);
 
   final FirebaseAuth _auth;
   final FirebaseFunctions _functions;
@@ -114,6 +129,7 @@ class PrayerCircleRepository {
     final data = Map<String, dynamic>.from(result.data as Map);
     final mine = await _localRequestIds();
     final reported = await _localReportedIds();
+    final prayed = await _loadPrayedMap();
     final items = ((data['items'] as List?) ?? const [])
         .whereType<Map>()
         .map((raw) {
@@ -129,6 +145,7 @@ class PrayerCircleRepository {
             createdAt: DateTime.fromMillisecondsSinceEpoch(createdAtMs),
             expiresAt: DateTime.fromMillisecondsSinceEpoch(expiresAtMs),
             isMine: item['isMine'] == true || mine.contains(id),
+            isPrayed: prayed.containsKey(id),
           );
         })
         .where(
@@ -227,6 +244,10 @@ class PrayerCircleRepository {
       'requestId': requestId,
     });
     final data = Map<String, dynamic>.from(result.data as Map);
+    // `counted: false` da "zaten eşlik ettin" anlamına gelir — her iki
+    // durumda da yerelde işaretleyip bir dahaki açılışta butonun doğru
+    // (Eşlik ettin) görünmesini sağlıyoruz.
+    await _markPrayed(requestId);
     return PrayerActionResult(
       counted: data['counted'] == true,
       prayerCount: (data['prayerCount'] as num?)?.toInt() ?? 0,
@@ -255,6 +276,19 @@ class PrayerCircleRepository {
     final credentials = await _requiredInstallationCredentials();
     await _functions.httpsCallable('deletePrayerRequest').call({
       ...credentials,
+      'requestId': requestId,
+    });
+    final prefs = await SharedPreferences.getInstance();
+    final ids = (prefs.getStringList(_mineKey) ?? const <String>[]).toSet()
+      ..remove(requestId);
+    await prefs.setStringList(_mineKey, ids.toList(growable: false));
+  }
+
+  /// Yönetici moderasyon silmesi — sahiplik farketmeksizin. Sunucu tarafında
+  /// gerçek oturum açmış admin e-postası veya `admin_users` rolü kontrol
+  /// edilir; kurulum kimlik bilgisi gerektirmez.
+  Future<void> adminDeleteRequest(String requestId) async {
+    await _functions.httpsCallable('adminDeletePrayerRequest').call({
       'requestId': requestId,
     });
     final prefs = await SharedPreferences.getInstance();
@@ -315,6 +349,49 @@ class PrayerCircleRepository {
   Future<Set<String>> _localReportedIds() async {
     final prefs = await SharedPreferences.getInstance();
     return (prefs.getStringList(_reportedKey) ?? const <String>[]).toSet();
+  }
+
+  /// `{requestId: eşlikEttiğiZamanMs}` haritasını okur; okuma sırasında
+  /// [_prayedRetention] süresini aşmış kayıtları eler ve (bir şey silindiyse)
+  /// temizlenmiş halini geri yazar. Böylece süresi çoktan dolmuş dua
+  /// talepleri cihazda sonsuza kadar birikmez.
+  Future<Map<String, int>> _loadPrayedMap() async {
+    final prefs = await SharedPreferences.getInstance();
+    final raw = prefs.getString(_prayedKey);
+    if (raw == null || raw.isEmpty) return {};
+    Map<String, dynamic> decoded;
+    try {
+      final parsed = jsonDecode(raw);
+      if (parsed is! Map) return {};
+      decoded = Map<String, dynamic>.from(parsed);
+    } catch (error) {
+      debugPrint('PrayerCircleRepository: prayed cache corrupt: $error');
+      return {};
+    }
+    final cutoffMs = DateTime.now()
+        .subtract(_prayedRetention)
+        .millisecondsSinceEpoch;
+    final pruned = <String, int>{};
+    var removedAny = false;
+    decoded.forEach((id, value) {
+      final ts = (value as num?)?.toInt() ?? 0;
+      if (ts >= cutoffMs) {
+        pruned[id] = ts;
+      } else {
+        removedAny = true;
+      }
+    });
+    if (removedAny) {
+      await prefs.setString(_prayedKey, jsonEncode(pruned));
+    }
+    return pruned;
+  }
+
+  Future<void> _markPrayed(String requestId) async {
+    final prefs = await SharedPreferences.getInstance();
+    final current = await _loadPrayedMap();
+    current[requestId] = DateTime.now().millisecondsSinceEpoch;
+    await prefs.setString(_prayedKey, jsonEncode(current));
   }
 
   Future<String> _requiredInstallId(String bindingSecret) async {

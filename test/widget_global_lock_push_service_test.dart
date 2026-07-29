@@ -26,6 +26,7 @@ void main() {
       expect(payload!.locked, isTrue);
       expect(payload.revision, 12);
       expect(payload.note, 'Bakım');
+      expect(payload.unlockHours, 24);
     });
 
     test('geçerli kilit kaldırma mesajını ayrıştırır', () {
@@ -45,6 +46,24 @@ void main() {
           'type': 'moment_verse',
           'locked': '1',
           'revision': '12',
+        }),
+        isNull,
+      );
+      expect(
+        WidgetGlobalLockPushPayload.tryParse({
+          'type': 'widget_global_lock',
+          'locked': '1',
+          'revision': '12',
+          'unlockHours': '2.5',
+        }),
+        isNull,
+      );
+      expect(
+        WidgetGlobalLockPushPayload.tryParse({
+          'type': 'widget_global_lock',
+          'locked': '1',
+          'revision': '12',
+          'unlockHours': '73',
         }),
         isNull,
       );
@@ -71,6 +90,7 @@ void main() {
         locked: true,
         revision: 200,
         note: '',
+        unlockHours: 24,
       );
 
       expect(payload.isOlderThan(201), isTrue);
@@ -113,6 +133,7 @@ void main() {
           locked: true,
           revision: 3,
           note: 'Bakım',
+          unlockHours: 24,
         ),
         isTrue,
       );
@@ -126,6 +147,7 @@ void main() {
           locked: false,
           revision: 2,
           note: '',
+          unlockHours: 24,
         ),
         isFalse,
       );
@@ -137,6 +159,7 @@ void main() {
           locked: false,
           revision: 4,
           note: '',
+          unlockHours: 24,
         ),
         isTrue,
       );
@@ -153,12 +176,14 @@ void main() {
           locked: true,
           revision: 11,
           note: 'Yeni',
+          unlockHours: 10,
         ),
         GlobalWidgetLockService.applyRemoteOverride(
           prefs,
           locked: false,
           revision: 10,
           note: 'Eski',
+          unlockHours: 24,
         ),
       ]);
 
@@ -177,6 +202,7 @@ void main() {
           locked: true,
           revision: 1,
           note: '',
+          unlockHours: 24,
         );
         final service = WidgetAccessService(prefs);
 

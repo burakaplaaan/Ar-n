@@ -21,11 +21,19 @@ class GlobalWidgetLockResult {
 abstract final class GlobalWidgetLockService {
   static const collection = 'app_public';
   static const documentId = 'widget_global_lock';
+  static const defaultUnlockHours = 24;
+
+  /// Eski istemciler yalnızca bitiş zamanı yazıyordu; başlangıç türetilirken
+  /// o dönemdeki süre (24 saat) kullanılmalı — [defaultUnlockHours] değil.
+  static const legacyUnlockHours = 24;
+  static const minUnlockHours = 1;
+  static const maxUnlockHours = 72;
 
   static const _lastFetchMsKey = 'arin_global_widget_lock_last_fetch_ms';
   static const _localLockedKey = 'arin_global_widget_lock_locked';
   static const _localNoteKey = 'arin_global_widget_lock_note';
   static const _localRevisionKey = 'arin_global_widget_lock_revision';
+  static const _localUnlockHoursKey = 'arin_widget_unlock_hours';
   static const _minFetchGap = Duration(minutes: 5);
   static Future<void> _mutationTail = Future<void>.value();
 
@@ -54,6 +62,14 @@ abstract final class GlobalWidgetLockService {
   static int revision(SharedPreferences prefs) =>
       prefs.getInt(_localRevisionKey) ?? 0;
 
+  static int unlockHours(SharedPreferences prefs) {
+    final value = prefs.getInt(_localUnlockHoursKey);
+    return isValidUnlockHours(value) ? value! : defaultUnlockHours;
+  }
+
+  static bool isValidUnlockHours(int? value) =>
+      value != null && value >= minUnlockHours && value <= maxUnlockHours;
+
   static bool shouldApplyRevision({
     required int current,
     required int incoming,
@@ -71,9 +87,11 @@ abstract final class GlobalWidgetLockService {
     required bool locked,
     required int revision,
     required String note,
+    required int unlockHours,
   }) async {
     return _serializedMutation(() async {
       if (revision <= 0 ||
+          !isValidUnlockHours(unlockHours) ||
           !shouldApplyRevision(
             current: GlobalWidgetLockService.revision(prefs),
             incoming: revision,
@@ -82,6 +100,7 @@ abstract final class GlobalWidgetLockService {
       }
       await prefs.setBool(_localLockedKey, locked);
       await prefs.setString(_localNoteKey, note.trim());
+      await prefs.setInt(_localUnlockHoursKey, unlockHours);
       await prefs.setInt(_localRevisionKey, revision);
       return true;
     });
@@ -129,6 +148,11 @@ abstract final class GlobalWidgetLockService {
       final data = snap.data();
       final locked = data?['locked'] == true;
       final note = data?['note']?.toString().trim() ?? '';
+      final unlockHoursValue = data?['unlockHours'];
+      final remoteUnlockHours =
+          unlockHoursValue is int && isValidUnlockHours(unlockHoursValue)
+          ? unlockHoursValue
+          : defaultUnlockHours;
       final revisionValue = data?['revision'];
       final remoteRevision = revisionValue is num && revisionValue > 0
           ? revisionValue.toInt()
@@ -149,6 +173,7 @@ abstract final class GlobalWidgetLockService {
         }
         await prefs.setBool(_localLockedKey, locked);
         await prefs.setString(_localNoteKey, note);
+        await prefs.setInt(_localUnlockHoursKey, remoteUnlockHours);
         await prefs.setInt(_localRevisionKey, remoteRevision);
         return GlobalWidgetLockResult(
           fetched: true,

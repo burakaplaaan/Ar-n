@@ -33,7 +33,7 @@ class PurchaseService {
   /// getLocalPremiumEntitlement() bu flag'i kontrol ederek RC hazır olana kadar bekler.
   static bool _isConfigured = false;
   static Future<void>? _configureFuture;
-  
+
   /// Global callback for customer info updates (e.g. to invalidate provider)
   static void Function()? onCustomerInfoUpdated;
 
@@ -464,36 +464,38 @@ class PurchaseService {
   }
 
   void _logMetaSubscription(StoreProduct product, CustomerInfo info) {
+    if (!Platform.isAndroid) return;
     final orderId = info.originalAppUserId.isNotEmpty
         ? '${info.originalAppUserId}_${product.identifier}_${DateTime.now().millisecondsSinceEpoch}'
         : '${product.identifier}_${DateTime.now().millisecondsSinceEpoch}';
     unawaited(
-      MetaAppEvents.logSubscribe(
+      MetaAppEvents.logAndroidSubscribe(
         price: product.price,
         currency: product.currencyCode,
         orderId: orderId,
       ),
     );
     unawaited(
-      MetaAppEvents.logPurchase(
+      MetaAppEvents.logAndroidPurchase(
         amount: product.price,
         currency: product.currencyCode,
         orderId: orderId,
-        parameters: {'fb_content_id': product.identifier},
+        productId: product.identifier,
       ),
     );
   }
 
   void _logMetaPurchase(StoreProduct product, CustomerInfo info) {
+    if (!Platform.isAndroid) return;
     final orderId = info.originalAppUserId.isNotEmpty
         ? '${info.originalAppUserId}_${product.identifier}_${DateTime.now().millisecondsSinceEpoch}'
         : '${product.identifier}_${DateTime.now().millisecondsSinceEpoch}';
     unawaited(
-      MetaAppEvents.logPurchase(
+      MetaAppEvents.logAndroidPurchase(
         amount: product.price,
         currency: product.currencyCode,
         orderId: orderId,
-        parameters: {'fb_content_id': product.identifier},
+        productId: product.identifier,
       ),
     );
   }

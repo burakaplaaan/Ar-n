@@ -265,6 +265,216 @@ const List<DailyNamazWisdom> kDailyNamazWisdomList = [
         'Hiçbir yere sığamadığın anlarda, sadece bir rükû mesafesinde bekleyen o sonsuz huzurdur.',
     kind: 'Söz',
   ),
+  DailyNamazWisdom(
+    arabic: '',
+    turkish:
+        'Namaz, aciz bir ruhun Sonsuz Kudret\'e yaslanıp ferahlamasıdır.',
+    kind: 'Söz',
+  ),
+  DailyNamazWisdom(
+    arabic: '',
+    turkish:
+        '"Allah-u Ekber" demek, ruhun dünyevi bütün korkulardan özgürleşmesidir.',
+    kind: 'Söz',
+  ),
+  DailyNamazWisdom(
+    arabic: '',
+    turkish:
+        'Rabbine yönelen bir ruh, dünyanın bütün çıkmaz sokaklarından kurtulur.',
+    kind: 'Söz',
+  ),
+  DailyNamazWisdom(
+    arabic: '',
+    turkish:
+        'Namaz, kalbin ritmini Allah\'ın rızasına ayarlayan şifalı bir dokunuştur.',
+    kind: 'Söz',
+  ),
+  DailyNamazWisdom(
+    arabic: '',
+    turkish:
+        'Namaz kılan insan, ruhunu Allah\'ın himayesine ve şifasına emanet etmiştir.',
+    kind: 'Söz',
+  ),
+  DailyNamazWisdom(
+    arabic: '',
+    turkish:
+        'Ruhun gerçek hürriyeti ve şifası, sadece Allah\'a kul olup namazla divana durmaktır.',
+    kind: 'Söz',
+  ),
+  DailyNamazWisdom(
+    arabic: '',
+    turkish:
+        'Her rekat, insanın dünyadan bir adım daha uzaklaşıp manevi şifaya yaklaşmasıdır.',
+    kind: 'Söz',
+  ),
+  DailyNamazWisdom(
+    arabic: '',
+    turkish:
+        'Allah ile baş başa kalmanın verdiği huzur, ruhun en kalıcı merhemidir.',
+    kind: 'Söz',
+  ),
+  DailyNamazWisdom(
+    arabic: '',
+    turkish:
+        'Namaz, çaresizlik hissinin yerini ilahi bir güvenin aldığı anın adıdır.',
+    kind: 'Söz',
+  ),
+  DailyNamazWisdom(
+    arabic: '',
+    turkish:
+        'Yönünü kıbleye çevirenin ruhu, asla pusulasız kalıp kaybolmaz.',
+    kind: 'Söz',
+  ),
+  DailyNamazWisdom(
+    arabic: '',
+    turkish:
+        'Sabah namazı, uyanan güne ve ruha sürülen ilk şifa merhemidir.',
+    kind: 'Söz',
+  ),
+  DailyNamazWisdom(
+    arabic: '',
+    turkish:
+        'Beş vakit namaz, ruhu günde beş defa iyileştiren manevi bir terapidir.',
+    kind: 'Söz',
+  ),
+  DailyNamazWisdom(
+    arabic: '',
+    turkish:
+        'Namazın ardındaki dua, iyileşen ruhun Allah\'a sunduğu bir teşekkür mektubudur.',
+    kind: 'Söz',
+  ),
+  DailyNamazWisdom(
+    arabic: '',
+    turkish:
+        'Ezan sesi, ruhun şifahanesine çağrılan bir acil şifa davetidir.',
+    kind: 'Söz',
+  ),
+  DailyNamazWisdom(
+    arabic: '',
+    turkish:
+        'Gecenin karanlığında kılınan teheccüd, ruhun en gizli yaralarını iyileştirir.',
+    kind: 'Söz',
+  ),
+  DailyNamazWisdom(
+    arabic: '',
+    turkish:
+        'Namaz, insana umutsuzluğun yasak olduğunu hatırlatan ilahi bir umut ışığıdır.',
+    kind: 'Söz',
+  ),
+  DailyNamazWisdom(
+    arabic: '',
+    turkish:
+        'Zamanı namazla ölçen insanın ruhu, dünyanın telaşı içinde yara almaz.',
+    kind: 'Söz',
+  ),
+  DailyNamazWisdom(
+    arabic: '',
+    turkish:
+        'Namazsızlık ruhun kuraklığı, namaz ise ona can veren rahmet yağmurudur.',
+    kind: 'Söz',
+  ),
+  DailyNamazWisdom(
+    arabic: '',
+    turkish:
+        'Şifa arayan kalpler için namaz, yan etkisi olmayan tek ve en kesin ilaçtır.',
+    kind: 'Söz',
+  ),
+  DailyNamazWisdom(
+    arabic: '',
+    turkish:
+        'Ahiretteki kurtuluşun anahtarı olan namaz, dünyada da ruhun en büyük şifasıdır.',
+    kind: 'Söz',
+  ),
+  DailyNamazWisdom(
+    arabic: '',
+    turkish:
+        'Namaz, savrulan ömrümüzü seccadeye sabitleyen, hayatı toparlayan manevi bir demirdir.',
+    kind: 'Söz',
+  ),
+  DailyNamazWisdom(
+    arabic: '',
+    turkish:
+        'Günün sahibine gün içinde beş kez selam vermeden, o günün gerçek bereketi bulunmaz.',
+    kind: 'Söz',
+  ),
+  DailyNamazWisdom(
+    arabic: '',
+    turkish:
+        'Ezan, dünyanın geçici işlerine "dur", kalıcı ve sonsuz olana "gel" deme anıdır.',
+    kind: 'Söz',
+  ),
+  DailyNamazWisdom(
+    arabic: '',
+    turkish:
+        'Vaktini namaza göre ayarlayanın, hayatı da huzura göre şekillenir ve düzene girer.',
+    kind: 'Söz',
+  ),
+  DailyNamazWisdom(
+    arabic: '',
+    turkish:
+        'Namaz, hayatın bitmek bilmeyen karmaşasına atılan ilahi bir düğümdür; dağılanı toparlar.',
+    kind: 'Söz',
+  ),
+  DailyNamazWisdom(
+    arabic: '',
+    turkish:
+        'Namaz, kulluğun en saf haliyle "Seni unutmadım Rabbim" demenin bedensel ve ruhsal ispatıdır.',
+    kind: 'Söz',
+  ),
+  DailyNamazWisdom(
+    arabic: '',
+    turkish:
+        'Kimsenin seni duymadığı ve anlamadığı anlarda, seni en iyi anlayanla baş başa kalmaktır.',
+    kind: 'Söz',
+  ),
+  DailyNamazWisdom(
+    arabic: '',
+    turkish:
+        'Rabbinle arandaki manevi bağı koparmak istemiyorsan, seccadenle olan bağını sıkı tutmalısın.',
+    kind: 'Söz',
+  ),
+  DailyNamazWisdom(
+    arabic: '',
+    turkish:
+        'Dünyada tüm kapılar yüzüne kapandığında, namaz arşın rahmet kapılarını sana sonuna kadar açar.',
+    kind: 'Söz',
+  ),
+  DailyNamazWisdom(
+    arabic: '',
+    turkish:
+        'Evinde bir seccade serecek kadar yerin varsa, dünyadaki en güvenli sığınağa sahipsin demektir.',
+    kind: 'Söz',
+  ),
+  DailyNamazWisdom(
+    arabic: '',
+    turkish:
+        'Namaz, dünyaya ve kula kulluk etmekten kurtulup sadece Allah\'a eğilmenin asil hürriyetidir.',
+    kind: 'Söz',
+  ),
+  DailyNamazWisdom(
+    arabic: '',
+    turkish:
+        'Her secde, nefsin kibrini sessizce toprağa gömüp tevazuyu baş tacı etmektir.',
+    kind: 'Söz',
+  ),
+  DailyNamazWisdom(
+    arabic: '',
+    turkish:
+        'Dünyayı arkana atıp, sonsuzluğu karşına aldığın o muazzam ve dik duruştur kıyam.',
+    kind: 'Söz',
+  ),
+  DailyNamazWisdom(
+    arabic: '',
+    turkish:
+        'Bütün yüklerini, dertlerini ve tasalarını tek bir "Allah-u Ekber" nidasıyla O\'na bırakmanın adıdır namaz.',
+    kind: 'Söz',
+  ),
+  DailyNamazWisdom(
+    arabic: '',
+    turkish:
+        'Yalnızca Allah\'ın huzurunda rükûda eğilen bir beden, hayatta karşılaştığı hiçbir zorluk karşısında eğilmez.',
+    kind: 'Söz',
+  ),
 ];
 
 /// Yerel takvime göre gün anahtarı; aynı gün her açılışta aynı içerik.

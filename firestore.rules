@@ -220,7 +220,12 @@ service cloud.firestore {
     match /app_public/{docId} {
       allow read: if true;
       allow write: if isAdmin()
-        && docId in ['inspiration_cards', 'widget_override', 'widget_global_lock'];
+        && docId in ['inspiration_cards', 'widget_override', 'widget_global_lock']
+        && (docId != 'widget_global_lock'
+          || !request.resource.data.keys().hasAny(['unlockHours'])
+          || (request.resource.data.unlockHours is int
+            && request.resource.data.unlockHours >= 1
+            && request.resource.data.unlockHours <= 72));
     }
 
     // Premium yetki kayıtları:

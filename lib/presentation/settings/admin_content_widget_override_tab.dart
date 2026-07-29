@@ -18,9 +18,11 @@ Widget _buildAdminWidgetOverrideTab({
   required String? globalLockError,
   required Map<String, dynamic>? globalLockDoc,
   required TextEditingController globalLockNoteController,
+  required TextEditingController widgetUnlockHoursController,
   required Future<void> Function() onGlobalLockRefresh,
   required Future<void> Function() onGlobalLock,
   required Future<void> Function() onGlobalUnlock,
+  required Future<void> Function() onWidgetUnlockHoursSave,
 }) {
   final now = DateTime.now();
   final expiresAt = _adminDateFromValue(doc?['expiresAt']);
@@ -46,9 +48,11 @@ Widget _buildAdminWidgetOverrideTab({
           error: globalLockError,
           doc: globalLockDoc,
           noteController: globalLockNoteController,
+          unlockHoursController: widgetUnlockHoursController,
           onRefresh: onGlobalLockRefresh,
           onLock: onGlobalLock,
           onUnlock: onGlobalUnlock,
+          onUnlockHoursSave: onWidgetUnlockHoursSave,
         ),
         const SizedBox(height: 20),
         const Divider(height: 1, color: Colors.white24),
@@ -200,9 +204,11 @@ Widget _globalLockSectionCard({
   required String? error,
   required Map<String, dynamic>? doc,
   required TextEditingController noteController,
+  required TextEditingController unlockHoursController,
   required Future<void> Function() onRefresh,
   required Future<void> Function() onLock,
   required Future<void> Function() onUnlock,
+  required Future<void> Function() onUnlockHoursSave,
 }) {
   final locked = doc?['locked'] == true;
   final updatedAt = _adminDateFromValue(doc?['updatedAt']);
@@ -303,6 +309,34 @@ Widget _globalLockSectionCard({
               isDense: true,
               counterText: '',
             ),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: TextField(
+                  controller: unlockHoursController,
+                  keyboardType: TextInputType.number,
+                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                  decoration: const InputDecoration(
+                    labelText: 'Reklam sonrası açık kalma süresi',
+                    helperText: '1–72 saat arasında bir değer gir.',
+                    suffixText: 'saat',
+                    border: OutlineInputBorder(),
+                    isDense: true,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 10),
+              FilledButton.icon(
+                onPressed: saving ? null : onUnlockHoursSave,
+                icon: const Icon(Icons.schedule_rounded, size: 18),
+                label: const Text('Kaydet'),
+              ),
+            ],
           ),
         ),
         Padding(

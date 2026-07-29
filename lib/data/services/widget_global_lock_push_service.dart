@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'arin_widget_sync.dart';
+import 'ad_gate_service.dart';
 import 'global_widget_lock_service.dart';
 
 /// Sunucudan gelen sessiz widget-kilit mesajının doğrulanmış karşılığı.
@@ -11,6 +12,7 @@ class WidgetGlobalLockPushPayload {
     required this.locked,
     required this.revision,
     required this.note,
+    required this.unlockHours,
   });
 
   static const messageType = 'widget_global_lock';
@@ -18,6 +20,7 @@ class WidgetGlobalLockPushPayload {
   final bool locked;
   final int revision;
   final String note;
+  final int unlockHours;
 
   static WidgetGlobalLockPushPayload? tryParse(Map<String, dynamic> data) {
     if (data['type']?.toString() != messageType) return null;
@@ -27,11 +30,17 @@ class WidgetGlobalLockPushPayload {
 
     final revision = int.tryParse(data['revision']?.toString() ?? '');
     if (revision == null || revision <= 0) return null;
+    final unlockHoursRaw = data['unlockHours'];
+    final unlockHours = unlockHoursRaw == null
+        ? GlobalWidgetLockService.defaultUnlockHours
+        : int.tryParse(unlockHoursRaw.toString());
+    if (!GlobalWidgetLockService.isValidUnlockHours(unlockHours)) return null;
 
     return WidgetGlobalLockPushPayload(
       locked: lockedRaw == '1',
       revision: revision,
       note: data['note']?.toString() ?? '',
+      unlockHours: unlockHours!,
     );
   }
 
@@ -56,6 +65,7 @@ abstract final class WidgetGlobalLockPushService {
           locked: payload.locked,
           revision: payload.revision,
           note: payload.note,
+          unlockHours: payload.unlockHours,
         );
         if (!applied) {
           // Eski foreground mesaj native cache'i de geri almamalı. Mevcut
@@ -65,6 +75,7 @@ abstract final class WidgetGlobalLockPushService {
             locked: GlobalWidgetLockService.isGloballyLocked(prefs),
             revision: GlobalWidgetLockService.revision(prefs),
             lockNote: GlobalWidgetLockService.lockedNote(prefs),
+            unlockHours: GlobalWidgetLockService.unlockHours(prefs),
           );
           return true;
         }
@@ -73,6 +84,7 @@ abstract final class WidgetGlobalLockPushService {
         locked: payload.locked,
         revision: payload.revision,
         lockNote: payload.note,
+        unlockHours: payload.unlockHours,
       );
     } catch (e, st) {
       debugPrint('WidgetGlobalLockPushService: $e\n$st');
@@ -87,11 +99,17 @@ abstract final class WidgetGlobalLockPushService {
     try {
       final snapshot = await ArinWidgetSync.readGlobalLockOverride();
       if (snapshot == null) return;
-      await GlobalWidgetLockService.applyRemoteOverride(
+      final applied = await GlobalWidgetLockService.applyRemoteOverride(
         prefs,
         locked: snapshot.locked,
         revision: snapshot.revision,
         note: snapshot.note,
+        unlockHours: snapshot.unlockHours,
+      );
+      if (!applied) return;
+      await AdGateService(prefs).reconcileWidgetUnlockSnapshot(
+        startedAtMsByKind: snapshot.unlockStartedAtMsByKind,
+        untilMsByKind: snapshot.unlockUntilMsByKind,
       );
     } catch (e, st) {
       debugPrint('WidgetGlobalLockPushService.reconcile: $e\n$st');

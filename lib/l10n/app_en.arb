@@ -1466,15 +1466,26 @@
   "widgetUnlockTrackingTitle": "Tracking Widget",
   "widgetUnlockZikirTitle": "Dhikr Counter Widget",
   "widgetUnlockAdLoadFailed": "The ad could not be loaded right now, please try again later.",
-  "widgetUnlockSuccessTitle": "{title} unlocked for 24 hours! 🎉",
+  "widgetUnlockSuccessTitle": "{hours, plural, =1{{title} unlocked for 1 hour! 🎉} other{{title} unlocked for {hours} hours! 🎉}}",
   "@widgetUnlockSuccessTitle": {
     "placeholders": {
-      "title": {}
+      "title": {},
+      "hours": {"type": "int"}
     }
   },
   "widgetUnlockPremiumSuccess": "Premium active! All widgets unlocked. 🎉",
-  "widgetUnlockDescription": "You can watch a short ad to unlock this widget for 24 hours. Upgrade to Premium for permanent access.",
-  "widgetUnlockAdButton": "Watch ad — Unlock for 24h",
+  "widgetUnlockDescription": "{hours, plural, =1{You can watch a short ad to unlock this widget for 1 hour. Upgrade to Premium for permanent access.} other{You can watch a short ad to unlock this widget for {hours} hours. Upgrade to Premium for permanent access.}}",
+  "@widgetUnlockDescription": {
+    "placeholders": {
+      "hours": {"type": "int"}
+    }
+  },
+  "widgetUnlockAdButton": "{hours, plural, =1{Watch ad — Unlock for 1 hour} other{Watch ad — Unlock for {hours} hours}}",
+  "@widgetUnlockAdButton": {
+    "placeholders": {
+      "hours": {"type": "int"}
+    }
+  },
   "widgetUnlockPremiumButton": "Upgrade to Premium",
   "widgetUnlockCancelButton": "Not now",
   "purchaseErrorNotFound": "Product not found. Please check your internet connection.",
@@ -1872,7 +1883,7 @@
   "keepGoing": "Keep going...",
   "premiumLoadingWait": "Loading premium status. Please try again shortly.",
   "secondAlarmPremiumFeature": "2nd alarm premium feature",
-  "secondAlarmAdWatchText": "To enable the 2nd azan alarm in free usage, a short ad is watched. Premium users do not see this lock.",
+  "secondAlarmAdWatchText": "To unlock the 2nd azan alarm for 2 days in free usage, a short ad is watched. Premium users do not see this lock.",
   "giveUp": "Give up",
   "openAfterAd": "Open after ad",
   "reflection": "Reflection",
@@ -1956,6 +1967,10 @@
   "prayerCircleDeleteTitle": "Remove your prayer request?",
   "prayerCircleDeleteBody": "The request will be removed from the circle immediately and cannot be restored.",
   "prayerCircleDeleteAction": "Remove",
+  "prayerCircleAdminDeleteTitle": "Remove this request as an admin?",
+  "prayerCircleAdminDeleteBody": "It will be permanently removed as inappropriate content and cannot be restored.",
+  "prayerCircleAdminDeleteAction": "Admin: Remove",
+  "prayerCircleAdminDeleted": "Request removed by an admin.",
   "prayerCircleCancel": "Cancel",
   "prayerCircleSlowDown": "You are acting too quickly. Please try again shortly.",
   "prayerCircleContentRejected": "Check the text and remove personal, contact, or payment information.",

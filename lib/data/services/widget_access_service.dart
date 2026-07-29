@@ -76,7 +76,7 @@ class WidgetAccessService {
       normalStates[kind] = adState;
       if (globallyLocked) {
         // Acil global override: premium olmayan tüm widget'ları trial veya
-        // reklamla açılmış 24 saatlik hakka bakmadan anında kilitle.
+        // reklamla açılmış unlock hakkına bakmadan anında kilitle.
         // Süreler silinmez; override kalkınca normal durum yeniden hesaplanır.
         states[kind] = WidgetGateState(
           allowed: false,
@@ -107,9 +107,14 @@ class WidgetAccessService {
         for (final entry in normalStates.entries)
           entry.key.id: entry.value.unlockUntil,
       },
+      unlockStartedAtByKind: {
+        for (final kind in ArinWidgetAccessKind.values)
+          kind.id: adGate.unlockStartedAt(kind.placement),
+      },
       isPremium: isPremium,
       globalLocked: globallyLocked,
       globalLockRevision: GlobalWidgetLockService.revision(_prefs),
+      unlockHours: GlobalWidgetLockService.unlockHours(_prefs),
       lockNote: lockNote,
     );
     return states;
@@ -120,6 +125,7 @@ class WidgetAccessService {
     required bool isPremium,
   }) async {
     final adGate = AdGateService(_prefs);
+    await adGate.reconcileWidgetUnlockDeadline(kind.placement);
     final firstSeen = await _readWidgetFirstUse(kind);
 
     // firstSeen henüz yazılmamışsa widget'ın home ekrana yeni eklendiği varsayılır

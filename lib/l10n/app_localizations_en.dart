@@ -3114,8 +3114,14 @@ class AppLocalizationsEn extends AppLocalizations {
       'The ad could not be loaded right now, please try again later.';
 
   @override
-  String widgetUnlockSuccessTitle(Object title) {
-    return '$title unlocked for 24 hours! 🎉';
+  String widgetUnlockSuccessTitle(Object title, int hours) {
+    String _temp0 = intl.Intl.pluralLogic(
+      hours,
+      locale: localeName,
+      other: '$title unlocked for $hours hours! 🎉',
+      one: '$title unlocked for 1 hour! 🎉',
+    );
+    return '$_temp0';
   }
 
   @override
@@ -3123,11 +3129,28 @@ class AppLocalizationsEn extends AppLocalizations {
       'Premium active! All widgets unlocked. 🎉';
 
   @override
-  String get widgetUnlockDescription =>
-      'You can watch a short ad to unlock this widget for 24 hours. Upgrade to Premium for permanent access.';
+  String widgetUnlockDescription(int hours) {
+    String _temp0 = intl.Intl.pluralLogic(
+      hours,
+      locale: localeName,
+      other:
+          'You can watch a short ad to unlock this widget for $hours hours. Upgrade to Premium for permanent access.',
+      one:
+          'You can watch a short ad to unlock this widget for 1 hour. Upgrade to Premium for permanent access.',
+    );
+    return '$_temp0';
+  }
 
   @override
-  String get widgetUnlockAdButton => 'Watch ad — Unlock for 24h';
+  String widgetUnlockAdButton(int hours) {
+    String _temp0 = intl.Intl.pluralLogic(
+      hours,
+      locale: localeName,
+      other: 'Watch ad — Unlock for $hours hours',
+      one: 'Watch ad — Unlock for 1 hour',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get widgetUnlockPremiumButton => 'Upgrade to Premium';
@@ -4434,7 +4457,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get secondAlarmAdWatchText =>
-      'To enable the 2nd azan alarm in free usage, a short ad is watched. Premium users do not see this lock.';
+      'To unlock the 2nd azan alarm for 2 days in free usage, a short ad is watched. Premium users do not see this lock.';
 
   @override
   String get giveUp => 'Give up';
@@ -4692,6 +4715,19 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get prayerCircleDeleteAction => 'Remove';
+
+  @override
+  String get prayerCircleAdminDeleteTitle => 'Remove this request as an admin?';
+
+  @override
+  String get prayerCircleAdminDeleteBody =>
+      'It will be permanently removed as inappropriate content and cannot be restored.';
+
+  @override
+  String get prayerCircleAdminDeleteAction => 'Admin: Remove';
+
+  @override
+  String get prayerCircleAdminDeleted => 'Request removed by an admin.';
 
   @override
   String get prayerCircleCancel => 'Cancel';

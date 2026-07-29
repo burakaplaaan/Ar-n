@@ -1049,6 +1049,10 @@ exports.getAdminPerformance = onCall(
 // daha eski revision'ı reddeder; retry/duplicate teslimler idempotent kalır.
 // Premium istisnası cihazdaki native widget provider tarafından uygulanır.
 // ─────────────────────────────────────────────────────────────────────────────
+function _normalizedWidgetUnlockHours(raw) {
+  return Number.isSafeInteger(raw) && raw >= 1 && raw <= 72 ? raw : 24;
+}
+
 exports.syncGlobalWidgetLock = onDocumentWritten(
   {
     document: "app_public/widget_global_lock",
@@ -1065,10 +1069,16 @@ exports.syncGlobalWidgetLock = onDocumentWritten(
     const previousLocked =
       before?.exists === true && before.data()?.locked === true;
     const locked = after.data()?.locked === true;
+    const previousUnlockHoursRaw = before?.data()?.unlockHours;
+    const previousUnlockHours =
+      _normalizedWidgetUnlockHours(previousUnlockHoursRaw);
+    const requestedUnlockHours = after.data()?.unlockHours;
+    const unlockHours = _normalizedWidgetUnlockHours(requestedUnlockHours);
 
-    // Not/audit alanı gibi kilit durumunu değiştirmeyen yazılar push üretmesin.
+    // Not/audit alanı gibi erişim davranışını değiştirmeyen yazılar push üretmesin.
     if (before?.exists === true && after?.exists === true &&
-        previousLocked === locked) {
+        previousLocked === locked &&
+        previousUnlockHours === unlockHours) {
       return;
     }
 
@@ -1087,6 +1097,7 @@ exports.syncGlobalWidgetLock = onDocumentWritten(
         locked: locked ? "1" : "0",
         revision: String(revision),
         note,
+        unlockHours: String(unlockHours),
       },
       android: {
         priority: "high",
@@ -1106,7 +1117,7 @@ exports.syncGlobalWidgetLock = onDocumentWritten(
     });
 
     console.log(
-      `[WidgetGlobalLock] locked=${locked} revision=${revision} messageId=${messageId}`,
+      `[WidgetGlobalLock] locked=${locked} unlockHours=${unlockHours} revision=${revision} messageId=${messageId}`,
     );
   },
 );
@@ -3292,6 +3303,36 @@ exports.deletePrayerRequest = onCall(
   },
 );
 
+// Yönetici (Dua Halkası) moderasyon silmesi — sahiplik farketmeksizin,
+// uygunsuz/kural dışı içeriği kaldırmak için. `assertCallerIsAdmin` gerçek
+// oturum açmış (Google/Apple) admin e-postası veya `admin_users` rolünü
+// kontrol eder; kurulum bazlı "prayer session" bunun yerine geçemez.
+exports.adminDeletePrayerRequest = onCall(
+  {
+    region: "europe-west1",
+    memory: "256MiB",
+    enforceAppCheck: true,
+  },
+  async (req) => {
+    await assertCallerIsAdmin(req);
+    const documentId = _validatedPrayerDocumentId(req.data?.requestId);
+    const db = getFirestore();
+    const requestRef = db.collection("prayer_requests").doc(documentId);
+    const ownerRef = db.collection("prayer_request_owners").doc(documentId);
+    const requestSnap = await requestRef.get();
+    if (!requestSnap.exists) {
+      throw new HttpsError("not-found", "Dua talebi bulunamadı.");
+    }
+    await _deleteCollectionInBatches(requestRef.collection("reactions"));
+    await _deleteCollectionInBatches(requestRef.collection("reports"));
+    await Promise.all([requestRef.delete(), ownerRef.delete()]);
+    console.log(
+      `[PrayerCircle] Admin ${req.auth.uid} deleted request ${documentId}`,
+    );
+    return { ok: true };
+  },
+);
+
 exports.deliverPrayerNotifications = onSchedule(
   {
     schedule: "every 1 minutes",
@@ -3375,5 +3416,6 @@ if (process.env.NODE_ENV === "test") {
     premiumRecordActive: _premiumRecordActive,
     verifyAdMobSsvSignature: _verifyAdMobSsvSignature,
     assertPrayerPolicyAccepted: _assertPrayerPolicyAccepted,
+    normalizedWidgetUnlockHours: _normalizedWidgetUnlockHours,
   };
 }

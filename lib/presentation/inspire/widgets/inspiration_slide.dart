@@ -7,6 +7,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../../core/constants/app_colors.dart';
 import '../../../data/models/inspiration_card_model.dart';
+import '../../../data/services/inspiration_asset_discovery.dart';
 import '../inspiration_catalog_provider.dart';
 import '../inspiration_share_service.dart';
 import '../inspiration_text_layouts.dart';
@@ -37,6 +38,7 @@ class InspirationSlide extends ConsumerStatefulWidget {
 class _InspirationSlideState extends ConsumerState<InspirationSlide> {
   late InspirationCardModel _displayCard;
   final GlobalKey _shareBoundaryKey = GlobalKey();
+  bool _isRemixingBackground = false;
 
   @override
   void initState() {
@@ -52,25 +54,48 @@ class _InspirationSlideState extends ConsumerState<InspirationSlide> {
     }
   }
 
-  void _remixBackground() {
-    final catalog = ref.read(inspirationCatalogProvider).valueOrNull;
-    if (catalog == null || catalog.isEmpty) return;
-    final pool = catalog
-        .map((c) => c.imageIndex)
-        .where((i) => i >= 1)
-        .toSet()
-        .toList();
-    if (pool.isEmpty) return;
-    if (pool.length == 1) return;
-    pool.shuffle(Random());
-    final next = pool.firstWhere(
-      (i) => i != _displayCard.imageIndex,
-      orElse: () => pool.first,
-    );
-    setState(() {
-      _displayCard = _displayCard.copyWith(imageIndex: next);
-    });
+  Future<void> _remixBackground() async {
+    if (_isRemixingBackground) return;
+    _isRemixingBackground = true;
+    final requestedCardId = _displayCard.id;
     HapticFeedback.selectionClick();
+
+    try {
+      var pool = await InspirationAssetDiscovery.discoverConsecutiveJpeg();
+      if (pool.isEmpty) {
+        final catalog = ref.read(inspirationCatalogProvider).valueOrNull;
+        pool =
+            catalog
+                ?.map((card) => card.imageIndex)
+                .where((index) => index >= 1)
+                .toSet()
+                .toList() ??
+            const [];
+      }
+
+      final alternatives =
+          pool.where((index) => index != _displayCard.imageIndex).toList()
+            ..shuffle(Random());
+      if (!mounted || _displayCard.id != requestedCardId) return;
+      if (alternatives.isEmpty) {
+        ScaffoldMessenger.maybeOf(context)?.showSnackBar(
+          const SnackBar(
+            content: Text('Başka bir arka plan bulunamadı.'),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+        return;
+      }
+
+      setState(() {
+        _displayCard = _displayCard.copyWith(
+          imageIndex: alternatives.first,
+          clearUseLightTextOnImage: true,
+        );
+      });
+    } finally {
+      _isRemixingBackground = false;
+    }
   }
 
   Future<void> _onSharePressed(Rect? shareAnchor) async {
@@ -200,7 +225,7 @@ class _InspirationSlideState extends ConsumerState<InspirationSlide> {
 
   @override
   Widget build(BuildContext context) {
-    final forced = widget.card.useLightTextOnImage;
+    final forced = _displayCard.useLightTextOnImage;
 
     if (!widget.reelsLayout) {
       final light = forced ?? true;
