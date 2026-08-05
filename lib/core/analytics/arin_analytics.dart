@@ -151,4 +151,24 @@ abstract final class ArinAnalytics {
 
   /// Kullanıcı hesabını sildi.
   static Future<void> accountDelete() => log('account_delete');
+
+  /// Hilal Düellosu lobisi açıldı.
+  static Future<void> hilalDuelLobbyOpen() => log('hilal_duel_lobby_open');
+
+  /// Hilal Düellosu maçı başladı.
+  static Future<void> hilalDuelMatchStart() => log('hilal_duel_match_start');
+
+  /// Hilal Düellosu maçı bitti (cevap içeriği yok).
+  static Future<void> hilalDuelMatchComplete({required int correct}) =>
+      log('hilal_duel_match_complete', {'correct': correct});
+
+  /// Hilal Düellosu can ödülü (SSV sonrası).
+  static Future<void> hilalDuelRewardHeart() => log('hilal_duel_reward_heart');
+
+  /// Hilal Düellosu çift hilal ödülü (SSV sonrası).
+  static Future<void> hilalDuelRewardDouble() =>
+      log('hilal_duel_reward_double');
+
+  /// Hilal Düellosu ara reklamı gösterildi.
+  static Future<void> hilalDuelInterstitial() => log('hilal_duel_interstitial');
 }

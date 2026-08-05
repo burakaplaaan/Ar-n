@@ -1,7 +1,7 @@
 name: arin
 description: "Arın - İslami Yaşam, Alışkanlık ve Odaklanma Asistanı"
 publish_to: 'none'
-version: 1.1.5+44
+version: 1.1.5+45
 
 environment:
   sdk: '>=3.8.0 <4.0.0'
@@ -111,6 +111,11 @@ dependencies:
   facebook_app_events: ^0.30.2
   app_tracking_transparency: ^2.0.7
   firebase_app_check: ^0.4.5+2
+  # Splash CLI + Android native plugin. Must stay in dependencies (not
+  # dev_dependencies): release builds exclude dev plugins from the classpath
+  # while GeneratedPluginRegistrant still registers them.
+  # Config: `flutter_native_splash:` below; generate: dart run flutter_native_splash:create
+  flutter_native_splash: ^2.4.3
 
 dev_dependencies:
   flutter_test:
@@ -125,10 +130,6 @@ dev_dependencies:
       url: https://github.com/Telosnex/minimp3_dart.git
       ref: aa7d15582363c63f9a101b87ca5bab6b68b3e6e9
   flutter_launcher_icons: ^0.14.4
-  # Android 12+ SplashScreen API + iOS LaunchScreen hazırlayan CLI.
-  # Config `flutter_native_splash:` bloğu altında; generate için:
-  #   dart run flutter_native_splash:create
-  flutter_native_splash: ^2.4.3
 
 # dependency_overrides block removed — flutter_qiblah and its vector_math
 # override are no longer needed.
@@ -179,6 +180,7 @@ flutter:
     - assets/data/willpower/
     - assets/inspiration/
     - assets/sounds/prayer/
+    - assets/sounds/quiz/
     - assets/sounds/healing/tones/
     - assets/sounds/healing/ambi/
     - assets/music/explore/

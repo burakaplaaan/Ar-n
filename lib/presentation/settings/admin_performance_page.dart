@@ -2,6 +2,7 @@ import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/material.dart';
 
 import '../../core/constants/app_colors.dart';
+import '../../core/constants/product_metric_features.dart';
 
 class AdminPerformancePage extends StatefulWidget {
   const AdminPerformancePage({super.key});
@@ -139,6 +140,8 @@ class _AdminPerformancePageState extends State<AdminPerformancePage> {
             else ...[
               _buildOverview(),
               const SizedBox(height: 14),
+              _buildDayUsage(),
+              const SizedBox(height: 14),
               _buildNotifications(),
               const SizedBox(height: 14),
               _buildWidgets(),
@@ -146,6 +149,8 @@ class _AdminPerformancePageState extends State<AdminPerformancePage> {
               _buildContent(),
               const SizedBox(height: 12),
               Text(
+                'Günler İstanbul saatiyle gece 12’de değişir. Reklamlar “kaç '
+                'kez”, özellikler “o gün kaç kişi açtı” olarak sayılır. '
                 'Veriler bu sürüm yayınlandıktan sonra birikir. Bildirim hedef '
                 'kitlesi topic aboneliği tahminidir; FCM gerçek teslim edilen '
                 'kişi sayısını vermez. Android ve iOS widget kaldırılmasını '
@@ -172,6 +177,7 @@ class _AdminPerformancePageState extends State<AdminPerformancePage> {
     final clicks = _dailyTotal(const ['notifications', 'clicks']);
     final widgets = _asMap(_data['widgets']);
     final active = _numberAt(widgets, [_days == 30 ? 'active30' : 'active7']);
+    final todayAds = _numberAt(_asMap(_data['today']), const ['ads', 'watches']);
 
     return _SectionCard(
       title: 'Genel Bakış',
@@ -185,8 +191,42 @@ class _AdminPerformancePageState extends State<AdminPerformancePage> {
           _Kpi(label: 'Kaydetme', value: _count(saves)),
           _Kpi(label: 'Bildirim tıklaması', value: _count(clicks)),
           _Kpi(label: 'Aktif widget kullanıcısı', value: _count(active)),
+          _Kpi(label: 'Bugün reklam izlenme', value: _count(todayAds)),
         ],
       ),
+    );
+  }
+
+  String _dayLabel(String? dayKey) {
+    final raw = (dayKey ?? '').trim();
+    if (!RegExp(r'^\d{4}-\d{2}-\d{2}$').hasMatch(raw)) return 'Tarih yok';
+    final parts = raw.split('-');
+    return '${parts[2]}.${parts[1]}.${parts[0]}';
+  }
+
+  Widget _buildDayUsage() {
+    final today = _asMap(_data['today']);
+    final yesterday = _asMap(_data['yesterday']);
+    return Column(
+      children: [
+        _DayUsageCard(
+          title: 'Bugün',
+          subtitle:
+              '${_dayLabel(today['dayKey']?.toString())} · gece 12’ye kadar '
+              '(İstanbul)',
+          ads: _asMap(today['ads']),
+          features: _asMap(today['features']),
+          count: _count,
+        ),
+        const SizedBox(height: 14),
+        _DayUsageCard(
+          title: 'Dün',
+          subtitle: '${_dayLabel(yesterday['dayKey']?.toString())} · tamamlandı',
+          ads: _asMap(yesterday['ads']),
+          features: _asMap(yesterday['features']),
+          count: _count,
+        ),
+      ],
     );
   }
 
@@ -262,6 +302,133 @@ class _AdminPerformancePageState extends State<AdminPerformancePage> {
                   _ContentRow(rank: i + 1, data: rows[i]),
               ],
             ),
+    );
+  }
+}
+
+class _DayUsageCard extends StatelessWidget {
+  const _DayUsageCard({
+    required this.title,
+    required this.subtitle,
+    required this.ads,
+    required this.features,
+    required this.count,
+  });
+
+  final String title;
+  final String subtitle;
+  final Map<String, dynamic> ads;
+  final Map<String, dynamic> features;
+  final String Function(num value) count;
+
+  num _adWatches(String feature) {
+    final by = ads['byFeature'];
+    if (by is! Map) return 0;
+    final row = by[feature];
+    if (row is! Map) return 0;
+    final value = row['watches'];
+    return value is num ? value : num.tryParse('$value') ?? 0;
+  }
+
+  num _featureUsers(String feature) {
+    final by = features['byFeature'];
+    if (by is! Map) return 0;
+    final row = by[feature];
+    if (row is! Map) return 0;
+    final value = row['users'];
+    return value is num ? value : num.tryParse('$value') ?? 0;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final totalAds = ads['watches'] is num
+        ? ads['watches'] as num
+        : num.tryParse('${ads['watches']}') ?? 0;
+    return _SectionCard(
+      title: title,
+      subtitle: subtitle,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Reklam izlenme (kaç kez)',
+            style: TextStyle(
+              color: Colors.white.withValues(alpha: 0.78),
+              fontSize: 12.5,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          const SizedBox(height: 8),
+          for (final feature in ProductMetricFeatures.all)
+            _UsageLine(
+              label: ProductMetricFeatures.labelTr(feature),
+              value: count(_adWatches(feature)),
+            ),
+          _UsageLine(
+            label: 'Toplam',
+            value: count(totalAds),
+            emphasize: true,
+          ),
+          const SizedBox(height: 14),
+          Text(
+            'Özellik açan kişi (kaç kişi)',
+            style: TextStyle(
+              color: Colors.white.withValues(alpha: 0.78),
+              fontSize: 12.5,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          const SizedBox(height: 8),
+          for (final feature in ProductMetricFeatures.all)
+            _UsageLine(
+              label: ProductMetricFeatures.labelTr(feature),
+              value: count(_featureUsers(feature)),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+class _UsageLine extends StatelessWidget {
+  const _UsageLine({
+    required this.label,
+    required this.value,
+    this.emphasize = false,
+  });
+
+  final String label;
+  final String value;
+  final bool emphasize;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 6),
+      child: Row(
+        children: [
+          Expanded(
+            child: Text(
+              label,
+              style: TextStyle(
+                color: Colors.white.withValues(alpha: emphasize ? 0.9 : 0.62),
+                fontSize: emphasize ? 12.5 : 12,
+                fontWeight: emphasize ? FontWeight.w800 : FontWeight.w500,
+              ),
+            ),
+          ),
+          Text(
+            value,
+            style: TextStyle(
+              color: emphasize
+                  ? AppColors.accentNeonGreen
+                  : Colors.white.withValues(alpha: 0.85),
+              fontSize: emphasize ? 14 : 12.5,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

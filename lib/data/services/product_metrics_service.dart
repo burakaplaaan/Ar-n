@@ -50,6 +50,7 @@ abstract final class ProductMetricsService {
     String event, {
     String? cardId,
     String? kind,
+    String? feature,
   }) async {
     if (!isFirebaseReady) return false;
     try {
@@ -63,6 +64,7 @@ abstract final class ProductMetricsService {
         'installId': installId,
         if (cardId != null) 'cardId': cardId,
         if (kind != null) 'kind': kind,
+        if (feature != null) 'feature': feature,
       });
       final data = result.data;
       return data is Map && data['accepted'] == true;
@@ -92,6 +94,14 @@ abstract final class ProductMetricsService {
 
   static Future<bool> widgetUnlock(String kind) =>
       _record('widget_unlock', kind: kind);
+
+  /// Tamamlanan her reklam gösterimi (günlük tekilleştirme yok — kaç kez).
+  static Future<bool> adWatch(String feature) =>
+      _record('ad_watch', feature: feature);
+
+  /// Özelliği o gün açan kurulum (install başına günde bir kez).
+  static Future<bool> featureOpen(String feature) =>
+      _record('feature_open', feature: feature);
 
   static Future<void> notificationClick(String deliveryId) async {
     if (!isFirebaseReady || deliveryId.trim().isEmpty) return;

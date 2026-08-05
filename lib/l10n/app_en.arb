@@ -662,6 +662,128 @@
   "qiblaHubBreathingSubtitle": "Calm down and refocus with the 4-7-8 breathing cycle",
   "qiblaHubHealingTitle": "Healing Frequencies",
   "qiblaHubHealingSubtitle": "A calming session with therapy tones, ambience, and sleep timer",
+  "qiblaHubHilalDuelTitle": "Knowledge Duel",
+  "qiblaHubHilalDuelSubtitle": "Compete across 7 Islamic knowledge questions, earn crescents, and level up",
+  "hilalDuelTitle": "Knowledge Duel",
+  "hilalDuelLanguageNote": "Questions are currently in Turkish",
+  "hilalDuelRulesSummary": "7 questions • 20 seconds each\nAccuracy and speed win. The next question opens once both players answer. Watch an ad for a heart or play unlimited with Premium.",
+  "hilalDuelLevelLabel": "Level {level}",
+  "@hilalDuelLevelLabel": {
+    "placeholders": {
+      "level": {"type": "int"}
+    }
+  },
+  "hilalDuelHilalsLabel": "{count} crescents",
+  "@hilalDuelHilalsLabel": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "hilalDuelHeartsLabel": "{count} hearts",
+  "@hilalDuelHeartsLabel": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "hilalDuelPlay": "Find opponent",
+  "hilalDuelWatchAdForHeart": "Watch ad for 1 heart",
+  "hilalDuelNeedHeartTitle": "You need 1 heart to play",
+  "hilalDuelNeedHeartHint": "Watch a short ad → earn 1 heart and find a rival",
+  "hilalDuelNeedHeartCta": "Watch ad",
+  "hilalDuelSearching": "Searching for opponent…",
+  "hilalDuelCancelSearch": "Cancel search",
+  "hilalDuelCancelFailed": "Cancel failed. Retry to refund your heart.",
+  "hilalDuelQuestionProgress": "Question {current}/{total}",
+  "@hilalDuelQuestionProgress": {
+    "placeholders": {
+      "current": {"type": "int"},
+      "total": {"type": "int"}
+    }
+  },
+  "hilalDuelWaitingOpponent": "Opponent is answering…",
+  "hilalDuelAnsweredBubble": "Answered",
+  "hilalDuelRoundCorrect": "Correct",
+  "hilalDuelRoundWrong": "Wrong",
+  "hilalDuelNoAnswer": "No answer",
+  "hilalDuelFastOpponent": "Quick Opponent",
+  "hilalDuelResultWin": "You won",
+  "hilalDuelResultLose": "You lost",
+  "hilalDuelResultDraw": "Draw",
+  "hilalDuelCorrectCount": "{count} correct",
+  "@hilalDuelCorrectCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "hilalDuelTotalSeconds": "{seconds}s",
+  "@hilalDuelTotalSeconds": {
+    "placeholders": {
+      "seconds": {"type": "int"}
+    }
+  },
+  "hilalDuelHilalsEarned": "+{count} crescents",
+  "@hilalDuelHilalsEarned": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "hilalDuelDoubleReward": "Watch ad to double crescents",
+  "hilalDuelDoubled": "Crescents doubled",
+  "hilalDuelLobby": "Back to lobby",
+  "hilalDuelRematch": "Play again",
+  "hilalDuelRetry": "Try again",
+  "hilalDuelPremiumUnlimited": "Premium: unlimited hearts",
+  "hilalDuelUpgradePremium": "Upgrade to Premium • Play Unlimited",
+  "hilalDuelNextLevel": "Next level",
+  "hilalDuelMaxLevel": "Maximum level",
+  "hilalDuelNextRewardFrame": "Next reward: Avatar frame (LV {level})",
+  "@hilalDuelNextRewardFrame": {
+    "placeholders": {
+      "level": {"type": "int"}
+    }
+  },
+  "hilalDuelNextRewardTitle": "Next reward: Title “{title}” (LV {level})",
+  "@hilalDuelNextRewardTitle": {
+    "placeholders": {
+      "title": {"type": "String"},
+      "level": {"type": "int"}
+    }
+  },
+  "hilalDuelNextRewardHilalIcon": "Next reward: Special crescent icon (LV {level})",
+  "@hilalDuelNextRewardHilalIcon": {
+    "placeholders": {
+      "level": {"type": "int"}
+    }
+  },
+  "hilalDuelWeeklyTitle": "Player of the Week",
+  "hilalDuelWeeklyThisWeek": "This week: {count} crescents",
+  "@hilalDuelWeeklyThisWeek": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "hilalDuelWeeklyRank": "Rank: #{rank}",
+  "@hilalDuelWeeklyRank": {
+    "placeholders": {
+      "rank": {"type": "int"}
+    }
+  },
+  "hilalDuelWeeklyRankNone": "Rank: —",
+  "hilalDuelWeeklyTapHint": "View leaderboard",
+  "hilalDuelWeeklyTopPreview": "Top 3",
+  "hilalDuelWeeklyClimbHint": "Top 10 is the green league — play and climb!",
+  "hilalDuelWeeklyEmpty": "No crescents earned this week yet. Finish the first match!",
+  "hilalDuelWeeklyYourPlace": "Your place: #{rank} · {count} crescents",
+  "@hilalDuelWeeklyYourPlace": {
+    "placeholders": {
+      "rank": {"type": "int"},
+      "count": {"type": "int"}
+    }
+  },
+  "hilalDuelTitleTalebe": "Student",
+  "hilalDuelTitleIlimDostu": "Friend of Knowledge",
+  "hilalDuelYouLabel": "You",
+  "hilalDuelOpponentLabel": "Opponent",
   "languageChangedMessage": "Language changed: {languageName}",
   "@languageChangedMessage": {
     "placeholders": {
@@ -1465,7 +1587,10 @@
   "widgetUnlockComboTitle": "Quote + Prayer Widget",
   "widgetUnlockTrackingTitle": "Tracking Widget",
   "widgetUnlockZikirTitle": "Dhikr Counter Widget",
-  "widgetUnlockAdLoadFailed": "The ad could not be loaded right now, please try again later.",
+  "widgetUnlockAdPreparing": "Preparing the ad…",
+  "widgetUnlockAdLoadFailed": "No suitable ad is available right now. Please try again in a few seconds.",
+  "widgetUnlockAdRetryButton": "Try again",
+  "widgetUnlockAdLaterButton": "Later",
   "widgetUnlockSuccessTitle": "{hours, plural, =1{{title} unlocked for 1 hour! 🎉} other{{title} unlocked for {hours} hours! 🎉}}",
   "@widgetUnlockSuccessTitle": {
     "placeholders": {
@@ -1687,6 +1812,9 @@
   "premiumBenefitWidgets": "No widget locks",
   "premiumBenefitExplore": "Uninterrupted explore feed",
   "premiumBenefitAdhan": "2nd adhan alarm enabled",
+  "premiumBenefitPrayerCircle": "Prayer Circle: unlimited requests",
+  "premiumBenefitContest": "Unlimited contest plays",
+  "premiumBenefitExtras": "No ads in zikr, compass, and frequencies",
   "premiumSignInRequiredNotice": "Sign-in is not required for purchase. You can use Premium on this device right away; optionally link your account afterward to access it on your other devices.",
   "premiumSignInSheetTitle": "Link your account for Premium",
   "premiumSignInSheetSubtitle": "Linking your account makes it easier to restore Premium on your other devices. Sign-in is optional for purchase.",

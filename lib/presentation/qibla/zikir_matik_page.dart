@@ -14,9 +14,11 @@ import 'package:vibration/vibration.dart';
 
 import 'package:arin/l10n/app_localizations.dart';
 import '../../core/analytics/arin_analytics.dart';
+import '../../core/constants/product_metric_features.dart';
 import '../../core/providers/shared_preferences_provider.dart';
 import '../../data/models/zikir_matik_tur_log.dart';
 import '../../data/repositories/zikir_matik_repository.dart';
+import '../../data/services/product_metrics_service.dart';
 import '../../data/services/zikir_widget_service.dart';
 import 'zikir_bilgisi_page.dart';
 import '../shared/mixins/review_prompt_on_exit_mixin.dart';
@@ -92,6 +94,13 @@ List<String> _zikirPresetPhrases(BuildContext context) {
 
 enum _ZikirCustomPhraseAction { use, saveAndUse }
 
+class _ZikirCustomPhraseResult {
+  const _ZikirCustomPhraseResult({required this.action, required this.text});
+
+  final _ZikirCustomPhraseAction action;
+  final String text;
+}
+
 class ZikirMatikPage extends ConsumerStatefulWidget {
   const ZikirMatikPage({super.key});
 
@@ -152,6 +161,7 @@ class _ZikirMatikPageState extends ConsumerState<ZikirMatikPage>
     super.initState();
     startReviewPromptTracking();
     WidgetsBinding.instance.addObserver(this);
+    unawaited(ProductMetricsService.featureOpen(ProductMetricFeatures.zikir));
     _phraseAnim = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 2600),
@@ -235,7 +245,9 @@ class _ZikirMatikPageState extends ConsumerState<ZikirMatikPage>
       target: target,
       widgetTotal: widgetTotal,
     );
-    if (rec.total == prevTotal && rec.round == prevRound && rec.tur == prevTur) {
+    if (rec.total == prevTotal &&
+        rec.round == prevRound &&
+        rec.tur == prevTur) {
       unawaited(_pushToWidget());
       return;
     }
@@ -692,49 +704,43 @@ class _ZikirMatikPageState extends ConsumerState<ZikirMatikPage>
   }
 
   Future<void> _editPhrase() async {
-    final l10n = AppLocalizations.of(context)!;
-    final controller = TextEditingController(text: _phrase);
-    final action = await showDialog<_ZikirCustomPhraseAction>(
+    final result = await showGeneralDialog<_ZikirCustomPhraseResult>(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text(l10n.zikirmatikEditPhraseTitle),
-        content: TextField(
-          controller: controller,
-          decoration: const InputDecoration(border: OutlineInputBorder()),
-          maxLength: 80,
-          textCapitalization: TextCapitalization.sentences,
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: Text(l10n.zikirmatikCancel),
+      useRootNavigator: false,
+      barrierDismissible: true,
+      barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
+      barrierColor: Colors.black.withValues(alpha: 0.52),
+      transitionDuration: const Duration(milliseconds: 360),
+      pageBuilder: (dialogCtx, animation, secondaryAnimation) {
+        return SafeArea(child: _ZikirEditPhraseDialog(initialPhrase: _phrase));
+      },
+      transitionBuilder: (dialogCtx, animation, secondaryAnimation, child) {
+        final curved = CurvedAnimation(
+          parent: animation,
+          curve: Curves.easeOutCubic,
+        );
+        return FadeTransition(
+          opacity: curved,
+          child: ScaleTransition(
+            scale: Tween<double>(begin: 0.9, end: 1.0).animate(curved),
+            child: child,
           ),
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, _ZikirCustomPhraseAction.use),
-            child: Text(l10n.zikirmatikUse),
-          ),
-          FilledButton(
-            onPressed: () =>
-                Navigator.pop(ctx, _ZikirCustomPhraseAction.saveAndUse),
-            child: Text(l10n.zikirmatikSaveAndUse),
-          ),
-        ],
-      ),
+        );
+      },
     );
-    if (action != null) {
-      final t = controller.text.trim();
-      if (action == _ZikirCustomPhraseAction.saveAndUse && t.isNotEmpty) {
-        await _repo?.saveCustomPhrase(t);
-      }
-      setState(() {
-        _phrase = t.isEmpty ? '' : t;
-      });
-      if (action == _ZikirCustomPhraseAction.saveAndUse) {
-        _reloadCustomPhrases();
-      }
-      await _persist();
+    if (!mounted || result == null) return;
+    final t = result.text.trim();
+    if (result.action == _ZikirCustomPhraseAction.saveAndUse && t.isNotEmpty) {
+      await _repo?.saveCustomPhrase(t);
+      if (!mounted) return;
     }
-    controller.dispose();
+    setState(() {
+      _phrase = t.isEmpty ? '' : t;
+    });
+    if (result.action == _ZikirCustomPhraseAction.saveAndUse) {
+      _reloadCustomPhrases();
+    }
+    await _persist();
   }
 
   @override
@@ -754,8 +760,7 @@ class _ZikirMatikPageState extends ConsumerState<ZikirMatikPage>
     final l10n = AppLocalizations.of(context)!;
     return Semantics(
       label: l10n.zikirmatikCounterSemantics,
-      value:
-          '$_total, ${l10n.zikirmatikRound} $_tur',
+      value: '$_total, ${l10n.zikirmatikRound} $_tur',
       child: Scaffold(
         backgroundColor: _ZikirmatikColors.pageBg,
         body: SafeArea(
@@ -917,12 +922,14 @@ class _ZikirMatikPageState extends ConsumerState<ZikirMatikPage>
                                                     _ZikirMatikCircleIconButton(
                                                       onPressed: _reset,
                                                       icon: Icons.undo_rounded,
-                                                      tooltip: l10n.zikirmatikReset,
+                                                      tooltip:
+                                                          l10n.zikirmatikReset,
                                                     ),
                                                     _ZikirMatikCircleIconButton(
                                                       onPressed: _pickTarget,
                                                       icon: Icons.sync_rounded,
-                                                      tooltip: l10n.zikirmatikTarget,
+                                                      tooltip:
+                                                          l10n.zikirmatikTarget,
                                                     ),
                                                   ],
                                                 ),
@@ -937,8 +944,14 @@ class _ZikirMatikPageState extends ConsumerState<ZikirMatikPage>
                                               // anında güncellenir.
                                               Semantics(
                                                 button: true,
-                                                label: l10n.zikirmatikCounterSemanticsLabel(_round, _target, _total),
-                                                hint: l10n.zikirmatikCounterSemanticsHint,
+                                                label: l10n
+                                                    .zikirmatikCounterSemanticsLabel(
+                                                      _round,
+                                                      _target,
+                                                      _total,
+                                                    ),
+                                                hint: l10n
+                                                    .zikirmatikCounterSemanticsHint,
                                                 child: Material(
                                                   color:
                                                       _ZikirmatikColors.outer,

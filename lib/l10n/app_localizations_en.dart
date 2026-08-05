@@ -1355,6 +1355,200 @@ class AppLocalizationsEn extends AppLocalizations {
       'A calming session with therapy tones, ambience, and sleep timer';
 
   @override
+  String get qiblaHubHilalDuelTitle => 'Knowledge Duel';
+
+  @override
+  String get qiblaHubHilalDuelSubtitle =>
+      'Compete across 7 Islamic knowledge questions, earn crescents, and level up';
+
+  @override
+  String get hilalDuelTitle => 'Knowledge Duel';
+
+  @override
+  String get hilalDuelLanguageNote => 'Questions are currently in Turkish';
+
+  @override
+  String get hilalDuelRulesSummary =>
+      '7 questions • 20 seconds each\nAccuracy and speed win. The next question opens once both players answer. Watch an ad for a heart or play unlimited with Premium.';
+
+  @override
+  String hilalDuelLevelLabel(int level) {
+    return 'Level $level';
+  }
+
+  @override
+  String hilalDuelHilalsLabel(int count) {
+    return '$count crescents';
+  }
+
+  @override
+  String hilalDuelHeartsLabel(int count) {
+    return '$count hearts';
+  }
+
+  @override
+  String get hilalDuelPlay => 'Find opponent';
+
+  @override
+  String get hilalDuelWatchAdForHeart => 'Watch ad for 1 heart';
+
+  @override
+  String get hilalDuelNeedHeartTitle => 'You need 1 heart to play';
+
+  @override
+  String get hilalDuelNeedHeartHint =>
+      'Watch a short ad → earn 1 heart and find a rival';
+
+  @override
+  String get hilalDuelNeedHeartCta => 'Watch ad';
+
+  @override
+  String get hilalDuelSearching => 'Searching for opponent…';
+
+  @override
+  String get hilalDuelCancelSearch => 'Cancel search';
+
+  @override
+  String get hilalDuelCancelFailed =>
+      'Cancel failed. Retry to refund your heart.';
+
+  @override
+  String hilalDuelQuestionProgress(int current, int total) {
+    return 'Question $current/$total';
+  }
+
+  @override
+  String get hilalDuelWaitingOpponent => 'Opponent is answering…';
+
+  @override
+  String get hilalDuelAnsweredBubble => 'Answered';
+
+  @override
+  String get hilalDuelRoundCorrect => 'Correct';
+
+  @override
+  String get hilalDuelRoundWrong => 'Wrong';
+
+  @override
+  String get hilalDuelNoAnswer => 'No answer';
+
+  @override
+  String get hilalDuelFastOpponent => 'Quick Opponent';
+
+  @override
+  String get hilalDuelResultWin => 'You won';
+
+  @override
+  String get hilalDuelResultLose => 'You lost';
+
+  @override
+  String get hilalDuelResultDraw => 'Draw';
+
+  @override
+  String hilalDuelCorrectCount(int count) {
+    return '$count correct';
+  }
+
+  @override
+  String hilalDuelTotalSeconds(int seconds) {
+    return '${seconds}s';
+  }
+
+  @override
+  String hilalDuelHilalsEarned(int count) {
+    return '+$count crescents';
+  }
+
+  @override
+  String get hilalDuelDoubleReward => 'Watch ad to double crescents';
+
+  @override
+  String get hilalDuelDoubled => 'Crescents doubled';
+
+  @override
+  String get hilalDuelLobby => 'Back to lobby';
+
+  @override
+  String get hilalDuelRematch => 'Play again';
+
+  @override
+  String get hilalDuelRetry => 'Try again';
+
+  @override
+  String get hilalDuelPremiumUnlimited => 'Premium: unlimited hearts';
+
+  @override
+  String get hilalDuelUpgradePremium => 'Upgrade to Premium • Play Unlimited';
+
+  @override
+  String get hilalDuelNextLevel => 'Next level';
+
+  @override
+  String get hilalDuelMaxLevel => 'Maximum level';
+
+  @override
+  String hilalDuelNextRewardFrame(int level) {
+    return 'Next reward: Avatar frame (LV $level)';
+  }
+
+  @override
+  String hilalDuelNextRewardTitle(String title, int level) {
+    return 'Next reward: Title “$title” (LV $level)';
+  }
+
+  @override
+  String hilalDuelNextRewardHilalIcon(int level) {
+    return 'Next reward: Special crescent icon (LV $level)';
+  }
+
+  @override
+  String get hilalDuelWeeklyTitle => 'Player of the Week';
+
+  @override
+  String hilalDuelWeeklyThisWeek(int count) {
+    return 'This week: $count crescents';
+  }
+
+  @override
+  String hilalDuelWeeklyRank(int rank) {
+    return 'Rank: #$rank';
+  }
+
+  @override
+  String get hilalDuelWeeklyRankNone => 'Rank: —';
+
+  @override
+  String get hilalDuelWeeklyTapHint => 'View leaderboard';
+
+  @override
+  String get hilalDuelWeeklyTopPreview => 'Top 3';
+
+  @override
+  String get hilalDuelWeeklyClimbHint =>
+      'Top 10 is the green league — play and climb!';
+
+  @override
+  String get hilalDuelWeeklyEmpty =>
+      'No crescents earned this week yet. Finish the first match!';
+
+  @override
+  String hilalDuelWeeklyYourPlace(int rank, int count) {
+    return 'Your place: #$rank · $count crescents';
+  }
+
+  @override
+  String get hilalDuelTitleTalebe => 'Student';
+
+  @override
+  String get hilalDuelTitleIlimDostu => 'Friend of Knowledge';
+
+  @override
+  String get hilalDuelYouLabel => 'You';
+
+  @override
+  String get hilalDuelOpponentLabel => 'Opponent';
+
+  @override
   String get generalLoading => 'Loading...';
 
   @override
@@ -3110,8 +3304,17 @@ class AppLocalizationsEn extends AppLocalizations {
   String get widgetUnlockZikirTitle => 'Dhikr Counter Widget';
 
   @override
+  String get widgetUnlockAdPreparing => 'Preparing the ad…';
+
+  @override
   String get widgetUnlockAdLoadFailed =>
-      'The ad could not be loaded right now, please try again later.';
+      'No suitable ad is available right now. Please try again in a few seconds.';
+
+  @override
+  String get widgetUnlockAdRetryButton => 'Try again';
+
+  @override
+  String get widgetUnlockAdLaterButton => 'Later';
 
   @override
   String widgetUnlockSuccessTitle(Object title, int hours) {
@@ -3821,6 +4024,15 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get premiumBenefitAdhan => '2nd adhan alarm enabled';
+
+  @override
+  String get premiumBenefitPrayerCircle => 'Prayer Circle: unlimited requests';
+
+  @override
+  String get premiumBenefitContest => 'Unlimited contest plays';
+
+  @override
+  String get premiumBenefitExtras => 'No ads in zikr, compass, and frequencies';
 
   @override
   String get premiumSignInRequiredNotice =>

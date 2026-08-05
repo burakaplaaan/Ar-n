@@ -185,9 +185,9 @@ class AdMobService {
   // ───────────────────────────────────────────────────────────────────────
 
   /// AdMob reklamları yüklendikten ~1 saat sonra geçersiz olur; biraz erken
-  /// (55 dk) bayatlamış sayıp yenisini yükleriz.
+  /// (55 dk) bayatlamış sayarız. Yenileme, yalnızca sonraki yüksek niyetli
+  /// yüzey tekrar preload istediğinde yapılır.
   static const Duration _adCacheTtl = Duration(minutes: 55);
-  static const Duration _adRefreshAfter = Duration(minutes: 50);
   static const Duration _preloadJoinTimeout = Duration(milliseconds: 800);
 
   /// Arka plan preload yüklemesi için watchdog süresi. SDK callback'i (çok
@@ -212,13 +212,10 @@ class AdMobService {
   static DateTime? _rewardedLoadedAt;
   static bool _rewardedLoading = false;
   static bool _rewardedShowing = false;
-  static int _rewardedPreloadRetry = 0;
-  static Timer? _rewardedPreloadTimer;
-  static Timer? _rewardedRefreshTimer;
   static Completer<void>? _rewardedPreloadSettled;
   static Timer? _iosRewardedStartupTimer;
-  static bool _rewardedPreloadEligible = true;
-  static bool _rewardedEligibilityConfirmed = true;
+  static bool _rewardedPreloadEligible = false;
+  static bool _rewardedEligibilityConfirmed = false;
   static bool _rewardedPreloadForeground = true;
   static int _rewardedLoadGeneration = 0;
 
@@ -234,6 +231,11 @@ class AdMobService {
       _rewardedAd != null &&
       _rewardedLoadedAt != null &&
       DateTime.now().difference(_rewardedLoadedAt!) < _adCacheTtl;
+
+  static bool get _rewardedRequestAllowed =>
+      _rewardedPreloadEligible &&
+      _rewardedEligibilityConfirmed &&
+      _rewardedPreloadForeground;
 
   static bool get _interstitialReady =>
       _interstitialAd != null &&
@@ -260,9 +262,7 @@ class AdMobService {
   /// geçiş reklamı GÖSTERMEYEN yüzeyler için — gereksiz interstitial isteği
   /// üretmez). Premium kontrolü çağıranın sorumluluğundadır.
   static void preloadRewarded() {
-    if (!_isSupportedMobilePlatform ||
-        !_rewardedPreloadEligible ||
-        !_rewardedPreloadForeground) {
+    if (!_isSupportedMobilePlatform || !_rewardedRequestAllowed) {
       return;
     }
     // iOS'ta ATT ve ilk frame işlerini öne almak için var olan başlangıç
@@ -282,6 +282,46 @@ class AdMobService {
     _runWhenReady(() => unawaited(_preloadRewarded()));
   }
 
+  /// Kullanıcı reklam izleme niyeti gösterdiğinde hazır cache'i kullanır veya
+  /// tek bir preload başlatıp en fazla [timeout] kadar sonucunu bekler.
+  ///
+  /// Timeout reklamı sonradan otomatik göstermez; geç gelen başarılı sonuç
+  /// cache'te kalır ve kullanıcının bir sonraki denemesinde kullanılabilir.
+  bool get isRewardedReady => _rewardedReady && _rewardedRequestAllowed;
+
+  Future<bool> prepareRewarded({
+    Duration timeout = const Duration(seconds: 5),
+  }) async {
+    if (!_isSupportedMobilePlatform) return false;
+    try {
+      return await _prepareRewarded().timeout(timeout, onTimeout: () => false);
+    } catch (error) {
+      debugPrint('AdMob rewarded preparation failed: $error');
+      return false;
+    }
+  }
+
+  Future<bool> _prepareRewarded() async {
+    if (!_rewardedRequestAllowed) return false;
+    if (_rewardedReady) return true;
+    await initialize();
+    if (!_sdkInitialized || !_canRequestAds || !_rewardedRequestAllowed) {
+      return false;
+    }
+    if (_rewardedReady) return true;
+
+    // Açık kullanıcı niyeti, uygulama başlangıcındaki iOS gecikmesinden daha
+    // güçlüdür; bekleyen timer yerine yüklemeyi şimdi başlat.
+    _iosRewardedStartupTimer?.cancel();
+    _iosRewardedStartupTimer = null;
+    unawaited(_preloadRewarded());
+    final settled = _rewardedPreloadSettled;
+    if (settled != null && !settled.isCompleted) {
+      await settled.future;
+    }
+    return _rewardedReady && _rewardedRequestAllowed;
+  }
+
   /// `main.dart` tarafından gecikmeli başlatılan iOS SDK hazır olduğunda,
   /// ilk preload isteğinin kendi fallback timer'ını beklemeden devam eder.
   static void _flushIosRewardedStartupPreload() {
@@ -298,10 +338,9 @@ class AdMobService {
 
   /// Premium değişiminde preload durumunu servis seviyesinde günceller.
   ///
-  /// Eligibility kapanınca bekleyen timer'lar iptal edilir, cache dispose
-  /// edilir ve tamamlanması geciken SDK callback'leri generation ile geçersiz
-  /// kılınır. Böylece free iken başlayan istek premium olduktan sonra cache'e
-  /// reklam koyamaz veya yeni retry başlatamaz.
+  /// Eligibility kapanınca cache dispose edilir ve tamamlanması geciken SDK
+  /// callback'leri generation ile geçersiz kılınır. Böylece free iken başlayan
+  /// istek premium olduktan sonra cache'e reklam koyamaz.
   static void setRewardedPreloadEligible(bool eligible) {
     final wasConfirmed = _rewardedEligibilityConfirmed;
     _rewardedEligibilityConfirmed = true;
@@ -310,10 +349,6 @@ class AdMobService {
     if (eligible) return;
 
     _rewardedLoadGeneration++;
-    _rewardedPreloadTimer?.cancel();
-    _rewardedPreloadTimer = null;
-    _rewardedRefreshTimer?.cancel();
-    _rewardedRefreshTimer = null;
     _iosRewardedStartupTimer?.cancel();
     _iosRewardedStartupTimer = null;
     _rewardedLoading = false;
@@ -332,10 +367,6 @@ class AdMobService {
   static void markRewardedEligibilityPending() {
     _rewardedEligibilityConfirmed = false;
     _rewardedLoadGeneration++;
-    _rewardedPreloadTimer?.cancel();
-    _rewardedPreloadTimer = null;
-    _rewardedRefreshTimer?.cancel();
-    _rewardedRefreshTimer = null;
     _iosRewardedStartupTimer?.cancel();
     _iosRewardedStartupTimer = null;
     _rewardedLoading = false;
@@ -344,15 +375,17 @@ class AdMobService {
     _rewardedPreloadSettled = null;
   }
 
-  /// Refresh/retry timer'larının yalnızca uygulama foreground'dayken
-  /// çalışmasını sağlar. Cache korunur; resume çağrısı yaşına göre tazeler.
+  /// Yeni preload isteklerinin yalnızca uygulama foreground'dayken
+  /// çalışmasını sağlar. Var olan cache korunur.
   static void setRewardedPreloadForeground(bool foreground) {
+    if (_rewardedPreloadForeground == foreground) return;
     _rewardedPreloadForeground = foreground;
     if (foreground) return;
-    _rewardedPreloadTimer?.cancel();
-    _rewardedPreloadTimer = null;
-    _rewardedRefreshTimer?.cancel();
-    _rewardedRefreshTimer = null;
+    _rewardedLoadGeneration++;
+    _rewardedLoading = false;
+    final signal = _rewardedPreloadSettled;
+    if (signal != null) _completePreloadSignal(signal);
+    _rewardedPreloadSettled = null;
     _iosRewardedStartupTimer?.cancel();
     _iosRewardedStartupTimer = null;
   }
@@ -373,20 +406,17 @@ class AdMobService {
     );
   }
 
-  static Future<void> _preloadRewarded({bool refresh = false}) async {
+  static Future<void> _preloadRewarded() async {
     if (kIsWeb ||
         !_canRequestAds ||
         !_rewardedPreloadEligible ||
         !_rewardedEligibilityConfirmed ||
         !_rewardedPreloadForeground ||
         _rewardedLoading ||
-        (_rewardedShowing && refresh)) {
+        _rewardedShowing) {
       return;
     }
-    if (_rewardedReady && !refresh) {
-      _scheduleRewardedRefreshFromAge();
-      return;
-    }
+    if (_rewardedReady) return;
     final adUnitId = AdMobIds.unitId(ArinAdUnit.rewardedUnlock);
     if (adUnitId == null) return;
     _rewardedLoading = true;
@@ -394,11 +424,7 @@ class AdMobService {
     final preloadSettled = Completer<void>();
     _rewardedPreloadSettled = preloadSettled;
 
-    // 50. dakikadaki proaktif yenilemede çalışan reklamı yenisi başarıyla
-    // gelene kadar tut. Gerçekten bayat reklam ise artık gösterilemeyeceği için
-    // hemen at.
-    final keepCurrentAd = refresh && _rewardedReady;
-    final stale = keepCurrentAd ? null : _rewardedAd;
+    final stale = _rewardedAd;
     if (stale != null) {
       _rewardedAd = null;
       _rewardedLoadedAt = null;
@@ -409,14 +435,13 @@ class AdMobService {
     watchdog = Timer(_preloadLoadTimeout, () {
       if (settled) return;
       settled = true;
-      if (generation != _rewardedLoadGeneration || !_rewardedPreloadEligible) {
+      if (generation != _rewardedLoadGeneration || !_rewardedRequestAllowed) {
         _completePreloadSignal(preloadSettled);
         return;
       }
       _rewardedLoading = false;
       debugPrint('AdMob rewarded preload watchdog timeout');
       _completePreloadSignal(preloadSettled);
-      _scheduleRewardedPreloadRetry(refresh: keepCurrentAd);
     });
     try {
       await RewardedAd.load(
@@ -426,7 +451,7 @@ class AdMobService {
           onAdLoaded: (ad) {
             if (settled ||
                 generation != _rewardedLoadGeneration ||
-                !_rewardedPreloadEligible) {
+                !_rewardedRequestAllowed) {
               if (!settled) {
                 settled = true;
                 watchdog?.cancel();
@@ -441,11 +466,7 @@ class AdMobService {
             _rewardedAd = ad;
             _rewardedLoadedAt = DateTime.now();
             _rewardedLoading = false;
-            _rewardedPreloadRetry = 0;
-            _rewardedPreloadTimer?.cancel();
-            _rewardedPreloadTimer = null;
             _completePreloadSignal(preloadSettled);
-            _scheduleRewardedRefresh();
             if (previous != null && !identical(previous, ad)) {
               unawaited(previous.dispose());
             }
@@ -456,14 +477,13 @@ class AdMobService {
             settled = true;
             watchdog?.cancel();
             if (generation != _rewardedLoadGeneration ||
-                !_rewardedPreloadEligible) {
+                !_rewardedRequestAllowed) {
               _completePreloadSignal(preloadSettled);
               return;
             }
             _rewardedLoading = false;
             debugPrint('AdMob rewarded preload failed: $error');
             _completePreloadSignal(preloadSettled);
-            _scheduleRewardedPreloadRetry(refresh: keepCurrentAd);
           },
         ),
       );
@@ -471,56 +491,15 @@ class AdMobService {
       if (!settled) {
         settled = true;
         watchdog.cancel();
-        if (generation != _rewardedLoadGeneration ||
-            !_rewardedPreloadEligible) {
+        if (generation != _rewardedLoadGeneration || !_rewardedRequestAllowed) {
           _completePreloadSignal(preloadSettled);
           return;
         }
         _rewardedLoading = false;
         debugPrint('AdMob rewarded preload threw: $e');
         _completePreloadSignal(preloadSettled);
-        _scheduleRewardedPreloadRetry(refresh: keepCurrentAd);
       }
     }
-  }
-
-  static void _scheduleRewardedPreloadRetry({bool refresh = false}) {
-    if (!_rewardedPreloadEligible || !_rewardedPreloadForeground) return;
-    _rewardedPreloadTimer?.cancel();
-    final delay = _backoffDelay(_rewardedPreloadRetry);
-    _rewardedPreloadRetry++;
-    _rewardedPreloadTimer = Timer(
-      delay,
-      () => unawaited(_preloadRewarded(refresh: refresh)),
-    );
-  }
-
-  static void _scheduleRewardedRefresh() {
-    if (!_rewardedPreloadEligible || !_rewardedPreloadForeground) return;
-    _rewardedRefreshTimer?.cancel();
-    _rewardedRefreshTimer = Timer(
-      _adRefreshAfter,
-      () => unawaited(_preloadRewarded(refresh: true)),
-    );
-  }
-
-  static void _scheduleRewardedRefreshFromAge() {
-    if (!_rewardedPreloadEligible ||
-        !_rewardedPreloadForeground ||
-        _rewardedLoadedAt == null) {
-      return;
-    }
-    _rewardedRefreshTimer?.cancel();
-    final age = DateTime.now().difference(_rewardedLoadedAt!);
-    final remaining = _adRefreshAfter - age;
-    if (remaining <= Duration.zero) {
-      unawaited(_preloadRewarded(refresh: true));
-      return;
-    }
-    _rewardedRefreshTimer = Timer(
-      remaining,
-      () => unawaited(_preloadRewarded(refresh: true)),
-    );
   }
 
   static void _completePreloadSignal(Completer<void> signal) {
@@ -607,12 +586,13 @@ class AdMobService {
   Future<RewardedAdResult?> _showPreloadedRewarded({
     String? serverSideCustomData,
   }) async {
-    if (!_rewardedReady || _rewardedShowing) return null;
+    if (!_rewardedReady || !_rewardedRequestAllowed || _rewardedShowing) {
+      return null;
+    }
+    final generation = _rewardedLoadGeneration;
     final ad = _rewardedAd!;
     _rewardedAd = null;
     _rewardedLoadedAt = null;
-    _rewardedRefreshTimer?.cancel();
-    _rewardedRefreshTimer = null;
     _rewardedShowing = true;
     final completer = Completer<RewardedAdResult>();
     var earned = false;
@@ -644,6 +624,11 @@ class AdMobService {
         _completeOnceOutcome(completer, RewardedAdResult.showFailed);
       },
     );
+    if (generation != _rewardedLoadGeneration || !_rewardedRequestAllowed) {
+      await ad.dispose();
+      _rewardedShowing = false;
+      return RewardedAdResult.showFailed;
+    }
     try {
       await ad.show(onUserEarnedReward: (_, __) => earned = true);
     } catch (e) {
@@ -819,22 +804,20 @@ class AdMobService {
     if (!_canRequestAds) return RewardedAdResult.loadFailed;
     final isUnlockAd = unit == ArinAdUnit.rewardedUnlock;
     final requestGeneration = _rewardedLoadGeneration;
-    if (isUnlockAd &&
-        (!_rewardedPreloadEligible || !_rewardedEligibilityConfirmed)) {
+    if (isUnlockAd && !_rewardedRequestAllowed) {
       return RewardedAdResult.loadFailed;
     }
 
-    // 1) Hazır (preloaded) reklam varsa anında göster, sonra yenisini hazırla.
+    // 1) Hazır (preloaded) reklam varsa anında göster.
     if (isUnlockAd) {
       final preloaded = await _showPreloadedRewarded(
         serverSideCustomData: serverSideCustomData,
       );
       if (preloaded != null) {
-        unawaited(_preloadRewarded());
         return preloaded;
       }
 
-      // Uygulama açılışında başlatılan preload hâlâ devam ediyorsa ayrı bir
+      // İlgili reklam yüzeyinde başlatılan preload hâlâ devam ediyorsa ayrı bir
       // ikinci reklam isteği açmak yerine kısa süre aynı isteğin sonucunu bekle.
       // Başarılı olursa reklam hemen gösterilir; takılırsa on-demand fallback
       // mevcut davranışıyla devam eder.
@@ -848,19 +831,16 @@ class AdMobService {
           serverSideCustomData: serverSideCustomData,
         );
         if (warmed != null) {
-          unawaited(_preloadRewarded());
           return warmed;
         }
       }
     }
 
-    // 2) Hazır reklam yok → on-demand yükle (geçici hatalarda retry'lı), sonra
-    // bir sonraki sefer için arka planda preload tetikle.
+    // 2) Hazır reklam yok → on-demand yükle (geçici hatalarda retry'lı).
     for (var attempt = 0; attempt < _rewardedMaxAttempts; attempt++) {
       if (isUnlockAd &&
           (requestGeneration != _rewardedLoadGeneration ||
-              !_rewardedPreloadEligible ||
-              !_rewardedEligibilityConfirmed)) {
+              !_rewardedRequestAllowed)) {
         return RewardedAdResult.loadFailed;
       }
       final outcome = await _loadAndShowRewarded(
@@ -869,19 +849,16 @@ class AdMobService {
         canShow: isUnlockAd
             ? () =>
                   requestGeneration == _rewardedLoadGeneration &&
-                  _rewardedPreloadEligible &&
-                  _rewardedEligibilityConfirmed
+                  _rewardedRequestAllowed
             : null,
       );
       if (outcome != RewardedAdResult.loadFailed) {
-        unawaited(_preloadRewarded());
         return outcome;
       }
       if (attempt < _rewardedMaxAttempts - 1) {
         await Future<void>.delayed(_rewardedRetryDelay);
       }
     }
-    unawaited(_preloadRewarded());
     return RewardedAdResult.loadFailed;
   }
 
@@ -946,6 +923,11 @@ class AdMobService {
                 _completeOnceOutcome(completer, RewardedAdResult.showFailed);
               },
             );
+            if (canShow != null && !canShow()) {
+              ad.dispose();
+              _completeOnceOutcome(completer, RewardedAdResult.loadFailed);
+              return;
+            }
             try {
               unawaited(
                 ad

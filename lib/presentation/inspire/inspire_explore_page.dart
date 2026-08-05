@@ -7,11 +7,13 @@ import 'package:go_router/go_router.dart';
 import 'package:arin/l10n/app_localizations.dart';
 
 import '../../core/constants/app_colors.dart';
+import '../../core/constants/product_metric_features.dart';
 import '../../core/providers/shared_preferences_provider.dart';
 import '../../core/router/app_router.dart';
 import '../../data/models/inspiration_card_model.dart';
 import '../../data/models/inspiration_content_kind.dart';
 import '../../data/repositories/inspiration_firestore_repository.dart';
+import '../../data/services/product_metrics_service.dart';
 import '../shared/widgets/arin_skeleton.dart';
 import 'explore_content_filter_provider.dart';
 import 'inspiration_catalog_provider.dart';
@@ -43,6 +45,7 @@ class _InspireExplorePageState extends ConsumerState<InspireExplorePage> {
   void initState() {
     super.initState();
     _searchController.addListener(_onSearchChanged);
+    unawaited(ProductMetricsService.featureOpen(ProductMetricFeatures.explore));
   }
 
   void _onSearchChanged() {

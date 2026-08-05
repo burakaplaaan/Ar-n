@@ -2,12 +2,14 @@ import 'dart:async';
 
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/physics.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:arin/l10n/app_localizations.dart';
 
 import '../../core/constants/app_colors.dart';
+import '../../core/constants/product_metric_features.dart';
 import '../../core/ads/admob_ids.dart';
 import '../../data/models/inspiration_card_model.dart';
 import '../../data/services/ad_gate_service.dart';
@@ -80,13 +82,16 @@ class _InspireViewerPageState extends ConsumerState<InspireViewerPage> {
     if (override != null) {
       if (override.isEmpty) {
         return Scaffold(
-          backgroundColor: Colors.black,
-          body: _ViewerEmpty(onClose: () => context.pop()),
+          backgroundColor: Colors.transparent,
+          body: ColoredBox(
+            color: Colors.black,
+            child: _ViewerEmpty(onClose: () => context.pop()),
+          ),
         );
       }
       final safe = initial.clamp(0, override.length - 1);
       return Scaffold(
-        backgroundColor: Colors.black,
+        backgroundColor: Colors.transparent,
         body: _ViewerBody(cards: override, initialIndex: safe),
       );
     }
@@ -94,11 +99,14 @@ class _InspireViewerPageState extends ConsumerState<InspireViewerPage> {
     final async = ref.watch(inspirationShuffledGridProvider);
 
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: Colors.transparent,
       body: async.when(
         data: (cards) {
           if (cards.isEmpty) {
-            return _ViewerEmpty(onClose: () => context.pop());
+            return ColoredBox(
+              color: Colors.black,
+              child: _ViewerEmpty(onClose: () => context.pop()),
+            );
           }
           return _ViewerBody(
             cards: cards,
@@ -108,14 +116,20 @@ class _InspireViewerPageState extends ConsumerState<InspireViewerPage> {
             ),
           );
         },
-        loading: () => const Padding(
-          padding: EdgeInsets.all(24),
-          child: ArinSkeletonCard(height: 520, borderRadius: 24),
+        loading: () => const ColoredBox(
+          color: Colors.black,
+          child: Padding(
+            padding: EdgeInsets.all(24),
+            child: ArinSkeletonCard(height: 520, borderRadius: 24),
+          ),
         ),
-        error: (e, _) => _ViewerError(
-          message: '$e',
-          onClose: () => context.pop(),
-          onRetry: () => ref.invalidate(inspirationCatalogProvider),
+        error: (e, _) => ColoredBox(
+          color: Colors.black,
+          child: _ViewerError(
+            message: '$e',
+            onClose: () => context.pop(),
+            onRetry: () => ref.invalidate(inspirationCatalogProvider),
+          ),
         ),
       ),
     );
@@ -133,16 +147,15 @@ class _ViewerBody extends ConsumerStatefulWidget {
 }
 
 class _ViewerBodyState extends ConsumerState<_ViewerBody>
-    with ReviewPromptOnExitMixin {
+    with ReviewPromptOnExitMixin, SingleTickerProviderStateMixin {
   PageController? _pc;
+  late final AnimationController _dismissController;
   late int _settledPage;
   bool _adGateShowing = false;
   int _pendingExploreAdGateViews = 0;
   bool _initialPrecacheDone = false;
   bool _warmedAds = false;
-
-  /// Sol kenar “geri” jesti: sağa doğru sürükleme mesafesi (px).
-  double _edgeSwipeDx = 0;
+  bool _isDismissing = false;
 
   @override
   void initState() {
@@ -151,6 +164,7 @@ class _ViewerBodyState extends ConsumerState<_ViewerBody>
     final safe = widget.initialIndex.clamp(0, widget.cards.length - 1);
     _settledPage = safe;
     _pc = PageController(initialPage: safe, viewportFraction: 1);
+    _dismissController = AnimationController.unbounded(vsync: this);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _recordView(safe);
       _maybeShowExploreAdGate();
@@ -177,6 +191,7 @@ class _ViewerBodyState extends ConsumerState<_ViewerBody>
   @override
   void dispose() {
     maybeRequestReviewOnExit();
+    _dismissController.dispose();
     _pc?.dispose();
     super.dispose();
   }
@@ -196,16 +211,51 @@ class _ViewerBodyState extends ConsumerState<_ViewerBody>
     }
   }
 
-  void _tryPopFromEdgeSwipe(DragEndDetails details) {
-    final v = details.primaryVelocity ?? 0;
-    // Sağa hızlı fırlatma veya yavaş ama yeterince sağa çekme
-    if (v > 240 || _edgeSwipeDx > 56) {
-      HapticFeedback.lightImpact();
-      if (context.mounted) {
-        context.pop();
-      }
+  void _updateDismissDrag(DragUpdateDetails details, double width) {
+    if (_isDismissing || width <= 0) return;
+    final next = _dismissController.value + details.delta.dx;
+    _dismissController.value = next.clamp(-width, 0);
+  }
+
+  void _endDismissDrag(DragEndDetails details, double width) {
+    if (_isDismissing || width <= 0) return;
+    final velocity = details.primaryVelocity ?? 0;
+    final progress = (-_dismissController.value / width).clamp(0.0, 1.0);
+    final shouldDismiss = progress >= 0.22 || velocity <= -700;
+
+    if (shouldDismiss) {
+      unawaited(_completeDismiss(width));
+      return;
     }
-    _edgeSwipeDx = 0;
+    _restoreDismissPosition(velocity);
+  }
+
+  void _restoreDismissPosition([double velocity = 0]) {
+    if (_isDismissing) return;
+    _dismissController.animateWith(
+      SpringSimulation(
+        const SpringDescription(mass: 1, stiffness: 460, damping: 44),
+        _dismissController.value,
+        0,
+        velocity > 0 ? 0 : velocity,
+      ),
+    );
+  }
+
+  Future<void> _completeDismiss(double width) async {
+    if (_isDismissing) return;
+    _isDismissing = true;
+    HapticFeedback.lightImpact();
+    try {
+      await _dismissController.animateTo(
+        -width * 1.05,
+        duration: const Duration(milliseconds: 180),
+        curve: Curves.easeOutCubic,
+      );
+    } on TickerCanceled {
+      return;
+    }
+    if (mounted) context.pop();
   }
 
   void _maybeShowExploreAdGate() {
@@ -270,6 +320,9 @@ class _ViewerBodyState extends ConsumerState<_ViewerBody>
         if (!mounted) return;
         if (shown) {
           await adGate.recordRewardedUnlock(AdGatePlacement.exploreSwipe);
+          unawaited(
+            ProductMetricsService.adWatch(ProductMetricFeatures.explore),
+          );
         } else {
           await adGate.clearPending(AdGatePlacement.exploreSwipe);
         }
@@ -283,73 +336,102 @@ class _ViewerBodyState extends ConsumerState<_ViewerBody>
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final cards = widget.cards;
-    final pad = MediaQuery.paddingOf(context);
-    return Stack(
-      fit: StackFit.expand,
-      children: [
-        PageView.builder(
-          scrollDirection: Axis.vertical,
-          controller: _pc,
-          itemCount: cards.length,
-          allowImplicitScrolling: false,
-          dragStartBehavior: DragStartBehavior.down,
-          physics: _InstagramLikePageScrollPhysics(
-            settledPage: () => _settledPage,
-            parent: const BouncingScrollPhysics(),
-          ),
-          onPageChanged: (page) {
-            _settledPage = page;
-            _recordView(page);
-            _precacheNeighbors(page);
-            _maybeShowExploreAdGate();
-          },
-          itemBuilder: (context, i) {
-            return InspirationSlide(
-              card: cards[i],
-              reelsLayout: true,
-              viewerZoom: 1,
-            );
-          },
-        ),
-        // Instagram benzeri: sol kenardan sağa çekerek çık (dikey akışa dokunmamak için dar şerit).
-        Positioned(
-          left: 0,
-          top: 0,
-          bottom: 0,
-          width: pad.left + 56,
-          child: GestureDetector(
-            behavior: HitTestBehavior.translucent,
-            onHorizontalDragStart: (_) {
-              _edgeSwipeDx = 0;
+  Widget _buildViewerContent(List<InspirationCardModel> cards) {
+    return RepaintBoundary(
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          PageView.builder(
+            scrollDirection: Axis.vertical,
+            controller: _pc,
+            itemCount: cards.length,
+            allowImplicitScrolling: false,
+            dragStartBehavior: DragStartBehavior.down,
+            physics: _InstagramLikePageScrollPhysics(
+              settledPage: () => _settledPage,
+              parent: const BouncingScrollPhysics(),
+            ),
+            onPageChanged: (page) {
+              _settledPage = page;
+              _recordView(page);
+              _precacheNeighbors(page);
+              _maybeShowExploreAdGate();
             },
-            onHorizontalDragUpdate: (details) {
-              if (details.delta.dx > 0) {
-                _edgeSwipeDx += details.delta.dx;
-              }
-            },
-            onHorizontalDragEnd: _tryPopFromEdgeSwipe,
-            onHorizontalDragCancel: () {
-              _edgeSwipeDx = 0;
+            itemBuilder: (context, i) {
+              return InspirationSlide(
+                card: cards[i],
+                reelsLayout: true,
+                viewerZoom: 1,
+              );
             },
           ),
-        ),
-        Align(
-          alignment: Alignment.topLeft,
-          child: SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(4, 2, 8, 0),
-              child: ArinBackButton(
-                onPressed: () => context.pop(),
-                semanticLabel: AppLocalizations.of(context)!.viewerBackAction,
-                variant: ArinBackButtonVariant.overlaySubtle,
+          Align(
+            alignment: Alignment.topLeft,
+            child: SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(4, 2, 8, 0),
+                child: ArinBackButton(
+                  onPressed: () => context.pop(),
+                  semanticLabel: AppLocalizations.of(context)!.viewerBackAction,
+                  variant: ArinBackButtonVariant.overlaySubtle,
+                ),
               ),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final cards = widget.cards;
+    final width = MediaQuery.sizeOf(context).width;
+
+    return GestureDetector(
+      behavior: HitTestBehavior.translucent,
+      onHorizontalDragStart: (_) {
+        if (!_isDismissing) _dismissController.stop();
+      },
+      onHorizontalDragUpdate: (details) => _updateDismissDrag(details, width),
+      onHorizontalDragEnd: (details) => _endDismissDrag(details, width),
+      onHorizontalDragCancel: _restoreDismissPosition,
+      child: AnimatedBuilder(
+        animation: _dismissController,
+        child: _buildViewerContent(cards),
+        builder: (context, child) {
+          final dragProgress = width <= 0
+              ? 0.0
+              : (-_dismissController.value / width).clamp(0.0, 1.0);
+          final easedProgress = Curves.easeOutCubic.transform(dragProgress);
+          final scale = 1 - (0.16 * easedProgress);
+          final radius = 28 * easedProgress;
+          final backgroundOpacity = (1 - (0.72 * easedProgress)).clamp(
+            0.0,
+            1.0,
+          );
+          final offsetDx = _dismissController.value.clamp(-width, 0.0);
+
+          return Stack(
+            fit: StackFit.expand,
+            children: [
+              ColoredBox(
+                color: Colors.black.withValues(alpha: backgroundOpacity),
+              ),
+              Transform.translate(
+                offset: Offset(offsetDx, 0),
+                child: Transform.scale(
+                  scale: scale,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(radius),
+                    child: child,
+                  ),
+                ),
+              ),
+            ],
+          );
+        },
+      ),
     );
   }
 }

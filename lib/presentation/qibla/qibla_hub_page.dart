@@ -15,6 +15,7 @@ import 'qibla_tools_dashboard_page.dart';
 import 'qibla_nested_swipe_back.dart';
 import 'qibla_shell_swipe_provider.dart';
 import 'prayer_circle/prayer_circle_page.dart';
+import 'hilal_duel/hilal_duel_page.dart';
 import 'zikir_matik_page.dart';
 import 'healing_frequencies/healing_frequencies_page.dart';
 import '../willpower/breathing_exercise_page.dart';
@@ -26,6 +27,7 @@ abstract final class QiblaHubRoutes {
   static const String breathing = '/breathing';
   static const String healing = '/healing';
   static const String prayerCircle = '/prayer-circle';
+  static const String hilalDuel = '/hilal-duel';
 }
 
 /// [Navigator] gözlemcisi: araç paneli dışına çıkıldığında shell kaydırmayı kilitler.
@@ -146,6 +148,12 @@ class _QiblaHubPageState extends ConsumerState<QiblaHubPage> {
               builder: (_) =>
                   const QiblaNestedSwipeBack(child: PrayerCirclePage()),
             );
+          case QiblaHubRoutes.hilalDuel:
+            // NestedSwipeBack zorla pop eder; eşleşme iptali/iade HilalDuelPage içinde.
+            return _toolRoute(
+              settings: settings,
+              builder: (_) => const HilalDuelPage(),
+            );
           case QiblaHubRoutes.dashboard:
           default:
             return MaterialPageRoute<void>(
@@ -161,13 +169,30 @@ class _QiblaHubPageState extends ConsumerState<QiblaHubPage> {
     required RouteSettings settings,
     required WidgetBuilder builder,
   }) {
+    // opaque:false — fade sırasında altındaki dashboard görünsün (siyah flash yok).
     return PageRouteBuilder<void>(
       settings: settings,
+      opaque: false,
+      barrierDismissible: false,
       transitionDuration: const Duration(milliseconds: 180),
-      reverseTransitionDuration: const Duration(milliseconds: 140),
+      reverseTransitionDuration: const Duration(milliseconds: 160),
       pageBuilder: (context, animation, secondaryAnimation) => builder(context),
       transitionsBuilder: (context, animation, secondaryAnimation, child) {
-        return FadeTransition(opacity: animation, child: child);
+        final curved = CurvedAnimation(
+          parent: animation,
+          curve: Curves.easeOutCubic,
+          reverseCurve: Curves.easeInCubic,
+        );
+        return FadeTransition(
+          opacity: curved,
+          child: SlideTransition(
+            position: Tween<Offset>(
+              begin: const Offset(0.04, 0),
+              end: Offset.zero,
+            ).animate(curved),
+            child: child,
+          ),
+        );
       },
     );
   }

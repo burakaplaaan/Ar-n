@@ -29,9 +29,11 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 
 import '../../core/constants/app_colors.dart';
+import '../../core/constants/product_metric_features.dart';
 import '../../core/router/app_router.dart';
 import '../../core/services/arin_review_prompter.dart';
 import '../../core/theme/arin_shell_background.dart';
+import '../../data/services/product_metrics_service.dart';
 import '../../data/services/qibla_compass_controller.dart';
 import '../shared/widgets/arin_back_button.dart';
 
@@ -109,6 +111,7 @@ class _QiblaPageState extends State<QiblaPage> {
     _enteredAt = DateTime.now();
     // Umre/çekim senaryosu: pusula açıkken ekran kararmasın.
     unawaited(WakelockPlus.enable().catchError((_) {}));
+    unawaited(ProductMetricsService.featureOpen(ProductMetricFeatures.qibla));
     _launch();
   }
 

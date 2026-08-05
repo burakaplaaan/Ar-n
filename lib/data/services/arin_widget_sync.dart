@@ -424,6 +424,12 @@ abstract final class ArinWidgetSync {
       });
       if (!stateCurrent) return;
       await _updateAllWidgets();
+      // Kilit ekranı bildirimleri ana ekran widget'larıyla aynı reklam/deneme
+      // kapısını paylaşır (bkz. `ArinLockNotifications.kt`); reklam izlenince
+      // veya premium alınınca bildirimin de anında normale dönmesi için
+      // native tarafı burada da tetikle — aksi halde kullanıcı uygulamayı
+      // kapatıp açana kadar "kilitli" görünmeye devam ederdi.
+      unawaited(ArinLockNotificationService.syncAll());
     } catch (e, st) {
       debugPrint('ArinWidgetSync.pushWidgetGateStates: $e\n$st');
     }
@@ -451,6 +457,7 @@ abstract final class ArinWidgetSync {
     );
     if (!applied) return;
     await _updateAllWidgets();
+    unawaited(ArinLockNotificationService.syncAll());
   }
 
   /// Background FCM isolate'ının yazdığı native/App Group durumunu foreground

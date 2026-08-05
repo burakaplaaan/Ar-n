@@ -9,6 +9,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../core/constants/app_colors.dart';
+import '../../../core/constants/product_metric_features.dart';
+import '../../../data/services/product_metrics_service.dart';
 import 'healing_audio_notifier.dart';
 import 'healing_daily_comfort_entries.dart';
 import '../../shared/mixins/review_prompt_on_exit_mixin.dart';
@@ -85,6 +87,9 @@ class _HealingFrequenciesPageState extends ConsumerState<HealingFrequenciesPage>
     super.initState();
     startReviewPromptTracking();
     WidgetsBinding.instance.addObserver(this);
+    unawaited(
+      ProductMetricsService.featureOpen(ProductMetricFeatures.healing),
+    );
   }
 
   @override

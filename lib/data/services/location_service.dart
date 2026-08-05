@@ -14,6 +14,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:hive/hive.dart';
 import '../../core/utils/hive_boxes.dart';
 import '../../core/router/app_router.dart';
+import '../../presentation/shared/widgets/arin_permission_dialog.dart';
 import 'diyanet_district_matcher.dart';
 
 /// GPS ile tespit edilen şehir, kaydedilen şehirden farklıysa döner.
@@ -84,8 +85,7 @@ class LocationService {
 
   /// Konum güncelleme tercihi. Olası değerler: [LocationUpdatePref].
   String get locationUpdatePref =>
-      (_prefs.get(_locationUpdatePrefKey) as String?) ??
-      LocationUpdatePref.ask;
+      (_prefs.get(_locationUpdatePrefKey) as String?) ?? LocationUpdatePref.ask;
 
   Future<void> setLocationUpdatePref(String pref) async {
     await _prefs.put(_locationUpdatePrefKey, pref);
@@ -188,7 +188,7 @@ class LocationService {
     final currentGen = ++_syncGeneration;
     try {
       final oldLocationKey = _locationKey();
-      
+
       // Manuel yenileme (forceRefresh) her zaman çalışır. Otomatik çalışmada:
       //  • neverUpdate → kullanıcı sadece manuel değiştirmek istiyor; GPS'e dokunma.
       //  • ask         → şehir değişimi diyalog akışı (LocationChangeListener) üstlenir;
@@ -241,7 +241,8 @@ class LocationService {
         } else {
           // TR dışına çıkıldıysa eski ilçe ID'si yanıltıcı; sıfırla.
           final oldCountry = (_prefs.get(_countryKey) as String?) ?? '';
-          if (oldCountry.toUpperCase() == 'TR' || oldCountry.toUpperCase() == 'TURKEY') {
+          if (oldCountry.toUpperCase() == 'TR' ||
+              oldCountry.toUpperCase() == 'TURKEY') {
             await saveDistrictId(null);
           }
         }
@@ -250,10 +251,10 @@ class LocationService {
           _lastPrayerLocSyncMs,
           DateTime.now().millisecondsSinceEpoch,
         );
-        
+
         final newLocationKey = _locationKey();
         if (oldLocationKey != newLocationKey) {
-           _notifySilentLocationChange();
+          _notifySilentLocationChange();
         }
       } catch (_) {
         // Koordinatlar kayıtlı; Aladhan yine doğru vakit döner, şehir etiketi eski kalabilir.
@@ -348,10 +349,7 @@ class LocationService {
         ),
       );
 
-      final marks = await placemarkFromCoordinates(
-        pos.latitude,
-        pos.longitude,
-      );
+      final marks = await placemarkFromCoordinates(pos.latitude, pos.longitude);
       if (marks.isEmpty) return null;
       final p = marks.first;
 
@@ -401,7 +399,9 @@ class LocationService {
   }
 
   static bool _isSameCity(String a, String b) {
-    String fold(String s) => s.trim().toLowerCase()
+    String fold(String s) => s
+        .trim()
+        .toLowerCase()
         .replaceAll('ı', 'i')
         .replaceAll('ğ', 'g')
         .replaceAll('ü', 'u')
@@ -461,19 +461,40 @@ class LocationService {
     return 'Turkey';
   }
 
+  Future<LocationPermission> _requestLocationPermissionWithDisclosure() async {
+    var permission = await Geolocator.checkPermission();
+    if (permission != LocationPermission.denied) return permission;
+
+    final ctx = rootNavigatorKey.currentContext;
+    if (ctx == null || !ctx.mounted) return LocationPermission.denied;
+    final l10n = AppLocalizations.of(ctx);
+    final confirmed = await showArinPermissionDialog(
+      context: ctx,
+      icon: Icons.location_on_rounded,
+      title: l10n?.locationPermissionRequiredTitle ?? 'Konum İzni Gerekli',
+      body:
+          l10n?.locationPermissionRequiredBody ??
+          'Arın, namaz vakitlerini ve kıble yönünü doğru hesaplayabilmek için '
+              'konumunuza erişim izni gerektirir. Konum verileriniz yalnızca '
+              'bu amaçlar için kullanılır ve cihazınızda işlenir.',
+      cancelLabel: l10n?.locationPermissionNotNow ?? 'Şimdi Değil',
+      confirmLabel: l10n?.locationPermissionContinue ?? 'Devam Et',
+    );
+    if (!confirmed) return LocationPermission.denied;
+
+    permission = await Geolocator.requestPermission();
+    return permission;
+  }
+
   /// Konum iznini kontrol eder ve GPS'ten pozisyon alır — **Hive'a yazmaz**.
   /// Yalnızca [detectLocationChange] tarafından kullanılır; kayıt işlemi
   /// kullanıcı onayından sonra [applyLocationChange] üstlenir.
   Future<({double lat, double lon})?> _getCurrentPositionNoSave() async {
-    var permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied ||
-          permission == LocationPermission.deniedForever) {
-        return null;
-      }
+    final permission = await _requestLocationPermissionWithDisclosure();
+    if (permission == LocationPermission.denied ||
+        permission == LocationPermission.deniedForever) {
+      return null;
     }
-    if (permission == LocationPermission.deniedForever) return null;
     try {
       final pos = await Geolocator.getCurrentPosition(
         locationSettings: const LocationSettings(
@@ -488,45 +509,11 @@ class LocationService {
   }
 
   Future<({double lat, double lon})?> requestCurrentPosition() async {
-    var permission = await Geolocator.checkPermission();
-
-    if (permission == LocationPermission.denied) {
-      final ctx = rootNavigatorKey.currentContext;
-      if (ctx != null) {
-        // Play Store requirement: show prominent disclosure before requesting permission
-        final confirmed = await showDialog<bool>(
-          context: ctx,
-          builder: (dialogCtx) => AlertDialog(
-            title: Text(AppLocalizations.of(dialogCtx)?.locationPermissionRequiredTitle ?? 'Konum İzni Gerekli'),
-            content: Text(
-              AppLocalizations.of(dialogCtx)?.locationPermissionRequiredBody ??
-              'Arın, namaz vakitlerini ve kıble yönünü doğru hesaplayabilmek için '
-              'konumunuza erişim izni gerektirir. Konum verileriniz yalnızca bu amaçlar '
-              'için kullanılır ve cihazınızda işlenir.',
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(dialogCtx).pop(false),
-                child: Text(AppLocalizations.of(dialogCtx)?.locationPermissionNotNow ?? 'Şimdi Değil'),
-              ),
-              TextButton(
-                onPressed: () => Navigator.of(dialogCtx).pop(true),
-                child: Text(AppLocalizations.of(dialogCtx)?.locationPermissionContinue ?? 'Devam Et'),
-              ),
-            ],
-          ),
-        );
-        if (confirmed != true) return null;
-      }
-
-      permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied ||
-          permission == LocationPermission.deniedForever) {
-        return null;
-      }
+    final permission = await _requestLocationPermissionWithDisclosure();
+    if (permission == LocationPermission.denied ||
+        permission == LocationPermission.deniedForever) {
+      return null;
     }
-
-    if (permission == LocationPermission.deniedForever) return null;
 
     try {
       final pos = await Geolocator.getCurrentPosition(

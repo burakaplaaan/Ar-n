@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../core/constants/product_metric_features.dart';
 import 'ad_gate_service.dart';
 import 'global_widget_lock_service.dart';
 import 'product_metrics_service.dart';
@@ -98,6 +99,7 @@ abstract final class WidgetMetricsService {
       Future<void> reportNewNativeRender() async {
         if (!hasNewNativeRender) return;
         if (await ProductMetricsService.widgetActive()) {
+          await ProductMetricsService.featureOpen(ProductMetricFeatures.widget);
           await prefs.setInt(
             _lastRenderReportedKey,
             nativeRender.millisecondsSinceEpoch,

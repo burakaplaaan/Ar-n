@@ -125,6 +125,10 @@ abstract final class FcmTokenService {
     );
   }
 
+  static void _openHilalDuel() {
+    _navigate(AppRoutes.hilalDuel);
+  }
+
   static Future<bool> _queueAudienceSync({required bool active}) {
     final completer = Completer<bool>();
     _audienceSyncTail = _audienceSyncTail
@@ -182,6 +186,9 @@ abstract final class FcmTokenService {
           final parts = payload.split('|');
           _openPrayerCircle(requestId: parts.length > 1 ? parts[1] : null);
         });
+        registerLocalNotificationTapHandler('hilal_duel', (_) {
+          _openHilalDuel();
+        });
         _localTapHandlerRegistered = true;
       }
       if (!_initialLocalNotificationChecked) {
@@ -197,6 +204,8 @@ abstract final class FcmTokenService {
           _openMomentVerse(deliveryId: initial.data['deliveryId']?.toString());
         } else if (initial?.data['type'] == 'prayer_circle') {
           _openPrayerCircle(requestId: initial?.data['requestId']?.toString());
+        } else if (initial?.data['type'] == 'hilal_duel') {
+          _openHilalDuel();
         }
       }
 
@@ -211,6 +220,8 @@ abstract final class FcmTokenService {
               _openPrayerCircle(
                 requestId: message.data['requestId']?.toString(),
               );
+            } else if (message.data['type'] == 'hilal_duel') {
+              _openHilalDuel();
             }
           });
 
@@ -271,28 +282,45 @@ abstract final class FcmTokenService {
     if (ntf == null) return;
     if (defaultTargetPlatform != TargetPlatform.android) return;
     try {
-      final isPrayerCircle = message.data['type'] == 'prayer_circle';
+      final type = message.data['type']?.toString() ?? '';
+      final isPrayerCircle = type == 'prayer_circle';
+      final isHilalDuel = type == 'hilal_duel';
+      final channelId = isPrayerCircle
+          ? 'arin_prayer_circle'
+          : isHilalDuel
+              ? 'arin_hilal_duel'
+              : 'arin_ntf_broadcast';
+      final channelName = isPrayerCircle
+          ? 'Dua Halkası'
+          : isHilalDuel
+              ? 'Bilgi Düellosu'
+              : 'Ayet Bildirimleri';
+      final channelDescription = isPrayerCircle
+          ? 'Dua taleplerine eşlik bildirimleri'
+          : isHilalDuel
+              ? 'Bilgi Düellosu sıralama ve hatırlatma bildirimleri'
+              : 'Günlük ayet ve anlık bildirimler';
       await arinLocalNotificationsPlugin.show(
         DateTime.now().millisecondsSinceEpoch.remainder(1 << 31),
         ntf.title,
         ntf.body,
         NotificationDetails(
           android: AndroidNotificationDetails(
-            isPrayerCircle ? 'arin_prayer_circle' : 'arin_ntf_broadcast',
-            isPrayerCircle ? 'Dua Halkası' : 'Ayet Bildirimleri',
-            channelDescription: isPrayerCircle
-                ? 'Dua taleplerine eşlik bildirimleri'
-                : 'Günlük ayet ve anlık bildirimler',
+            channelId,
+            channelName,
+            channelDescription: channelDescription,
             importance: Importance.high,
             priority: Priority.high,
             playSound: true,
           ),
         ),
         payload: [
-          message.data['type']?.toString() ?? '',
+          type,
           isPrayerCircle
               ? message.data['requestId']?.toString() ?? ''
-              : message.data['deliveryId']?.toString() ?? '',
+              : isHilalDuel
+                  ? ''
+                  : message.data['deliveryId']?.toString() ?? '',
         ].join('|'),
       );
     } catch (e) {
@@ -360,6 +388,15 @@ abstract final class FcmTokenService {
           'Dua Halkası',
           description: 'Dua taleplerine eşlik bildirimleri',
           importance: Importance.high,
+          playSound: true,
+        ),
+      );
+      await android.createNotificationChannel(
+        const AndroidNotificationChannel(
+          'arin_hilal_duel',
+          'Bilgi Düellosu',
+          description: 'Bilgi Düellosu sıralama ve hatırlatma bildirimleri',
+          importance: Importance.defaultImportance,
           playSound: true,
         ),
       );

@@ -1346,6 +1346,200 @@ class AppLocalizationsAr extends AppLocalizations {
       'جلسة هادئة مع نغمات علاجية، أجواء صوتية، ومؤقت نوم';
 
   @override
+  String get qiblaHubHilalDuelTitle => 'مبارزة المعرفة';
+
+  @override
+  String get qiblaHubHilalDuelSubtitle =>
+      'تنافس في 7 أسئلة إسلامية، واجمع الأهلة وتقدّم بالمستوى';
+
+  @override
+  String get hilalDuelTitle => 'مبارزة المعرفة';
+
+  @override
+  String get hilalDuelLanguageNote => 'الأسئلة حالياً بالتركية';
+
+  @override
+  String get hilalDuelRulesSummary =>
+      '7 أسئلة • 20 ثانية لكل سؤال\nالدقة والسرعة تحسمان الفوز. يفتح السؤال التالي فور إجابة الطرفين. شاهد إعلانًا لقلب أو العب بلا حدود مع بريميوم.';
+
+  @override
+  String hilalDuelLevelLabel(int level) {
+    return 'المستوى $level';
+  }
+
+  @override
+  String hilalDuelHilalsLabel(int count) {
+    return '$count هلال';
+  }
+
+  @override
+  String hilalDuelHeartsLabel(int count) {
+    return '$count قلب';
+  }
+
+  @override
+  String get hilalDuelPlay => 'ابحث عن منافس';
+
+  @override
+  String get hilalDuelWatchAdForHeart => 'شاهد إعلاناً لتحصل على قلب واحد';
+
+  @override
+  String get hilalDuelNeedHeartTitle => 'تحتاج قلباً واحداً للعب';
+
+  @override
+  String get hilalDuelNeedHeartHint =>
+      'شاهد إعلاناً قصيراً ← احصل على قلب واحد والعب فوراً';
+
+  @override
+  String get hilalDuelNeedHeartCta => 'شاهد الإعلان';
+
+  @override
+  String get hilalDuelSearching => 'جارٍ البحث عن منافس…';
+
+  @override
+  String get hilalDuelCancelSearch => 'إلغاء البحث';
+
+  @override
+  String get hilalDuelCancelFailed =>
+      'تعذّر الإلغاء. أعد المحاولة لاسترداد القلب.';
+
+  @override
+  String hilalDuelQuestionProgress(int current, int total) {
+    return 'سؤال $current/$total';
+  }
+
+  @override
+  String get hilalDuelWaitingOpponent => 'المنافس يجيب…';
+
+  @override
+  String get hilalDuelAnsweredBubble => 'أجاب';
+
+  @override
+  String get hilalDuelRoundCorrect => 'صحيح';
+
+  @override
+  String get hilalDuelRoundWrong => 'خطأ';
+
+  @override
+  String get hilalDuelNoAnswer => 'بلا إجابة';
+
+  @override
+  String get hilalDuelFastOpponent => 'منافس سريع';
+
+  @override
+  String get hilalDuelResultWin => 'لقد فزت';
+
+  @override
+  String get hilalDuelResultLose => 'لقد خسرت';
+
+  @override
+  String get hilalDuelResultDraw => 'تعادل';
+
+  @override
+  String hilalDuelCorrectCount(int count) {
+    return '$count صحيحة';
+  }
+
+  @override
+  String hilalDuelTotalSeconds(int seconds) {
+    return '$seconds ث';
+  }
+
+  @override
+  String hilalDuelHilalsEarned(int count) {
+    return '+$count هلال';
+  }
+
+  @override
+  String get hilalDuelDoubleReward => 'شاهد إعلاناً لمضاعفة الأهلة';
+
+  @override
+  String get hilalDuelDoubled => 'تم مضاعفة الأهلة';
+
+  @override
+  String get hilalDuelLobby => 'العودة إلى الردهة';
+
+  @override
+  String get hilalDuelRematch => 'العب مجدداً';
+
+  @override
+  String get hilalDuelRetry => 'أعد المحاولة';
+
+  @override
+  String get hilalDuelPremiumUnlimited => 'بريميوم: قلوب غير محدودة';
+
+  @override
+  String get hilalDuelUpgradePremium => 'الترقية إلى بريميوم • لعب بلا حدود';
+
+  @override
+  String get hilalDuelNextLevel => 'المستوى التالي';
+
+  @override
+  String get hilalDuelMaxLevel => 'أقصى مستوى';
+
+  @override
+  String hilalDuelNextRewardFrame(int level) {
+    return 'المكافأة التالية: إطار الصورة (LV $level)';
+  }
+
+  @override
+  String hilalDuelNextRewardTitle(String title, int level) {
+    return 'المكافأة التالية: لقب “$title” (LV $level)';
+  }
+
+  @override
+  String hilalDuelNextRewardHilalIcon(int level) {
+    return 'المكافأة التالية: أيقونة هلال خاصة (LV $level)';
+  }
+
+  @override
+  String get hilalDuelWeeklyTitle => 'أفضل لاعب هذا الأسبوع';
+
+  @override
+  String hilalDuelWeeklyThisWeek(int count) {
+    return 'هذا الأسبوع: $count هلال';
+  }
+
+  @override
+  String hilalDuelWeeklyRank(int rank) {
+    return 'الترتيب: #$rank';
+  }
+
+  @override
+  String get hilalDuelWeeklyRankNone => 'الترتيب: —';
+
+  @override
+  String get hilalDuelWeeklyTapHint => 'عرض الترتيب';
+
+  @override
+  String get hilalDuelWeeklyTopPreview => 'أفضل 3';
+
+  @override
+  String get hilalDuelWeeklyClimbHint =>
+      'أفضل 10 في الدوري الأخضر — العب وتقدّم!';
+
+  @override
+  String get hilalDuelWeeklyEmpty =>
+      'لم يكتسب أحد أهلة هذا الأسبوع بعد. أنهِ أول مباراة!';
+
+  @override
+  String hilalDuelWeeklyYourPlace(int rank, int count) {
+    return 'ترتيبك: #$rank · $count هلال';
+  }
+
+  @override
+  String get hilalDuelTitleTalebe => 'طالب';
+
+  @override
+  String get hilalDuelTitleIlimDostu => 'صديق العلم';
+
+  @override
+  String get hilalDuelYouLabel => 'أنت';
+
+  @override
+  String get hilalDuelOpponentLabel => 'المنافس';
+
+  @override
   String get generalLoading => 'جارٍ التحميل...';
 
   @override
@@ -3091,8 +3285,17 @@ class AppLocalizationsAr extends AppLocalizations {
   String get widgetUnlockZikirTitle => 'أداة المسبحة';
 
   @override
+  String get widgetUnlockAdPreparing => 'جارٍ تجهيز الإعلان…';
+
+  @override
   String get widgetUnlockAdLoadFailed =>
-      'تعذر تحميل الإعلان الآن، يرجى المحاولة مرة أخرى لاحقًا.';
+      'لا يتوفر إعلان مناسب الآن. يرجى المحاولة مرة أخرى بعد بضع ثوانٍ.';
+
+  @override
+  String get widgetUnlockAdRetryButton => 'حاول مجددًا';
+
+  @override
+  String get widgetUnlockAdLaterButton => 'لاحقًا';
 
   @override
   String widgetUnlockSuccessTitle(Object title, int hours) {
@@ -3806,6 +4009,15 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get premiumBenefitAdhan => 'منبه الأذان الثاني مفعل';
+
+  @override
+  String get premiumBenefitPrayerCircle => 'حلقة الدعاء: طلبات غير محدودة';
+
+  @override
+  String get premiumBenefitContest => 'مشاركات مسابقة غير محدودة';
+
+  @override
+  String get premiumBenefitExtras => 'بدون إعلانات في الذكر والبوصلة والترددات';
 
   @override
   String get premiumSignInRequiredNotice =>

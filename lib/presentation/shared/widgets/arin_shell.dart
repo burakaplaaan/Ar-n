@@ -191,9 +191,9 @@ class _ArinShellState extends State<ArinShell> {
     }
     final shellRoot = _isShellSwipeRoot(path);
 
-    // Bildirim/deep-link Dua Halkası'nı nested hub yerine doğrudan GoRouter
-    // rotasıyla açar. Geri, Home'a değil Kıble araç paneline dönmelidir.
-    if (path == AppRoutes.prayerCircle) {
+    // Bildirim/deep-link Dua Halkası / Bilgi Düellosu nested hub yerine
+    // doğrudan GoRouter ile açılabilir. Geri → Kıble paneli.
+    if (path == AppRoutes.prayerCircle || path == AppRoutes.hilalDuel) {
       _lastExitBackPressAt = null;
       context.go(AppRoutes.qibla);
       return;

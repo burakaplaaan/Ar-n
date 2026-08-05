@@ -8,8 +8,10 @@ import 'package:flutter/foundation.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:arin/l10n/app_localizations.dart';
 
 import '../../core/router/app_router.dart';
+import '../../presentation/shared/widgets/arin_permission_dialog.dart';
 import 'prayer_reminder_prefs.dart';
 
 abstract final class PrayerUserNotificationSoundStore {
@@ -66,30 +68,21 @@ abstract final class PrayerUserNotificationSoundStore {
       var perm = await Permission.audio.status;
       if (perm.isDenied) {
         final ctx = rootNavigatorKey.currentContext;
-        if (ctx != null) {
-          final confirmed = await showDialog<bool>(
-            context: ctx,
-            builder: (dialogCtx) => AlertDialog(
-              title: const Text('Medya İzni Gerekli'),
-              content: const Text(
-                'Arın, kendi cihazınızdan özel ezan veya bildirim sesi seçebilmeniz için '
-                'ses dosyalarınıza erişim izni gerektirir. Bu dosyalar sadece uygulama '
-                'içinde bildirim olarak kullanılır.',
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.of(dialogCtx).pop(false),
-                  child: const Text('Şimdi Değil'),
-                ),
-                TextButton(
-                  onPressed: () => Navigator.of(dialogCtx).pop(true),
-                  child: const Text('Devam Et'),
-                ),
-              ],
-            ),
-          );
-          if (confirmed != true) return null;
-        }
+        if (ctx == null || !ctx.mounted) return null;
+        final l10n = AppLocalizations.of(ctx);
+        final confirmed = await showArinPermissionDialog(
+          context: ctx,
+          icon: Icons.audio_file_rounded,
+          title: l10n?.audioPermissionRequiredTitle ?? 'Medya İzni Gerekli',
+          body:
+              l10n?.audioPermissionRequiredBody ??
+              'Arın, kendi cihazınızdan özel ezan veya bildirim sesi '
+                  'seçebilmeniz için ses dosyalarınıza erişim izni gerektirir. '
+                  'Bu dosyalar sadece uygulama içinde bildirim olarak kullanılır.',
+          cancelLabel: l10n?.locationPermissionNotNow ?? 'Şimdi Değil',
+          confirmLabel: l10n?.locationPermissionContinue ?? 'Devam Et',
+        );
+        if (!confirmed) return null;
       }
       await Permission.audio.request();
     }

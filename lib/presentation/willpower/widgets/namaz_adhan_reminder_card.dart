@@ -15,6 +15,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../../core/ads/admob_ids.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_text_styles.dart';
+import '../../../core/constants/product_metric_features.dart';
 import '../../../core/providers/shared_preferences_provider.dart';
 import '../../../data/services/arin_local_notifications_plugin.dart';
 import '../../../data/services/ad_gate_service.dart';
@@ -25,6 +26,7 @@ import '../../../data/services/prayer_notification_scheduler.dart';
 import '../../../data/services/prayer_notification_sounds.dart';
 import '../../../data/services/prayer_reminder_prefs.dart';
 import '../../../data/services/prayer_user_notification_sound_store.dart';
+import '../../../data/services/product_metrics_service.dart';
 import '../../shared/providers/ad_gate_providers.dart';
 import '../../shared/providers/admob_providers.dart';
 import '../../shared/providers/premium_providers.dart';
@@ -194,6 +196,20 @@ class _NamazAdhanReminderCardState
   bool _effectiveEnabled(SharedPreferences prefs) =>
       _enabledOverride ?? PrayerReminderPrefs.isEnabled(prefs);
 
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      final prefs = ref.read(sharedPreferencesProvider);
+      if (_effectiveEnabled(prefs)) {
+        unawaited(
+          ProductMetricsService.featureOpen(ProductMetricFeatures.prayerAlarm),
+        );
+      }
+    });
+  }
+
   Future<void> _turnOff(SharedPreferences prefs) async {
     HapticFeedback.selectionClick();
     await PrayerReminderPrefs.setEnabled(prefs, false);
@@ -255,6 +271,9 @@ class _NamazAdhanReminderCardState
     }
 
     await PrayerReminderPrefs.setEnabled(prefs, true);
+    unawaited(
+      ProductMetricsService.featureOpen(ProductMetricFeatures.prayerAlarm),
+    );
     await _rescheduleNotifications(ref, force: true);
     if (mounted) setState(() => _enabledOverride = null);
   }
@@ -373,6 +392,9 @@ class _NamazAdhanReminderCardState
         .showRewarded(ArinAdUnit.rewardedUnlock);
     if (!rewarded || !mounted) return false;
     await adGate.recordRewardedUnlock(AdGatePlacement.prayerSecondAlarm);
+    unawaited(
+      ProductMetricsService.adWatch(ProductMetricFeatures.prayerAlarm),
+    );
     return true;
   }
 

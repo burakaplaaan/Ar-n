@@ -158,7 +158,9 @@ class _ZikirPhraseConcreteCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     Text(
-                      AppLocalizations.of(context)!.zikirmatikTitle.toUpperCase(),
+                      AppLocalizations.of(
+                        context,
+                      )!.zikirmatikTitle.toUpperCase(),
                       textAlign: TextAlign.center,
                       style: GoogleFonts.outfit(
                         fontSize: 11,
@@ -428,7 +430,9 @@ class _ZikirPhrasePickerPanel extends StatelessWidget {
                             ),
                             size: 26,
                           ),
-                          tooltip: AppLocalizations.of(context)!.zikirmatikCancel,
+                          tooltip: AppLocalizations.of(
+                            context,
+                          )!.zikirmatikCancel,
                         ),
                         0.04,
                         0.24,
@@ -727,6 +731,240 @@ class _ZikirCustomPhraseTile extends StatelessWidget {
                   ),
                 ),
               ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Zikir adı düzenleme: [ZİKİR SEÇ] paneliyle aynı beton yüzey dili.
+class _ZikirEditPhraseDialog extends StatefulWidget {
+  const _ZikirEditPhraseDialog({required this.initialPhrase});
+
+  final String initialPhrase;
+
+  @override
+  State<_ZikirEditPhraseDialog> createState() => _ZikirEditPhraseDialogState();
+}
+
+class _ZikirEditPhraseDialogState extends State<_ZikirEditPhraseDialog> {
+  static const _betonTop = Color(0xFF4A5C66);
+  static const _betonMid = Color(0xFF323D44);
+  static const _betonBot = Color(0xFF1F272C);
+
+  late final TextEditingController _controller;
+  late final FocusNode _focusNode;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = TextEditingController(text: widget.initialPhrase);
+    _focusNode = FocusNode();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _focusNode.requestFocus();
+    });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    _focusNode.dispose();
+    super.dispose();
+  }
+
+  void _pop(_ZikirCustomPhraseAction? action) {
+    if (action == null) {
+      Navigator.of(context).pop();
+      return;
+    }
+    Navigator.of(
+      context,
+    ).pop(_ZikirCustomPhraseResult(action: action, text: _controller.text));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final bottomInset = MediaQuery.viewInsetsOf(context).bottom;
+
+    return Padding(
+      padding: EdgeInsets.only(bottom: bottomInset),
+      child: Center(
+        child: Material(
+          color: Colors.transparent,
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 360),
+            child: Container(
+              margin: const EdgeInsets.symmetric(horizontal: 20),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(28),
+                gradient: const LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [_betonTop, _betonMid, _betonBot],
+                  stops: [0.0, 0.46, 1.0],
+                ),
+                border: Border.all(
+                  color: Colors.white.withValues(alpha: 0.1),
+                  width: 1.15,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.55),
+                    blurRadius: 32,
+                    offset: const Offset(0, 18),
+                    spreadRadius: -8,
+                  ),
+                ],
+              ),
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  maxHeight: MediaQuery.sizeOf(context).height * 0.78,
+                ),
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.fromLTRB(22, 20, 18, 16),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Text(
+                        l10n.zikirmatikEditPhraseTitle,
+                        style: GoogleFonts.outfit(
+                          color: _ZikirmatikColors.labelMuted,
+                          fontSize: 20,
+                          fontWeight: FontWeight.w700,
+                          height: 1.2,
+                          letterSpacing: -0.2,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      TextField(
+                        controller: _controller,
+                        focusNode: _focusNode,
+                        maxLength: 80,
+                        textCapitalization: TextCapitalization.sentences,
+                        style: GoogleFonts.outfit(
+                          color: _ZikirmatikColors.labelMuted,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 15.5,
+                          height: 1.25,
+                        ),
+                        cursorColor: _ZikirmatikColors.lcdBg,
+                        decoration: InputDecoration(
+                          counterStyle: GoogleFonts.outfit(
+                            color: _ZikirmatikColors.labelMuted.withValues(
+                              alpha: 0.55,
+                            ),
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                          ),
+                          filled: true,
+                          fillColor: const Color(
+                            0xFF283238,
+                          ).withValues(alpha: 0.92),
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 14,
+                            vertical: 14,
+                          ),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(14),
+                            borderSide: BorderSide(
+                              color: Colors.white.withValues(alpha: 0.12),
+                            ),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(14),
+                            borderSide: BorderSide(
+                              color: Colors.white.withValues(alpha: 0.12),
+                            ),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(14),
+                            borderSide: BorderSide(
+                              color: _ZikirmatikColors.outer.withValues(
+                                alpha: 0.85,
+                              ),
+                              width: 1.4,
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Align(
+                        alignment: AlignmentDirectional.centerEnd,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            TextButton(
+                              onPressed: () => _pop(null),
+                              style: TextButton.styleFrom(
+                                foregroundColor: _ZikirmatikColors.outer,
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 14,
+                                  vertical: 12,
+                                ),
+                                minimumSize: const Size(64, 44),
+                              ),
+                              child: Text(
+                                l10n.zikirmatikCancel,
+                                style: GoogleFonts.outfit(
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 15,
+                                ),
+                              ),
+                            ),
+                            TextButton(
+                              onPressed: () =>
+                                  _pop(_ZikirCustomPhraseAction.use),
+                              style: TextButton.styleFrom(
+                                foregroundColor: _ZikirmatikColors.outer,
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 14,
+                                  vertical: 12,
+                                ),
+                                minimumSize: const Size(64, 44),
+                              ),
+                              child: Text(
+                                l10n.zikirmatikUse,
+                                style: GoogleFonts.outfit(
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 15,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            FilledButton(
+                              onPressed: () =>
+                                  _pop(_ZikirCustomPhraseAction.saveAndUse),
+                              style: FilledButton.styleFrom(
+                                backgroundColor: _ZikirmatikColors.outer,
+                                foregroundColor: const Color(0xFF1A2424),
+                                elevation: 0,
+                                shadowColor: Colors.transparent,
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 18,
+                                  vertical: 12,
+                                ),
+                                minimumSize: const Size(64, 44),
+                                shape: const StadiumBorder(),
+                              ),
+                              child: Text(
+                                l10n.zikirmatikSaveAndUse,
+                                style: GoogleFonts.outfit(
+                                  fontWeight: FontWeight.w700,
+                                  fontSize: 14.5,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
             ),
           ),
         ),

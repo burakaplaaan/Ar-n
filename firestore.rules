@@ -216,6 +216,43 @@ service cloud.firestore {
       allow read, write: if false;
     }
 
+    // Hilal Düellosu eşleştirme, cevap, profil ve reklam ödülleri yalnız
+    // App Check kullanan Cloud Functions üzerinden işlenir. Doğru cevaplar ve
+    // rakibin henüz açıklanmamış seçimi istemciye doğrudan açılmaz.
+    match /quiz_installations/{docId} {
+      allow read, write: if false;
+    }
+    match /quiz_players/{docId} {
+      allow read, write: if false;
+    }
+    match /quiz_queue/{docId} {
+      allow read, write: if false;
+    }
+    match /quiz_matches/{docId} {
+      allow read, write: if false;
+    }
+    match /quiz_reward_proofs/{docId} {
+      allow read, write: if false;
+    }
+    match /quiz_reward_transactions/{docId} {
+      allow read, write: if false;
+    }
+    match /quiz_rate_limits/{docId} {
+      allow read, write: if false;
+    }
+    match /quiz_heart_charges/{docId} {
+      allow read, write: if false;
+    }
+    match /quiz_weekly/{weekId} {
+      allow read, write: if false;
+      match /entries/{ownerHash} {
+        allow read, write: if false;
+      }
+    }
+    match /quiz_devices/{installationHash} {
+      allow read, write: if false;
+    }
+
     // Genel app_public belgeleri (quotes_bundle, widget_override vb.)
     match /app_public/{docId} {
       allow read: if true;

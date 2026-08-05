@@ -39,11 +39,16 @@ import kotlin.math.roundToInt
  * mevcut namaz/söz/zikir/takip push akışlarına dokunmadan aynı veriler
  * okunabilir.
  *
- * NOT (bilinçli kapsam sınırlaması): Bu ilk sürümde reklam/deneme kilidi
- * (ana ekran widget'larındaki `isWidgetLocked` mantığı) UYGULANMAMIŞTIR.
- * Bildirimler premium/deneme ayrımı olmadan, açık olan her kullanıcıya
- * gösterilir. Reklam kapısı eklenmek istenirse ayrı, kendi başına test
- * edilebilir bir iş olarak ele alınmalıdır.
+ * Reklam/deneme kilidi: ana ekran widget'larıyla (`ArinPrayerWidgetProvider.
+ * isWidgetLocked`) BİREBİR AYNI anahtarları ve 24 saatlik deneme süresini
+ * paylaşır (`arin_widget_gate_*`, `arin_widget_first_use_ms_<kind>`). Fark:
+ * bu bildirimler ana ekran widget'ına bağlı olmadığından, deneme süresi
+ * kullanıcı hiç widget eklememiş olsa bile bildirimin İLK gösterildiği anda
+ * [recordFirstUse] ile başlatılır. 24 saat dolunca bildirim "Açmak için
+ * dokun" durumuna döner; dokunma, mevcut widget kilidi derin bağlantısıyla
+ * (`MainActivity.EXTRA_WIDGET_LOCK`) doğrudan reklam-izle/premium ekranına
+ * (`WidgetUnlockPage`) götürür — aynı reklam turu hem widget'ı hem bu
+ * bildirimi birlikte açar.
  */
 object ArinLockNotifications {
     private const val CHANNEL_ID = "arin_lock_widgets"
@@ -82,6 +87,65 @@ object ArinLockNotifications {
     private const val DEFAULT_QUOTE_TEXT = "İşitirim ve görürüm."
     private const val DEFAULT_QUOTE_SOURCE = "Tâhâ, 46"
 
+    // Ana ekran widget'larıyla (`ArinPrayerWidgetProvider`) paylaşılan reklam/
+    // deneme kapısı anahtarları. Aynı isimler kasıtlı: bir tur reklam hem
+    // widget'ı hem bu bildirimi birlikte açar.
+    private const val KEY_GATE_PREMIUM = "arin_widget_gate_premium"
+    private const val KEY_GATE_GLOBAL_LOCKED = "arin_widget_gate_global_locked"
+    private const val GATE_TRIAL_DURATION_MS = 24L * 60L * 60L * 1000L
+
+    private fun firstUseKey(kind: String) = "arin_widget_first_use_ms_$kind"
+    private fun gateLockedKey(kind: String) = "arin_widget_gate_${kind}_locked"
+    private fun gateUnlockUntilKey(kind: String) = "arin_widget_gate_${kind}_unlock_until_ms"
+
+    /** Bu tür için kilit ekranı bildirimi ilk kez gösterildiğinde deneme
+     * sayacını başlatır. Kullanıcı ana ekran widget'ını hiç eklememiş olsa
+     * bile bağımsız olarak çalışır; anahtar zaten set edilmişse dokunmaz. */
+    private fun recordFirstUse(prefs: SharedPreferences, kind: String) {
+        val key = firstUseKey(kind)
+        if ((prefs.getString(key, null)?.toLongOrNull() ?: 0L) > 0L) return
+        prefs.edit().putString(key, System.currentTimeMillis().toString()).apply()
+    }
+
+    private fun firstUseMs(prefs: SharedPreferences, kind: String): Long =
+        prefs.getString(firstUseKey(kind), null)?.toLongOrNull() ?: 0L
+
+    /** `ArinPrayerWidgetProvider.isWidgetLocked` ile birebir aynı karar
+     * mantığı: premium/global override, sonra aktif reklam turu, sonra 24
+     * saatlik deneme süresi. */
+    private fun isGateLocked(prefs: SharedPreferences, kind: String): Boolean {
+        if (prefs.getString(KEY_GATE_PREMIUM, null) == "1") return false
+        if (prefs.getString(KEY_GATE_GLOBAL_LOCKED, null) == "1") return true
+        val now = System.currentTimeMillis()
+        val unlockUntil = prefs.getString(gateUnlockUntilKey(kind), null)?.toLongOrNull() ?: 0L
+        if (unlockUntil > now) return false
+        if (prefs.getString(gateLockedKey(kind), null) == "1") return true
+        val firstUse = firstUseMs(prefs, kind)
+        if (firstUse <= 0L) return false
+        return now >= firstUse + GATE_TRIAL_DURATION_MS
+    }
+
+    /** Deneme bitişi veya aktif reklam turunun bitişinden hangisi daha
+     * yakınsa o an — bildirim durumunu (kilitli/açık) o ana yeniden
+     * değerlendirmek için bir alarm kurulmalı. Premium'da yenileme gerekmez. */
+    private fun gateRefreshMs(prefs: SharedPreferences, kind: String): Long? {
+        if (prefs.getString(KEY_GATE_PREMIUM, null) == "1") return null
+        val now = System.currentTimeMillis()
+        val firstUse = firstUseMs(prefs, kind)
+        val trialEnd = if (firstUse > 0L) firstUse + GATE_TRIAL_DURATION_MS else 0L
+        val unlockUntil = prefs.getString(gateUnlockUntilKey(kind), null)?.toLongOrNull() ?: 0L
+        return listOf(trialEnd, unlockUntil).filter { it > now }.minOrNull()?.plus(1_000L)
+    }
+
+    private fun kindLabel(kind: String): String = when (kind) {
+        KIND_PRAYER -> "Namaz vakti"
+        KIND_QUOTE -> "Günün sözü"
+        KIND_COMBO -> "Söz + Namaz"
+        KIND_ZIKIR -> "Zikirmatik"
+        KIND_TRACKING -> "Takip"
+        else -> "ARIN"
+    }
+
     fun defaultEnabled(kind: String): Boolean = kind == KIND_PRAYER || kind == KIND_QUOTE
 
     fun isEnabled(prefs: SharedPreferences, kind: String): Boolean {
@@ -116,6 +180,20 @@ object ArinLockNotifications {
             cancelKind(context, kind)
             return
         }
+        // Deneme sayacı, bildirim ilk kez fiilen gösterilebilir hale
+        // geldiğinde başlar (widget eklenmiş olması şart değil).
+        recordFirstUse(prefs, kind)
+        if (isGateLocked(prefs, kind)) {
+            postLockedNotification(context, kind)
+            cancelTick(context, kind)
+            val refreshAt = gateRefreshMs(prefs, kind)
+            if (refreshAt != null) {
+                scheduleExact(context, kind, refreshAt)
+            } else {
+                cancelDeadline(context, kind)
+            }
+            return
+        }
         val nowMs = System.currentTimeMillis()
         val content = buildContent(context, kind, prefs, nowMs)
         if (content == null) {
@@ -124,7 +202,7 @@ object ArinLockNotifications {
             return
         }
         postNotification(context, kind, content)
-        scheduleNext(context, kind, content)
+        scheduleNext(context, kind, content, prefs)
     }
 
     // ─── İçerik modeli ──────────────────────────────────────────────────────
@@ -422,7 +500,29 @@ object ArinLockNotifications {
 
     // ─── Bildirim oluşturma ─────────────────────────────────────────────────
 
-    private fun postNotification(context: Context, kind: String, content: NotifBuild) {
+    /** 24 saatlik deneme (veya reklam turu) dolduğunda gösterilen "dokun ve
+     * aç" durumu. Gerçek içerik yerine geçer; PendingIntent doğrudan reklam
+     * izle/premium ekranına (`WidgetUnlockPage`) yönlendirir. */
+    private fun postLockedNotification(context: Context, kind: String) {
+        val label = kindLabel(kind)
+        val content = NotifBuild(
+            title = "$label bildirimi kilitli",
+            secondary = "",
+            primaryText = "Açmak için dokun",
+            primarySizeSp = 13f,
+            chronometerBaseElapsed = null,
+            nextDeadlineEpochMs = null,
+            useTickFallback = false,
+        )
+        postNotification(context, kind, content, locked = true)
+    }
+
+    private fun postNotification(
+        context: Context,
+        kind: String,
+        content: NotifBuild,
+        locked: Boolean = false,
+    ) {
         val views = RemoteViews(context.packageName, R.layout.arin_lock_notification)
         // Kompakt 2 satırlık tasarım: başlık + meta bilgi tek üst satırda
         // birleşir ("Günün Sözü · Tâhâ, 46"), alt satırda ana değer gösterilir.
@@ -454,6 +554,10 @@ object ArinLockNotifications {
                 Intent.FLAG_ACTIVITY_CLEAR_TOP or
                 Intent.FLAG_ACTIVITY_SINGLE_TOP
             putExtra(MainActivity.EXTRA_WIDGET_KIND, kind)
+            // Ana ekran widget kilidiyle aynı derin bağlantı: Flutter tarafı
+            // (`WidgetLaunchGateListener`) bunu görünce doğrudan reklam-izle/
+            // premium ekranını (`WidgetUnlockPage`) açar.
+            if (locked) putExtra(MainActivity.EXTRA_WIDGET_LOCK, "1")
         }
         val piFlags = PendingIntent.FLAG_UPDATE_CURRENT or
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
@@ -519,14 +623,26 @@ object ArinLockNotifications {
 
     // ─── Zamanlama ──────────────────────────────────────────────────────────
 
-    private fun scheduleNext(context: Context, kind: String, content: NotifBuild) {
+    private fun scheduleNext(
+        context: Context,
+        kind: String,
+        content: NotifBuild,
+        prefs: SharedPreferences,
+    ) {
         if (content.useTickFallback) {
+            // Tick her 60sn'de bir zaten `syncInternal`'ı tekrar çalıştırıp
+            // kilit durumunu yeniden değerlendiriyor; ayrı bir gate alarmı
+            // gerekmez.
             cancelDeadline(context, kind)
             scheduleTick(context, kind)
             return
         }
         cancelTick(context, kind)
-        val at = content.nextDeadlineEpochMs
+        // Deneme/reklam turu, bir sonraki içerik güncellemesinden ÖNCE
+        // dolabilir (örn. namaz vaktine daha saatler varken deneme biter) —
+        // hangisi daha yakınsa o anda yeniden değerlendirme kur.
+        val gateRefresh = gateRefreshMs(prefs, kind)
+        val at = listOfNotNull(content.nextDeadlineEpochMs, gateRefresh).minOrNull()
         if (at != null) {
             scheduleExact(context, kind, at)
         } else {

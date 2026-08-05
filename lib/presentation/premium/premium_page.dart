@@ -11,6 +11,7 @@ import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../core/constants/app_colors.dart';
+import '../../core/constants/app_text_styles.dart';
 import '../../core/router/app_router.dart';
 import '../../data/models/purchase_result.dart' show PurchaseOutcomeX;
 import '../../data/services/purchase_service.dart';
@@ -764,7 +765,7 @@ class _PremiumBenefits extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final textColor = isDark
-        ? Colors.white.withValues(alpha: 0.88)
+        ? Colors.white.withValues(alpha: 0.92)
         : AppColors.textPrimary;
     final l10n = AppLocalizations.of(context)!;
 
@@ -773,14 +774,26 @@ class _PremiumBenefits extends StatelessWidget {
       (Icons.widgets_rounded, l10n.premiumBenefitWidgets),
       (Icons.explore_rounded, l10n.premiumBenefitExplore),
       (Icons.notifications_active_rounded, l10n.premiumBenefitAdhan),
+      (Icons.volunteer_activism_rounded, l10n.premiumBenefitPrayerCircle),
+      (Icons.emoji_events_rounded, l10n.premiumBenefitContest),
+      (Icons.spa_rounded, l10n.premiumBenefitExtras),
     ];
+
+    final labelStyle = AppTextStyles.titleSmall.copyWith(
+      color: textColor,
+      fontSize: 15,
+      fontWeight: FontWeight.w600,
+      height: 1.28,
+      letterSpacing: -0.15,
+    );
 
     return Column(
       children: [
         for (final item in items)
           Padding(
-            padding: const EdgeInsets.only(bottom: 10),
+            padding: const EdgeInsets.only(bottom: 11),
             child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Container(
                   width: 34,
@@ -801,10 +814,7 @@ class _PremiumBenefits extends StatelessWidget {
                 Expanded(
                   child: Text(
                     item.$2,
-                    style: TextStyle(
-                      color: textColor,
-                      fontWeight: FontWeight.w600,
-                    ),
+                    style: labelStyle,
                   ),
                 ),
               ],

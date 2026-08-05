@@ -9,9 +9,11 @@ import 'package:uuid/uuid.dart';
 
 import '../../../core/ads/admob_ids.dart';
 import '../../../core/constants/app_colors.dart';
+import '../../../core/constants/product_metric_features.dart';
 import '../../../core/router/app_router.dart';
 import '../../../core/theme/arin_shell_background.dart';
 import '../../../data/services/admob_service.dart';
+import '../../../data/services/product_metrics_service.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../shared/providers/admob_providers.dart';
 import '../../shared/providers/auth_providers.dart';
@@ -203,6 +205,9 @@ class _PrayerCirclePageState extends ConsumerState<PrayerCirclePage> {
   @override
   void initState() {
     super.initState();
+    unawaited(
+      ProductMetricsService.featureOpen(ProductMetricFeatures.prayerCircle),
+    );
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       final locale = Localizations.localeOf(context).languageCode;
@@ -521,6 +526,9 @@ class _PrayerCirclePageState extends ConsumerState<PrayerCirclePage> {
           }
           return;
         }
+        unawaited(
+          ProductMetricsService.adWatch(ProductMetricFeatures.prayerCircle),
+        );
         await repository.createRequest(
           text: draft.text,
           category: draft.category,

@@ -2430,6 +2430,330 @@ abstract class AppLocalizations {
   /// **'Terapi tonları, ambiyans ve uyku zamanlayıcısı ile sakin bir oturum'**
   String get qiblaHubHealingSubtitle;
 
+  /// No description provided for @qiblaHubHilalDuelTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bilgi Düellosu'**
+  String get qiblaHubHilalDuelTitle;
+
+  /// No description provided for @qiblaHubHilalDuelSubtitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'7 İslami bilgi sorusunda yarış; hilal kazan, seviye atla'**
+  String get qiblaHubHilalDuelSubtitle;
+
+  /// No description provided for @hilalDuelTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bilgi Düellosu'**
+  String get hilalDuelTitle;
+
+  /// No description provided for @hilalDuelLanguageNote.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sorular şu an Türkçe'**
+  String get hilalDuelLanguageNote;
+
+  /// No description provided for @hilalDuelRulesSummary.
+  ///
+  /// In tr, this message translates to:
+  /// **'7 soru • Her soru 20 saniye\nDoğruluk ve hız kazanır. İki taraf cevaplayınca sonraki soru otomatik açılır. Can için reklam izle veya Premium ile sınırsız oyna.'**
+  String get hilalDuelRulesSummary;
+
+  /// No description provided for @hilalDuelLevelLabel.
+  ///
+  /// In tr, this message translates to:
+  /// **'Seviye {level}'**
+  String hilalDuelLevelLabel(int level);
+
+  /// No description provided for @hilalDuelHilalsLabel.
+  ///
+  /// In tr, this message translates to:
+  /// **'{count} hilal'**
+  String hilalDuelHilalsLabel(int count);
+
+  /// No description provided for @hilalDuelHeartsLabel.
+  ///
+  /// In tr, this message translates to:
+  /// **'{count} can'**
+  String hilalDuelHeartsLabel(int count);
+
+  /// No description provided for @hilalDuelPlay.
+  ///
+  /// In tr, this message translates to:
+  /// **'Rakip bul'**
+  String get hilalDuelPlay;
+
+  /// No description provided for @hilalDuelWatchAdForHeart.
+  ///
+  /// In tr, this message translates to:
+  /// **'Reklam izle, 1 can kazan'**
+  String get hilalDuelWatchAdForHeart;
+
+  /// No description provided for @hilalDuelNeedHeartTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Oynamak için 1 can lazım'**
+  String get hilalDuelNeedHeartTitle;
+
+  /// No description provided for @hilalDuelNeedHeartHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kısa bir reklam izle → 1 can kazan, hemen rakip bul'**
+  String get hilalDuelNeedHeartHint;
+
+  /// No description provided for @hilalDuelNeedHeartCta.
+  ///
+  /// In tr, this message translates to:
+  /// **'Reklamı izle'**
+  String get hilalDuelNeedHeartCta;
+
+  /// No description provided for @hilalDuelSearching.
+  ///
+  /// In tr, this message translates to:
+  /// **'Rakip aranıyor…'**
+  String get hilalDuelSearching;
+
+  /// No description provided for @hilalDuelCancelSearch.
+  ///
+  /// In tr, this message translates to:
+  /// **'Aramayı iptal et'**
+  String get hilalDuelCancelSearch;
+
+  /// No description provided for @hilalDuelCancelFailed.
+  ///
+  /// In tr, this message translates to:
+  /// **'İptal tamamlanamadı. Can iadesi için tekrar dene.'**
+  String get hilalDuelCancelFailed;
+
+  /// No description provided for @hilalDuelQuestionProgress.
+  ///
+  /// In tr, this message translates to:
+  /// **'Soru {current}/{total}'**
+  String hilalDuelQuestionProgress(int current, int total);
+
+  /// No description provided for @hilalDuelWaitingOpponent.
+  ///
+  /// In tr, this message translates to:
+  /// **'Rakip cevaplıyor…'**
+  String get hilalDuelWaitingOpponent;
+
+  /// No description provided for @hilalDuelAnsweredBubble.
+  ///
+  /// In tr, this message translates to:
+  /// **'Cevapladı'**
+  String get hilalDuelAnsweredBubble;
+
+  /// No description provided for @hilalDuelRoundCorrect.
+  ///
+  /// In tr, this message translates to:
+  /// **'Doğru'**
+  String get hilalDuelRoundCorrect;
+
+  /// No description provided for @hilalDuelRoundWrong.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yanlış'**
+  String get hilalDuelRoundWrong;
+
+  /// No description provided for @hilalDuelNoAnswer.
+  ///
+  /// In tr, this message translates to:
+  /// **'Cevap yok'**
+  String get hilalDuelNoAnswer;
+
+  /// No description provided for @hilalDuelFastOpponent.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hızlı Rakip'**
+  String get hilalDuelFastOpponent;
+
+  /// No description provided for @hilalDuelResultWin.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kazandın'**
+  String get hilalDuelResultWin;
+
+  /// No description provided for @hilalDuelResultLose.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kaybettin'**
+  String get hilalDuelResultLose;
+
+  /// No description provided for @hilalDuelResultDraw.
+  ///
+  /// In tr, this message translates to:
+  /// **'Berabere'**
+  String get hilalDuelResultDraw;
+
+  /// No description provided for @hilalDuelCorrectCount.
+  ///
+  /// In tr, this message translates to:
+  /// **'{count} doğru'**
+  String hilalDuelCorrectCount(int count);
+
+  /// No description provided for @hilalDuelTotalSeconds.
+  ///
+  /// In tr, this message translates to:
+  /// **'{seconds} sn'**
+  String hilalDuelTotalSeconds(int seconds);
+
+  /// No description provided for @hilalDuelHilalsEarned.
+  ///
+  /// In tr, this message translates to:
+  /// **'+{count} hilal'**
+  String hilalDuelHilalsEarned(int count);
+
+  /// No description provided for @hilalDuelDoubleReward.
+  ///
+  /// In tr, this message translates to:
+  /// **'Reklam izle, hilalleri ikiye katla'**
+  String get hilalDuelDoubleReward;
+
+  /// No description provided for @hilalDuelDoubled.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hilaller ikiye katlandı'**
+  String get hilalDuelDoubled;
+
+  /// No description provided for @hilalDuelLobby.
+  ///
+  /// In tr, this message translates to:
+  /// **'Lobiye dön'**
+  String get hilalDuelLobby;
+
+  /// No description provided for @hilalDuelRematch.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yeniden oyna'**
+  String get hilalDuelRematch;
+
+  /// No description provided for @hilalDuelRetry.
+  ///
+  /// In tr, this message translates to:
+  /// **'Tekrar dene'**
+  String get hilalDuelRetry;
+
+  /// No description provided for @hilalDuelPremiumUnlimited.
+  ///
+  /// In tr, this message translates to:
+  /// **'Premium: sınırsız can'**
+  String get hilalDuelPremiumUnlimited;
+
+  /// No description provided for @hilalDuelUpgradePremium.
+  ///
+  /// In tr, this message translates to:
+  /// **'Premium’a Geç • Sınırsız Oyna'**
+  String get hilalDuelUpgradePremium;
+
+  /// No description provided for @hilalDuelNextLevel.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sonraki seviye'**
+  String get hilalDuelNextLevel;
+
+  /// No description provided for @hilalDuelMaxLevel.
+  ///
+  /// In tr, this message translates to:
+  /// **'Maksimum seviye'**
+  String get hilalDuelMaxLevel;
+
+  /// No description provided for @hilalDuelNextRewardFrame.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sonraki ödül: Avatar çerçevesi (LV {level})'**
+  String hilalDuelNextRewardFrame(int level);
+
+  /// No description provided for @hilalDuelNextRewardTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sonraki ödül: Unvan “{title}” (LV {level})'**
+  String hilalDuelNextRewardTitle(String title, int level);
+
+  /// No description provided for @hilalDuelNextRewardHilalIcon.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sonraki ödül: Özel hilal ikonu (LV {level})'**
+  String hilalDuelNextRewardHilalIcon(int level);
+
+  /// No description provided for @hilalDuelWeeklyTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Haftanın En İyisi'**
+  String get hilalDuelWeeklyTitle;
+
+  /// No description provided for @hilalDuelWeeklyThisWeek.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu hafta: {count} hilal'**
+  String hilalDuelWeeklyThisWeek(int count);
+
+  /// No description provided for @hilalDuelWeeklyRank.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sıra: #{rank}'**
+  String hilalDuelWeeklyRank(int rank);
+
+  /// No description provided for @hilalDuelWeeklyRankNone.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sıra: —'**
+  String get hilalDuelWeeklyRankNone;
+
+  /// No description provided for @hilalDuelWeeklyTapHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sıralamayı gör'**
+  String get hilalDuelWeeklyTapHint;
+
+  /// No description provided for @hilalDuelWeeklyTopPreview.
+  ///
+  /// In tr, this message translates to:
+  /// **'İlk 3'**
+  String get hilalDuelWeeklyTopPreview;
+
+  /// No description provided for @hilalDuelWeeklyClimbHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'İlk 10 yeşil ligde — oyna, yüksel!'**
+  String get hilalDuelWeeklyClimbHint;
+
+  /// No description provided for @hilalDuelWeeklyEmpty.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu hafta henüz kimse hilal kazanmadı. İlk maçı sen bitir!'**
+  String get hilalDuelWeeklyEmpty;
+
+  /// No description provided for @hilalDuelWeeklyYourPlace.
+  ///
+  /// In tr, this message translates to:
+  /// **'Senin sıran: #{rank} · {count} hilal'**
+  String hilalDuelWeeklyYourPlace(int rank, int count);
+
+  /// No description provided for @hilalDuelTitleTalebe.
+  ///
+  /// In tr, this message translates to:
+  /// **'Talebe'**
+  String get hilalDuelTitleTalebe;
+
+  /// No description provided for @hilalDuelTitleIlimDostu.
+  ///
+  /// In tr, this message translates to:
+  /// **'İlim Dostu'**
+  String get hilalDuelTitleIlimDostu;
+
+  /// No description provided for @hilalDuelYouLabel.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sen'**
+  String get hilalDuelYouLabel;
+
+  /// No description provided for @hilalDuelOpponentLabel.
+  ///
+  /// In tr, this message translates to:
+  /// **'Rakip'**
+  String get hilalDuelOpponentLabel;
+
   /// No description provided for @generalLoading.
   ///
   /// In tr, this message translates to:
@@ -5498,11 +5822,29 @@ abstract class AppLocalizations {
   /// **'Zikirmatik Widgetı'**
   String get widgetUnlockZikirTitle;
 
+  /// No description provided for @widgetUnlockAdPreparing.
+  ///
+  /// In tr, this message translates to:
+  /// **'Reklam hazırlanıyor…'**
+  String get widgetUnlockAdPreparing;
+
   /// No description provided for @widgetUnlockAdLoadFailed.
   ///
   /// In tr, this message translates to:
-  /// **'Reklam şu an yüklenemedi, daha sonra tekrar dene.'**
+  /// **'Şu anda uygun bir reklam bulunamadı. Birkaç saniye sonra tekrar deneyebilirsiniz.'**
   String get widgetUnlockAdLoadFailed;
+
+  /// No description provided for @widgetUnlockAdRetryButton.
+  ///
+  /// In tr, this message translates to:
+  /// **'Tekrar dene'**
+  String get widgetUnlockAdRetryButton;
+
+  /// No description provided for @widgetUnlockAdLaterButton.
+  ///
+  /// In tr, this message translates to:
+  /// **'Daha sonra'**
+  String get widgetUnlockAdLaterButton;
 
   /// No description provided for @widgetUnlockSuccessTitle.
   ///
@@ -6715,6 +7057,24 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'2. ezan alarmı açık'**
   String get premiumBenefitAdhan;
+
+  /// No description provided for @premiumBenefitPrayerCircle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Dua Halkası: sınırsız dua isteme'**
+  String get premiumBenefitPrayerCircle;
+
+  /// No description provided for @premiumBenefitContest.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sınırsız yarışma hakkı'**
+  String get premiumBenefitContest;
+
+  /// No description provided for @premiumBenefitExtras.
+  ///
+  /// In tr, this message translates to:
+  /// **'Zikir, pusula ve frekanslarda reklam yok'**
+  String get premiumBenefitExtras;
 
   /// No description provided for @premiumSignInRequiredNotice.
   ///

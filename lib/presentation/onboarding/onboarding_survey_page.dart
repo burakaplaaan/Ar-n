@@ -22,6 +22,7 @@ import '../../data/services/arin_local_notifications_plugin.dart';
 import '../../data/services/fcm_token_service.dart';
 import '../../data/services/local_notification_permission_gate.dart';
 import '../shared/providers/user_profile_providers.dart';
+import '../shared/widgets/arin_permission_dialog.dart';
 
 class OnboardingSurveyPage extends ConsumerStatefulWidget {
   const OnboardingSurveyPage({super.key});
@@ -157,24 +158,15 @@ class _OnboardingSurveyPageState extends ConsumerState<OnboardingSurveyPage>
       // Battery optimization dialog'u (Android'de Samsung/Xiaomi için önemli).
       // Play Store şartı: Sistem popup'ından önce kullanıcıya bilgi ver.
       if (ok) {
-        final confirmed = await showDialog<bool>(
+        final confirmed = await showArinPermissionDialog(
           context: context,
-          builder: (ctx) => AlertDialog(
-            title: Text(l10n.notificationsBatteryRationaleTitle),
-            content: Text(l10n.notificationsBatteryRationaleBody),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(ctx).pop(false),
-                child: Text(l10n.notificationsBatteryRationaleCancel),
-              ),
-              TextButton(
-                onPressed: () => Navigator.of(ctx).pop(true),
-                child: Text(l10n.notificationsBatteryRationaleConfirm),
-              ),
-            ],
-          ),
+          icon: Icons.battery_saver_rounded,
+          title: l10n.notificationsBatteryRationaleTitle,
+          body: l10n.notificationsBatteryRationaleBody,
+          cancelLabel: l10n.notificationsBatteryRationaleCancel,
+          confirmLabel: l10n.notificationsBatteryRationaleConfirm,
         );
-        if (confirmed == true) {
+        if (confirmed) {
           await requestIgnoreBatteryOptimizations();
         }
       }

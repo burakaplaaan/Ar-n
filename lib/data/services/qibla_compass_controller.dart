@@ -22,8 +22,10 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:arin/l10n/app_localizations.dart';
 
 import '../../core/router/app_router.dart';
+import '../../presentation/shared/widgets/arin_permission_dialog.dart';
 import 'location_service.dart';
 
 const _compassChannel = EventChannel('com.arin.arin/rotation_compass');
@@ -216,32 +218,27 @@ class QiblaCompassController {
     if (_disposed) return false;
     if (perm == LocationPermission.denied) {
       final ctx = rootNavigatorKey.currentContext;
-      if (ctx != null) {
-        final confirmed = await showDialog<bool>(
-          context: ctx,
-          builder: (dialogCtx) => AlertDialog(
-            title: const Text('Konum İzni Gerekli'),
-            content: const Text(
-              'Arın, namaz vakitlerini ve kıble yönünü doğru hesaplayabilmek için '
-              'konumunuza erişim izni gerektirir. Konum verileriniz yalnızca bu amaçlar '
-              'için kullanılır ve cihazınızda işlenir.',
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(dialogCtx).pop(false),
-                child: const Text('Şimdi Değil'),
-              ),
-              TextButton(
-                onPressed: () => Navigator.of(dialogCtx).pop(true),
-                child: const Text('Devam Et'),
-              ),
-            ],
-          ),
-        );
-        if (confirmed != true) {
-          _out.addError(Exception('location_permission_denied'));
-          return false;
-        }
+      if (ctx == null || !ctx.mounted) {
+        _out.addError(Exception('location_permission_denied'));
+        return false;
+      }
+      final l10n = AppLocalizations.of(ctx);
+      final confirmed = await showArinPermissionDialog(
+        context: ctx,
+        icon: Icons.explore_rounded,
+        title: l10n?.locationPermissionRequiredTitle ?? 'Konum İzni Gerekli',
+        body:
+            l10n?.locationPermissionRequiredBody ??
+            'Arın, namaz vakitlerini ve kıble yönünü doğru hesaplayabilmek '
+                'için konumunuza erişim izni gerektirir. Konum verileriniz '
+                'yalnızca bu amaçlar için kullanılır ve cihazınızda işlenir.',
+        cancelLabel: l10n?.locationPermissionNotNow ?? 'Şimdi Değil',
+        confirmLabel: l10n?.locationPermissionContinue ?? 'Devam Et',
+      );
+      if (_disposed) return false;
+      if (!confirmed) {
+        _out.addError(Exception('location_permission_denied'));
+        return false;
       }
       perm = await Geolocator.requestPermission();
     }

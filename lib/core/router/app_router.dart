@@ -30,6 +30,7 @@ import '../../presentation/kaza/kaza_calculator_page.dart';
 import '../../presentation/kaza/kaza_tracker_page.dart';
 import '../../presentation/qibla/qibla_hub_page.dart';
 import '../../presentation/qibla/prayer_circle/prayer_circle_page.dart';
+import '../../presentation/qibla/hilal_duel/hilal_duel_page.dart';
 import '../../presentation/settings/admin_content_page.dart';
 import '../../presentation/settings/admin_notifications_page.dart';
 import '../../presentation/settings/admin_performance_page.dart';
@@ -69,6 +70,7 @@ abstract final class AppRoutes {
     path: prayerCircle,
     queryParameters: {'request': requestId},
   ).toString();
+  static const String hilalDuel = '/qibla/hilal-duel';
   static const String habits = '/habits';
 
   /// Irade hub’ında Arınma sekmesini aç (Gelişim’e sıfırlamayı önler).
@@ -322,6 +324,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             ),
           ),
           GoRoute(
+            path: AppRoutes.hilalDuel,
+            pageBuilder: (context, state) =>
+                _page(state, const HilalDuelPage()),
+          ),
+          GoRoute(
             path: AppRoutes.habits,
             pageBuilder: (context, state) =>
                 _page(state, const WillpowerHubPage()),
@@ -446,7 +453,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                       0,
                       deck.cards.length - 1,
                     );
-                    return _page(
+                    return _inspireViewerPage(
                       state,
                       InspireViewerPage(
                         key: ValueKey<String>('inspire_deck_${state.uri}'),
@@ -455,7 +462,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                       ),
                     );
                   }
-                  return _page(
+                  return _inspireViewerPage(
                     state,
                     InspireViewerPage(
                       key: ValueKey<String>('inspire_cat_${state.uri}'),
@@ -494,57 +501,13 @@ final appRouterProvider = Provider<GoRouter>((ref) {
               ),
               GoRoute(
                 path: 'about',
-                pageBuilder: (context, state) => CustomTransitionPage<void>(
-                  key: state.pageKey,
-                  child: const AboutArinPage(),
-                  transitionDuration: const Duration(milliseconds: 340),
-                  reverseTransitionDuration: const Duration(milliseconds: 280),
-                  transitionsBuilder:
-                      (context, animation, secondaryAnimation, child) {
-                        final curved = CurvedAnimation(
-                          parent: animation,
-                          curve: Curves.easeOutCubic,
-                          reverseCurve: Curves.easeInCubic,
-                        );
-                        return FadeTransition(
-                          opacity: curved,
-                          child: SlideTransition(
-                            position: Tween<Offset>(
-                              begin: const Offset(0, 0.035),
-                              end: Offset.zero,
-                            ).animate(curved),
-                            child: child,
-                          ),
-                        );
-                      },
-                ),
+                pageBuilder: (context, state) =>
+                    _page(state, const AboutArinPage()),
               ),
               GoRoute(
                 path: 'widgets',
-                pageBuilder: (context, state) => CustomTransitionPage<void>(
-                  key: state.pageKey,
-                  child: const WidgetCenterPage(),
-                  transitionDuration: const Duration(milliseconds: 320),
-                  reverseTransitionDuration: const Duration(milliseconds: 260),
-                  transitionsBuilder:
-                      (context, animation, secondaryAnimation, child) {
-                        final curved = CurvedAnimation(
-                          parent: animation,
-                          curve: Curves.easeOutCubic,
-                          reverseCurve: Curves.easeInCubic,
-                        );
-                        return FadeTransition(
-                          opacity: curved,
-                          child: SlideTransition(
-                            position: Tween<Offset>(
-                              begin: const Offset(0, 0.03),
-                              end: Offset.zero,
-                            ).animate(curved),
-                            child: child,
-                          ),
-                        );
-                      },
-                ),
+                pageBuilder: (context, state) =>
+                    _page(state, const WidgetCenterPage()),
               ),
               GoRoute(
                 path: 'privacy',
@@ -553,30 +516,8 @@ final appRouterProvider = Provider<GoRouter>((ref) {
               ),
               GoRoute(
                 path: 'notifications',
-                pageBuilder: (context, state) => CustomTransitionPage<void>(
-                  key: state.pageKey,
-                  child: const NotificationsSettingsPage(),
-                  transitionDuration: const Duration(milliseconds: 320),
-                  reverseTransitionDuration: const Duration(milliseconds: 260),
-                  transitionsBuilder:
-                      (context, animation, secondaryAnimation, child) {
-                        final curved = CurvedAnimation(
-                          parent: animation,
-                          curve: Curves.easeOutCubic,
-                          reverseCurve: Curves.easeInCubic,
-                        );
-                        return FadeTransition(
-                          opacity: curved,
-                          child: SlideTransition(
-                            position: Tween<Offset>(
-                              begin: const Offset(0, 0.03),
-                              end: Offset.zero,
-                            ).animate(curved),
-                            child: child,
-                          ),
-                        );
-                      },
-                ),
+                pageBuilder: (context, state) =>
+                    _page(state, const NotificationsSettingsPage()),
                 routes: [
                   GoRoute(
                     path: 'vakit',
@@ -611,6 +552,26 @@ final appRouterProvider = Provider<GoRouter>((ref) {
 
 MaterialPage<void> _page(GoRouterState state, Widget child) =>
     MaterialPage<void>(key: state.pageKey, child: child);
+
+CustomTransitionPage<void> _inspireViewerPage(
+  GoRouterState state,
+  Widget child,
+) => CustomTransitionPage<void>(
+  key: state.pageKey,
+  opaque: false,
+  barrierColor: Colors.transparent,
+  transitionDuration: const Duration(milliseconds: 220),
+  reverseTransitionDuration: const Duration(milliseconds: 160),
+  transitionsBuilder: (context, animation, secondaryAnimation, child) {
+    final eased = CurvedAnimation(
+      parent: animation,
+      curve: Curves.easeOutCubic,
+      reverseCurve: Curves.easeInCubic,
+    );
+    return FadeTransition(opacity: eased, child: child);
+  },
+  child: child,
+);
 
 /// Bilinmeyen bir rota ile karşılaşıldığında (genellikle widget tıklaması
 /// nedeniyle home_widget URI'si GoRouter'a ulaştığında) kullanıcıyı sessizce

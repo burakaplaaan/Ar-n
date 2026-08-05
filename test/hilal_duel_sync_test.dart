@@ -1,0 +1,167 @@
+import 'package:arin/presentation/qibla/hilal_duel/hilal_duel_repository.dart';
+import 'package:arin/presentation/qibla/hilal_duel/hilal_duel_sync.dart';
+import 'package:flutter_test/flutter_test.dart';
+
+HilalDuelMatch _match({
+  required String id,
+  required int version,
+  bool selfAnswered = false,
+}) {
+  return HilalDuelMatch(
+    id: id,
+    status: 'playing',
+    version: version,
+    currentRound: 0,
+    totalRounds: 7,
+    roundStartedAtMs: 1,
+    deadlineMs: 2,
+    selfAnswered: selfAnswered,
+    opponentAnswered: false,
+    self: const HilalDuelPlayer(
+      id: 'a',
+      name: 'A',
+      hilals: 0,
+      level: 1,
+      isBot: false,
+    ),
+    opponent: const HilalDuelPlayer(
+      id: 'b',
+      name: 'B',
+      hilals: 0,
+      level: 1,
+      isBot: true,
+    ),
+  );
+}
+
+void main() {
+  group('selectFresherMatch', () {
+    test('eski version yeni submit sonucunu ezmez', () {
+      final current = _match(id: 'm1', version: 5, selfAnswered: true);
+      final stale = _match(id: 'm1', version: 4, selfAnswered: false);
+      final selected = selectFresherMatch(current, stale);
+      expect(selected, same(current));
+      expect(selected!.selfAnswered, isTrue);
+      expect(selected.version, 5);
+    });
+
+    test('daha yeni version kabul edilir', () {
+      final current = _match(id: 'm1', version: 2);
+      final newer = _match(id: 'm1', version: 3, selfAnswered: true);
+      final selected = selectFresherMatch(current, newer);
+      expect(selected!.version, 3);
+      expect(selected.selfAnswered, isTrue);
+    });
+
+    test('farklı maç id tamamen değiştirir', () {
+      final current = _match(id: 'm1', version: 9);
+      final other = _match(id: 'm2', version: 1);
+      expect(selectFresherMatch(current, other)!.id, 'm2');
+    });
+  });
+
+  group('decideCancelOutcome', () {
+    test('matched iptal yanıtında maça girer', () {
+      expect(
+        decideCancelOutcome(status: 'matched', matchId: 'abc'),
+        HilalDuelCancelDecision.enterMatch,
+      );
+    });
+
+    test('idle/waiting iptalde lobiye döner', () {
+      expect(
+        decideCancelOutcome(status: 'idle', matchId: null),
+        HilalDuelCancelDecision.goLobby,
+      );
+      expect(
+        decideCancelOutcome(status: 'matched', matchId: null),
+        HilalDuelCancelDecision.goLobby,
+      );
+    });
+  });
+
+  group('queue arms / leave state machine', () {
+    test('start in-flight leave requires cancel', () {
+      final armed = armBeforeStartRpc(const HilalDuelQueueArms());
+      expect(armed.startInFlight, isTrue);
+      expect(armed.queueMayExist, isTrue);
+      expect(armed.requiresCancelBeforeLeave, isTrue);
+      expect(armed.shouldBestEffortCancelOnDispose, isTrue);
+      expect(decideLeaveAction(armed), HilalDuelLeaveAction.requireCancel);
+    });
+
+    test('cancel failure retains queue armed and blocks pop', () {
+      var arms = armBeforeStartRpc(const HilalDuelQueueArms());
+      arms = afterStartWaiting(arms);
+      arms = afterCancelRequested(arms);
+      arms = afterCancelFailure(arms);
+      expect(arms.cancelPending, isTrue);
+      expect(arms.queueMayExist, isTrue);
+      expect(arms.startInFlight, isFalse);
+      expect(decideLeaveAction(arms), HilalDuelLeaveAction.requireCancel);
+      expect(
+        settleLeaveAfterCancel(
+          decision: HilalDuelCancelDecision.goLobby,
+          cancelSucceeded: false,
+        ),
+        HilalDuelLeaveSettle.blockedRetry,
+      );
+    });
+
+    test('matched cancel outcome settles as enter match', () {
+      expect(
+        settleLeaveAfterCancel(
+          decision: HilalDuelCancelDecision.enterMatch,
+          cancelSucceeded: true,
+        ),
+        HilalDuelLeaveSettle.enteredMatch,
+      );
+      final disarmed = afterEnteredMatch(
+        afterCancelRequested(afterStartWaiting(const HilalDuelQueueArms())),
+      );
+      expect(disarmed.requiresCancelBeforeLeave, isFalse);
+      expect(decideLeaveAction(disarmed), HilalDuelLeaveAction.allowPop);
+    });
+
+    test('exact queue-disarm transitions', () {
+      expect(
+        afterQueueConfirmedAbsent(
+          armBeforeStartRpc(const HilalDuelQueueArms()),
+        ).requiresCancelBeforeLeave,
+        isFalse,
+      );
+      expect(
+        afterCancelIdleSuccess(
+          afterCancelFailure(
+            afterCancelRequested(afterStartWaiting(const HilalDuelQueueArms())),
+          ),
+        ).requiresCancelBeforeLeave,
+        isFalse,
+      );
+      expect(
+        afterEnteredMatch(
+          armBeforeStartRpc(const HilalDuelQueueArms()),
+        ).requiresCancelBeforeLeave,
+        isFalse,
+      );
+      // idle cancel success → pop allowed
+      expect(
+        settleLeaveAfterCancel(
+          decision: HilalDuelCancelDecision.goLobby,
+          cancelSucceeded: true,
+        ),
+        HilalDuelLeaveSettle.poppedToLobby,
+      );
+      // lobby (disarmed) leave → allowPop
+      expect(
+        decideLeaveAction(const HilalDuelQueueArms()),
+        HilalDuelLeaveAction.allowPop,
+      );
+    });
+
+    test('cancelMayIssueRpc blocks while start pending', () {
+      expect(cancelMayIssueRpc(startFuturePending: true), isFalse);
+      expect(cancelMayIssueRpc(startFuturePending: false), isTrue);
+    });
+  });
+}

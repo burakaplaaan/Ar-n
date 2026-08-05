@@ -662,6 +662,128 @@
   "qiblaHubBreathingSubtitle": "4-7-8 nefes döngüsü ile sakinleş, odağını toparla",
   "qiblaHubHealingTitle": "İyileştirici Frekanslar",
   "qiblaHubHealingSubtitle": "Terapi tonları, ambiyans ve uyku zamanlayıcısı ile sakin bir oturum",
+  "qiblaHubHilalDuelTitle": "Bilgi Düellosu",
+  "qiblaHubHilalDuelSubtitle": "7 İslami bilgi sorusunda yarış; hilal kazan, seviye atla",
+  "hilalDuelTitle": "Bilgi Düellosu",
+  "hilalDuelLanguageNote": "Sorular şu an Türkçe",
+  "hilalDuelRulesSummary": "7 soru • Her soru 20 saniye\nDoğruluk ve hız kazanır. İki taraf cevaplayınca sonraki soru otomatik açılır. Can için reklam izle veya Premium ile sınırsız oyna.",
+  "hilalDuelLevelLabel": "Seviye {level}",
+  "@hilalDuelLevelLabel": {
+    "placeholders": {
+      "level": {"type": "int"}
+    }
+  },
+  "hilalDuelHilalsLabel": "{count} hilal",
+  "@hilalDuelHilalsLabel": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "hilalDuelHeartsLabel": "{count} can",
+  "@hilalDuelHeartsLabel": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "hilalDuelPlay": "Rakip bul",
+  "hilalDuelWatchAdForHeart": "Reklam izle, 1 can kazan",
+  "hilalDuelNeedHeartTitle": "Oynamak için 1 can lazım",
+  "hilalDuelNeedHeartHint": "Kısa bir reklam izle → 1 can kazan, hemen rakip bul",
+  "hilalDuelNeedHeartCta": "Reklamı izle",
+  "hilalDuelSearching": "Rakip aranıyor…",
+  "hilalDuelCancelSearch": "Aramayı iptal et",
+  "hilalDuelCancelFailed": "İptal tamamlanamadı. Can iadesi için tekrar dene.",
+  "hilalDuelQuestionProgress": "Soru {current}/{total}",
+  "@hilalDuelQuestionProgress": {
+    "placeholders": {
+      "current": {"type": "int"},
+      "total": {"type": "int"}
+    }
+  },
+  "hilalDuelWaitingOpponent": "Rakip cevaplıyor…",
+  "hilalDuelAnsweredBubble": "Cevapladı",
+  "hilalDuelRoundCorrect": "Doğru",
+  "hilalDuelRoundWrong": "Yanlış",
+  "hilalDuelNoAnswer": "Cevap yok",
+  "hilalDuelFastOpponent": "Hızlı Rakip",
+  "hilalDuelResultWin": "Kazandın",
+  "hilalDuelResultLose": "Kaybettin",
+  "hilalDuelResultDraw": "Berabere",
+  "hilalDuelCorrectCount": "{count} doğru",
+  "@hilalDuelCorrectCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "hilalDuelTotalSeconds": "{seconds} sn",
+  "@hilalDuelTotalSeconds": {
+    "placeholders": {
+      "seconds": {"type": "int"}
+    }
+  },
+  "hilalDuelHilalsEarned": "+{count} hilal",
+  "@hilalDuelHilalsEarned": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "hilalDuelDoubleReward": "Reklam izle, hilalleri ikiye katla",
+  "hilalDuelDoubled": "Hilaller ikiye katlandı",
+  "hilalDuelLobby": "Lobiye dön",
+  "hilalDuelRematch": "Yeniden oyna",
+  "hilalDuelRetry": "Tekrar dene",
+  "hilalDuelPremiumUnlimited": "Premium: sınırsız can",
+  "hilalDuelUpgradePremium": "Premium’a Geç • Sınırsız Oyna",
+  "hilalDuelNextLevel": "Sonraki seviye",
+  "hilalDuelMaxLevel": "Maksimum seviye",
+  "hilalDuelNextRewardFrame": "Sonraki ödül: Avatar çerçevesi (LV {level})",
+  "@hilalDuelNextRewardFrame": {
+    "placeholders": {
+      "level": {"type": "int"}
+    }
+  },
+  "hilalDuelNextRewardTitle": "Sonraki ödül: Unvan “{title}” (LV {level})",
+  "@hilalDuelNextRewardTitle": {
+    "placeholders": {
+      "title": {"type": "String"},
+      "level": {"type": "int"}
+    }
+  },
+  "hilalDuelNextRewardHilalIcon": "Sonraki ödül: Özel hilal ikonu (LV {level})",
+  "@hilalDuelNextRewardHilalIcon": {
+    "placeholders": {
+      "level": {"type": "int"}
+    }
+  },
+  "hilalDuelWeeklyTitle": "Haftanın En İyisi",
+  "hilalDuelWeeklyThisWeek": "Bu hafta: {count} hilal",
+  "@hilalDuelWeeklyThisWeek": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "hilalDuelWeeklyRank": "Sıra: #{rank}",
+  "@hilalDuelWeeklyRank": {
+    "placeholders": {
+      "rank": {"type": "int"}
+    }
+  },
+  "hilalDuelWeeklyRankNone": "Sıra: —",
+  "hilalDuelWeeklyTapHint": "Sıralamayı gör",
+  "hilalDuelWeeklyTopPreview": "İlk 3",
+  "hilalDuelWeeklyClimbHint": "İlk 10 yeşil ligde — oyna, yüksel!",
+  "hilalDuelWeeklyEmpty": "Bu hafta henüz kimse hilal kazanmadı. İlk maçı sen bitir!",
+  "hilalDuelWeeklyYourPlace": "Senin sıran: #{rank} · {count} hilal",
+  "@hilalDuelWeeklyYourPlace": {
+    "placeholders": {
+      "rank": {"type": "int"},
+      "count": {"type": "int"}
+    }
+  },
+  "hilalDuelTitleTalebe": "Talebe",
+  "hilalDuelTitleIlimDostu": "İlim Dostu",
+  "hilalDuelYouLabel": "Sen",
+  "hilalDuelOpponentLabel": "Rakip",
   "generalLoading": "Yükleniyor...",
   "settingsPrivacyPageTitle": "Gizlilik Politikası",
   "settingsPrivacyLastUpdated": "Son güncelleme: 26.04.2026",
@@ -1465,7 +1587,10 @@
   "widgetUnlockComboTitle": "Söz + Namaz Widgetı",
   "widgetUnlockTrackingTitle": "Takip Widgetı",
   "widgetUnlockZikirTitle": "Zikirmatik Widgetı",
-  "widgetUnlockAdLoadFailed": "Reklam şu an yüklenemedi, daha sonra tekrar dene.",
+  "widgetUnlockAdPreparing": "Reklam hazırlanıyor…",
+  "widgetUnlockAdLoadFailed": "Şu anda uygun bir reklam bulunamadı. Birkaç saniye sonra tekrar deneyebilirsiniz.",
+  "widgetUnlockAdRetryButton": "Tekrar dene",
+  "widgetUnlockAdLaterButton": "Daha sonra",
   "widgetUnlockSuccessTitle": "{hours, plural, =1{{title} 1 saat açıldı! 🎉} other{{title} {hours} saat açıldı! 🎉}}",
   "@widgetUnlockSuccessTitle": {
     "placeholders": {
@@ -1687,6 +1812,9 @@
   "premiumBenefitWidgets": "Widget kilidi yok",
   "premiumBenefitExplore": "Keşfet akışı kesintisiz",
   "premiumBenefitAdhan": "2. ezan alarmı açık",
+  "premiumBenefitPrayerCircle": "Dua Halkası: sınırsız dua isteme",
+  "premiumBenefitContest": "Sınırsız yarışma hakkı",
+  "premiumBenefitExtras": "Zikir, pusula ve frekanslarda reklam yok",
   "premiumSignInRequiredNotice": "Satın alma için giriş zorunlu değil. Premiumu bu cihazda hemen kullanabilirsin; istersen sonrasında hesabını bağlayıp diğer cihazlarda da erişebilirsin.",
   "premiumSignInSheetTitle": "Premium için hesabını bağla",
   "premiumSignInSheetSubtitle": "Hesabını bağlarsan premiumun diğer cihazlarında da daha kolay geri yüklenir. Satın alma için giriş zorunlu değildir.",

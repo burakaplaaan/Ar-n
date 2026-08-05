@@ -5,6 +5,7 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:file_picker/file_picker.dart';
@@ -129,10 +130,19 @@ class _AdminContentPageState extends ConsumerState<AdminContentPage>
   String? _auditError;
   List<_AdminAuditRow> _auditRows = const [];
 
+  static const String _kFunctionsRegion = 'europe-west1';
+  final TextEditingController _quizOwnerHashController =
+      TextEditingController();
+  final TextEditingController _quizHeartsAmountController =
+      TextEditingController(text: '1');
+  bool _quizHeartsGrantAllBusy = false;
+  bool _quizHeartsGrantOneBusy = false;
+  String? _quizHeartsLastResult;
+
   @override
   void initState() {
     super.initState();
-    _tabs = TabController(length: 8, vsync: this);
+    _tabs = TabController(length: 9, vsync: this);
     _tabs.addListener(_onTabChanged);
   }
 
@@ -162,7 +172,7 @@ class _AdminContentPageState extends ConsumerState<AdminContentPage>
         _premiumInvites.isEmpty) {
       _loadPremiumGrants();
     }
-    if (_tabs.index == 7 && !_auditLoading && !_auditLoaded) {
+    if (_tabs.index == 8 && !_auditLoading && !_auditLoaded) {
       _loadAuditRows();
     }
   }
@@ -180,6 +190,8 @@ class _AdminContentPageState extends ConsumerState<AdminContentPage>
     _widgetOverrideHoursController.dispose();
     _globalLockNoteController.dispose();
     _widgetUnlockHoursController.dispose();
+    _quizOwnerHashController.dispose();
+    _quizHeartsAmountController.dispose();
     super.dispose();
   }
 
@@ -2525,6 +2537,10 @@ class _AdminContentPageState extends ConsumerState<AdminContentPage>
               icon: Icon(Icons.workspace_premium_outlined),
               text: 'Premium',
             ),
+            const Tab(
+              icon: Icon(Icons.favorite_outline_rounded),
+              text: 'Düello',
+            ),
             const Tab(icon: Icon(Icons.history_rounded), text: 'Geçmiş'),
           ],
         ),
@@ -2546,6 +2562,7 @@ class _AdminContentPageState extends ConsumerState<AdminContentPage>
                 _buildDeveloperToolsTab(role),
                 _buildAdminGrantsTab(role),
                 _buildPremiumGrantsTab(role),
+                _buildQuizHeartsTab(role),
                 _buildAuditTab(role),
               ],
             ),
@@ -2986,6 +3003,275 @@ class _AdminContentPageState extends ConsumerState<AdminContentPage>
               ),
             ),
           ),
+      ],
+    );
+  }
+
+  Future<void> _grantQuizHeartsAll() async {
+    if (_quizHeartsGrantAllBusy) return;
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Herkese +1 can'),
+        content: const Text(
+          'Tüm Bilgi Düellosu oyuncularına +1 can yazılır ve herkese '
+          '“can verildi / bilginle herkesi yen” bildirimi gönderilir.\n\n'
+          'Bildirime tıklanınca düello açılır. Emin misin?',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: Text(l10n.commonCancel),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('Gönder'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !mounted) return;
+
+    setState(() {
+      _quizHeartsGrantAllBusy = true;
+      _quizHeartsLastResult = null;
+    });
+    try {
+      // Sunucu timeout 300s; varsayılan ~60s client timeout çift-can riski yaratır.
+      final callable = FirebaseFunctions.instanceFor(region: _kFunctionsRegion)
+          .httpsCallable(
+            'adminGrantQuizHeartsAll',
+            options: HttpsCallableOptions(
+              timeout: const Duration(seconds: 300),
+            ),
+          );
+      final res = await callable.call<Map<String, dynamic>>(
+        <String, dynamic>{},
+      );
+      final data = res.data;
+      final updated = data['updated'];
+      final fcmOk = data['fcmOk'] != false;
+      final title = data['title']?.toString() ?? '';
+      final body = data['body']?.toString() ?? '';
+      if (!mounted) return;
+      if (fcmOk) {
+        setState(() {
+          _quizHeartsLastResult =
+              'Herkese +1 can: $updated oyuncu. Bildirim: "$title — $body"';
+        });
+        _snack(
+          'Herkese +1 can verildi ($updated oyuncu) ve bildirim gönderildi.',
+        );
+      } else {
+        setState(() {
+          _quizHeartsLastResult =
+              'Canlar yazıldı ($updated oyuncu) ama bildirim düşmedi. '
+              'Tekrar basma — canlar zaten verildi. Bildirimi ayrı kontrol et.';
+        });
+        _snack(
+          'Canlar yazıldı ($updated); bildirim gönderilemedi. Tekrar BASMA.',
+        );
+      }
+    } on FirebaseFunctionsException catch (e) {
+      _snack('Hata (${e.code}): ${e.message ?? e.code}');
+    } catch (e) {
+      _snack(_friendlyAdminError(e, fallback: 'Can dağıtımı başarısız.'));
+    } finally {
+      if (mounted) setState(() => _quizHeartsGrantAllBusy = false);
+    }
+  }
+
+  Future<void> _grantQuizHeartsOne() async {
+    if (_quizHeartsGrantOneBusy) return;
+    final ownerHash = _quizOwnerHashController.text.trim().toLowerCase();
+    final amount = int.tryParse(_quizHeartsAmountController.text.trim()) ?? 0;
+    final hexOk = RegExp(r'^[a-f0-9]{64}$').hasMatch(ownerHash);
+    if (!hexOk) {
+      _snack('ownerHash 64 karakter hex olmalı (installId SHA-256).');
+      return;
+    }
+    if (amount < 1 || amount > 20) {
+      _snack('Can sayısı 1–20 arasında olmalı.');
+      return;
+    }
+
+    setState(() {
+      _quizHeartsGrantOneBusy = true;
+      _quizHeartsLastResult = null;
+    });
+    try {
+      final callable = FirebaseFunctions.instanceFor(region: _kFunctionsRegion)
+          .httpsCallable('adminGrantQuizHeartsOne');
+      final res = await callable.call<Map<String, dynamic>>(<String, dynamic>{
+        'ownerHash': ownerHash,
+        'amount': amount,
+      });
+      final data = res.data;
+      if (!mounted) return;
+      setState(() {
+        _quizHeartsLastResult =
+            'Tekil can: ${data['amount']} → ${ownerHash.substring(0, 8)}… '
+            '(${data['beforeHearts']} → ${data['afterHearts']}'
+            '${data['existed'] == true ? '' : ', yeni kayıt'})';
+      });
+      _snack(
+        '+$amount can verildi '
+        '(${data['beforeHearts']} → ${data['afterHearts']}).',
+      );
+    } on FirebaseFunctionsException catch (e) {
+      _snack('Hata (${e.code}): ${e.message ?? e.code}');
+    } catch (e) {
+      _snack(_friendlyAdminError(e, fallback: 'Tekil can verilemedi.'));
+    } finally {
+      if (mounted) setState(() => _quizHeartsGrantOneBusy = false);
+    }
+  }
+
+  Widget _buildQuizHeartsTab(AdminRole role) {
+    if (!role.canManageAdmins) {
+      return _buildAccessDenied(
+        icon: Icons.favorite_outline_rounded,
+        title: 'Düello can yönetimi tam yetki ister',
+        subtitle:
+            'Can dağıtımı ve yayın bildirimi yalnızca developer rolünde açık.',
+      );
+    }
+    final bottomInset = _shellBodyBottomInset(context);
+    final busy = _quizHeartsGrantAllBusy || _quizHeartsGrantOneBusy;
+    return ListView(
+      padding: EdgeInsets.fromLTRB(16, 16, 16, bottomInset + 16),
+      children: [
+        Text(
+          'Bilgi Düellosu canları. Herkese +1 yazınca broadcast bildirimi de '
+          'gider; tıklanınca düello açılır.',
+          style: TextStyle(color: Colors.white.withValues(alpha: 0.72)),
+        ),
+        const SizedBox(height: 16),
+        Card(
+          color: const Color(0xFF0F2419),
+          child: Padding(
+            padding: const EdgeInsets.all(14),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Herkese +1 can + bildirim',
+                  style: TextStyle(
+                    color: Colors.white.withValues(alpha: 0.92),
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Metin: “Herkese 1 can verildi! Şimdi bilginle herkesi yen — '
+                  'düelloya gir.”',
+                  style: TextStyle(
+                    color: Colors.white.withValues(alpha: 0.7),
+                    fontSize: 12,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                FilledButton.icon(
+                  onPressed: busy ? null : _grantQuizHeartsAll,
+                  icon: _quizHeartsGrantAllBusy
+                      ? const SizedBox(
+                          width: 16,
+                          height: 16,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : const Icon(Icons.campaign_rounded),
+                  label: Text(
+                    _quizHeartsGrantAllBusy
+                        ? 'Gönderiliyor…'
+                        : 'Herkese +1 can ve bildir',
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        const SizedBox(height: 16),
+        Card(
+          color: const Color(0xFF0F2419),
+          child: Padding(
+            padding: const EdgeInsets.all(14),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Belirli oyuncuya can',
+                  style: TextStyle(
+                    color: Colors.white.withValues(alpha: 0.92),
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'ownerHash = installId SHA-256 (quiz_players doküman id). '
+                  'Bildirim gitmez; sadece can artar.',
+                  style: TextStyle(
+                    color: Colors.white.withValues(alpha: 0.7),
+                    fontSize: 12,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: _quizOwnerHashController,
+                  enabled: !busy,
+                  style: const TextStyle(color: Colors.white),
+                  decoration: InputDecoration(
+                    labelText: 'ownerHash',
+                    labelStyle: TextStyle(
+                      color: Colors.white.withValues(alpha: 0.7),
+                    ),
+                    hintText: '64 karakter hex',
+                    hintStyle: TextStyle(
+                      color: Colors.white.withValues(alpha: 0.35),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 10),
+                TextField(
+                  controller: _quizHeartsAmountController,
+                  enabled: !busy,
+                  keyboardType: TextInputType.number,
+                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                  style: const TextStyle(color: Colors.white),
+                  decoration: InputDecoration(
+                    labelText: 'Can (1–20)',
+                    labelStyle: TextStyle(
+                      color: Colors.white.withValues(alpha: 0.7),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                OutlinedButton.icon(
+                  onPressed: busy ? null : _grantQuizHeartsOne,
+                  icon: _quizHeartsGrantOneBusy
+                      ? const SizedBox(
+                          width: 16,
+                          height: 16,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : const Icon(Icons.favorite_rounded),
+                  label: Text(
+                    _quizHeartsGrantOneBusy ? 'Yazılıyor…' : 'Bu oyuncuya can ver',
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        if (_quizHeartsLastResult != null) ...[
+          const SizedBox(height: 16),
+          Text(
+            _quizHeartsLastResult!,
+            style: TextStyle(
+              color: AppColors.accentNeonGreen.withValues(alpha: 0.9),
+              fontSize: 13,
+            ),
+          ),
+        ],
       ],
     );
   }

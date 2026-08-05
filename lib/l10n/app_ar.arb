@@ -662,6 +662,128 @@
   "qiblaHubBreathingSubtitle": "اهدأ واستعد تركيزك عبر دورة التنفس 4-7-8",
   "qiblaHubHealingTitle": "ترددات الشفاء",
   "qiblaHubHealingSubtitle": "جلسة هادئة مع نغمات علاجية، أجواء صوتية، ومؤقت نوم",
+  "qiblaHubHilalDuelTitle": "مبارزة المعرفة",
+  "qiblaHubHilalDuelSubtitle": "تنافس في 7 أسئلة إسلامية، واجمع الأهلة وتقدّم بالمستوى",
+  "hilalDuelTitle": "مبارزة المعرفة",
+  "hilalDuelLanguageNote": "الأسئلة حالياً بالتركية",
+  "hilalDuelRulesSummary": "7 أسئلة • 20 ثانية لكل سؤال\nالدقة والسرعة تحسمان الفوز. يفتح السؤال التالي فور إجابة الطرفين. شاهد إعلانًا لقلب أو العب بلا حدود مع بريميوم.",
+  "hilalDuelLevelLabel": "المستوى {level}",
+  "@hilalDuelLevelLabel": {
+    "placeholders": {
+      "level": {"type": "int"}
+    }
+  },
+  "hilalDuelHilalsLabel": "{count} هلال",
+  "@hilalDuelHilalsLabel": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "hilalDuelHeartsLabel": "{count} قلب",
+  "@hilalDuelHeartsLabel": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "hilalDuelPlay": "ابحث عن منافس",
+  "hilalDuelWatchAdForHeart": "شاهد إعلاناً لتحصل على قلب واحد",
+  "hilalDuelNeedHeartTitle": "تحتاج قلباً واحداً للعب",
+  "hilalDuelNeedHeartHint": "شاهد إعلاناً قصيراً ← احصل على قلب واحد والعب فوراً",
+  "hilalDuelNeedHeartCta": "شاهد الإعلان",
+  "hilalDuelSearching": "جارٍ البحث عن منافس…",
+  "hilalDuelCancelSearch": "إلغاء البحث",
+  "hilalDuelCancelFailed": "تعذّر الإلغاء. أعد المحاولة لاسترداد القلب.",
+  "hilalDuelQuestionProgress": "سؤال {current}/{total}",
+  "@hilalDuelQuestionProgress": {
+    "placeholders": {
+      "current": {"type": "int"},
+      "total": {"type": "int"}
+    }
+  },
+  "hilalDuelWaitingOpponent": "المنافس يجيب…",
+  "hilalDuelAnsweredBubble": "أجاب",
+  "hilalDuelRoundCorrect": "صحيح",
+  "hilalDuelRoundWrong": "خطأ",
+  "hilalDuelNoAnswer": "بلا إجابة",
+  "hilalDuelFastOpponent": "منافس سريع",
+  "hilalDuelResultWin": "لقد فزت",
+  "hilalDuelResultLose": "لقد خسرت",
+  "hilalDuelResultDraw": "تعادل",
+  "hilalDuelCorrectCount": "{count} صحيحة",
+  "@hilalDuelCorrectCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "hilalDuelTotalSeconds": "{seconds} ث",
+  "@hilalDuelTotalSeconds": {
+    "placeholders": {
+      "seconds": {"type": "int"}
+    }
+  },
+  "hilalDuelHilalsEarned": "+{count} هلال",
+  "@hilalDuelHilalsEarned": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "hilalDuelDoubleReward": "شاهد إعلاناً لمضاعفة الأهلة",
+  "hilalDuelDoubled": "تم مضاعفة الأهلة",
+  "hilalDuelLobby": "العودة إلى الردهة",
+  "hilalDuelRematch": "العب مجدداً",
+  "hilalDuelRetry": "أعد المحاولة",
+  "hilalDuelPremiumUnlimited": "بريميوم: قلوب غير محدودة",
+  "hilalDuelUpgradePremium": "الترقية إلى بريميوم • لعب بلا حدود",
+  "hilalDuelNextLevel": "المستوى التالي",
+  "hilalDuelMaxLevel": "أقصى مستوى",
+  "hilalDuelNextRewardFrame": "المكافأة التالية: إطار الصورة (LV {level})",
+  "@hilalDuelNextRewardFrame": {
+    "placeholders": {
+      "level": {"type": "int"}
+    }
+  },
+  "hilalDuelNextRewardTitle": "المكافأة التالية: لقب “{title}” (LV {level})",
+  "@hilalDuelNextRewardTitle": {
+    "placeholders": {
+      "title": {"type": "String"},
+      "level": {"type": "int"}
+    }
+  },
+  "hilalDuelNextRewardHilalIcon": "المكافأة التالية: أيقونة هلال خاصة (LV {level})",
+  "@hilalDuelNextRewardHilalIcon": {
+    "placeholders": {
+      "level": {"type": "int"}
+    }
+  },
+  "hilalDuelWeeklyTitle": "أفضل لاعب هذا الأسبوع",
+  "hilalDuelWeeklyThisWeek": "هذا الأسبوع: {count} هلال",
+  "@hilalDuelWeeklyThisWeek": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "hilalDuelWeeklyRank": "الترتيب: #{rank}",
+  "@hilalDuelWeeklyRank": {
+    "placeholders": {
+      "rank": {"type": "int"}
+    }
+  },
+  "hilalDuelWeeklyRankNone": "الترتيب: —",
+  "hilalDuelWeeklyTapHint": "عرض الترتيب",
+  "hilalDuelWeeklyTopPreview": "أفضل 3",
+  "hilalDuelWeeklyClimbHint": "أفضل 10 في الدوري الأخضر — العب وتقدّم!",
+  "hilalDuelWeeklyEmpty": "لم يكتسب أحد أهلة هذا الأسبوع بعد. أنهِ أول مباراة!",
+  "hilalDuelWeeklyYourPlace": "ترتيبك: #{rank} · {count} هلال",
+  "@hilalDuelWeeklyYourPlace": {
+    "placeholders": {
+      "rank": {"type": "int"},
+      "count": {"type": "int"}
+    }
+  },
+  "hilalDuelTitleTalebe": "طالب",
+  "hilalDuelTitleIlimDostu": "صديق العلم",
+  "hilalDuelYouLabel": "أنت",
+  "hilalDuelOpponentLabel": "المنافس",
   "languageChangedMessage": "تم تغيير اللغة إلى: {languageName}",
   "@languageChangedMessage": {
     "placeholders": {
@@ -1465,7 +1587,10 @@
   "widgetUnlockComboTitle": "أداة الاقتباس + الصلاة",
   "widgetUnlockTrackingTitle": "أداة التتبع",
   "widgetUnlockZikirTitle": "أداة المسبحة",
-  "widgetUnlockAdLoadFailed": "تعذر تحميل الإعلان الآن، يرجى المحاولة مرة أخرى لاحقًا.",
+  "widgetUnlockAdPreparing": "جارٍ تجهيز الإعلان…",
+  "widgetUnlockAdLoadFailed": "لا يتوفر إعلان مناسب الآن. يرجى المحاولة مرة أخرى بعد بضع ثوانٍ.",
+  "widgetUnlockAdRetryButton": "حاول مجددًا",
+  "widgetUnlockAdLaterButton": "لاحقًا",
   "widgetUnlockSuccessTitle": "{hours, plural, =1{تم فتح {title} لمدة ساعة واحدة! 🎉} =2{تم فتح {title} لمدة ساعتين! 🎉} few{تم فتح {title} لمدة {hours} ساعات! 🎉} other{تم فتح {title} لمدة {hours} ساعة! 🎉}}",
   "@widgetUnlockSuccessTitle": {
     "placeholders": {
@@ -1687,6 +1812,9 @@
   "premiumBenefitWidgets": "لا يوجد قفل للأدوات",
   "premiumBenefitExplore": "تدفق استكشاف غير منقطع",
   "premiumBenefitAdhan": "منبه الأذان الثاني مفعل",
+  "premiumBenefitPrayerCircle": "حلقة الدعاء: طلبات غير محدودة",
+  "premiumBenefitContest": "مشاركات مسابقة غير محدودة",
+  "premiumBenefitExtras": "بدون إعلانات في الذكر والبوصلة والترددات",
   "premiumSignInRequiredNotice": "تسجيل الدخول غير مطلوب للشراء. يمكنك استخدام Premium على هذا الجهاز فورًا، ويمكنك ربط حسابك لاحقًا لاستخدامه على أجهزتك الأخرى.",
   "premiumSignInSheetTitle": "اربط حسابك لـ Premium",
   "premiumSignInSheetSubtitle": "ربط الحساب يجعل استعادة Premium على أجهزتك الأخرى أسهل. تسجيل الدخول اختياري لإتمام الشراء.",

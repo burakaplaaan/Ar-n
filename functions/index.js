@@ -237,6 +237,8 @@ const _kMetricEvents = new Set([
   "widget_churned",
   "widget_returned",
   "widget_unlock",
+  "ad_watch",
+  "feature_open",
 ]);
 const _kWidgetKinds = new Set([
   "quote",
@@ -244,6 +246,17 @@ const _kWidgetKinds = new Set([
   "combo",
   "tracking",
   "zikir",
+]);
+/** Reklam / özellik günlük özetinde kullanılan sabit anahtarlar. */
+const _kProductFeatures = new Set([
+  "explore",
+  "zikir",
+  "prayer_alarm",
+  "widget",
+  "hilal_duel",
+  "prayer_circle",
+  "qibla",
+  "healing",
 ]);
 
 function _istanbulDayKey(ms = Date.now()) {
@@ -258,6 +271,55 @@ function _istanbulDayKey(ms = Date.now()) {
       .map((part) => [part.type, part.value]),
   );
   return `${values.year}-${values.month}-${values.day}`;
+}
+
+/** İstanbul takvim gününü ±N gün kaydırır (Türkiye sürekli UTC+3). */
+function _shiftIstanbulDayKey(dayKey, deltaDays) {
+  const noonMs = Date.parse(`${dayKey}T12:00:00+03:00`);
+  if (!Number.isFinite(noonMs)) return dayKey;
+  return _istanbulDayKey(noonMs + deltaDays * 86400000);
+}
+
+function _validatedProductFeature(rawFeature) {
+  const value = String(rawFeature || "").trim();
+  if (!_kProductFeatures.has(value)) {
+    throw new HttpsError("invalid-argument", "Geçersiz özellik kimliği.");
+  }
+  return value;
+}
+
+function _emptyDayUsage() {
+  return {
+    ads: {
+      watches: 0,
+      byFeature: Object.fromEntries(
+        [..._kProductFeatures].map((f) => [f, { watches: 0 }]),
+      ),
+    },
+    features: {
+      users: 0,
+      byFeature: Object.fromEntries(
+        [..._kProductFeatures].map((f) => [f, { users: 0 }]),
+      ),
+    },
+  };
+}
+
+function _accumulateDayUsage(target, data) {
+  const ads = data?.ads || {};
+  const features = data?.features || {};
+  target.ads.watches += Number(ads.watches) || 0;
+  const adsBy = ads.byFeature || {};
+  for (const feature of _kProductFeatures) {
+    target.ads.byFeature[feature].watches +=
+      Number(adsBy[feature]?.watches) || 0;
+  }
+  target.features.users += Number(features.users) || 0;
+  const featBy = features.byFeature || {};
+  for (const feature of _kProductFeatures) {
+    target.features.byFeature[feature].users +=
+      Number(featBy[feature]?.users) || 0;
+  }
 }
 
 function _validatedInstallHash(rawInstallId) {
@@ -708,6 +770,9 @@ exports.recordProductMetric = onCall(
     let entity = "all";
     let cardId = null;
     let kind = null;
+    let feature = null;
+    const isAdWatch = event === "ad_watch";
+    const isFeatureOpen = event === "feature_open";
     if (event.startsWith("content_")) {
       cardId = _validatedCardId(req.data?.cardId);
       await _assertKnownContentCard(db, cardId);
@@ -717,25 +782,33 @@ exports.recordProductMetric = onCall(
       kind = _validatedWidgetKind(req.data?.kind);
       entity = kind;
     }
-    const dedupeRef = db.collection("admin_metric_event_dedupe").doc(
-      _dedupeId([dayKey, event, installHash, entity]),
-    );
-    const rateRef = _rateLimitRef(db, dayKey, installHash, "product");
+    if (isAdWatch || isFeatureOpen) {
+      feature = _validatedProductFeature(req.data?.feature);
+      entity = feature;
+    }
+    const dedupeRef = isAdWatch ? null : db.collection(
+      "admin_metric_event_dedupe",
+    ).doc(_dedupeId([dayKey, event, installHash, entity]));
+    const rateScope = isAdWatch ? "ad" : "product";
+    const rateLimit = isAdWatch ? 120 : 300;
+    const rateRef = _rateLimitRef(db, dayKey, installHash, rateScope);
     let counted = false;
     let accepted = false;
 
     await db.runTransaction(async (tx) => {
-      const reads = [tx.get(dedupeRef), tx.get(rateRef)];
+      const reads = [tx.get(rateRef)];
+      if (dedupeRef) reads.push(tx.get(dedupeRef));
       if (event.startsWith("widget_")) reads.push(tx.get(installRef));
       const snapshots = await Promise.all(reads);
-      const dedupeSnap = snapshots[0];
-      const rateSnap = snapshots[1];
-      if (dedupeSnap.exists) {
+      const rateSnap = snapshots[0];
+      const dedupeSnap = dedupeRef ? snapshots[1] : null;
+      const installSnap = event.startsWith("widget_") ?
+        snapshots[dedupeRef ? 2 : 1] : null;
+      if (dedupeSnap?.exists) {
         accepted = true;
         return;
       }
 
-      const installSnap = event.startsWith("widget_") ? snapshots[2] : null;
       const installData = installSnap?.data() || {};
       if (event === "widget_first_use" &&
           installData.kinds?.[kind]?.firstSeenAt != null) {
@@ -762,16 +835,18 @@ exports.recordProductMetric = onCall(
         return;
       }
 
-      _applyRateLimit(tx, rateSnap, rateRef, 300);
+      _applyRateLimit(tx, rateSnap, rateRef, rateLimit);
       counted = true;
       accepted = true;
-      tx.create(dedupeRef, {
-        event,
-        dayKey,
-        entity,
-        expiresAt: Timestamp.fromMillis(Date.now() + 120 * 86400000),
-        createdAt: FieldValue.serverTimestamp(),
-      });
+      if (dedupeRef) {
+        tx.create(dedupeRef, {
+          event,
+          dayKey,
+          entity,
+          expiresAt: Timestamp.fromMillis(Date.now() + 120 * 86400000),
+          createdAt: FieldValue.serverTimestamp(),
+        });
+      }
 
       const dailyUpdate = {
         dayKey,
@@ -793,6 +868,24 @@ exports.recordProductMetric = onCall(
           [metric + "s"]: FieldValue.increment(1),
           lastEventAt: FieldValue.serverTimestamp(),
         }, { merge: true });
+      } else if (isAdWatch) {
+        dailyUpdate.ads = {
+          watches: FieldValue.increment(1),
+          byFeature: {
+            [feature]: {
+              watches: FieldValue.increment(1),
+            },
+          },
+        };
+      } else if (isFeatureOpen) {
+        dailyUpdate.features = {
+          users: FieldValue.increment(1),
+          byFeature: {
+            [feature]: {
+              users: FieldValue.increment(1),
+            },
+          },
+        };
       } else if (event === "widget_active") {
         dailyUpdate.widgets = {
           activeUsers: FieldValue.increment(1),
@@ -997,14 +1090,38 @@ exports.getAdminPerformance = onCall(
       0,
     );
 
+    const todayKey = _istanbulDayKey(now);
+    const yesterdayKey = _shiftIstanbulDayKey(todayKey, -1);
+    const todayUsage = _emptyDayUsage();
+    const yesterdayUsage = _emptyDayUsage();
+    for (const doc of dailySnap.docs) {
+      const data = doc.data() || {};
+      const dayKey = String(data.dayKey || "").trim() ||
+        String(doc.id || "").slice(0, 10);
+      if (dayKey === todayKey) _accumulateDayUsage(todayUsage, data);
+      if (dayKey === yesterdayKey) _accumulateDayUsage(yesterdayUsage, data);
+    }
+
     return {
       days,
       generatedAtMs: now,
+      dayBoundary: "Europe/Istanbul",
+      today: {
+        dayKey: todayKey,
+        ...todayUsage,
+      },
+      yesterday: {
+        dayKey: yesterdayKey,
+        ...yesterdayUsage,
+      },
       daily: dailySnap.docs.map((doc) => ({
         id: doc.id,
+        dayKey: doc.data().dayKey || String(doc.id || "").slice(0, 10),
         content: doc.data().content || {},
         notifications: doc.data().notifications || {},
         widgets: doc.data().widgets || {},
+        ads: doc.data().ads || {},
+        features: doc.data().features || {},
       })),
       deliveries: deliveriesSnap.docs.map((doc) => {
         const data = doc.data();
@@ -1037,6 +1154,7 @@ exports.getAdminPerformance = onCall(
         active30: active30Snap.data().count,
       },
       notificationAudience: audienceSnap.data().count,
+      productFeatures: [..._kProductFeatures],
     };
   },
 );
@@ -2519,6 +2637,18 @@ function _decodePrayerRewardCustomData(raw) {
   }
 }
 
+function _decodeQuizRewardCustomData(raw) {
+  try {
+    const decoded = Buffer.from(String(raw || ""), "base64url")
+      .toString("utf8");
+    const data = JSON.parse(decoded);
+    if (data?.version !== 2 || data?.kind !== "quiz") return null;
+    return { proofId: _validatedPrayerProofId(data?.proofId) };
+  } catch (_) {
+    return null;
+  }
+}
+
 function _validatedPrayerCursorMs(raw) {
   const value = Number(raw);
   return Number.isSafeInteger(value) && value > 0 ? value : null;
@@ -2652,11 +2782,14 @@ async function _deliverPrayerNotificationJob(jobRef) {
   }
 }
 
+// TEMP (emülatör): Play Integrity emülatörde fail. Mağaza öncesi true yap.
+const ENFORCE_PRAYER_APP_CHECK = false;
+
 exports.createPrayerSession = onCall(
   {
     region: "europe-west1",
     memory: "256MiB",
-    enforceAppCheck: true,
+    enforceAppCheck: ENFORCE_PRAYER_APP_CHECK,
   },
   async (req) => {
     const installHash = _validatedInstallHash(req.data?.installId);
@@ -2705,7 +2838,7 @@ exports.checkPrayerPremium = onCall(
   {
     region: "europe-west1",
     memory: "256MiB",
-    enforceAppCheck: true,
+    enforceAppCheck: ENFORCE_PRAYER_APP_CHECK,
   },
   async (req) => {
     const installHash = _validatedInstallHash(req.data?.installId);
@@ -2719,7 +2852,7 @@ exports.beginPrayerSubmission = onCall(
   {
     region: "europe-west1",
     memory: "256MiB",
-    enforceAppCheck: true,
+    enforceAppCheck: ENFORCE_PRAYER_APP_CHECK,
   },
   async (req) => {
     const uid = _assertPrayerAuth(req);
@@ -2804,7 +2937,11 @@ exports.rewardedAdSsv = onRequest(
       const adUnit = String(req.query.ad_unit || "");
       const transactionId = String(req.query.transaction_id || "");
       const timestampMs = Number(req.query.timestamp);
-      const reward = _decodePrayerRewardCustomData(req.query.custom_data);
+      const prayerReward = _decodePrayerRewardCustomData(
+        req.query.custom_data,
+      );
+      const quizReward = _decodeQuizRewardCustomData(req.query.custom_data);
+      const reward = prayerReward || quizReward;
       if (!reward) {
         // Aynı rewarded unit widget gibi başka yüzeylerde de kullanılır.
         res.status(200).send("Ignored");
@@ -2821,9 +2958,15 @@ exports.rewardedAdSsv = onRequest(
       }
 
       const db = getFirestore();
-      const proofRef = db.collection("prayer_reward_proofs")
+      const proofCollection = quizReward
+        ? "quiz_reward_proofs"
+        : "prayer_reward_proofs";
+      const transactionCollection = quizReward
+        ? "quiz_reward_transactions"
+        : "prayer_reward_transactions";
+      const proofRef = db.collection(proofCollection)
         .doc(reward.proofId);
-      const transactionRef = db.collection("prayer_reward_transactions")
+      const transactionRef = db.collection(transactionCollection)
         .doc(crypto.createHash("sha256").update(transactionId).digest("hex"));
       await db.runTransaction(async (tx) => {
         const [proofSnap, transactionSnap] = await Promise.all([
@@ -2851,6 +2994,8 @@ exports.rewardedAdSsv = onRequest(
           status: "rewarded",
           transactionHash: transactionRef.id,
           rewardedAt: FieldValue.serverTimestamp(),
+          // SSV gecikmeli gelebilir; claim penceresini ödül anından uzat.
+          expiresAt: Timestamp.fromMillis(Date.now() + 10 * 60_000),
         });
       });
       res.status(200).send("OK");
@@ -2865,7 +3010,7 @@ exports.registerPrayerDevice = onCall(
   {
     region: "europe-west1",
     memory: "256MiB",
-    enforceAppCheck: true,
+    enforceAppCheck: ENFORCE_PRAYER_APP_CHECK,
   },
   async (req) => {
     _assertPrayerAuth(req);
@@ -2906,7 +3051,7 @@ exports.listPrayerRequests = onCall(
   {
     region: "europe-west1",
     memory: "256MiB",
-    enforceAppCheck: true,
+    enforceAppCheck: ENFORCE_PRAYER_APP_CHECK,
   },
   async (req) => {
     _assertPrayerAuth(req);
@@ -2999,7 +3144,7 @@ exports.reportPrayerRequest = onCall(
   {
     region: "europe-west1",
     memory: "256MiB",
-    enforceAppCheck: true,
+    enforceAppCheck: ENFORCE_PRAYER_APP_CHECK,
   },
   async (req) => {
     _assertPrayerAuth(req);
@@ -3073,7 +3218,7 @@ exports.createPrayerRequest = onCall(
   {
     region: "europe-west1",
     memory: "256MiB",
-    enforceAppCheck: true,
+    enforceAppCheck: ENFORCE_PRAYER_APP_CHECK,
   },
   async (req) => {
     const uid = _assertPrayerAuth(req);
@@ -3186,7 +3331,7 @@ exports.prayForRequest = onCall(
   {
     region: "europe-west1",
     memory: "256MiB",
-    enforceAppCheck: true,
+    enforceAppCheck: ENFORCE_PRAYER_APP_CHECK,
   },
   async (req) => {
     _assertPrayerAuth(req);
@@ -3282,7 +3427,7 @@ exports.deletePrayerRequest = onCall(
   {
     region: "europe-west1",
     memory: "256MiB",
-    enforceAppCheck: true,
+    enforceAppCheck: ENFORCE_PRAYER_APP_CHECK,
   },
   async (req) => {
     _assertPrayerAuth(req);
@@ -3311,7 +3456,7 @@ exports.adminDeletePrayerRequest = onCall(
   {
     region: "europe-west1",
     memory: "256MiB",
-    enforceAppCheck: true,
+    enforceAppCheck: ENFORCE_PRAYER_APP_CHECK,
   },
   async (req) => {
     await assertCallerIsAdmin(req);
@@ -3405,6 +3550,7 @@ if (process.env.NODE_ENV === "test") {
     validatedPrayerDocumentId: _validatedPrayerDocumentId,
     validatedPrayerProofId: _validatedPrayerProofId,
     decodePrayerRewardCustomData: _decodePrayerRewardCustomData,
+    decodeQuizRewardCustomData: _decodeQuizRewardCustomData,
     dedupeId: _dedupeId,
     prayerNotificationCopy: _prayerNotificationCopy,
     isPrayerMilestone: _isPrayerMilestone,
@@ -3418,4 +3564,184 @@ if (process.env.NODE_ENV === "test") {
     assertPrayerPolicyAccepted: _assertPrayerPolicyAccepted,
     normalizedWidgetUnlockHours: _normalizedWidgetUnlockHours,
   };
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Bilgi Düellosu — admin can yönetimi
+//   • Herkese +1 can + broadcast_all FCM (tıklanınca düello açılır)
+//   • Belirli ownerHash'e N can
+// ─────────────────────────────────────────────────────────────────────────────
+const _kQuizOwnerHashRe = /^[a-f0-9]{64}$/i;
+
+exports.adminGrantQuizHeartsAll = onCall(
+  {
+    region: "europe-west1",
+    memory: "512MiB",
+    timeoutSeconds: 300,
+  },
+  async (req) => {
+    await assertCallerIsAdmin(req);
+    const db = getFirestore();
+    const messaging = getMessaging();
+
+    let updated = 0;
+    let lastDoc = null;
+    // quiz_players üzerinde sayfalı increment — tek batch limiti aşılmasın.
+    while (true) {
+      let q = db
+        .collection("quiz_players")
+        .orderBy(FieldPath.documentId())
+        .limit(400);
+      if (lastDoc) q = q.startAfter(lastDoc);
+      const snap = await q.get();
+      if (snap.empty) break;
+      const batch = db.batch();
+      for (const doc of snap.docs) {
+        batch.set(
+          doc.ref,
+          {
+            adHearts: FieldValue.increment(1),
+            updatedAt: FieldValue.serverTimestamp(),
+          },
+          { merge: true },
+        );
+        updated += 1;
+      }
+      await batch.commit();
+      lastDoc = snap.docs[snap.docs.length - 1];
+      if (snap.size < 400) break;
+    }
+
+    const title = "Bilgi Düellosu · +1 can";
+    const body =
+      "Herkese 1 can verildi! Şimdi bilginle herkesi yen — düelloya gir.";
+    let fcmMessageId = null;
+    let fcmOk = true;
+    let fcmError = null;
+    try {
+      fcmMessageId = await messaging.send({
+        topic: "broadcast_all",
+        notification: { title, body },
+        data: {
+          type: "hilal_duel",
+          reason: "admin_heart_grant_all",
+        },
+        android: {
+          notification: {
+            channelId: "arin_hilal_duel",
+            priority: "high",
+            defaultSound: true,
+          },
+        },
+        apns: { payload: { aps: { sound: "default" } } },
+      });
+    } catch (err) {
+      // Canlar yazıldıktan sonra FCM düşse bile audit ve partial-success dön;
+      // aksi halde admin yeniden basınca ikinci +1 riski oluşur.
+      fcmOk = false;
+      fcmError = String(err?.message || err).slice(0, 300);
+      console.error("[adminGrantQuizHeartsAll] FCM failed:", err);
+    }
+
+    const email = (req.auth?.token?.email || "").toString().toLowerCase();
+    await db.collection("admin_audit").add({
+      action: "quiz_hearts_grant_all",
+      targetType: "quiz_players",
+      targetId: "all",
+      uid: req.auth?.uid || null,
+      email: email || null,
+      afterCount: updated,
+      details: {
+        amount: 1,
+        fcmOk,
+        fcmMessageId,
+        fcmError,
+        title,
+        body,
+      },
+      createdAt: FieldValue.serverTimestamp(),
+    });
+
+    return {
+      ok: true,
+      updated,
+      fcmOk,
+      fcmMessageId,
+      fcmError,
+      title,
+      body,
+    };
+  },
+);
+
+exports.adminGrantQuizHeartsOne = onCall(
+  {
+    region: "europe-west1",
+    memory: "256MiB",
+  },
+  async (req) => {
+    await assertCallerIsAdmin(req);
+    const ownerHash = String(req.data?.ownerHash || "").trim().toLowerCase();
+    const amountRaw = Number(req.data?.amount);
+    const amount = Number.isFinite(amountRaw)
+      ? Math.floor(amountRaw)
+      : NaN;
+    if (!_kQuizOwnerHashRe.test(ownerHash)) {
+      throw new HttpsError(
+        "invalid-argument",
+        "ownerHash 64 karakter hex olmalı (installId SHA-256).",
+      );
+    }
+    if (!Number.isFinite(amount) || amount < 1 || amount > 20) {
+      throw new HttpsError(
+        "invalid-argument",
+        "amount 1 ile 20 arasında olmalı.",
+      );
+    }
+
+    const db = getFirestore();
+    const playerRef = db.collection("quiz_players").doc(ownerHash);
+    const beforeSnap = await playerRef.get();
+    const beforeHearts = beforeSnap.exists
+      ? Math.max(0, Math.floor(Number(beforeSnap.data()?.adHearts) || 0))
+      : 0;
+
+    await playerRef.set(
+      {
+        adHearts: FieldValue.increment(amount),
+        updatedAt: FieldValue.serverTimestamp(),
+      },
+      { merge: true },
+    );
+
+    const email = (req.auth?.token?.email || "").toString().toLowerCase();
+    await db.collection("admin_audit").add({
+      action: "quiz_hearts_grant_one",
+      targetType: "quiz_player",
+      targetId: ownerHash,
+      uid: req.auth?.uid || null,
+      email: email || null,
+      beforeCount: beforeHearts,
+      afterCount: beforeHearts + amount,
+      details: { amount },
+      createdAt: FieldValue.serverTimestamp(),
+    });
+
+    return {
+      ok: true,
+      ownerHash,
+      amount,
+      beforeHearts,
+      afterHearts: beforeHearts + amount,
+      existed: beforeSnap.exists,
+    };
+  },
+);
+
+// Hilal Düellosu ayrı bir modülde tutulur; büyük oyun akışı mevcut bildirim ve
+// Dua Halkası fonksiyonlarının bakım yüzeyini büyütmez.
+const quizModule = require("./quiz");
+Object.assign(exports, quizModule.functions);
+if (process.env.NODE_ENV === "test") {
+  Object.assign(exports._testables, quizModule.testables);
 }

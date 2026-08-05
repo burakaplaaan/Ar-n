@@ -1350,6 +1350,199 @@ class AppLocalizationsTr extends AppLocalizations {
       'Terapi tonları, ambiyans ve uyku zamanlayıcısı ile sakin bir oturum';
 
   @override
+  String get qiblaHubHilalDuelTitle => 'Bilgi Düellosu';
+
+  @override
+  String get qiblaHubHilalDuelSubtitle =>
+      '7 İslami bilgi sorusunda yarış; hilal kazan, seviye atla';
+
+  @override
+  String get hilalDuelTitle => 'Bilgi Düellosu';
+
+  @override
+  String get hilalDuelLanguageNote => 'Sorular şu an Türkçe';
+
+  @override
+  String get hilalDuelRulesSummary =>
+      '7 soru • Her soru 20 saniye\nDoğruluk ve hız kazanır. İki taraf cevaplayınca sonraki soru otomatik açılır. Can için reklam izle veya Premium ile sınırsız oyna.';
+
+  @override
+  String hilalDuelLevelLabel(int level) {
+    return 'Seviye $level';
+  }
+
+  @override
+  String hilalDuelHilalsLabel(int count) {
+    return '$count hilal';
+  }
+
+  @override
+  String hilalDuelHeartsLabel(int count) {
+    return '$count can';
+  }
+
+  @override
+  String get hilalDuelPlay => 'Rakip bul';
+
+  @override
+  String get hilalDuelWatchAdForHeart => 'Reklam izle, 1 can kazan';
+
+  @override
+  String get hilalDuelNeedHeartTitle => 'Oynamak için 1 can lazım';
+
+  @override
+  String get hilalDuelNeedHeartHint =>
+      'Kısa bir reklam izle → 1 can kazan, hemen rakip bul';
+
+  @override
+  String get hilalDuelNeedHeartCta => 'Reklamı izle';
+
+  @override
+  String get hilalDuelSearching => 'Rakip aranıyor…';
+
+  @override
+  String get hilalDuelCancelSearch => 'Aramayı iptal et';
+
+  @override
+  String get hilalDuelCancelFailed =>
+      'İptal tamamlanamadı. Can iadesi için tekrar dene.';
+
+  @override
+  String hilalDuelQuestionProgress(int current, int total) {
+    return 'Soru $current/$total';
+  }
+
+  @override
+  String get hilalDuelWaitingOpponent => 'Rakip cevaplıyor…';
+
+  @override
+  String get hilalDuelAnsweredBubble => 'Cevapladı';
+
+  @override
+  String get hilalDuelRoundCorrect => 'Doğru';
+
+  @override
+  String get hilalDuelRoundWrong => 'Yanlış';
+
+  @override
+  String get hilalDuelNoAnswer => 'Cevap yok';
+
+  @override
+  String get hilalDuelFastOpponent => 'Hızlı Rakip';
+
+  @override
+  String get hilalDuelResultWin => 'Kazandın';
+
+  @override
+  String get hilalDuelResultLose => 'Kaybettin';
+
+  @override
+  String get hilalDuelResultDraw => 'Berabere';
+
+  @override
+  String hilalDuelCorrectCount(int count) {
+    return '$count doğru';
+  }
+
+  @override
+  String hilalDuelTotalSeconds(int seconds) {
+    return '$seconds sn';
+  }
+
+  @override
+  String hilalDuelHilalsEarned(int count) {
+    return '+$count hilal';
+  }
+
+  @override
+  String get hilalDuelDoubleReward => 'Reklam izle, hilalleri ikiye katla';
+
+  @override
+  String get hilalDuelDoubled => 'Hilaller ikiye katlandı';
+
+  @override
+  String get hilalDuelLobby => 'Lobiye dön';
+
+  @override
+  String get hilalDuelRematch => 'Yeniden oyna';
+
+  @override
+  String get hilalDuelRetry => 'Tekrar dene';
+
+  @override
+  String get hilalDuelPremiumUnlimited => 'Premium: sınırsız can';
+
+  @override
+  String get hilalDuelUpgradePremium => 'Premium’a Geç • Sınırsız Oyna';
+
+  @override
+  String get hilalDuelNextLevel => 'Sonraki seviye';
+
+  @override
+  String get hilalDuelMaxLevel => 'Maksimum seviye';
+
+  @override
+  String hilalDuelNextRewardFrame(int level) {
+    return 'Sonraki ödül: Avatar çerçevesi (LV $level)';
+  }
+
+  @override
+  String hilalDuelNextRewardTitle(String title, int level) {
+    return 'Sonraki ödül: Unvan “$title” (LV $level)';
+  }
+
+  @override
+  String hilalDuelNextRewardHilalIcon(int level) {
+    return 'Sonraki ödül: Özel hilal ikonu (LV $level)';
+  }
+
+  @override
+  String get hilalDuelWeeklyTitle => 'Haftanın En İyisi';
+
+  @override
+  String hilalDuelWeeklyThisWeek(int count) {
+    return 'Bu hafta: $count hilal';
+  }
+
+  @override
+  String hilalDuelWeeklyRank(int rank) {
+    return 'Sıra: #$rank';
+  }
+
+  @override
+  String get hilalDuelWeeklyRankNone => 'Sıra: —';
+
+  @override
+  String get hilalDuelWeeklyTapHint => 'Sıralamayı gör';
+
+  @override
+  String get hilalDuelWeeklyTopPreview => 'İlk 3';
+
+  @override
+  String get hilalDuelWeeklyClimbHint => 'İlk 10 yeşil ligde — oyna, yüksel!';
+
+  @override
+  String get hilalDuelWeeklyEmpty =>
+      'Bu hafta henüz kimse hilal kazanmadı. İlk maçı sen bitir!';
+
+  @override
+  String hilalDuelWeeklyYourPlace(int rank, int count) {
+    return 'Senin sıran: #$rank · $count hilal';
+  }
+
+  @override
+  String get hilalDuelTitleTalebe => 'Talebe';
+
+  @override
+  String get hilalDuelTitleIlimDostu => 'İlim Dostu';
+
+  @override
+  String get hilalDuelYouLabel => 'Sen';
+
+  @override
+  String get hilalDuelOpponentLabel => 'Rakip';
+
+  @override
   String get generalLoading => 'Yükleniyor...';
 
   @override
@@ -3104,8 +3297,17 @@ class AppLocalizationsTr extends AppLocalizations {
   String get widgetUnlockZikirTitle => 'Zikirmatik Widgetı';
 
   @override
+  String get widgetUnlockAdPreparing => 'Reklam hazırlanıyor…';
+
+  @override
   String get widgetUnlockAdLoadFailed =>
-      'Reklam şu an yüklenemedi, daha sonra tekrar dene.';
+      'Şu anda uygun bir reklam bulunamadı. Birkaç saniye sonra tekrar deneyebilirsiniz.';
+
+  @override
+  String get widgetUnlockAdRetryButton => 'Tekrar dene';
+
+  @override
+  String get widgetUnlockAdLaterButton => 'Daha sonra';
 
   @override
   String widgetUnlockSuccessTitle(Object title, int hours) {
@@ -3811,6 +4013,15 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get premiumBenefitAdhan => '2. ezan alarmı açık';
+
+  @override
+  String get premiumBenefitPrayerCircle => 'Dua Halkası: sınırsız dua isteme';
+
+  @override
+  String get premiumBenefitContest => 'Sınırsız yarışma hakkı';
+
+  @override
+  String get premiumBenefitExtras => 'Zikir, pusula ve frekanslarda reklam yok';
 
   @override
   String get premiumSignInRequiredNotice =>

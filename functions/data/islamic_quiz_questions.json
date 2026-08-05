@@ -1,0 +1,5702 @@
+[
+  {
+    "id": "iq_001",
+    "category": "Kur'an bilgisi",
+    "difficulty": 1,
+    "question": "Kur'an-ı Kerim kaç sureden oluşur?",
+    "options": [
+      "120",
+      "114",
+      "99",
+      "110"
+    ],
+    "correctIndex": 1,
+    "explanation": "Kur'an-ı Kerim 114 sureden oluşur.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_002",
+    "category": "Kur'an bilgisi",
+    "difficulty": 1,
+    "question": "Mushaf sıralamasında ilk sure hangisidir?",
+    "options": [
+      "Fatiha",
+      "İhlas",
+      "Bakara",
+      "Nas"
+    ],
+    "correctIndex": 0,
+    "explanation": "Mushaf'ta ilk sure Fatiha'dır.",
+    "source": "Diyanet Kur'an Yolu"
+  },
+  {
+    "id": "iq_003",
+    "category": "Kur'an bilgisi",
+    "difficulty": 1,
+    "question": "Mushaf sıralamasında son sure hangisidir?",
+    "options": [
+      "Felak",
+      "İhlas",
+      "Nas",
+      "Fatiha"
+    ],
+    "correctIndex": 2,
+    "explanation": "Mushaf'ta son sure Nas'tır.",
+    "source": "Diyanet Kur'an Yolu"
+  },
+  {
+    "id": "iq_004",
+    "category": "Kur'an bilgisi",
+    "difficulty": 1,
+    "question": "Kur'an'ın en uzun suresi hangisidir?",
+    "options": [
+      "Nisâ",
+      "Âl-i İmran",
+      "Mâide",
+      "Bakara"
+    ],
+    "correctIndex": 3,
+    "explanation": "En uzun sure Bakara'dır.",
+    "source": "Diyanet Kur'an Yolu"
+  },
+  {
+    "id": "iq_005",
+    "category": "Kur'an bilgisi",
+    "difficulty": 1,
+    "question": "Tevhid vurgusuyla bilinen kısa sure hangisidir?",
+    "options": [
+      "Nasr",
+      "Kevser",
+      "Asr",
+      "İhlas"
+    ],
+    "correctIndex": 3,
+    "explanation": "İhlas suresi tevhid esasını özlü anlatır.",
+    "source": "Diyanet Kur'an Yolu, İhlas"
+  },
+  {
+    "id": "iq_006",
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "İlk vahyin geldiği yer geleneksel olarak neresidir?",
+    "options": [
+      "Kuba Mescidi",
+      "Uhud dağı",
+      "Hira Mağarası",
+      "Sevr Mağarası"
+    ],
+    "correctIndex": 2,
+    "explanation": "İlk vahyin Hira'da geldiği kabul edilir.",
+    "source": "TDV İslam Ansiklopedisi, Vahiy"
+  },
+  {
+    "id": "iq_007",
+    "category": "Kur'an bilgisi",
+    "difficulty": 1,
+    "question": "İlk inen ayetler hangi sureye aittir?",
+    "options": [
+      "Fatiha",
+      "Müddessir",
+      "Alak",
+      "Müzzemmil"
+    ],
+    "correctIndex": 2,
+    "explanation": "İlk inen ayetler Alak suresindendir.",
+    "source": "Diyanet Kur'an Yolu, Alak"
+  },
+  {
+    "id": "iq_008",
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "Kur'an'da özel adıyla anılan tek kadın kimdir?",
+    "options": [
+      "Âsiye",
+      "Hatice",
+      "Fâtıma",
+      "Meryem"
+    ],
+    "correctIndex": 3,
+    "explanation": "Kur'an'da adı geçen kadın Meryem'dir.",
+    "source": "TDV İslam Ansiklopedisi, Meryem"
+  },
+  {
+    "id": "iq_009",
+    "category": "Kur'an bilgisi",
+    "difficulty": 1,
+    "question": "Fatiha suresinin diğer adlarından biri nedir?",
+    "options": [
+      "Seb'u'l-Mesânî",
+      "Amme",
+      "Tıvâl",
+      "Âyetü'l-Kürsî"
+    ],
+    "correctIndex": 0,
+    "explanation": "Fatiha, Seb'u'l-Mesânî diye de anılır.",
+    "source": "TDV İslam Ansiklopedisi, Fâtiha"
+  },
+  {
+    "id": "iq_010",
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "Âyetü'l-Kürsî hangi surededir?",
+    "options": [
+      "Âl-i İmran",
+      "İhlas",
+      "Bakara",
+      "Nisâ"
+    ],
+    "correctIndex": 2,
+    "explanation": "Âyetü'l-Kürsî Bakara 2/255'tedir.",
+    "source": "Diyanet Kur'an Yolu, Bakara 2/255"
+  },
+  {
+    "id": "iq_011",
+    "category": "Kur'an bilgisi",
+    "difficulty": 1,
+    "question": "Kevser suresi kaç ayetten oluşur?",
+    "options": [
+      "7",
+      "10",
+      "5",
+      "3"
+    ],
+    "correctIndex": 3,
+    "explanation": "Kevser suresi üç ayettir.",
+    "source": "Diyanet Kur'an Yolu, Kevser"
+  },
+  {
+    "id": "iq_012",
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "Secde ayeti okunduğunda yapılan secdeye ne ad verilir?",
+    "options": [
+      "Cenaze namazı",
+      "Küsuf namazı",
+      "Şükür namazı",
+      "Tilavet secdesi"
+    ],
+    "correctIndex": 3,
+    "explanation": "Secde ayetinde tilavet secdesi yapılır.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_013",
+    "category": "Kur'an bilgisi",
+    "difficulty": 1,
+    "question": "Yasin suresinde öne çıkan temel hatırlatmalardan biri nedir?",
+    "options": [
+      "Sadece savaş ganimeti",
+      "Sadece faiz hükmü",
+      "Sadece miras hesabı",
+      "Ahiret bilinci"
+    ],
+    "correctIndex": 3,
+    "explanation": "Yasin'de ahiret ve risalet vurgusu vardır.",
+    "source": "Diyanet Kur'an Yolu, Yasin"
+  },
+  {
+    "id": "iq_014",
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "Vahyin tamamlanması yaklaşık kaç yıl sürmüştür?",
+    "options": [
+      "23 yıl",
+      "7 yıl",
+      "40 yıl",
+      "10 yıl"
+    ],
+    "correctIndex": 0,
+    "explanation": "Kur'an vahyi yaklaşık 23 yılda tamamlanmıştır.",
+    "source": "TDV İslam Ansiklopedisi, Kur'an"
+  },
+  {
+    "id": "iq_015",
+    "category": "Kur'an bilgisi",
+    "difficulty": 1,
+    "question": "Mekkî sureler hangi döneme aittir?",
+    "options": [
+      "Yalnızca Veda Hutbesi günü",
+      "Mekke dönemi",
+      "Yalnızca fetih sonrası",
+      "Yalnızca Taif yılı"
+    ],
+    "correctIndex": 1,
+    "explanation": "Mekkî sureler Mekke döneminde inmiştir.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_016",
+    "category": "Kur'an bilgisi",
+    "difficulty": 1,
+    "question": "Medenî sureler hangi döneme aittir?",
+    "options": [
+      "Yalnızca Fil Vakası",
+      "Yalnızca Hira yılları",
+      "Yalnızca Sevr gecesi",
+      "Medine dönemi"
+    ],
+    "correctIndex": 3,
+    "explanation": "Medenî sureler Medine döneminde inmiştir.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_017",
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "Kıssası bir sure boyunca genişçe anlatılan peygamber kimdir?",
+    "options": [
+      "Hz. Zülkifl",
+      "Hz. Şuayb",
+      "Hz. Yusuf",
+      "Hz. İdris"
+    ],
+    "correctIndex": 2,
+    "explanation": "Yusuf suresi kıssayı genişçe anlatır.",
+    "source": "Diyanet Kur'an Yolu, Yusuf"
+  },
+  {
+    "id": "iq_018",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Tevbe suresinin başında besmele bulunmamasının sebebi nedir?",
+    "options": [
+      "Surenin eksik oluşu",
+      "Çok kısa oluşu",
+      "Nüzul ve üslup özelliği",
+      "Yalnızca şiir oluşu"
+    ],
+    "correctIndex": 2,
+    "explanation": "Tevbe, besmelesiz başlayan tek suredir.",
+    "source": "Diyanet Kur'an Yolu, Tevbe"
+  },
+  {
+    "id": "iq_019",
+    "category": "Kur'an bilgisi",
+    "difficulty": 1,
+    "question": "Felak ve Nas sureleri birlikte nasıl adlandırılır?",
+    "options": [
+      "Tıvâl",
+      "Muavvizeteyn",
+      "Mufassal",
+      "Mesânî"
+    ],
+    "correctIndex": 1,
+    "explanation": "Felak ve Nas Muavvizeteyn diye anılır.",
+    "source": "TDV İslam Ansiklopedisi, Muavvizeteyn"
+  },
+  {
+    "id": "iq_020",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Kur'an'da Levh-i Mahfuz neyi ifade eder?",
+    "options": [
+      "Korunan ilahi yazgı gerçeğini",
+      "Ticaret sicilini",
+      "Savaş ganimet listesini",
+      "Kabile nüfus defterini"
+    ],
+    "correctIndex": 0,
+    "explanation": "Levh-i Mahfuz ilahi ilim ve korunan yazgıyla anılır.",
+    "source": "TDV İslam Ansiklopedisi, Levh-i Mahfûz"
+  },
+  {
+    "id": "iq_021",
+    "category": "Kur'an bilgisi",
+    "difficulty": 1,
+    "question": "Fatiha suresi namazda nasıl konumlanır?",
+    "options": [
+      "Her rekatta okunan temel suredir",
+      "Yalnızca cenazede okunur",
+      "Hiç okunmaz",
+      "Yalnızca bayramda okunur"
+    ],
+    "correctIndex": 0,
+    "explanation": "Fatiha namazın temel okuyuşlarındandır.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_022",
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "Kur'an'ın korunmuşluğu ile ilgili temel inanç nedir?",
+    "options": [
+      "Zamana göre değişmesi",
+      "İnsanlarca yeniden yazılması",
+      "Allah tarafından korunması",
+      "Yalnızca ezbercilerin keyfine kalması"
+    ],
+    "correctIndex": 2,
+    "explanation": "Kur'an'ın korunacağı bildirilmiştir.",
+    "source": "Diyanet Kur'an Yolu, Hicr 15/9"
+  },
+  {
+    "id": "iq_023",
+    "category": "Kur'an bilgisi",
+    "difficulty": 1,
+    "question": "Asr suresi insanın kurtuluşu için neyi vurgular?",
+    "options": [
+      "İman, salih amel ve hakkı tavsiye",
+      "Yalnızca mal çoğaltmayı",
+      "Yalnızca soy üstünlüğünü",
+      "Yalnızca savaş gücünü"
+    ],
+    "correctIndex": 0,
+    "explanation": "Asr; iman, amel ve sabrı öne çıkarır.",
+    "source": "Diyanet Kur'an Yolu, Asr"
+  },
+  {
+    "id": "iq_024",
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "Kur'an'da geçen 'gayb' kavramı neyi ifade eder?",
+    "options": [
+      "İnsanın bilemeyeceği alanları",
+      "Yalnızca savaş taktiğini",
+      "Yalnızca ticaret kârını",
+      "Yalnızca şehir haritasını"
+    ],
+    "correctIndex": 0,
+    "explanation": "Gayb, insan idrakini aşan alandır.",
+    "source": "TDV İslam Ansiklopedisi, Gayb"
+  },
+  {
+    "id": "iq_025",
+    "category": "Kur'an bilgisi",
+    "difficulty": 1,
+    "question": "İhlas suresinde Allah nasıl tanıtılır?",
+    "options": [
+      "Ortaklar sahibi",
+      "Ehad ve Samed",
+      "Yalnızca mekân sahibi",
+      "Yalnızca zaman bağlısı"
+    ],
+    "correctIndex": 1,
+    "explanation": "İhlas tevhid sıfatlarını bildirir.",
+    "source": "Diyanet Kur'an Yolu, İhlas"
+  },
+  {
+    "id": "iq_026",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Kur'an'da 'müteşabih' ayetler neyi ifade eder?",
+    "options": [
+      "Yorum derinliği olan ayetleri",
+      "Sadece rakam listelerini",
+      "Hiçbir anlamı olmayan metni",
+      "Sadece kabile isimlerini"
+    ],
+    "correctIndex": 0,
+    "explanation": "Müteşabih, manası derin yönlü ayetlerdir.",
+    "source": "TDV İslam Ansiklopedisi, Muhkem"
+  },
+  {
+    "id": "iq_027",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Kur'an'da 'muhkem' ayetler nasıl anlaşılır?",
+    "options": [
+      "Anlamsız ayetler",
+      "Neshedilmiş tüm metin",
+      "Hüküm ve mana yönü açık ayetler",
+      "Yalnızca şiir dizeleri"
+    ],
+    "correctIndex": 2,
+    "explanation": "Muhkem ayetler anlamı açık olanlardır.",
+    "source": "TDV İslam Ansiklopedisi, Muhkem"
+  },
+  {
+    "id": "iq_028",
+    "category": "Kur'an bilgisi",
+    "difficulty": 1,
+    "question": "Bakara suresi adını hangi kıssadan alır?",
+    "options": [
+      "Fil ordusu kıssası",
+      "Yunus ve balık kıssası",
+      "İsrailoğulları ve inek kıssası",
+      "Ashab-ı Kehf kıssası"
+    ],
+    "correctIndex": 2,
+    "explanation": "Sure, bakara (inek) kıssasıyla anılır.",
+    "source": "Diyanet Kur'an Yolu, Bakara"
+  },
+  {
+    "id": "iq_029",
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "Fil suresi hangi olayı hatırlatır?",
+    "options": [
+      "Hayber Seferi",
+      "Fil Vakası",
+      "Hendek Savaşı",
+      "Bedir Savaşı"
+    ],
+    "correctIndex": 1,
+    "explanation": "Fil suresi Fil Vakası'nı anlatır.",
+    "source": "Diyanet Kur'an Yolu, Fil"
+  },
+  {
+    "id": "iq_030",
+    "category": "Kur'an bilgisi",
+    "difficulty": 1,
+    "question": "Nasr suresi neyi müjdelemiştir?",
+    "options": [
+      "Yardım ve fetih",
+      "Orucun kaldırılmasını",
+      "Haccın yasaklanmasını",
+      "Namazın iptalini"
+    ],
+    "correctIndex": 0,
+    "explanation": "Nasr yardım ve fethi bildirir.",
+    "source": "Diyanet Kur'an Yolu, Nasr"
+  },
+  {
+    "id": "iq_031",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Kur'an'da 'ümmü'l-Kitab' ifadesi hangi bağlamda geçer?",
+    "options": [
+      "Yalnızca savaş günlüğü",
+      "Yalnızca şiir divanı",
+      "Ana kitap / ana kaynak vurgusu",
+      "Yalnızca ticaret defteri"
+    ],
+    "correctIndex": 2,
+    "explanation": "Ümmü'l-Kitab ilahi kitaba dair bir ifadedir.",
+    "source": "Diyanet Kur'an Yolu; TDV İslam Ansiklopedisi"
+  },
+  {
+    "id": "iq_032",
+    "category": "Kur'an bilgisi",
+    "difficulty": 1,
+    "question": "Kur'an okumaya besmele ile başlamak neden yaygındır?",
+    "options": [
+      "Allah'ın adıyla başlama edebi",
+      "Kıraati iptal etmek için",
+      "Ayetleri silmek için",
+      "Sure sayısını azaltmak için"
+    ],
+    "correctIndex": 0,
+    "explanation": "Besmele ile başlamak yaygın bir edeptir.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_033",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Kur'an'da geçen 'Furkan' ismi neyi vurgular?",
+    "options": [
+      "Yalnızca şiir kitabı oluşunu",
+      "Yalnızca tarih kitabı oluşunu",
+      "Hak ile batılı ayırt eden kitap oluşunu",
+      "Yalnızca hesap defteri oluşunu"
+    ],
+    "correctIndex": 2,
+    "explanation": "Furkan, ayırt edici vahiy anlamındadır.",
+    "source": "TDV İslam Ansiklopedisi, Furkân"
+  },
+  {
+    "id": "iq_034",
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "Hicr suresinde Kur'an'ın korunmasıyla ilgili temel mesaj nedir?",
+    "options": [
+      "Kur'an'ın Allah tarafından korunacağı",
+      "Kur'an'ın yasaklanacağı",
+      "Kur'an'ın silineceği",
+      "Kur'an'ın gizleneceği"
+    ],
+    "correctIndex": 0,
+    "explanation": "Hicr 15/9 korunma vaadini bildirir.",
+    "source": "Diyanet Kur'an Yolu, Hicr 15/9"
+  },
+  {
+    "id": "iq_035",
+    "category": "Kur'an bilgisi",
+    "difficulty": 1,
+    "question": "Kur'an'da gece ibadetini teşvik eden surelerden biri hangisidir?",
+    "options": [
+      "Tebbet",
+      "Kâfirûn",
+      "Fil",
+      "Müzzemmil"
+    ],
+    "correctIndex": 3,
+    "explanation": "Müzzemmil gece ibadetini konu edinir.",
+    "source": "Diyanet Kur'an Yolu, Müzzemmil"
+  },
+  {
+    "id": "iq_036",
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "Duhâ suresi Hz. Peygamber'e hangi üslupta hitap eder?",
+    "options": [
+      "Savaş emri üslubu",
+      "Teselli ve müjde üslubu",
+      "Miras taksimi üslubu",
+      "Ticaret yasağı üslubu"
+    ],
+    "correctIndex": 1,
+    "explanation": "Duhâ teselli ve müjde içerir.",
+    "source": "Diyanet Kur'an Yolu, Duhâ"
+  },
+  {
+    "id": "iq_037",
+    "category": "Kur'an bilgisi",
+    "difficulty": 1,
+    "question": "Kâfirûn suresinin temel mesajı nedir?",
+    "options": [
+      "Ganimet paylaşımı",
+      "İbadette net tavır ve tevhid",
+      "Miras dilimleri",
+      "Faiz hesabı"
+    ],
+    "correctIndex": 1,
+    "explanation": "Kâfirûn tevhid ve net tavrı bildirir.",
+    "source": "Diyanet Kur'an Yolu, Kâfirûn"
+  },
+  {
+    "id": "iq_038",
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "Kur'an'da 'ehl-i kitap' ifadesi kimleri kapsar?",
+    "options": [
+      "Yalnızca müşrikleri",
+      "Yahudi ve Hristiyanları",
+      "Yalnızca put ustalarını",
+      "Yalnızca şairleri"
+    ],
+    "correctIndex": 1,
+    "explanation": "Ehl-i kitap Yahudi ve Hristiyanlardır.",
+    "source": "TDV İslam Ansiklopedisi, Ehl-i kitap"
+  },
+  {
+    "id": "iq_039",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Kur'an'da kıraat farklılıkları ne anlama gelir?",
+    "options": [
+      "Ayet sayısının rastgeleliği",
+      "Nakledilen okuyuş çeşitlilikleri",
+      "Surelerin silinmesi",
+      "Metnin uydurma oluşu"
+    ],
+    "correctIndex": 1,
+    "explanation": "Kıraatler güvenilir okuyuş rivayetleridir.",
+    "source": "TDV İslam Ansiklopedisi, Kıraat"
+  },
+  {
+    "id": "iq_040",
+    "category": "Kur'an bilgisi",
+    "difficulty": 1,
+    "question": "Rahmân suresinde sık tekrarlanan soru nedir?",
+    "options": [
+      "Hangi şehri yıktınız?",
+      "Hangi savaşı kazandınız?",
+      "Rabbinizin hangi nimetlerini yalanlıyorsunuz?",
+      "Hangi malı sakladınız?"
+    ],
+    "correctIndex": 2,
+    "explanation": "Rahmân'da nimet sorusu tekrarlanır.",
+    "source": "Diyanet Kur'an Yolu, Rahmân"
+  },
+  {
+    "id": "iq_041",
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "Mülk suresinin temel vurgularından biri nedir?",
+    "options": [
+      "Yalnızca kabile övgüsü",
+      "Yalnızca şehir planı",
+      "Allah'ın egemenliği ve yaratılış",
+      "Yalnızca ticaret kârı"
+    ],
+    "correctIndex": 2,
+    "explanation": "Mülk, rububiyet ve yaratılışı işler.",
+    "source": "Diyanet Kur'an Yolu, Mülk"
+  },
+  {
+    "id": "iq_042",
+    "category": "Kur'an bilgisi",
+    "difficulty": 1,
+    "question": "Kur'an'da 'salât' emri neyi bildirir?",
+    "options": [
+      "Yalnızca şiiri",
+      "Namazı",
+      "Yalnızca yolculuğu",
+      "Yalnızca ticareti"
+    ],
+    "correctIndex": 1,
+    "explanation": "Salât namazı ifade eder.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_043",
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "Kur'an'da zekât emriyle birlikte sık anılan ibadet hangisidir?",
+    "options": [
+      "Namaz",
+      "Yalnızca çiftçilik",
+      "Yalnızca denizcilik",
+      "Yalnızca avcılık"
+    ],
+    "correctIndex": 0,
+    "explanation": "Namaz ve zekât birlikte sık geçer.",
+    "source": "Diyanet Kur'an Yolu"
+  },
+  {
+    "id": "iq_044",
+    "category": "Kur'an bilgisi",
+    "difficulty": 1,
+    "question": "Fatiha'da istenen yol nasıl nitelendirilir?",
+    "options": [
+      "Dosdoğru yol",
+      "Kısa ticaret yolu",
+      "Savaş kestirme yolu",
+      "Gizli hazine yolu"
+    ],
+    "correctIndex": 0,
+    "explanation": "Fatiha dosdoğru yolu ister.",
+    "source": "Diyanet Kur'an Yolu, Fatiha"
+  },
+  {
+    "id": "iq_045",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Nesh kavramı tefsirde neyi ifade eder?",
+    "options": [
+      "Bazı hükümlerin sonraki düzenlemesi bahsini",
+      "Sure isimlerinin silinmesini",
+      "Kıraatin yasaklanmasını",
+      "Tüm Kur'an'ın iptalini"
+    ],
+    "correctIndex": 0,
+    "explanation": "Nesh, hüküm bahislerinde kullanılan bir kavramdır.",
+    "source": "TDV İslam Ansiklopedisi, Nesh"
+  },
+  {
+    "id": "iq_046",
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "Kur'an'da Ashab-ı Kehf kıssası hangi temayı işler?",
+    "options": [
+      "Ganimet paylaşımı",
+      "İman ve sabır imtihanı",
+      "Miras hesabı",
+      "Ticaret ortaklığı"
+    ],
+    "correctIndex": 1,
+    "explanation": "Ashab-ı Kehf iman ve sabır kıssasıdır.",
+    "source": "Diyanet Kur'an Yolu, Kehf"
+  },
+  {
+    "id": "iq_047",
+    "category": "Kur'an bilgisi",
+    "difficulty": 1,
+    "question": "İnşirah suresi Hz. Peygamber'e neyi müjdeler?",
+    "options": [
+      "Haccın kalkması",
+      "Güçlükle birlikte kolaylık",
+      "Namazın kalkması",
+      "Orucun kalkması"
+    ],
+    "correctIndex": 1,
+    "explanation": "İnşirah kolaylık müjdesi verir.",
+    "source": "Diyanet Kur'an Yolu, İnşirah"
+  },
+  {
+    "id": "iq_048",
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "Kur'an'da 'takva' neyi ifade eder?",
+    "options": [
+      "Yalnızca güç gösterme",
+      "Yalnızca soy övünme",
+      "Allah'a karşı sorumluluk bilinci",
+      "Yalnızca mal biriktirme"
+    ],
+    "correctIndex": 2,
+    "explanation": "Takva sorumluluk ve sakınma bilincidir.",
+    "source": "TDV İslam Ansiklopedisi, Takvâ"
+  },
+  {
+    "id": "iq_049",
+    "category": "Kur'an bilgisi",
+    "difficulty": 1,
+    "question": "Kur'an'ın dili nedir?",
+    "options": [
+      "Latince",
+      "Farsça",
+      "Arapça",
+      "Süryanice"
+    ],
+    "correctIndex": 2,
+    "explanation": "Kur'an Arapça indirilmiştir.",
+    "source": "Diyanet Kur'an Yolu; TDV İslam Ansiklopedisi, Kur'an"
+  },
+  {
+    "id": "iq_050",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Mesani ve mufassal gibi terimler neyi sınıflandırır?",
+    "options": [
+      "Zekât nisaplarını",
+      "Hac menzillerini",
+      "Namaz vakitlerini",
+      "Sure gruplarını"
+    ],
+    "correctIndex": 3,
+    "explanation": "Bu terimler sure tasnifinde kullanılır.",
+    "source": "TDV İslam Ansiklopedisi, Sure"
+  },
+  {
+    "id": "iq_051",
+    "category": "Siyer",
+    "difficulty": 1,
+    "question": "Hz. Muhammed hangi şehirde doğmuştur?",
+    "options": [
+      "Taif",
+      "Kudüs",
+      "Medine",
+      "Mekke"
+    ],
+    "correctIndex": 3,
+    "explanation": "Hz. Peygamber Mekke'de doğmuştur.",
+    "source": "TDV İslam Ansiklopedisi, Muhammed"
+  },
+  {
+    "id": "iq_052",
+    "category": "Siyer",
+    "difficulty": 1,
+    "question": "Hz. Peygamber'in babasının adı nedir?",
+    "options": [
+      "Abdullah",
+      "Hamza",
+      "Ebu Talib",
+      "Abdülmuttalib"
+    ],
+    "correctIndex": 0,
+    "explanation": "Babası Abdullah'tır.",
+    "source": "TDV İslam Ansiklopedisi, Muhammed"
+  },
+  {
+    "id": "iq_053",
+    "category": "Siyer",
+    "difficulty": 1,
+    "question": "Hz. Peygamber'in annesinin adı nedir?",
+    "options": [
+      "Zeynep",
+      "Hatice",
+      "Fatıma",
+      "Âmine"
+    ],
+    "correctIndex": 3,
+    "explanation": "Annesi Âmine'dir.",
+    "source": "TDV İslam Ansiklopedisi, Âmine"
+  },
+  {
+    "id": "iq_054",
+    "category": "Siyer",
+    "difficulty": 1,
+    "question": "Hz. Peygamber'i sütanne olarak emziren kadın kimdir?",
+    "options": [
+      "Hatice",
+      "Ümmü Seleme",
+      "Sümeyye",
+      "Halime"
+    ],
+    "correctIndex": 3,
+    "explanation": "Sütannesi Halime'dir.",
+    "source": "TDV İslam Ansiklopedisi, Halîme"
+  },
+  {
+    "id": "iq_055",
+    "category": "Siyer",
+    "difficulty": 1,
+    "question": "Hz. Peygamber'in ilk eşi kimdir?",
+    "options": [
+      "Hafsa",
+      "Sevde",
+      "Âişe",
+      "Hatice"
+    ],
+    "correctIndex": 3,
+    "explanation": "İlk eşi Hz. Hatice'dir.",
+    "source": "TDV İslam Ansiklopedisi, Hatice"
+  },
+  {
+    "id": "iq_056",
+    "category": "Siyer",
+    "difficulty": 2,
+    "question": "İlk vahiy geldiğinde Hz. Peygamber kaç yaşındaydı?",
+    "options": [
+      "40",
+      "33",
+      "63",
+      "25"
+    ],
+    "correctIndex": 0,
+    "explanation": "Nübüvvet 40 yaşında başlamıştır.",
+    "source": "TDV İslam Ansiklopedisi, Muhammed"
+  },
+  {
+    "id": "iq_057",
+    "category": "Siyer",
+    "difficulty": 1,
+    "question": "İlk müslümanlardan olan eşi kimdir?",
+    "options": [
+      "Ümmü Cemil",
+      "Reyhane",
+      "Hind",
+      "Hatice"
+    ],
+    "correctIndex": 3,
+    "explanation": "İlk inananlardan biri Hz. Hatice'dir.",
+    "source": "TDV İslam Ansiklopedisi, Hatice"
+  },
+  {
+    "id": "iq_058",
+    "category": "Siyer",
+    "difficulty": 1,
+    "question": "İlk erkek müslümanlar arasında kim öne çıkar?",
+    "options": [
+      "Ebu Leheb",
+      "Ebu Bekir",
+      "Ebu Cehil",
+      "Velid"
+    ],
+    "correctIndex": 1,
+    "explanation": "Hz. Ebu Bekir ilk erkek müslümanlardandır.",
+    "source": "TDV İslam Ansiklopedisi, Ebû Bekir"
+  },
+  {
+    "id": "iq_059",
+    "category": "Siyer",
+    "difficulty": 2,
+    "question": "Habeşistan'a hicret neden yapılmıştır?",
+    "options": [
+      "İşkenceden korunmak için",
+      "Ticaret tekeli kurmak için",
+      "Savaş ilan etmek için",
+      "Kâbe'yi yıkmak için"
+    ],
+    "correctIndex": 0,
+    "explanation": "Müslümanlar zulümden Habeşistan'a göç etmiştir.",
+    "source": "TDV İslam Ansiklopedisi, Habeşistan Hicreti"
+  },
+  {
+    "id": "iq_060",
+    "category": "Siyer",
+    "difficulty": 1,
+    "question": "Hicret hangi şehre yapılmıştır?",
+    "options": [
+      "Taif",
+      "Kudüs",
+      "San'a",
+      "Medine"
+    ],
+    "correctIndex": 3,
+    "explanation": "Hicret Yesrib/Medine'yedir.",
+    "source": "TDV İslam Ansiklopedisi, Hicret"
+  },
+  {
+    "id": "iq_061",
+    "category": "Siyer",
+    "difficulty": 2,
+    "question": "Hicret yolunda sığınılan mağara hangisidir?",
+    "options": [
+      "Uhud",
+      "Sevr",
+      "Hira",
+      "Nur"
+    ],
+    "correctIndex": 1,
+    "explanation": "Hicrette Sevr Mağarası'na sığınılmıştır.",
+    "source": "TDV İslam Ansiklopedisi, Hicret"
+  },
+  {
+    "id": "iq_062",
+    "category": "Siyer",
+    "difficulty": 1,
+    "question": "Medine'de inşa edilen mescidin adı nedir?",
+    "options": [
+      "Kuba dışı bir kale",
+      "Mescid-i Haram dışında bir çarşı",
+      "Mescid-i Nebevî",
+      "Mescid-i Aksa"
+    ],
+    "correctIndex": 2,
+    "explanation": "Mescid-i Nebevî Medine'dedir.",
+    "source": "TDV İslam Ansiklopedisi, Mescid-i Nebevî"
+  },
+  {
+    "id": "iq_063",
+    "category": "Siyer",
+    "difficulty": 2,
+    "question": "Bedir Savaşı hangi taraflar arasında olmuştur?",
+    "options": [
+      "Yalnızca Rum ve Berberi",
+      "Yalnızca Evs ve Hazreç",
+      "Müslümanlar ve Kureyş ordusu",
+      "Bizans ve Sasaniler"
+    ],
+    "correctIndex": 2,
+    "explanation": "Bedir, müslümanlar ile Kureyş arasında geçmiştir.",
+    "source": "TDV İslam Ansiklopedisi, Bedir Gazvesi"
+  },
+  {
+    "id": "iq_064",
+    "category": "Siyer",
+    "difficulty": 2,
+    "question": "Uhud Savaşı'nda şehit düşen amca kimdir?",
+    "options": [
+      "Ebu Talib",
+      "Zübeyr",
+      "Abbas",
+      "Hamza"
+    ],
+    "correctIndex": 3,
+    "explanation": "Uhud'da Hz. Hamza şehit olmuştur.",
+    "source": "TDV İslam Ansiklopedisi, Uhud Gazvesi"
+  },
+  {
+    "id": "iq_065",
+    "category": "Siyer",
+    "difficulty": 2,
+    "question": "Hendek Savaşı'nda savunma yöntemi neydi?",
+    "options": [
+      "Şehrin önüne hendek kazılması",
+      "Kaleyi yakmak",
+      "Denizden hücum",
+      "Çarşıyı kapatmak"
+    ],
+    "correctIndex": 0,
+    "explanation": "Hendek kazılarak savunulmuştur.",
+    "source": "TDV İslam Ansiklopedisi, Hendek Gazvesi"
+  },
+  {
+    "id": "iq_066",
+    "category": "Siyer",
+    "difficulty": 1,
+    "question": "Hudeybiye Antlaşması kimlerle yapılmıştır?",
+    "options": [
+      "Sasanilerle",
+      "Mekkeli müşriklerle",
+      "Bizans'la",
+      "Habeşistan'la"
+    ],
+    "correctIndex": 1,
+    "explanation": "Hudeybiye Mekke tarafıyla imzalanmıştır.",
+    "source": "TDV İslam Ansiklopedisi, Hudeybiye Antlaşması"
+  },
+  {
+    "id": "iq_067",
+    "category": "Siyer",
+    "difficulty": 1,
+    "question": "Mekke'nin fethi hangi yılda gerçekleşmiştir?",
+    "options": [
+      "Hicri 2",
+      "Hicri 3",
+      "Hicri 1",
+      "Hicri 8"
+    ],
+    "correctIndex": 3,
+    "explanation": "Mekke fethi hicri 8. yıldadır.",
+    "source": "TDV İslam Ansiklopedisi, Mekke'nin Fethi"
+  },
+  {
+    "id": "iq_068",
+    "category": "Siyer",
+    "difficulty": 2,
+    "question": "Veda Hutbesi nerede irad edilmiştir?",
+    "options": [
+      "Sevr",
+      "Hira",
+      "Bedir",
+      "Arafat"
+    ],
+    "correctIndex": 3,
+    "explanation": "Veda Hutbesi Arafat'ta irad edilmiştir.",
+    "source": "TDV İslam Ansiklopedisi, Veda Hutbesi"
+  },
+  {
+    "id": "iq_069",
+    "category": "Siyer",
+    "difficulty": 1,
+    "question": "Hz. Peygamber kaç yaşında vefat etmiştir?",
+    "options": [
+      "40",
+      "25",
+      "63",
+      "50"
+    ],
+    "correctIndex": 2,
+    "explanation": "63 yaşında vefat etmiştir.",
+    "source": "TDV İslam Ansiklopedisi, Muhammed"
+  },
+  {
+    "id": "iq_070",
+    "category": "Siyer",
+    "difficulty": 1,
+    "question": "Hz. Peygamber'in kabri nerededir?",
+    "options": [
+      "Kudüs",
+      "Medine",
+      "Taif",
+      "Mekke"
+    ],
+    "correctIndex": 1,
+    "explanation": "Kabri Medine'dedir.",
+    "source": "TDV İslam Ansiklopedisi, Ravza-i Mutahhara"
+  },
+  {
+    "id": "iq_071",
+    "category": "Siyer",
+    "difficulty": 2,
+    "question": "İsra ve Miraç olayı neyi ifade eder?",
+    "options": [
+      "Bedir keşfi",
+      "Hicret kervanı",
+      "Hendek kazısı",
+      "Gece yolculuğu ve göğe yükseliş mucizesi"
+    ],
+    "correctIndex": 3,
+    "explanation": "İsra ve Miraç özel bir mucizedir.",
+    "source": "TDV İslam Ansiklopedisi, İsrâ ve Mi'râc"
+  },
+  {
+    "id": "iq_072",
+    "category": "Siyer",
+    "difficulty": 1,
+    "question": "Hz. Peygamber hangi boydandır?",
+    "options": [
+      "Evs",
+      "Sakif",
+      "Hazreç",
+      "Kureyş / Haşimoğulları"
+    ],
+    "correctIndex": 3,
+    "explanation": "Haşimoğulları'ndandır.",
+    "source": "TDV İslam Ansiklopedisi, Muhammed"
+  },
+  {
+    "id": "iq_073",
+    "category": "Siyer",
+    "difficulty": 2,
+    "question": "Taif yolculuğunun amacı neydi?",
+    "options": [
+      "Kâbe'yi taşımak",
+      "İslam'ı tebliğ etmek",
+      "Deniz ticareti kurmak",
+      "Ordu toplamak"
+    ],
+    "correctIndex": 1,
+    "explanation": "Taif'te tebliğ yapılmıştır.",
+    "source": "TDV İslam Ansiklopedisi, Tâif"
+  },
+  {
+    "id": "iq_074",
+    "category": "Siyer",
+    "difficulty": 1,
+    "question": "Erkam'ın evi ne için kullanılmıştır?",
+    "options": [
+      "Yalnızca ticaret deposu",
+      "Yalnızca gümrük kapısı",
+      "Gizli tebliğ ve eğitim mekânı",
+      "Yalnızca silah imalathanesi"
+    ],
+    "correctIndex": 2,
+    "explanation": "Dârülkamm erken dönem eğitim yeridir.",
+    "source": "TDV İslam Ansiklopedisi, Dârülerkam"
+  },
+  {
+    "id": "iq_075",
+    "category": "Siyer",
+    "difficulty": 2,
+    "question": "Akabe biatları nerede gerçekleşmiştir?",
+    "options": [
+      "Hayber kalesinde",
+      "Mina yakınlarında",
+      "Bedir ovasında",
+      "Hudeybiye çölünde yalnızca"
+    ],
+    "correctIndex": 1,
+    "explanation": "Akabe biatları hac döneminde yapılmıştır.",
+    "source": "TDV İslam Ansiklopedisi, Akabe Biatları"
+  },
+  {
+    "id": "iq_076",
+    "category": "Siyer",
+    "difficulty": 1,
+    "question": "Medine Sözleşmesi neyi düzenlemiştir?",
+    "options": [
+      "Yalnızca Bizans vergisini",
+      "Yalnızca Fil ordusunu",
+      "Yalnızca Kâbe örtüsünü",
+      "Medine toplumunun ortak esaslarını"
+    ],
+    "correctIndex": 3,
+    "explanation": "Medine Vesikası şehir düzenini belirlemiştir.",
+    "source": "TDV İslam Ansiklopedisi, Medine Sözleşmesi"
+  },
+  {
+    "id": "iq_077",
+    "category": "Siyer",
+    "difficulty": 2,
+    "question": "Huneyn Savaşı hangi olaydan sonra olmuştur?",
+    "options": [
+      "Fil Vakası'ndan önce",
+      "Hicretten bir gün önce",
+      "İlk vahiyden hemen sonra",
+      "Mekke'nin fethinden sonra"
+    ],
+    "correctIndex": 3,
+    "explanation": "Huneyn fetih sonrasındadır.",
+    "source": "TDV İslam Ansiklopedisi, Huneyn Gazvesi"
+  },
+  {
+    "id": "iq_078",
+    "category": "Siyer",
+    "difficulty": 1,
+    "question": "Hz. Peygamber'in dedesi kimdir?",
+    "options": [
+      "Abdülmuttalib",
+      "Ebu Leheb",
+      "Ebu Cehil",
+      "Utbe"
+    ],
+    "correctIndex": 0,
+    "explanation": "Dedesi Abdülmuttalib'dir.",
+    "source": "TDV İslam Ansiklopedisi, Abdülmuttalib"
+  },
+  {
+    "id": "iq_079",
+    "category": "Siyer",
+    "difficulty": 3,
+    "question": "Şakk-ı sadr olayı siyerde nasıl anılır?",
+    "options": [
+      "Göğsün açılması mucizesi rivayeti",
+      "Hendek kazısı",
+      "Çarşı denetimi",
+      "Kâbe tamiri"
+    ],
+    "correctIndex": 0,
+    "explanation": "Şakk-ı sadr erken dönem mucize rivayetidir.",
+    "source": "TDV İslam Ansiklopedisi, Muhammed"
+  },
+  {
+    "id": "iq_080",
+    "category": "Siyer",
+    "difficulty": 1,
+    "question": "Hz. Peygamber'in süt kardeşi olarak bilinen isimlerden biri kimdir?",
+    "options": [
+      "Ebu Leheb",
+      "Velid",
+      "Ebu Cehil",
+      "Şeymâ"
+    ],
+    "correctIndex": 3,
+    "explanation": "Şeymâ süt kardeşi olarak anılır.",
+    "source": "TDV İslam Ansiklopedisi, Şeymâ"
+  },
+  {
+    "id": "iq_081",
+    "category": "Siyer",
+    "difficulty": 2,
+    "question": "Boykot yılları neyi ifade eder?",
+    "options": [
+      "Hac menasikinin iptali",
+      "Orucun farz oluşu",
+      "Hâşimoğulları'na uygulanan ambargo",
+      "Namazın yasaklanması"
+    ],
+    "correctIndex": 2,
+    "explanation": "Boykot erken dönem baskı dönemidir.",
+    "source": "TDV İslam Ansiklopedisi, Boykot"
+  },
+  {
+    "id": "iq_082",
+    "category": "Siyer",
+    "difficulty": 1,
+    "question": "Hz. Peygamber'in ilk inşa ettiği mescitlerden biri hangisidir?",
+    "options": [
+      "Eyüp Sultan",
+      "Sultanahmet",
+      "Kuba Mescidi",
+      "Mescid-i Aksa'nın tamamı"
+    ],
+    "correctIndex": 2,
+    "explanation": "Kuba, hicret yolundaki önemli mescittir.",
+    "source": "TDV İslam Ansiklopedisi, Kubâ Mescidi"
+  },
+  {
+    "id": "iq_083",
+    "category": "Siyer",
+    "difficulty": 3,
+    "question": "Ci'râne hangi olayla anılır?",
+    "options": [
+      "Uhud şehitliği",
+      "Huneyn sonrası ganimet dağıtımı",
+      "Hira inzivası",
+      "Bedir kuyuları"
+    ],
+    "correctIndex": 1,
+    "explanation": "Ci'râne Huneyn sonrasıyla anılır.",
+    "source": "TDV İslam Ansiklopedisi, Ci'râne"
+  },
+  {
+    "id": "iq_084",
+    "category": "Siyer",
+    "difficulty": 3,
+    "question": "Rıdvan Biatı hangi süreçtedir?",
+    "options": [
+      "Ashab-ı Kehf",
+      "Yalnızca Taif dönüşü",
+      "Hudeybiye süreci",
+      "Fil Vakası"
+    ],
+    "correctIndex": 2,
+    "explanation": "Rıdvan Biatı Hudeybiye ile bağlıdır.",
+    "source": "TDV İslam Ansiklopedisi, Rıdvân Biatı"
+  },
+  {
+    "id": "iq_085",
+    "category": "Siyer",
+    "difficulty": 1,
+    "question": "Hz. Peygamber'in doğum yılı geleneksel olarak nasıl anılır?",
+    "options": [
+      "Hendek Yılı",
+      "Fil Yılı",
+      "Fetih Yılı",
+      "Bedir Yılı"
+    ],
+    "correctIndex": 1,
+    "explanation": "Doğum Fil Yılı ile anılır.",
+    "source": "TDV İslam Ansiklopedisi, Muhammed"
+  },
+  {
+    "id": "iq_086",
+    "category": "Siyer",
+    "difficulty": 1,
+    "question": "Yesrib hicretten sonra hangi adla anılmıştır?",
+    "options": [
+      "Hayber",
+      "Fadak",
+      "Taif",
+      "Medine"
+    ],
+    "correctIndex": 3,
+    "explanation": "Yesrib Medine adını almıştır.",
+    "source": "TDV İslam Ansiklopedisi, Medine"
+  },
+  {
+    "id": "iq_087",
+    "category": "Siyer",
+    "difficulty": 1,
+    "question": "Sahabe kimdir?",
+    "options": [
+      "Yalnızca mezhep imamı",
+      "Yalnızca tabiîn",
+      "Peygamber'i mümin olarak görüp müslüman ölen kimse",
+      "Yalnızca müfessir"
+    ],
+    "correctIndex": 2,
+    "explanation": "Sahabe, Peygamber'i gören müminlerdir.",
+    "source": "TDV İslam Ansiklopedisi, Sahâbe"
+  },
+  {
+    "id": "iq_088",
+    "category": "Siyer",
+    "difficulty": 2,
+    "question": "Hicrette yolda eşlik eden sahabi kimdir?",
+    "options": [
+      "Ebu Bekir",
+      "Osman",
+      "Hamza",
+      "Ömer"
+    ],
+    "correctIndex": 0,
+    "explanation": "Hicrette Ebu Bekir refakat etmiştir.",
+    "source": "TDV İslam Ansiklopedisi, Hicret"
+  },
+  {
+    "id": "iq_089",
+    "category": "Siyer",
+    "difficulty": 3,
+    "question": "Dârünnedve neydi?",
+    "options": [
+      "Namazgâh",
+      "Zekât evi",
+      "Hac menzili",
+      "Kureyş'in istişare meclisi"
+    ],
+    "correctIndex": 3,
+    "explanation": "Dârünnedve Kureyş istişare yeridir.",
+    "source": "TDV İslam Ansiklopedisi, Dârünnedve"
+  },
+  {
+    "id": "iq_090",
+    "category": "Siyer",
+    "difficulty": 3,
+    "question": "Veda Haccı hangi yılda yapılmıştır?",
+    "options": [
+      "Hicri 6",
+      "Hicri 1",
+      "Hicri 10",
+      "Hicri 3"
+    ],
+    "correctIndex": 2,
+    "explanation": "Veda Haccı hicri 10. yıldadır.",
+    "source": "TDV İslam Ansiklopedisi, Veda Haccı"
+  },
+  {
+    "id": "iq_091",
+    "category": "Siyer",
+    "difficulty": 1,
+    "question": "Hz. Peygamber'in son hastalığında namazı kim kıldırmıştır?",
+    "options": [
+      "Ali",
+      "Osman",
+      "Ebu Bekir",
+      "Ömer"
+    ],
+    "correctIndex": 2,
+    "explanation": "Namazı Hz. Ebu Bekir kıldırmıştır.",
+    "source": "TDV İslam Ansiklopedisi, Ebû Bekir"
+  },
+  {
+    "id": "iq_092",
+    "category": "Siyer",
+    "difficulty": 2,
+    "question": "Kıble değişikliği neyi göstermiştir?",
+    "options": [
+      "Kudüs'ten Kâbe'ye yönelişi",
+      "Haccın kaldırılmasını",
+      "Namazın kaldırılmasını",
+      "Orucun kaldırılmasını"
+    ],
+    "correctIndex": 0,
+    "explanation": "Kıble Kâbe'ye çevrilmiştir.",
+    "source": "TDV İslam Ansiklopedisi, Kıble"
+  },
+  {
+    "id": "iq_093",
+    "category": "Siyer",
+    "difficulty": 1,
+    "question": "Ebu Talib kimdir?",
+    "options": [
+      "Hz. Peygamber'in amcası ve koruyucusu",
+      "Taif kralı",
+      "Hayber reisi",
+      "Bizans imparatoru"
+    ],
+    "correctIndex": 0,
+    "explanation": "Ebu Talib amca ve koruyucudur.",
+    "source": "TDV İslam Ansiklopedisi, Ebû Tâlib"
+  },
+  {
+    "id": "iq_094",
+    "category": "Siyer",
+    "difficulty": 2,
+    "question": "Bedir zaferinin önemi nedir?",
+    "options": [
+      "İslam'ın ilk büyük meydan zaferi oluşu",
+      "Orucun kalkması",
+      "Haccın farz oluşu",
+      "Zekâtın kalkması"
+    ],
+    "correctIndex": 0,
+    "explanation": "Bedir ilk büyük zafer olarak anılır.",
+    "source": "TDV İslam Ansiklopedisi, Bedir Gazvesi"
+  },
+  {
+    "id": "iq_095",
+    "category": "Siyer",
+    "difficulty": 2,
+    "question": "Uhud'da okçuların yerini terk etmesinin sonucu ne olmuştur?",
+    "options": [
+      "Savaşın seyri aleyhe dönmüştür",
+      "Boykot bitmiştir",
+      "Hemen fetih olmuştur",
+      "Hicret başlamıştır"
+    ],
+    "correctIndex": 0,
+    "explanation": "Okçuların ayrılması savaşı etkilemiştir.",
+    "source": "TDV İslam Ansiklopedisi, Uhud Gazvesi"
+  },
+  {
+    "id": "iq_096",
+    "category": "Siyer",
+    "difficulty": 1,
+    "question": "Hz. Peygamber'in çocuklarından biri kimdir?",
+    "options": [
+      "Fatıma",
+      "Hatice'nin annesi",
+      "Âmine",
+      "Halime"
+    ],
+    "correctIndex": 0,
+    "explanation": "Hz. Fatıma kızıdır.",
+    "source": "TDV İslam Ansiklopedisi, Fâtıma"
+  },
+  {
+    "id": "iq_097",
+    "category": "Siyer",
+    "difficulty": 3,
+    "question": "Mute Seferi hangi güce karşı yapılmıştır?",
+    "options": [
+      "Yalnızca Evs'e",
+      "Bizans sınır güçlerine",
+      "Yalnızca Hazreç'e",
+      "Yalnızca Sakif'e"
+    ],
+    "correctIndex": 1,
+    "explanation": "Mute, Bizans hattıyla ilgilidir.",
+    "source": "TDV İslam Ansiklopedisi, Mute"
+  },
+  {
+    "id": "iq_098",
+    "category": "Siyer",
+    "difficulty": 2,
+    "question": "Hayber'in fethi neyi sağlamıştır?",
+    "options": [
+      "Kuzeydeki önemli bir kalenin alınmasını",
+      "Kâbe'nin yıkılmasını",
+      "Namazın iptalini",
+      "Orucun kalkmasını"
+    ],
+    "correctIndex": 0,
+    "explanation": "Hayber seferi stratejik bir zaferdir.",
+    "source": "TDV İslam Ansiklopedisi, Hayber"
+  },
+  {
+    "id": "iq_099",
+    "category": "Siyer",
+    "difficulty": 1,
+    "question": "Ezana dair uygulamalar hangi dönemde yerleşmiştir?",
+    "options": [
+      "Yalnızca boykot yıllarında",
+      "Yalnızca Taif dönüşünde",
+      "Fil Vakası'nda",
+      "Medine döneminde"
+    ],
+    "correctIndex": 3,
+    "explanation": "Ezan Medine'de kurumsallaşmıştır.",
+    "source": "TDV İslam Ansiklopedisi, Ezan"
+  },
+  {
+    "id": "iq_100",
+    "category": "Siyer",
+    "difficulty": 2,
+    "question": "Hz. Peygamber'in ahlakını özetleyen bilinen vurgu nedir?",
+    "options": [
+      "Mal biriktirme tutkusu",
+      "Güç gösterisi tutkusu",
+      "Soy övünme tutkusu",
+      "Üstün ahlak üzere oluşu"
+    ],
+    "correctIndex": 3,
+    "explanation": "Kur'an ve siyer üstün ahlakı vurgular.",
+    "source": "Diyanet Kur'an Yolu, Kalem 68/4"
+  },
+  {
+    "id": "iq_101",
+    "category": "Peygamberler tarihi",
+    "difficulty": 1,
+    "question": "İlk insan ve peygamber kimdir?",
+    "options": [
+      "Hz. Nuh",
+      "Hz. Musa",
+      "Hz. İbrahim",
+      "Hz. Âdem"
+    ],
+    "correctIndex": 3,
+    "explanation": "İlk insan ve peygamber Hz. Âdem'dir.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_102",
+    "category": "Peygamberler tarihi",
+    "difficulty": 1,
+    "question": "Tufan kıssası hangi peygamberle anılır?",
+    "options": [
+      "Hz. Hud",
+      "Hz. Salih",
+      "Hz. Lut",
+      "Hz. Nuh"
+    ],
+    "correctIndex": 3,
+    "explanation": "Tufan Hz. Nuh ile anlatılır.",
+    "source": "Diyanet Kur'an Yolu; TDV İslam Ansiklopedisi, Nûh"
+  },
+  {
+    "id": "iq_103",
+    "category": "Peygamberler tarihi",
+    "difficulty": 1,
+    "question": "Kâbe'nin temellerini yükselten peygamberler kimlerdir?",
+    "options": [
+      "Hz. İbrahim ve Hz. İsmail",
+      "Hz. Yahya ve Hz. İsa",
+      "Hz. Musa ve Hz. Harun",
+      "Hz. Davud ve Hz. Süleyman"
+    ],
+    "correctIndex": 0,
+    "explanation": "Kur'an İbrahim-İsmail'in Kâbe'yi yükseltmesini anlatır.",
+    "source": "Diyanet Kur'an Yolu, Bakara 2/127"
+  },
+  {
+    "id": "iq_104",
+    "category": "Peygamberler tarihi",
+    "difficulty": 1,
+    "question": "Asâ mucizesi hangi peygamberle anılır?",
+    "options": [
+      "Hz. Yunus",
+      "Hz. Eyyub",
+      "Hz. Musa",
+      "Hz. İsa"
+    ],
+    "correctIndex": 2,
+    "explanation": "Hz. Musa'nın asâ mucizesi anlatılır.",
+    "source": "Diyanet Kur'an Yolu, Şuara"
+  },
+  {
+    "id": "iq_105",
+    "category": "Peygamberler tarihi",
+    "difficulty": 2,
+    "question": "Beşikte konuşma mucizesi hangi peygamberle ilişkilendirilir?",
+    "options": [
+      "Hz. Yusuf",
+      "Hz. Yunus",
+      "Hz. Musa",
+      "Hz. İsa"
+    ],
+    "correctIndex": 3,
+    "explanation": "Kur'an Hz. İsa'nın mucizelerinden bahseder.",
+    "source": "Diyanet Kur'an Yolu, Meryem"
+  },
+  {
+    "id": "iq_106",
+    "category": "Peygamberler tarihi",
+    "difficulty": 1,
+    "question": "Kuyuya atılma kıssası hangi peygambere aittir?",
+    "options": [
+      "Hz. Yunus",
+      "Hz. Eyyub",
+      "Hz. Yusuf",
+      "Hz. Salih"
+    ],
+    "correctIndex": 2,
+    "explanation": "Yusuf kıssasında kuyuya atılma anlatılır.",
+    "source": "Diyanet Kur'an Yolu, Yusuf"
+  },
+  {
+    "id": "iq_107",
+    "category": "Peygamberler tarihi",
+    "difficulty": 1,
+    "question": "Balık kıssası hangi peygamberledir?",
+    "options": [
+      "Hz. İlyas",
+      "Hz. Musa",
+      "Hz. Yusuf",
+      "Hz. Yunus"
+    ],
+    "correctIndex": 3,
+    "explanation": "Yunus kıssası balık hadisesiyle anılır.",
+    "source": "Diyanet Kur'an Yolu, Saffat"
+  },
+  {
+    "id": "iq_108",
+    "category": "Peygamberler tarihi",
+    "difficulty": 1,
+    "question": "Sabır örneği olarak anılan peygamber kimdir?",
+    "options": [
+      "Hz. Lut",
+      "Hz. Şuayb",
+      "Hz. Eyyub",
+      "Hz. Hud"
+    ],
+    "correctIndex": 2,
+    "explanation": "Hz. Eyyub sabrıyla anılır.",
+    "source": "Diyanet Kur'an Yolu; TDV İslam Ansiklopedisi, Eyyûb"
+  },
+  {
+    "id": "iq_109",
+    "category": "Peygamberler tarihi",
+    "difficulty": 1,
+    "question": "Putları kıran peygamber hangisidir?",
+    "options": [
+      "Hz. Yunus",
+      "Hz. İbrahim",
+      "Hz. Nuh",
+      "Hz. İdris"
+    ],
+    "correctIndex": 1,
+    "explanation": "İbrahim kıssasında putların kırılması anlatılır.",
+    "source": "Diyanet Kur'an Yolu, Enbiya"
+  },
+  {
+    "id": "iq_110",
+    "category": "Peygamberler tarihi",
+    "difficulty": 1,
+    "question": "Tevrat hangi peygambere verilmiştir?",
+    "options": [
+      "Hz. Davud",
+      "Hz. Musa",
+      "Hz. İbrahim",
+      "Hz. İsa"
+    ],
+    "correctIndex": 1,
+    "explanation": "Tevrat Hz. Musa'ya verilmiştir.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_111",
+    "category": "Peygamberler tarihi",
+    "difficulty": 2,
+    "question": "Zebur hangi peygambere verilmiştir?",
+    "options": [
+      "Hz. Davud",
+      "Hz. İsa",
+      "Hz. Musa",
+      "Hz. İbrahim"
+    ],
+    "correctIndex": 0,
+    "explanation": "Zebur Hz. Davud'a verilmiştir.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_112",
+    "category": "Peygamberler tarihi",
+    "difficulty": 1,
+    "question": "İncil hangi peygambere nispet edilir?",
+    "options": [
+      "Hz. Nuh",
+      "Hz. Musa",
+      "Hz. İsa",
+      "Hz. Davud"
+    ],
+    "correctIndex": 2,
+    "explanation": "İncil Hz. İsa'ya nispet edilir.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_113",
+    "category": "Peygamberler tarihi",
+    "difficulty": 2,
+    "question": "Kur'an'da Halilullah diye anılan peygamber kimdir?",
+    "options": [
+      "Hz. İbrahim",
+      "Hz. İsa",
+      "Hz. Musa",
+      "Hz. Nuh"
+    ],
+    "correctIndex": 0,
+    "explanation": "Hz. İbrahim Halilullah diye anılır.",
+    "source": "TDV İslam Ansiklopedisi, İbrâhîm"
+  },
+  {
+    "id": "iq_114",
+    "category": "Peygamberler tarihi",
+    "difficulty": 2,
+    "question": "Semud kavmine gönderilen peygamber kimdir?",
+    "options": [
+      "Hz. Şuayb",
+      "Hz. Hud",
+      "Hz. Salih",
+      "Hz. Lut"
+    ],
+    "correctIndex": 2,
+    "explanation": "Semud'a Hz. Salih gönderilmiştir.",
+    "source": "TDV İslam Ansiklopedisi, Sâlih"
+  },
+  {
+    "id": "iq_115",
+    "category": "Peygamberler tarihi",
+    "difficulty": 2,
+    "question": "Âd kavmine gönderilen peygamber kimdir?",
+    "options": [
+      "Hz. Lut",
+      "Hz. Hud",
+      "Hz. Salih",
+      "Hz. Şuayb"
+    ],
+    "correctIndex": 1,
+    "explanation": "Âd kavmine Hz. Hud gönderilmiştir.",
+    "source": "TDV İslam Ansiklopedisi, Hûd"
+  },
+  {
+    "id": "iq_116",
+    "category": "Peygamberler tarihi",
+    "difficulty": 2,
+    "question": "Medyen halkına gönderilen peygamber kimdir?",
+    "options": [
+      "Hz. Yunus",
+      "Hz. Salih",
+      "Hz. Hud",
+      "Hz. Şuayb"
+    ],
+    "correctIndex": 3,
+    "explanation": "Medyen'e Hz. Şuayb gönderilmiştir.",
+    "source": "TDV İslam Ansiklopedisi, Şuayb"
+  },
+  {
+    "id": "iq_117",
+    "category": "Peygamberler tarihi",
+    "difficulty": 1,
+    "question": "Hz. İsmail kimin oğludur?",
+    "options": [
+      "Hz. Yusuf'un",
+      "Hz. İbrahim'in",
+      "Hz. Nuh'un",
+      "Hz. Musa'nın"
+    ],
+    "correctIndex": 1,
+    "explanation": "Hz. İsmail Hz. İbrahim'in oğludur.",
+    "source": "TDV İslam Ansiklopedisi, İsmâil"
+  },
+  {
+    "id": "iq_118",
+    "category": "Peygamberler tarihi",
+    "difficulty": 1,
+    "question": "Hz. İshak kimin oğludur?",
+    "options": [
+      "Hz. Salih'in",
+      "Hz. Hud'un",
+      "Hz. Nuh'un",
+      "Hz. İbrahim'in"
+    ],
+    "correctIndex": 3,
+    "explanation": "Hz. İshak Hz. İbrahim'in oğludur.",
+    "source": "TDV İslam Ansiklopedisi, İshak"
+  },
+  {
+    "id": "iq_119",
+    "category": "Peygamberler tarihi",
+    "difficulty": 1,
+    "question": "Mısır'da yönetici konumuna yükselen peygamber kimdir?",
+    "options": [
+      "Hz. Eyyub",
+      "Hz. Yunus",
+      "Hz. Yusuf",
+      "Hz. İlyas"
+    ],
+    "correctIndex": 2,
+    "explanation": "Hz. Yusuf Mısır'da görev almıştır.",
+    "source": "Diyanet Kur'an Yolu, Yusuf"
+  },
+  {
+    "id": "iq_120",
+    "category": "Peygamberler tarihi",
+    "difficulty": 1,
+    "question": "Hz. Harun hangi peygamberin kardeşidir?",
+    "options": [
+      "Hz. İbrahim",
+      "Hz. Musa",
+      "Hz. Nuh",
+      "Hz. İsa"
+    ],
+    "correctIndex": 1,
+    "explanation": "Hz. Harun Hz. Musa'nın kardeşidir.",
+    "source": "TDV İslam Ansiklopedisi, Hârûn"
+  },
+  {
+    "id": "iq_121",
+    "category": "Peygamberler tarihi",
+    "difficulty": 2,
+    "question": "Hz. Zekeriya'nın oğlu olan peygamber kimdir?",
+    "options": [
+      "Hz. Yusuf",
+      "Hz. Musa",
+      "Hz. İsa",
+      "Hz. Yahya"
+    ],
+    "correctIndex": 3,
+    "explanation": "Hz. Yahya Hz. Zekeriya'nın oğludur.",
+    "source": "TDV İslam Ansiklopedisi, Yahyâ"
+  },
+  {
+    "id": "iq_122",
+    "category": "Peygamberler tarihi",
+    "difficulty": 1,
+    "question": "Hz. Meryem'in oğlu olan peygamber kimdir?",
+    "options": [
+      "Hz. Musa",
+      "Hz. Yusuf",
+      "Hz. İsa",
+      "Hz. Yahya"
+    ],
+    "correctIndex": 2,
+    "explanation": "Hz. İsa Hz. Meryem'in oğludur.",
+    "source": "Diyanet Kur'an Yolu, Meryem"
+  },
+  {
+    "id": "iq_123",
+    "category": "Peygamberler tarihi",
+    "difficulty": 3,
+    "question": "Ulu'l-azm peygamberler kimlerdir?",
+    "options": [
+      "Yalnızca Yusuf ve Yunus",
+      "Nuh, İbrahim, Musa, İsa ve Muhammed",
+      "Yalnızca Hud ve Salih",
+      "Yalnızca Davud ve Süleyman"
+    ],
+    "correctIndex": 1,
+    "explanation": "Ulu'l-azm beş büyük peygamberdir.",
+    "source": "TDV İslam Ansiklopedisi, Ulü'l-azm"
+  },
+  {
+    "id": "iq_124",
+    "category": "Peygamberler tarihi",
+    "difficulty": 2,
+    "question": "Hz. Süleyman hangi yönüyle de anılır?",
+    "options": [
+      "Yalnızca denizci",
+      "Yalnızca demirci",
+      "Hükümdar-peygamber",
+      "Yalnızca çiftçi"
+    ],
+    "correctIndex": 2,
+    "explanation": "Hz. Süleyman hükümdar-peygamber olarak anılır.",
+    "source": "TDV İslam Ansiklopedisi, Süleyman"
+  },
+  {
+    "id": "iq_125",
+    "category": "Peygamberler tarihi",
+    "difficulty": 2,
+    "question": "Hz. Davud hangi yönüyle de anılır?",
+    "options": [
+      "Yalnızca tacir",
+      "Hükümdar-peygamber ve Zebur sahibi",
+      "Yalnızca çiftçi",
+      "Yalnızca kâhin"
+    ],
+    "correctIndex": 1,
+    "explanation": "Hz. Davud Zebur ve hükümdarlıkla anılır.",
+    "source": "TDV İslam Ansiklopedisi, Dâvûd"
+  },
+  {
+    "id": "iq_126",
+    "category": "Peygamberler tarihi",
+    "difficulty": 1,
+    "question": "Hz. Lut hangi kavme gönderilmiştir?",
+    "options": [
+      "Semud kavmine",
+      "Âd kavmine",
+      "Lut kavmine",
+      "Medyen'e"
+    ],
+    "correctIndex": 2,
+    "explanation": "Hz. Lut kendi kavmine gönderilmiştir.",
+    "source": "TDV İslam Ansiklopedisi, Lût"
+  },
+  {
+    "id": "iq_127",
+    "category": "Peygamberler tarihi",
+    "difficulty": 3,
+    "question": "Hz. İdris hakkında Kur'an'da geçen vurgu nedir?",
+    "options": [
+      "Doğru bir peygamber oluşu",
+      "Demirci oluşu",
+      "Tacir oluşu",
+      "Denizci oluşu"
+    ],
+    "correctIndex": 0,
+    "explanation": "Kur'an Hz. İdris'i doğru bir peygamber olarak anar.",
+    "source": "Diyanet Kur'an Yolu, Meryem 19/56"
+  },
+  {
+    "id": "iq_128",
+    "category": "Peygamberler tarihi",
+    "difficulty": 3,
+    "question": "Hz. İsmail ile ilgili Kâbe hizmeti nasıl anılır?",
+    "options": [
+      "İncil yazması",
+      "Tevrat yazması",
+      "Zebur yazması",
+      "Babasıyla Kâbe'yi yükseltmesi"
+    ],
+    "correctIndex": 3,
+    "explanation": "İsmail, İbrahim ile Kâbe'yi yükseltmiştir.",
+    "source": "Diyanet Kur'an Yolu, Bakara 2/127"
+  },
+  {
+    "id": "iq_129",
+    "category": "Peygamberler tarihi",
+    "difficulty": 1,
+    "question": "Son peygamber kimdir?",
+    "options": [
+      "Hz. Musa",
+      "Hz. Muhammed",
+      "Hz. İbrahim",
+      "Hz. İsa"
+    ],
+    "correctIndex": 1,
+    "explanation": "Son peygamber Hz. Muhammed'dir.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_130",
+    "category": "Peygamberler tarihi",
+    "difficulty": 2,
+    "question": "Hz. Musa'ya verilen mucizelerden biri nedir?",
+    "options": [
+      "Put kırma",
+      "Kuyuya atılma",
+      "Balığa yutulma",
+      "Denizin yarılması"
+    ],
+    "correctIndex": 3,
+    "explanation": "Denizin yarılması Musa kıssasındadır.",
+    "source": "Diyanet Kur'an Yolu, Şuara"
+  },
+  {
+    "id": "iq_131",
+    "category": "Peygamberler tarihi",
+    "difficulty": 1,
+    "question": "Hz. İbrahim'in ateşe atılması kıssası neyi gösterir?",
+    "options": [
+      "Ticaret kârını",
+      "Allah'ın yardımını ve imanı",
+      "Miras dilimini",
+      "Ganimet paylaşımını"
+    ],
+    "correctIndex": 1,
+    "explanation": "Ateş kıssası iman imtihanıdır.",
+    "source": "Diyanet Kur'an Yolu, Enbiya"
+  },
+  {
+    "id": "iq_132",
+    "category": "Peygamberler tarihi",
+    "difficulty": 2,
+    "question": "Hz. Nuh'un gemisi kıssası neyi anlatır?",
+    "options": [
+      "İman edenlerin kurtuluşunu",
+      "Çarşı kurmayı",
+      "Zekât nisabını",
+      "Kâbe örtüsünü"
+    ],
+    "correctIndex": 0,
+    "explanation": "Gemi kıssası kurtuluşu anlatır.",
+    "source": "Diyanet Kur'an Yolu, Hud"
+  },
+  {
+    "id": "iq_133",
+    "category": "Peygamberler tarihi",
+    "difficulty": 1,
+    "question": "Hz. Yakub hangi peygamberin babasıdır?",
+    "options": [
+      "Hz. Salih'in",
+      "Hz. Yusuf'un",
+      "Hz. Yunus'un",
+      "Hz. Hud'un"
+    ],
+    "correctIndex": 1,
+    "explanation": "Hz. Yakub Hz. Yusuf'un babasıdır.",
+    "source": "TDV İslam Ansiklopedisi, Ya'kûb"
+  },
+  {
+    "id": "iq_134",
+    "category": "Peygamberler tarihi",
+    "difficulty": 3,
+    "question": "Zülkarneyn kıssası hangi surededir?",
+    "options": [
+      "Rahmân",
+      "Yasin",
+      "Kehf",
+      "Mülk"
+    ],
+    "correctIndex": 2,
+    "explanation": "Zülkarneyn Kehf suresinde anlatılır.",
+    "source": "Diyanet Kur'an Yolu, Kehf"
+  },
+  {
+    "id": "iq_135",
+    "category": "Peygamberler tarihi",
+    "difficulty": 2,
+    "question": "Hz. Salih'in kavmine verilen deve mucizesi nasıl anılır?",
+    "options": [
+      "Savaş atı",
+      "Ticaret gemisi",
+      "Hazine sandığı",
+      "Allah'ın ayeti olarak deve"
+    ],
+    "correctIndex": 3,
+    "explanation": "Semud'a deve mucizesi verilmiştir.",
+    "source": "Diyanet Kur'an Yolu; TDV İslam Ansiklopedisi, Sâlih"
+  },
+  {
+    "id": "iq_136",
+    "category": "Peygamberler tarihi",
+    "difficulty": 1,
+    "question": "Hz. İsa'ya verilen kitap hangisidir?",
+    "options": [
+      "Tevrat",
+      "İncil",
+      "Suhuf",
+      "Zebur"
+    ],
+    "correctIndex": 1,
+    "explanation": "İncil Hz. İsa'ya nispet edilir.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_137",
+    "category": "Peygamberler tarihi",
+    "difficulty": 2,
+    "question": "Hz. Musa'nın kardeşi yardımcı olarak kimdir?",
+    "options": [
+      "Hz. Yusuf",
+      "Hz. Lut",
+      "Hz. Yunus",
+      "Hz. Harun"
+    ],
+    "correctIndex": 3,
+    "explanation": "Harun Musa'ya yardımcı olmuştur.",
+    "source": "TDV İslam Ansiklopedisi, Hârûn"
+  },
+  {
+    "id": "iq_138",
+    "category": "Peygamberler tarihi",
+    "difficulty": 1,
+    "question": "Hz. İbrahim'e verilen sahifelere ne ad verilir?",
+    "options": [
+      "Mesnevi",
+      "İncil",
+      "Suhuf",
+      "Zebur"
+    ],
+    "correctIndex": 2,
+    "explanation": "İbrahim'e suhuf verildiği bildirilir.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_139",
+    "category": "Peygamberler tarihi",
+    "difficulty": 2,
+    "question": "Lokman kıssasında öne çıkan tema nedir?",
+    "options": [
+      "Ganimet paylaşımı",
+      "Miras hesabı",
+      "Savaş taktiği",
+      "Hikmetli öğütler"
+    ],
+    "correctIndex": 3,
+    "explanation": "Lokman hikmet ve öğütle anılır.",
+    "source": "Diyanet Kur'an Yolu, Lokman"
+  },
+  {
+    "id": "iq_140",
+    "category": "Peygamberler tarihi",
+    "difficulty": 3,
+    "question": "Ashab-ı Ress kıssası neyi hatırlatır?",
+    "options": [
+      "Hac menzillerini",
+      "Geçmiş kavimlerin ibretlik akıbetini",
+      "Namaz vakitlerini",
+      "Ticaret yolunu"
+    ],
+    "correctIndex": 1,
+    "explanation": "Ashab-ı Ress ibret kıssalarındandır.",
+    "source": "Diyanet Kur'an Yolu; TDV İslam Ansiklopedisi"
+  },
+  {
+    "id": "iq_141",
+    "category": "Peygamberler tarihi",
+    "difficulty": 1,
+    "question": "Hz. Muhammed hangi kitabın peygamberidir?",
+    "options": [
+      "Kur'an",
+      "Zebur",
+      "İncil",
+      "Tevrat"
+    ],
+    "correctIndex": 0,
+    "explanation": "Kur'an son kitaptır.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_142",
+    "category": "Peygamberler tarihi",
+    "difficulty": 2,
+    "question": "Hz. Yusuf'un rüya tabiri yeteneği kıssada neyi gösterir?",
+    "options": [
+      "Soy üstünlüğünü",
+      "Savaş gücünü",
+      "Allah'ın verdiği ilmi",
+      "Ticaret zekâsını"
+    ],
+    "correctIndex": 2,
+    "explanation": "Yusuf'a rüya ilmi verilmiştir.",
+    "source": "Diyanet Kur'an Yolu, Yusuf"
+  },
+  {
+    "id": "iq_143",
+    "category": "Peygamberler tarihi",
+    "difficulty": 1,
+    "question": "Hz. Nuh'a uzun süre ne yapması emredilmiştir?",
+    "options": [
+      "Çarşıyı yakması",
+      "Kâbe'yi yıkması",
+      "Kavmini hakka çağırması",
+      "Denizi kapatması"
+    ],
+    "correctIndex": 2,
+    "explanation": "Nuh kavmini uzun süre davet etmiştir.",
+    "source": "Diyanet Kur'an Yolu, Nuh"
+  },
+  {
+    "id": "iq_144",
+    "category": "Peygamberler tarihi",
+    "difficulty": 2,
+    "question": "Hz. İsa'nın havarileri nasıl anılır?",
+    "options": [
+      "Ticaret ortakları",
+      "Vergi memurları",
+      "Yardımcıları ve inananları",
+      "Düşman ordusu"
+    ],
+    "correctIndex": 2,
+    "explanation": "Havariler İsa'nın yardımcılarıdır.",
+    "source": "TDV İslam Ansiklopedisi, Havârî"
+  },
+  {
+    "id": "iq_145",
+    "category": "Peygamberler tarihi",
+    "difficulty": 1,
+    "question": "Peygamberlerin ortak tebliğ özü nedir?",
+    "options": [
+      "Mal biriktirme",
+      "Soy övünme",
+      "Allah'a kulluk ve tevhid",
+      "Güç yarışı"
+    ],
+    "correctIndex": 2,
+    "explanation": "Bütün peygamberler tevhide çağırmıştır.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_146",
+    "category": "Peygamberler tarihi",
+    "difficulty": 3,
+    "question": "Kur'an'da adı geçen peygamber sayısı yaklaşık kaçtır?",
+    "options": [
+      "7",
+      "100",
+      "3",
+      "25 civarı"
+    ],
+    "correctIndex": 3,
+    "explanation": "Kur'an'da ismi geçen peygamberlerin sayısı yaygın olarak yirmi beş civarında kabul edilir.",
+    "source": "TDV İslam Ansiklopedisi, Peygamber"
+  },
+  {
+    "id": "iq_147",
+    "category": "Peygamberler tarihi",
+    "difficulty": 2,
+    "question": "Hz. Musa'nın Firavun'a karşı duruşu neyi temsil eder?",
+    "options": [
+      "Ticaret pazarlığını",
+      "Ganimet paylaşımını",
+      "Hak davetini",
+      "Miras taksimini"
+    ],
+    "correctIndex": 2,
+    "explanation": "Musa-Firavun kıssası hak-batıl mücadelesidir.",
+    "source": "Diyanet Kur'an Yolu, Tâhâ"
+  },
+  {
+    "id": "iq_148",
+    "category": "Peygamberler tarihi",
+    "difficulty": 1,
+    "question": "Hz. İbrahim'in oğlunu kurban etme kıssası neyi öğretir?",
+    "options": [
+      "Teslimiyet ve imtihanı",
+      "Savaş ganimetini",
+      "Şehir planını",
+      "Ticaret kârını"
+    ],
+    "correctIndex": 0,
+    "explanation": "Kurban kıssası teslimiyeti anlatır.",
+    "source": "Diyanet Kur'an Yolu, Saffat"
+  },
+  {
+    "id": "iq_149",
+    "category": "Peygamberler tarihi",
+    "difficulty": 2,
+    "question": "Hz. Süleyman'ın kuşlarla ilgili anlatımı hangi temadadır?",
+    "options": [
+      "Vergi toplama",
+      "Sıradan avcılık",
+      "Allah'ın lütfu ve mucizevi hâkimiyet",
+      "Çarşı denetimi"
+    ],
+    "correctIndex": 2,
+    "explanation": "Süleyman kıssasında özel lütuflar anlatılır.",
+    "source": "Diyanet Kur'an Yolu, Neml"
+  },
+  {
+    "id": "iq_150",
+    "category": "Peygamberler tarihi",
+    "difficulty": 1,
+    "question": "Son semavi kitap hangisidir?",
+    "options": [
+      "Kur'an",
+      "Zebur",
+      "Tevrat",
+      "İncil"
+    ],
+    "correctIndex": 0,
+    "explanation": "Son kitap Kur'an'dır.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_151",
+    "category": "İslam tarihi",
+    "difficulty": 1,
+    "question": "İlk halife kimdir?",
+    "options": [
+      "Hz. Ali",
+      "Hz. Ebu Bekir",
+      "Hz. Osman",
+      "Hz. Ömer"
+    ],
+    "correctIndex": 1,
+    "explanation": "İlk halife Hz. Ebu Bekir'dir.",
+    "source": "TDV İslam Ansiklopedisi, Ebû Bekir"
+  },
+  {
+    "id": "iq_152",
+    "category": "İslam tarihi",
+    "difficulty": 1,
+    "question": "İkinci halife kimdir?",
+    "options": [
+      "Hz. Ömer",
+      "Hz. Ali",
+      "Hz. Ebu Bekir",
+      "Hz. Osman"
+    ],
+    "correctIndex": 0,
+    "explanation": "İkinci halife Hz. Ömer'dir.",
+    "source": "TDV İslam Ansiklopedisi, Ömer"
+  },
+  {
+    "id": "iq_153",
+    "category": "İslam tarihi",
+    "difficulty": 1,
+    "question": "Üçüncü halife kimdir?",
+    "options": [
+      "Hz. Ebu Bekir",
+      "Hz. Ali",
+      "Hz. Osman",
+      "Hz. Ömer"
+    ],
+    "correctIndex": 2,
+    "explanation": "Üçüncü halife Hz. Osman'dır.",
+    "source": "TDV İslam Ansiklopedisi, Osmân"
+  },
+  {
+    "id": "iq_154",
+    "category": "İslam tarihi",
+    "difficulty": 1,
+    "question": "Dördüncü halife kimdir?",
+    "options": [
+      "Hz. Osman",
+      "Hz. Ömer",
+      "Hz. Ali",
+      "Hz. Ebu Bekir"
+    ],
+    "correctIndex": 2,
+    "explanation": "Dördüncü halife Hz. Ali'dir.",
+    "source": "TDV İslam Ansiklopedisi, Ali"
+  },
+  {
+    "id": "iq_155",
+    "category": "İslam tarihi",
+    "difficulty": 3,
+    "question": "Kur'an'ın mushaf haline getirilmesi ilk olarak kimin döneminde hız kazanmıştır?",
+    "options": [
+      "Emevilerin sonu",
+      "Hz. Ebu Bekir",
+      "Hz. Ömer'in son yılı yalnızca",
+      "Abbasilerin sonu"
+    ],
+    "correctIndex": 1,
+    "explanation": "Yemame sonrası cem çalışması Ebu Bekir dönemindedir.",
+    "source": "TDV İslam Ansiklopedisi, Mushaf"
+  },
+  {
+    "id": "iq_156",
+    "category": "İslam tarihi",
+    "difficulty": 3,
+    "question": "Mushaf'ın çoğaltılıp vilayetlere gönderilmesi kimin döneminde olmuştur?",
+    "options": [
+      "Hz. Ebu Bekir'in ilk günü",
+      "Hz. Osman",
+      "Yalnızca Emevi sonu",
+      "Yalnızca Selçuklu"
+    ],
+    "correctIndex": 1,
+    "explanation": "Osmân döneminde resmi nüshalar çoğaltılmıştır.",
+    "source": "TDV İslam Ansiklopedisi, Osmân"
+  },
+  {
+    "id": "iq_157",
+    "category": "İslam tarihi",
+    "difficulty": 1,
+    "question": "Hicri takvimin esas alınması kimin dönemine bağlanır?",
+    "options": [
+      "Muaviye'nin son yılı",
+      "Hz. Osman",
+      "Hz. Ömer",
+      "Hz. Ali"
+    ],
+    "correctIndex": 2,
+    "explanation": "Hicri takvim Hz. Ömer döneminde düzenlenmiştir.",
+    "source": "TDV İslam Ansiklopedisi, Hicrî Takvim"
+  },
+  {
+    "id": "iq_158",
+    "category": "İslam tarihi",
+    "difficulty": 3,
+    "question": "Yemame Savaşı neden önemlidir?",
+    "options": [
+      "Birçok hâfızın şehit olması",
+      "Namazın kalkması",
+      "Orucun kalkması",
+      "Kâbe'nin yıkılması"
+    ],
+    "correctIndex": 0,
+    "explanation": "Yemame'de birçok hâfız şehit olmuştur.",
+    "source": "TDV İslam Ansiklopedisi, Yemâme"
+  },
+  {
+    "id": "iq_159",
+    "category": "İslam tarihi",
+    "difficulty": 1,
+    "question": "Dört halife dönemine ne ad verilir?",
+    "options": [
+      "Endülüs devri",
+      "Emevi devri",
+      "Hulefâ-yi Râşidîn",
+      "Abbasi devri"
+    ],
+    "correctIndex": 2,
+    "explanation": "Dört halife Râşidîn diye anılır.",
+    "source": "TDV İslam Ansiklopedisi, Hulefâ-yi Râşidîn"
+  },
+  {
+    "id": "iq_160",
+    "category": "İslam tarihi",
+    "difficulty": 2,
+    "question": "Kudüs'ün fethi hangi halife dönemindedir?",
+    "options": [
+      "Hz. Ebu Bekir'in ilk ayı",
+      "Hz. Osman'ın son günü yalnızca",
+      "Abbasi sonu",
+      "Hz. Ömer"
+    ],
+    "correctIndex": 3,
+    "explanation": "Kudüs Hz. Ömer döneminde açılmıştır.",
+    "source": "TDV İslam Ansiklopedisi, Ömer"
+  },
+  {
+    "id": "iq_161",
+    "category": "İslam tarihi",
+    "difficulty": 1,
+    "question": "Emevi Devleti'nin kurucusu olarak anılan isim kimdir?",
+    "options": [
+      "Harun Reşid",
+      "Mutevekkil",
+      "Me'mun",
+      "Muaviye b. Ebu Süfyan"
+    ],
+    "correctIndex": 3,
+    "explanation": "Emevi iktidarı Muaviye ile anılır.",
+    "source": "TDV İslam Ansiklopedisi, Emevîler"
+  },
+  {
+    "id": "iq_162",
+    "category": "İslam tarihi",
+    "difficulty": 2,
+    "question": "Abbasi Devleti'nin merkezi sonradan hangi şehir olmuştur?",
+    "options": [
+      "Taif",
+      "Bağdat",
+      "Mekke",
+      "Medine"
+    ],
+    "correctIndex": 1,
+    "explanation": "Abbasiler Bağdat'ı merkez yapmıştır.",
+    "source": "TDV İslam Ansiklopedisi, Abbâsîler"
+  },
+  {
+    "id": "iq_163",
+    "category": "İslam tarihi",
+    "difficulty": 2,
+    "question": "Endülüs İslam medeniyeti hangi coğrafyadadır?",
+    "options": [
+      "İber Yarımadası",
+      "Orta Asya bozkırı",
+      "Sibirya",
+      "Güney Afrika"
+    ],
+    "correctIndex": 0,
+    "explanation": "Endülüs İspanya coğrafyasındadır.",
+    "source": "TDV İslam Ansiklopedisi, Endülüs"
+  },
+  {
+    "id": "iq_164",
+    "category": "İslam tarihi",
+    "difficulty": 1,
+    "question": "İstanbul'u fetheden Osmanlı padişahı kimdir?",
+    "options": [
+      "Fatih Sultan Mehmet",
+      "Kanuni Sultan Süleyman",
+      "I. Murad",
+      "Yavuz Sultan Selim"
+    ],
+    "correctIndex": 0,
+    "explanation": "İstanbul'u Fatih fethetmiştir.",
+    "source": "TDV İslam Ansiklopedisi, İstanbul'un Fethi"
+  },
+  {
+    "id": "iq_165",
+    "category": "İslam tarihi",
+    "difficulty": 2,
+    "question": "İstanbul'un fethi hangi yıldadır?",
+    "options": [
+      "1299",
+      "1071",
+      "1453",
+      "1517"
+    ],
+    "correctIndex": 2,
+    "explanation": "Fetih 1453'tedir.",
+    "source": "TDV İslam Ansiklopedisi, İstanbul'un Fethi"
+  },
+  {
+    "id": "iq_166",
+    "category": "İslam tarihi",
+    "difficulty": 1,
+    "question": "Malazgirt Zaferi hangi yılda kazanılmıştır?",
+    "options": [
+      "1453",
+      "1517",
+      "1071",
+      "1299"
+    ],
+    "correctIndex": 2,
+    "explanation": "Malazgirt 1071'dedir.",
+    "source": "TDV İslam Ansiklopedisi, Malazgirt Muharebesi"
+  },
+  {
+    "id": "iq_167",
+    "category": "İslam tarihi",
+    "difficulty": 2,
+    "question": "Malazgirt'te zafer kazanan komutan kimdir?",
+    "options": [
+      "Yavuz",
+      "Alparslan",
+      "Kanuni",
+      "Fatih"
+    ],
+    "correctIndex": 1,
+    "explanation": "Alparslan Malazgirt zaferini kazanmıştır.",
+    "source": "TDV İslam Ansiklopedisi, Alparslan"
+  },
+  {
+    "id": "iq_168",
+    "category": "İslam tarihi",
+    "difficulty": 1,
+    "question": "Osmanlı Devleti'nin kurucusu kimdir?",
+    "options": [
+      "Osman Bey",
+      "Fatih",
+      "Yavuz",
+      "Orhan Bey'in torunu yalnızca"
+    ],
+    "correctIndex": 0,
+    "explanation": "Kurucu Osman Bey'dir.",
+    "source": "TDV İslam Ansiklopedisi, Osman Gazi"
+  },
+  {
+    "id": "iq_169",
+    "category": "İslam tarihi",
+    "difficulty": 2,
+    "question": "Yavuz Sultan Selim'in Mısır seferi neyi etkilemiştir?",
+    "options": [
+      "Yalnızca Vikingleri",
+      "Hilafet ve Haremeyn hizmetlerini",
+      "Yalnızca Çin Seddi'ni",
+      "Yalnızca Amerika keşfini"
+    ],
+    "correctIndex": 1,
+    "explanation": "Mısır seferi Osmanlı'yı Haremeyn ile bağladı.",
+    "source": "TDV İslam Ansiklopedisi, Selim I"
+  },
+  {
+    "id": "iq_170",
+    "category": "İslam tarihi",
+    "difficulty": 1,
+    "question": "Kanuni Sultan Süleyman hangi devletle anılır?",
+    "options": [
+      "Emevi",
+      "Safevi yalnızca",
+      "Osmanlı",
+      "Abbasi"
+    ],
+    "correctIndex": 2,
+    "explanation": "Kanuni Osmanlı padişahıdır.",
+    "source": "TDV İslam Ansiklopedisi, Süleyman I"
+  },
+  {
+    "id": "iq_171",
+    "category": "İslam tarihi",
+    "difficulty": 2,
+    "question": "Beytülmal ne demektir?",
+    "options": [
+      "Devlet hazinesi",
+      "Yalnızca mezarlık",
+      "Özel çarşı",
+      "Yalnızca mescit avlusu"
+    ],
+    "correctIndex": 0,
+    "explanation": "Beytülmal kamu hazinesidir.",
+    "source": "TDV İslam Ansiklopedisi, Beytülmâl"
+  },
+  {
+    "id": "iq_172",
+    "category": "İslam tarihi",
+    "difficulty": 3,
+    "question": "Kadisiye Savaşı hangi güçle yapılmıştır?",
+    "options": [
+      "Vikinglerle",
+      "Azteklerle",
+      "Sasanilerle",
+      "Moğol öncesi Çin'le yalnızca"
+    ],
+    "correctIndex": 2,
+    "explanation": "Kadisiye Sasani cephesidir.",
+    "source": "TDV İslam Ansiklopedisi, Kādisiye"
+  },
+  {
+    "id": "iq_173",
+    "category": "İslam tarihi",
+    "difficulty": 3,
+    "question": "Nihavend Savaşı'nın sonucu ne olmuştur?",
+    "options": [
+      "Orucun kalkması",
+      "Sasani direnişinin kırılması",
+      "Namazın kalkması",
+      "Kâbe'nin yıkılması"
+    ],
+    "correctIndex": 1,
+    "explanation": "Nihavend Sasani gücünü sarsmıştır.",
+    "source": "TDV İslam Ansiklopedisi, Nihâvend"
+  },
+  {
+    "id": "iq_174",
+    "category": "İslam tarihi",
+    "difficulty": 1,
+    "question": "Kudüs'teki mübarek mescid hangisidir?",
+    "options": [
+      "Kuba'nın tamamı",
+      "Mescid-i Aksa",
+      "Mescid-i Nebevî'nin tamamı",
+      "Sultanahmet"
+    ],
+    "correctIndex": 1,
+    "explanation": "Mescid-i Aksa Kudüs'tedir.",
+    "source": "TDV İslam Ansiklopedisi, Mescid-i Aksâ"
+  },
+  {
+    "id": "iq_175",
+    "category": "İslam tarihi",
+    "difficulty": 2,
+    "question": "Emevi döneminde İslam ordularının ulaştığı batı ucu neresidir?",
+    "options": [
+      "Alaska",
+      "Avustralya",
+      "Endülüs / İberya",
+      "Japonya"
+    ],
+    "correctIndex": 2,
+    "explanation": "Fetihler Endülüs'e uzanmıştır.",
+    "source": "TDV İslam Ansiklopedisi, Endülüs"
+  },
+  {
+    "id": "iq_176",
+    "category": "İslam tarihi",
+    "difficulty": 1,
+    "question": "Hicri takvimin başlangıcı hangi olaydır?",
+    "options": [
+      "Veda Haccı",
+      "Hicret",
+      "Fetih",
+      "Bedir"
+    ],
+    "correctIndex": 1,
+    "explanation": "Takvim hicreti esas alır.",
+    "source": "TDV İslam Ansiklopedisi, Hicrî Takvim"
+  },
+  {
+    "id": "iq_177",
+    "category": "İslam tarihi",
+    "difficulty": 2,
+    "question": "Ridde olayları hangi dönemde yaşanmıştır?",
+    "options": [
+      "Kanuni dönemi",
+      "Fatih dönemi",
+      "Hz. Ebu Bekir dönemi",
+      "Yavuz dönemi"
+    ],
+    "correctIndex": 2,
+    "explanation": "Ridde Ebu Bekir dönemindedir.",
+    "source": "TDV İslam Ansiklopedisi, Ridde"
+  },
+  {
+    "id": "iq_178",
+    "category": "İslam tarihi",
+    "difficulty": 3,
+    "question": "Cemel Vakası hangi dönemde meydana gelmiştir?",
+    "options": [
+      "Hz. Ebu Bekir'in ilk günü",
+      "Abbasi sonu",
+      "Osmanlı kuruluşu",
+      "Hz. Ali dönemi"
+    ],
+    "correctIndex": 3,
+    "explanation": "Cemel Hz. Ali döneminde geçmiştir.",
+    "source": "TDV İslam Ansiklopedisi, Cemel Vakası"
+  },
+  {
+    "id": "iq_179",
+    "category": "İslam tarihi",
+    "difficulty": 3,
+    "question": "Sıffin Savaşı hangi taraflar arasında olmuştur?",
+    "options": [
+      "Selçuklu ile Haçlı öncesi Çin",
+      "Endülüs ile Aztekler",
+      "Hz. Ali ile Muaviye taraftarları",
+      "Bizans ile Vikingler"
+    ],
+    "correctIndex": 2,
+    "explanation": "Sıffin Ali-Muaviye gerilimindedir.",
+    "source": "TDV İslam Ansiklopedisi, Sıffîn"
+  },
+  {
+    "id": "iq_180",
+    "category": "İslam tarihi",
+    "difficulty": 1,
+    "question": "İslam'da ilk ezanı okuyan sahabi kimdir?",
+    "options": [
+      "Ebu Cehil",
+      "Velid",
+      "Bilal-i Habeşi",
+      "Ebu Leheb"
+    ],
+    "correctIndex": 2,
+    "explanation": "İlk müezzin Bilal'dir.",
+    "source": "TDV İslam Ansiklopedisi, Bilâl-i Habeşî"
+  },
+  {
+    "id": "iq_181",
+    "category": "İslam tarihi",
+    "difficulty": 2,
+    "question": "Kâbe'nin İslamî dönemde putlardan temizlenmesi hangi olayla anılır?",
+    "options": [
+      "Fil Vakası",
+      "Uhud öncesi",
+      "Bedir öncesi",
+      "Mekke'nin fethi"
+    ],
+    "correctIndex": 3,
+    "explanation": "Fetihte Kâbe putlardan arındırılmıştır.",
+    "source": "TDV İslam Ansiklopedisi, Mekke'nin Fethi"
+  },
+  {
+    "id": "iq_182",
+    "category": "İslam tarihi",
+    "difficulty": 1,
+    "question": "Ashab-ı Suffe kimlerdir?",
+    "options": [
+      "Mescid-i Nebevî'de ilimle meşgul sahabiler",
+      "Yalnızca put ustaları",
+      "Yalnızca vergi memurları",
+      "Yalnızca tüccar kervanı"
+    ],
+    "correctIndex": 0,
+    "explanation": "Suffe ashâbı ilim ehlidir.",
+    "source": "TDV İslam Ansiklopedisi, Ashâb-ı Suffe"
+  },
+  {
+    "id": "iq_183",
+    "category": "İslam tarihi",
+    "difficulty": 2,
+    "question": "Tabiîn kimdir?",
+    "options": [
+      "Sahabeyi gören sonraki nesil",
+      "Peygamber'i görenler",
+      "Yalnızca mezhep imamları",
+      "Yalnızca padişahlar"
+    ],
+    "correctIndex": 0,
+    "explanation": "Tabiîn sahabeyi gören nesildir.",
+    "source": "TDV İslam Ansiklopedisi, Tâbiûn"
+  },
+  {
+    "id": "iq_184",
+    "category": "İslam tarihi",
+    "difficulty": 3,
+    "question": "Tebeu't-tabiîn kimdir?",
+    "options": [
+      "Tabiîni gören nesil",
+      "Sahabenin tamamı",
+      "Yalnızca Haçlı şövalyeleri",
+      "Yalnızca Emevi vezirleri"
+    ],
+    "correctIndex": 0,
+    "explanation": "Tebeu't-tabiîn üçüncü nesildir.",
+    "source": "TDV İslam Ansiklopedisi, Tebeu't-tâbiîn"
+  },
+  {
+    "id": "iq_185",
+    "category": "İslam tarihi",
+    "difficulty": 1,
+    "question": "Mescid-i Haram nerededir?",
+    "options": [
+      "Taif",
+      "Medine",
+      "Mekke",
+      "Kudüs"
+    ],
+    "correctIndex": 2,
+    "explanation": "Mescid-i Haram Mekke'dedir.",
+    "source": "TDV İslam Ansiklopedisi, Mescid-i Harâm"
+  },
+  {
+    "id": "iq_186",
+    "category": "İslam tarihi",
+    "difficulty": 3,
+    "question": "Kerbela faciası hangi yılda meydana gelmiştir?",
+    "options": [
+      "Hicri 1",
+      "Hicri 61",
+      "Hicri 8",
+      "Hicri 2"
+    ],
+    "correctIndex": 1,
+    "explanation": "Kerbela hicri 61'dedir.",
+    "source": "TDV İslam Ansiklopedisi, Kerbela"
+  },
+  {
+    "id": "iq_187",
+    "category": "İslam tarihi",
+    "difficulty": 1,
+    "question": "Hz. Hüseyin kimdir?",
+    "options": [
+      "Hz. Ali'nin oğlu",
+      "Abbasi veziri",
+      "Endülüs emiri",
+      "Emevi kurucusu"
+    ],
+    "correctIndex": 0,
+    "explanation": "Hz. Hüseyin Hz. Ali'nin oğludur.",
+    "source": "TDV İslam Ansiklopedisi, Hüseyin"
+  },
+  {
+    "id": "iq_188",
+    "category": "İslam tarihi",
+    "difficulty": 2,
+    "question": "Selçukluların İslam tarihindeki önemi nedir?",
+    "options": [
+      "Orta Doğu'da güçlü bir Türk-İslam devleti oluşu",
+      "Matbaayı ilk icadı iddiası",
+      "Amerika'yı keşfi",
+      "Uçmayı bulması"
+    ],
+    "correctIndex": 0,
+    "explanation": "Selçuklular önemli bir İslam devletidir.",
+    "source": "TDV İslam Ansiklopedisi, Selçuklular"
+  },
+  {
+    "id": "iq_189",
+    "category": "İslam tarihi",
+    "difficulty": 3,
+    "question": "Nizamiye medreseleri kimin adıyla anılır?",
+    "options": [
+      "Nizamülmülk",
+      "Kanuni",
+      "Fatih",
+      "Yavuz"
+    ],
+    "correctIndex": 0,
+    "explanation": "Nizamiye Nizamülmülk'le anılır.",
+    "source": "TDV İslam Ansiklopedisi, Nizâmiye Medresesi"
+  },
+  {
+    "id": "iq_190",
+    "category": "İslam tarihi",
+    "difficulty": 2,
+    "question": "Haçlı Seferleri İslam dünyasında neyi etkilemiştir?",
+    "options": [
+      "Kudüs ve Şam hattındaki mücadeleleri",
+      "Yalnızca Aztek tapınaklarını",
+      "Yalnızca Çin çayını",
+      "Yalnızca Viking mitlerini"
+    ],
+    "correctIndex": 0,
+    "explanation": "Haçlılar Doğu Akdeniz'i etkilemiştir.",
+    "source": "TDV İslam Ansiklopedisi, Haçlılar"
+  },
+  {
+    "id": "iq_191",
+    "category": "İslam tarihi",
+    "difficulty": 1,
+    "question": "Memlükler hangi coğrafyada güçlenmiştir?",
+    "options": [
+      "Patagonya",
+      "Mısır-Suriye",
+      "İskandinavya",
+      "Japonya"
+    ],
+    "correctIndex": 1,
+    "explanation": "Memlükler Mısır-Suriye'de hüküm sürmüştür.",
+    "source": "TDV İslam Ansiklopedisi, Memlûkler"
+  },
+  {
+    "id": "iq_192",
+    "category": "İslam tarihi",
+    "difficulty": 3,
+    "question": "Aynicâlût Savaşı'nın önemi nedir?",
+    "options": [
+      "Kâbe'nin yıkılması",
+      "Orucun kalkması",
+      "Moğol ilerleyişinin durdurulması",
+      "Namazın kalkması"
+    ],
+    "correctIndex": 2,
+    "explanation": "Aynicâlût Moğollara karşı zaferdir.",
+    "source": "TDV İslam Ansiklopedisi, Aynicâlût"
+  },
+  {
+    "id": "iq_193",
+    "category": "İslam tarihi",
+    "difficulty": 1,
+    "question": "Safevi Devleti hangi coğrafyada kurulmuştur?",
+    "options": [
+      "İran",
+      "Endülüs",
+      "Anadolu'nun tamamı yalnızca",
+      "Habeşistan"
+    ],
+    "correctIndex": 0,
+    "explanation": "Safeviler İran merkezlidir.",
+    "source": "TDV İslam Ansiklopedisi, Safevîler"
+  },
+  {
+    "id": "iq_194",
+    "category": "İslam tarihi",
+    "difficulty": 2,
+    "question": "Timur hangi yüzyılda etkili bir hükümdardır?",
+    "options": [
+      "21. yüzyıl",
+      "14-15. yüzyıl",
+      "3. yüzyıl",
+      "7. yüzyıl başı"
+    ],
+    "correctIndex": 1,
+    "explanation": "Timur 14-15. yüzyılda etkilidir.",
+    "source": "TDV İslam Ansiklopedisi, Timur"
+  },
+  {
+    "id": "iq_195",
+    "category": "İslam tarihi",
+    "difficulty": 1,
+    "question": "Buhari eserini ne türde yazmıştır?",
+    "options": [
+      "Hadis",
+      "Yalnızca coğrafya",
+      "Yalnızca tipografi",
+      "Yalnızca astronomi"
+    ],
+    "correctIndex": 0,
+    "explanation": "Buhari hadis âlimidir.",
+    "source": "TDV İslam Ansiklopedisi, Buhârî"
+  },
+  {
+    "id": "iq_196",
+    "category": "İslam tarihi",
+    "difficulty": 2,
+    "question": "Müslim'in eseri hangi alandadır?",
+    "options": [
+      "Yalnızca mimari",
+      "Hadis",
+      "Yalnızca denizcilik",
+      "Yalnızca müzik"
+    ],
+    "correctIndex": 1,
+    "explanation": "Müslim hadis mecmuası sahibidir.",
+    "source": "TDV İslam Ansiklopedisi, Müslim"
+  },
+  {
+    "id": "iq_197",
+    "category": "İslam tarihi",
+    "difficulty": 3,
+    "question": "Taberi hangi ilimlerle öne çıkar?",
+    "options": [
+      "Yalnızca bahçıvanlık",
+      "Yalnızca tipografi",
+      "Tarih ve tefsir",
+      "Yalnızca kuyumculuk"
+    ],
+    "correctIndex": 2,
+    "explanation": "Taberi tarih ve tefsir âlimidir.",
+    "source": "TDV İslam Ansiklopedisi, Taberî"
+  },
+  {
+    "id": "iq_198",
+    "category": "İslam tarihi",
+    "difficulty": 1,
+    "question": "Gazali hangi alanlarda etkili bir âlimdir?",
+    "options": [
+      "Yalnızca gemicilik",
+      "Kelam, tasavvuf ve fıkıh düşüncesi",
+      "Yalnızca madencilik",
+      "Yalnızca matbaacılık"
+    ],
+    "correctIndex": 1,
+    "explanation": "Gazali çok yönlü bir âlimdir.",
+    "source": "TDV İslam Ansiklopedisi, Gazzâlî"
+  },
+  {
+    "id": "iq_199",
+    "category": "İslam tarihi",
+    "difficulty": 2,
+    "question": "İbn Sina hangi alanda dünya çapında ünlenmiştir?",
+    "options": [
+      "Yalnızca kuyumculuk",
+      "Yalnızca deniz savaşı",
+      "Yalnızca tipografi",
+      "Tıp ve felsefe"
+    ],
+    "correctIndex": 3,
+    "explanation": "İbn Sina tıp ve felsefede ünlüdür.",
+    "source": "TDV İslam Ansiklopedisi, İbn Sînâ"
+  },
+  {
+    "id": "iq_200",
+    "category": "İslam tarihi",
+    "difficulty": 1,
+    "question": "Hicaz demiryolu hangi dönemde gündeme gelmiştir?",
+    "options": [
+      "Osmanlı son dönemi",
+      "Abbasi kuruluşu",
+      "Hulefâ-yi Râşidîn başı",
+      "Emevi ilk yılı"
+    ],
+    "correctIndex": 0,
+    "explanation": "Hicaz demiryolu Osmanlı son dönemindedir.",
+    "source": "TDV İslam Ansiklopedisi, Hicaz Demiryolu"
+  },
+  {
+    "id": "iq_201",
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 1,
+    "question": "İslam'ın şartı kaçtır?",
+    "options": [
+      "3",
+      "6",
+      "4",
+      "5"
+    ],
+    "correctIndex": 3,
+    "explanation": "İslam'ın beş şartı vardır.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_202",
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 1,
+    "question": "İmanın şartı kaçtır?",
+    "options": [
+      "3",
+      "4",
+      "5",
+      "6"
+    ],
+    "correctIndex": 3,
+    "explanation": "İmanın altı şartı vardır.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_203",
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 1,
+    "question": "Günde farz namaz kaç vakittir?",
+    "options": [
+      "6",
+      "4",
+      "5",
+      "3"
+    ],
+    "correctIndex": 2,
+    "explanation": "Beş vakit farz namaz vardır.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_204",
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 1,
+    "question": "Namazın farzlarından önce yapılan temizlik hangisidir?",
+    "options": [
+      "Ticaret",
+      "Oruç bozma",
+      "Yolculuk",
+      "Abdest"
+    ],
+    "correctIndex": 3,
+    "explanation": "Namaz için abdest alınır.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_205",
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 2,
+    "question": "Gusül ne zaman gerekir?",
+    "options": [
+      "Her alışverişte",
+      "Her gülümseyişte",
+      "Her yolculukta zorunlu değil ifadesi yanlış",
+      "Cünüplük ve benzeri hallerde"
+    ],
+    "correctIndex": 3,
+    "explanation": "Gusül belirli hallerde farzdır.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_206",
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 1,
+    "question": "Oruç hangi ayda farzdır?",
+    "options": [
+      "Muharrem",
+      "Ramazan",
+      "Şevval",
+      "Receb"
+    ],
+    "correctIndex": 1,
+    "explanation": "Ramazan orucu farzdır.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_207",
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 1,
+    "question": "Zekât kimlere farzdır?",
+    "options": [
+      "Yalnızca çocuklara",
+      "Yalnızca yolculara",
+      "Herkese yaş fark etmeksizin aynı",
+      "Nisap sahibi müslümanlara"
+    ],
+    "correctIndex": 3,
+    "explanation": "Zekât nisap şartıyla farzdır.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_208",
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 1,
+    "question": "Hac kimlere farzdır?",
+    "options": [
+      "Hiç kimseye",
+      "Gücü yeten müslümanlara",
+      "Yalnızca çocuklara",
+      "Yalnızca yolculara zorunlu değil ifadesi yanlış"
+    ],
+    "correctIndex": 1,
+    "explanation": "Hac istitaat şartıyla farzdır.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_209",
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 2,
+    "question": "Namazın kılınamayacağı vakitlerden biri hangisidir?",
+    "options": [
+      "Yatsı sonrası serbest",
+      "İkindi farzı sonrası serbest",
+      "Güneş doğarken",
+      "Öğle vakti girerken serbest"
+    ],
+    "correctIndex": 2,
+    "explanation": "Kerahiyet vakitlerinde namaz kılınmaz.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_210",
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 1,
+    "question": "Ezan neyi bildirir?",
+    "options": [
+      "Savaş ilanını",
+      "Namaz vaktinin girdiğini",
+      "Miras paylaşımını",
+      "Ticaret açılışını"
+    ],
+    "correctIndex": 1,
+    "explanation": "Ezan namaz çağrısıdır.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_211",
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 2,
+    "question": "Kamet ne zaman getirilir?",
+    "options": [
+      "Farz namaza durmadan önce",
+      "Hacdan dönünce yalnızca",
+      "Oruç açarken",
+      "Zekât verirken"
+    ],
+    "correctIndex": 0,
+    "explanation": "Kamet farz namaz öncesidir.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_212",
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 1,
+    "question": "Vitir namazı Diyanet Temel Dini Bilgiler'de hangi grupta yer alır?",
+    "options": [
+      "Zekât nisabı hükümleri",
+      "Hac menasiki",
+      "Oruç bozma sebepleri",
+      "Müekked sünnet namazlar"
+    ],
+    "correctIndex": 3,
+    "explanation": "Vitir namazı temel dini bilgilerde müekked sünnet namazlar arasında anlatılır.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_213",
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 2,
+    "question": "Teravih namazı hangi aya özgüdür?",
+    "options": [
+      "Ramazan",
+      "Şevval'in tamamı zorunlu",
+      "Muharrem'in tamamı zorunlu",
+      "Receb'in tamamı zorunlu"
+    ],
+    "correctIndex": 0,
+    "explanation": "Teravih Ramazan'da kılınır.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_214",
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 1,
+    "question": "Sadaka-i fıtır ne zaman verilir?",
+    "options": [
+      "Yalnızca Cuma'da",
+      "Yalnızca hacda",
+      "Kurban Bayramı sonrası zorunlu değil ifadesi yanlış",
+      "Ramazan Bayramı öncesi"
+    ],
+    "correctIndex": 3,
+    "explanation": "Fıtır sadakası bayram öncesi verilir.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_215",
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 2,
+    "question": "Kurban ibadeti hangi bayramla anılır?",
+    "options": [
+      "Kurban Bayramı",
+      "Aşure günü yalnızca",
+      "Ramazan Bayramı",
+      "Mevlid haftası"
+    ],
+    "correctIndex": 0,
+    "explanation": "Kurban, Kurban Bayramı'nda kesilir.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_216",
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 1,
+    "question": "Niyet ibadette neden önemlidir?",
+    "options": [
+      "Sadece süs içindir",
+      "Amelin sıhhati için temeldir",
+      "Sadece ticaret içindir",
+      "Hiç gerekli değildir"
+    ],
+    "correctIndex": 1,
+    "explanation": "Niyet ibadetin esaslarındandır.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_217",
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 2,
+    "question": "Teyemmüm ne zaman yapılır?",
+    "options": [
+      "Her yemekte",
+      "Her alışverişte",
+      "Her yolculukta zorunlu",
+      "Su bulunamadığında veya kullanılamadığında"
+    ],
+    "correctIndex": 3,
+    "explanation": "Teyemmüm özür halinde abdest yerine geçer.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_218",
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 1,
+    "question": "Kıble neresidir?",
+    "options": [
+      "Güneş doğusu daima",
+      "Rastgele yön",
+      "Deniz kıyısı daima",
+      "Kâbe yönü"
+    ],
+    "correctIndex": 3,
+    "explanation": "Namazda kıble Kâbe'dir.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_219",
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 2,
+    "question": "Seferilik namazda neyi etkiler?",
+    "options": [
+      "Orucun ebedi kalkmasını",
+      "Zekâtın kalkmasını",
+      "Dört rekâtlı farzların kısaltılmasını",
+      "Haccın kalkmasını"
+    ],
+    "correctIndex": 2,
+    "explanation": "Yolcu namazı kısaltabilir.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_220",
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 1,
+    "question": "Cuma namazı kimlere farzdır?",
+    "options": [
+      "Yalnızca yolculara her halde",
+      "Yalnızca çocuklara",
+      "Belirli şartları taşıyan erkeklere",
+      "Hiç kimseye"
+    ],
+    "correctIndex": 2,
+    "explanation": "Cuma şartları oluşunca farzdır.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_221",
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 2,
+    "question": "Hutbe hangi namazın parçasıdır?",
+    "options": [
+      "Yatsı",
+      "Kuşluk",
+      "İmsak",
+      "Cuma"
+    ],
+    "correctIndex": 3,
+    "explanation": "Cuma'da hutbe okunur.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_222",
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 1,
+    "question": "Rükû namazda ne demektir?",
+    "options": [
+      "Eğilmek",
+      "Oturmak",
+      "Selam vermek",
+      "Abdest almak"
+    ],
+    "correctIndex": 0,
+    "explanation": "Rükû eğilme rüknüdür.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_223",
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 1,
+    "question": "Secde namazda ne demektir?",
+    "options": [
+      "Selamlaşmak",
+      "Ayaktadurmak",
+      "Alnı yere koymak",
+      "Zekât vermek"
+    ],
+    "correctIndex": 2,
+    "explanation": "Secde yer öpme/yer koyma rüknüdür.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_224",
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 2,
+    "question": "Tahiyyat ne zaman okunur?",
+    "options": [
+      "Oturuşlarda",
+      "Yalnızca ezanda",
+      "Yalnızca bayramda",
+      "Yalnızca hacda"
+    ],
+    "correctIndex": 0,
+    "explanation": "Tahiyyat oturuşta okunur.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_225",
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 1,
+    "question": "Selam ile namaz nasıl tamamlanır?",
+    "options": [
+      "Hacca gidilerek",
+      "Zekât verilerek",
+      "Sağa ve sola selam verilerek",
+      "Oruç tutularak"
+    ],
+    "correctIndex": 2,
+    "explanation": "Namaz selamla biter.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_226",
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 2,
+    "question": "Oruçta imsak neyi ifade eder?",
+    "options": [
+      "Zekâtı",
+      "Bayramı",
+      "Haccı",
+      "Oruca başlama vaktini"
+    ],
+    "correctIndex": 3,
+    "explanation": "İmsak oruç başlangıcıdır.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_227",
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 1,
+    "question": "İftar ne demektir?",
+    "options": [
+      "Hacca gitmek",
+      "Namaz kılmak",
+      "Zekât vermek",
+      "Orucu açmak"
+    ],
+    "correctIndex": 3,
+    "explanation": "İftar orucu açmaktır.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_228",
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 2,
+    "question": "Kaza namazı neyi ifade eder?",
+    "options": [
+      "Haccın iptali",
+      "Orucun iptali",
+      "Namazın iptali",
+      "Vaktinde kılınamayan namazın sonradan kılınması"
+    ],
+    "correctIndex": 3,
+    "explanation": "Kaza, kaçırılan namazı telafidir.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_229",
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 1,
+    "question": "Sünnet namazlar neye örnektir?",
+    "options": [
+      "Haccın kendisi",
+      "Farza bağlı veya müstakil nafileler",
+      "Orucun kendisi",
+      "Zekâtın kendisi"
+    ],
+    "correctIndex": 1,
+    "explanation": "Sünnetler nafile namazlardır.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_230",
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 3,
+    "question": "Nisap ne demektir?",
+    "options": [
+      "Namaz rekâtı",
+      "Zekât ve benzeri yükümlülük eşiği",
+      "Hac menzili",
+      "Oruç günü"
+    ],
+    "correctIndex": 1,
+    "explanation": "Nisap mali eşiktir.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_231",
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 2,
+    "question": "Fitre kimler için verilir?",
+    "options": [
+      "Yalnızca ticaret gemileri için",
+      "Kendisi ve bakmakla yükümlü olduğu kişiler için",
+      "Yalnızca hayvanlar için",
+      "Yalnızca komşu ülkeler için"
+    ],
+    "correctIndex": 1,
+    "explanation": "Fitre kişi başına hesaplanır.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_232",
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 1,
+    "question": "Tekbir namazda neyi ifade eder?",
+    "options": [
+      "Zekât vermeyi",
+      "Hacdan dönmeyi",
+      "Oruç açmayı",
+      "Allahu ekber demeyi"
+    ],
+    "correctIndex": 3,
+    "explanation": "İftitah tekbiri namaza giriştir.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_233",
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 2,
+    "question": "Abdestin farzlarından biri nedir?",
+    "options": [
+      "Yolculuğa çıkmak",
+      "Yüzü yıkamak",
+      "Şiir okumak",
+      "Ticaret yapmak"
+    ],
+    "correctIndex": 1,
+    "explanation": "Yüzün yıkanması abdest farzlarındandır.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_234",
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 1,
+    "question": "Mesh ne demektir?",
+    "options": [
+      "Oruç tutma",
+      "Zekât verme",
+      "Islak el ile sürme",
+      "Hacca gitme"
+    ],
+    "correctIndex": 2,
+    "explanation": "Mesh abdestte başa/ mestе sürülür.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_235",
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 2,
+    "question": "Mest üzerine mesh neyi kolaylaştırır?",
+    "options": [
+      "Haccı",
+      "Abdest almayı",
+      "Zekâtı",
+      "Orucu"
+    ],
+    "correctIndex": 1,
+    "explanation": "Mest üzerine mesh ruhsattır.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_236",
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 1,
+    "question": "Cenaze namazı nasıl kılınır?",
+    "options": [
+      "Normal beş vakit gibi",
+      "Oruçla birlikte",
+      "Zekâtla birlikte",
+      "Ayakta ve rükûsuz"
+    ],
+    "correctIndex": 3,
+    "explanation": "Cenaze namazı özel kılınır.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_237",
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 2,
+    "question": "Bayram namazı ne zaman kılınır?",
+    "options": [
+      "Her öğle öncesi zorunlu",
+      "Her gece yarısı",
+      "Bayram sabahı",
+      "Her imsakta zorunlu"
+    ],
+    "correctIndex": 2,
+    "explanation": "Bayram namazı bayram sabahıdır.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_238",
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 3,
+    "question": "İtikâf nedir?",
+    "options": [
+      "Ticaret gezisi",
+      "Şehir turu",
+      "Savaş eğitimi",
+      "Mescitte ibadetle inzivaya çekilmek"
+    ],
+    "correctIndex": 3,
+    "explanation": "İtikâf özellikle Ramazan'da yapılır.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_239",
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 1,
+    "question": "Tesbih namazda ne için çekilir?",
+    "options": [
+      "Ticaret hesabı için",
+      "Yol ölçmek için",
+      "Allah'ı anmak için",
+      "Vergi için"
+    ],
+    "correctIndex": 2,
+    "explanation": "Tesbih zikir içindir.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_240",
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 3,
+    "question": "Kunut duası hangi namazla anılır?",
+    "options": [
+      "Vitir",
+      "Yalnızca cenaze",
+      "Yalnızca bayram zorunlu değil ifadesi yanlış",
+      "Yalnızca Cuma hutbesi"
+    ],
+    "correctIndex": 0,
+    "explanation": "Kunut vitirde okunur.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_241",
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 1,
+    "question": "Sahur ne demektir?",
+    "options": [
+      "Zekât yemeği",
+      "Oruç öncesi gece yemeği",
+      "Bayram yemeği zorunlu",
+      "Hac yemeği"
+    ],
+    "correctIndex": 1,
+    "explanation": "Sahur oruç öncesi yenir.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_242",
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 2,
+    "question": "Umre ibadeti kısaca nedir?",
+    "options": [
+      "Beş vakit namaz",
+      "Zekâtın adı",
+      "Orucun adı",
+      "Hac zamanı dışında Kâbe ziyareti ibadeti"
+    ],
+    "correctIndex": 3,
+    "explanation": "Umre ayrı bir ibadettir.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_243",
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 1,
+    "question": "Tavaf ibadeti kısaca nedir?",
+    "options": [
+      "Arafat'ta durmak",
+      "Mina'da taşlamak",
+      "Müzdelife'de yatmak",
+      "Kâbe'nin etrafında dönmek"
+    ],
+    "correctIndex": 3,
+    "explanation": "Tavaf Kâbe etrafında dönmektir.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_244",
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 2,
+    "question": "Sa'y ibadeti kısaca nedir?",
+    "options": [
+      "Mina gecesi",
+      "Arafat hutbesi",
+      "Kâbe'yi öpmek",
+      "Safa ile Merve arasında yürüyüş"
+    ],
+    "correctIndex": 3,
+    "explanation": "Sa'y Safa-Merve arasındadır.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_245",
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 1,
+    "question": "Hacda vakfe nerededir?",
+    "options": [
+      "Hira",
+      "Arafat",
+      "Bedir",
+      "Uhud"
+    ],
+    "correctIndex": 1,
+    "explanation": "Haccın rüknü Arafat vakfesidir.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_246",
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 2,
+    "question": "Şeytan taşlama nerede yapılır?",
+    "options": [
+      "Arafat zirvesi",
+      "Müzdelife kuyusu",
+      "Kuba avlusu",
+      "Mina"
+    ],
+    "correctIndex": 3,
+    "explanation": "Cemreler Mina'dadır.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_247",
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 3,
+    "question": "İhram hali kısaca nedir?",
+    "options": [
+      "Ticaret üniforması",
+      "Normal ev kıyafeti",
+      "Askeri torba",
+      "Hac/umre yasaklarıyla özel hale girmek"
+    ],
+    "correctIndex": 3,
+    "explanation": "İhram hac/umre niyetidir.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_248",
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 1,
+    "question": "Kelime-i şehadet İslam'ın şartlarından midir?",
+    "options": [
+      "Evet, temeldir",
+      "Hayır, hiç ilgili değil",
+      "Yalnızca zekâttır",
+      "Yalnızca oruçtur"
+    ],
+    "correctIndex": 0,
+    "explanation": "Şehadet İslam'ın ilk şartıdır.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_249",
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 2,
+    "question": "Sübhaneke ne zaman okunur?",
+    "options": [
+      "Namazın başında",
+      "Yalnızca hacda",
+      "Yalnızca zekâtta",
+      "Yalnızca oruçta"
+    ],
+    "correctIndex": 0,
+    "explanation": "Sübhaneke iftitah sonrası okunur.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_250",
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 1,
+    "question": "Amin ne zaman denir?",
+    "options": [
+      "Fatiha bitince",
+      "Yolculukta zorunlu",
+      "Kurban kesince zorunlu",
+      "Zekât verince zorunlu"
+    ],
+    "correctIndex": 0,
+    "explanation": "Fatiha sonrası âmin denir.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_251",
+    "category": "Dini kavramlar",
+    "difficulty": 1,
+    "question": "Tevhid ne demektir?",
+    "options": [
+      "Putperestlik",
+      "Soy üstünlüğü",
+      "Allah'ın birliği inancı",
+      "Çok tanrıcılık"
+    ],
+    "correctIndex": 2,
+    "explanation": "Tevhid Allah'ın birlenmesi demektir.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_252",
+    "category": "Dini kavramlar",
+    "difficulty": 1,
+    "question": "Şirk ne demektir?",
+    "options": [
+      "Zekât vermek",
+      "Oruç tutmak",
+      "Namaz kılmak",
+      "Allah'a ortak koşmak"
+    ],
+    "correctIndex": 3,
+    "explanation": "Şirk Allah'a ortak koşmaktır.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_253",
+    "category": "Dini kavramlar",
+    "difficulty": 1,
+    "question": "İman ne demektir?",
+    "options": [
+      "Yalnızca güç göstermek",
+      "Yalnızca soy övünmek",
+      "Kalben tasdik etmek",
+      "Yalnızca mal biriktirmek"
+    ],
+    "correctIndex": 2,
+    "explanation": "İman kalbi tasdiktir.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_254",
+    "category": "Dini kavramlar",
+    "difficulty": 1,
+    "question": "İslam sözlükte neye gelir?",
+    "options": [
+      "Alay etmek",
+      "Teslim olmak",
+      "İnkâr etmek",
+      "İnatlaşmak"
+    ],
+    "correctIndex": 1,
+    "explanation": "İslam teslimiyet anlamındadır.",
+    "source": "TDV İslam Ansiklopedisi, İslâm"
+  },
+  {
+    "id": "iq_255",
+    "category": "Dini kavramlar",
+    "difficulty": 2,
+    "question": "İhsan hadiste nasıl tarif edilir?",
+    "options": [
+      "Yalnızca mal çoğaltma",
+      "Allah'ı görüyormuş gibi kulluk",
+      "Yalnızca tartışma",
+      "Yalnızca ün kazanma"
+    ],
+    "correctIndex": 1,
+    "explanation": "İhsan kullukta derin bilinçtir.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_256",
+    "category": "Dini kavramlar",
+    "difficulty": 1,
+    "question": "Helal ne demektir?",
+    "options": [
+      "Belirsiz olan",
+      "İmkânsız olan",
+      "Dinen izin verilen",
+      "Dinen yasak olan"
+    ],
+    "correctIndex": 2,
+    "explanation": "Helal caiz olan şeydir.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_257",
+    "category": "Dini kavramlar",
+    "difficulty": 1,
+    "question": "Haram ne demektir?",
+    "options": [
+      "Dinen yasaklanan",
+      "Dinen zorunlu övgü",
+      "Sadece alışkanlık",
+      "Sadece süs"
+    ],
+    "correctIndex": 0,
+    "explanation": "Haram yasak olan şeydir.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_258",
+    "category": "Dini kavramlar",
+    "difficulty": 2,
+    "question": "Mekruh ne demektir?",
+    "options": [
+      "Kesin vacip daima",
+      "Yapılması hoş görülmeyen",
+      "Tamamen mubah övgü",
+      "Kesin farz"
+    ],
+    "correctIndex": 1,
+    "explanation": "Mekruh kerih görülen davranıştır.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_259",
+    "category": "Dini kavramlar",
+    "difficulty": 1,
+    "question": "Mübah ne demektir?",
+    "options": [
+      "Kesin farz",
+      "Yapılması serbest olan",
+      "Kesin haram",
+      "Kesin küfür"
+    ],
+    "correctIndex": 1,
+    "explanation": "Mübah serbest fiildir.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_260",
+    "category": "Dini kavramlar",
+    "difficulty": 2,
+    "question": "Farz ne demektir?",
+    "options": [
+      "Yasaklanan",
+      "Kesin delille emredilen",
+      "Önemsiz görülen",
+      "Serbest bırakılan"
+    ],
+    "correctIndex": 1,
+    "explanation": "Farz yükümlülük doğurur.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_261",
+    "category": "Dini kavramlar",
+    "difficulty": 3,
+    "question": "Vacip Hanefi usulünde neye yakındır?",
+    "options": [
+      "Tamamen haram övgü",
+      "Tamamen şirk",
+      "Tamamen mubah",
+      "Farz benzeri güçlü yükümlülük"
+    ],
+    "correctIndex": 3,
+    "explanation": "Vacip güçlü bir sorumluluktur.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_262",
+    "category": "Dini kavramlar",
+    "difficulty": 1,
+    "question": "Sünnet terimi dinde neyi ifade eder?",
+    "options": [
+      "Put geleneği",
+      "Peygamber uygulaması",
+      "Ticaret oyunu",
+      "Rastgele alışkanlık"
+    ],
+    "correctIndex": 1,
+    "explanation": "Sünnet nebevi yoldur.",
+    "source": "TDV İslam Ansiklopedisi, Sünnet"
+  },
+  {
+    "id": "iq_263",
+    "category": "Dini kavramlar",
+    "difficulty": 1,
+    "question": "Hadis terimi nedir?",
+    "options": [
+      "Peygamber söz, fiil ve takrirleri",
+      "Yalnızca ticaret kaydı",
+      "Yalnızca vergi listesi",
+      "Yalnızca şiir"
+    ],
+    "correctIndex": 0,
+    "explanation": "Hadis sünnetin naklidir.",
+    "source": "TDV İslam Ansiklopedisi, Hadis"
+  },
+  {
+    "id": "iq_264",
+    "category": "Dini kavramlar",
+    "difficulty": 2,
+    "question": "Sünnet-i müekkede ne demektir?",
+    "options": [
+      "Kuvvetli sünnet",
+      "Haram fiil",
+      "Şirk inancı",
+      "Küfür sözü"
+    ],
+    "correctIndex": 0,
+    "explanation": "Müekked sünnet önemlidir.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_265",
+    "category": "Dini kavramlar",
+    "difficulty": 1,
+    "question": "Dua ne demektir?",
+    "options": [
+      "Allah'a yalvarış",
+      "İnsanlara övünme",
+      "Mal sayma",
+      "Putlara tapma"
+    ],
+    "correctIndex": 0,
+    "explanation": "Dua Allah'a yönelmedir.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_266",
+    "category": "Dini kavramlar",
+    "difficulty": 1,
+    "question": "Zikir ne demektir?",
+    "options": [
+      "Unutmak",
+      "Alay etmek",
+      "İnkâr etmek",
+      "Allah'ı anmak"
+    ],
+    "correctIndex": 3,
+    "explanation": "Zikir Allah'ı anmaktır.",
+    "source": "TDV İslam Ansiklopedisi, Zikir"
+  },
+  {
+    "id": "iq_267",
+    "category": "Dini kavramlar",
+    "difficulty": 2,
+    "question": "Tövbe ne demektir?",
+    "options": [
+      "Günahdan dönüp pişman olmak",
+      "Günahı çoğaltmak",
+      "İnkârı artırmak",
+      "Övünmek"
+    ],
+    "correctIndex": 0,
+    "explanation": "Tövbe pişmanlık ve dönüştür.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_268",
+    "category": "Dini kavramlar",
+    "difficulty": 1,
+    "question": "Sabır ne demektir?",
+    "options": [
+      "Öfkeyi kutsamak",
+      "Sıkıntıya göğüs germek",
+      "İsyanı övmek",
+      "Haksızlığı yaymak"
+    ],
+    "correctIndex": 1,
+    "explanation": "Sabır imanın gereğidir.",
+    "source": "TDV İslam Ansiklopedisi, Sabır"
+  },
+  {
+    "id": "iq_269",
+    "category": "Dini kavramlar",
+    "difficulty": 1,
+    "question": "Şükür ne demektir?",
+    "options": [
+      "Nimeti görüp teşekkür etmek",
+      "Nimeti inkâr",
+      "Nimeti yok saymak",
+      "Nimeti gizlemek zorunda kalmak daima"
+    ],
+    "correctIndex": 0,
+    "explanation": "Şükür nimet bilincidir.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_270",
+    "category": "Dini kavramlar",
+    "difficulty": 2,
+    "question": "Takva ne demektir?",
+    "options": [
+      "İsraf övgüsü",
+      "Gaflet",
+      "Allah'a karşı sakınma bilinci",
+      "Kibir"
+    ],
+    "correctIndex": 2,
+    "explanation": "Takva sorumluluk bilincidir.",
+    "source": "TDV İslam Ansiklopedisi, Takvâ"
+  },
+  {
+    "id": "iq_271",
+    "category": "Dini kavramlar",
+    "difficulty": 1,
+    "question": "Adalet ne demektir?",
+    "options": [
+      "Hakkı gözetmek",
+      "Kayırmayı kutsamak",
+      "Haksızlık yapmak",
+      "Zulmü övmek"
+    ],
+    "correctIndex": 0,
+    "explanation": "Adalet hakkın teslimidir.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_272",
+    "category": "Dini kavramlar",
+    "difficulty": 2,
+    "question": "Emanet ne demektir?",
+    "options": [
+      "Güvenilirlik ve korunan hak",
+      "Hıyanet",
+      "Yalan",
+      "Hırsızlık"
+    ],
+    "correctIndex": 0,
+    "explanation": "Emanet güven unsurudur.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_273",
+    "category": "Dini kavramlar",
+    "difficulty": 1,
+    "question": "Helalleşmek neyi ifade eder?",
+    "options": [
+      "Hakları karşılıklı temizlemek",
+      "Kibirlenmek",
+      "Yalanı yaymak",
+      "Düşmanlığı artırmak"
+    ],
+    "correctIndex": 0,
+    "explanation": "Helalleşme hak temizliği arayışıdır.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_274",
+    "category": "Dini kavramlar",
+    "difficulty": 2,
+    "question": "Gıybet ne demektir?",
+    "options": [
+      "Hayır dua",
+      "Adaletli şahitlik",
+      "Dürüst övgü",
+      "Birinin ardından hoşlanmayacağı söz söylemek"
+    ],
+    "correctIndex": 3,
+    "explanation": "Gıybet dinen yasaklanan bir davranıştır.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_275",
+    "category": "Dini kavramlar",
+    "difficulty": 1,
+    "question": "İftira ne demektir?",
+    "options": [
+      "Emanet",
+      "Olmayan suçu yüklemek",
+      "Adalet",
+      "Doğru şahitlik"
+    ],
+    "correctIndex": 1,
+    "explanation": "İftira büyük günahtır.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_276",
+    "category": "Dini kavramlar",
+    "difficulty": 2,
+    "question": "Riya ne demektir?",
+    "options": [
+      "İhlas",
+      "İhsan",
+      "İman",
+      "Gösteriş için ibadet"
+    ],
+    "correctIndex": 3,
+    "explanation": "Riya gösteriş hastalığıdır.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_277",
+    "category": "Dini kavramlar",
+    "difficulty": 1,
+    "question": "İhlas ne demektir?",
+    "options": [
+      "Ameli yalnız Allah için yapmak",
+      "Riya",
+      "Gösteriş",
+      "Şirk"
+    ],
+    "correctIndex": 0,
+    "explanation": "İhlas samimiyettir.",
+    "source": "TDV İslam Ansiklopedisi, İhlâs"
+  },
+  {
+    "id": "iq_278",
+    "category": "Dini kavramlar",
+    "difficulty": 2,
+    "question": "Kader inancı neyi ifade eder?",
+    "options": [
+      "Putçuluk",
+      "Allah'ın ilim ve takdiri",
+      "İnkâr",
+      "Tesadüfçülük"
+    ],
+    "correctIndex": 1,
+    "explanation": "Kader imanın şartlarındandır.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_279",
+    "category": "Dini kavramlar",
+    "difficulty": 1,
+    "question": "Ahiret ne demektir?",
+    "options": [
+      "Yalnızca çocukluk",
+      "Ölüm sonrası ebedi hayat",
+      "Yalnızca uyku",
+      "Yalnızca dünya ticareti"
+    ],
+    "correctIndex": 1,
+    "explanation": "Ahiret hesap ve sonsuz hayattır.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_280",
+    "category": "Dini kavramlar",
+    "difficulty": 1,
+    "question": "Cennet ne demektir?",
+    "options": [
+      "Dünya çarşısı",
+      "Savaş alanı",
+      "Müminlere vaat edilen ebedi yurt",
+      "Geçici gölgelik"
+    ],
+    "correctIndex": 2,
+    "explanation": "Cennet ahiret yurdudur.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_281",
+    "category": "Dini kavramlar",
+    "difficulty": 1,
+    "question": "Cehennem ne demektir?",
+    "options": [
+      "Oyun alanı",
+      "Azap yurdu",
+      "Bayram yeri",
+      "Ticaret limanı"
+    ],
+    "correctIndex": 1,
+    "explanation": "Cehennem azap mahallidir.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_282",
+    "category": "Dini kavramlar",
+    "difficulty": 2,
+    "question": "Şefaat kavramı neyi ifade eder?",
+    "options": [
+      "Şirk kurma",
+      "İnkârı övme",
+      "İzinle aracılık dileği",
+      "Putlara tapma"
+    ],
+    "correctIndex": 2,
+    "explanation": "Şefaat ehli sünnet bahislerindendir.",
+    "source": "TDV İslam Ansiklopedisi, Şefaat"
+  },
+  {
+    "id": "iq_283",
+    "category": "Dini kavramlar",
+    "difficulty": 1,
+    "question": "Tefsir ilmi nedir?",
+    "options": [
+      "Kur'an'ı açıklama ilmi",
+      "Hadis ezber yarışması yalnızca",
+      "Astronomi",
+      "Fıkıh usulünün tamamı değil ifadesi yanlış"
+    ],
+    "correctIndex": 0,
+    "explanation": "Tefsir Kur'an yorumudur.",
+    "source": "TDV İslam Ansiklopedisi, Tefsir"
+  },
+  {
+    "id": "iq_284",
+    "category": "Dini kavramlar",
+    "difficulty": 1,
+    "question": "Fıkıh ilmi nedir?",
+    "options": [
+      "Yalnızca şiir ilmi",
+      "Yalnızca bahçıvanlık",
+      "Yalnızca tipografi",
+      "Ameli hükümleri bilme ilmi"
+    ],
+    "correctIndex": 3,
+    "explanation": "Fıkıh amelî hükümleri inceler.",
+    "source": "TDV İslam Ansiklopedisi, Fıkıh"
+  },
+  {
+    "id": "iq_285",
+    "category": "Dini kavramlar",
+    "difficulty": 3,
+    "question": "Kelam ilmi neyi inceler?",
+    "options": [
+      "Yalnızca madenciliği",
+      "İtikadi konuları",
+      "Yalnızca gemiciliği",
+      "Yalnızca yemek tariflerini"
+    ],
+    "correctIndex": 1,
+    "explanation": "Kelam akide konularını işler.",
+    "source": "TDV İslam Ansiklopedisi, Kelâm"
+  },
+  {
+    "id": "iq_286",
+    "category": "Dini kavramlar",
+    "difficulty": 1,
+    "question": "Tecvit ilmi nedir?",
+    "options": [
+      "Zekât hesabı",
+      "Hac menzili",
+      "Kur'an'ı doğru okuma kuralları",
+      "Oruç niyeti"
+    ],
+    "correctIndex": 2,
+    "explanation": "Tecvit kıraat kurallarıdır.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_287",
+    "category": "Dini kavramlar",
+    "difficulty": 3,
+    "question": "İcma ne demektir?",
+    "options": [
+      "Put konsensüsü",
+      "Müçtehitlerin bir konuda birleşmesi",
+      "Rastgele oy",
+      "Tek kişinin hevesi"
+    ],
+    "correctIndex": 1,
+    "explanation": "İcma usul delillerindendir.",
+    "source": "TDV İslam Ansiklopedisi, İcmâ"
+  },
+  {
+    "id": "iq_288",
+    "category": "Dini kavramlar",
+    "difficulty": 3,
+    "question": "Kıyas usulde ne demektir?",
+    "options": [
+      "Rastgele yasak",
+      "Put kıyası",
+      "Şiir benzetmesi yalnızca",
+      "Benzer hükmü benzer olaya taşıma"
+    ],
+    "correctIndex": 3,
+    "explanation": "Kıyas fıkıh usulü delilidir.",
+    "source": "TDV İslam Ansiklopedisi, Kıyas"
+  },
+  {
+    "id": "iq_289",
+    "category": "Dini kavramlar",
+    "difficulty": 2,
+    "question": "Sünnetullah ne demektir?",
+    "options": [
+      "Rastgele tesadüf",
+      "İnsan uydurması",
+      "Allah'ın âdet ve kanunları",
+      "Put kuralı"
+    ],
+    "correctIndex": 2,
+    "explanation": "Sünnetullah ilahi kanundur.",
+    "source": "TDV İslam Ansiklopedisi, Sünnetullah"
+  },
+  {
+    "id": "iq_290",
+    "category": "Dini kavramlar",
+    "difficulty": 1,
+    "question": "Ümmet ne demektir?",
+    "options": [
+      "Tek çarşı esnafı",
+      "Peygambere bağlı topluluk",
+      "Tek ordu birliği yalnızca",
+      "Tek aile şirketi"
+    ],
+    "correctIndex": 1,
+    "explanation": "Ümmet inanç topluluğudur.",
+    "source": "TDV İslam Ansiklopedisi, Ümmet"
+  },
+  {
+    "id": "iq_291",
+    "category": "Dini kavramlar",
+    "difficulty": 2,
+    "question": "Cihad kavramı geniş anlamda neyi kapsar?",
+    "options": [
+      "Sadece soy övüncünü",
+      "Sadece dünya malı yarışını",
+      "Sadece eğlenceyi",
+      "Allah yolunda gayreti"
+    ],
+    "correctIndex": 3,
+    "explanation": "Cihad gayret ve mücadele anlamındadır.",
+    "source": "TDV İslam Ansiklopedisi, Cihad"
+  },
+  {
+    "id": "iq_292",
+    "category": "Dini kavramlar",
+    "difficulty": 1,
+    "question": "Sevap ne demektir?",
+    "options": [
+      "Azap",
+      "İnkâr",
+      "Günah",
+      "İyi amelin karşılığı"
+    ],
+    "correctIndex": 3,
+    "explanation": "Sevap hayrın mükâfatıdır.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_293",
+    "category": "Dini kavramlar",
+    "difficulty": 1,
+    "question": "Günah ne demektir?",
+    "options": [
+      "Allah'ın emrine aykırı fiil",
+      "İhlas",
+      "İhsan",
+      "İbadet"
+    ],
+    "correctIndex": 0,
+    "explanation": "Günah yasak fiildir.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_294",
+    "category": "Dini kavramlar",
+    "difficulty": 2,
+    "question": "Küfür ne demektir?",
+    "options": [
+      "İmanı reddetmek",
+      "Oruç tutmak",
+      "Zekât vermek",
+      "Namaz kılmak"
+    ],
+    "correctIndex": 0,
+    "explanation": "Küfür inkârdır.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_295",
+    "category": "Dini kavramlar",
+    "difficulty": 1,
+    "question": "Mümin kimdir?",
+    "options": [
+      "Alay eden",
+      "İnkâr eden",
+      "Putlara tapan",
+      "İman eden kimse"
+    ],
+    "correctIndex": 3,
+    "explanation": "Mümin iman sahibidir.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_296",
+    "category": "Dini kavramlar",
+    "difficulty": 1,
+    "question": "Münafık kimdir?",
+    "options": [
+      "Samimi mümin",
+      "İçi dışı ayrı olup iman iddia eden",
+      "Açık müşrik daima aynı",
+      "Çocuk"
+    ],
+    "correctIndex": 1,
+    "explanation": "Münafık ikiyüzlülükle anılır.",
+    "source": "TDV İslam Ansiklopedisi, Münâfık"
+  },
+  {
+    "id": "iq_297",
+    "category": "Dini kavramlar",
+    "difficulty": 2,
+    "question": "Bidat kavramı neyi ifade eder?",
+    "options": [
+      "Sünnetin tamamını",
+      "Kur'an'ın kendisini",
+      "Dinde sonradan uydurulan eklemeler bahsini",
+      "Farzların tamamını"
+    ],
+    "correctIndex": 2,
+    "explanation": "Bidat dinde sonradan çıkarma tartışmasıdır.",
+    "source": "TDV İslam Ansiklopedisi, Bid'at"
+  },
+  {
+    "id": "iq_298",
+    "category": "Dini kavramlar",
+    "difficulty": 3,
+    "question": "İstiare ve mecaz tefsirde neyi gösterir?",
+    "options": [
+      "Metnin yokluğunu",
+      "Ayetlerin silinmesini",
+      "Kıraatin yasaklanmasını",
+      "Dil sanatlarıyla anlatım"
+    ],
+    "correctIndex": 3,
+    "explanation": "Belagat tefsirde önemlidir.",
+    "source": "TDV İslam Ansiklopedisi, Tefsir"
+  },
+  {
+    "id": "iq_299",
+    "category": "Dini kavramlar",
+    "difficulty": 2,
+    "question": "Helal kazanç neden önemlidir?",
+    "options": [
+      "Haramı çoğaltmak için",
+      "İbadet ve bereket bilinci için",
+      "İsrafı kutsamak için",
+      "Riya için"
+    ],
+    "correctIndex": 1,
+    "explanation": "Helal rızık temel ahlakıdır.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_300",
+    "category": "Dini kavramlar",
+    "difficulty": 1,
+    "question": "Selam vermek İslam ahlakında neyi ifade eder?",
+    "options": [
+      "Barış ve hayır dileği",
+      "Kibir",
+      "Düşmanlık",
+      "Alay"
+    ],
+    "correctIndex": 0,
+    "explanation": "Selam barış dileğidir.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_301",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Kur'an'da ismi en çok geçen peygamber hangisidir?",
+    "options": [
+      "İbrahim",
+      "İsa",
+      "Musa",
+      "Muhammed"
+    ],
+    "correctIndex": 2,
+    "explanation": "Hz. Musa'nın adı Kur'an'da en sık anılan peygamberdir.",
+    "source": "Diyanet Kur'an Yolu"
+  },
+  {
+    "id": "iq_302",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Kur'an'da secde ayeti bulunan sure sayısı kaçtır?",
+    "options": [
+      "11",
+      "13",
+      "15",
+      "17"
+    ],
+    "correctIndex": 2,
+    "explanation": "Kur'an'da on beş surede tilavet secdesi vardır.",
+    "source": "Diyanet Kur'an Yolu"
+  },
+  {
+    "id": "iq_303",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Besmele iki kez yazılan sure hangisidir?",
+    "options": [
+      "Kehf",
+      "Yasin",
+      "Neml",
+      "Mülk"
+    ],
+    "correctIndex": 2,
+    "explanation": "Neml suresinde Süleyman'ın mektubunda ikinci besmele geçer.",
+    "source": "Diyanet Kur'an Yolu, Neml 27/30"
+  },
+  {
+    "id": "iq_304",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Bakara suresi kaç ayetten oluşur?",
+    "options": [
+      "284",
+      "285",
+      "286",
+      "287"
+    ],
+    "correctIndex": 2,
+    "explanation": "Bakara suresi 286 ayettir.",
+    "source": "Diyanet Kur'an Yolu"
+  },
+  {
+    "id": "iq_305",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Kur'an'da 'Ha-Mim' harfleriyle başlayan surelere genel olarak ne denir?",
+    "options": [
+      "Mufassal",
+      "Mesani",
+      "Havâmiim",
+      "Seb'u tıval"
+    ],
+    "correctIndex": 2,
+    "explanation": "Ha-Mim ile başlayan yedi sure Havâmiim diye anılır.",
+    "source": "TDV İslam Ansiklopedisi, Havâmiim"
+  },
+  {
+    "id": "iq_306",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Kronolojik olarak Kur'an'da inen son surelerden biri hangisidir?",
+    "options": [
+      "Yasin",
+      "Kehf",
+      "Nasr",
+      "Kehf suresinin başı"
+    ],
+    "correctIndex": 2,
+    "explanation": "Nasr suresi veda döneminde inen son surelerdendir.",
+    "source": "TDV İslam Ansiklopedisi, Nasr"
+  },
+  {
+    "id": "iq_307",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Kur'an'da 'Iqra' (oku) emri hangi surenin başında gelir?",
+    "options": [
+      "Fatiha",
+      "Alak",
+      "Rahman",
+      "Kalem"
+    ],
+    "correctIndex": 1,
+    "explanation": "İlk vahiy Alak suresinin 'Oku' ayetleriyle başlamıştır.",
+    "source": "Diyanet Kur'an Yolu, Alak 96/1"
+  },
+  {
+    "id": "iq_308",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Kehf suresinde Ashab-ı Kehf kaç genç olarak anlatılır?",
+    "options": [
+      "Beş",
+      "Yedi",
+      "On",
+      "On iki"
+    ],
+    "correctIndex": 1,
+    "explanation": "Ashab-ı Kehf kıssasında yedi genç ve köpekleri anlatılır.",
+    "source": "Diyanet Kur'an Yolu, Kehf 18/22"
+  },
+  {
+    "id": "iq_309",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "İsra suresinin bir diğer adı nedir?",
+    "options": [
+      "Bani İsrail",
+      "En'am",
+      "A'raf",
+      "Yunus"
+    ],
+    "correctIndex": 0,
+    "explanation": "İsra suresi Bani İsrail adıyla da bilinir.",
+    "source": "Diyanet Kur'an Yolu, İsra"
+  },
+  {
+    "id": "iq_310",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Kur'an'da 'Seb'u tıval' (yedi uzun sure) grubunda hangisi yer alır?",
+    "options": [
+      "Yasin",
+      "Bakara",
+      "Kevser",
+      "Asr"
+    ],
+    "correctIndex": 1,
+    "explanation": "Bakara, yedi uzun sureden biridir.",
+    "source": "TDV İslam Ansiklopedisi, Seb'u Tıvâl"
+  },
+  {
+    "id": "iq_311",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Kur'an'da 'Mesani' sureler hangi özellikle anılır?",
+    "options": [
+      "Yalnızca tek ayetli sureler",
+      "Tekrarlı ve kısa sureler",
+      "Sadece Medeni sureler",
+      "Sadece Mekki sureler"
+    ],
+    "correctIndex": 1,
+    "explanation": "Mesani, tekrarlı ve genelde kısa sureleri ifade eder.",
+    "source": "TDV İslam Ansiklopedisi, Mesânî"
+  },
+  {
+    "id": "iq_312",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Kur'an'da 'el-Mufassal' bölümü mushafın hangi kısmını ifade eder?",
+    "options": [
+      "İlk cüz",
+      "Fatiha ve Bakara",
+      "Son kısa sureler bölümü",
+      "Yalnızca Medeni sureler"
+    ],
+    "correctIndex": 2,
+    "explanation": "Mufassal genelde mushafın sonundaki kısa sureleri kapsar.",
+    "source": "TDV İslam Ansiklopedisi, Mufassal"
+  },
+  {
+    "id": "iq_313",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Tevbe suresinin bir diğer adı nedir?",
+    "options": [
+      "Berae",
+      "Furkan",
+      "Feth",
+      "Nasr"
+    ],
+    "correctIndex": 0,
+    "explanation": "Tevbe suresi Berae adıyla da bilinir.",
+    "source": "Diyanet Kur'an Yolu, Tevbe"
+  },
+  {
+    "id": "iq_314",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Yasin suresi geleneksel olarak ne diye anılır?",
+    "options": [
+      "Kur'an'ın kalbi",
+      "Kur'an'ın aynası",
+      "Kur'an'ın anahtarı",
+      "Kur'an'ın kapısı"
+    ],
+    "correctIndex": 0,
+    "explanation": "Yasin suresi 'Kur'an'ın kalbi' diye anılır.",
+    "source": "TDV İslam Ansiklopedisi, Yâsîn"
+  },
+  {
+    "id": "iq_315",
+    "category": "Siyer",
+    "difficulty": 3,
+    "question": "Hudeybiye Antlaşması hangi yılda yapılmıştır?",
+    "options": [
+      "4 H",
+      "6 H",
+      "8 H",
+      "10 H"
+    ],
+    "correctIndex": 1,
+    "explanation": "Hudeybiye Antlaşması 6. hicri yılda imzalanmıştır.",
+    "source": "TDV İslam Ansiklopedisi, Hudeybiye"
+  },
+  {
+    "id": "iq_316",
+    "category": "Siyer",
+    "difficulty": 3,
+    "question": "Feth-i Mekke hangi ay içinde gerçekleşmiştir?",
+    "options": [
+      "Recep",
+      "Ramazan",
+      "Şaban",
+      "Zilhicce"
+    ],
+    "correctIndex": 1,
+    "explanation": "Mekke'nin fethi Ramazan ayında gerçekleşmiştir.",
+    "source": "TDV İslam Ansiklopedisi, Mekke'nin Fethi"
+  },
+  {
+    "id": "iq_317",
+    "category": "Siyer",
+    "difficulty": 3,
+    "question": "Hendek Savaşı hangi yılda olmuştur?",
+    "options": [
+      "3 H",
+      "4 H",
+      "5 H",
+      "6 H"
+    ],
+    "correctIndex": 2,
+    "explanation": "Hendek Savaşı 5. hicri yılda yaşanmıştır.",
+    "source": "TDV İslam Ansiklopedisi, Hendek Gazvesi"
+  },
+  {
+    "id": "iq_318",
+    "category": "Siyer",
+    "difficulty": 3,
+    "question": "Uhud Savaşı hangi yılda olmuştur?",
+    "options": [
+      "2 H",
+      "3 H",
+      "4 H",
+      "5 H"
+    ],
+    "correctIndex": 1,
+    "explanation": "Uhud Savaşı 3. hicri yılda gerçekleşmiştir.",
+    "source": "TDV İslam Ansiklopedisi, Uhud Gazvesi"
+  },
+  {
+    "id": "iq_319",
+    "category": "Siyer",
+    "difficulty": 3,
+    "question": "Bedir Savaşı hangi yılda olmuştur?",
+    "options": [
+      "1 H",
+      "2 H",
+      "3 H",
+      "4 H"
+    ],
+    "correctIndex": 1,
+    "explanation": "Bedir Savaşı 2. hicri yılda olmuştur.",
+    "source": "TDV İslam Ansiklopedisi, Bedir Gazvesi"
+  },
+  {
+    "id": "iq_320",
+    "category": "Siyer",
+    "difficulty": 3,
+    "question": "Tebük Seferi hangi yılda gerçekleşmiştir?",
+    "options": [
+      "7 H",
+      "8 H",
+      "9 H",
+      "10 H"
+    ],
+    "correctIndex": 2,
+    "explanation": "Tebük Seferi 9. hicri yılda yapılmıştır.",
+    "source": "TDV İslam Ansiklopedisi, Tebük Seferi"
+  },
+  {
+    "id": "iq_321",
+    "category": "Siyer",
+    "difficulty": 3,
+    "question": "Hz. Peygamber vefat ettiğinde hicri takvime göre hangi yıldaydı?",
+    "options": [
+      "9 H",
+      "10 H",
+      "11 H",
+      "12 H"
+    ],
+    "correctIndex": 2,
+    "explanation": "Hz. Peygamber 11. hicri yılda vefat etmiştir.",
+    "source": "TDV İslam Ansiklopedisi, Hz. Muhammed"
+  },
+  {
+    "id": "iq_322",
+    "category": "Siyer",
+    "difficulty": 3,
+    "question": "Hicret hangi yılda gerçekleşmiştir?",
+    "options": [
+      "610",
+      "615",
+      "622",
+      "630"
+    ],
+    "correctIndex": 2,
+    "explanation": "Hicret 622 yılında Medine'ye yapılmıştır.",
+    "source": "TDV İslam Ansiklopedisi, Hicret"
+  },
+  {
+    "id": "iq_323",
+    "category": "Siyer",
+    "difficulty": 3,
+    "question": "Mescid-i Nebevi hangi şehirde inşa edilmiştir?",
+    "options": [
+      "Mekke",
+      "Medine",
+      "Taif",
+      "Kudüs"
+    ],
+    "correctIndex": 1,
+    "explanation": "Mescid-i Nebevi Medine'de inşa edilmiştir.",
+    "source": "TDV İslam Ansiklopedisi, Mescid-i Nebevî"
+  },
+  {
+    "id": "iq_324",
+    "category": "Siyer",
+    "difficulty": 3,
+    "question": "Hicrette Medine'ye yerleşen Mekkeli Müslümanlara ne ad verilir?",
+    "options": [
+      "Ensar",
+      "Muhacir",
+      "Tabiîn",
+      "Emevî"
+    ],
+    "correctIndex": 1,
+    "explanation": "Mekke'den hicret edenlere Muhacir denir.",
+    "source": "TDV İslam Ansiklopedisi, Muhacir"
+  },
+  {
+    "id": "iq_325",
+    "category": "Siyer",
+    "difficulty": 3,
+    "question": "Medine'de Hz. Peygamber'i barındıran Ensar liderlerinden biri kimdir?",
+    "options": [
+      "Ebu Cehil",
+      "Ebu Talib",
+      "Ebu Eyyub el-Ensari",
+      "Ebu Leheb"
+    ],
+    "correctIndex": 2,
+    "explanation": "Ebu Eyyub el-Ensari Medine'de misafir ettiği sahabidir.",
+    "source": "TDV İslam Ansiklopedisi, Ebu Eyyûb el-Ensârî"
+  },
+  {
+    "id": "iq_326",
+    "category": "Siyer",
+    "difficulty": 3,
+    "question": "Taif seferi hangi büyük savaştan sonra yapılmıştır?",
+    "options": [
+      "Bedir",
+      "Uhud",
+      "Huneyn",
+      "Mute"
+    ],
+    "correctIndex": 2,
+    "explanation": "Taif seferi Huneyn Savaşı sonrasında gerçekleşmiştir.",
+    "source": "TDV İslam Ansiklopedisi, Taif Seferi"
+  },
+  {
+    "id": "iq_327",
+    "category": "Siyer",
+    "difficulty": 3,
+    "question": "Hicrette Mekke'de emanetleri iade etmek için geride kalan sahabi kimdir?",
+    "options": [
+      "Ömer b. Hattab",
+      "Hz. Ali",
+      "Ebu Bekir",
+      "Hz. Osman"
+    ],
+    "correctIndex": 1,
+    "explanation": "Hz. Ali hicrette Mekke'de vekalet için geride kalmıştır.",
+    "source": "TDV İslam Ansiklopedisi, Hicret"
+  },
+  {
+    "id": "iq_328",
+    "category": "Peygamberler tarihi",
+    "difficulty": 3,
+    "question": "Hz. Yakub'un diğer adı nedir?",
+    "options": [
+      "İshak",
+      "İsrail",
+      "Yusuf",
+      "İsmail"
+    ],
+    "correctIndex": 1,
+    "explanation": "Hz. Yakub Kur'an'da İsrail adıyla da anılır.",
+    "source": "Diyanet Kur'an Yolu, Bakara 2/133"
+  },
+  {
+    "id": "iq_329",
+    "category": "Peygamberler tarihi",
+    "difficulty": 3,
+    "question": "Hz. Yusuf'un on bir kardeşi vardır; babaları kimdir?",
+    "options": [
+      "Hz. İbrahim",
+      "Hz. Yakub",
+      "Hz. İshak",
+      "Hz. İsmail"
+    ],
+    "correctIndex": 1,
+    "explanation": "Yusuf kıssasında babası Hz. Yakub'dur.",
+    "source": "Diyanet Kur'an Yolu, Yusuf"
+  },
+  {
+    "id": "iq_330",
+    "category": "Peygamberler tarihi",
+    "difficulty": 3,
+    "question": "Hz. Süleyman'ın babası hangi peygamberdir?",
+    "options": [
+      "Hz. Musa",
+      "Hz. Davud",
+      "Hz. İbrahim",
+      "Hz. İshak"
+    ],
+    "correctIndex": 1,
+    "explanation": "Hz. Süleyman'ın babası Hz. Davud'dur.",
+    "source": "Diyanet Kur'an Yolu, Neml 27/16"
+  },
+  {
+    "id": "iq_331",
+    "category": "Peygamberler tarihi",
+    "difficulty": 3,
+    "question": "Hz. Musa'nın peygamber kardeşi ve yardımcısı kimdir?",
+    "options": [
+      "Harun",
+      "Yusha",
+      "Şuayb",
+      "Lut"
+    ],
+    "correctIndex": 0,
+    "explanation": "Hz. Harun, Musa'nın kardeşi ve peygamber yardımcısıdır.",
+    "source": "Diyanet Kur'an Yolu, Taha 20/29-36"
+  },
+  {
+    "id": "iq_332",
+    "category": "Peygamberler tarihi",
+    "difficulty": 3,
+    "question": "Hz. Hud hangi kavme gönderilmiştir?",
+    "options": [
+      "Semud",
+      "Âd",
+      "Medyen",
+      "Lut kavmi"
+    ],
+    "correctIndex": 1,
+    "explanation": "Hz. Hud Âd kavmine gönderilmiş peygamberdir.",
+    "source": "Diyanet Kur'an Yolu, Hud 11/50"
+  },
+  {
+    "id": "iq_333",
+    "category": "Peygamberler tarihi",
+    "difficulty": 3,
+    "question": "Hz. Salih hangi kavme gönderilmiştir?",
+    "options": [
+      "Âd",
+      "Semud",
+      "Eyke",
+      "Nuh kavmi"
+    ],
+    "correctIndex": 1,
+    "explanation": "Hz. Salih Semud kavmine gönderilmiştir.",
+    "source": "Diyanet Kur'an Yolu, Hud 11/61"
+  },
+  {
+    "id": "iq_334",
+    "category": "Peygamberler tarihi",
+    "difficulty": 3,
+    "question": "Hz. Şuayb hangi halka gönderilmiştir?",
+    "options": [
+      "Semud",
+      "Medyen (Eyke)",
+      "Âd",
+      "Amalek"
+    ],
+    "correctIndex": 1,
+    "explanation": "Hz. Şuayb Medyen halkına gönderilmiş peygamberdir.",
+    "source": "Diyanet Kur'an Yolu, A'raf 7/85"
+  },
+  {
+    "id": "iq_335",
+    "category": "Peygamberler tarihi",
+    "difficulty": 3,
+    "question": "Hz. Nuh'un gemisi hangi dağa oturduğu bildirilir?",
+    "options": [
+      "Sina",
+      "Cudi",
+      "Arafat",
+      "Uhud"
+    ],
+    "correctIndex": 1,
+    "explanation": "Kur'an geminin Cudi dağına oturduğunu bildirir.",
+    "source": "Diyanet Kur'an Yolu, Hud 11/44"
+  },
+  {
+    "id": "iq_336",
+    "category": "Peygamberler tarihi",
+    "difficulty": 3,
+    "question": "Hz. İsa'ya indirildiği bildirilen kitap hangisidir?",
+    "options": [
+      "Tevrat",
+      "Zebur",
+      "İncil",
+      "Furkan"
+    ],
+    "correctIndex": 2,
+    "explanation": "Hz. İsa'ya İncil indirildiği bildirilir.",
+    "source": "Diyanet Kur'an Yolu, Maide 5/46"
+  },
+  {
+    "id": "iq_337",
+    "category": "Peygamberler tarihi",
+    "difficulty": 3,
+    "question": "Hz. Davud'a indirildiği bildirilen kitap hangisidir?",
+    "options": [
+      "Tevrat",
+      "Zebur",
+      "İncil",
+      "Suhuf"
+    ],
+    "correctIndex": 1,
+    "explanation": "Hz. Davud'a Zebur indirildiği bildirilir.",
+    "source": "Diyanet Kur'an Yolu, Nisa 4/163"
+  },
+  {
+    "id": "iq_338",
+    "category": "Peygamberler tarihi",
+    "difficulty": 3,
+    "question": "Hz. Musa'ya indirildiği bildirilen kitap hangisidir?",
+    "options": [
+      "Tevrat",
+      "Zebur",
+      "İncil",
+      "Kur'an"
+    ],
+    "correctIndex": 0,
+    "explanation": "Hz. Musa'ya Tevrat indirildiği bildirilir.",
+    "source": "Diyanet Kur'an Yolu, Maide 5/44"
+  },
+  {
+    "id": "iq_339",
+    "category": "Peygamberler tarihi",
+    "difficulty": 3,
+    "question": "Lokman kıssası hangi surede yer alır?",
+    "options": [
+      "Kehf",
+      "Lokman",
+      "Saba",
+      "Meryem"
+    ],
+    "correctIndex": 1,
+    "explanation": "Lokman kıssası Lokman suresinde geçer.",
+    "source": "Diyanet Kur'an Yolu, Lokman"
+  },
+  {
+    "id": "iq_340",
+    "category": "Peygamberler tarihi",
+    "difficulty": 3,
+    "question": "Hz. Yunus hangi kent halkına gönderilmiştir?",
+    "options": [
+      "Mekke",
+      "Nineve",
+      "Kudüs",
+      "Petra"
+    ],
+    "correctIndex": 1,
+    "explanation": "Hz. Yunus kıssası Nineve halkıyla ilişkilendirilir.",
+    "source": "Diyanet Kur'an Yolu; TDV İslam Ansiklopedisi, Yûnus"
+  },
+  {
+    "id": "iq_341",
+    "category": "İslam tarihi",
+    "difficulty": 3,
+    "question": "Dört halife dönemi toplam yaklaşık kaç yıl sürmüştür?",
+    "options": [
+      "On yıl",
+      "Yirmi yıl",
+      "Otuz yıl",
+      "Kırk yıl"
+    ],
+    "correctIndex": 2,
+    "explanation": "Dört halife dönemi yaklaşık otuz yıl sürmüştür.",
+    "source": "TDV İslam Ansiklopedisi, Hulefâ-i Râşidîn"
+  },
+  {
+    "id": "iq_342",
+    "category": "İslam tarihi",
+    "difficulty": 3,
+    "question": "İslam takvimi hangi olaydan itibaren başlatılmıştır?",
+    "options": [
+      "Bedir",
+      "Hicret",
+      "Mekke'nin fethi",
+      "Veda Haccı"
+    ],
+    "correctIndex": 1,
+    "explanation": "Hicri takvim Hz. Ömer döneminde Hicret'ten başlatılmıştır.",
+    "source": "TDV İslam Ansiklopedisi, Hicrî Takvim"
+  },
+  {
+    "id": "iq_343",
+    "category": "İslam tarihi",
+    "difficulty": 3,
+    "question": "Emevi halifeliğinin başkenti hangi şehirdir?",
+    "options": [
+      "Medine",
+      "Kufe",
+      "Basra",
+      "Şam"
+    ],
+    "correctIndex": 3,
+    "explanation": "Emevi halifeliğinin merkezi Şam olmuştur.",
+    "source": "TDV İslam Ansiklopedisi, Emevîler"
+  },
+  {
+    "id": "iq_344",
+    "category": "İslam tarihi",
+    "difficulty": 3,
+    "question": "Abbasi Devleti'nin kurucusu kimdir?",
+    "options": [
+      "Harun Reşid",
+      "Memun",
+      "Ebu'l-Abbas es-Saffah",
+      "Mansur"
+    ],
+    "correctIndex": 2,
+    "explanation": "Abbasi Devleti Ebu'l-Abbas es-Saffah ile kurulmuştur.",
+    "source": "TDV İslam Ansiklopedisi, Abbâsîler"
+  },
+  {
+    "id": "iq_345",
+    "category": "İslam tarihi",
+    "difficulty": 3,
+    "question": "Selçuklu Devleti hangi savaş sonrası Anadolu'da kalıcı hâkimiyet kurmuştur?",
+    "options": [
+      "Nihavend",
+      "Malazgirt",
+      "Aynıcalut",
+      "Preveze"
+    ],
+    "correctIndex": 1,
+    "explanation": "Malazgirt sonrası Türkler Anadolu'da yerleşmiştir.",
+    "source": "TDV İslam Ansiklopedisi, Malazgirt Muharebesi"
+  },
+  {
+    "id": "iq_346",
+    "category": "İslam tarihi",
+    "difficulty": 3,
+    "question": "Sahih-i Buhari'nin derleyicisi kimdir?",
+    "options": [
+      "İmam Müslim",
+      "İmam Buhari",
+      "İmam Tirmizi",
+      "İmam Nesai"
+    ],
+    "correctIndex": 1,
+    "explanation": "Sahih-i Buhari İmam Buhari tarafından derlenmiştir.",
+    "source": "TDV İslam Ansiklopedisi, Buhârî"
+  },
+  {
+    "id": "iq_347",
+    "category": "İslam tarihi",
+    "difficulty": 3,
+    "question": "İmam-ı Azam Ebu Hanife hangi ilim dalında öne çıkar?",
+    "options": [
+      "Astronomi",
+      "Fıkıh",
+      "Tıp",
+      "Coğrafya"
+    ],
+    "correctIndex": 1,
+    "explanation": "Ebu Hanife fıkıh alanında imam kabul edilir.",
+    "source": "TDV İslam Ansiklopedisi, Ebu Hanife"
+  },
+  {
+    "id": "iq_348",
+    "category": "İslam tarihi",
+    "difficulty": 3,
+    "question": "İmam Gazali'nin en meşhur eseri hangisidir?",
+    "options": [
+      "El-Muvatta",
+      "İhyau Ulumiddin",
+      "El-Kanun",
+      "El-İşarat"
+    ],
+    "correctIndex": 1,
+    "explanation": "Gazali'nin en bilinen eseri İhyau Ulumiddin'dir.",
+    "source": "TDV İslam Ansiklopedisi, Gazzâlî"
+  },
+  {
+    "id": "iq_349",
+    "category": "İslam tarihi",
+    "difficulty": 3,
+    "question": "Endülüs Emevi Devleti'nin başkenti neresidir?",
+    "options": [
+      "Granada",
+      "Kurtuba",
+      "Sevilla",
+      "Valensiya"
+    ],
+    "correctIndex": 1,
+    "explanation": "Endülüs Emevi Devleti'nin başkenti Kurtuba'dır.",
+    "source": "TDV İslam Ansiklopedisi, Endülüs Emevîleri"
+  },
+  {
+    "id": "iq_350",
+    "category": "İslam tarihi",
+    "difficulty": 3,
+    "question": "Haçlıların Kudüs'ü işgali hangi yılda olmuştur?",
+    "options": [
+      "969",
+      "1099",
+      "1187",
+      "1291"
+    ],
+    "correctIndex": 1,
+    "explanation": "Birinci Haçlı Seferi sonunda Kudüs 1099'da işgal edilmiştir.",
+    "source": "TDV İslam Ansiklopedisi, Haçlı Seferleri"
+  },
+  {
+    "id": "iq_351",
+    "category": "İslam tarihi",
+    "difficulty": 3,
+    "question": "Aynıcalut Savaşı hangi yılda olmuştur?",
+    "options": [
+      "1071",
+      "1176",
+      "1260",
+      "1453"
+    ],
+    "correctIndex": 2,
+    "explanation": "Aynıcalut Savaşı 1260 yılında yapılmıştır.",
+    "source": "TDV İslam Ansiklopedisi, Aynicâlût"
+  },
+  {
+    "id": "iq_352",
+    "category": "İslam tarihi",
+    "difficulty": 3,
+    "question": "Osmanlı Devleti hangi yılda kurulmuştur?",
+    "options": [
+      "1071",
+      "1299",
+      "1453",
+      "1517"
+    ],
+    "correctIndex": 1,
+    "explanation": "Osmanlı Devleti 1299 yılında kurulmuştur.",
+    "source": "TDV İslam Ansiklopedisi, Osmanlı Devleti"
+  },
+  {
+    "id": "iq_353",
+    "category": "İslam tarihi",
+    "difficulty": 3,
+    "question": "Hz. Ömer'in halifeliği yaklaşık kaç yıl sürmüştür?",
+    "options": [
+      "Beş yıl",
+      "On yıl",
+      "On beş yıl",
+      "Yirmi yıl"
+    ],
+    "correctIndex": 1,
+    "explanation": "Hz. Ömer'in halifeliği yaklaşık on yıl sürmüştür.",
+    "source": "TDV İslam Ansiklopedisi, Ömer b. Hattâb"
+  },
+  {
+    "id": "iq_354",
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 3,
+    "question": "Malî zekâtta genel oran kırkta bir ise yüzde kaçtır?",
+    "options": [
+      "%1",
+      "%2,5",
+      "%5",
+      "%10"
+    ],
+    "correctIndex": 1,
+    "explanation": "Kırkta bir oranı yüzde 2,5'e karşılık gelir.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_355",
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 3,
+    "question": "Hanefi mezhebine göre abdestin farzı kaç tanedir?",
+    "options": [
+      "Dört",
+      "Altı",
+      "Sekiz",
+      "On"
+    ],
+    "correctIndex": 0,
+    "explanation": "Hanefi mezhebinde abdestin dört farzı vardır.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_356",
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 3,
+    "question": "Hanefi mezhebine göre guslün farzı kaç tanedir?",
+    "options": [
+      "İki",
+      "Üç",
+      "Dört",
+      "Altı"
+    ],
+    "correctIndex": 1,
+    "explanation": "Hanefi mezhebinde guslün üç farzı vardır.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_357",
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 3,
+    "question": "Hac ibadetinde vakfe nerede yapılır?",
+    "options": [
+      "Mina",
+      "Arafat",
+      "Müzdelife",
+      "Kabe"
+    ],
+    "correctIndex": 1,
+    "explanation": "Hacın rüknü olan vakfe Arafat'ta yapılır.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_358",
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 3,
+    "question": "Sehiv secdesi ne zaman yapılır?",
+    "options": [
+      "Her vitirde",
+      "Namazda hata veya eksiklikte",
+      "Oruç açılırken",
+      "Kurban keserken"
+    ],
+    "correctIndex": 1,
+    "explanation": "Sehiv secdesi namazdaki hata veya eksikliklerde yapılır.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_359",
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 3,
+    "question": "Vitir namazı kaç rekattır?",
+    "options": [
+      "İki",
+      "Üç",
+      "Dört",
+      "Beş"
+    ],
+    "correctIndex": 1,
+    "explanation": "Vitir namazı üç rekattır.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_360",
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 3,
+    "question": "Zekâtü'l-fıtr (fitre) miktarı neye göre belirlenir?",
+    "options": [
+      "Kişinin borcuna",
+      "Diyanet'in belirlediği ölçüye",
+      "Ev büyüklüğüne",
+      "Yaşa"
+    ],
+    "correctIndex": 1,
+    "explanation": "Fitre miktarı Diyanet tarafından her yıl belirlenir.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_361",
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 3,
+    "question": "İhramda yasaklardan biri aşağıdakilerden hangisidir?",
+    "options": [
+      "Tavaf",
+      "Sa'y",
+      "Saç kesmek",
+      "Telbiye getirmek"
+    ],
+    "correctIndex": 2,
+    "explanation": "İhramda saç ve tırnak kesmek yasaktır.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_362",
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 3,
+    "question": "Nafile namaz ile farz namaz arasındaki temel fark nedir?",
+    "options": [
+      "Nafile vaciptir",
+      "Farz vacip, nafile ihtiyari ibadettir",
+      "İkisi de farzdır",
+      "Nafile yalnızca bayramda kılınır"
+    ],
+    "correctIndex": 1,
+    "explanation": "Farz zorunlu, nafile gönüllü ibadettir.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_363",
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 3,
+    "question": "Cenaze namazında kaç tekbir vardır?",
+    "options": [
+      "İki",
+      "Dört",
+      "Altı",
+      "Sekiz"
+    ],
+    "correctIndex": 1,
+    "explanation": "Cenaze namazında dört tekbir vardır.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_364",
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 3,
+    "question": "Oruç ibadetinin farz kılındığı ay hangisidir?",
+    "options": [
+      "Recep",
+      "Şaban",
+      "Ramazan",
+      "Zilhicce"
+    ],
+    "correctIndex": 2,
+    "explanation": "Oruç Ramazan ayında farzdır.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_365",
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 3,
+    "question": "Kurban kesimi hangi bayram günlerinde yapılır?",
+    "options": [
+      "Ramazan bayramı",
+      "Kurban bayramı",
+      "Mevlit",
+      "Regaib"
+    ],
+    "correctIndex": 1,
+    "explanation": "Kurban ibadeti Kurban Bayramı'nda yerine getirilir.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_366",
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 3,
+    "question": "Teyemmüm hangi durumda yapılır?",
+    "options": [
+      "Su bulunamadığında veya kullanılamadığında",
+      "Her gusülden sonra",
+      "Her namazdan önce",
+      "Sadece cuma günü"
+    ],
+    "correctIndex": 0,
+    "explanation": "Su bulunamayınca veya kullanılamayınca teyemmüm caizdir.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_367",
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 3,
+    "question": "Müzdelife vakfesi ne zaman yapılır?",
+    "options": [
+      "8 Zilhicce",
+      "9 Zilhicce gecesi",
+      "10 Zilhicce sabahı",
+      "11 Zilhicce"
+    ],
+    "correctIndex": 1,
+    "explanation": "Müzdelife vakfesi Arafat'tan sonra gece yapılır.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_368",
+    "category": "Dini kavramlar",
+    "difficulty": 3,
+    "question": "İmanın şartları kaç tanedir?",
+    "options": [
+      "Beş",
+      "Altı",
+      "Yedi",
+      "Sekiz"
+    ],
+    "correctIndex": 1,
+    "explanation": "İmanın altı şartı vardır.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_369",
+    "category": "Dini kavramlar",
+    "difficulty": 3,
+    "question": "İslam'ın şartları kaç tanedir?",
+    "options": [
+      "Dört",
+      "Beş",
+      "Altı",
+      "Yedi"
+    ],
+    "correctIndex": 1,
+    "explanation": "İslam'ın beş şartı vardır.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_370",
+    "category": "Dini kavramlar",
+    "difficulty": 3,
+    "question": "Esmaü'l-Hüsna kaç isimden oluşur?",
+    "options": [
+      "Yedi",
+      "Doksan dokuz",
+      "Yüz",
+      "Yüz on dört"
+    ],
+    "correctIndex": 1,
+    "explanation": "Allah'ın doksan dokuz güzel ismi Esmaü'l-Hüsna'dır.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_371",
+    "category": "Dini kavramlar",
+    "difficulty": 3,
+    "question": "Tevekkül ne demektir?",
+    "options": [
+      "Allah'a güvenip sebeplere sarılma",
+      "Sebepleri reddetme",
+      "Kaderi inkâr",
+      "İbadeti terk"
+    ],
+    "correctIndex": 0,
+    "explanation": "Tevekkül Allah'a güvenmek ve sebeplere riayet etmektir.",
+    "source": "TDV İslam Ansiklopedisi, Tevekkül"
+  },
+  {
+    "id": "iq_372",
+    "category": "Dini kavramlar",
+    "difficulty": 3,
+    "question": "Rububiyet ne demektir?",
+    "options": [
+      "Allah'a ortak koşmak",
+      "Allah'ın yaratıp yönetmesi",
+      "Peygamber seçmesi",
+      "Melek yaratması"
+    ],
+    "correctIndex": 1,
+    "explanation": "Rububiyet Allah'ın yaratma ve yönetme sıfatıdır.",
+    "source": "TDV İslam Ansiklopedisi, Rubûbiyet"
+  },
+  {
+    "id": "iq_373",
+    "category": "Dini kavramlar",
+    "difficulty": 3,
+    "question": "Uluhiyet ne demektir?",
+    "options": [
+      "Allah'a ibadet edilmesi gerekliliği",
+      "Meleklerin sayısı",
+      "Peygamberlerin sırası",
+      "Kur'an'ın dili"
+    ],
+    "correctIndex": 0,
+    "explanation": "Uluhiyet yalnız Allah'a ibadet edilmesini ifade eder.",
+    "source": "TDV İslam Ansiklopedisi, Ulûhiyet"
+  },
+  {
+    "id": "iq_374",
+    "category": "Dini kavramlar",
+    "difficulty": 3,
+    "question": "Akaid ilmi neyi inceler?",
+    "options": [
+      "Kur'an kıraati",
+      "İnanç esasları",
+      "Ticaret hukuku",
+      "Miras paylaşımı"
+    ],
+    "correctIndex": 1,
+    "explanation": "Akaid ilmi iman esaslarını inceler.",
+    "source": "TDV İslam Ansiklopedisi, Akaid"
+  },
+  {
+    "id": "iq_375",
+    "category": "Dini kavramlar",
+    "difficulty": 3,
+    "question": "Ubudiyet ne demektir?",
+    "options": [
+      "Allah'a kulluk ve ibadet",
+      "Peygamber seçimi",
+      "Kur'an yazımı",
+      "Ticaret yapma"
+    ],
+    "correctIndex": 0,
+    "explanation": "Ubudiyet Allah'a kulluk etmektir.",
+    "source": "TDV İslam Ansiklopedisi, Ubûdiyet"
+  },
+  {
+    "id": "iq_376",
+    "category": "Dini kavramlar",
+    "difficulty": 3,
+    "question": "İstihsan Hanefi usulünde ne demektir?",
+    "options": [
+      "Kıyasa tercih edilen istisna",
+      "Ayet iptali",
+      "Hadis reddi",
+      "İcma inkârı"
+    ],
+    "correctIndex": 0,
+    "explanation": "İstihsan Hanefi usulünde kıyasa tercih edilen hükümdür.",
+    "source": "TDV İslam Ansiklopedisi, İstihsân"
+  },
+  {
+    "id": "iq_377",
+    "category": "Dini kavramlar",
+    "difficulty": 3,
+    "question": "Sedd-i zerî ne demektir?",
+    "options": [
+      "Zararlı yolu önceden kapatma",
+      "Farzı artırma",
+      "Nafileyi azaltma",
+      "Kıyası reddetme"
+    ],
+    "correctIndex": 0,
+    "explanation": "Sedd-i zerî, günaha giden yolu önceden kapatmaktır.",
+    "source": "TDV İslam Ansiklopedisi, Sedd-i Zerî"
+  },
+  {
+    "id": "iq_378",
+    "category": "Dini kavramlar",
+    "difficulty": 3,
+    "question": "Masiyet ne demektir?",
+    "options": [
+      "İbadet",
+      "Günah ve isyan",
+      "Sevap",
+      "Tövbe"
+    ],
+    "correctIndex": 1,
+    "explanation": "Masiyet Allah'a isyan ve günah işlemektir.",
+    "source": "TDV İslam Ansiklopedisi, Ma'siyet"
+  },
+  {
+    "id": "iq_379",
+    "category": "Dini kavramlar",
+    "difficulty": 3,
+    "question": "Hikmet (hikme) kavramı ne demektir?",
+    "options": [
+      "Rastgele konuşma",
+      "Doğru, yerinde ve faydalı bilgi",
+      "Put yapma",
+      "Savaş sanatı"
+    ],
+    "correctIndex": 1,
+    "explanation": "Hikmet faydalı ve yerinde bilgi ve davranıştır.",
+    "source": "TDV İslam Ansiklopedisi, Hikmet"
+  },
+  {
+    "id": "iq_380",
+    "category": "Dini kavramlar",
+    "difficulty": 3,
+    "question": "İstidlal usulde ne demektir?",
+    "options": [
+      "Delilden hüküm çıkarma",
+      "Ayet silme",
+      "Hadis uydurma",
+      "Kıraat yasağı"
+    ],
+    "correctIndex": 0,
+    "explanation": "İstidlal delillerden hüküm çıkarma yöntemidir.",
+    "source": "TDV İslam Ansiklopedisi, İstidlâl"
+  }
+]

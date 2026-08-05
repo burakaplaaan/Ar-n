@@ -75,7 +75,6 @@ class _ArinAppState extends ConsumerState<ArinApp> with WidgetsBindingObserver {
   bool _postOnboardingStartupScheduled = false;
   bool _foregroundMaintenanceInFlight = false;
   bool _foregroundMaintenanceQueued = false;
-  int _rewardedEntitlementEpoch = 0;
 
   Future<void> _flushHabitDeleteQueueIfSignedIn() async {
     if (!isFirebaseReady) return;
@@ -178,28 +177,6 @@ class _ArinAppState extends ConsumerState<ArinApp> with WidgetsBindingObserver {
     await AudioSessionCoordinator.pauseActive();
   }
 
-  /// Free kullanıcı için ödüllü reklam hazırlığını ağır foreground bakımından
-  /// bağımsız ve mümkün olan en erken anda başlatır. Widget dokunuşuyla yapılan
-  /// cold launch'ta senkronizasyon işlerini beklemek reklamı gereksiz yere
-  /// geciktiriyordu.
-  Future<void> _warmRewardedForFreeUser() async {
-    if (!_isOnboardingCompletedForMaintenance()) return;
-    final requestEpoch = ++_rewardedEntitlementEpoch;
-    try {
-      final entitlement = await ref.read(premiumEntitlementProvider.future);
-      if (!mounted || requestEpoch != _rewardedEntitlementEpoch) return;
-      AdMobService.setRewardedPreloadEligible(!entitlement.isActive);
-      if (entitlement.isActive) return;
-      AdMobService.preloadRewarded();
-    } catch (e) {
-      if (!mounted || requestEpoch != _rewardedEntitlementEpoch) return;
-      // Belirsiz entitlement durumunda reklam göstermeyi/yenilemeyi durdur ve
-      // korunmuş cache'i temizle; sonraki başarılı refresh yeniden etkinleştirir.
-      AdMobService.setRewardedPreloadEligible(false);
-      debugPrint('AdMob rewarded early preload skipped: $e');
-    }
-  }
-
   @override
   void initState() {
     super.initState();
@@ -215,7 +192,6 @@ class _ArinAppState extends ConsumerState<ArinApp> with WidgetsBindingObserver {
         liveRouter.go(route);
       });
 
-      unawaited(_warmRewardedForFreeUser());
       unawaited(_runForegroundMaintenance(initial: true));
     });
   }
@@ -422,9 +398,6 @@ class _ArinAppState extends ConsumerState<ArinApp> with WidgetsBindingObserver {
       AdMobService.markRewardedEligibilityPending();
       ref.invalidate(premiumEntitlementProvider);
       AdMobService.setRewardedPreloadForeground(true);
-      // Uzun süre arka planda kalan reklam SDK nesnesi bayatlamış olabilir.
-      // Diğer bakım işlerini beklemeden tazelemeyi başlat.
-      unawaited(_warmRewardedForFreeUser());
       // Kullanıcı Android/iOS sistem ayarlarında bildirim iznini değiştirmiş
       // olabilir; görünür yayın topic üyeliğini izinle yeniden uzlaştır.
       unawaited(FcmTokenService.syncBroadcastSubscriptionIfAuthorized());
@@ -535,22 +508,16 @@ class _ArinAppState extends ConsumerState<ArinApp> with WidgetsBindingObserver {
 
     ref.listen(premiumEntitlementProvider, (previous, next) {
       if (next.isLoading) {
-        _rewardedEntitlementEpoch++;
         AdMobService.markRewardedEligibilityPending();
         return;
       }
       if (next.hasError) {
-        _rewardedEntitlementEpoch++;
         AdMobService.setRewardedPreloadEligible(false);
         return;
       }
       final entitlement = next.asData?.value;
       if (entitlement == null) return;
-      _rewardedEntitlementEpoch++;
       AdMobService.setRewardedPreloadEligible(!entitlement.isActive);
-      if (!entitlement.isActive) {
-        AdMobService.preloadRewarded();
-      }
       unawaited(
         WidgetAccessService(
           ref.read(sharedPreferencesProvider),

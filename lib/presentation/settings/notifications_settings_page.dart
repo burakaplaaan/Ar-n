@@ -27,6 +27,7 @@ import '../../data/services/prayer_service_resolver.dart';
 import '../shared/providers/prayer_time_providers.dart';
 import '../shared/providers/quotes_providers.dart';
 import '../shared/widgets/arin_clock_time_sheet.dart';
+import '../shared/widgets/arin_permission_dialog.dart';
 import 'widgets/permission_gate_card.dart';
 
 class NotificationsSettingsPage extends ConsumerStatefulWidget {
@@ -118,24 +119,15 @@ class _NotificationsSettingsPageState
     HapticFeedback.selectionClick();
     if (!mounted) return;
     final l10n = AppLocalizations.of(context)!;
-    final confirmed = await showDialog<bool>(
+    final confirmed = await showArinPermissionDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text(l10n.notificationsBatteryRationaleTitle),
-        content: Text(l10n.notificationsBatteryRationaleBody),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(false),
-            child: Text(l10n.notificationsBatteryRationaleCancel),
-          ),
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(true),
-            child: Text(l10n.notificationsBatteryRationaleConfirm),
-          ),
-        ],
-      ),
+      icon: Icons.battery_saver_rounded,
+      title: l10n.notificationsBatteryRationaleTitle,
+      body: l10n.notificationsBatteryRationaleBody,
+      cancelLabel: l10n.notificationsBatteryRationaleCancel,
+      confirmLabel: l10n.notificationsBatteryRationaleConfirm,
     );
-    if (confirmed != true) return;
+    if (!confirmed) return;
     await requestIgnoreBatteryOptimizations();
     if (mounted) await _refreshDiagnostics();
   }
@@ -146,25 +138,15 @@ class _NotificationsSettingsPageState
   /// hiç istenmez.
   Future<bool> _confirmBackgroundLocationDisclosure() async {
     final l10n = AppLocalizations.of(context)!;
-    final result = await showDialog<bool>(
+    return showArinPermissionDialog(
       context: context,
       barrierDismissible: false,
-      builder: (dialogCtx) => AlertDialog(
-        title: Text(l10n.backgroundLocationDisclosureTitle),
-        content: Text(l10n.backgroundLocationDisclosureBody),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(dialogCtx).pop(false),
-            child: Text(l10n.backgroundLocationDisclosureDecline),
-          ),
-          TextButton(
-            onPressed: () => Navigator.of(dialogCtx).pop(true),
-            child: Text(l10n.backgroundLocationDisclosureAccept),
-          ),
-        ],
-      ),
+      icon: Icons.location_searching_rounded,
+      title: l10n.backgroundLocationDisclosureTitle,
+      body: l10n.backgroundLocationDisclosureBody,
+      cancelLabel: l10n.backgroundLocationDisclosureDecline,
+      confirmLabel: l10n.backgroundLocationDisclosureAccept,
     );
-    return result == true;
   }
 
   /// "Arka planda otomatik güncelle" anahtarı. Açılırken önce yukarıdaki
@@ -205,7 +187,9 @@ class _NotificationsSettingsPageState
         if (!mounted) return;
         setState(() => _backgroundLocationEnabled = true);
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(l10n.settingsBackgroundLocationEnabledMessage)),
+          SnackBar(
+            content: Text(l10n.settingsBackgroundLocationEnabledMessage),
+          ),
         );
       } else {
         await loc.setLocationUpdatePref(LocationUpdatePref.ask);
@@ -213,7 +197,9 @@ class _NotificationsSettingsPageState
         if (!mounted) return;
         setState(() => _backgroundLocationEnabled = false);
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(l10n.settingsBackgroundLocationDisabledMessage)),
+          SnackBar(
+            content: Text(l10n.settingsBackgroundLocationDisabledMessage),
+          ),
         );
       }
     } finally {
@@ -262,7 +248,9 @@ class _NotificationsSettingsPageState
     await AppLocalNotificationScheduler.rescheduleAll(
       prefs,
       pools: pools,
-      prayerTimes: (upcomingDays != null && upcomingDays.isNotEmpty) ? upcomingDays.first : prayerTimes,
+      prayerTimes: (upcomingDays != null && upcomingDays.isNotEmpty)
+          ? upcomingDays.first
+          : prayerTimes,
       upcomingDays: upcomingDays,
       force: true,
     );
@@ -295,7 +283,9 @@ class _NotificationsSettingsPageState
       context,
       initialMinutesFromMidnight: initial,
       title: AppLocalizations.of(context)!.notificationsZikirTimePickerTitle,
-      subtitle: AppLocalizations.of(context)!.notificationsZikirTimePickerSubtitle,
+      subtitle: AppLocalizations.of(
+        context,
+      )!.notificationsZikirTimePickerSubtitle,
     );
     if (picked == null || !mounted) return;
     await _applyPrefsAndSync(
@@ -328,7 +318,9 @@ class _NotificationsSettingsPageState
         : l10n.notificationsNextReminderTomorrow;
     String humanGap() {
       if (diff.inMinutes < 1) return l10n.notificationsNextReminderUnderMinute;
-      if (diff.inHours < 1) return l10n.notificationsNextReminderMinutes(diff.inMinutes);
+      if (diff.inHours < 1) {
+        return l10n.notificationsNextReminderMinutes(diff.inMinutes);
+      }
       final hh = diff.inHours;
       final mm = diff.inMinutes % 60;
       if (mm == 0) return l10n.notificationsNextReminderHoursOnly(hh);
@@ -509,8 +501,7 @@ class _NotificationsSettingsPageState
                               _NtfSwitchRow(
                                 onDark: onDark,
                                 title: l10n.notificationsArinmaDailyTitle,
-                                subtitle:
-                                    l10n.notificationsArinmaDailySubtitle,
+                                subtitle: l10n.notificationsArinmaDailySubtitle,
                                 value: dailyOn,
                                 onChanged: (v) async {
                                   HapticFeedback.selectionClick();
@@ -528,8 +519,7 @@ class _NotificationsSettingsPageState
                               _NtfSwitchRow(
                                 onDark: onDark,
                                 title: l10n.notificationsMilestoneTitle,
-                                subtitle:
-                                    l10n.notificationsMilestoneSubtitle,
+                                subtitle: l10n.notificationsMilestoneSubtitle,
                                 value:
                                     AppNotificationChannelPrefs.milestoneEnabled(
                                       prefs,

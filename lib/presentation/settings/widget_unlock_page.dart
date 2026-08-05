@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -6,10 +8,12 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../core/ads/admob_ids.dart';
 import '../../core/constants/app_colors.dart';
+import '../../core/constants/product_metric_features.dart';
 import '../../core/providers/shared_preferences_provider.dart';
 import '../../core/router/app_router.dart';
 import '../../data/services/admob_service.dart';
 import '../../data/services/global_widget_lock_service.dart';
+import '../../data/services/product_metrics_service.dart';
 import '../../data/services/widget_access_service.dart';
 import '../../data/services/widget_metrics_service.dart';
 import '../shared/providers/admob_providers.dart';
@@ -53,10 +57,13 @@ class _WidgetUnlockPageState extends ConsumerState<WidgetUnlockPage> {
   Future<void> _maybeWarmRewarded() async {
     try {
       final entitlement = await ref.read(premiumEntitlementProvider.future);
-      if (!mounted || entitlement.isActive) return;
+      if (!mounted) return;
+      AdMobService.setRewardedPreloadEligible(!entitlement.isActive);
+      if (entitlement.isActive) return;
       AdMobService.preloadRewarded();
     } catch (_) {
       // Entitlement okunamadı: belirsizken reklam ısıtmayı atla (fail-safe).
+      AdMobService.setRewardedPreloadEligible(false);
     }
   }
 
@@ -64,35 +71,57 @@ class _WidgetUnlockPageState extends ConsumerState<WidgetUnlockPage> {
     final l10n = AppLocalizations.of(context)!;
     setState(() => _busy = true);
     try {
-      // Reklam teklifinde gösterilen süre ile ödül kaydında kullanılan süreyi
-      // mümkün olduğunca aynı tutmak için sunucu ayarını gösterimden hemen önce
-      // yenile. Push kaçırılmış olsa bile kullanıcı güncel teklifi görür.
-      await GlobalWidgetLockService.applyIfDue(
-        ref.read(sharedPreferencesProvider),
-        force: true,
-      );
-      if (!context.mounted) return;
-      setState(() {});
-      final result = await ref
-          .read(adMobServiceProvider)
-          .showRewardedDetailed(ArinAdUnit.rewardedUnlock);
-      if (!context.mounted) return;
-      if (result != RewardedAdResult.rewarded) {
-        // Kullanıcı reklamı erken kapattıysa (notRewarded) "yüklenemedi"
-        // mesajı yanıltıcı olur; yalnızca gerçek yükleme/gösterim hatasında
-        // bilgilendir.
-        if (result != RewardedAdResult.notRewarded) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(l10n.widgetUnlockAdLoadFailed)),
-          );
-        }
+      bool premiumActive;
+      try {
+        premiumActive = (await ref.read(
+          premiumEntitlementProvider.future,
+        )).isActive;
+      } catch (_) {
+        if (context.mounted) await _showAdUnavailableDialog(context);
         return;
       }
+      if (!context.mounted) return;
+      AdMobService.setRewardedPreloadEligible(!premiumActive);
+      if (premiumActive) {
+        context.pop();
+        return;
+      }
+
+      while (context.mounted) {
+        final prepared = await _prepareRewardedWithFeedback(context);
+        if (!context.mounted) return;
+        if (!prepared) {
+          final retry = await _showAdUnavailableDialog(context);
+          if (!context.mounted || !retry) return;
+          continue;
+        }
+
+        // Reklam teklifinde gösterilen süre ile ödül kaydında kullanılan süreyi
+        // mümkün olduğunca aynı tutmak için sunucu ayarını gösterimden hemen
+        // önce yenile. Push kaçırılmış olsa bile kullanıcı güncel teklifi görür.
+        await GlobalWidgetLockService.applyIfDue(
+          ref.read(sharedPreferencesProvider),
+          force: true,
+        );
+        if (!context.mounted) return;
+        setState(() {});
+        final result = await ref
+            .read(adMobServiceProvider)
+            .showRewardedDetailed(ArinAdUnit.rewardedUnlock);
+        if (!context.mounted) return;
+        if (result == RewardedAdResult.rewarded) break;
+        // Kullanıcı reklamı erken kapattıysa bu bir yükleme hatası değildir.
+        if (result == RewardedAdResult.notRewarded) return;
+        final retry = await _showAdUnavailableDialog(context);
+        if (!context.mounted || !retry) return;
+      }
+
       final service = ref.read(widgetAccessServiceProvider);
       await service.recordRewardedUnlock(widget.kind);
       final premium = await ref.read(premiumEntitlementProvider.future);
       final states = await service.syncAll(isPremium: premium.isActive);
       await WidgetMetricsService.recordRewardedUnlock(widget.kind);
+      unawaited(ProductMetricsService.adWatch(ProductMetricFeatures.widget));
       final prefs = await SharedPreferences.getInstance();
       await WidgetMetricsService.reconcile(
         prefs: prefs,
@@ -127,6 +156,41 @@ class _WidgetUnlockPageState extends ConsumerState<WidgetUnlockPage> {
     } finally {
       if (mounted) setState(() => _busy = false);
     }
+  }
+
+  Future<bool> _prepareRewardedWithFeedback(BuildContext context) async {
+    final adMob = ref.read(adMobServiceProvider);
+    if (adMob.isRewardedReady) return true;
+    return await showDialog<bool>(
+          context: context,
+          barrierDismissible: false,
+          builder: (_) => _RewardedPreparingDialog(
+            prepare: adMob.prepareRewarded,
+            message: AppLocalizations.of(context)!.widgetUnlockAdPreparing,
+          ),
+        ) ??
+        false;
+  }
+
+  Future<bool> _showAdUnavailableDialog(BuildContext context) async {
+    final l10n = AppLocalizations.of(context)!;
+    return await showDialog<bool>(
+          context: context,
+          builder: (dialogContext) => AlertDialog(
+            content: Text(l10n.widgetUnlockAdLoadFailed),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(dialogContext).pop(false),
+                child: Text(l10n.widgetUnlockAdLaterButton),
+              ),
+              FilledButton(
+                onPressed: () => Navigator.of(dialogContext).pop(true),
+                child: Text(l10n.widgetUnlockAdRetryButton),
+              ),
+            ],
+          ),
+        ) ??
+        false;
   }
 
   Future<void> _goPremium(BuildContext context) async {
@@ -311,6 +375,53 @@ class _WidgetUnlockPageState extends ConsumerState<WidgetUnlockPage> {
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class _RewardedPreparingDialog extends StatefulWidget {
+  const _RewardedPreparingDialog({
+    required this.prepare,
+    required this.message,
+  });
+
+  final Future<bool> Function() prepare;
+  final String message;
+
+  @override
+  State<_RewardedPreparingDialog> createState() =>
+      _RewardedPreparingDialogState();
+}
+
+class _RewardedPreparingDialogState extends State<_RewardedPreparingDialog> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _prepare());
+  }
+
+  Future<void> _prepare() async {
+    final ready = await widget.prepare();
+    if (mounted) Navigator.of(context).pop(ready);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return PopScope(
+      canPop: false,
+      child: AlertDialog(
+        content: Row(
+          children: [
+            const SizedBox(
+              width: 24,
+              height: 24,
+              child: CircularProgressIndicator(strokeWidth: 2.5),
+            ),
+            const SizedBox(width: 16),
+            Expanded(child: Text(widget.message)),
+          ],
         ),
       ),
     );
