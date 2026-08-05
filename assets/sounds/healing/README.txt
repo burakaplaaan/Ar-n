@@ -1,10 +1,12 @@
 İyileştirici Frekanslar — ses varlıkları
 ========================================
 
-**Ses çıkmıyorsa:** `assets/sounds/healing/tones/` ve `ambi/` klasörlerinde `.wav` olmalı.
+**Ses çıkmıyorsa:** `assets/sounds/healing/tones/` altında `.wav`,
+`ambi/` altında `ambi_forest.mp3` / `ambi_fire.mp3` / `ambi_evren.mp3` olmalı.
 Proje kökünde çalıştır: `dart run tool/generate_healing_assets.dart`
-  (Bu komut `ambi_forest.wav`, `ambi_fire.wav` ve `ambi_evren.wav` dahil tüm ambiyansları yer tutucuyla yeniden yazar;
-   özel kayıtlarınızı `seamless_loop_wav.dart` ile tekrar üretin.)
+  (Bu komut ambiyansları yer tutucu WAV olarak yeniden yazar; ardından MP3’e
+   çevirip `healing_audio_notifier.dart` path’lerini güncelleyin.
+   Özel kayıtlar: `seamless_loop_wav.dart` → WAV, sonra 96 kbps mono MP3.)
 
 tones/tone_*Hz.wav
   Yerel üretim: `dart run tool/generate_healing_assets.dart`
@@ -13,9 +15,10 @@ tones/tone_*Hz.wav
   `generate_healing_assets.dart` içindeki ton seviyesi ambiyansla birlikte duyulacak şekilde ayarlanır;
   uzun süre dinlerken kulak rahatlığı için uygulama içi “Frekans tonu” slider’ını düşük tutun.
 
-ambi/ambi_*.wav
-  22.05 kHz mono PCM döngüler: orman, ateş, evren (pad yer tutucu).
-  Gerçek ambiyans için `tool/seamless_loop_wav.dart` ile WAV veya MP3 kaynağından 60 sn döngü üretin.
+ambi/ambi_*.mp3
+  22.05 kHz kaynaklarından üretilmiş 96 kbps mono MP3 döngüler: orman, ateş, evren.
+  Üretim: `tool/seamless_loop_wav.dart` ile 60 sn WAV → ardından MP3’e encode.
+  (APK boyutu için runtime asset MP3; seamless WAV yedekleri tool/_backups altında.)
 
 Gerçek kayıt nereden? (telif / lisans)
   - Yapay zekâ ile üretilen ses: aracın kullanım şartlarına bakın; “telifsiz” varsaymayın.

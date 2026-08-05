@@ -345,10 +345,10 @@ test("bot plan knows easy questions and hesitates on hard misses", () => {
   assert.ok(avgWrongMs >= 8_000, `hard wrong too fast: ${avgWrongMs}`);
 });
 
-test("botReadyAtMs delays after human answer without locking the round", () => {
+test("botReadyAtMs resolves with human submit; waits plan if human silent", () => {
   const start = 1_000_000;
   const planned = 12_000;
-  // İnsan 3sn'de cevapladı; bot planı 12sn — en fazla ~4.2sn sonra gelsin.
+  // İnsan cevapladıysa bot aynı nowMs ile hazır — submit'te reveal gelsin.
   const ready = t.botReadyAtMs({
     roundStartedAtMs: start,
     plannedElapsedMs: planned,
@@ -357,8 +357,7 @@ test("botReadyAtMs delays after human answer without locking the round", () => {
     humanAnswered: true,
     humanElapsedMs: 3_000,
   });
-  assert.ok(ready >= start + 3_000 + 1_400);
-  assert.ok(ready <= start + 3_000 + 4_200);
+  assert.equal(ready, start + 3_500);
   // İnsan yoksa planlanan süre.
   assert.equal(
     t.botReadyAtMs({
@@ -370,6 +369,30 @@ test("botReadyAtMs delays after human answer without locking the round", () => {
       humanElapsedMs: 0,
     }),
     start + 7_000,
+  );
+});
+
+test("botAnswerElapsedMs keeps plan when human forces early bot write", () => {
+  const start = 1_000_000;
+  const planElapsed = 12_000;
+  assert.equal(
+    t.botAnswerElapsedMs({
+      planElapsedMs: planElapsed,
+      nowMs: start + 3_500,
+      roundStartedAtMs: start,
+      humanAnswered: true,
+    }),
+    planElapsed,
+  );
+  // İnsan yokken duvar saati planı aşmasın.
+  assert.equal(
+    t.botAnswerElapsedMs({
+      planElapsedMs: planElapsed,
+      nowMs: start + 5_000,
+      roundStartedAtMs: start,
+      humanAnswered: false,
+    }),
+    5_000,
   );
 });
 

@@ -709,6 +709,7 @@
   "hilalDuelResultWin": "Kazandın",
   "hilalDuelResultLose": "Kaybettin",
   "hilalDuelResultDraw": "Berabere",
+  "hilalDuelResultScoreCaption": "Doğru cevap sayısı",
   "hilalDuelCorrectCount": "{count} doğru",
   "@hilalDuelCorrectCount": {
     "placeholders": {

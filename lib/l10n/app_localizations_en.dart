@@ -1445,6 +1445,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get hilalDuelResultDraw => 'Draw';
 
   @override
+  String get hilalDuelResultScoreCaption => 'Correct answers';
+
+  @override
   String hilalDuelCorrectCount(int count) {
     return '$count correct';
   }

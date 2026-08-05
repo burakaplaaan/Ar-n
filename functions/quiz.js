@@ -853,7 +853,12 @@ function _botPlan(questionIds, playerLevel) {
   });
 }
 
-/** İnsan cevapladıktan sonra botun anında basmasını engeller; turu da kilitlemez. */
+/**
+ * Bot cevabı zamanı.
+ * İnsan yokken planlanan süreyi bekler.
+ * İnsan cevapladıysa aynı istekte yazılır — yoksa "Cevapladı" görünüp reveal
+ * için 1–5 sn poll bekleniyordu.
+ */
 function _botReadyAtMs({
   roundStartedAtMs,
   plannedElapsedMs,
@@ -868,15 +873,29 @@ function _botReadyAtMs({
     start + 1_000,
     Math.floor(Number(deadlineMs) || (start + ROUND_DURATION_MS)),
   );
+  const now = Math.max(0, Math.floor(Number(nowMs) || 0));
   if (!humanAnswered) {
     return Math.min(planned, deadline - 200);
   }
-  const humanAt = start + Math.max(0, Math.floor(Number(humanElapsedMs) || 0));
-  // Planlanan süre + insanın ardından kısa düşünme; en fazla ~4.2sn beklet.
-  const minAfterHuman = humanAt + 1_400;
-  const maxAfterHuman = humanAt + 4_200;
-  const ready = Math.min(maxAfterHuman, Math.max(planned, minAfterHuman));
-  return Math.min(ready, deadline - 200);
+  // humanElapsedMs API uyumu için kalır; submit anında tur çözülsün.
+  return Math.min(now, deadline - 200);
+}
+
+/** Bot elapsedMs: erken resolve'da plan; zamanında cevapta duvar saati tavanı. */
+function _botAnswerElapsedMs({
+  planElapsedMs,
+  nowMs,
+  roundStartedAtMs,
+  humanAnswered,
+}) {
+  const planned = Math.min(
+    ROUND_DURATION_MS,
+    Math.max(800, Math.floor(Number(planElapsedMs) || ROUND_DURATION_MS)),
+  );
+  if (humanAnswered) return planned;
+  const roundStart = Math.max(0, Math.floor(Number(roundStartedAtMs) || 0));
+  const wall = Math.max(0, Math.floor(Number(nowMs) || 0) - roundStart);
+  return Math.min(ROUND_DURATION_MS, Math.max(800, Math.min(planned, wall || planned)));
 }
 
 function _questionPayload(questionId, includeAnswer = false) {
@@ -1310,14 +1329,14 @@ async function _resolveRoundIfReady(tx, db, matchRef, match, nowMs) {
       });
       if (nowMs >= dueAt) {
         const question = QUESTION_BY_ID.get(match.questionIds[round]);
-        const roundStart = Number(match.roundStartedAtMs) || nowMs;
-        const elapsedMs = Math.min(
-          ROUND_DURATION_MS,
-          Math.max(
-            800,
-            Math.min(Number(plan.elapsedMs) || ROUND_DURATION_MS, nowMs - roundStart),
-          ),
-        );
+        // İnsan erken bitirdiyse bot hemen yazılır ama skor için planlanan süre kalır
+        // (hiz beraberliğinde insan haksız yere kaybetmesin).
+        const elapsedMs = _botAnswerElapsedMs({
+          planElapsedMs: plan.elapsedMs,
+          nowMs,
+          roundStartedAtMs: match.roundStartedAtMs,
+          humanAnswered,
+        });
         answers[bot.id] = {
           choice: plan.choice,
           elapsedMs,
@@ -1362,6 +1381,8 @@ async function _resolveRoundIfReady(tx, db, matchRef, match, nowMs) {
       return;
     }
     match.currentRound = round + 1;
+    // İstemci ~ROUND_REVEAL_MS reveal gösterir; süre o bitince 20'den başlasın.
+    // Erken submit istemcide retry edilir; butonlar roundStartedAtMs ile kilitlenmez.
     match.roundStartedAtMs = nowMs + ROUND_REVEAL_MS;
     match.deadlineMs = match.roundStartedAtMs + ROUND_DURATION_MS;
     tx.set(matchRef, {
@@ -2513,6 +2534,7 @@ module.exports = {
     ENGAGEMENT_MAX_IDLE_MS,
     botPlan: _botPlan,
     botReadyAtMs: _botReadyAtMs,
+    botAnswerElapsedMs: _botAnswerElapsedMs,
     canAcceptAnswer,
     allPlayersAnswered,
     shouldRefundAbandonedQueue,

@@ -48,11 +48,11 @@ double _healingToneVolumeOut(double stored01) {
 String healingAmbientAssetPath(String key) {
   switch (key) {
     case kHealingAmbientForest:
-      return 'sounds/healing/ambi/ambi_forest.wav';
+      return 'sounds/healing/ambi/ambi_forest.mp3';
     case kHealingAmbientFire:
-      return 'sounds/healing/ambi/ambi_fire.wav';
+      return 'sounds/healing/ambi/ambi_fire.mp3';
     case kHealingAmbientEvren:
-      return 'sounds/healing/ambi/ambi_evren.wav';
+      return 'sounds/healing/ambi/ambi_evren.mp3';
     case kHealingAmbientInshirah:
       return '';
     default:

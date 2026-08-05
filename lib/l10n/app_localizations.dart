@@ -2586,6 +2586,12 @@ abstract class AppLocalizations {
   /// **'Berabere'**
   String get hilalDuelResultDraw;
 
+  /// No description provided for @hilalDuelResultScoreCaption.
+  ///
+  /// In tr, this message translates to:
+  /// **'Doğru cevap sayısı'**
+  String get hilalDuelResultScoreCaption;
+
   /// No description provided for @hilalDuelCorrectCount.
   ///
   /// In tr, this message translates to:

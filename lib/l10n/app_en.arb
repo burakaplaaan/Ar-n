@@ -709,6 +709,7 @@
   "hilalDuelResultWin": "You won",
   "hilalDuelResultLose": "You lost",
   "hilalDuelResultDraw": "Draw",
+  "hilalDuelResultScoreCaption": "Correct answers",
   "hilalDuelCorrectCount": "{count} correct",
   "@hilalDuelCorrectCount": {
     "placeholders": {

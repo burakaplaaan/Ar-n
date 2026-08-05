@@ -2,6 +2,7 @@ import 'hilal_duel_repository.dart';
 
 /// Sunucu `version` alanına göre eşzamanlı poll/submit yarışını çözer.
 /// [incoming] daha eskiyse [current] korunur.
+/// Aynı version'da cevaplı / ilerlemiş durum ezilmez.
 HilalDuelMatch? selectFresherMatch(
   HilalDuelMatch? current,
   HilalDuelMatch incoming,
@@ -9,7 +10,68 @@ HilalDuelMatch? selectFresherMatch(
   if (current == null) return incoming;
   if (current.id != incoming.id) return incoming;
   if (incoming.version < current.version) return current;
+  if (incoming.version > current.version) return incoming;
+  // Eşit version: submit cevabını poll'un cevapsız kopyası ezmesin.
+  final currentProgress = (current.selfAnswered ? 2 : 0) +
+      (current.opponentAnswered ? 1 : 0) +
+      current.currentRound * 10;
+  final incomingProgress = (incoming.selfAnswered ? 2 : 0) +
+      (incoming.opponentAnswered ? 1 : 0) +
+      incoming.currentRound * 10;
+  if (incomingProgress < currentProgress) return current;
   return incoming;
+}
+
+/// Önceki turun lastResolution'ı bir sonraki turun tamamında "gösterilmeli"
+/// gibi durur; seçimi silmek için kullanılmamalı. Yalnızca henüz gösterilmemiş
+/// çözüm için true.
+bool shouldStartResolutionReveal({
+  required HilalDuelMatch match,
+  required int? alreadyRevealedRound,
+}) {
+  final res = match.lastResolution;
+  if (res == null) return false;
+  if (alreadyRevealedRound == res.round) return false;
+  if (match.isCompleted) return res.round == match.currentRound;
+  return res.round == match.currentRound - 1;
+}
+
+/// Submit sonrası optimistic seçim temizlensin mi?
+/// Önceki turun lastResolution'ı varken bile aynı turda beklerken seçim kalmalı.
+bool shouldClearOptimisticChoice({
+  required int submittedRound,
+  required HilalDuelMatch match,
+}) {
+  if (match.currentRound != submittedRound) return true;
+  final res = match.lastResolution;
+  // Bu turun çözümü geldiyse (rakip de cevapladı / süre bitti) temizle.
+  return res != null && res.round == submittedRound;
+}
+
+bool computeAwaitingOpponent({
+  required HilalDuelMatch match,
+  required int? selectedChoice,
+  required bool revealingResolution,
+}) {
+  if (match.isCompleted || revealingResolution || match.opponentAnswered) {
+    return false;
+  }
+  return selectedChoice != null || match.selfAnswered;
+}
+
+/// Cevap sonrası reveal gelene kadar sık poll (rakip "Cevapladı" olsa bile).
+bool needsFastMatchPoll({
+  required HilalDuelMatch? match,
+  required int? selectedChoice,
+  required bool revealingResolution,
+  required bool awaitingOpponent,
+}) {
+  if (match == null || match.isCompleted || revealingResolution) {
+    return false;
+  }
+  if (awaitingOpponent) return true;
+  if (selectedChoice != null || match.selfAnswered) return true;
+  return false;
 }
 
 /// İptal yanıtı: matched ise maça gir; aksi halde lobi.
@@ -121,4 +183,22 @@ HilalDuelLeaveSettle settleLeaveAfterCancel({
 /// Cancel must not issue RPC while the captured start future is still pending.
 bool cancelMayIssueRpc({required bool startFuturePending}) {
   return !startFuturePending;
+}
+
+/// Ara tur reveal süresi: yeni soru [roundStartedAtMs] ile açılsın.
+/// Gecikmede kısalt/atla — sabit 2600ms sunucu saatinden çalmasın.
+int computeRevealHoldMs({
+  required int nowMs,
+  required int roundStartedAtMs,
+  required bool waitForRoundStart,
+  required bool matchCompleted,
+  int defaultHoldMs = 2600,
+  int maxHoldMs = 4500,
+}) {
+  if (!waitForRoundStart || matchCompleted) {
+    return defaultHoldMs.clamp(1, maxHoldMs);
+  }
+  final untilStart = roundStartedAtMs - nowMs;
+  if (untilStart <= 0) return 1;
+  return untilStart.clamp(1, maxHoldMs);
 }

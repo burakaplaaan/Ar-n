@@ -13,12 +13,32 @@ import '../../../core/theme/arin_shell_background.dart';
 import '../../../data/services/product_metrics_service.dart';
 import '../../shared/providers/admob_providers.dart';
 import '../../shared/providers/user_profile_providers.dart';
+import '../../shared/widgets/arin_permission_dialog.dart';
 import '../qibla_hub_navigator_key.dart';
 import '../qibla_hub_page.dart';
 import 'hilal_duel_controller.dart';
 import 'hilal_duel_level.dart';
 import 'hilal_duel_repository.dart';
 import 'hilal_duel_sync.dart';
+
+/// 0 can: eşleşme ekranına girmeden uyarı; isterse reklam izlet.
+Future<void> _promptNeedHeartDialog({
+  required BuildContext context,
+  required AppLocalizations l10n,
+  required HilalDuelController controller,
+}) async {
+  final watch = await showArinPermissionDialog(
+    context: context,
+    title: l10n.hilalDuelNeedHeartTitle,
+    body: l10n.hilalDuelNeedHeartHint,
+    icon: Icons.favorite_rounded,
+    cancelLabel: l10n.commonCancel,
+    confirmLabel: l10n.hilalDuelNeedHeartCta,
+  );
+  if (watch && context.mounted) {
+    unawaited(controller.watchHeartAd());
+  }
+}
 
 final hilalDuelRepositoryProvider = Provider<HilalDuelRepository>((ref) {
   return HilalDuelRepository();
@@ -586,6 +606,14 @@ class _LobbyBodyState extends State<_LobbyBody>
             final p = controller.profile;
             if (p != null && !p.premium && p.hearts <= 0) {
               _nudgeEmptyHearts();
+              unawaited(
+                _promptNeedHeartDialog(
+                  context: context,
+                  l10n: l10n,
+                  controller: controller,
+                ),
+              );
+              return;
             }
             unawaited(controller.startMatchmaking());
           },
@@ -2085,7 +2113,7 @@ class _PlayingBody extends StatelessWidget {
         ...List.generate(question?.options.length ?? 0, (index) {
           if (showReveal) {
             final correct = resolution.question.correctIndex ?? -1;
-            final selfChoice = resolution.choices[match.self.id];
+            final selfChoice = controller.choiceForRevealRound(resolution.round);
             final opponentChoice = resolution.choices[match.opponent.id];
             final selfPicked =
                 selfChoice != null && selfChoice >= 0 && selfChoice == index;
@@ -2110,12 +2138,17 @@ class _PlayingBody extends StatelessWidget {
                 onDark: onDark,
                 leftLabel: selfPicked ? selfName : null,
                 rightLabel: opponentPicked ? opponentName : null,
+                // Sen / rakip rozetleri şık rengiyle aynı olmasın (yeşilde kaybolmasın).
+                leftChipColor: selfPicked ? const Color(0xFF1B4332) : null,
+                rightChipColor: opponentPicked ? const Color(0xFF6D2E4B) : null,
                 onTap: () {},
               ),
             );
           }
 
           final selected = controller.selectedChoice == index;
+          // roundStartedAtMs ile kilitleme: yeni soru görünürken ölü buton hissi.
+          // Reveal sırasında zaten showReveal dalı enabled:false.
           final locked = match.selfAnswered ||
               controller.selectedChoice != null ||
               controller.busy;
@@ -2578,6 +2611,16 @@ class _ResultBodyState extends State<_ResultBody>
                           letterSpacing: 1.2,
                         ),
                       ),
+                      const SizedBox(height: 6),
+                      Text(
+                        l10n.hilalDuelResultScoreCaption,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: Colors.white.withValues(alpha: 0.82),
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
                       const SizedBox(height: 10),
                       Text(
                         title,
@@ -2641,7 +2684,20 @@ class _ResultBodyState extends State<_ResultBody>
               label: l10n.hilalDuelRematch,
               busy: controller.busy,
               onDark: onDark,
-              onTap: () => unawaited(controller.rematch()),
+              onTap: () {
+                final p = controller.profile;
+                if (p != null && !p.premium && p.hearts <= 0) {
+                  unawaited(
+                    _promptNeedHeartDialog(
+                      context: context,
+                      l10n: l10n,
+                      controller: controller,
+                    ),
+                  );
+                  return;
+                }
+                unawaited(controller.rematch());
+              },
             ),
             const SizedBox(height: 10),
             _SecondaryButton(
@@ -2885,6 +2941,8 @@ class _OptionTile extends StatelessWidget {
     required this.onTap,
     this.leftLabel,
     this.rightLabel,
+    this.leftChipColor,
+    this.rightChipColor,
   });
 
   final String label;
@@ -2894,6 +2952,8 @@ class _OptionTile extends StatelessWidget {
   final VoidCallback onTap;
   final String? leftLabel;
   final String? rightLabel;
+  final Color? leftChipColor;
+  final Color? rightChipColor;
 
   @override
   Widget build(BuildContext context) {
@@ -2988,7 +3048,10 @@ class _OptionTile extends StatelessWidget {
                   top: 0,
                   bottom: 0,
                   child: Center(
-                    child: _SideNameChip(label: leftLabel!, color: chipColor),
+                    child: _SideNameChip(
+                      label: leftLabel!,
+                      color: leftChipColor ?? chipColor,
+                    ),
                   ),
                 ),
               if (rightLabel != null)
@@ -2997,7 +3060,10 @@ class _OptionTile extends StatelessWidget {
                   top: 0,
                   bottom: 0,
                   child: Center(
-                    child: _SideNameChip(label: rightLabel!, color: chipColor),
+                    child: _SideNameChip(
+                      label: rightLabel!,
+                      color: rightChipColor ?? chipColor,
+                    ),
                   ),
                 ),
             ],

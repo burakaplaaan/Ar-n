@@ -6,17 +6,22 @@ HilalDuelMatch _match({
   required String id,
   required int version,
   bool selfAnswered = false,
+  bool opponentAnswered = false,
+  int currentRound = 0,
+  HilalDuelResolution? lastResolution,
+  String status = 'playing',
 }) {
   return HilalDuelMatch(
     id: id,
-    status: 'playing',
+    status: status,
     version: version,
-    currentRound: 0,
+    currentRound: currentRound,
     totalRounds: 7,
     roundStartedAtMs: 1,
     deadlineMs: 2,
     selfAnswered: selfAnswered,
-    opponentAnswered: false,
+    opponentAnswered: opponentAnswered,
+    lastResolution: lastResolution,
     self: const HilalDuelPlayer(
       id: 'a',
       name: 'A',
@@ -31,6 +36,20 @@ HilalDuelMatch _match({
       level: 1,
       isBot: true,
     ),
+  );
+}
+
+HilalDuelResolution _resolution(int round) {
+  return HilalDuelResolution(
+    round: round,
+    question: const HilalDuelQuestion(
+      id: 'q',
+      category: 'c',
+      text: 'Q?',
+      options: ['a', 'b', 'c', 'd'],
+    ),
+    choices: const {'a': 0, 'b': 1},
+    elapsedMs: const {'a': 1000, 'b': 1200},
   );
 }
 
@@ -57,6 +76,88 @@ void main() {
       final current = _match(id: 'm1', version: 9);
       final other = _match(id: 'm2', version: 1);
       expect(selectFresherMatch(current, other)!.id, 'm2');
+    });
+
+    test('eşit versionda selfAnswered poll tarafından ezilmez', () {
+      final current = _match(id: 'm1', version: 7, selfAnswered: true);
+      final staleTwin = _match(id: 'm1', version: 7, selfAnswered: false);
+      final selected = selectFresherMatch(current, staleTwin);
+      expect(selected, same(current));
+      expect(selected!.selfAnswered, isTrue);
+    });
+  });
+
+  group('answer waiting / reveal guards', () {
+    test('önceki lastResolution seçimi temizlemez', () {
+      final match = _match(
+        id: 'm1',
+        version: 4,
+        currentRound: 4,
+        selfAnswered: true,
+        lastResolution: _resolution(3),
+      );
+      expect(
+        shouldClearOptimisticChoice(submittedRound: 4, match: match),
+        isFalse,
+      );
+      expect(
+        shouldStartResolutionReveal(match: match, alreadyRevealedRound: 3),
+        isFalse,
+      );
+    });
+
+    test('yeni çözüm henüz gösterilmediyse reveal başlar', () {
+      final match = _match(
+        id: 'm1',
+        version: 5,
+        currentRound: 4,
+        lastResolution: _resolution(3),
+      );
+      expect(
+        shouldStartResolutionReveal(match: match, alreadyRevealedRound: null),
+        isTrue,
+      );
+    });
+
+    test('bu tur çözülünce optimistic seçim temizlenir', () {
+      final match = _match(
+        id: 'm1',
+        version: 6,
+        currentRound: 4,
+        lastResolution: _resolution(4),
+      );
+      expect(
+        shouldClearOptimisticChoice(submittedRound: 4, match: match),
+        isTrue,
+      );
+    });
+
+    test('awaitingOpponent seçim veya selfAnswered ile true kalır', () {
+      final match = _match(id: 'm1', version: 1, selfAnswered: true);
+      expect(
+        computeAwaitingOpponent(
+          match: match,
+          selectedChoice: null,
+          revealingResolution: false,
+        ),
+        isTrue,
+      );
+      expect(
+        computeAwaitingOpponent(
+          match: match,
+          selectedChoice: 2,
+          revealingResolution: false,
+        ),
+        isTrue,
+      );
+      expect(
+        computeAwaitingOpponent(
+          match: _match(id: 'm1', version: 1, opponentAnswered: true),
+          selectedChoice: 1,
+          revealingResolution: false,
+        ),
+        isFalse,
+      );
     });
   });
 
@@ -162,6 +263,120 @@ void main() {
     test('cancelMayIssueRpc blocks while start pending', () {
       expect(cancelMayIssueRpc(startFuturePending: true), isFalse);
       expect(cancelMayIssueRpc(startFuturePending: false), isTrue);
+    });
+  });
+
+  group('needsFastMatchPoll', () {
+    test('kendi cevabından sonra reveal gelene kadar true', () {
+      expect(
+        needsFastMatchPoll(
+          match: _match(id: 'm', version: 1, selfAnswered: true),
+          selectedChoice: 1,
+          revealingResolution: false,
+          awaitingOpponent: false,
+        ),
+        isTrue,
+      );
+    });
+
+    test('rakip Cevapladı olsa bile reveal yoksa true', () {
+      expect(
+        needsFastMatchPoll(
+          match: _match(
+            id: 'm',
+            version: 1,
+            selfAnswered: true,
+            opponentAnswered: true,
+          ),
+          selectedChoice: 2,
+          revealingResolution: false,
+          awaitingOpponent: false,
+        ),
+        isTrue,
+      );
+    });
+
+    test('reveal sırasında false', () {
+      expect(
+        needsFastMatchPoll(
+          match: _match(id: 'm', version: 1, selfAnswered: true),
+          selectedChoice: 1,
+          revealingResolution: true,
+          awaitingOpponent: false,
+        ),
+        isFalse,
+      );
+    });
+  });
+
+  group('computeRevealHoldMs', () {
+    test('zamanında: untilStart kadar bekler (~2600)', () {
+      expect(
+        computeRevealHoldMs(
+          nowMs: 10_000,
+          roundStartedAtMs: 12_600,
+          waitForRoundStart: true,
+          matchCompleted: false,
+        ),
+        2600,
+      );
+    });
+
+    test('geçikmede kısaltır — sabit 2600 ile sunucu saatini yakmaz', () {
+      expect(
+        computeRevealHoldMs(
+          nowMs: 10_500,
+          roundStartedAtMs: 12_600,
+          waitForRoundStart: true,
+          matchCompleted: false,
+        ),
+        2100,
+      );
+    });
+
+    test('roundStartedAtMs geçmişse hemen biter', () {
+      expect(
+        computeRevealHoldMs(
+          nowMs: 13_000,
+          roundStartedAtMs: 12_600,
+          waitForRoundStart: true,
+          matchCompleted: false,
+        ),
+        1,
+      );
+    });
+
+    test('aşırı untilStart 4500 ile sınırlanır', () {
+      expect(
+        computeRevealHoldMs(
+          nowMs: 10_000,
+          roundStartedAtMs: 20_000,
+          waitForRoundStart: true,
+          matchCompleted: false,
+        ),
+        4500,
+      );
+    });
+
+    test('final reveal / waitForRoundStart false: varsayılan hold', () {
+      expect(
+        computeRevealHoldMs(
+          nowMs: 10_000,
+          roundStartedAtMs: 12_600,
+          waitForRoundStart: false,
+          matchCompleted: false,
+        ),
+        2600,
+      );
+      expect(
+        computeRevealHoldMs(
+          nowMs: 10_000,
+          roundStartedAtMs: 12_600,
+          waitForRoundStart: true,
+          matchCompleted: true,
+        ),
+        2600,
+      );
     });
   });
 }

@@ -709,6 +709,7 @@
   "hilalDuelResultWin": "لقد فزت",
   "hilalDuelResultLose": "لقد خسرت",
   "hilalDuelResultDraw": "تعادل",
+  "hilalDuelResultScoreCaption": "عدد الإجابات الصحيحة",
   "hilalDuelCorrectCount": "{count} صحيحة",
   "@hilalDuelCorrectCount": {
     "placeholders": {
