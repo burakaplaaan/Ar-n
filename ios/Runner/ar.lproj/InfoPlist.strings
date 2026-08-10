@@ -1,0 +1,7 @@
+/* Native permission strings — Arabic */
+"CFBundleDisplayName" = "أرين";
+"NSUserTrackingUsageDescription" = "يُستخدم معرّف إعلانات الجهاز لقياس أداء الحملات الإعلانية. إذا رفضت الإذن، يستمر التطبيق في العمل بشكل طبيعي.";
+"NSLocationWhenInUseUsageDescription" = "يُستخدم موقعك لحساب أوقات الصلاة وإظهار اتجاه القبلة.";
+"NSLocationAlwaysAndWhenInUseUsageDescription" = "يُستخدم موقعك لحساب أوقات الصلاة وإظهار اتجاه القبلة.";
+"NSPhotoLibraryUsageDescription" = "يُستخدم الوصول إلى مكتبة الصور للصور التي تختارها للملف الشخصي أو المشاركة.";
+"NSAppleMusicUsageDescription" = "يُستخدم الوصول إلى مكتبة الوسائط لملف الصوت الذي تختاره لإشعارات الصلاة.";

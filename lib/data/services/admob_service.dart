@@ -2,6 +2,7 @@ import 'dart:io' show Platform;
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
+import 'package:gma_mediation_unity/gma_mediation_unity.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 import '../../core/ads/admob_ids.dart';
@@ -61,13 +62,28 @@ class AdMobService {
       // SDK'yı consent sonucundan BAĞIMSIZ olarak başlat. Consent akışı
       // hata verse/asılsa bile reklam motoru hazır olsun; aksi halde tek
       // bir consent hıçkırığı tüm reklamları topyekûn öldürüyordu.
+      // Mediation adapter'lar da bu initialize sırasında ayağa kalkar;
+      // Google, ilk reklam isteğinden önce init'in bitmesini ister.
+      // https://developers.google.com/admob/flutter/mediation
       if (!_sdkInitialized) {
-        await MobileAds.instance.initialize();
+        final status = await MobileAds.instance.initialize();
         _sdkInitialized = true;
+        // Profile/release'te de mediation doğrulaması için logla (Ad Inspector
+        // alternatifi / cihaz log'u). Hassas veri yok; yalnızca adapter adı.
+        status.adapterStatuses.forEach((adapter, value) {
+          debugPrint(
+            '══ ARIN ══ AdMob adapter $adapter: '
+            '${value.state.name} — ${value.description}',
+          );
+        });
       }
 
       // Consent EN İYİ ÇABA ile yürütülür; sonuç [_canRequestAds]'i belirler.
       await _runConsentFlowBestEffort();
+      // Google, mediation partner'lara consent'i otomatik iletmez.
+      // Unity Ads: reklam istemeden önce GDPR/CCPA bayraklarını ilet.
+      // https://developers.google.com/admob/flutter/mediation/unity
+      await _syncUnityPrivacyConsent();
       _flushIosRewardedStartupPreload();
 
       // NOT: Preload burada KOŞULSUZ tetiklenmez. Premium kullanıcılar reklam
@@ -83,6 +99,33 @@ class AdMobService {
       debugPrint('══ ARIN ══ AdMob init failed (sessiz): $e');
       // Geçici hata: kalıcı kilitlenme olmasın, sonraki istek yeniden denesin.
       _initializeFuture = null;
+    }
+  }
+
+  /// AdMob Ad Inspector — mediation (Unity / Meta bidding) doğrulaması için.
+  /// SDK init edilmemişse önce [initialize] dener.
+  static Future<String?> openAdInspector() async {
+    if (!_isSupportedMobilePlatform) {
+      return 'Ad Inspector yalnız Android/iOS.';
+    }
+    try {
+      await initialize();
+      final completer = Completer<String?>();
+      MobileAds.instance.openAdInspector((error) {
+        if (error == null) {
+          completer.complete(null);
+        } else {
+          completer.complete(
+            'Ad Inspector: ${error.message ?? error.code}',
+          );
+        }
+      });
+      return completer.future.timeout(
+        const Duration(seconds: 30),
+        onTimeout: () => 'Ad Inspector zaman aşımı',
+      );
+    } catch (e) {
+      return 'Ad Inspector açılamadı: $e';
     }
   }
 
@@ -125,6 +168,23 @@ class AdMobService {
     } catch (e) {
       debugPrint('══ ARIN ══ AdMob consent best-effort fallback (sessiz): $e');
       _canRequestAds = true;
+    }
+  }
+
+  /// UMP sonucunu Unity Ads mediation adapter'a iletir.
+  /// `_canRequestAds == true` → kişiselleştirilmiş reklam için rıza var / gerekli değil.
+  static Future<void> _syncUnityPrivacyConsent() async {
+    try {
+      final unity = GmaMediationUnity();
+      await unity.setGDPRConsent(_canRequestAds);
+      await unity.setCCPAConsent(_canRequestAds);
+      if (kDebugMode) {
+        debugPrint(
+          '══ ARIN ══ Unity privacy synced (consent=$_canRequestAds)',
+        );
+      }
+    } catch (e) {
+      debugPrint('══ ARIN ══ Unity privacy sync failed (sessiz): $e');
     }
   }
 

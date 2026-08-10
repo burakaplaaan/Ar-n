@@ -12,6 +12,7 @@ import '../../core/constants/app_colors.dart';
 import '../../core/firebase/firebase_bootstrap.dart';
 import '../../core/providers/shared_preferences_provider.dart';
 import '../../data/services/admin_dev_prefs.dart';
+import '../../data/services/admob_service.dart';
 import '../../data/services/app_local_notification_scheduler.dart';
 import '../../data/services/arin_local_notifications_plugin.dart';
 import '../../data/services/location_service.dart';
@@ -217,6 +218,39 @@ class _AdminDevTabState extends ConsumerState<AdminDevTab> {
             );
           },
           child: Text(l10n.adminDevAppNotificationNowAction),
+        ),
+        const SizedBox(height: 28),
+        Text(
+          'AdMob Ad Inspector',
+          style: TextStyle(
+            color: AppColors.creamBase.withValues(alpha: 0.95),
+            fontWeight: FontWeight.w700,
+            fontSize: 16,
+          ),
+        ),
+        const SizedBox(height: 6),
+        const Text(
+          'Mediation doğrulama: Unity Ads (Bidding) / Meta Audience Network single ad source. Onboarding bitmiş ve SDK init olmuş olmalı.',
+          style: TextStyle(
+            color: AppColors.textOnDarkMuted,
+            fontSize: 13,
+            height: 1.35,
+          ),
+        ),
+        const SizedBox(height: 12),
+        FilledButton.tonal(
+          onPressed: () async {
+            final messenger = ScaffoldMessenger.of(context);
+            messenger.showSnackBar(
+              const SnackBar(content: Text('Ad Inspector açılıyor…')),
+            );
+            final err = await AdMobService.openAdInspector();
+            if (!mounted) return;
+            if (err != null) {
+              messenger.showSnackBar(SnackBar(content: Text(err)));
+            }
+          },
+          child: const Text('Ad Inspector aç'),
         ),
         const SizedBox(height: 28),
         Card(

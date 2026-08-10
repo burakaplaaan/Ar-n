@@ -429,10 +429,10 @@ packages:
     dependency: "direct main"
     description:
       name: facebook_app_events
-      sha256: fe6851be836e9482c3d1849e3446234224f4d8e9efa54516cd7da81010840089
+      sha256: "422a94108edc53106298739182d2c5002eb60f209ca87ee20e4c69fd4b9a3bc7"
       url: "https://pub.dev"
     source: hosted
-    version: "0.30.2"
+    version: "0.30.5"
   fake_async:
     dependency: transitive
     description:
@@ -853,6 +853,22 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.1.3"
+  gma_mediation_meta:
+    dependency: "direct main"
+    description:
+      name: gma_mediation_meta
+      sha256: d65dd79c51f6161aaac8c9b07f9a921f73a560d275a15106f440be2016c766bc
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.5.2"
+  gma_mediation_unity:
+    dependency: "direct main"
+    description:
+      name: gma_mediation_unity
+      sha256: "42d039d2b7fb6c2a7702cbe64bbe4465e6d5b29e83e4fd67936366da6f3597e1"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.8.1"
   go_router:
     dependency: "direct main"
     description:
