@@ -1,0 +1,7 @@
+/* Native permission strings — English */
+"CFBundleDisplayName" = "Arın";
+"NSUserTrackingUsageDescription" = "Your device advertising identifier is used to measure ad campaign performance. If you decline, the app continues to work normally.";
+"NSLocationWhenInUseUsageDescription" = "Your location is used to calculate prayer times and show the Qibla direction.";
+"NSLocationAlwaysAndWhenInUseUsageDescription" = "Your location is used to calculate prayer times and show the Qibla direction.";
+"NSPhotoLibraryUsageDescription" = "Access to your photo library is used for images you select for your profile or sharing.";
+"NSAppleMusicUsageDescription" = "Access to your media library is used for the sound file you select for prayer notifications.";

@@ -5,16 +5,20 @@
     <!-- Meta App Events (facebook_app_events) reklam performansı ölçümü için
          ATT izniyle IDFA toplar ve Meta'ya iletir — bu Apple'ın tanımıyla
          "tracking" sayılır. App Store Connect → App Privacy'de
-         "Data Used to Track You" bölümü bu beyanla eşleşmeli. -->
+         "Data Used to Track You" bölümü bu beyanla eşleşmeli.
+
+         DİKKAT: Facebook domain'leri (facebook.com vb.) buraya ASLA elle
+         eklenmemeli. FBSDK'nın kendi PrivacyInfo.xcprivacy'si bu domain'leri
+         zaten beyan ediyor; ayrıca FBSDK 18.x, uygulamanın manifest'inde
+         "facebook.com" / "ep2.facebook.com" görürse development imzalı
+         build'lerde KASITLI olarak InvalidOperationException fırlatıp
+         uygulamayı çökertiyor (FBSDKDomainConfigurationManager
+         processInvalidDomainsIfNeeded). Uygulamanın kendi kodu doğrudan
+         tracking domain'ine bağlanmadığı için liste boş kalmalı. -->
     <key>NSPrivacyTracking</key>
     <true/>
     <key>NSPrivacyTrackingDomains</key>
-    <array>
-        <string>graph.facebook.com</string>
-        <string>connect.facebook.net</string>
-        <string>fbcdn.net</string>
-        <string>facebook.com</string>
-    </array>
+    <array/>
 
     <!-- Apple'ın "Required Reason API" kuralı (Mayıs 2024+): aşağıdaki sistem
          API'leri reddedilmemek için mutlaka nedenle beyan edilmeli. Firebase,

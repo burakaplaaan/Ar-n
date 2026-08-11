@@ -1,0 +1,7 @@
+/* Native permission strings — Turkish */
+"CFBundleDisplayName" = "Arın";
+"NSUserTrackingUsageDescription" = "Reklam kampanyalarının performansını ölçmek için cihaz reklam kimliği kullanılır. İzin vermezsen uygulama normal çalışmaya devam eder.";
+"NSLocationWhenInUseUsageDescription" = "Konumunuz, namaz vakitlerini hesaplamak ve kıble yönünü göstermek için kullanılır.";
+"NSLocationAlwaysAndWhenInUseUsageDescription" = "Konumunuz, namaz vakitlerini hesaplamak ve kıble yönünü göstermek için kullanılır.";
+"NSPhotoLibraryUsageDescription" = "Profil veya paylaşım için seçtiğiniz görselleri kullanmak amacıyla fotoğraf arşivinize erişilir.";
+"NSAppleMusicUsageDescription" = "Namaz bildirimi için telefonunuzdan seçtiğiniz ses dosyasını kullanmak amacıyla medya arşivinize erişilir.";
