@@ -129,6 +129,8 @@ class HilalDuelWeeklyEntry {
     required this.weeklyHilals,
     required this.level,
     required this.isSelf,
+    this.ownerHash = '',
+    this.isBot = false,
     this.title,
     this.avatarFrame = false,
     this.specialHilalIcon = false,
@@ -140,6 +142,8 @@ class HilalDuelWeeklyEntry {
   final int weeklyHilals;
   final int level;
   final bool isSelf;
+  final String ownerHash;
+  final bool isBot;
   final String? title;
   final bool avatarFrame;
   final bool specialHilalIcon;
@@ -152,10 +156,58 @@ class HilalDuelWeeklyEntry {
       weeklyHilals: (map['weeklyHilals'] as num?)?.toInt() ?? 0,
       level: (map['level'] as num?)?.toInt() ?? 1,
       isSelf: map['isSelf'] == true,
+      ownerHash: map['ownerHash']?.toString() ?? '',
+      isBot: map['isBot'] == true,
       title: map['title']?.toString(),
       avatarFrame: map['avatarFrame'] == true,
       specialHilalIcon: map['specialHilalIcon'] == true,
       nameAccent: map['nameAccent'] == true,
+    );
+  }
+}
+
+class HilalDuelChallengeSummary {
+  const HilalDuelChallengeSummary({
+    required this.id,
+    required this.status,
+    required this.role,
+    required this.opponentName,
+    required this.opponentLevel,
+    required this.challengeDeadlineMs,
+    this.canAccept = false,
+    this.myTurn = false,
+    this.result,
+  });
+
+  final String id;
+  final String status;
+  final String role;
+  final String opponentName;
+  final int opponentLevel;
+  final int challengeDeadlineMs;
+  final bool canAccept;
+  final bool myTurn;
+  final HilalDuelResult? result;
+
+  bool get isOpen =>
+      status == 'challenger_playing' ||
+      status == 'awaiting_opponent' ||
+      status == 'opponent_playing';
+
+  factory HilalDuelChallengeSummary.fromMap(Map<String, dynamic> map) {
+    final rawResult = map['result'];
+    return HilalDuelChallengeSummary(
+      id: map['id']?.toString() ?? '',
+      status: map['status']?.toString() ?? '',
+      role: map['role']?.toString() ?? '',
+      opponentName: map['opponentName']?.toString() ?? 'Oyuncu',
+      opponentLevel: (map['opponentLevel'] as num?)?.toInt() ?? 1,
+      challengeDeadlineMs: (map['challengeDeadlineMs'] as num?)?.toInt() ?? 0,
+      canAccept: map['canAccept'] == true,
+      myTurn: map['myTurn'] == true,
+      result: rawResult is Map
+          ? HilalDuelResult.fromMap(Map<String, dynamic>.from(rawResult))
+          : null,
     );
   }
 }
@@ -230,6 +282,8 @@ class HilalDuelResolution {
     required this.question,
     required this.choices,
     required this.elapsedMs,
+    this.selfChoice,
+    this.opponentChoice,
   });
 
   final int round;
@@ -237,24 +291,42 @@ class HilalDuelResolution {
   final Map<String, int> choices;
   final Map<String, int> elapsedMs;
 
+  /// Sunucunun bakış açısına göre seçimler (map key kaybına karşı).
+  final int? selfChoice;
+  final int? opponentChoice;
+
   factory HilalDuelResolution.fromMap(Map<String, dynamic> map) {
-    final rawChoices = Map<String, dynamic>.from(
+    final rawChoices = Map<Object?, Object?>.from(
       (map['choices'] as Map?) ?? const {},
     );
-    final rawElapsed = Map<String, dynamic>.from(
+    final rawElapsed = Map<Object?, Object?>.from(
       (map['elapsedMs'] as Map?) ?? const {},
     );
+    int? perspective(String key) {
+      final value = map[key];
+      if (value is! num) return null;
+      return value.toInt();
+    }
+
     return HilalDuelResolution(
       round: (map['round'] as num?)?.toInt() ?? 0,
       question: HilalDuelQuestion.fromMap(
         Map<String, dynamic>.from((map['question'] as Map?) ?? const {}),
       ),
       choices: rawChoices.map(
-        (key, value) => MapEntry(key, (value as num?)?.toInt() ?? -1),
+        (key, value) => MapEntry(
+          key.toString(),
+          (value as num?)?.toInt() ?? -1,
+        ),
       ),
       elapsedMs: rawElapsed.map(
-        (key, value) => MapEntry(key, (value as num?)?.toInt() ?? 0),
+        (key, value) => MapEntry(
+          key.toString(),
+          (value as num?)?.toInt() ?? 0,
+        ),
       ),
+      selfChoice: perspective('selfChoice'),
+      opponentChoice: perspective('opponentChoice'),
     );
   }
 }
@@ -283,14 +355,23 @@ class HilalDuelPlayerResult {
 }
 
 class HilalDuelResult {
-  const HilalDuelResult({required this.winnerId, required this.players});
+  const HilalDuelResult({
+    required this.winnerId,
+    required this.players,
+    this.expired = false,
+    this.rankBonus = 0,
+  });
 
   final String? winnerId;
   final List<HilalDuelPlayerResult> players;
+  final bool expired;
+  final int rankBonus;
 
   factory HilalDuelResult.fromMap(Map<String, dynamic> map) {
     return HilalDuelResult(
       winnerId: map['winnerId']?.toString(),
+      expired: map['expired'] == true,
+      rankBonus: (map['rankBonus'] as num?)?.toInt() ?? 0,
       players: ((map['players'] as List?) ?? const [])
           .whereType<Map>()
           .map(
@@ -316,6 +397,10 @@ class HilalDuelMatch {
     required this.selfAnswered,
     required this.opponentAnswered,
     this.doubled = false,
+    this.kind,
+    this.canAccept = false,
+    this.myTurn = false,
+    this.challengeDeadlineMs = 0,
     this.question,
     this.lastResolution,
     this.result,
@@ -333,11 +418,19 @@ class HilalDuelMatch {
   final bool selfAnswered;
   final bool opponentAnswered;
   final bool doubled;
+  final String? kind;
+  final bool canAccept;
+  final bool myTurn;
+  final int challengeDeadlineMs;
   final HilalDuelQuestion? question;
   final HilalDuelResolution? lastResolution;
   final HilalDuelResult? result;
 
-  bool get isCompleted => status == 'completed';
+  bool get isCompleted => status == 'completed' || status == 'expired';
+  bool get isChallenge => kind == 'challenge';
+  bool get isChallengePlayable =>
+      status == 'challenger_playing' || status == 'opponent_playing';
+  bool get isAwaitingChallengeOpponent => status == 'awaiting_opponent';
 
   factory HilalDuelMatch.fromMap(Map<String, dynamic> map) {
     final rawResolution = map['lastResolution'];
@@ -360,6 +453,10 @@ class HilalDuelMatch {
       selfAnswered: map['selfAnswered'] == true,
       opponentAnswered: map['opponentAnswered'] == true,
       doubled: map['doubled'] == true,
+      kind: map['kind']?.toString(),
+      canAccept: map['canAccept'] == true,
+      myTurn: map['myTurn'] == true,
+      challengeDeadlineMs: (map['challengeDeadlineMs'] as num?)?.toInt() ?? 0,
       question: rawQuestion is Map
           ? HilalDuelQuestion.fromMap(Map<String, dynamic>.from(rawQuestion))
           : null,
@@ -430,6 +527,22 @@ abstract class HilalDuelRepositoryApi {
   });
   Future<HilalDuelMatch> forfeitMatch(String matchId);
   Future<HilalDuelWeeklyBoard> loadWeeklyLeaderboard();
+  Future<void> adminRemoveWeeklyEntry({
+    required String ownerHash,
+    String? reason,
+  });
+  Future<HilalDuelMatch> createChallenge({
+    required String name,
+    required String opponentOwnerHash,
+  });
+  Future<HilalDuelMatch> acceptChallenge(String challengeId);
+  Future<HilalDuelMatch> loadChallenge(String challengeId);
+  Future<HilalDuelMatch> submitChallengeAnswer({
+    required String challengeId,
+    required int round,
+    required int choice,
+  });
+  Future<List<HilalDuelChallengeSummary>> listChallenges();
   void clearCredentialsCache();
 }
 
@@ -621,6 +734,92 @@ class HilalDuelRepository implements HilalDuelRepositoryApi {
       ...await _credentials(),
     });
     return HilalDuelWeeklyBoard.fromMap(result);
+  }
+
+  /// Yönetici: uygunsuz isimli oyuncuyu haftalık listeden kaldırır.
+  /// Firebase Auth admin oturumu gerekir (quiz install credentials yetmez).
+  @override
+  Future<void> adminRemoveWeeklyEntry({
+    required String ownerHash,
+    String? reason,
+  }) async {
+    final hash = ownerHash.trim().toLowerCase();
+    if (hash.isEmpty) {
+      throw StateError('ownerHash gerekli');
+    }
+    await _functions.httpsCallable('adminRemoveQuizWeeklyEntry').call({
+      'ownerHash': hash,
+      if (reason != null && reason.trim().isNotEmpty) 'reason': reason.trim(),
+    });
+  }
+
+  @override
+  Future<HilalDuelMatch> createChallenge({
+    required String name,
+    required String opponentOwnerHash,
+  }) async {
+    final result = await _call('createQuizChallenge', {
+      ...await _credentials(),
+      'name': _safeName(name),
+      'opponentOwnerHash': opponentOwnerHash,
+    });
+    return HilalDuelMatch.fromMap(
+      Map<String, dynamic>.from((result['challenge'] as Map?) ?? const {}),
+    );
+  }
+
+  @override
+  Future<HilalDuelMatch> acceptChallenge(String challengeId) async {
+    final result = await _call('acceptQuizChallenge', {
+      ...await _credentials(),
+      'challengeId': challengeId,
+    });
+    return HilalDuelMatch.fromMap(
+      Map<String, dynamic>.from((result['challenge'] as Map?) ?? const {}),
+    );
+  }
+
+  @override
+  Future<HilalDuelMatch> loadChallenge(String challengeId) async {
+    final result = await _call('getQuizChallenge', {
+      ...await _credentials(),
+      'challengeId': challengeId,
+    });
+    return HilalDuelMatch.fromMap(
+      Map<String, dynamic>.from((result['challenge'] as Map?) ?? const {}),
+    );
+  }
+
+  @override
+  Future<HilalDuelMatch> submitChallengeAnswer({
+    required String challengeId,
+    required int round,
+    required int choice,
+  }) async {
+    final result = await _call('submitQuizChallengeAnswer', {
+      ...await _credentials(),
+      'challengeId': challengeId,
+      'round': round,
+      'choice': choice,
+    });
+    return HilalDuelMatch.fromMap(
+      Map<String, dynamic>.from((result['challenge'] as Map?) ?? const {}),
+    );
+  }
+
+  @override
+  Future<List<HilalDuelChallengeSummary>> listChallenges() async {
+    final result = await _call('listQuizChallenges', {
+      ...await _credentials(),
+    });
+    return ((result['challenges'] as List?) ?? const [])
+        .whereType<Map>()
+        .map(
+          (item) => HilalDuelChallengeSummary.fromMap(
+            Map<String, dynamic>.from(item),
+          ),
+        )
+        .toList(growable: false);
   }
 
   /// Engajman push için FCM token kaydı (en az 1 maç sonrası hatırlatmalar).

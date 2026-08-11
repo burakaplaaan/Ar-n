@@ -6,6 +6,7 @@ abstract final class ProductMetricFeatures {
   static const zikir = 'zikir';
   static const prayerAlarm = 'prayer_alarm';
   static const widget = 'widget';
+  static const lockWidget = 'lock_widget';
   static const hilalDuel = 'hilal_duel';
   static const prayerCircle = 'prayer_circle';
   static const qibla = 'qibla';
@@ -16,6 +17,7 @@ abstract final class ProductMetricFeatures {
     zikir,
     prayerAlarm,
     widget,
+    lockWidget,
     hilalDuel,
     prayerCircle,
     qibla,
@@ -26,7 +28,8 @@ abstract final class ProductMetricFeatures {
     explore => 'Keşfet',
     zikir => 'Zikirmatik',
     prayerAlarm => 'Namaz bildirimi',
-    widget => 'Widget',
+    widget => 'Ana ekran widget',
+    lockWidget => 'Kilit ekranı bildirimi',
     hilalDuel => 'Bilgi düellosu',
     prayerCircle => 'Dua halkası',
     qibla => 'Pusula',

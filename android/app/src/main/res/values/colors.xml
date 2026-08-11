@@ -20,6 +20,9 @@
     <color name="widget_quote_body">#FFF2F6FA</color>
     <color name="widget_quote_white">#FFEFF5F0</color>
     <color name="widget_text_muted">#CCE8E2D8</color>
+    <!-- Kilit bildirimi: açık yüzeylerde koyu metin (gece için values-night). -->
+    <color name="lock_notif_text_primary">#FF1C1C1E</color>
+    <color name="lock_notif_text_secondary">#99000000</color>
     <color name="widget_divider">#22FFFFFF</color>
     <color name="widget_accent_soft">#E6D4B8</color>
 	<color name="ic_launcher_background">#0d2f32</color>

@@ -11,7 +11,9 @@ import '../../core/constants/app_colors.dart';
 import '../../core/providers/shared_preferences_provider.dart';
 import '../../core/theme/arin_shell_background.dart';
 import '../../data/repositories/salat_log_repository.dart';
+import '../../data/services/android_oem_settings_service.dart';
 import '../../data/services/arin_lock_notification_service.dart';
+import '../../data/services/local_notification_permission_gate.dart';
 import '../../data/services/tracking_widget_service.dart';
 import '../../data/services/widget_access_service.dart';
 import '../kaza/kaza_tracking_provider.dart';
@@ -169,7 +171,7 @@ class _WidgetCenterPageState extends ConsumerState<WidgetCenterPage> {
                       ),
                       const SizedBox(height: 10),
                       Text(
-                        'Android\'de kilit ekranına gerçek widget eklenemiyor; bunun yerine seçtiğin bilgiler kalıcı bir bildirim olarak kilit ekranında görünür.',
+                        'Android\'de kilit ekranına gerçek widget eklenemiyor; bunun yerine seçtiğin bilgiler kalıcı bir bildirim olarak kilit ekranında görünür. Xiaomi, Huawei ve benzeri cihazlarda ek otomatik başlat / pil ayarı gerekebilir.',
                         style: GoogleFonts.plusJakartaSans(
                           fontSize: 13,
                           height: 1.45,
@@ -179,6 +181,8 @@ class _WidgetCenterPageState extends ConsumerState<WidgetCenterPage> {
                       ),
                       const SizedBox(height: 12),
                       const _LockNotificationToggles(),
+                      const SizedBox(height: 12),
+                      const _OemLockScreenHelpCard(),
                     ],
                     const SizedBox(height: 24),
                     _SectionTitle('Takip widgetı', muted: muted),
@@ -549,6 +553,356 @@ class _LockNotificationTile extends StatelessWidget {
               activeThumbColor: AppColors.accentNeonGreen,
               onChanged: onChanged,
             ),
+    );
+  }
+}
+
+/// Xiaomi / Huawei vb. cihazlarda kilit bildiriminin görünmesi için
+/// markaya özel adımlar + mümkünse ayar deep-link butonları.
+class _OemLockScreenHelpCard extends StatefulWidget {
+  const _OemLockScreenHelpCard();
+
+  @override
+  State<_OemLockScreenHelpCard> createState() => _OemLockScreenHelpCardState();
+}
+
+class _OemLockScreenHelpCardState extends State<_OemLockScreenHelpCard> {
+  AndroidOemInfo? _info;
+  bool _loading = true;
+  bool _busy = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  Future<void> _load() async {
+    final info = await AndroidOemSettingsService.getInfo();
+    if (!mounted) return;
+    setState(() {
+      _info = info;
+      _loading = false;
+    });
+  }
+
+  Future<void> _runOpen(
+    Future<AndroidOemOpenResult> Function() action,
+    String failMessage,
+  ) async {
+    if (_busy) return;
+    setState(() => _busy = true);
+    HapticFeedback.selectionClick();
+    try {
+      final result = await action();
+      if (!mounted) return;
+      switch (result) {
+        case AndroidOemOpenResult.oem:
+          break;
+        case AndroidOemOpenResult.fallback:
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text(
+                'Özel menü açılamadı; genel ayar sayfası açıldı. Listeden Arın\'ı bul.',
+              ),
+            ),
+          );
+        case AndroidOemOpenResult.failed:
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(failMessage)),
+          );
+      }
+      await _load();
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
+  Future<void> _runBool(
+    Future<bool> Function() action,
+    String failMessage,
+  ) async {
+    if (_busy) return;
+    setState(() => _busy = true);
+    HapticFeedback.selectionClick();
+    try {
+      final ok = await action();
+      if (!mounted) return;
+      if (!ok) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(failMessage)),
+        );
+      }
+      await _load();
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
+  Future<void> _requestBatteryExemption() async {
+    if (_busy) return;
+    setState(() => _busy = true);
+    HapticFeedback.selectionClick();
+    try {
+      if (_info?.batteryOptimizationsIgnored == true) {
+        final r = await AndroidOemSettingsService.openOemBattery();
+        if (!mounted) return;
+        switch (r) {
+          case AndroidOemOpenResult.oem:
+            break;
+          case AndroidOemOpenResult.fallback:
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text(
+                  'Özel menü açılamadı; genel ayar sayfası açıldı. Listeden Arın\'ı bul.',
+                ),
+              ),
+            );
+          case AndroidOemOpenResult.failed:
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Pil menüsü açılamadı.')),
+            );
+        }
+      } else {
+        final granted = await requestIgnoreBatteryOptimizations();
+        if (!granted) {
+          final r = await AndroidOemSettingsService.openOemBattery();
+          if (!mounted) return;
+          if (r == AndroidOemOpenResult.failed) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Pil menüsü açılamadı.')),
+            );
+          } else if (r == AndroidOemOpenResult.fallback) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text(
+                  'Özel menü açılamadı; genel ayar sayfası açıldı. Listeden Arın\'ı bul.',
+                ),
+              ),
+            );
+          }
+        }
+      }
+      if (!mounted) return;
+      await _load();
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_loading) return const SizedBox.shrink();
+    final info = _info;
+    if (info == null || !info.restricted) return const SizedBox.shrink();
+
+    final onDark = Theme.of(context).brightness == Brightness.dark;
+    final titleColor = onDark
+        ? Colors.white.withValues(alpha: 0.96)
+        : AppColors.emeraldDark;
+    final muted = onDark ? AppColors.textOnDarkMuted : AppColors.textSecondary;
+    final steps = info.lockScreenSteps;
+
+    return Container(
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 14),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(20),
+        color: onDark
+            ? Colors.white.withValues(alpha: 0.06)
+            : Colors.white.withValues(alpha: 0.72),
+        border: Border.all(
+          color: onDark
+              ? Colors.amber.withValues(alpha: 0.28)
+              : Colors.amber.shade700.withValues(alpha: 0.35),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Icon(
+                Icons.phonelink_setup_rounded,
+                size: 22,
+                color: onDark
+                    ? Colors.amber.shade200
+                    : Colors.amber.shade800,
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  '${info.displayName} cihazında kilit bildirimi için',
+                  style: GoogleFonts.plusJakartaSans(
+                    fontSize: 14.5,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: -0.2,
+                    color: titleColor,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Bu markada sistem arka planda uygulamayı kısıtlayabilir. Aşağıdaki adımları bir kez yapman yeterli.',
+            style: GoogleFonts.plusJakartaSans(
+              fontSize: 12.5,
+              height: 1.4,
+              color: muted,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          const SizedBox(height: 12),
+          for (var i = 0; i < steps.length; i++) ...[
+            if (i > 0) const SizedBox(height: 6),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '${i + 1}.',
+                  style: GoogleFonts.plusJakartaSans(
+                    fontSize: 12.5,
+                    fontWeight: FontWeight.w800,
+                    color: titleColor.withValues(alpha: 0.75),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    steps[i],
+                    style: GoogleFonts.plusJakartaSans(
+                      fontSize: 12.5,
+                      height: 1.35,
+                      color: muted,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+          const SizedBox(height: 14),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              if (info.canOpenAutoStart)
+                _OemActionChip(
+                  onDark: onDark,
+                  label: info.autoStartChipLabel,
+                  icon: Icons.play_circle_outline_rounded,
+                  enabled: !_busy,
+                  onTap: () => _runOpen(
+                    AndroidOemSettingsService.openAutoStart,
+                    'Otomatik başlatma sayfası açılamadı. Uygulama ayarlarından dene.',
+                  ),
+                ),
+              if (!info.batteryOptimizationsIgnored)
+                _OemActionChip(
+                  onDark: onDark,
+                  label: 'Pil kısıtını kaldır',
+                  icon: Icons.battery_charging_full_rounded,
+                  enabled: !_busy,
+                  emphasized: true,
+                  onTap: _requestBatteryExemption,
+                )
+              else if (info.canOpenOemBattery ||
+                  info.family == AndroidOemFamily.samsung ||
+                  info.family == AndroidOemFamily.other)
+                _OemActionChip(
+                  onDark: onDark,
+                  label: info.batteryChipLabel,
+                  icon: Icons.settings_power_rounded,
+                  enabled: !_busy,
+                  onTap: () => _runOpen(
+                    AndroidOemSettingsService.openOemBattery,
+                    'Pil menüsü açılamadı.',
+                  ),
+                ),
+              _OemActionChip(
+                onDark: onDark,
+                label: 'Uygulama ayarları',
+                icon: Icons.settings_outlined,
+                enabled: !_busy,
+                onTap: () => _runBool(
+                  AndroidOemSettingsService.openAppDetails,
+                  'Uygulama ayarları açılamadı.',
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _OemActionChip extends StatelessWidget {
+  const _OemActionChip({
+    required this.onDark,
+    required this.label,
+    required this.icon,
+    required this.enabled,
+    required this.onTap,
+    this.emphasized = false,
+  });
+
+  final bool onDark;
+  final String label;
+  final IconData icon;
+  final bool enabled;
+  final VoidCallback onTap;
+  final bool emphasized;
+
+  @override
+  Widget build(BuildContext context) {
+    final bg = emphasized
+        ? AppColors.accentNeonGreen.withValues(alpha: onDark ? 0.22 : 0.18)
+        : (onDark
+              ? Colors.white.withValues(alpha: 0.08)
+              : AppColors.creamDark.withValues(alpha: 0.55));
+    final fg = emphasized
+        ? (onDark ? AppColors.accentNeonGreen : AppColors.emeraldDark)
+        : (onDark
+              ? Colors.white.withValues(alpha: 0.9)
+              : AppColors.emeraldDark.withValues(alpha: 0.9));
+
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: enabled ? onTap : null,
+        borderRadius: BorderRadius.circular(999),
+        child: Ink(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          decoration: BoxDecoration(
+            color: bg,
+            borderRadius: BorderRadius.circular(999),
+            border: Border.all(
+              color: emphasized
+                  ? AppColors.accentNeonGreen.withValues(alpha: 0.45)
+                  : (onDark
+                        ? Colors.white.withValues(alpha: 0.1)
+                        : AppColors.creamDark),
+            ),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(icon, size: 16, color: fg),
+              const SizedBox(width: 6),
+              Text(
+                label,
+                style: GoogleFonts.plusJakartaSans(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w700,
+                  color: fg,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

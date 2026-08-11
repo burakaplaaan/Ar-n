@@ -17,6 +17,11 @@ const REGION = "europe-west1";
 const ENFORCE_APP_CHECK = false;
 const ROUND_COUNT = 7;
 const ROUND_DURATION_MS = 20_000;
+/**
+ * Deadline sonrası cevap kabul / otomatik timeout öncesi ortak tolerans.
+ * Poll `deadline`'da timeout yazıp submit'in grace penceresini yutmasın.
+ */
+const ANSWER_GRACE_MS = 1_500;
 /** Tur sonucu şıklar üzerinde gösterilirken sonraki soruya geçmeden önce bekleme. */
 const ROUND_REVEAL_MS = 2_600;
 /** Şimdilik son seviye; ödüller buna göre kilitlenir. */
@@ -34,8 +39,28 @@ const ENGAGEMENT_COOLDOWN_MS = 3 * 24 * 60 * 60_000;
 const ENGAGEMENT_MIN_IDLE_MS = 36 * 60 * 60_000;
 /** 14 günden eski oyuncuya tekrar yazma. */
 const ENGAGEMENT_MAX_IDLE_MS = 14 * 24 * 60 * 60_000;
+/** Lobiyi açmış ama hiç oynamamış: ilk teşvik için min profil yaşı. */
+const ENGAGEMENT_NEVER_PLAYED_MIN_AGE_MS = 24 * 60 * 60_000;
+/** Hiç oynamamışa 30 günden sonra tekrar yazma. */
+const ENGAGEMENT_NEVER_PLAYED_MAX_AGE_MS = 30 * 24 * 60 * 60_000;
 const ENGAGEMENT_BATCH_LIMIT = 60;
+/** Admin “herkese can” — hiç oynamayan ilk açılışta claim eder. */
+const PROMO_HEARTS_DOC = "promo_hearts";
+const PROMO_HEARTS_COLLECTION = "quiz_config";
 const QUIZ_DEVICE_TTL_MS = 45 * 24 * 60 * 60_000;
+/** Meydan okuma: davetten itibaren toplam süre. Dolarsa kimseye puan yok. */
+const CHALLENGE_TTL_MS = 24 * 60 * 60_000;
+/**
+ * Bota meydan okunduğunda cevap gecikmesi.
+ * Bot bilinçli zayıf oynar (yalnızca 1 doğru) — liderlik tablosunu ezmesin.
+ */
+const CHALLENGE_BOT_DELAY_MS = 12 * 60 * 60_000;
+/** Bitişe bu kadar kala rakibe hatırlatma push'u. */
+const CHALLENGE_REMINDER_BEFORE_MS = 4 * 60 * 60_000;
+/** Challenge dokümanı geçmişte görünsün; TTL silmesi 7 gün sonra. */
+const CHALLENGE_DOC_TTL_MS = 7 * 24 * 60 * 60_000;
+/** Aynı anda bekleyen giden meydan okuma limiti. */
+const CHALLENGE_MAX_ACTIVE_OUTGOING = 3;
 const QUEUE_WAIT_MS = 15_000;
 /** Mantıksal terk: bu süreden sonra waiting kuyruk iade edilir. */
 const QUEUE_ABANDON_MS = 10 * 60_000;
@@ -46,24 +71,35 @@ const MATCH_EXPIRY_MS = 24 * 60 * 60_000;
 const REWARD_PROOF_TTL_MS = 10 * 60_000;
 const RATE_WINDOW_MS = 5 * 60_000;
 const INSTALL_TTL_MS = 180 * 86400000;
+// Yalnızca ilk ad — soyadlı tam isimler botları çok belli ediyordu.
 const BOT_NAMES = [
-  "Ahmet Yılmaz",
-  "Ayşe Demir",
-  "Mehmet Kaya",
-  "Zeynep Şahin",
-  "Mustafa Çelik",
-  "Elif Aydın",
-  "Ömer Arslan",
-  "Merve Koç",
-  "Yusuf Kurt",
-  "Fatma Yıldız",
-  "Emine Aksoy",
-  "İbrahim Kılıç",
+  "Ahmet",
+  "Ayşe",
+  "Mehmet",
+  "Zeynep",
+  "Mustafa",
+  "Elif",
+  "Ömer",
+  "Merve",
+  "Yusuf",
+  "Fatma",
+  "Emine",
+  "İbrahim",
 ];
 
+/** Bot görünen adı: soyadı düş (eski haftalık kayıtlarda da). */
+function _botDisplayName(raw) {
+  const trimmed = String(raw || "")
+    .replace(/\s+/gu, " ")
+    .trim();
+  if (!trimmed) return "Oyuncu";
+  const first = trimmed.split(" ")[0] || trimmed;
+  return first.slice(0, 32);
+}
+
 function _assertQuestionBank() {
-  if (!Array.isArray(questions) || questions.length !== 380) {
-    throw new Error("Hilal Düellosu question bank must contain 380 questions.");
+  if (!Array.isArray(questions) || questions.length !== 500) {
+    throw new Error("Hilal Düellosu question bank must contain 500 questions.");
   }
   const ids = new Set();
   for (const item of questions) {
@@ -125,6 +161,28 @@ function _validatedDocumentId(raw, label = "kayıt") {
     throw new HttpsError("invalid-argument", `Geçersiz ${label} kimliği.`);
   }
   return value;
+}
+
+/** quiz_players doküman kimliği (sha256 hex). Bot id'leri bu deseni tutmaz. */
+function _validatedOwnerHash(raw) {
+  const value = String(raw || "").trim().toLowerCase();
+  if (!/^[a-f0-9]{64}$/.test(value)) {
+    throw new HttpsError("invalid-argument", "Geçersiz oyuncu kimliği.");
+  }
+  return value;
+}
+
+/** Haftalık listedeki sabit bot kimliği: bot_ + 20 hex. */
+function _isBotId(raw) {
+  return /^bot_[a-f0-9]{20}$/.test(String(raw || "").trim().toLowerCase());
+}
+
+/** İnsan (64 hex) veya bot (bot_…) rakip kimliği. */
+function _validatedOpponentId(raw) {
+  const value = String(raw || "").trim().toLowerCase();
+  if (/^[a-f0-9]{64}$/.test(value)) return value;
+  if (_isBotId(value)) return value;
+  throw new HttpsError("invalid-argument", "Geçersiz oyuncu kimliği.");
 }
 
 function _validatedProofId(raw) {
@@ -239,26 +297,48 @@ function _writeHilalDelta(tx, {
     weeklyHilals = Math.floor(Number(weeklySnap.data()?.weeklyHilals) || 0) +
       safeDelta;
   }
+  const prevData = playerSnap.data() || {};
   const prevMatches = Math.max(
     0,
-    Math.floor(Number(playerSnap.data()?.matchesCompleted) || 0),
+    Math.floor(Number(prevData.matchesCompleted) || 0),
   );
+  const matchInc = Math.max(0, matchesCompletedInc);
+  const prevWeekId = String(prevData.weekId || "");
+  const prevWeeklyMatches = prevWeekId === weekId
+    ? Math.max(0, Math.floor(Number(prevData.weeklyMatches) || 0))
+    : 0;
+  const nextWeeklyMatches = prevWeeklyMatches + matchInc;
+  const excluded = prevData.leaderboardExcluded === true;
   const playerPatch = {
-    name: displayName,
+    name: excluded
+      ? String(prevData.name || "Oyuncu").slice(0, 32)
+      : displayName,
     hilals: nextHilals,
     weekId,
-    weeklyHilals,
-    matchesCompleted: prevMatches + Math.max(0, matchesCompletedInc),
+    // Moderasyon: listeden atılan oyuncu haftalık skor biriktirmesin.
+    weeklyHilals: excluded ? 0 : weeklyHilals,
+    weeklyMatches: excluded ? 0 : nextWeeklyMatches,
+    matchesCompleted: prevMatches + matchInc,
     updatedAt: FieldValue.serverTimestamp(),
   };
-  if (matchesCompletedInc > 0) {
+  if (matchInc > 0) {
     playerPatch.lastMatchAt = FieldValue.serverTimestamp();
   }
   tx.set(playerRef, playerPatch, { merge: true });
+  if (excluded) {
+    if (weeklySnap.exists) {
+      tx.delete(weeklyRef);
+    }
+    return { nextHilals, weeklyHilals: 0, level: progression.level };
+  }
+  const prevWeeklyMatchCount = weeklySnap.exists
+    ? Math.max(0, Math.floor(Number(weeklySnap.data()?.matchesPlayed) || 0))
+    : 0;
   tx.set(weeklyRef, {
     ownerHash: playerRef.id,
     name: displayName,
     weeklyHilals,
+    matchesPlayed: prevWeeklyMatchCount + matchInc,
     level: progression.level,
     isBot: false,
     title: cosmetics.title,
@@ -271,9 +351,9 @@ function _writeHilalDelta(tx, {
   return { nextHilals, weeklyHilals, level: progression.level };
 }
 
-/** Bot id'si isme sabit — aynı "Elif Aydın" haftalıkta tek satır. */
+/** Bot id'si isme sabit — aynı "Elif" haftalıkta tek satır. */
 function _stableBotId(name) {
-  return `bot_${_sha256(`hilal_bot:${String(name || "").trim()}`).slice(0, 20)}`;
+  return `bot_${_sha256(`hilal_bot:${_botDisplayName(name)}`).slice(0, 20)}`;
 }
 
 /**
@@ -292,10 +372,11 @@ function _writeBotWeeklyDelta(tx, {
     0,
     Math.min(BOT_WEEKLY_GAIN_CAP, Math.floor(Number(delta) || 0)),
   );
+  const displayName = _botDisplayName(name);
   if (gain <= 0 && weeklySnap.exists) {
     // Yine de isim/level tazele.
     tx.set(weeklyRef, {
-      name: String(name || "Oyuncu").slice(0, 32),
+      name: displayName,
       level: Math.max(1, Math.floor(Number(level) || 1)),
       isBot: true,
       updatedAt: FieldValue.serverTimestamp(),
@@ -310,7 +391,7 @@ function _writeBotWeeklyDelta(tx, {
   const safeLevel = Math.max(1, Math.min(3, Math.floor(Number(level) || 1)));
   tx.set(weeklyRef, {
     ownerHash: botId,
-    name: String(name || "Oyuncu").slice(0, 32),
+    name: displayName,
     weeklyHilals,
     level: safeLevel,
     isBot: true,
@@ -356,8 +437,21 @@ function _validatedQuizLocale(raw) {
 }
 
 /**
- * Engajman push adayı mı? (en az 1 maç, 36s–14g boşluk, 3g cooldown)
- * reason: "rank_drop" | "comeback" | null
+ * Admin global can bağışı: oyuncu henüz claim etmediyse kaç can eklenir.
+ * Ara grant’ler kaçırıldıysa yalnız son `amount` verilir (çift yazımı önler).
+ */
+function pendingPromoHeartsGain({ claimedSeq, promoSeq, amount }) {
+  const claimed = Math.max(0, Math.floor(Number(claimedSeq) || 0));
+  const seq = Math.max(0, Math.floor(Number(promoSeq) || 0));
+  const add = Math.max(0, Math.floor(Number(amount) || 0));
+  if (seq <= 0 || add <= 0 || claimed >= seq) return 0;
+  return Math.min(20, add);
+}
+
+/**
+ * Engajman push adayı mı?
+ * - never_played: lobiyi açmış, 0 maç, 1g–30g profil yaşı, 3g cooldown
+ * - oynayan: 36s–14g idle, 3g cooldown → rank_drop | comeback
  */
 function decideQuizEngagement({
   matchesCompleted,
@@ -367,18 +461,30 @@ function decideQuizEngagement({
   currentRank,
   bestWeeklyRank,
   lastKnownWeeklyRank = 0,
+  createdAtMs = 0,
 }) {
-  const matches = Math.floor(Number(matchesCompleted) || 0);
-  if (matches < 1) return { send: false, reason: null };
   const now = Math.floor(Number(nowMs) || 0);
+  const lastPush = Math.floor(Number(lastPushAtMs) || 0);
+  if (lastPush > 0 && now - lastPush < ENGAGEMENT_COOLDOWN_MS) {
+    return { send: false, reason: null };
+  }
+  const matches = Math.floor(Number(matchesCompleted) || 0);
+  if (matches < 1) {
+    const created = Math.floor(Number(createdAtMs) || 0);
+    if (!created) return { send: false, reason: null };
+    const age = now - created;
+    if (
+      age < ENGAGEMENT_NEVER_PLAYED_MIN_AGE_MS ||
+      age > ENGAGEMENT_NEVER_PLAYED_MAX_AGE_MS
+    ) {
+      return { send: false, reason: null };
+    }
+    return { send: true, reason: "never_played" };
+  }
   const lastMatch = Math.floor(Number(lastMatchAtMs) || 0);
   if (!lastMatch) return { send: false, reason: null };
   const idle = now - lastMatch;
   if (idle < ENGAGEMENT_MIN_IDLE_MS || idle > ENGAGEMENT_MAX_IDLE_MS) {
-    return { send: false, reason: null };
-  }
-  const lastPush = Math.floor(Number(lastPushAtMs) || 0);
-  if (lastPush > 0 && now - lastPush < ENGAGEMENT_COOLDOWN_MS) {
     return { send: false, reason: null };
   }
   const rank = Math.floor(Number(currentRank) || 0);
@@ -393,6 +499,24 @@ function decideQuizEngagement({
 
 function quizEngagementCopy(locale, reason) {
   const lang = _validatedQuizLocale(locale);
+  if (reason === "never_played") {
+    if (lang === "ar") {
+      return {
+        title: "تحدي المعرفة بانتظارك",
+        body: "7 أسئلة · 20 ثانية — جرّب أول مباراة الآن، قد تكون لديك حياة هدية.",
+      };
+    }
+    if (lang === "en") {
+      return {
+        title: "Knowledge Duel is waiting",
+        body: "7 questions · 20 seconds — try your first match; a gift life may be ready.",
+      };
+    }
+    return {
+      title: "Bilgi Düellosu seni bekliyor",
+      body: "7 soru · 20 sn — ilk maçını dene; hediye canın hazır olabilir.",
+    };
+  }
   if (reason === "rank_drop") {
     if (lang === "ar") {
       return {
@@ -474,14 +598,149 @@ function hilalAward(correct, won, draw = false) {
     (correct === ROUND_COUNT ? 3 : 0);
 }
 
+/**
+ * Meydan okuma bonus hilali: yenilen rakip davet anında sıralamada
+ * kazanandan daha yukarıdaysa ekstra puan (üst sıradakini devirme ödülü).
+ * rank 0 = sıralamasız. Bonus yalnız kazanana.
+ */
+function challengeRankBonus(winnerRank, loserRank) {
+  const winner = Math.max(0, Math.floor(Number(winnerRank) || 0));
+  const loser = Math.max(0, Math.floor(Number(loserRank) || 0));
+  if (loser <= 0) return 0;
+  if (winner > 0 && loser >= winner) return 0;
+  if (loser <= 3) return 5;
+  if (loser <= 10) return 3;
+  return 2;
+}
+
+/** Meydan okuma süresi doldu mu? Dolarsa kimse puan alamaz. */
+function challengeIsExpired(challenge, nowMs = Date.now()) {
+  const deadline = Math.floor(Number(challenge?.challengeDeadlineMs) || 0);
+  if (deadline <= 0) return false;
+  const status = String(challenge?.status || "");
+  if (status === "completed" || status === "expired") return false;
+  return nowMs > deadline;
+}
+
+/** Meydan okuma push metinleri (tr/en/ar). */
+function quizChallengeCopy(locale, kind, params = {}) {
+  const lang = _validatedQuizLocale(locale);
+  const name = String(params.name || "").slice(0, 32) || (
+    lang === "tr" ? "Bir oyuncu" : lang === "ar" ? "لاعب" : "A player"
+  );
+  const copies = {
+    invited: {
+      tr: {
+        title: "Bilgi Düellosu · Meydan okuma!",
+        body: `${name} sana meydan okudu. 24 saatin var — 7 soru, 20 saniye.`,
+      },
+      en: {
+        title: "Knowledge Duel · Challenge!",
+        body: `${name} challenged you. You have 24 hours — 7 questions, 20 seconds.`,
+      },
+      ar: {
+        title: "مبارزة المعرفة · تحدٍّ!",
+        body: `${name} تحداك. أمامك 24 ساعة — 7 أسئلة، 20 ثانية.`,
+      },
+    },
+    reminder: {
+      tr: {
+        title: "Bilgi Düellosu · Son 4 saat!",
+        body: `${name} cevabını bekliyor. Süre dolarsa kimse puan alamaz.`,
+      },
+      en: {
+        title: "Knowledge Duel · Last 4 hours!",
+        body: `${name} is waiting for your answer. If time runs out, no one scores.`,
+      },
+      ar: {
+        title: "مبارزة المعرفة · آخر 4 ساعات!",
+        body: `${name} بانتظار إجابتك. إذا انتهى الوقت فلن يحصل أحد على نقاط.`,
+      },
+    },
+    won: {
+      tr: {
+        title: "Bilgi Düellosu · Kazandın!",
+        body: `${name} ile meydan okuma bitti — sen kazandın. Sonucu gör.`,
+      },
+      en: {
+        title: "Knowledge Duel · You won!",
+        body: `Your challenge with ${name} ended — you won. See the result.`,
+      },
+      ar: {
+        title: "مبارزة المعرفة · فزت!",
+        body: `انتهى التحدي مع ${name} — لقد فزت. شاهد النتيجة.`,
+      },
+    },
+    lost: {
+      tr: {
+        title: "Bilgi Düellosu · Sonuç belli",
+        body: `${name} ile meydan okuma bitti. Rövanş için hazır mısın?`,
+      },
+      en: {
+        title: "Knowledge Duel · Result is in",
+        body: `Your challenge with ${name} ended. Ready for a rematch?`,
+      },
+      ar: {
+        title: "مبارزة المعرفة · النتيجة جاهزة",
+        body: `انتهى التحدي مع ${name}. هل أنت مستعد للثأر؟`,
+      },
+    },
+    draw: {
+      tr: {
+        title: "Bilgi Düellosu · Berabere!",
+        body: `${name} ile meydan okuma berabere bitti. Sonucu gör.`,
+      },
+      en: {
+        title: "Knowledge Duel · Draw!",
+        body: `Your challenge with ${name} ended in a draw. See the result.`,
+      },
+      ar: {
+        title: "مبارزة المعرفة · تعادل!",
+        body: `انتهى التحدي مع ${name} بالتعادل. شاهد النتيجة.`,
+      },
+    },
+  };
+  const table = copies[kind] || copies.invited;
+  return table[lang] || table.tr;
+}
+
 /** Erken gönderim istismarı: tur başlamadan cevap kabul edilmez. */
 function canAcceptAnswer(nowMs, roundStartedAtMs, deadlineMs) {
   const start = Number(roundStartedAtMs) || 0;
   const deadline = Number(deadlineMs) || 0;
   const now = Number(nowMs) || 0;
   if (now < start) return { ok: false, reason: "not_started" };
-  if (now > deadline + 1_500) return { ok: false, reason: "expired" };
+  if (now > deadline + ANSWER_GRACE_MS) return { ok: false, reason: "expired" };
   return { ok: true, reason: "ok" };
+}
+
+/** Eksik cevaplar ancak grace bitince timeout'a çevrilir (submit ile aynı pencere). */
+function shouldAutoTimeoutAnswers(nowMs, deadlineMs) {
+  const deadline = Number(deadlineMs) || 0;
+  const now = Number(nowMs) || 0;
+  if (deadline <= 0) return false;
+  return now > deadline + ANSWER_GRACE_MS;
+}
+
+function isTimeoutAnswer(answer) {
+  if (!answer || typeof answer !== "object") return false;
+  return !Number.isInteger(Number(answer.choice)) || Number(answer.choice) < 0;
+}
+
+/** Skor kaynağı: saklanan `correct` bayrağı değil, choice ≡ correctIndex. */
+function isChoiceCorrect(choice, questionId) {
+  const question = QUESTION_BY_ID.get(questionId);
+  const index = Number(choice);
+  return Boolean(question) &&
+    Number.isInteger(index) &&
+    index >= 0 &&
+    index === question.correctIndex;
+}
+
+/** Poll'un yazdığı `choice: -1` grace içinde gerçek cevapla değiştirilebilir mi? */
+function canReplaceTimeoutAnswer(existing, nowMs, roundStartedAtMs, deadlineMs) {
+  if (!isTimeoutAnswer(existing)) return false;
+  return canAcceptAnswer(nowMs, roundStartedAtMs, deadlineMs).ok;
 }
 
 function allPlayersAnswered(players, answers) {
@@ -853,6 +1112,51 @@ function _botPlan(questionIds, playerLevel) {
   });
 }
 
+function _isChallengeBotOpponent(challenge) {
+  return challenge?.challengedIsBot === true ||
+    _isBotId(challenge?.challengedId);
+}
+
+/** Bot cevap penceresinin challenge TTL'sini ezmemesi için minimum deadline. */
+function _challengeBotMinDeadlineMs(respondAfterMs, currentDeadlineMs) {
+  const respondAfter = Math.floor(Number(respondAfterMs) || 0);
+  const minDeadline = respondAfter + 5 * 60_000;
+  const current = Math.floor(Number(currentDeadlineMs) || 0);
+  return current > 0 && current >= minDeadline ? current : minDeadline;
+}
+
+/**
+ * Meydan okuma bot cevabı: tur başına tam 1 doğru, geri kalanı yanlış.
+ * Canlı eşleşmedeki botlardan bilinçli olarak daha zayıf.
+ */
+function _challengeBotWeakPlan(questionIds) {
+  const ids = Array.isArray(questionIds) ? questionIds : [];
+  if (ids.length === 0) return [];
+  const correctRound = crypto.randomInt(ids.length);
+  return ids.map((questionId, index) => {
+    const question = QUESTION_BY_ID.get(questionId);
+    const correctIndex = Number.isInteger(question?.correctIndex)
+      ? question.correctIndex
+      : 0;
+    const isCorrect = index === correctRound;
+    let choice = correctIndex;
+    if (!isCorrect) {
+      const alternatives = [0, 1, 2, 3].filter((i) => i !== correctIndex);
+      choice = alternatives.length > 0
+        ? alternatives[crypto.randomInt(alternatives.length)]
+        : (correctIndex + 1) % 4;
+    }
+    const elapsedMs = isCorrect
+      ? crypto.randomInt(4_000, 11_000)
+      : crypto.randomInt(7_000, 16_000);
+    return {
+      choice,
+      elapsedMs: Math.min(ROUND_DURATION_MS - 500, Math.max(2_200, elapsedMs)),
+      correct: isCorrect,
+    };
+  });
+}
+
 /**
  * Bot cevabı zamanı.
  * İnsan yokken planlanan süreyi bekler.
@@ -924,22 +1228,61 @@ function _nextVersion(match) {
   return Math.max(0, Math.floor(Number(match.version) || 0)) + 1;
 }
 
+/**
+ * lastResolution.choices → bakış açısına göre sabit alanlar.
+ * Yok = null (challenge solo / henüz cevap yok).
+ * Timeout = -1. Geçerli şık = 0..3.
+ */
+function _perspectiveResolutionChoices(lastResolution, ownerHash, opponentId) {
+  const raw = lastResolution?.choices && typeof lastResolution.choices === "object"
+    ? lastResolution.choices
+    : {};
+  const read = (id) => {
+    if (id == null || id === "") return null;
+    if (!Object.prototype.hasOwnProperty.call(raw, id)) return null;
+    const value = Number(raw[id]);
+    return Number.isInteger(value) ? value : null;
+  };
+  return {
+    selfChoice: read(ownerHash),
+    opponentChoice: read(opponentId),
+  };
+}
+
+function _serializeLastResolution(match, lastResolution, ownerHash, opponentId) {
+  if (!lastResolution) return null;
+  const perspective = _perspectiveResolutionChoices(
+    lastResolution,
+    ownerHash,
+    opponentId,
+  );
+  return {
+    round: Number(lastResolution.round) || 0,
+    // Ham map (geriye uyumluluk) + bakış açısı alanları.
+    choices: lastResolution.choices || {},
+    elapsedMs: lastResolution.elapsedMs || {},
+    selfChoice: perspective.selfChoice,
+    opponentChoice: perspective.opponentChoice,
+    question: _questionPayload(
+      match.questionIds[lastResolution.round],
+      true,
+    ),
+  };
+}
+
 function _serializeMatch(matchId, match, ownerHash) {
   const selfIndex = match.players.findIndex((player) => player.id === ownerHash);
   if (selfIndex < 0) {
     throw new HttpsError("permission-denied", "Bu karşılaşmaya erişemezsiniz.");
   }
   const opponentIndex = selfIndex === 0 ? 1 : 0;
+  const opponentId = match.players[opponentIndex].id;
   const currentRound = Math.min(
     Math.max(0, Number(match.currentRound) || 0),
     ROUND_COUNT - 1,
   );
   const selfAnswer = _answerFor(match, currentRound, ownerHash);
-  const opponentAnswer = _answerFor(
-    match,
-    currentRound,
-    match.players[opponentIndex].id,
-  );
+  const opponentAnswer = _answerFor(match, currentRound, opponentId);
   const lastResolution = match.lastResolution || null;
   return {
     id: matchId,
@@ -957,15 +1300,12 @@ function _serializeMatch(matchId, match, ownerHash) {
     selfAnswered: Boolean(selfAnswer),
     opponentAnswered: Boolean(opponentAnswer),
     doubled: match.doubledBy?.[ownerHash] === true,
-    lastResolution: lastResolution
-      ? {
-          ...lastResolution,
-          question: _questionPayload(
-            match.questionIds[lastResolution.round],
-            true,
-          ),
-        }
-      : null,
+    lastResolution: _serializeLastResolution(
+      match,
+      lastResolution,
+      ownerHash,
+      opponentId,
+    ),
     result: match.result || null,
   };
 }
@@ -1107,9 +1447,11 @@ async function _createMatchInTransaction({
     level: firstLevel,
     isBot: false,
   };
-  const secondPlayer = bot
+    const secondPlayer = bot
     ? (() => {
-      const botName = BOT_NAMES[crypto.randomInt(BOT_NAMES.length)];
+      const botName = _botDisplayName(
+        BOT_NAMES[crypto.randomInt(BOT_NAMES.length)],
+      );
       return {
         id: _stableBotId(botName),
         name: botName,
@@ -1185,8 +1527,14 @@ function _matchPlayerStats(match) {
     let elapsedMs = 0;
     for (let round = 0; round < ROUND_COUNT; round += 1) {
       const answer = _answerFor(match, round, player.id);
-      if (answer?.correct === true) correct += 1;
-      elapsedMs += answer ? Number(answer.elapsedMs) || 0 : ROUND_DURATION_MS;
+      if (!answer) {
+        elapsedMs += ROUND_DURATION_MS;
+        continue;
+      }
+      if (isChoiceCorrect(answer.choice, match.questionIds?.[round])) {
+        correct += 1;
+      }
+      elapsedMs += Number(answer.elapsedMs) || 0;
     }
     return { id: player.id, correct, elapsedMs };
   });
@@ -1345,7 +1693,7 @@ async function _resolveRoundIfReady(tx, db, matchRef, match, nowMs) {
       }
     }
   }
-  if (nowMs >= match.deadlineMs) {
+  if (shouldAutoTimeoutAnswers(nowMs, match.deadlineMs)) {
     for (const player of match.players) {
       if (!answers[player.id]) {
         answers[player.id] = {
@@ -1486,22 +1834,46 @@ const getQuizProfile = onCall(
       }
     });
 
+    const promoRef = db
+      .collection(PROMO_HEARTS_COLLECTION)
+      .doc(PROMO_HEARTS_DOC);
     await db.runTransaction(async (tx) => {
       const snap = await tx.get(playerRef);
+      const promoSnap = await tx.get(promoRef);
+      const promoSeq = Math.floor(Number(promoSnap.data()?.seq) || 0);
+      const promoAmount = Math.max(0, Math.floor(Number(promoSnap.data()?.amount) || 0));
       if (!snap.exists) {
+        const gift = pendingPromoHeartsGain({
+          claimedSeq: 0,
+          promoSeq,
+          amount: promoAmount,
+        });
         tx.create(playerRef, {
           name,
           hilals: 0,
-          adHearts: 0,
+          adHearts: gift,
+          claimedPromoHeartSeq: promoSeq > 0 ? promoSeq : 0,
           createdAt: FieldValue.serverTimestamp(),
           updatedAt: FieldValue.serverTimestamp(),
         });
         return;
       }
-      tx.update(playerRef, {
+      const data = snap.data() || {};
+      const claimed = Math.floor(Number(data.claimedPromoHeartSeq) || 0);
+      const gift = pendingPromoHeartsGain({
+        claimedSeq: claimed,
+        promoSeq,
+        amount: promoAmount,
+      });
+      const patch = {
         name,
         updatedAt: FieldValue.serverTimestamp(),
-      });
+      };
+      if (gift > 0) {
+        patch.adHearts = FieldValue.increment(gift);
+        patch.claimedPromoHeartSeq = promoSeq;
+      }
+      tx.update(playerRef, patch);
     });
     const [snap, queueSnap] = await Promise.all([
       playerRef.get(),
@@ -2123,11 +2495,20 @@ const submitQuizAnswer = onCall(
       ) {
         throw new HttpsError("failed-precondition", "Bu soru artık aktif değil.");
       }
-      if (_answerFor(data, round, ownerHash)) {
-        await _resolveRoundIfReady(tx, db, matchRef, data, Date.now());
+      const nowMs = Date.now();
+      const existing = _answerFor(data, round, ownerHash);
+      if (
+        existing &&
+        !canReplaceTimeoutAnswer(
+          existing,
+          nowMs,
+          data.roundStartedAtMs,
+          data.deadlineMs,
+        )
+      ) {
+        await _resolveRoundIfReady(tx, db, matchRef, data, nowMs);
         return data;
       }
-      const nowMs = Date.now();
       const gate = canAcceptAnswer(nowMs, data.roundStartedAtMs, data.deadlineMs);
       if (!gate.ok && gate.reason === "not_started") {
         throw new HttpsError(
@@ -2140,30 +2521,30 @@ const submitQuizAnswer = onCall(
         return data;
       }
       const question = QUESTION_BY_ID.get(data.questionIds[round]);
+      if (!question) {
+        throw new HttpsError("failed-precondition", "Soru bulunamadı.");
+      }
       const elapsedMs = Math.min(
         ROUND_DURATION_MS,
         Math.max(0, nowMs - data.roundStartedAtMs),
       );
+      const graded = {
+        choice,
+        elapsedMs,
+        correct: choice === question.correctIndex,
+      };
       data.answers = {
         ...(data.answers || {}),
         [String(round)]: {
           ...(data.answers?.[String(round)] || {}),
-          [ownerHash]: {
-            choice,
-            elapsedMs,
-            correct: choice === question.correctIndex,
-          },
+          [ownerHash]: graded,
         },
       };
       await _resolveRoundIfReady(tx, db, matchRef, data, nowMs);
       if (!_answerFor(data, round, ownerHash)) {
         data.version = _nextVersion(data);
         tx.set(matchRef, {
-          [`answers.${round}.${ownerHash}`]: {
-            choice,
-            elapsedMs,
-            correct: choice === question.correctIndex,
-          },
+          [`answers.${round}.${ownerHash}`]: graded,
           version: data.version,
           updatedAt: FieldValue.serverTimestamp(),
         }, { merge: true });
@@ -2234,9 +2615,10 @@ const getQuizWeeklyLeaderboard = onCall(
           nameAccent: false,
         }
         : cosmeticsForLevel(level);
+      const rawName = String(data.name || "Oyuncu").slice(0, 32);
       return {
         ownerHash: doc.id,
-        name: String(data.name || "Oyuncu").slice(0, 32),
+        name: isBot ? _botDisplayName(rawName) : rawName,
         weeklyHilals: Math.floor(Number(data.weeklyHilals) || 0),
         level: isBot ? Math.min(3, level) : level,
         title: isBot ? null : (data.title || cosmetics.title),
@@ -2253,8 +2635,13 @@ const getQuizWeeklyLeaderboard = onCall(
         isSelf: doc.id === ownerHash,
       };
     };
-    for (const doc of topSnap.docs) byId.set(doc.id, mapDoc(doc));
+    for (const doc of topSnap.docs) {
+      // Admin moderasyonu entry üzerinde de işaretlenebilir.
+      if (doc.data()?.leaderboardExcluded === true) continue;
+      byId.set(doc.id, mapDoc(doc));
+    }
     for (const doc of botSnap.docs) {
+      if (doc.data()?.leaderboardExcluded === true) continue;
       if (!byId.has(doc.id)) byId.set(doc.id, mapDoc(doc));
     }
     const ordered = _orderWeeklyLeaderboard([...byId.values()]);
@@ -2404,9 +2791,1179 @@ async function _deliverQuizEngagementPush({
 }
 
 /**
- * Günde 1 kez: en az 1 maç oynamış, 36s–14g idle, 3g cooldown.
- * Sıra düştüyse ona göre metin; değilse nazik comeback.
+ * Günde 1 kez:
+ * - hiç oynamamış (lobi açmış): 1g–30g teşvik
+ * - oynamış: 36s–14g idle comeback / rank_drop
+ * (Uygulamayı hiç açmamışlara `broadcast_all` admin kampanyası gider.)
  */
+function _challengeAnswerFor(challenge, round, ownerHash) {
+  return challenge.answers?.[String(round)]?.[ownerHash] || null;
+}
+
+function _challengePlayerStats(challenge, playerId) {
+  let correct = 0;
+  let elapsedMs = 0;
+  for (let round = 0; round < ROUND_COUNT; round += 1) {
+    const answer = _challengeAnswerFor(challenge, round, playerId);
+    if (!answer) {
+      elapsedMs += ROUND_DURATION_MS;
+      continue;
+    }
+    if (isChoiceCorrect(answer.choice, challenge.questionIds?.[round])) {
+      correct += 1;
+    }
+    elapsedMs += Number(answer.elapsedMs) || 0;
+  }
+  return { id: playerId, correct, elapsedMs };
+}
+
+function _serializeChallenge(challengeId, challenge, ownerHash) {
+  const challengerId = String(challenge.challengerId || "");
+  const challengedId = String(challenge.challengedId || "");
+  if (ownerHash !== challengerId && ownerHash !== challengedId) {
+    throw new HttpsError("permission-denied", "Bu meydan okumaya erişemezsiniz.");
+  }
+  const selfIsChallenger = ownerHash === challengerId;
+  const challengedIsBot = challenge.challengedIsBot === true ||
+    _isBotId(challengedId);
+  const self = {
+    id: ownerHash,
+    name: selfIsChallenger
+      ? String(challenge.challengerName || "Oyuncu")
+      : String(challenge.challengedName || "Oyuncu"),
+    hilals: selfIsChallenger
+      ? Math.floor(Number(challenge.challengerHilals) || 0)
+      : Math.floor(Number(challenge.challengedHilals) || 0),
+    level: selfIsChallenger
+      ? Math.max(1, Math.floor(Number(challenge.challengerLevel) || 1))
+      : Math.max(1, Math.floor(Number(challenge.challengedLevel) || 1)),
+    isBot: !selfIsChallenger && challengedIsBot,
+  };
+  const opponent = {
+    id: selfIsChallenger ? challengedId : challengerId,
+    name: selfIsChallenger
+      ? String(challenge.challengedName || "Oyuncu")
+      : String(challenge.challengerName || "Oyuncu"),
+    hilals: selfIsChallenger
+      ? Math.floor(Number(challenge.challengedHilals) || 0)
+      : Math.floor(Number(challenge.challengerHilals) || 0),
+    level: selfIsChallenger
+      ? Math.max(1, Math.floor(Number(challenge.challengedLevel) || 1))
+      : Math.max(1, Math.floor(Number(challenge.challengerLevel) || 1)),
+    isBot: selfIsChallenger && challengedIsBot,
+  };
+  const status = String(challenge.status || "");
+  const currentRound = Math.min(
+    Math.max(0, Number(challenge.currentRound) || 0),
+    ROUND_COUNT - 1,
+  );
+  const playing = status === "challenger_playing" || status === "opponent_playing";
+  const myTurn = playing && String(challenge.activePlayerId || "") === ownerHash;
+  const selfAnswer = myTurn
+    ? _challengeAnswerFor(challenge, currentRound, ownerHash)
+    : null;
+  const lastResolution = challenge.lastResolution || null;
+  const perspective = _perspectiveResolutionChoices(
+    lastResolution,
+    ownerHash,
+    opponent.id,
+  );
+  return {
+    id: challengeId,
+    kind: "challenge",
+    status,
+    version: Math.max(0, Math.floor(Number(challenge.version) || 0)),
+    currentRound,
+    totalRounds: ROUND_COUNT,
+    roundStartedAtMs: Number(challenge.roundStartedAtMs) || 0,
+    deadlineMs: Number(challenge.deadlineMs) || 0,
+    challengeDeadlineMs: Number(challenge.challengeDeadlineMs) || 0,
+    self: _decoratePlayer(self),
+    opponent: _decoratePlayer(opponent),
+    role: selfIsChallenger ? "challenger" : "challenged",
+    myTurn,
+    canAccept: status === "awaiting_opponent" &&
+      ownerHash === challengedId &&
+      !challengedIsBot,
+    question: playing && myTurn
+      ? _questionPayload(challenge.questionIds[currentRound])
+      : null,
+    // Solo tur: rakip yok; istemci "rakip bekleniyor"a düşmesin.
+    selfAnswered: Boolean(selfAnswer),
+    opponentAnswered: myTurn ? Boolean(selfAnswer) : true,
+    lastResolution: lastResolution
+      ? {
+          round: Number(lastResolution.round) || 0,
+          choices: lastResolution.choices || {},
+          elapsedMs: lastResolution.elapsedMs || {},
+          selfChoice: perspective.selfChoice,
+          opponentChoice: perspective.opponentChoice,
+          question: _questionPayload(
+            challenge.questionIds[lastResolution.round],
+            true,
+          ),
+        }
+      : null,
+    result: challenge.result || null,
+  };
+}
+
+async function _chargeHeartForChallenge(tx, db, {
+  playerRef,
+  playerData,
+  ownerHash,
+  premium,
+  nowMs,
+}) {
+  const adHearts = adHeartBalance(playerData);
+  if (!premium && adHearts <= 0) {
+    throw new HttpsError(
+      "resource-exhausted",
+      "Oynamak için reklam izleyerek can kazanmalısın.",
+    );
+  }
+  const heartSource = premium ? "premium" : "ad";
+  const heartChargeId = premium
+    ? null
+    : crypto.randomBytes(16).toString("hex");
+  if (!premium) {
+    tx.set(playerRef, {
+      adHearts: FieldValue.increment(-1),
+      updatedAt: FieldValue.serverTimestamp(),
+    }, { merge: true });
+    tx.create(db.collection("quiz_heart_charges").doc(heartChargeId), {
+      ownerHash,
+      heartSource,
+      status: "consumed_by_challenge",
+      createdAt: FieldValue.serverTimestamp(),
+      expiresAt: Timestamp.fromMillis(nowMs + 30 * 86400000),
+    });
+  }
+  return { heartSource, heartChargeId };
+}
+
+async function _finalizeChallenge(tx, db, challengeRef, challenge, options = {}) {
+  if (challenge.completedAwarded === true) {
+    return;
+  }
+  const expired = options.expired === true;
+  const challengerId = String(challenge.challengerId || "");
+  const challengedId = String(challenge.challengedId || "");
+  const challengedIsBot = challenge.challengedIsBot === true ||
+    _isBotId(challengedId);
+  const challengerStat = _challengePlayerStats(challenge, challengerId);
+  const challengedStat = _challengePlayerStats(challenge, challengedId);
+  let winnerId = null;
+  let rankBonus = 0;
+  const awards = {
+    [challengerId]: 0,
+    [challengedId]: 0,
+  };
+  if (!expired) {
+    const outcome = determineWinner(challengerStat, challengedStat);
+    winnerId = outcome === "a"
+      ? challengerId
+      : outcome === "b"
+        ? challengedId
+        : null;
+    for (const stat of [challengerStat, challengedStat]) {
+      const won = winnerId === stat.id;
+      const draw = winnerId == null;
+      awards[stat.id] = hilalAward(stat.correct, won, draw);
+    }
+    if (winnerId === challengerId) {
+      rankBonus = challengeRankBonus(
+        challenge.challengerRank,
+        challenge.challengedRank,
+      );
+    } else if (winnerId === challengedId) {
+      rankBonus = challengeRankBonus(
+        challenge.challengedRank,
+        challenge.challengerRank,
+      );
+    }
+    if (winnerId && rankBonus > 0) {
+      awards[winnerId] += rankBonus;
+    }
+  }
+
+  const weekId = weekIdIstanbul();
+  const playerIds = [challengerId, challengedId];
+  const isBotSide = playerIds.map((id) => (
+    id === challengedId ? challengedIsBot : _isBotId(id)
+  ));
+  const weeklyRefs = playerIds.map((id) => _weeklyEntryRef(db, weekId, id));
+  const playerRefs = playerIds.map((id, i) => (
+    isBotSide[i] ? null : db.collection("quiz_players").doc(id)
+  ));
+  // Firestore tx: tüm okumalar yazmalardan önce.
+  const weeklySnaps = [];
+  const playerSnaps = [];
+  for (const ref of weeklyRefs) weeklySnaps.push(await tx.get(ref));
+  for (const ref of playerRefs) {
+    playerSnaps.push(ref ? await tx.get(ref) : null);
+  }
+
+  if (!expired) {
+    for (let i = 0; i < playerIds.length; i += 1) {
+      const id = playerIds[i];
+      const delta = awards[id] || 0;
+      const name = id === challengerId
+        ? challenge.challengerName
+        : challenge.challengedName;
+      if (isBotSide[i]) {
+        _writeBotWeeklyDelta(tx, {
+          weeklyRef: weeklyRefs[i],
+          weeklySnap: weeklySnaps[i],
+          delta,
+          name,
+          level: id === challengedId
+            ? challenge.challengedLevel
+            : challenge.challengerLevel,
+          botId: id,
+        });
+        continue;
+      }
+      _writeHilalDelta(tx, {
+        playerRef: playerRefs[i],
+        weeklyRef: weeklyRefs[i],
+        playerSnap: playerSnaps[i],
+        weeklySnap: weeklySnaps[i],
+        delta,
+        name,
+        weekId,
+        matchesCompletedInc: 1,
+      });
+    }
+  }
+
+  challenge.status = expired ? "expired" : "completed";
+  challenge.completedAwarded = true;
+  challenge.version = _nextVersion(challenge);
+  challenge.result = {
+    winnerId,
+    expired,
+    rankBonus,
+    players: [challengerStat, challengedStat].map((stat) => ({
+      ...stat,
+      hilalsAwarded: awards[stat.id] || 0,
+    })),
+  };
+  challenge.updatedAt = Timestamp.now();
+  tx.set(challengeRef, {
+    status: challenge.status,
+    result: challenge.result,
+    completedAwarded: true,
+    version: challenge.version,
+    activePlayerId: FieldValue.delete(),
+    updatedAt: challenge.updatedAt,
+  }, { merge: true });
+}
+
+async function _resolveChallengeRoundIfReady(tx, db, challengeRef, challenge, nowMs) {
+  const status = String(challenge.status || "");
+  if (status !== "challenger_playing" && status !== "opponent_playing") {
+    return { finishedSide: false };
+  }
+  if (challengeIsExpired(challenge, nowMs)) {
+    await _finalizeChallenge(tx, db, challengeRef, challenge, { expired: true });
+    return { finishedSide: true, expired: true };
+  }
+  const activeId = String(challenge.activePlayerId || "");
+  if (!activeId) return { finishedSide: false };
+  const round = Math.max(0, Math.floor(Number(challenge.currentRound) || 0));
+  const key = String(round);
+  const answers = { ...(challenge.answers?.[key] || {}) };
+  if (
+    !answers[activeId] &&
+    shouldAutoTimeoutAnswers(nowMs, challenge.deadlineMs)
+  ) {
+    answers[activeId] = {
+      choice: -1,
+      elapsedMs: ROUND_DURATION_MS,
+      correct: false,
+    };
+  }
+  if (!answers[activeId]) return { finishedSide: false };
+
+  challenge.answers = { ...(challenge.answers || {}), [key]: answers };
+  challenge.lastResolution = {
+    round,
+    choices: { [activeId]: answers[activeId].choice },
+    elapsedMs: { [activeId]: answers[activeId].elapsedMs },
+  };
+  challenge.version = _nextVersion(challenge);
+
+  if (round >= ROUND_COUNT - 1) {
+    if (status === "challenger_playing") {
+      challenge.status = "awaiting_opponent";
+      challenge.activePlayerId = null;
+      challenge.currentRound = 0;
+      challenge.roundStartedAtMs = 0;
+      challenge.deadlineMs = 0;
+      const patch = {
+        answers: challenge.answers,
+        lastResolution: challenge.lastResolution,
+        status: challenge.status,
+        activePlayerId: FieldValue.delete(),
+        currentRound: 0,
+        roundStartedAtMs: 0,
+        deadlineMs: 0,
+        version: challenge.version,
+        updatedAt: FieldValue.serverTimestamp(),
+      };
+      if (_isChallengeBotOpponent(challenge)) {
+        const respondAfter = nowMs + CHALLENGE_BOT_DELAY_MS;
+        challenge.botRespondAfterMs = respondAfter;
+        patch.botRespondAfterMs = respondAfter;
+        // 12 saatlik bot cevabı TTL'yi aşmasın.
+        const nextDeadline = _challengeBotMinDeadlineMs(
+          respondAfter,
+          challenge.challengeDeadlineMs,
+        );
+        if (nextDeadline !== Number(challenge.challengeDeadlineMs)) {
+          challenge.challengeDeadlineMs = nextDeadline;
+          patch.challengeDeadlineMs = nextDeadline;
+        }
+      }
+      tx.set(challengeRef, patch, { merge: true });
+      return { finishedSide: true, awaitingOpponent: true };
+    }
+    await _finalizeChallenge(tx, db, challengeRef, challenge);
+    tx.set(challengeRef, {
+      answers: challenge.answers,
+      lastResolution: challenge.lastResolution,
+      version: challenge.version,
+    }, { merge: true });
+    return { finishedSide: true, completed: true };
+  }
+
+  challenge.currentRound = round + 1;
+  challenge.roundStartedAtMs = nowMs + ROUND_REVEAL_MS;
+  challenge.deadlineMs = challenge.roundStartedAtMs + ROUND_DURATION_MS;
+  tx.set(challengeRef, {
+    answers: challenge.answers,
+    lastResolution: challenge.lastResolution,
+    currentRound: challenge.currentRound,
+    roundStartedAtMs: challenge.roundStartedAtMs,
+    deadlineMs: challenge.deadlineMs,
+    version: challenge.version,
+    updatedAt: FieldValue.serverTimestamp(),
+  }, { merge: true });
+  return { finishedSide: false };
+}
+
+/**
+ * Bota meydan okuma: 12 saat sonra zayıf cevap yazıp maçı bitir.
+ * Can / push yok; yalnızca haftalık bot satırı güncellenir.
+ */
+async function _maybeResolveBotChallenge(tx, db, challengeRef, challenge, nowMs) {
+  if (!_isChallengeBotOpponent(challenge)) return { resolved: false };
+  if (String(challenge.status || "") !== "awaiting_opponent") {
+    return { resolved: false };
+  }
+  if (challenge.completedAwarded === true) return { resolved: false };
+  if (challengeIsExpired(challenge, nowMs)) {
+    await _finalizeChallenge(tx, db, challengeRef, challenge, { expired: true });
+    return { resolved: true, expired: true };
+  }
+  const readyAt = Math.floor(Number(challenge.botRespondAfterMs) || 0);
+  if (readyAt <= 0 || nowMs < readyAt) return { resolved: false };
+
+  const botId = String(challenge.challengedId || "");
+  const questionIds = Array.isArray(challenge.questionIds)
+    ? challenge.questionIds
+    : [];
+  const plan = _challengeBotWeakPlan(questionIds);
+  const answers = { ...(challenge.answers || {}) };
+  for (let round = 0; round < ROUND_COUNT; round += 1) {
+    const key = String(round);
+    const roundAnswers = { ...(answers[key] || {}) };
+    const step = plan[round] || {
+      choice: -1,
+      elapsedMs: ROUND_DURATION_MS,
+      correct: false,
+    };
+    roundAnswers[botId] = {
+      choice: step.choice,
+      elapsedMs: step.elapsedMs,
+      correct: step.correct === true,
+    };
+    answers[key] = roundAnswers;
+  }
+  challenge.answers = answers;
+  challenge.botRespondedAtMs = nowMs;
+  await _finalizeChallenge(tx, db, challengeRef, challenge);
+  tx.set(challengeRef, {
+    answers: challenge.answers,
+    botRespondedAtMs: nowMs,
+  }, { merge: true });
+  return { resolved: true, completed: true };
+}
+
+async function _deliverQuizChallengePush({
+  db,
+  ownerHash,
+  kind,
+  fromName,
+  challengeId,
+}) {
+  if (_isBotId(ownerHash)) return null;
+  const deviceSnap = await db.collection("quiz_devices").doc(ownerHash).get();
+  if (!deviceSnap.exists) return null;
+  const device = deviceSnap.data() || {};
+  const token = String(device.token || "").trim();
+  if (token.length < 32) return null;
+  const copy = quizChallengeCopy(device.locale, kind, { name: fromName });
+  try {
+    return await getMessaging().send({
+      token,
+      notification: copy,
+      data: {
+        type: "hilal_duel",
+        reason: `challenge_${kind}`,
+        challengeId: String(challengeId || ""),
+      },
+      android: {
+        notification: {
+          channelId: "arin_hilal_duel",
+          priority: "high",
+          defaultSound: true,
+        },
+      },
+      apns: { payload: { aps: { sound: "default" } } },
+    });
+  } catch (error) {
+    const code = String(error?.code || "");
+    if (
+      code.includes("registration-token-not-registered") ||
+      code.includes("invalid-registration-token")
+    ) {
+      await deviceSnap.ref.delete().catch(() => {});
+    }
+    console.error("[HilalDuel] challenge push failed", ownerHash, error);
+    return null;
+  }
+}
+
+const createQuizChallenge = onCall(
+  { region: REGION, memory: "256MiB", enforceAppCheck: ENFORCE_APP_CHECK },
+  async (req) => {
+    const db = getFirestore();
+    const { ownerHash } = await _assertInstallation(db, req);
+    await _assertQuizCallerRates(db, req, ownerHash, "challenge_create", 15);
+    const name = _validatedName(req.data?.name);
+    const opponentId = _validatedOpponentId(req.data?.opponentOwnerHash);
+    if (opponentId === ownerHash) {
+      throw new HttpsError("invalid-argument", "Kendine meydan okuyamazsın.");
+    }
+    const isBotOpponent = _isBotId(opponentId);
+    const opponentRef = isBotOpponent
+      ? null
+      : db.collection("quiz_players").doc(opponentId);
+    const playerRef = db.collection("quiz_players").doc(ownerHash);
+    const weekId = weekIdIstanbul();
+    const [opponentSnap, playerSnap, botWeeklySnap] = await Promise.all([
+      opponentRef ? opponentRef.get() : Promise.resolve(null),
+      playerRef.get(),
+      isBotOpponent
+        ? _weeklyEntryRef(db, weekId, opponentId).get()
+        : Promise.resolve(null),
+    ]);
+    if (isBotOpponent) {
+      if (!botWeeklySnap?.exists) {
+        throw new HttpsError("not-found", "Rakip bulunamadı.");
+      }
+      const botRow = botWeeklySnap.data() || {};
+      if (botRow.isBot !== true) {
+        throw new HttpsError("not-found", "Rakip bulunamadı.");
+      }
+    } else if (!opponentSnap?.exists) {
+      throw new HttpsError("not-found", "Rakip bulunamadı.");
+    }
+    const openStatuses = new Set([
+      "challenger_playing",
+      "awaiting_opponent",
+      "opponent_playing",
+    ]);
+    const relatedSnap = await db.collection("quiz_challenges")
+      .where("participantIds", "array-contains", ownerHash)
+      .limit(30)
+      .get();
+    let outgoingOpen = 0;
+    let hasOpenPair = false;
+    for (const doc of relatedSnap.docs) {
+      const data = doc.data() || {};
+      if (!openStatuses.has(String(data.status || ""))) continue;
+      if (String(data.challengerId || "") === ownerHash) outgoingOpen += 1;
+      const ids = [
+        String(data.challengerId || ""),
+        String(data.challengedId || ""),
+      ];
+      if (ids.includes(ownerHash) && ids.includes(opponentId)) {
+        hasOpenPair = true;
+      }
+    }
+    if (outgoingOpen >= CHALLENGE_MAX_ACTIVE_OUTGOING) {
+      throw new HttpsError(
+        "resource-exhausted",
+        "Aynı anda en fazla 3 açık meydan okuman olabilir.",
+      );
+    }
+    if (hasOpenPair) {
+      throw new HttpsError(
+        "already-exists",
+        "Bu rakiple zaten açık bir meydan okumanız var.",
+      );
+    }
+
+    const premium = await _isPremiumCaller(db, req);
+    const playerData = playerSnap.data() || {};
+    const opponentData = isBotOpponent
+      ? (botWeeklySnap.data() || {})
+      : (opponentSnap.data() || {});
+    const selfWeekly = playerData.weekId === weekId
+      ? Math.floor(Number(playerData.weeklyHilals) || 0)
+      : 0;
+    const oppWeekly = isBotOpponent
+      ? Math.floor(Number(opponentData.weeklyHilals) || 0)
+      : (opponentData.weekId === weekId
+        ? Math.floor(Number(opponentData.weeklyHilals) || 0)
+        : 0);
+    const challengedName = isBotOpponent
+      ? _botDisplayName(opponentData.name)
+      : String(opponentData.name || "Oyuncu").slice(0, 32);
+    const challengedLevel = isBotOpponent
+      ? Math.max(1, Math.min(3, Math.floor(Number(opponentData.level) || 1)))
+      : levelForHilals(Math.floor(Number(opponentData.hilals) || 0)).level;
+    const challengedHilals = isBotOpponent
+      ? Math.floor(Number(opponentData.weeklyHilals) || 0)
+      : Math.floor(Number(opponentData.hilals) || 0);
+    const [selfRank, oppRank] = await Promise.all([
+      _computeWeeklyRank(db, weekId, ownerHash, selfWeekly),
+      _computeWeeklyRank(db, weekId, opponentId, oppWeekly),
+    ]);
+    const questionIds = _pickQuestions();
+    const challengeId = crypto.randomBytes(16).toString("hex");
+    const nowMs = Date.now();
+    const challengeDeadlineMs = nowMs + CHALLENGE_TTL_MS;
+    const challengeRef = db.collection("quiz_challenges").doc(challengeId);
+
+    const challenge = await db.runTransaction(async (tx) => {
+      const freshPlayer = await tx.get(playerRef);
+      if (!isBotOpponent) {
+        const freshOpponent = await tx.get(opponentRef);
+        if (!freshOpponent.exists) {
+          throw new HttpsError("not-found", "Rakip bulunamadı.");
+        }
+      } else {
+        const freshBotWeekly = await tx.get(
+          _weeklyEntryRef(db, weekId, opponentId),
+        );
+        if (!freshBotWeekly.exists || freshBotWeekly.data()?.isBot !== true) {
+          throw new HttpsError("not-found", "Rakip bulunamadı.");
+        }
+      }
+      await _chargeHeartForChallenge(tx, db, {
+        playerRef,
+        playerData: freshPlayer.data() || {},
+        ownerHash,
+        premium,
+        nowMs,
+      });
+      const me = freshPlayer.data() || {};
+      const doc = {
+        challengerId: ownerHash,
+        challengerName: name,
+        challengerLevel: levelForHilals(Math.floor(Number(me.hilals) || 0)).level,
+        challengerHilals: Math.floor(Number(me.hilals) || 0),
+        challengerRank: selfRank,
+        challengedId: opponentId,
+        challengedName,
+        challengedLevel,
+        challengedHilals,
+        challengedRank: oppRank,
+        challengedIsBot: isBotOpponent,
+        botRespondAfterMs: 0,
+        participantIds: [ownerHash, opponentId],
+        questionIds,
+        status: "challenger_playing",
+        activePlayerId: ownerHash,
+        currentRound: 0,
+        roundStartedAtMs: nowMs,
+        deadlineMs: nowMs + ROUND_DURATION_MS,
+        challengeDeadlineMs,
+        answers: {},
+        lastResolution: null,
+        reminderSent: false,
+        version: 1,
+        createdAt: Timestamp.fromMillis(nowMs),
+        updatedAt: Timestamp.fromMillis(nowMs),
+        expiresAt: Timestamp.fromMillis(nowMs + CHALLENGE_DOC_TTL_MS),
+      };
+      tx.set(playerRef, {
+        name,
+        updatedAt: FieldValue.serverTimestamp(),
+        ...(me.createdAt ? {} : { createdAt: FieldValue.serverTimestamp() }),
+      }, { merge: true });
+      tx.create(challengeRef, doc);
+      return doc;
+    });
+    return {
+      ok: true,
+      challenge: _serializeChallenge(challengeId, challenge, ownerHash),
+    };
+  },
+);
+
+const acceptQuizChallenge = onCall(
+  { region: REGION, memory: "256MiB", enforceAppCheck: ENFORCE_APP_CHECK },
+  async (req) => {
+    const db = getFirestore();
+    const { ownerHash } = await _assertInstallation(db, req);
+    await _assertQuizCallerRates(db, req, ownerHash, "challenge_accept", 20);
+    const challengeId = _validatedDocumentId(req.data?.challengeId, "meydan okuma");
+    const challengeRef = db.collection("quiz_challenges").doc(challengeId);
+    const playerRef = db.collection("quiz_players").doc(ownerHash);
+    const premium = await _isPremiumCaller(db, req);
+    const nowMs = Date.now();
+    const challenge = await db.runTransaction(async (tx) => {
+      const snap = await tx.get(challengeRef);
+      if (!snap.exists) {
+        throw new HttpsError("not-found", "Meydan okuma bulunamadı.");
+      }
+      const data = snap.data() || {};
+      if (String(data.challengedId || "") !== ownerHash) {
+        throw new HttpsError("permission-denied", "Bu davet sana ait değil.");
+      }
+      if (_isChallengeBotOpponent(data)) {
+        throw new HttpsError(
+          "failed-precondition",
+          "Bot meydan okuması otomatik cevaplanır.",
+        );
+      }
+      if (challengeIsExpired(data, nowMs)) {
+        await _finalizeChallenge(tx, db, challengeRef, data, { expired: true });
+        return data;
+      }
+      if (data.status === "opponent_playing" && data.activePlayerId === ownerHash) {
+        return data;
+      }
+      if (data.status !== "awaiting_opponent") {
+        throw new HttpsError("failed-precondition", "Bu meydan okuma kabul edilemez.");
+      }
+      const playerSnap = await tx.get(playerRef);
+      await _chargeHeartForChallenge(tx, db, {
+        playerRef,
+        playerData: playerSnap.data() || {},
+        ownerHash,
+        premium,
+        nowMs,
+      });
+      data.status = "opponent_playing";
+      data.activePlayerId = ownerHash;
+      data.currentRound = 0;
+      data.roundStartedAtMs = nowMs;
+      data.deadlineMs = nowMs + ROUND_DURATION_MS;
+      data.lastResolution = null;
+      data.version = _nextVersion(data);
+      data.updatedAt = Timestamp.fromMillis(nowMs);
+      tx.set(challengeRef, {
+        status: data.status,
+        activePlayerId: data.activePlayerId,
+        currentRound: 0,
+        roundStartedAtMs: data.roundStartedAtMs,
+        deadlineMs: data.deadlineMs,
+        lastResolution: null,
+        version: data.version,
+        updatedAt: data.updatedAt,
+      }, { merge: true });
+      return data;
+    });
+    return {
+      ok: true,
+      challenge: _serializeChallenge(challengeId, challenge, ownerHash),
+    };
+  },
+);
+
+const getQuizChallenge = onCall(
+  { region: REGION, memory: "256MiB", enforceAppCheck: ENFORCE_APP_CHECK },
+  async (req) => {
+    const db = getFirestore();
+    const { ownerHash } = await _assertInstallation(db, req);
+    await _assertQuizCallerRates(db, req, ownerHash, "challenge_get", 450);
+    const challengeId = _validatedDocumentId(req.data?.challengeId, "meydan okuma");
+    const challengeRef = db.collection("quiz_challenges").doc(challengeId);
+    let notifyAwaiting = false;
+    let notifyCompleted = false;
+    const challenge = await db.runTransaction(async (tx) => {
+      const snap = await tx.get(challengeRef);
+      if (!snap.exists) {
+        throw new HttpsError("not-found", "Meydan okuma bulunamadı.");
+      }
+      const data = snap.data() || {};
+      if (
+        ownerHash !== data.challengerId &&
+        ownerHash !== data.challengedId
+      ) {
+        throw new HttpsError("permission-denied", "Bu meydan okumaya erişemezsiniz.");
+      }
+      const nowMs = Date.now();
+      if (
+        challengeIsExpired(data, nowMs) &&
+        data.status !== "completed" &&
+        data.status !== "expired"
+      ) {
+        await _finalizeChallenge(tx, db, challengeRef, data, { expired: true });
+        return data;
+      }
+      const botResolved = await _maybeResolveBotChallenge(
+        tx,
+        db,
+        challengeRef,
+        data,
+        nowMs,
+      );
+      if (botResolved.completed) {
+        notifyCompleted = true;
+        return data;
+      }
+      if (botResolved.expired) {
+        return data;
+      }
+      const before = String(data.status || "");
+      const resolved = await _resolveChallengeRoundIfReady(
+        tx,
+        db,
+        challengeRef,
+        data,
+        nowMs,
+      );
+      if (
+        resolved.awaitingOpponent &&
+        before === "challenger_playing" &&
+        !_isChallengeBotOpponent(data)
+      ) {
+        notifyAwaiting = true;
+      }
+      if (resolved.completed && before === "opponent_playing") {
+        notifyCompleted = true;
+      }
+      return data;
+    });
+    if (notifyAwaiting) {
+      await _deliverQuizChallengePush({
+        db,
+        ownerHash: challenge.challengedId,
+        kind: "invited",
+        fromName: challenge.challengerName,
+        challengeId,
+      });
+    }
+    if (notifyCompleted && challenge.result) {
+      const winnerId = challenge.result.winnerId;
+      const kindFor = (id) => {
+        if (!winnerId) return "draw";
+        return winnerId === id ? "won" : "lost";
+      };
+      await Promise.all([
+        _deliverQuizChallengePush({
+          db,
+          ownerHash: challenge.challengerId,
+          kind: kindFor(challenge.challengerId),
+          fromName: challenge.challengedName,
+          challengeId,
+        }),
+        _deliverQuizChallengePush({
+          db,
+          ownerHash: challenge.challengedId,
+          kind: kindFor(challenge.challengedId),
+          fromName: challenge.challengerName,
+          challengeId,
+        }),
+      ]);
+    }
+    return {
+      ok: true,
+      challenge: _serializeChallenge(challengeId, challenge, ownerHash),
+    };
+  },
+);
+
+const submitQuizChallengeAnswer = onCall(
+  { region: REGION, memory: "256MiB", enforceAppCheck: ENFORCE_APP_CHECK },
+  async (req) => {
+    const db = getFirestore();
+    const { ownerHash } = await _assertInstallation(db, req);
+    await _assertQuizCallerRates(db, req, ownerHash, "challenge_submit", 60);
+    const challengeId = _validatedDocumentId(req.data?.challengeId, "meydan okuma");
+    const round = Number(req.data?.round);
+    const choice = Number(req.data?.choice);
+    if (!Number.isInteger(round) || round < 0 || round >= ROUND_COUNT) {
+      throw new HttpsError("invalid-argument", "Geçersiz soru sırası.");
+    }
+    if (!Number.isInteger(choice) || choice < 0 || choice > 3) {
+      throw new HttpsError("invalid-argument", "Geçersiz cevap.");
+    }
+    const challengeRef = db.collection("quiz_challenges").doc(challengeId);
+    let notifyAwaiting = false;
+    let notifyCompleted = false;
+    const challenge = await db.runTransaction(async (tx) => {
+      const snap = await tx.get(challengeRef);
+      if (!snap.exists) {
+        throw new HttpsError("not-found", "Meydan okuma bulunamadı.");
+      }
+      const data = snap.data() || {};
+      const status = String(data.status || "");
+      if (
+        (status !== "challenger_playing" && status !== "opponent_playing") ||
+        String(data.activePlayerId || "") !== ownerHash ||
+        Number(data.currentRound) !== round
+      ) {
+        throw new HttpsError("failed-precondition", "Bu soru artık aktif değil.");
+      }
+      const nowMs = Date.now();
+      if (challengeIsExpired(data, nowMs)) {
+        await _finalizeChallenge(tx, db, challengeRef, data, { expired: true });
+        return data;
+      }
+      const existing = _challengeAnswerFor(data, round, ownerHash);
+      if (
+        existing &&
+        !canReplaceTimeoutAnswer(
+          existing,
+          nowMs,
+          data.roundStartedAtMs,
+          data.deadlineMs,
+        )
+      ) {
+        const resolved = await _resolveChallengeRoundIfReady(
+          tx,
+          db,
+          challengeRef,
+          data,
+          nowMs,
+        );
+        if (resolved.awaitingOpponent && !_isChallengeBotOpponent(data)) {
+          notifyAwaiting = true;
+        }
+        if (resolved.completed) notifyCompleted = true;
+        return data;
+      }
+      const gate = canAcceptAnswer(nowMs, data.roundStartedAtMs, data.deadlineMs);
+      if (!gate.ok && gate.reason === "not_started") {
+        throw new HttpsError("failed-precondition", "Soru henüz başlamadı.");
+      }
+      if (!gate.ok && gate.reason === "expired") {
+        const resolved = await _resolveChallengeRoundIfReady(
+          tx,
+          db,
+          challengeRef,
+          data,
+          nowMs,
+        );
+        if (resolved.awaitingOpponent && !_isChallengeBotOpponent(data)) {
+          notifyAwaiting = true;
+        }
+        if (resolved.completed) notifyCompleted = true;
+        return data;
+      }
+      const question = QUESTION_BY_ID.get(data.questionIds[round]);
+      if (!question) {
+        throw new HttpsError("failed-precondition", "Soru bulunamadı.");
+      }
+      const elapsedMs = Math.min(
+        ROUND_DURATION_MS,
+        Math.max(0, nowMs - data.roundStartedAtMs),
+      );
+      const graded = {
+        choice,
+        elapsedMs,
+        correct: choice === question.correctIndex,
+      };
+      data.answers = {
+        ...(data.answers || {}),
+        [String(round)]: {
+          ...(data.answers?.[String(round)] || {}),
+          [ownerHash]: graded,
+        },
+      };
+      const before = status;
+      const resolved = await _resolveChallengeRoundIfReady(
+        tx,
+        db,
+        challengeRef,
+        data,
+        nowMs,
+      );
+      if (
+        resolved.awaitingOpponent &&
+        before === "challenger_playing" &&
+        !_isChallengeBotOpponent(data)
+      ) {
+        notifyAwaiting = true;
+      }
+      if (resolved.completed && before === "opponent_playing") {
+        notifyCompleted = true;
+      }
+      if (!_challengeAnswerFor(data, round, ownerHash)) {
+        data.version = _nextVersion(data);
+        tx.set(challengeRef, {
+          [`answers.${round}.${ownerHash}`]: graded,
+          version: data.version,
+          updatedAt: FieldValue.serverTimestamp(),
+        }, { merge: true });
+      }
+      return data;
+    });
+    if (notifyAwaiting) {
+      await _deliverQuizChallengePush({
+        db,
+        ownerHash: challenge.challengedId,
+        kind: "invited",
+        fromName: challenge.challengerName,
+        challengeId,
+      });
+    }
+    if (notifyCompleted && challenge.result) {
+      const winnerId = challenge.result.winnerId;
+      const kindFor = (id) => {
+        if (!winnerId) return "draw";
+        return winnerId === id ? "won" : "lost";
+      };
+      await Promise.all([
+        _deliverQuizChallengePush({
+          db,
+          ownerHash: challenge.challengerId,
+          kind: kindFor(challenge.challengerId),
+          fromName: challenge.challengedName,
+          challengeId,
+        }),
+        _deliverQuizChallengePush({
+          db,
+          ownerHash: challenge.challengedId,
+          kind: kindFor(challenge.challengedId),
+          fromName: challenge.challengerName,
+          challengeId,
+        }),
+      ]);
+    }
+    return {
+      ok: true,
+      challenge: _serializeChallenge(challengeId, challenge, ownerHash),
+    };
+  },
+);
+
+const listQuizChallenges = onCall(
+  { region: REGION, memory: "256MiB", enforceAppCheck: ENFORCE_APP_CHECK },
+  async (req) => {
+    const db = getFirestore();
+    const { ownerHash } = await _assertInstallation(db, req);
+    await _assertQuizCallerRates(db, req, ownerHash, "challenge_list", 40);
+    const snap = await db.collection("quiz_challenges")
+      .where("participantIds", "array-contains", ownerHash)
+      .limit(30)
+      .get();
+    const nowMs = Date.now();
+    const items = [];
+    for (const doc of snap.docs) {
+      let fresh = doc.data() || {};
+      if (
+        challengeIsExpired(fresh, nowMs) &&
+        fresh.status !== "completed" &&
+        fresh.status !== "expired"
+      ) {
+        try {
+          await db.runTransaction(async (tx) => {
+            const currentSnap = await tx.get(doc.ref);
+            const current = currentSnap.data() || {};
+            if (
+              challengeIsExpired(current, Date.now()) &&
+              current.status !== "completed" &&
+              current.status !== "expired"
+            ) {
+              await _finalizeChallenge(tx, db, doc.ref, current, {
+                expired: true,
+              });
+            }
+          });
+          fresh = (await doc.ref.get()).data() || fresh;
+        } catch (error) {
+          console.error("[HilalDuel] challenge expire on list", doc.id, error);
+        }
+      } else if (
+        fresh.status === "awaiting_opponent" &&
+        _isChallengeBotOpponent(fresh)
+      ) {
+        try {
+          await db.runTransaction(async (tx) => {
+            const currentSnap = await tx.get(doc.ref);
+            const current = currentSnap.data() || {};
+            await _maybeResolveBotChallenge(
+              tx,
+              db,
+              doc.ref,
+              current,
+              Date.now(),
+            );
+          });
+          fresh = (await doc.ref.get()).data() || fresh;
+        } catch (error) {
+          console.error("[HilalDuel] bot challenge resolve on list", doc.id, error);
+        }
+      }
+      const selfIsChallenger = ownerHash === fresh.challengerId;
+      items.push({
+        id: doc.id,
+        status: String(fresh.status || ""),
+        role: selfIsChallenger ? "challenger" : "challenged",
+        canAccept: fresh.status === "awaiting_opponent" &&
+          !selfIsChallenger &&
+          !_isChallengeBotOpponent(fresh),
+        myTurn: (
+          (fresh.status === "challenger_playing" ||
+            fresh.status === "opponent_playing") &&
+          fresh.activePlayerId === ownerHash
+        ),
+        challengeDeadlineMs: Number(fresh.challengeDeadlineMs) || 0,
+        updatedAtMs: _timestampMs(fresh.updatedAt),
+        opponentName: selfIsChallenger
+          ? String(fresh.challengedName || "Oyuncu")
+          : String(fresh.challengerName || "Oyuncu"),
+        opponentLevel: selfIsChallenger
+          ? Math.max(1, Math.floor(Number(fresh.challengedLevel) || 1))
+          : Math.max(1, Math.floor(Number(fresh.challengerLevel) || 1)),
+        result: fresh.result || null,
+      });
+    }
+    items.sort((a, b) => (b.updatedAtMs || 0) - (a.updatedAtMs || 0));
+    return { ok: true, challenges: items.slice(0, 20) };
+  },
+);
+
+/** Süresi dolanları kapat + son 4 saat hatırlatması. */
+const scanQuizChallenges = onSchedule(
+  {
+    region: REGION,
+    schedule: "every 15 minutes",
+    memory: "256MiB",
+    timeoutSeconds: 120,
+  },
+  async () => {
+    const db = getFirestore();
+    const nowMs = Date.now();
+    const openStatuses = [
+      "challenger_playing",
+      "awaiting_opponent",
+      "opponent_playing",
+    ];
+    let expired = 0;
+    let reminded = 0;
+    let botResolved = 0;
+    for (const status of openStatuses) {
+      const snap = await db.collection("quiz_challenges")
+        .where("status", "==", status)
+        .limit(40)
+        .get();
+      for (const doc of snap.docs) {
+        const data = doc.data() || {};
+        try {
+          if (challengeIsExpired(data, nowMs)) {
+            await db.runTransaction(async (tx) => {
+              const fresh = await tx.get(doc.ref);
+              const current = fresh.data() || {};
+              if (
+                challengeIsExpired(current, Date.now()) &&
+                current.status !== "completed" &&
+                current.status !== "expired"
+              ) {
+                await _finalizeChallenge(tx, db, doc.ref, current, {
+                  expired: true,
+                });
+              }
+            });
+            expired += 1;
+            continue;
+          }
+          if (
+            status === "awaiting_opponent" &&
+            _isChallengeBotOpponent(data)
+          ) {
+            let didResolve = false;
+            let completedChallenge = null;
+            await db.runTransaction(async (tx) => {
+              const fresh = await tx.get(doc.ref);
+              const current = fresh.data() || {};
+              const result = await _maybeResolveBotChallenge(
+                tx,
+                db,
+                doc.ref,
+                current,
+                Date.now(),
+              );
+              if (result.resolved) {
+                didResolve = true;
+                if (result.completed) completedChallenge = current;
+              }
+            });
+            if (didResolve) {
+              botResolved += 1;
+              if (completedChallenge?.result) {
+                const winnerId = completedChallenge.result.winnerId;
+                const kind = !winnerId
+                  ? "draw"
+                  : (winnerId === completedChallenge.challengerId
+                    ? "won"
+                    : "lost");
+                await _deliverQuizChallengePush({
+                  db,
+                  ownerHash: completedChallenge.challengerId,
+                  kind,
+                  fromName: completedChallenge.challengedName,
+                  challengeId: doc.id,
+                });
+              }
+            }
+            continue;
+          }
+          const deadline = Number(data.challengeDeadlineMs) || 0;
+          const inReminderWindow = deadline > 0 &&
+            nowMs >= deadline - CHALLENGE_REMINDER_BEFORE_MS &&
+            nowMs < deadline;
+          if (
+            inReminderWindow &&
+            data.reminderSent !== true &&
+            (status === "awaiting_opponent" || status === "opponent_playing") &&
+            !_isChallengeBotOpponent(data)
+          ) {
+            await _deliverQuizChallengePush({
+              db,
+              ownerHash: data.challengedId,
+              kind: "reminder",
+              fromName: data.challengerName,
+              challengeId: doc.id,
+            });
+            await doc.ref.set({
+              reminderSent: true,
+              updatedAt: FieldValue.serverTimestamp(),
+            }, { merge: true });
+            reminded += 1;
+          }
+        } catch (error) {
+          console.error("[HilalDuel] challenge scan failed", doc.id, error);
+        }
+      }
+    }
+    if (expired > 0 || reminded > 0 || botResolved > 0) {
+      console.log(
+        `[HilalDuel] challenge scan expired=${expired} reminded=${reminded} botResolved=${botResolved}`,
+      );
+    }
+  },
+);
+
 const scanQuizEngagementReminders = onSchedule(
   {
     region: REGION,
@@ -2465,6 +4022,7 @@ const scanQuizEngagementReminders = onSchedule(
           currentRank,
           bestWeeklyRank,
           lastKnownWeeklyRank: player.lastKnownWeeklyRank,
+          createdAtMs: player.createdAt?.toMillis?.() || 0,
         });
         if (!decision.send) {
           skipped += 1;
@@ -2514,6 +4072,12 @@ module.exports = {
     registerQuizDevice,
     cleanupAbandonedQuizQueues,
     scanQuizEngagementReminders,
+    createQuizChallenge,
+    acceptQuizChallenge,
+    getQuizChallenge,
+    submitQuizChallengeAnswer,
+    listQuizChallenges,
+    scanQuizChallenges,
   },
   testables: {
     levelForHilals,
@@ -2527,15 +4091,26 @@ module.exports = {
     BOT_WEEKLY_CAP,
     orderWeeklyLeaderboard: _orderWeeklyLeaderboard,
     stableBotId: _stableBotId,
+    botDisplayName: _botDisplayName,
+    BOT_NAMES,
     decideQuizEngagement,
     quizEngagementCopy,
+    pendingPromoHeartsGain,
     ENGAGEMENT_COOLDOWN_MS,
     ENGAGEMENT_MIN_IDLE_MS,
     ENGAGEMENT_MAX_IDLE_MS,
+    ENGAGEMENT_NEVER_PLAYED_MIN_AGE_MS,
+    ENGAGEMENT_NEVER_PLAYED_MAX_AGE_MS,
     botPlan: _botPlan,
     botReadyAtMs: _botReadyAtMs,
     botAnswerElapsedMs: _botAnswerElapsedMs,
     canAcceptAnswer,
+    shouldAutoTimeoutAnswers,
+    isTimeoutAnswer,
+    isChoiceCorrect,
+    canReplaceTimeoutAnswer,
+    perspectiveResolutionChoices: _perspectiveResolutionChoices,
+    ANSWER_GRACE_MS,
     allPlayersAnswered,
     shouldRefundAbandonedQueue,
     queueAbandonAtMs,
@@ -2552,5 +4127,15 @@ module.exports = {
     ROUND_DURATION_MS,
     ROUND_REVEAL_MS,
     pickQuestions: _pickQuestions,
+    challengeRankBonus,
+    challengeIsExpired,
+    quizChallengeCopy,
+    CHALLENGE_TTL_MS,
+    CHALLENGE_BOT_DELAY_MS,
+    CHALLENGE_REMINDER_BEFORE_MS,
+    isBotId: _isBotId,
+    isChallengeBotOpponent: _isChallengeBotOpponent,
+    challengeBotWeakPlan: _challengeBotWeakPlan,
+    challengeBotMinDeadlineMs: _challengeBotMinDeadlineMs,
   },
 };

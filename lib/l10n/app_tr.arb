@@ -685,7 +685,7 @@
       "count": {"type": "int"}
     }
   },
-  "hilalDuelPlay": "Rakip bul",
+  "hilalDuelPlay": "Canlı oyna",
   "hilalDuelWatchAdForHeart": "Reklam izle, 1 can kazan",
   "hilalDuelNeedHeartTitle": "Oynamak için 1 can lazım",
   "hilalDuelNeedHeartHint": "Kısa bir reklam izle → 1 can kazan, hemen rakip bul",
@@ -781,10 +781,37 @@
       "count": {"type": "int"}
     }
   },
+  "hilalDuelAdminRemoveTitle": "Listeden kaldır",
+  "hilalDuelAdminRemoveBody": "“{name}” haftalık sıralamadan silinsin mi? Alttakiler bir sıra yukarı kayar; bu oyuncu bu hafta tekrar listede görünmez.",
+  "@hilalDuelAdminRemoveBody": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "hilalDuelAdminRemoveAction": "Kaldır",
+  "hilalDuelAdminRemoved": "Oyuncu listeden kaldırıldı.",
   "hilalDuelTitleTalebe": "Talebe",
   "hilalDuelTitleIlimDostu": "İlim Dostu",
   "hilalDuelYouLabel": "Sen",
   "hilalDuelOpponentLabel": "Rakip",
+  "hilalDuelChallengeAction": "Meydan oku",
+  "hilalDuelChallengeInboxTitle": "Meydan okumalar",
+  "hilalDuelChallengeAccept": "Kabul et · 1 can",
+  "hilalDuelChallengeContinue": "Devam et",
+  "hilalDuelChallengeWaiting": "Rakip bekleniyor",
+  "hilalDuelChallengeYourTurn": "Sıra sende",
+  "hilalDuelChallengeExpired": "Süre doldu — puan yok",
+  "hilalDuelChallengeHint": "Listeden birine meydan oku. Sen 1 can harcarsın; süre dolarsa kimse puan alamaz. Botlar yaklaşık 12 saat sonra otomatik ve zayıf cevap verir.",
+  "hilalDuelChallengePickTitle": "Rakip seç",
+  "hilalDuelChallengePickHint": "Meydan okumak için bir oyuncu seç. Önce sen çözersin. İnsan rakibe 24 saat, bota yaklaşık 12 saat sonra otomatik cevap.",
+  "hilalDuelChallengeSentTitle": "Meydan okuma gönderildi",
+  "hilalDuelChallengeSentBody": "{name} cevap verince sonuç görünür.",
+  "@hilalDuelChallengeSentBody": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "hilalDuelChallengeSentOk": "Tamam",
   "generalLoading": "Yükleniyor...",
   "settingsPrivacyPageTitle": "Gizlilik Politikası",
   "settingsPrivacyLastUpdated": "Son güncelleme: 26.04.2026",
@@ -1484,6 +1511,13 @@
   "surveyNotificationAllow": "Devam Et",
   "surveyNotificationSkip": "Şimdilik geç",
   "surveyNotificationOpenSettings": "Ayarlardan aç",
+  "surveyLockWidgetsTitle": "Kilit ekranı",
+  "surveyLockWidgetsLead": "Namaz vakti ve günün sözünü kilit ekranında göstermek ister misin?",
+  "surveyLockWidgetsSubtitle": "Android’de kilit ekranına gerçek widget eklenemez; seçtiklerin kalıcı bildirim olarak görünür. İstediğin zaman Widget Merkezi’nden değiştirebilirsin.",
+  "surveyLockWidgetsPrayerTitle": "Namaz Vakti",
+  "surveyLockWidgetsPrayerSubtitle": "Sıradaki vakti ve geri sayımı kilit ekranında gösterir.",
+  "surveyLockWidgetsQuoteTitle": "Günlük Söz",
+  "surveyLockWidgetsQuoteSubtitle": "Günün sözünü kilit ekranında gösterir.",
   "surveySave": "Başla ➔",
   "surveyGenderDecline": "Paylaşmak istemiyorum",
   "surveyNameGreetingPrefix": "Merhaba",

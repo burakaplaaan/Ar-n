@@ -981,6 +981,18 @@ abstract final class ArinWidgetSync {
           '',
         );
         await HomeWidget.saveWidgetData<String>(
+          'arin_widget_home_last_render_ms_$kind',
+          '',
+        );
+        await HomeWidget.saveWidgetData<String>(
+          'arin_lock_notif_first_use_ms_$kind',
+          '',
+        );
+        await HomeWidget.saveWidgetData<String>(
+          'arin_lock_notif_last_show_ms_$kind',
+          '',
+        );
+        await HomeWidget.saveWidgetData<String>(
           'arin_widget_gate_${kind}_trial_until_ms',
           '',
         );

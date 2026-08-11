@@ -1,10 +1,13 @@
 // lib/presentation/onboarding/onboarding_survey_page.dart
-// İsim → (bildirim, izin yoksa) → başlangıç özeti.
-// Zümrüt tema, koşullu bildirim adımı, animasyonlar.
+// İsim → bildirim → (Android: kilit widget) → başlangıç özeti.
+// Zümrüt tema, koşullu bildirim / widget adımı, animasyonlar.
 
 import 'dart:async';
+import 'dart:io' show Platform;
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import 'package:arin/l10n/app_localizations.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -19,8 +22,10 @@ import '../../core/constants/profile_prefs_keys.dart';
 import '../../core/providers/shared_preferences_provider.dart';
 import '../../core/router/app_router.dart';
 import '../../data/services/arin_local_notifications_plugin.dart';
+import '../../data/services/arin_lock_notification_service.dart';
 import '../../data/services/fcm_token_service.dart';
 import '../../data/services/local_notification_permission_gate.dart';
+import '../../data/services/widget_access_service.dart';
 import '../shared/providers/user_profile_providers.dart';
 import '../shared/widgets/arin_permission_dialog.dart';
 
@@ -42,13 +47,25 @@ class _OnboardingSurveyPageState extends ConsumerState<OnboardingSurveyPage>
   bool _finishing = false;
   bool _notificationPermissionEnabled = false;
   bool _refreshPermissionAfterSettingsReturn = false;
+  bool _lockWidgetsSaving = false;
+  /// Varsayılan kapalı — kullanıcı onboarding'de açarsa yazılır.
+  bool _lockPrayerEnabled = false;
+  bool _lockQuoteEnabled = false;
 
   final TextEditingController _nameController = TextEditingController();
   final FocusNode _nameFocus = FocusNode();
 
   static const _surveyAccent = AppColors.emeraldMid;
 
-  int get _pageCount => _includeNotificationStep ? 3 : 2;
+  /// Kilit ekranı bildirim widget'ları yalnızca Android'de anlamlı (iOS hariç).
+  bool get _includeLockWidgetsStep => !kIsWeb && Platform.isAndroid;
+
+  int get _pageCount {
+    var n = 2; // isim + özet
+    if (_includeNotificationStep) n++;
+    if (_includeLockWidgetsStep) n++;
+    return n;
+  }
 
   @override
   void initState() {
@@ -230,20 +247,49 @@ class _OnboardingSurveyPageState extends ConsumerState<OnboardingSurveyPage>
   }
 
   /// PageView.builder için: index → sayfa. Sırasıyla:
-  /// 0 isim, (varsa) 1 bildirim, son: özet. `_pageCount` zaten doğru
-  /// toplamı veriyor. Lazy build sayesinde animasyon/text yükü tek
-  /// seferde inşa edilmiyor; sayfa geçişinde kasma azalıyor.
+  /// isim → bildirim → (Android kilit widget) → özet.
   Widget _buildPageAt(int index) {
-    switch (index) {
-      case 0:
-        return _buildNameStep();
-      case 1:
-        if (_includeNotificationStep) return _buildNotificationStep();
-        return _buildSummaryStep();
-      case 2:
-        return _buildSummaryStep();
-      default:
-        return const SizedBox.shrink();
+    final pages = <Widget Function()>[
+      _buildNameStep,
+      if (_includeNotificationStep) _buildNotificationStep,
+      if (_includeLockWidgetsStep) _buildLockWidgetsStep,
+      _buildSummaryStep,
+    ];
+    if (index < 0 || index >= pages.length) return const SizedBox.shrink();
+    return pages[index]();
+  }
+
+  Future<void> _continueFromLockWidgets() async {
+    if (_lockWidgetsSaving) return;
+    setState(() => _lockWidgetsSaving = true);
+    try {
+      final prayerOk = await ArinLockNotificationService.setEnabled(
+        ArinWidgetAccessKind.prayer,
+        _lockPrayerEnabled,
+      );
+      final quoteOk = await ArinLockNotificationService.setEnabled(
+        ArinWidgetAccessKind.quote,
+        _lockQuoteEnabled,
+      );
+      if (!mounted) return;
+      if ((_lockPrayerEnabled && !prayerOk) || (_lockQuoteEnabled && !quoteOk)) {
+        setState(() {
+          if (_lockPrayerEnabled && !prayerOk) _lockPrayerEnabled = false;
+          if (_lockQuoteEnabled && !quoteOk) _lockQuoteEnabled = false;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'Bildirim izni verilmeden kilit ekranı widget\'ı açılamaz.',
+            ),
+            duration: Duration(seconds: 3),
+          ),
+        );
+      }
+      if (!mounted) return;
+      _nextPage();
+    } finally {
+      if (mounted) setState(() => _lockWidgetsSaving = false);
     }
   }
 
@@ -571,6 +617,184 @@ class _OnboardingSurveyPageState extends ConsumerState<OnboardingSurveyPage>
     );
   }
 
+  Widget _buildLockWidgetsStep() {
+    final l10n = AppLocalizations.of(context)!;
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(24, 8, 24, 24),
+      child: Column(
+        children: [
+          Expanded(
+            child: SingleChildScrollView(
+              physics: const BouncingScrollPhysics(),
+              child: Column(
+                children: [
+                  const SizedBox(height: 12),
+                  Text(
+                    l10n.surveyLockWidgetsTitle,
+                    style: AppTextStyles.headlineSmall.copyWith(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ).animate().fadeIn(),
+                  const SizedBox(height: 20),
+                  const Icon(
+                    Icons.lock_clock_rounded,
+                    size: 72,
+                    color: AppColors.emeraldLight,
+                  ).animate().scale(delay: 100.ms, curve: Curves.easeOutBack),
+                  const SizedBox(height: 20),
+                  Text(
+                    l10n.surveyLockWidgetsLead,
+                    style: AppTextStyles.titleMedium.copyWith(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w600,
+                    ),
+                    textAlign: TextAlign.center,
+                  ).animate().fadeIn(delay: 140.ms),
+                  const SizedBox(height: 12),
+                  Text(
+                    l10n.surveyLockWidgetsSubtitle,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: Colors.white.withValues(alpha: 0.55),
+                      height: 1.55,
+                      fontSize: 14.5,
+                    ),
+                  ).animate().fadeIn(delay: 180.ms),
+                  const SizedBox(height: 22),
+                  _buildLockWidgetToggleCard(
+                    icon: Icons.access_time_rounded,
+                    title: l10n.surveyLockWidgetsPrayerTitle,
+                    subtitle: l10n.surveyLockWidgetsPrayerSubtitle,
+                    value: _lockPrayerEnabled,
+                    onChanged: (v) {
+                      HapticFeedback.selectionClick();
+                      setState(() => _lockPrayerEnabled = v);
+                    },
+                  ).animate().fadeIn(delay: 220.ms),
+                  const SizedBox(height: 10),
+                  _buildLockWidgetToggleCard(
+                    icon: Icons.format_quote_rounded,
+                    title: l10n.surveyLockWidgetsQuoteTitle,
+                    subtitle: l10n.surveyLockWidgetsQuoteSubtitle,
+                    value: _lockQuoteEnabled,
+                    onChanged: (v) {
+                      HapticFeedback.selectionClick();
+                      setState(() => _lockQuoteEnabled = v);
+                    },
+                  ).animate().fadeIn(delay: 260.ms),
+                  const SizedBox(height: 16),
+                ],
+              ),
+            ),
+          ),
+          SizedBox(
+            width: double.infinity,
+            child: FilledButton(
+              onPressed: _lockWidgetsSaving ? null : _continueFromLockWidgets,
+              style: FilledButton.styleFrom(
+                backgroundColor: AppColors.emeraldMid,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(vertical: 18),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+              ),
+              child: _lockWidgetsSaving
+                  ? const SizedBox(
+                      height: 20,
+                      width: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: Colors.white,
+                      ),
+                    )
+                  : Text(
+                      l10n.surveyNext,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+            ),
+          ).animate().fadeIn(delay: 300.ms),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLockWidgetToggleCard({
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    required bool value,
+    required ValueChanged<bool> onChanged,
+  }) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: () => onChanged(!value),
+        borderRadius: BorderRadius.circular(16),
+        child: Ink(
+          padding: const EdgeInsets.fromLTRB(14, 12, 10, 12),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16),
+            color: Colors.white.withValues(alpha: 0.06),
+            border: Border.all(
+              color: value
+                  ? AppColors.emeraldLight.withValues(alpha: 0.45)
+                  : Colors.white.withValues(alpha: 0.1),
+            ),
+          ),
+          child: Row(
+            children: [
+              Container(
+                width: 42,
+                height: 42,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: AppColors.emeraldLight.withValues(alpha: 0.14),
+                ),
+                child: Icon(icon, color: AppColors.emeraldLight, size: 22),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    const SizedBox(height: 3),
+                    Text(
+                      subtitle,
+                      style: TextStyle(
+                        color: Colors.white.withValues(alpha: 0.55),
+                        fontSize: 12.5,
+                        height: 1.35,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Switch.adaptive(
+                value: value,
+                activeThumbColor: Colors.white,
+                activeTrackColor: AppColors.emeraldMid,
+                onChanged: onChanged,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildSummaryItem({
     required IconData icon,
     required String label,
@@ -719,6 +943,24 @@ class _OnboardingSurveyPageState extends ConsumerState<OnboardingSurveyPage>
                                       : l10n.surveySummaryItemNotificationOff,
                                   index: 1,
                                 ),
+                                if (_includeLockWidgetsStep) ...[
+                                  _buildSummaryItem(
+                                    icon: Icons.access_time_rounded,
+                                    label: l10n.surveyLockWidgetsPrayerTitle,
+                                    value: _lockPrayerEnabled
+                                        ? l10n.surveySummaryItemNotificationOn
+                                        : l10n.surveySummaryItemNotificationOff,
+                                    index: 2,
+                                  ),
+                                  _buildSummaryItem(
+                                    icon: Icons.format_quote_rounded,
+                                    label: l10n.surveyLockWidgetsQuoteTitle,
+                                    value: _lockQuoteEnabled
+                                        ? l10n.surveySummaryItemNotificationOn
+                                        : l10n.surveySummaryItemNotificationOff,
+                                    index: 3,
+                                  ),
+                                ],
                               ],
                             ),
                           ),

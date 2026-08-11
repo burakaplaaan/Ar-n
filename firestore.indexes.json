@@ -1,6 +1,14 @@
 {
   "indexes": [
     {
+      "collectionGroup": "quiz_players",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "weekId", "order": "ASCENDING" },
+        { "fieldPath": "weeklyMatches", "order": "DESCENDING" }
+      ]
+    },
+    {
       "collectionGroup": "admin_ntf_pool",
       "queryScope": "COLLECTION",
       "fields": [
@@ -67,6 +75,15 @@
     },
     {
       "collectionGroup": "admin_metric_audience_members",
+      "fieldPath": "expiresAt",
+      "ttl": true,
+      "indexes": [
+        { "order": "ASCENDING", "queryScope": "COLLECTION" },
+        { "order": "DESCENDING", "queryScope": "COLLECTION" }
+      ]
+    },
+    {
+      "collectionGroup": "admin_install_members",
       "fieldPath": "expiresAt",
       "ttl": true,
       "indexes": [

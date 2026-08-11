@@ -2481,7 +2481,7 @@ abstract class AppLocalizations {
   /// No description provided for @hilalDuelPlay.
   ///
   /// In tr, this message translates to:
-  /// **'Rakip bul'**
+  /// **'Canlı oyna'**
   String get hilalDuelPlay;
 
   /// No description provided for @hilalDuelWatchAdForHeart.
@@ -2736,6 +2736,30 @@ abstract class AppLocalizations {
   /// **'Senin sıran: #{rank} · {count} hilal'**
   String hilalDuelWeeklyYourPlace(int rank, int count);
 
+  /// No description provided for @hilalDuelAdminRemoveTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Listeden kaldır'**
+  String get hilalDuelAdminRemoveTitle;
+
+  /// No description provided for @hilalDuelAdminRemoveBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'“{name}” haftalık sıralamadan silinsin mi? Alttakiler bir sıra yukarı kayar; bu oyuncu bu hafta tekrar listede görünmez.'**
+  String hilalDuelAdminRemoveBody(String name);
+
+  /// No description provided for @hilalDuelAdminRemoveAction.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kaldır'**
+  String get hilalDuelAdminRemoveAction;
+
+  /// No description provided for @hilalDuelAdminRemoved.
+  ///
+  /// In tr, this message translates to:
+  /// **'Oyuncu listeden kaldırıldı.'**
+  String get hilalDuelAdminRemoved;
+
   /// No description provided for @hilalDuelTitleTalebe.
   ///
   /// In tr, this message translates to:
@@ -2759,6 +2783,84 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'Rakip'**
   String get hilalDuelOpponentLabel;
+
+  /// No description provided for @hilalDuelChallengeAction.
+  ///
+  /// In tr, this message translates to:
+  /// **'Meydan oku'**
+  String get hilalDuelChallengeAction;
+
+  /// No description provided for @hilalDuelChallengeInboxTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Meydan okumalar'**
+  String get hilalDuelChallengeInboxTitle;
+
+  /// No description provided for @hilalDuelChallengeAccept.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kabul et · 1 can'**
+  String get hilalDuelChallengeAccept;
+
+  /// No description provided for @hilalDuelChallengeContinue.
+  ///
+  /// In tr, this message translates to:
+  /// **'Devam et'**
+  String get hilalDuelChallengeContinue;
+
+  /// No description provided for @hilalDuelChallengeWaiting.
+  ///
+  /// In tr, this message translates to:
+  /// **'Rakip bekleniyor'**
+  String get hilalDuelChallengeWaiting;
+
+  /// No description provided for @hilalDuelChallengeYourTurn.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sıra sende'**
+  String get hilalDuelChallengeYourTurn;
+
+  /// No description provided for @hilalDuelChallengeExpired.
+  ///
+  /// In tr, this message translates to:
+  /// **'Süre doldu — puan yok'**
+  String get hilalDuelChallengeExpired;
+
+  /// No description provided for @hilalDuelChallengeHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Listeden birine meydan oku. Sen 1 can harcarsın; süre dolarsa kimse puan alamaz. Botlar yaklaşık 12 saat sonra otomatik ve zayıf cevap verir.'**
+  String get hilalDuelChallengeHint;
+
+  /// No description provided for @hilalDuelChallengePickTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Rakip seç'**
+  String get hilalDuelChallengePickTitle;
+
+  /// No description provided for @hilalDuelChallengePickHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Meydan okumak için bir oyuncu seç. Önce sen çözersin. İnsan rakibe 24 saat, bota yaklaşık 12 saat sonra otomatik cevap.'**
+  String get hilalDuelChallengePickHint;
+
+  /// No description provided for @hilalDuelChallengeSentTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Meydan okuma gönderildi'**
+  String get hilalDuelChallengeSentTitle;
+
+  /// No description provided for @hilalDuelChallengeSentBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'{name} cevap verince sonuç görünür.'**
+  String hilalDuelChallengeSentBody(String name);
+
+  /// No description provided for @hilalDuelChallengeSentOk.
+  ///
+  /// In tr, this message translates to:
+  /// **'Tamam'**
+  String get hilalDuelChallengeSentOk;
 
   /// No description provided for @generalLoading.
   ///
@@ -5203,6 +5305,48 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'Ayarlardan aç'**
   String get surveyNotificationOpenSettings;
+
+  /// No description provided for @surveyLockWidgetsTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kilit ekranı'**
+  String get surveyLockWidgetsTitle;
+
+  /// No description provided for @surveyLockWidgetsLead.
+  ///
+  /// In tr, this message translates to:
+  /// **'Namaz vakti ve günün sözünü kilit ekranında göstermek ister misin?'**
+  String get surveyLockWidgetsLead;
+
+  /// No description provided for @surveyLockWidgetsSubtitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Android’de kilit ekranına gerçek widget eklenemez; seçtiklerin kalıcı bildirim olarak görünür. İstediğin zaman Widget Merkezi’nden değiştirebilirsin.'**
+  String get surveyLockWidgetsSubtitle;
+
+  /// No description provided for @surveyLockWidgetsPrayerTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Namaz Vakti'**
+  String get surveyLockWidgetsPrayerTitle;
+
+  /// No description provided for @surveyLockWidgetsPrayerSubtitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sıradaki vakti ve geri sayımı kilit ekranında gösterir.'**
+  String get surveyLockWidgetsPrayerSubtitle;
+
+  /// No description provided for @surveyLockWidgetsQuoteTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Günlük Söz'**
+  String get surveyLockWidgetsQuoteTitle;
+
+  /// No description provided for @surveyLockWidgetsQuoteSubtitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Günün sözünü kilit ekranında gösterir.'**
+  String get surveyLockWidgetsQuoteSubtitle;
 
   /// No description provided for @surveySave.
   ///

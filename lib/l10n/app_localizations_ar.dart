@@ -1378,7 +1378,7 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
-  String get hilalDuelPlay => 'ابحث عن منافس';
+  String get hilalDuelPlay => 'العب مباشرة';
 
   @override
   String get hilalDuelWatchAdForHeart => 'شاهد إعلاناً لتحصل على قلب واحد';
@@ -1531,6 +1531,20 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String get hilalDuelAdminRemoveTitle => 'إزالة من القائمة';
+
+  @override
+  String hilalDuelAdminRemoveBody(String name) {
+    return 'هل تريد إزالة “$name” من ترتيب هذا الأسبوع؟ يتقدم من بعده مرتبة واحدة؛ ولن يظهر في القائمة هذا الأسبوع.';
+  }
+
+  @override
+  String get hilalDuelAdminRemoveAction => 'إزالة';
+
+  @override
+  String get hilalDuelAdminRemoved => 'تمت إزالة اللاعب من القائمة.';
+
+  @override
   String get hilalDuelTitleTalebe => 'طالب';
 
   @override
@@ -1541,6 +1555,49 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get hilalDuelOpponentLabel => 'المنافس';
+
+  @override
+  String get hilalDuelChallengeAction => 'تحدَّ';
+
+  @override
+  String get hilalDuelChallengeInboxTitle => 'التحديات';
+
+  @override
+  String get hilalDuelChallengeAccept => 'اقبل · حياة واحدة';
+
+  @override
+  String get hilalDuelChallengeContinue => 'متابعة';
+
+  @override
+  String get hilalDuelChallengeWaiting => 'بانتظار المنافس';
+
+  @override
+  String get hilalDuelChallengeYourTurn => 'دورك';
+
+  @override
+  String get hilalDuelChallengeExpired => 'انتهى الوقت — بلا نقاط';
+
+  @override
+  String get hilalDuelChallengeHint =>
+      'تحدَّ أحداً من القائمة. تستهلك حياة واحدة؛ إذا انتهى الوقت فلن يحصل أحد على نقاط. البوتات ترد تلقائياً بعد نحو 12 ساعة بنتيجة ضعيفة.';
+
+  @override
+  String get hilalDuelChallengePickTitle => 'اختر منافساً';
+
+  @override
+  String get hilalDuelChallengePickHint =>
+      'اختر لاعباً للتحدي. تجيب أولاً. للبشر 24 ساعة؛ البوت يرد تلقائياً بعد نحو 12 ساعة.';
+
+  @override
+  String get hilalDuelChallengeSentTitle => 'تم إرسال التحدي';
+
+  @override
+  String hilalDuelChallengeSentBody(String name) {
+    return 'ستظهر النتيجة عندما يجيب $name.';
+  }
+
+  @override
+  String get hilalDuelChallengeSentOk => 'حسناً';
 
   @override
   String get generalLoading => 'جارٍ التحميل...';
@@ -2963,6 +3020,31 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get surveyNotificationOpenSettings => 'فتح الإعدادات';
+
+  @override
+  String get surveyLockWidgetsTitle => 'شاشة القفل';
+
+  @override
+  String get surveyLockWidgetsLead =>
+      'هل تريد أوقات الصلاة وكلمة اليوم على شاشة القفل؟';
+
+  @override
+  String get surveyLockWidgetsSubtitle =>
+      'لا يمكن إضافة ودجات حقيقية على شاشة القفل في أندرويد؛ تظهر اختياراتك كإشعارات دائمة. يمكنك تغييرها لاحقًا من مركز الودجات.';
+
+  @override
+  String get surveyLockWidgetsPrayerTitle => 'وقت الصلاة';
+
+  @override
+  String get surveyLockWidgetsPrayerSubtitle =>
+      'يعرض الوقت التالي والعد التنازلي على شاشة القفل.';
+
+  @override
+  String get surveyLockWidgetsQuoteTitle => 'كلمة اليوم';
+
+  @override
+  String get surveyLockWidgetsQuoteSubtitle =>
+      'يعرض كلمة اليوم على شاشة القفل.';
 
   @override
   String get surveySave => 'ابدأ ➔';

@@ -176,7 +176,10 @@ class _AdminPerformancePageState extends State<AdminPerformancePage> {
     final saves = _dailyTotal(const ['content', 'saves']);
     final clicks = _dailyTotal(const ['notifications', 'clicks']);
     final widgets = _asMap(_data['widgets']);
-    final active = _numberAt(widgets, [_days == 30 ? 'active30' : 'active7']);
+    final lockNotif = _asMap(widgets['lockNotif']);
+    final activeKey = _days == 30 ? 'active30' : 'active7';
+    final activeHome = _numberAt(widgets, [activeKey]);
+    final activeLock = _numberAt(lockNotif, [activeKey]);
     final todayAds = _numberAt(_asMap(_data['today']), const ['ads', 'watches']);
 
     return _SectionCard(
@@ -190,7 +193,11 @@ class _AdminPerformancePageState extends State<AdminPerformancePage> {
           _Kpi(label: 'Beğeni', value: _count(likes)),
           _Kpi(label: 'Kaydetme', value: _count(saves)),
           _Kpi(label: 'Bildirim tıklaması', value: _count(clicks)),
-          _Kpi(label: 'Aktif widget kullanıcısı', value: _count(active)),
+          _Kpi(label: 'Aktif ana ekran widget', value: _count(activeHome)),
+          _Kpi(
+            label: 'Aktif kilit ekranı bildirimi',
+            value: _count(activeLock),
+          ),
           _Kpi(label: 'Bugün reklam izlenme', value: _count(todayAds)),
         ],
       ),
@@ -258,6 +265,7 @@ class _AdminPerformancePageState extends State<AdminPerformancePage> {
 
   Widget _buildWidgets() {
     final data = _asMap(_data['widgets']);
+    final lockNotif = _asMap(data['lockNotif']);
     final total = _numberAt(data, const ['totalEverUsers']);
     final active7 = _numberAt(data, const ['active7']);
     final active30 = _numberAt(data, const ['active30']);
@@ -266,17 +274,29 @@ class _AdminPerformancePageState extends State<AdminPerformancePage> {
     final unlocks = _numberAt(data, const ['totalUnlocks']);
     final userDays = _numberAt(data, const ['activeUserDays']);
     final averageDays = total > 0 ? userDays / total : 0;
+    final lockTotal = _numberAt(lockNotif, const ['totalEverUsers']);
+    final lockActive7 = _numberAt(lockNotif, const ['active7']);
+    final lockActive30 = _numberAt(lockNotif, const ['active30']);
 
     return _SectionCard(
       title: 'Widget Kullanımı',
-      subtitle: 'Kullanım ve 48 saatlik bırakma tahmini',
+      subtitle:
+          'Ana ekran widget ve kilit ekranı bildirimi ayrı sayılır. '
+          'Kilit KPI’ları yeni sayaçtan başlar; eski “toplam” içinde '
+          'kilit-only kullanıcı kalabilir. Bırakma tahmini yalnızca ana ekran için.',
       child: Wrap(
         spacing: 8,
         runSpacing: 8,
         children: [
-          _Kpi(label: 'Toplam kullanıcı', value: _count(total)),
-          _Kpi(label: 'Son 7 gün aktif', value: _count(active7)),
-          _Kpi(label: 'Son 30 gün aktif', value: _count(active30)),
+          _Kpi(label: 'Ana ekran toplam', value: _count(total)),
+          _Kpi(label: 'Ana ekran 7 gün aktif', value: _count(active7)),
+          _Kpi(label: 'Ana ekran 30 gün aktif', value: _count(active30)),
+          _Kpi(label: 'Kilit bildirimi toplam', value: _count(lockTotal)),
+          _Kpi(label: 'Kilit bildirimi 7 gün aktif', value: _count(lockActive7)),
+          _Kpi(
+            label: 'Kilit bildirimi 30 gün aktif',
+            value: _count(lockActive30),
+          ),
           _Kpi(label: 'Kullanmayı bıraktı', value: _count(churned)),
           _Kpi(label: 'Geri döndü', value: _count(returned)),
           _Kpi(label: 'Reklamla açtı', value: _count(unlocks)),

@@ -37,10 +37,10 @@ class LocationChangeResult {
 
 /// Konum güncelleme tercihi sabitleri (Hive key: `location_auto_update_pref`).
 abstract final class LocationUpdatePref {
-  /// Her şehir değişiminde sor (varsayılan).
+  /// Her şehir değişiminde sor (kullanıcı Ayarlar'dan kapatırsa).
   static const String ask = 'ask';
 
-  /// Sessizce güncelle, bir daha sorma.
+  /// Sessizce güncelle, bir daha sorma (varsayılan — açık gelir).
   static const String alwaysUpdate = 'always_update';
 
   /// Hiç otomatik güncelleme, sadece manuel.
@@ -84,8 +84,10 @@ class LocationService {
   }
 
   /// Konum güncelleme tercihi. Olası değerler: [LocationUpdatePref].
+  /// Anahtar yoksa varsayılan: açık ([LocationUpdatePref.alwaysUpdate]).
   String get locationUpdatePref =>
-      (_prefs.get(_locationUpdatePrefKey) as String?) ?? LocationUpdatePref.ask;
+      (_prefs.get(_locationUpdatePrefKey) as String?) ??
+      LocationUpdatePref.alwaysUpdate;
 
   Future<void> setLocationUpdatePref(String pref) async {
     await _prefs.put(_locationUpdatePrefKey, pref);

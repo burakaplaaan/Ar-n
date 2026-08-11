@@ -54,17 +54,24 @@ class HilalDuelController extends ChangeNotifier {
   HilalDuelPhase phase = HilalDuelPhase.loading;
   HilalDuelProfile? profile;
   HilalDuelMatch? match;
+  List<HilalDuelChallengeSummary> challenges = const [];
   String? errorMessage;
   int? queuedAtMs;
   bool busy = false;
   bool doubledThisMatch = false;
+  bool challengeMode = false;
+  /// Challenger bitirdi → lobide tek seferlik 24 saat bilgilendirmesi.
+  String? challengeSentNoticeOpponentName;
   int? selectedChoice;
   bool awaitingOpponent = false;
   /// Tur çözümü şıklar üzerinde; cihaz saatine bağlı değil (yerel timer).
   bool revealingResolution = false;
-  /// Reveal sırasında "Sen" rozeti için son gönderilen seçim (sunucu -1 olsa bile).
+  /// Reveal / beklerken yerel ipucu; sunucu `-1` yazdıysa skor için kullanılmaz.
   int? lastSubmittedChoice;
   int? lastSubmittedRound;
+  /// Oyun içi doğru/yanlış tahtası (sunucu çözümüne göre, tur indeksli).
+  List<HilalDuelRoundMark> selfRoundMarks = const [];
+  List<HilalDuelRoundMark> opponentRoundMarks = const [];
 
   HilalDuelQueueArms _arms = const HilalDuelQueueArms();
 
@@ -130,6 +137,7 @@ class HilalDuelController extends ChangeNotifier {
       }
       _arms = afterQueueConfirmedAbsent(_arms);
       phase = HilalDuelPhase.lobby;
+      unawaited(refreshChallenges());
       unawaited(ArinAnalytics.hilalDuelLobbyOpen());
     } catch (error) {
       if (_disposed) return;
@@ -147,6 +155,120 @@ class HilalDuelController extends ChangeNotifier {
       profile = bundle.profile;
       _safeNotify();
     } catch (_) {}
+  }
+
+  Future<void> refreshChallenges() async {
+    if (_disposed) return;
+    try {
+      final items = await _repository.listChallenges();
+      if (_disposed) return;
+      challenges = items;
+      _safeNotify();
+    } catch (_) {}
+  }
+
+  Future<void> createChallenge(String opponentOwnerHash) async {
+    if (busy || _disposed || opponentOwnerHash.trim().isEmpty) return;
+    final p = profile;
+    if (p != null && !p.premium && p.hearts <= 0) {
+      errorMessage = needHeartErrorToken;
+      _safeNotify();
+      return;
+    }
+    busy = true;
+    errorMessage = null;
+    _safeNotify();
+    try {
+      final created = await _repository.createChallenge(
+        name: _displayName(),
+        opponentOwnerHash: opponentOwnerHash.trim(),
+      );
+      if (_disposed) return;
+      await refreshProfile();
+      await _enterChallenge(created.id, seed: created);
+    } catch (error) {
+      if (_disposed) return;
+      errorMessage = _friendlyError(error);
+      phase = HilalDuelPhase.lobby;
+      _safeNotify();
+    } finally {
+      busy = false;
+      if (!_disposed) _safeNotify();
+    }
+  }
+
+  Future<void> acceptChallenge(String challengeId) async {
+    if (busy || _disposed || challengeId.trim().isEmpty) return;
+    final p = profile;
+    if (p != null && !p.premium && p.hearts <= 0) {
+      errorMessage = needHeartErrorToken;
+      _safeNotify();
+      return;
+    }
+    busy = true;
+    errorMessage = null;
+    _safeNotify();
+    try {
+      final accepted = await _repository.acceptChallenge(challengeId.trim());
+      if (_disposed) return;
+      await refreshProfile();
+      if (accepted.isCompleted) {
+        challengeMode = true;
+        _activeMatchId = accepted.id;
+        match = accepted;
+        phase = HilalDuelPhase.result;
+        unawaited(refreshChallenges());
+        _safeNotify();
+        return;
+      }
+      await _enterChallenge(accepted.id, seed: accepted);
+    } catch (error) {
+      if (_disposed) return;
+      errorMessage = _friendlyError(error);
+      phase = HilalDuelPhase.lobby;
+      unawaited(refreshChallenges());
+      _safeNotify();
+    } finally {
+      busy = false;
+      if (!_disposed) _safeNotify();
+    }
+  }
+
+  Future<void> openChallenge(String challengeId) async {
+    if (busy || _disposed || challengeId.trim().isEmpty) return;
+    busy = true;
+    errorMessage = null;
+    _safeNotify();
+    try {
+      final loaded = await _repository.loadChallenge(challengeId.trim());
+      if (_disposed) return;
+      if (loaded.canAccept) {
+        busy = false;
+        await acceptChallenge(challengeId);
+        return;
+      }
+      if (loaded.isChallengePlayable && loaded.myTurn) {
+        await _enterChallenge(loaded.id, seed: loaded);
+        return;
+      }
+      if (loaded.isCompleted) {
+        challengeMode = true;
+        _activeMatchId = loaded.id;
+        match = loaded;
+        phase = HilalDuelPhase.result;
+        _safeNotify();
+        return;
+      }
+      phase = HilalDuelPhase.lobby;
+      unawaited(refreshChallenges());
+    } catch (error) {
+      if (_disposed) return;
+      errorMessage = _friendlyError(error);
+      phase = HilalDuelPhase.lobby;
+    } finally {
+      busy = false;
+      if (!_disposed) _safeNotify();
+    }
   }
 
   Future<void> startMatchmaking() async {
@@ -309,15 +431,20 @@ class HilalDuelController extends ChangeNotifier {
     }
     if (start.waiting || start.status == 'waiting') {
       _arms = afterCancelRequested(afterStartWaiting(_arms));
-      phase = HilalDuelPhase.matchmaking;
       _mergeQueuedAtMs(start.queuedAtMs);
+      // Optimistic iptal lobideyse geri matchmaking'e sıçratma.
+      if (phase != HilalDuelPhase.lobby) {
+        phase = HilalDuelPhase.matchmaking;
+      }
       return;
     }
     // idle: yine cancelPending tut — iptal yolu idle ile settle eder.
     _arms = afterCancelRequested(
       _arms.copyWith(startInFlight: false, queueMayExist: true),
     );
-    phase = HilalDuelPhase.matchmaking;
+    if (phase != HilalDuelPhase.lobby) {
+      phase = HilalDuelPhase.matchmaking;
+    }
   }
 
   Future<void> _applyAmbiguousStartWhileCancelPending(
@@ -329,9 +456,11 @@ class HilalDuelController extends ChangeNotifier {
       return;
     }
     _arms = afterCancelRequested(afterStartWaiting(_arms));
-    phase = HilalDuelPhase.matchmaking;
     if (queue != null && queue.waiting) {
       _mergeQueuedAtMs(queue.queuedAtMs);
+    }
+    if (phase != HilalDuelPhase.lobby) {
+      phase = HilalDuelPhase.matchmaking;
     }
   }
 
@@ -359,10 +488,30 @@ class HilalDuelController extends ChangeNotifier {
     return leaveFuture;
   }
 
+  /// Arama ekranını RPC beklemeden kapat — kullanıcı anında lobiye düşer.
+  void _optimisticLeaveMatchmakingUi() {
+    if (_disposed) return;
+    if (phase != HilalDuelPhase.matchmaking &&
+        phase != HilalDuelPhase.cancelRetry) {
+      return;
+    }
+    busy = true;
+    phase = HilalDuelPhase.lobby;
+    match = null;
+    queuedAtMs = null;
+    errorMessage = null;
+    _safeNotify();
+  }
+
   /// Lobi/iptal butonu veya retry.
   Future<String?> cancelMatchmaking({bool fromDispose = false}) async {
     if (_disposed && !fromDispose) return null;
     _arms = afterCancelRequested(_arms);
+    // İlk mikro görevden önce UI: start/cancel RPC gecikmesi ekranda hissedilmesin.
+    if (!fromDispose) {
+      _stopTimers();
+      _optimisticLeaveMatchmakingUi();
+    }
     final settle = await _executeCancel(fromDispose: fromDispose);
     if (settle == HilalDuelLeaveSettle.enteredMatch) {
       return _activeMatchId ?? match?.id;
@@ -373,14 +522,18 @@ class HilalDuelController extends ChangeNotifier {
   Future<HilalDuelLeaveSettle> retryCancel() async {
     errorMessage = null;
     _arms = afterCancelRequested(_arms);
-    phase = HilalDuelPhase.matchmaking;
-    _safeNotify();
+    _stopTimers();
+    _optimisticLeaveMatchmakingUi();
     return _executeCancel();
   }
 
   Future<HilalDuelLeaveSettle> _executeCancel({
     bool fromDispose = false,
   }) async {
+    // Çift dokunuş: yine de lobiye çek, mevcut cancel Future'ına bağlan.
+    if (!fromDispose) {
+      _optimisticLeaveMatchmakingUi();
+    }
     final inFlight = _cancelFuture;
     if (inFlight != null) {
       return inFlight;
@@ -400,6 +553,14 @@ class HilalDuelController extends ChangeNotifier {
     _stopTimers();
     if (!fromDispose && !_disposed) {
       busy = true;
+      // Anlık tepki: arama ekranını hemen kapat, RPC arkada bitsin.
+      if (phase == HilalDuelPhase.matchmaking ||
+          phase == HilalDuelPhase.cancelRetry) {
+        phase = HilalDuelPhase.lobby;
+        match = null;
+        queuedAtMs = null;
+        errorMessage = null;
+      }
       _safeNotify();
     }
 
@@ -489,6 +650,7 @@ class HilalDuelController extends ChangeNotifier {
           phase = HilalDuelPhase.cancelRetry;
           errorMessage = 'İptal henüz tamamlanamadı. Tekrar dene.';
           _completeLeave(HilalDuelLeaveSettle.blockedRetry);
+          _safeNotify();
         }
         return HilalDuelLeaveSettle.blockedRetry;
       }
@@ -498,7 +660,8 @@ class HilalDuelController extends ChangeNotifier {
         phase = HilalDuelPhase.lobby;
         match = null;
         queuedAtMs = null;
-        await refreshProfile();
+        _safeNotify();
+        unawaited(refreshProfile());
       }
       _completeLeave(HilalDuelLeaveSettle.poppedToLobby);
       return settle;
@@ -557,12 +720,22 @@ class HilalDuelController extends ChangeNotifier {
         attempt += 1;
         final seq = ++_matchRequestSeq;
         try {
-          final next = await _repository.submitAnswer(
-            matchId: current.id,
-            round: submittedRound,
-            choice: choice,
-          );
+          final next = challengeMode
+              ? await _repository.submitChallengeAnswer(
+                  challengeId: current.id,
+                  round: submittedRound,
+                  choice: choice,
+                )
+              : await _repository.submitAnswer(
+                  matchId: current.id,
+                  round: submittedRound,
+                  choice: choice,
+                );
           if (_disposed) break;
+          if (next.isAwaitingChallengeOpponent) {
+            await _returnToLobbyAfterChallengeSent(next);
+            break;
+          }
           _applyMatch(next, seq);
           if (match!.isCompleted) {
             awaitingOpponent = false;
@@ -834,6 +1007,7 @@ class HilalDuelController extends ChangeNotifier {
         maybeInterstitial && profile?.premium != true;
     phase = HilalDuelPhase.lobby;
     match = null;
+    challengeMode = false;
     selectedChoice = null;
     lastSubmittedChoice = null;
     lastSubmittedRound = null;
@@ -848,6 +1022,7 @@ class HilalDuelController extends ChangeNotifier {
     _arms = afterQueueConfirmedAbsent(_arms);
     _safeNotify();
     await refreshProfile();
+    await refreshChallenges();
     if (shouldShowInterstitial && !_disposed) {
       await _maybeShowInterstitial();
     }
@@ -859,15 +1034,17 @@ class HilalDuelController extends ChangeNotifier {
     await startMatchmaking();
   }
 
-  /// Maçı yarıda bırak: sunucu kalan oyuncuyu kazandırır, terk cezası yazar.
+  /// Maçı yarıda bırak: canlı maçta terk cezası; meydan okumada sadece lobiye dön.
   Future<void> forfeitAndLeave() async {
     final id = _activeMatchId ?? match?.id;
     if (id == null || id.isEmpty) return;
     _stopTimers();
-    try {
-      await _repository.forfeitMatch(id);
-    } catch (_) {
-      // Best-effort; bağlantı kopuksa ceza bir sonraki oturumda kaçabilir.
+    if (!challengeMode) {
+      try {
+        await _repository.forfeitMatch(id);
+      } catch (_) {
+        // Best-effort; bağlantı kopuksa ceza bir sonraki oturumda kaçabilir.
+      }
     }
     if (_disposed) return;
     revealingResolution = false;
@@ -876,13 +1053,23 @@ class HilalDuelController extends ChangeNotifier {
     _revealTimer = null;
     match = null;
     _activeMatchId = null;
+    challengeMode = false;
     phase = HilalDuelPhase.lobby;
     await refreshProfile();
+    await refreshChallenges();
     _safeNotify();
   }
 
   Future<HilalDuelWeeklyBoard> loadWeeklyLeaderboard() {
     return _repository.loadWeeklyLeaderboard();
+  }
+
+  /// Yönetici: haftalık listeden kaldır (sıra otomatik kayar).
+  Future<void> adminRemoveWeeklyEntry(String ownerHash) {
+    return _repository.adminRemoveWeeklyEntry(
+      ownerHash: ownerHash,
+      reason: 'inappropriate_name',
+    );
   }
 
   void _startQueuePolling() {
@@ -984,9 +1171,46 @@ class HilalDuelController extends ChangeNotifier {
   }
 
   Future<void> _enterMatch(String matchId) async {
+    challengeMode = false;
+    await _enterPlaySession(matchId);
+  }
+
+  Future<void> _enterChallenge(String challengeId, {HilalDuelMatch? seed}) async {
+    challengeMode = true;
+    await _enterPlaySession(challengeId, seed: seed);
+  }
+
+  Future<void> _returnToLobbyAfterChallengeSent(HilalDuelMatch finished) async {
+    _stopTimers();
+    final opponentName = finished.opponent.name.trim();
+    challengeSentNoticeOpponentName =
+        opponentName.isEmpty ? 'Rakip' : opponentName;
+    match = null;
+    _activeMatchId = null;
+    challengeMode = false;
+    selectedChoice = null;
+    lastSubmittedChoice = null;
+    lastSubmittedRound = null;
+    awaitingOpponent = false;
+    revealingResolution = false;
+    busy = false;
+    phase = HilalDuelPhase.lobby;
+    errorMessage = null;
+    await refreshChallenges();
+    await refreshProfile();
+    if (!_disposed) _safeNotify();
+  }
+
+  String? consumeChallengeSentNotice() {
+    final name = challengeSentNoticeOpponentName;
+    challengeSentNoticeOpponentName = null;
+    return name;
+  }
+
+  Future<void> _enterPlaySession(String sessionId, {HilalDuelMatch? seed}) async {
     if (_disposed) return;
     _stopTimers();
-    _activeMatchId = matchId;
+    _activeMatchId = sessionId;
     _arms = afterEnteredMatch(_arms);
     phase = HilalDuelPhase.playing;
     selectedChoice = null;
@@ -999,11 +1223,19 @@ class HilalDuelController extends ChangeNotifier {
     _revealTimer?.cancel();
     _revealTimer = null;
     doubledThisMatch = false;
+    _resetRoundMarks();
     unawaited(ArinAnalytics.hilalDuelMatchStart());
     final seq = ++_matchRequestSeq;
     try {
-      final loaded = await _repository.loadMatch(matchId);
+      final loaded = seed ??
+          (challengeMode
+              ? await _repository.loadChallenge(sessionId)
+              : await _repository.loadMatch(sessionId));
       if (_disposed) return;
+      if (loaded.isAwaitingChallengeOpponent) {
+        await _returnToLobbyAfterChallengeSent(loaded);
+        return;
+      }
       _applyMatch(loaded, seq);
       doubledThisMatch = loaded.doubled;
       if (loaded.isCompleted) {
@@ -1018,6 +1250,7 @@ class HilalDuelController extends ChangeNotifier {
       // playing + null match spinner'da kalma.
       match = null;
       _activeMatchId = null;
+      challengeMode = false;
       _stopTimers();
       _arms = const HilalDuelQueueArms();
       _queueConfirmed = false;
@@ -1086,10 +1319,12 @@ class HilalDuelController extends ChangeNotifier {
 
   Future<void> _pollMatch() async {
     final id = _activeMatchId;
-    // busy iken de poll et: submit sırasında rakip/bot cevabı kaçmasın.
+    // Submit uçuşundayken poll etme: getMatch grace sonunda kendi cevabını
+    // timeout'a çevirip turu ilerletebiliyordu; submit cevabı zaten resolve eder.
     if (_disposed ||
         id == null ||
         phase != HilalDuelPhase.playing ||
+        busy ||
         _matchPollInFlight) {
       return;
     }
@@ -1097,8 +1332,20 @@ class HilalDuelController extends ChangeNotifier {
     final seq = ++_matchRequestSeq;
     try {
       final previousRound = match?.currentRound;
-      final next = await _repository.loadMatch(id);
-      if (_disposed || phase != HilalDuelPhase.playing) return;
+      final next = challengeMode
+          ? await _repository.loadChallenge(id)
+          : await _repository.loadMatch(id);
+      // Submit busy / reveal sırasında açılmış poll: skor/rozet state'ini ezmesin.
+      if (_disposed ||
+          phase != HilalDuelPhase.playing ||
+          busy ||
+          revealingResolution) {
+        return;
+      }
+      if (next.isAwaitingChallengeOpponent) {
+        await _returnToLobbyAfterChallengeSent(next);
+        return;
+      }
       _applyMatch(next, seq);
       if (previousRound != null && match!.currentRound != previousRound) {
         selectedChoice = null;
@@ -1157,12 +1404,56 @@ class HilalDuelController extends ChangeNotifier {
     _startInterstitialReveal();
   }
 
-  void _restoreSelectedChoiceForReveal(HilalDuelResolution res) {
-    // Sunucu seçimi eksikse reveal'da "Sen" için yerel ipucu koru.
-    final restored = choiceForRevealRound(res.round);
-    if (restored != null && restored >= 0) {
-      selectedChoice = restored;
+  void _resetRoundMarks({int total = 7}) {
+    selfRoundMarks = List<HilalDuelRoundMark>.filled(
+      total,
+      HilalDuelRoundMark.pending,
+    );
+    opponentRoundMarks = List<HilalDuelRoundMark>.filled(
+      total,
+      HilalDuelRoundMark.pending,
+    );
+  }
+
+  void _recordResolutionMarks(HilalDuelResolution res) {
+    final m = match;
+    if (m == null) return;
+    final total = m.totalRounds > 0 ? m.totalRounds : 7;
+    if (selfRoundMarks.length != total || opponentRoundMarks.length != total) {
+      _resetRoundMarks(total: total);
     }
+    if (res.round < 0 || res.round >= total) return;
+    final correct = res.question.correctIndex;
+    final nextSelf = List<HilalDuelRoundMark>.from(selfRoundMarks);
+    final nextOpp = List<HilalDuelRoundMark>.from(opponentRoundMarks);
+    nextSelf[res.round] = markFromServerChoice(
+      choice: _rawRevealChoice(
+        resolution: res,
+        playerId: m.self.id,
+        preferPerspective: 'self',
+      ),
+      correctIndex: correct,
+    );
+    // Challenge solo: rakip choices'ta yok → pending kalsın (missed yazma).
+    final oppRaw = _rawRevealChoice(
+      resolution: res,
+      playerId: m.opponent.id,
+      preferPerspective: 'opponent',
+    );
+    if (oppRaw != null || !challengeMode) {
+      nextOpp[res.round] = markFromServerChoice(
+        choice: oppRaw,
+        correctIndex: correct,
+      );
+    }
+    selfRoundMarks = nextSelf;
+    opponentRoundMarks = nextOpp;
+  }
+
+  void _restoreSelectedChoiceForReveal(HilalDuelResolution res) {
+    // Yalnızca sunucunun kabul ettiği seçim "Sen" rozeti taşır.
+    final restored = choiceForRevealRound(res.round);
+    selectedChoice = restored;
   }
 
   void _startInterstitialReveal() {
@@ -1173,6 +1464,7 @@ class HilalDuelController extends ChangeNotifier {
     _revealForRound = res.round;
     revealingResolution = true;
     awaitingOpponent = false;
+    _recordResolutionMarks(res);
     _restoreSelectedChoiceForReveal(res);
     _playRevealOutcomeSfx(res);
     _scheduleRevealHold(
@@ -1207,23 +1499,64 @@ class HilalDuelController extends ChangeNotifier {
     });
   }
 
-  /// Reveal UI: sunucu seçimi, yoksa bu tur için yerel gönderim.
+  /// Ham sunucu seçimi: 0..3 veya timeout (-1) veya yok (null).
+  int? _rawRevealChoice({
+    required HilalDuelResolution resolution,
+    required String? playerId,
+    required String preferPerspective,
+  }) {
+    if (preferPerspective == 'self' && resolution.selfChoice != null) {
+      return resolution.selfChoice;
+    }
+    if (preferPerspective == 'opponent' && resolution.opponentChoice != null) {
+      return resolution.opponentChoice;
+    }
+    if (playerId == null) return null;
+    final key = playerId.toString();
+    if (resolution.choices.containsKey(key)) return resolution.choices[key];
+    for (final entry in resolution.choices.entries) {
+      if (entry.key.toString() == key) return entry.value;
+    }
+    return null;
+  }
+
+  /// Reveal UI: skora yazılan sunucu seçimi. Timeout (`-1`) → `null`.
+  /// Yerel optimistic seçime düşülmez; aksi halde doğru hissi sonuçla çelişir.
   int? choiceForRevealRound(int round) {
     final res = match?.lastResolution;
     if (res != null && res.round == round) {
-      final server = res.choices[match?.self.id];
-      if (server != null && server >= 0) return server;
-      // RakID eşleşmezse (nadir): rakip olmayan tek geçerli seçim.
-      final opponentId = match?.opponent.id;
-      for (final entry in res.choices.entries) {
-        if (entry.key != opponentId && entry.value >= 0) {
-          return entry.value;
-        }
-      }
+      final fromSelf = serverChoiceForReveal(
+        resolution: res,
+        playerId: match?.self.id,
+        preferPerspective: 'self',
+      );
+      if (fromSelf != null) return fromSelf;
+      // Perspective/map açıkça timeout (-1) söylediyse optimistic'e düşme.
+      final raw = _rawRevealChoice(
+        resolution: res,
+        playerId: match?.self.id,
+        preferPerspective: 'self',
+      );
+      if (raw != null && raw < 0) return null;
+      // Eski CF / map boş: Sen rozeti için yerel submit yedeği.
+      if (lastSubmittedRound == round) return lastSubmittedChoice;
+      if (selectedChoice != null) return selectedChoice;
+      return null;
     }
     if (lastSubmittedRound == round) return lastSubmittedChoice;
     if (selectedChoice != null) return selectedChoice;
     return null;
+  }
+
+  /// Reveal sırasında rakibin sunucu seçimi (rozette gösterilir).
+  int? opponentChoiceForRevealRound(int round) {
+    final res = match?.lastResolution;
+    if (res == null || res.round != round) return null;
+    return serverChoiceForReveal(
+      resolution: res,
+      playerId: match?.opponent.id,
+      preferPerspective: 'opponent',
+    );
   }
 
   void _scheduleFinalRevealThenComplete() {
@@ -1243,6 +1576,7 @@ class HilalDuelController extends ChangeNotifier {
     if (_revealForRound != resRound) {
       _revealForRound = resRound;
       revealingResolution = true;
+      _recordResolutionMarks(res);
       _restoreSelectedChoiceForReveal(res);
       _playRevealOutcomeSfx(res);
       _safeNotify();
@@ -1272,7 +1606,11 @@ class HilalDuelController extends ChangeNotifier {
   }
 
   void _playRevealOutcomeSfx(HilalDuelResolution res) {
-    final choice = choiceForRevealRound(res.round);
+    final choice = serverChoiceForReveal(
+      resolution: res,
+      playerId: match?.self.id,
+      preferPerspective: 'self',
+    );
     final correct = res.question.correctIndex;
     if (choice != null && correct != null && choice == correct) {
       HilalDuelSfx.instance.playCorrect();

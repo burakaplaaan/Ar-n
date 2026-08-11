@@ -685,7 +685,7 @@
       "count": {"type": "int"}
     }
   },
-  "hilalDuelPlay": "Find opponent",
+  "hilalDuelPlay": "Play live",
   "hilalDuelWatchAdForHeart": "Watch ad for 1 heart",
   "hilalDuelNeedHeartTitle": "You need 1 heart to play",
   "hilalDuelNeedHeartHint": "Watch a short ad → earn 1 heart and find a rival",
@@ -781,10 +781,37 @@
       "count": {"type": "int"}
     }
   },
+  "hilalDuelAdminRemoveTitle": "Remove from board",
+  "hilalDuelAdminRemoveBody": "Remove “{name}” from this week’s leaderboard? Players below move up one place; they won’t reappear on the board this week.",
+  "@hilalDuelAdminRemoveBody": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "hilalDuelAdminRemoveAction": "Remove",
+  "hilalDuelAdminRemoved": "Player removed from the board.",
   "hilalDuelTitleTalebe": "Student",
   "hilalDuelTitleIlimDostu": "Friend of Knowledge",
   "hilalDuelYouLabel": "You",
   "hilalDuelOpponentLabel": "Opponent",
+  "hilalDuelChallengeAction": "Challenge",
+  "hilalDuelChallengeInboxTitle": "Challenges",
+  "hilalDuelChallengeAccept": "Accept · 1 life",
+  "hilalDuelChallengeContinue": "Continue",
+  "hilalDuelChallengeWaiting": "Waiting for opponent",
+  "hilalDuelChallengeYourTurn": "Your turn",
+  "hilalDuelChallengeExpired": "Time's up — no points",
+  "hilalDuelChallengeHint": "Challenge someone from the list. You spend 1 life; if time runs out, nobody scores. Bots auto-reply after about 12 hours with a weak score.",
+  "hilalDuelChallengePickTitle": "Pick opponent",
+  "hilalDuelChallengePickHint": "Choose a player to challenge. You answer first. Humans have 24 hours; bots auto-reply after about 12 hours.",
+  "hilalDuelChallengeSentTitle": "Challenge sent",
+  "hilalDuelChallengeSentBody": "You'll see the result when {name} answers.",
+  "@hilalDuelChallengeSentBody": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "hilalDuelChallengeSentOk": "OK",
   "languageChangedMessage": "Language changed: {languageName}",
   "@languageChangedMessage": {
     "placeholders": {
@@ -1484,6 +1511,13 @@
   "surveyNotificationAllow": "Continue",
   "surveyNotificationSkip": "Skip for now",
   "surveyNotificationOpenSettings": "Open settings",
+  "surveyLockWidgetsTitle": "Lock screen",
+  "surveyLockWidgetsLead": "Would you like prayer times and the daily quote on your lock screen?",
+  "surveyLockWidgetsSubtitle": "Android can’t place real widgets on the lock screen; your choices appear as persistent notifications. You can change this anytime in Widget Center.",
+  "surveyLockWidgetsPrayerTitle": "Prayer Time",
+  "surveyLockWidgetsPrayerSubtitle": "Shows the next prayer and countdown on the lock screen.",
+  "surveyLockWidgetsQuoteTitle": "Daily Quote",
+  "surveyLockWidgetsQuoteSubtitle": "Shows today’s quote on the lock screen.",
   "surveySave": "Start ➔",
   "surveyGenderDecline": "I prefer not to share",
   "surveyNameGreetingPrefix": "Hello",

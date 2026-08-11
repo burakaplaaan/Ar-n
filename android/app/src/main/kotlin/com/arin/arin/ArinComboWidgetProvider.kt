@@ -499,7 +499,7 @@ class ArinComboWidgetProvider : HomeWidgetProvider() {
         val existing = widgetData.getString(key, null)?.toLongOrNull() ?: 0L
         val now = System.currentTimeMillis().toString()
         val editor = widgetData.edit()
-            .putString("arin_widget_last_render_ms_$kind", now)
+            .putString("arin_widget_home_last_render_ms_$kind", now)
         if (existing <= 0L) editor.putString(key, now)
         editor.apply()
     }

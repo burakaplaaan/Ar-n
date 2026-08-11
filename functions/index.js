@@ -237,6 +237,8 @@ const _kMetricEvents = new Set([
   "widget_churned",
   "widget_returned",
   "widget_unlock",
+  "lock_notif_active",
+  "lock_notif_first_use",
   "ad_watch",
   "feature_open",
 ]);
@@ -253,6 +255,7 @@ const _kProductFeatures = new Set([
   "zikir",
   "prayer_alarm",
   "widget",
+  "lock_widget",
   "hilal_duel",
   "prayer_circle",
   "qibla",
@@ -687,6 +690,140 @@ exports.syncAnalyticsAudience = onCall(
   },
 );
 
+/** Marka etiketini dar bir allowlist'e sıkıştır (admin özet satırı). */
+function _normalizedInstallBrand(raw, platform) {
+  if (platform === "ios") return "iPhone";
+  const blob = String(raw || "").trim().toLowerCase();
+  if (!blob) return platform === "android" ? "Other" : "Other";
+  if (blob.includes("samsung")) return "Samsung";
+  if (
+    blob.includes("xiaomi") ||
+    blob.includes("redmi") ||
+    blob.includes("poco") ||
+    blob.includes("blackshark")
+  ) {
+    return "Xiaomi";
+  }
+  if (blob.includes("huawei") || blob.includes("harmony")) return "Huawei";
+  if (blob.includes("honor")) return "Honor";
+  if (
+    blob.includes("oppo") ||
+    blob.includes("realme") ||
+    blob.includes("oneplus") ||
+    blob.includes("coloros")
+  ) {
+    return "Oppo";
+  }
+  if (blob.includes("vivo") || blob.includes("iqoo")) return "Vivo";
+  if (blob.includes("apple") || blob.includes("iphone")) return "iPhone";
+  if (blob.includes("google") || blob.includes("pixel")) return "Pixel";
+  return "Other";
+}
+
+/**
+ * Her uygulama açılışında (App Check + installId) cihaz varlığını kaydeder.
+ * Admin panelindeki "kişide yüklü" satırı bu koleksiyondan hesaplanır —
+ * manuel/tahmini rakam yok.
+ */
+exports.syncInstallPresence = onCall(
+  {
+    region: "europe-west1",
+    memory: "256MiB",
+    enforceAppCheck: true,
+  },
+  async (req) => {
+    const installHash = _validatedInstallHash(req.data?.installId);
+    const platform = ["android", "ios"].includes(req.data?.platform)
+      ? req.data.platform
+      : "other";
+    const brand = _normalizedInstallBrand(
+      req.data?.brand || req.data?.manufacturer || "",
+      platform,
+    );
+    const db = getFirestore();
+    const memberRef = db.collection("admin_install_members").doc(installHash);
+    const dayKey = _istanbulDayKey();
+    const rateRef = _rateLimitRef(db, dayKey, installHash, "install_presence");
+
+    await db.runTransaction(async (tx) => {
+      const rateSnap = await tx.get(rateRef);
+      // Günde birkaç kez yeterli — her ekran geçişinde spam olmasın.
+      _applyRateLimit(tx, rateSnap, rateRef, 12);
+      tx.set(memberRef, {
+        platform,
+        brand,
+        expiresAt: Timestamp.fromMillis(Date.now() + 90 * 86400000),
+        lastSeenAt: FieldValue.serverTimestamp(),
+      }, { merge: true });
+    });
+    return { ok: true, brand, platform };
+  },
+);
+
+/**
+ * Admin: son 90 günde uygulamayı açmış kurulum sayısı + marka/platform dağılımı.
+ * Aggregation istemciye kapalı koleksiyonda sunucu tarafında yapılır.
+ */
+exports.getAdminInstallAudience = onCall(
+  {
+    region: "europe-west1",
+    memory: "512MiB",
+  },
+  async (req) => {
+    await assertCallerIsAdmin(req);
+    const db = getFirestore();
+    const snap = await db
+      .collection("admin_install_members")
+      .where("expiresAt", ">=", Timestamp.now())
+      .select("brand", "platform")
+      .get();
+
+    const byBrand = Object.create(null);
+    const byPlatform = Object.create(null);
+    for (const doc of snap.docs) {
+      const data = doc.data() || {};
+      const brand = String(data.brand || "Other");
+      const platform = String(data.platform || "other");
+      byBrand[brand] = (byBrand[brand] || 0) + 1;
+      byPlatform[platform] = (byPlatform[platform] || 0) + 1;
+    }
+
+    const brandOrder = [
+      "Samsung",
+      "Xiaomi",
+      "iPhone",
+      "Huawei",
+      "Honor",
+      "Oppo",
+      "Vivo",
+      "Pixel",
+      "Other",
+    ];
+    const brands = brandOrder
+      .filter((label) => (byBrand[label] || 0) > 0)
+      .map((label) => ({ label, count: byBrand[label] || 0 }));
+    // Allowlist dışı etiket kalırsa ekle.
+    for (const [label, count] of Object.entries(byBrand)) {
+      if (!brandOrder.includes(label) && count > 0) {
+        brands.push({ label, count });
+      }
+    }
+
+    return {
+      ok: true,
+      total: snap.size,
+      windowDays: 90,
+      brands,
+      byPlatform: {
+        android: byPlatform.android || 0,
+        ios: byPlatform.ios || 0,
+        other: byPlatform.other || 0,
+      },
+      generatedAtMs: Date.now(),
+    };
+  },
+);
+
 exports.recordNotificationClick = onCall(
   {
     region: "europe-west1",
@@ -766,6 +903,12 @@ exports.recordProductMetric = onCall(
     const widgetSummaryRef = db
       .collection("admin_widget_summary")
       .doc("current");
+    const lockInstallRef = db
+      .collection("admin_lock_notif_installations")
+      .doc(installHash);
+    const lockSummaryRef = db
+      .collection("admin_lock_notif_summary")
+      .doc("current");
 
     let entity = "all";
     let cardId = null;
@@ -773,12 +916,17 @@ exports.recordProductMetric = onCall(
     let feature = null;
     const isAdWatch = event === "ad_watch";
     const isFeatureOpen = event === "feature_open";
+    const isLockNotifEvent =
+      event === "lock_notif_active" || event === "lock_notif_first_use";
+    const isHomeWidgetEvent = event.startsWith("widget_");
     if (event.startsWith("content_")) {
       cardId = _validatedCardId(req.data?.cardId);
       await _assertKnownContentCard(db, cardId);
       entity = cardId;
     }
-    if (event === "widget_first_use" || event === "widget_unlock") {
+    if (event === "widget_first_use" ||
+        event === "widget_unlock" ||
+        event === "lock_notif_first_use") {
       kind = _validatedWidgetKind(req.data?.kind);
       entity = kind;
     }
@@ -796,27 +944,34 @@ exports.recordProductMetric = onCall(
     let accepted = false;
 
     await db.runTransaction(async (tx) => {
-      const reads = [tx.get(rateRef)];
-      if (dedupeRef) reads.push(tx.get(dedupeRef));
-      if (event.startsWith("widget_")) reads.push(tx.get(installRef));
-      const snapshots = await Promise.all(reads);
-      const rateSnap = snapshots[0];
-      const dedupeSnap = dedupeRef ? snapshots[1] : null;
-      const installSnap = event.startsWith("widget_") ?
-        snapshots[dedupeRef ? 2 : 1] : null;
+      const rateSnap = await tx.get(rateRef);
+      const dedupeSnap = dedupeRef ? await tx.get(dedupeRef) : null;
+      const installSnap = isHomeWidgetEvent ? await tx.get(installRef) : null;
+      const lockInstallSnap = isLockNotifEvent ?
+        await tx.get(lockInstallRef) : null;
       if (dedupeSnap?.exists) {
         accepted = true;
         return;
       }
 
       const installData = installSnap?.data() || {};
+      const lockInstallData = lockInstallSnap?.data() || {};
       if (event === "widget_first_use" &&
           installData.kinds?.[kind]?.firstSeenAt != null) {
         accepted = true;
         return;
       }
+      if (event === "lock_notif_first_use" &&
+          lockInstallData.kinds?.[kind]?.firstSeenAt != null) {
+        accepted = true;
+        return;
+      }
       if (event === "widget_active" &&
           (!installSnap?.exists || installData.firstSeenAt == null)) {
+        return;
+      }
+      if (event === "lock_notif_active" &&
+          (!lockInstallSnap?.exists || lockInstallData.firstSeenAt == null)) {
         return;
       }
       if (event === "widget_churned") {
@@ -906,6 +1061,22 @@ exports.recordProductMetric = onCall(
           activeUserDays: FieldValue.increment(1),
           updatedAt: FieldValue.serverTimestamp(),
         }, { merge: true });
+      } else if (event === "lock_notif_active") {
+        dailyUpdate.lockNotifs = {
+          activeUsers: FieldValue.increment(1),
+        };
+        tx.set(lockInstallRef, {
+          lastActiveAt: FieldValue.serverTimestamp(),
+          updatedAt: FieldValue.serverTimestamp(),
+        }, { merge: true });
+        const lockActiveSummaryShardRef = db
+          .collection("admin_lock_notif_summary_shards")
+          .doc(_metricShardId(installHash));
+        tx.set(lockActiveSummaryShardRef, {
+          shardId: _metricShardId(installHash),
+          activeUserDays: FieldValue.increment(1),
+          updatedAt: FieldValue.serverTimestamp(),
+        }, { merge: true });
       } else if (event === "widget_first_use") {
         const firstEver = installSnap?.exists !== true;
         dailyUpdate.widgets = {
@@ -931,6 +1102,33 @@ exports.recordProductMetric = onCall(
           updatedAt: FieldValue.serverTimestamp(),
         }, { merge: true });
         tx.set(widgetSummaryRef, {
+          totalEverUsers: firstEver ? FieldValue.increment(1) :
+            FieldValue.increment(0),
+          updatedAt: FieldValue.serverTimestamp(),
+        }, { merge: true });
+      } else if (event === "lock_notif_first_use") {
+        const firstEver = lockInstallSnap?.exists !== true;
+        dailyUpdate.lockNotifs = {
+          firstUses: FieldValue.increment(1),
+          newUsers: FieldValue.increment(firstEver ? 1 : 0),
+          byKind: {
+            [kind]: {
+              firstUses: FieldValue.increment(1),
+            },
+          },
+        };
+        tx.set(lockInstallRef, {
+          firstSeenAt: lockInstallSnap?.data()?.firstSeenAt ||
+            FieldValue.serverTimestamp(),
+          lastActiveAt: FieldValue.serverTimestamp(),
+          kinds: {
+            [kind]: {
+              firstSeenAt: FieldValue.serverTimestamp(),
+            },
+          },
+          updatedAt: FieldValue.serverTimestamp(),
+        }, { merge: true });
+        tx.set(lockSummaryRef, {
           totalEverUsers: firstEver ? FieldValue.increment(1) :
             FieldValue.increment(0),
           updatedAt: FieldValue.serverTimestamp(),
@@ -1009,6 +1207,10 @@ exports.getAdminPerformance = onCall(
       active30Snap,
       inspireCatalogSnap,
       widgetSummaryShardsSnap,
+      lockSummarySnap,
+      lockActive7Snap,
+      lockActive30Snap,
+      lockSummaryShardsSnap,
     ] = await Promise.all([
       db.collection("admin_metric_daily_shards")
         .where("dayKey", ">=", fromDay)
@@ -1035,6 +1237,16 @@ exports.getAdminPerformance = onCall(
         .get(),
       db.collection("app_public").doc("inspiration_cards").get(),
       db.collection("admin_widget_summary_shards").get(),
+      db.collection("admin_lock_notif_summary").doc("current").get(),
+      db.collection("admin_lock_notif_installations")
+        .where("lastActiveAt", ">=", Timestamp.fromMillis(now - 7 * 86400000))
+        .count()
+        .get(),
+      db.collection("admin_lock_notif_installations")
+        .where("lastActiveAt", ">=", Timestamp.fromMillis(now - 30 * 86400000))
+        .count()
+        .get(),
+      db.collection("admin_lock_notif_summary_shards").get(),
     ]);
 
     const deliveryClickTotals = new Map();
@@ -1086,6 +1298,10 @@ exports.getAdminPerformance = onCall(
       .sort((a, b) => b.views - a.views)
       .slice(0, 30);
     const activeUserDays = widgetSummaryShardsSnap.docs.reduce(
+      (sum, doc) => sum + (Number(doc.data().activeUserDays) || 0),
+      0,
+    );
+    const lockActiveUserDays = lockSummaryShardsSnap.docs.reduce(
       (sum, doc) => sum + (Number(doc.data().activeUserDays) || 0),
       0,
     );
@@ -1152,6 +1368,13 @@ exports.getAdminPerformance = onCall(
         activeUserDays,
         active7: active7Snap.data().count,
         active30: active30Snap.data().count,
+        lockNotif: {
+          totalEverUsers:
+            Number(lockSummarySnap.data()?.totalEverUsers) || 0,
+          activeUserDays: lockActiveUserDays,
+          active7: lockActive7Snap.data().count,
+          active30: lockActive30Snap.data().count,
+        },
       },
       notificationAudience: audienceSnap.data().count,
       productFeatures: [..._kProductFeatures],
@@ -3567,11 +3790,133 @@ if (process.env.NODE_ENV === "test") {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Bilgi Düellosu — admin can yönetimi
-//   • Herkese +1 can + broadcast_all FCM (tıklanınca düello açılır)
+// Bilgi Düellosu — admin istatistik + can yönetimi
+//   • Bugün / bu hafta kaç kişi oynamış
+//   • En çok oynayan 3 (haftalık maç)
+//   • Herkese +1 can + broadcast_all FCM
 //   • Belirli ownerHash'e N can
 // ─────────────────────────────────────────────────────────────────────────────
+const quizModule = require("./quiz");
 const _kQuizOwnerHashRe = /^[a-f0-9]{64}$/i;
+
+function _quizWeekIdIstanbul(now = new Date()) {
+  return quizModule.testables.weekIdIstanbul(now);
+}
+
+function _istanbulDayStartMs(ms = Date.now()) {
+  const dayKey = _istanbulDayKey(ms);
+  const start = Date.parse(`${dayKey}T00:00:00+03:00`);
+  return Number.isFinite(start) ? start : ms;
+}
+
+function _istanbulWeekStartMs(now = new Date()) {
+  const weekId = _quizWeekIdIstanbul(now);
+  const y = weekId.slice(0, 4);
+  const m = weekId.slice(4, 6);
+  const d = weekId.slice(6, 8);
+  const start = Date.parse(`${y}-${m}-${d}T00:00:00+03:00`);
+  return Number.isFinite(start) ? start : Date.now();
+}
+
+exports.getAdminQuizStats = onCall(
+  {
+    region: "europe-west1",
+    memory: "256MiB",
+    timeoutSeconds: 60,
+  },
+  async (req) => {
+    await assertCallerIsAdmin(req);
+    const db = getFirestore();
+    const now = new Date();
+    const nowMs = now.getTime();
+    const dayStartMs = _istanbulDayStartMs(nowMs);
+    const weekStartMs = _istanbulWeekStartMs(now);
+    const weekId = _quizWeekIdIstanbul(now);
+    const dayKey = _istanbulDayKey(nowMs);
+
+    const players = db.collection("quiz_players");
+    const [todayAgg, weekAgg, topWeekSnap, topAllSnap] = await Promise.all([
+      players
+        .where("lastMatchAt", ">=", Timestamp.fromMillis(dayStartMs))
+        .count()
+        .get(),
+      players
+        .where("lastMatchAt", ">=", Timestamp.fromMillis(weekStartMs))
+        .count()
+        .get(),
+      players
+        .where("weekId", "==", weekId)
+        .orderBy("weeklyMatches", "desc")
+        .limit(3)
+        .get()
+        .catch((error) => {
+          console.warn("[AdminQuizStats] weekly top query failed", error);
+          return null;
+        }),
+      players.orderBy("matchesCompleted", "desc").limit(3).get(),
+    ]);
+
+    const mapTop = (doc) => {
+      const data = doc.data() || {};
+      return {
+        ownerHash: doc.id,
+        name: String(data.name || "Oyuncu").slice(0, 32),
+        matches: Math.max(
+          0,
+          Math.floor(
+            Number(
+              data.weeklyMatches != null
+                ? data.weeklyMatches
+                : data.matchesCompleted,
+            ) || 0,
+          ),
+        ),
+        matchesCompleted: Math.max(
+          0,
+          Math.floor(Number(data.matchesCompleted) || 0),
+        ),
+        weeklyMatches: Math.max(0, Math.floor(Number(data.weeklyMatches) || 0)),
+        hilals: Math.floor(Number(data.hilals) || 0),
+      };
+    };
+
+    let topPlayers = [];
+    let topScope = "week";
+    if (topWeekSnap && !topWeekSnap.empty) {
+      topPlayers = topWeekSnap.docs
+        .map(mapTop)
+        .filter((row) => row.weeklyMatches > 0)
+        .map((row) => ({
+          ownerHash: row.ownerHash,
+          name: row.name,
+          matches: row.weeklyMatches,
+          hilals: row.hilals,
+        }));
+    }
+    if (topPlayers.length === 0) {
+      topScope = "all_time";
+      topPlayers = topAllSnap.docs
+        .map(mapTop)
+        .filter((row) => row.matchesCompleted > 0)
+        .map((row) => ({
+          ownerHash: row.ownerHash,
+          name: row.name,
+          matches: row.matchesCompleted,
+          hilals: row.hilals,
+        }));
+    }
+
+    return {
+      ok: true,
+      dayKey,
+      weekId,
+      todayPlayers: Math.max(0, Number(todayAgg.data().count) || 0),
+      weekPlayers: Math.max(0, Number(weekAgg.data().count) || 0),
+      topScope,
+      topPlayers,
+    };
+  },
+);
 
 exports.adminGrantQuizHeartsAll = onCall(
   {
@@ -3584,9 +3929,24 @@ exports.adminGrantQuizHeartsAll = onCall(
     const db = getFirestore();
     const messaging = getMessaging();
 
+    // Global promo: hiç düello açmamışlar bildirimi görür; ilk profil
+    // açılışında getQuizProfile bu seq'i claim edip canı yazar.
+    const promoRef = db.collection("quiz_config").doc("promo_hearts");
+    const promoSnap = await promoRef.get();
+    const nextSeq = Math.floor(Number(promoSnap.data()?.seq) || 0) + 1;
+    const promoAmount = 1;
+    await promoRef.set(
+      {
+        seq: nextSeq,
+        amount: promoAmount,
+        updatedAt: FieldValue.serverTimestamp(),
+      },
+      { merge: true },
+    );
+
     let updated = 0;
     let lastDoc = null;
-    // quiz_players üzerinde sayfalı increment — tek batch limiti aşılmasın.
+    // Mevcut oyunculara hemen +1; claimedPromoHeartSeq ile çift claim engellenir.
     while (true) {
       let q = db
         .collection("quiz_players")
@@ -3600,7 +3960,8 @@ exports.adminGrantQuizHeartsAll = onCall(
         batch.set(
           doc.ref,
           {
-            adHearts: FieldValue.increment(1),
+            adHearts: FieldValue.increment(promoAmount),
+            claimedPromoHeartSeq: nextSeq,
             updatedAt: FieldValue.serverTimestamp(),
           },
           { merge: true },
@@ -3612,9 +3973,10 @@ exports.adminGrantQuizHeartsAll = onCall(
       if (snap.size < 400) break;
     }
 
-    const title = "Bilgi Düellosu · +1 can";
+    // Teşvik metni — özellikle hiç oynamayanlar için; kanal genel yayın.
+    const title = "Bilgi Düellosu · Hediye can";
     const body =
-      "Herkese 1 can verildi! Şimdi bilginle herkesi yen — düelloya gir.";
+      "Sana 1 can hediye! Hiç denemediysen şimdi başla — 7 soru, 20 saniye.";
     let fcmMessageId = null;
     let fcmOk = true;
     let fcmError = null;
@@ -3625,10 +3987,12 @@ exports.adminGrantQuizHeartsAll = onCall(
         data: {
           type: "hilal_duel",
           reason: "admin_heart_grant_all",
+          promoSeq: String(nextSeq),
         },
         android: {
           notification: {
-            channelId: "arin_hilal_duel",
+            // Genel kanal: düello kanalını kapatanlar da görsün.
+            channelId: "arin_ntf_broadcast",
             priority: "high",
             defaultSound: true,
           },
@@ -3646,18 +4010,20 @@ exports.adminGrantQuizHeartsAll = onCall(
     const email = (req.auth?.token?.email || "").toString().toLowerCase();
     await db.collection("admin_audit").add({
       action: "quiz_hearts_grant_all",
-      targetType: "quiz_players",
+      targetType: "quiz_players_and_promo",
       targetId: "all",
       uid: req.auth?.uid || null,
       email: email || null,
       afterCount: updated,
       details: {
-        amount: 1,
+        amount: promoAmount,
+        promoSeq: nextSeq,
         fcmOk,
         fcmMessageId,
         fcmError,
         title,
         body,
+        channelId: "arin_ntf_broadcast",
       },
       createdAt: FieldValue.serverTimestamp(),
     });
@@ -3665,11 +4031,193 @@ exports.adminGrantQuizHeartsAll = onCall(
     return {
       ok: true,
       updated,
+      promoSeq: nextSeq,
       fcmOk,
       fcmMessageId,
       fcmError,
       title,
       body,
+    };
+  },
+);
+
+/**
+ * Hedef çözümleyici:
+ *  - 64 hex → doğrudan ownerHash (cihaz installId SHA-256)
+ *  - e-posta → Firebase Auth uid → quiz_installations.authUid
+ * Birden fazla cihaz/kurulum varsa hepsine yazılır.
+ */
+async function _resolveQuizOwnerHashesForAdminTarget(db, rawTarget) {
+  const value = String(rawTarget || "").trim().toLowerCase();
+  if (!value) {
+    throw new HttpsError(
+      "invalid-argument",
+      "ownerHash veya e-posta gerekli.",
+    );
+  }
+  if (_kQuizOwnerHashRe.test(value)) return [{ ownerHash: value, email: null }];
+
+  if (!value.includes("@") || value.length < 5 || value.length > 120) {
+    throw new HttpsError(
+      "invalid-argument",
+      "ownerHash (64 hex) veya geçerli e-posta girin.",
+    );
+  }
+
+  let user;
+  try {
+    user = await getAuth().getUserByEmail(value);
+  } catch (err) {
+    if (String(err?.code || "") === "auth/user-not-found") {
+      throw new HttpsError(
+        "not-found",
+        `Bu e-posta ile kayıtlı Auth hesabı yok: ${value}`,
+      );
+    }
+    throw err;
+  }
+  const uid = String(user.uid || "");
+  if (!uid) {
+    throw new HttpsError("not-found", `Auth uid okunamadı: ${value}`);
+  }
+
+  const [byAuth, byPrev] = await Promise.all([
+    db.collection("quiz_installations").where("authUid", "==", uid).limit(20).get(),
+    db
+      .collection("quiz_installations")
+      .where("previousAuthUids", "array-contains", uid)
+      .limit(20)
+      .get(),
+  ]);
+  const hashes = new Set();
+  for (const doc of byAuth.docs) hashes.add(doc.id);
+  for (const doc of byPrev.docs) hashes.add(doc.id);
+  if (hashes.size === 0) {
+    throw new HttpsError(
+      "not-found",
+      `${value} giriş yapmış ama henüz Bilgi Düellosu açmamış ` +
+        "(quiz_installations yok). Uygulamada düelloyu bir kez açsın.",
+    );
+  }
+  return [...hashes].map((ownerHash) => ({ ownerHash, email: value }));
+}
+
+/**
+ * Haftalık lider tablosundan uygunsuz isimli / kural dışı oyuncuyu kaldırır.
+ * Sıra yeniden hesaplanır (rank read-time). Oyuncu tekrar maç oynasa da
+ * `leaderboardExcluded` ile haftalık listeye yazılmaz.
+ */
+exports.adminRemoveQuizWeeklyEntry = onCall(
+  {
+    region: "europe-west1",
+    memory: "256MiB",
+  },
+  async (req) => {
+    await assertCallerIsAdmin(req);
+    const ownerHash = String(req.data?.ownerHash || "").trim().toLowerCase();
+    const isBot = ownerHash.startsWith("bot_");
+    if (!isBot && !_kQuizOwnerHashRe.test(ownerHash)) {
+      throw new HttpsError(
+        "invalid-argument",
+        "Geçerli ownerHash gerekli.",
+      );
+    }
+    if (isBot && !/^bot_[a-f0-9]{8,40}$/i.test(ownerHash)) {
+      throw new HttpsError(
+        "invalid-argument",
+        "Geçerli bot ownerHash gerekli.",
+      );
+    }
+
+    const weekIdRaw = String(req.data?.weekId || "").trim();
+    const weekId = /^\d{8}$/.test(weekIdRaw)
+      ? weekIdRaw
+      : _quizWeekIdIstanbul();
+    const reason = String(req.data?.reason || "inappropriate_name")
+      .trim()
+      .slice(0, 120);
+
+    const db = getFirestore();
+    const weeklyRef = db
+      .collection("quiz_weekly")
+      .doc(weekId)
+      .collection("entries")
+      .doc(ownerHash);
+    const playerRef = db.collection("quiz_players").doc(ownerHash);
+
+    const [weeklySnap, playerSnap] = await Promise.all([
+      weeklyRef.get(),
+      isBot ? Promise.resolve(null) : playerRef.get(),
+    ]);
+
+    if (!weeklySnap.exists && !(playerSnap && playerSnap.exists)) {
+      throw new HttpsError(
+        "not-found",
+        "Bu hafta için oyuncu kaydı bulunamadı.",
+      );
+    }
+
+    const previousName = String(
+      (weeklySnap.exists ? weeklySnap.data()?.name : null) ||
+        (playerSnap && playerSnap.exists ? playerSnap.data()?.name : null) ||
+        "",
+    ).slice(0, 32);
+    const previousWeekly = weeklySnap.exists
+      ? Math.floor(Number(weeklySnap.data()?.weeklyHilals) || 0)
+      : 0;
+
+    const batch = db.batch();
+    if (weeklySnap.exists) {
+      batch.delete(weeklyRef);
+    }
+    if (!isBot) {
+      batch.set(
+        playerRef,
+        {
+          leaderboardExcluded: true,
+          leaderboardExcludedAt: FieldValue.serverTimestamp(),
+          leaderboardExcludedReason: reason || "inappropriate_name",
+          leaderboardExcludedWeekId: weekId,
+          // Uygunsuz isim listede ve profilde görünmesin.
+          name: "Oyuncu",
+          weekId,
+          weeklyHilals: 0,
+          weeklyMatches: 0,
+          updatedAt: FieldValue.serverTimestamp(),
+        },
+        { merge: true },
+      );
+    }
+    await batch.commit();
+
+    const adminEmail = (req.auth?.token?.email || "").toString().toLowerCase();
+    await db.collection("admin_audit").add({
+      action: "quiz_weekly_remove",
+      targetType: "quiz_weekly_entry",
+      targetId: ownerHash,
+      uid: req.auth?.uid || null,
+      email: adminEmail || null,
+      details: {
+        weekId,
+        reason,
+        previousName,
+        previousWeeklyHilals: previousWeekly,
+        isBot,
+      },
+      createdAt: FieldValue.serverTimestamp(),
+    });
+
+    console.log(
+      `[HilalDuel] Admin ${req.auth?.uid} removed weekly entry ` +
+        `${ownerHash} week=${weekId} name=${previousName}`,
+    );
+
+    return {
+      ok: true,
+      ownerHash,
+      weekId,
+      previousName,
+      previousWeeklyHilals: previousWeekly,
     };
   },
 );
@@ -3681,17 +4229,10 @@ exports.adminGrantQuizHeartsOne = onCall(
   },
   async (req) => {
     await assertCallerIsAdmin(req);
-    const ownerHash = String(req.data?.ownerHash || "").trim().toLowerCase();
     const amountRaw = Number(req.data?.amount);
     const amount = Number.isFinite(amountRaw)
       ? Math.floor(amountRaw)
       : NaN;
-    if (!_kQuizOwnerHashRe.test(ownerHash)) {
-      throw new HttpsError(
-        "invalid-argument",
-        "ownerHash 64 karakter hex olmalı (installId SHA-256).",
-      );
-    }
     if (!Number.isFinite(amount) || amount < 1 || amount > 20) {
       throw new HttpsError(
         "invalid-argument",
@@ -3699,48 +4240,109 @@ exports.adminGrantQuizHeartsOne = onCall(
       );
     }
 
+    // Geriye dönük: ownerHash; yeni: email / target; çoklu: emails[] veya virgüllü.
+    const rawList = [];
+    if (Array.isArray(req.data?.emails)) {
+      for (const item of req.data.emails) rawList.push(String(item || ""));
+    }
+    const single =
+      req.data?.email ||
+      req.data?.target ||
+      req.data?.ownerHash ||
+      "";
+    if (single) {
+      String(single)
+        .split(/[,;\n]+/u)
+        .map((s) => s.trim())
+        .filter(Boolean)
+        .forEach((s) => rawList.push(s));
+    }
+    const uniqueTargets = [...new Set(
+      rawList.map((s) => s.trim().toLowerCase()).filter(Boolean),
+    )];
+    if (uniqueTargets.length === 0) {
+      throw new HttpsError(
+        "invalid-argument",
+        "ownerHash veya e-posta gerekli.",
+      );
+    }
+    if (uniqueTargets.length > 10) {
+      throw new HttpsError(
+        "invalid-argument",
+        "Tek seferde en fazla 10 hedef.",
+      );
+    }
+
     const db = getFirestore();
-    const playerRef = db.collection("quiz_players").doc(ownerHash);
-    const beforeSnap = await playerRef.get();
-    const beforeHearts = beforeSnap.exists
-      ? Math.max(0, Math.floor(Number(beforeSnap.data()?.adHearts) || 0))
-      : 0;
+    const resolved = [];
+    for (const target of uniqueTargets) {
+      const rows = await _resolveQuizOwnerHashesForAdminTarget(db, target);
+      resolved.push(...rows);
+    }
+    // Aynı ownerHash birden fazla e-postadan gelmesin.
+    const byHash = new Map();
+    for (const row of resolved) {
+      if (!byHash.has(row.ownerHash)) byHash.set(row.ownerHash, row);
+    }
 
-    await playerRef.set(
-      {
-        adHearts: FieldValue.increment(amount),
-        updatedAt: FieldValue.serverTimestamp(),
-      },
-      { merge: true },
-    );
+    const grants = [];
+    for (const { ownerHash, email: targetEmail } of byHash.values()) {
+      const playerRef = db.collection("quiz_players").doc(ownerHash);
+      const beforeSnap = await playerRef.get();
+      const beforeHearts = beforeSnap.exists
+        ? Math.max(0, Math.floor(Number(beforeSnap.data()?.adHearts) || 0))
+        : 0;
 
-    const email = (req.auth?.token?.email || "").toString().toLowerCase();
+      await playerRef.set(
+        {
+          adHearts: FieldValue.increment(amount),
+          updatedAt: FieldValue.serverTimestamp(),
+        },
+        { merge: true },
+      );
+
+      grants.push({
+        ownerHash,
+        email: targetEmail,
+        beforeHearts,
+        afterHearts: beforeHearts + amount,
+        existed: beforeSnap.exists,
+      });
+    }
+
+    const adminEmail = (req.auth?.token?.email || "").toString().toLowerCase();
     await db.collection("admin_audit").add({
       action: "quiz_hearts_grant_one",
       targetType: "quiz_player",
-      targetId: ownerHash,
+      targetId: grants.map((g) => g.ownerHash).join(",").slice(0, 200),
       uid: req.auth?.uid || null,
-      email: email || null,
-      beforeCount: beforeHearts,
-      afterCount: beforeHearts + amount,
-      details: { amount },
+      email: adminEmail || null,
+      beforeCount: grants[0]?.beforeHearts ?? null,
+      afterCount: grants[0]?.afterHearts ?? null,
+      details: {
+        amount,
+        targets: uniqueTargets,
+        grants,
+      },
       createdAt: FieldValue.serverTimestamp(),
     });
 
+    const first = grants[0];
     return {
       ok: true,
-      ownerHash,
+      // Eski istemci alanları (tek hedef uyumu).
+      ownerHash: first?.ownerHash || null,
       amount,
-      beforeHearts,
-      afterHearts: beforeHearts + amount,
-      existed: beforeSnap.exists,
+      beforeHearts: first?.beforeHearts ?? 0,
+      afterHearts: first?.afterHearts ?? 0,
+      existed: first?.existed === true,
+      grants,
+      grantCount: grants.length,
     };
   },
 );
 
-// Hilal Düellosu ayrı bir modülde tutulur; büyük oyun akışı mevcut bildirim ve
-// Dua Halkası fonksiyonlarının bakım yüzeyini büyütmez.
-const quizModule = require("./quiz");
+// Hilal Düellosu callable'ları quiz modülünden dışa aktarılır.
 Object.assign(exports, quizModule.functions);
 if (process.env.NODE_ENV === "test") {
   Object.assign(exports._testables, quizModule.testables);

@@ -379,4 +379,88 @@ void main() {
       );
     });
   });
+
+  group('round marks / server reveal choice', () {
+    test('timeout choice (-1) missed sayılır, doğru index olsa bile', () {
+      expect(
+        markFromServerChoice(choice: -1, correctIndex: 2),
+        HilalDuelRoundMark.missed,
+      );
+      expect(
+        markFromServerChoice(choice: null, correctIndex: 2),
+        HilalDuelRoundMark.missed,
+      );
+    });
+
+    test('doğru ve yanlış işaretleri', () {
+      expect(
+        markFromServerChoice(choice: 1, correctIndex: 1),
+        HilalDuelRoundMark.correct,
+      );
+      expect(
+        markFromServerChoice(choice: 0, correctIndex: 1),
+        HilalDuelRoundMark.wrong,
+      );
+    });
+
+    test('serverChoiceForReveal timeout için null döner', () {
+      final res = HilalDuelResolution(
+        round: 0,
+        question: const HilalDuelQuestion(
+          id: 'q',
+          category: 'c',
+          text: 'Q?',
+          options: ['a', 'b', 'c', 'd'],
+          correctIndex: 2,
+        ),
+        choices: const {'a': -1, 'b': 2},
+        elapsedMs: const {'a': 20000, 'b': 900},
+      );
+      expect(serverChoiceForReveal(resolution: res, playerId: 'a'), isNull);
+      expect(serverChoiceForReveal(resolution: res, playerId: 'b'), 2);
+      expect(serverChoiceForReveal(resolution: res, playerId: null), isNull);
+    });
+
+    test('perspective selfChoice/opponentChoice map key olmasa da çalışır', () {
+      final res = HilalDuelResolution(
+        round: 1,
+        question: const HilalDuelQuestion(
+          id: 'q',
+          category: 'c',
+          text: 'Q?',
+          options: ['a', 'b', 'c', 'd'],
+          correctIndex: 0,
+        ),
+        choices: const {},
+        elapsedMs: const {},
+        selfChoice: 2,
+        opponentChoice: 0,
+      );
+      expect(
+        serverChoiceForReveal(
+          resolution: res,
+          playerId: 'missing-self',
+          preferPerspective: 'self',
+        ),
+        2,
+      );
+      expect(
+        serverChoiceForReveal(
+          resolution: res,
+          playerId: 'missing-opp',
+          preferPerspective: 'opponent',
+        ),
+        0,
+      );
+      expect(
+        serverChoiceForReveal(
+          resolution: res,
+          playerId: 'x',
+          preferPerspective: 'opponent',
+        ),
+        // index 0 geçerli seçim
+        0,
+      );
+    });
+  });
 }

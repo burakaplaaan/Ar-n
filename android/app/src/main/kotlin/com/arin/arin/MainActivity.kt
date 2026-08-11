@@ -2,6 +2,7 @@ package com.arin.arin
 
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.content.res.Configuration
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -28,11 +29,25 @@ class MainActivity : FlutterActivity() {
     private var systemBackGeneration = 0L
     private var systemBackRequestId = 0L
     private val mainHandler = Handler(Looper.getMainLooper())
+    private var lastUiModeNight: Int = Configuration.UI_MODE_NIGHT_UNDEFINED
 
     override fun onCreate(savedInstanceState: Bundle?) {
         pendingWidgetLaunchKind = intent?.getStringExtra(EXTRA_WIDGET_KIND)
         pendingWidgetLaunchLock = intent?.getStringExtra(EXTRA_WIDGET_LOCK)
+        lastUiModeNight =
+            resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
         super.onCreate(savedInstanceState)
+    }
+
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        // configChanges içinde uiMode var; absolute kilit-bildirim renkleri
+        // RemoteViews'e gömüldüğü için tema değişince yeniden sync gerekir.
+        val night = newConfig.uiMode and Configuration.UI_MODE_NIGHT_MASK
+        if (night != lastUiModeNight) {
+            lastUiModeNight = night
+            ArinLockNotifications.syncAll(applicationContext)
+        }
     }
 
     override fun onNewIntent(intent: Intent) {
@@ -309,6 +324,25 @@ class MainActivity : FlutterActivity() {
                         ArinLockNotifications.syncAll(applicationContext)
                         result.success(true)
                     }
+                    else -> result.notImplemented()
+                }
+            }
+
+        // OEM (Xiaomi/Huawei/Oppo/Vivo/Samsung) autostart + pil ayar deep-link.
+        MethodChannel(messenger, ArinOemSettings.CHANNEL)
+            .setMethodCallHandler { call, result ->
+                when (call.method) {
+                    "getInfo" -> result.success(ArinOemSettings.info(applicationContext))
+                    "openAutoStart" ->
+                        result.success(ArinOemSettings.openAutoStart(applicationContext))
+                    "openOemBattery" ->
+                        result.success(ArinOemSettings.openOemBattery(applicationContext))
+                    "openAppDetails" ->
+                        result.success(ArinOemSettings.openAppDetails(applicationContext))
+                    "openRequestIgnoreBattery" ->
+                        result.success(
+                            ArinOemSettings.openRequestIgnoreBattery(applicationContext),
+                        )
                     else -> result.notImplemented()
                 }
             }

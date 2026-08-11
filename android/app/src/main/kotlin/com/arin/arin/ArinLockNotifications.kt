@@ -18,6 +18,7 @@ import android.util.TypedValue
 import android.widget.RemoteViews
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import androidx.core.content.ContextCompat
 import es.antonborri.home_widget.HomeWidgetPlugin
 import org.json.JSONArray
 import org.json.JSONObject
@@ -49,6 +50,12 @@ import kotlin.math.roundToInt
  * (`MainActivity.EXTRA_WIDGET_LOCK`) doğrudan reklam-izle/premium ekranına
  * (`WidgetUnlockPage`) götürür — aynı reklam turu hem widget'ı hem bu
  * bildirimi birlikte açar.
+ *
+ * Admin metrikleri kapı anahtarlarından ayrıdır: kilit bildirimi
+ * `arin_lock_notif_first_use_ms_<kind>` / `arin_lock_notif_last_show_ms_<kind>`
+ * yazar; ana ekran widget sayımı `arin_widget_home_last_render_ms_<kind>`
+ * ile yapılır. Böylece "aktif widget" ile "aktif kilit ekranı bildirimi"
+ * admin panelde ayrı sayılır.
  */
 object ArinLockNotifications {
     private const val CHANNEL_ID = "arin_lock_widgets"
@@ -95,6 +102,8 @@ object ArinLockNotifications {
     private const val GATE_TRIAL_DURATION_MS = 24L * 60L * 60L * 1000L
 
     private fun firstUseKey(kind: String) = "arin_widget_first_use_ms_$kind"
+    private fun lockNotifFirstUseKey(kind: String) = "arin_lock_notif_first_use_ms_$kind"
+    private fun lockNotifLastShowKey(kind: String) = "arin_lock_notif_last_show_ms_$kind"
     private fun gateLockedKey(kind: String) = "arin_widget_gate_${kind}_locked"
     private fun gateUnlockUntilKey(kind: String) = "arin_widget_gate_${kind}_unlock_until_ms"
 
@@ -105,6 +114,18 @@ object ArinLockNotifications {
         val key = firstUseKey(kind)
         if ((prefs.getString(key, null)?.toLongOrNull() ?: 0L) > 0L) return
         prefs.edit().putString(key, System.currentTimeMillis().toString()).apply()
+    }
+
+    /** Admin metrikleri için kilit bildirimine özgü ilk kullanım + son gösterim.
+     * Reklam/deneme kapısı anahtarlarından bağımsızdır. */
+    private fun recordLockNotifMetrics(prefs: SharedPreferences, kind: String) {
+        val now = System.currentTimeMillis().toString()
+        val editor = prefs.edit()
+        val firstKey = lockNotifFirstUseKey(kind)
+        if ((prefs.getString(firstKey, null)?.toLongOrNull() ?: 0L) <= 0L) {
+            editor.putString(firstKey, now)
+        }
+        editor.putString(lockNotifLastShowKey(kind), now).apply()
     }
 
     private fun firstUseMs(prefs: SharedPreferences, kind: String): Long =
@@ -146,7 +167,8 @@ object ArinLockNotifications {
         else -> "ARIN"
     }
 
-    fun defaultEnabled(kind: String): Boolean = kind == KIND_PRAYER || kind == KIND_QUOTE
+    /** Yeni kurulumda hepsi kapalı; kullanıcı Widget Merkezi / onboarding ile açar. */
+    fun defaultEnabled(kind: String): Boolean = false
 
     fun isEnabled(prefs: SharedPreferences, kind: String): Boolean {
         return when (prefs.getString(enabledKey(kind), null)) {
@@ -184,7 +206,7 @@ object ArinLockNotifications {
         // geldiğinde başlar (widget eklenmiş olması şart değil).
         recordFirstUse(prefs, kind)
         if (isGateLocked(prefs, kind)) {
-            postLockedNotification(context, kind)
+            postLockedNotification(context, kind, prefs)
             cancelTick(context, kind)
             val refreshAt = gateRefreshMs(prefs, kind)
             if (refreshAt != null) {
@@ -201,7 +223,7 @@ object ArinLockNotifications {
             cancelAlarm(context, kind)
             return
         }
-        postNotification(context, kind, content)
+        postNotification(context, kind, content, prefs)
         scheduleNext(context, kind, content, prefs)
     }
 
@@ -503,7 +525,11 @@ object ArinLockNotifications {
     /** 24 saatlik deneme (veya reklam turu) dolduğunda gösterilen "dokun ve
      * aç" durumu. Gerçek içerik yerine geçer; PendingIntent doğrudan reklam
      * izle/premium ekranına (`WidgetUnlockPage`) yönlendirir. */
-    private fun postLockedNotification(context: Context, kind: String) {
+    private fun postLockedNotification(
+        context: Context,
+        kind: String,
+        prefs: SharedPreferences,
+    ) {
         val label = kindLabel(kind)
         val content = NotifBuild(
             title = "$label bildirimi kilitli",
@@ -514,13 +540,26 @@ object ArinLockNotifications {
             nextDeadlineEpochMs = null,
             useTickFallback = false,
         )
-        postNotification(context, kind, content, locked = true)
+        postNotification(context, kind, content, prefs, locked = true)
+    }
+
+    /**
+     * Kilit bildirimi metin renklerini uiMode'a göre absolute ARGB olarak yazar.
+     * Theme attribute (?android:attr/textColor*) OEM SystemUI'da koyu modda
+     * sık sık koyu-kart / koyu-metin üretiyor; setTextColor bu hatayı keser.
+     */
+    private fun applyLockNotifTextColors(context: Context, views: RemoteViews) {
+        val primary = ContextCompat.getColor(context, R.color.lock_notif_text_primary)
+        val secondary = ContextCompat.getColor(context, R.color.lock_notif_text_secondary)
+        views.setTextColor(R.id.notif_primary, primary)
+        views.setTextColor(R.id.notif_title, secondary)
     }
 
     private fun postNotification(
         context: Context,
         kind: String,
         content: NotifBuild,
+        prefs: SharedPreferences,
         locked: Boolean = false,
     ) {
         val views = RemoteViews(context.packageName, R.layout.arin_lock_notification)
@@ -530,6 +569,10 @@ object ArinLockNotifications {
             .filter { it.isNotBlank() }
             .joinToString(" · ")
         views.setTextViewText(R.id.notif_title, headerText)
+        // Absolute ARGB: OEM SystemUI ?attr/textColor* çözümünü koyu kartta
+        // koyu metne çevirip sözü görünmez yapabiliyor; burada uiMode'a göre
+        // çözülen renk RemoteViews action olarak gömülür.
+        applyLockNotifTextColors(context, views)
         views.setTextViewTextSize(
             R.id.notif_primary,
             TypedValue.COMPLEX_UNIT_SP,
@@ -586,6 +629,8 @@ object ArinLockNotifications {
         try {
             if (!NotificationManagerCompat.from(context).areNotificationsEnabled()) return
             NotificationManagerCompat.from(context).notify(notifId(kind), builder.build())
+            // Bildirim gerçekten post edildiğinde metrik damgası yazılır.
+            recordLockNotifMetrics(prefs, kind)
         } catch (_: SecurityException) {
             // POST_NOTIFICATIONS reddedilmiş olabilir (Android 13+); sessizce yut.
         }

@@ -152,10 +152,22 @@ service cloud.firestore {
     match /admin_widget_installations/{docId} {
       allow read, write: if false;
     }
+    match /admin_lock_notif_summary/{docId} {
+      allow read, write: if false;
+    }
+    match /admin_lock_notif_summary_shards/{docId} {
+      allow read, write: if false;
+    }
+    match /admin_lock_notif_installations/{docId} {
+      allow read, write: if false;
+    }
     match /admin_metric_audience/{docId} {
       allow read, write: if false;
     }
     match /admin_metric_audience_members/{docId} {
+      allow read, write: if false;
+    }
+    match /admin_install_members/{docId} {
       allow read, write: if false;
     }
     match /admin_metric_event_dedupe/{docId} {
@@ -229,6 +241,9 @@ service cloud.firestore {
       allow read, write: if false;
     }
     match /quiz_matches/{docId} {
+      allow read, write: if false;
+    }
+    match /quiz_challenges/{docId} {
       allow read, write: if false;
     }
     match /quiz_reward_proofs/{docId} {

@@ -1382,7 +1382,7 @@ class AppLocalizationsTr extends AppLocalizations {
   }
 
   @override
-  String get hilalDuelPlay => 'Rakip bul';
+  String get hilalDuelPlay => 'Canlı oyna';
 
   @override
   String get hilalDuelWatchAdForHeart => 'Reklam izle, 1 can kazan';
@@ -1534,6 +1534,20 @@ class AppLocalizationsTr extends AppLocalizations {
   }
 
   @override
+  String get hilalDuelAdminRemoveTitle => 'Listeden kaldır';
+
+  @override
+  String hilalDuelAdminRemoveBody(String name) {
+    return '“$name” haftalık sıralamadan silinsin mi? Alttakiler bir sıra yukarı kayar; bu oyuncu bu hafta tekrar listede görünmez.';
+  }
+
+  @override
+  String get hilalDuelAdminRemoveAction => 'Kaldır';
+
+  @override
+  String get hilalDuelAdminRemoved => 'Oyuncu listeden kaldırıldı.';
+
+  @override
   String get hilalDuelTitleTalebe => 'Talebe';
 
   @override
@@ -1544,6 +1558,49 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get hilalDuelOpponentLabel => 'Rakip';
+
+  @override
+  String get hilalDuelChallengeAction => 'Meydan oku';
+
+  @override
+  String get hilalDuelChallengeInboxTitle => 'Meydan okumalar';
+
+  @override
+  String get hilalDuelChallengeAccept => 'Kabul et · 1 can';
+
+  @override
+  String get hilalDuelChallengeContinue => 'Devam et';
+
+  @override
+  String get hilalDuelChallengeWaiting => 'Rakip bekleniyor';
+
+  @override
+  String get hilalDuelChallengeYourTurn => 'Sıra sende';
+
+  @override
+  String get hilalDuelChallengeExpired => 'Süre doldu — puan yok';
+
+  @override
+  String get hilalDuelChallengeHint =>
+      'Listeden birine meydan oku. Sen 1 can harcarsın; süre dolarsa kimse puan alamaz. Botlar yaklaşık 12 saat sonra otomatik ve zayıf cevap verir.';
+
+  @override
+  String get hilalDuelChallengePickTitle => 'Rakip seç';
+
+  @override
+  String get hilalDuelChallengePickHint =>
+      'Meydan okumak için bir oyuncu seç. Önce sen çözersin. İnsan rakibe 24 saat, bota yaklaşık 12 saat sonra otomatik cevap.';
+
+  @override
+  String get hilalDuelChallengeSentTitle => 'Meydan okuma gönderildi';
+
+  @override
+  String hilalDuelChallengeSentBody(String name) {
+    return '$name cevap verince sonuç görünür.';
+  }
+
+  @override
+  String get hilalDuelChallengeSentOk => 'Tamam';
 
   @override
   String get generalLoading => 'Yükleniyor...';
@@ -2973,6 +3030,31 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get surveyNotificationOpenSettings => 'Ayarlardan aç';
+
+  @override
+  String get surveyLockWidgetsTitle => 'Kilit ekranı';
+
+  @override
+  String get surveyLockWidgetsLead =>
+      'Namaz vakti ve günün sözünü kilit ekranında göstermek ister misin?';
+
+  @override
+  String get surveyLockWidgetsSubtitle =>
+      'Android’de kilit ekranına gerçek widget eklenemez; seçtiklerin kalıcı bildirim olarak görünür. İstediğin zaman Widget Merkezi’nden değiştirebilirsin.';
+
+  @override
+  String get surveyLockWidgetsPrayerTitle => 'Namaz Vakti';
+
+  @override
+  String get surveyLockWidgetsPrayerSubtitle =>
+      'Sıradaki vakti ve geri sayımı kilit ekranında gösterir.';
+
+  @override
+  String get surveyLockWidgetsQuoteTitle => 'Günlük Söz';
+
+  @override
+  String get surveyLockWidgetsQuoteSubtitle =>
+      'Günün sözünü kilit ekranında gösterir.';
 
   @override
   String get surveySave => 'Başla ➔';

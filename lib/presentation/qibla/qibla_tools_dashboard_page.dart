@@ -6,6 +6,7 @@ import 'package:arin/l10n/app_localizations.dart';
 
 import '../../core/constants/app_colors.dart';
 import '../../core/theme/arin_shell_background.dart';
+import '../shared/widgets/arin_shell_layout.dart';
 import '../shared/widgets/zikirmatik_silhouette_icon.dart';
 import 'qibla_hub_page.dart';
 
@@ -46,6 +47,10 @@ class QiblaToolsDashboardPage extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
     const accent = AppColors.accentNeonGreen;
 
+    // extendBody alt çubuğu gövdenin üstüne bindirdiği için son kart
+    // (Bilgi Düellosu) sistem nav + shell bar yüksekliği kadar yukarıda bitmeli.
+    final bottomPad = ArinShellLayout.bottomContentPadding(context);
+
     return SizedBox.expand(
       child: ArinShellBackground.buildLayered(
         context,
@@ -56,7 +61,7 @@ class QiblaToolsDashboardPage extends StatelessWidget {
             SliverSafeArea(
               bottom: false,
               sliver: SliverPadding(
-                padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
+                padding: EdgeInsets.fromLTRB(20, 12, 20, bottomPad),
                 sliver: SliverList(
                   delegate: SliverChildListDelegate([
                     _SpiritualHeader(onDark: onDark),
@@ -88,14 +93,14 @@ class QiblaToolsDashboardPage extends StatelessWidget {
                     _QiblaFeatureCard(
                       onDark: onDark,
                       accent: accent,
-                      title: l10n.qiblaHubBreathingTitle,
-                      subtitle: l10n.qiblaHubBreathingSubtitle,
-                      motif: _QiblaActionMotif.breath,
+                      title: l10n.qiblaHubHilalDuelTitle,
+                      subtitle: l10n.qiblaHubHilalDuelSubtitle,
+                      motif: _QiblaActionMotif.hilal,
                       onTap: () {
                         HapticFeedback.lightImpact();
                         Navigator.of(
                           context,
-                        ).pushNamed(QiblaHubRoutes.breathing);
+                        ).pushNamed(QiblaHubRoutes.hilalDuel);
                       },
                     ),
                     const SizedBox(height: 10),
@@ -128,14 +133,14 @@ class QiblaToolsDashboardPage extends StatelessWidget {
                     _QiblaFeatureCard(
                       onDark: onDark,
                       accent: accent,
-                      title: l10n.qiblaHubHilalDuelTitle,
-                      subtitle: l10n.qiblaHubHilalDuelSubtitle,
-                      motif: _QiblaActionMotif.hilal,
+                      title: l10n.qiblaHubBreathingTitle,
+                      subtitle: l10n.qiblaHubBreathingSubtitle,
+                      motif: _QiblaActionMotif.breath,
                       onTap: () {
                         HapticFeedback.lightImpact();
                         Navigator.of(
                           context,
-                        ).pushNamed(QiblaHubRoutes.hilalDuel);
+                        ).pushNamed(QiblaHubRoutes.breathing);
                       },
                     ),
                   ]),

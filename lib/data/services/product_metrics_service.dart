@@ -1,9 +1,12 @@
+import 'dart:io' show Platform;
+
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../core/firebase/firebase_bootstrap.dart';
+import 'android_oem_settings_service.dart';
 
 /// Admin performans ekranını besleyen anonim, tekilleştirilmiş ürün metrikleri.
 ///
@@ -88,6 +91,11 @@ abstract final class ProductMetricsService {
   static Future<bool> widgetFirstUse(String kind) =>
       _record('widget_first_use', kind: kind);
 
+  static Future<bool> lockNotifActive() => _record('lock_notif_active');
+
+  static Future<bool> lockNotifFirstUse(String kind) =>
+      _record('lock_notif_first_use', kind: kind);
+
   static Future<bool> widgetChurned() => _record('widget_churned');
 
   static Future<bool> widgetReturned() => _record('widget_returned');
@@ -161,5 +169,34 @@ abstract final class ProductMetricsService {
     final installId = await _installId(createIfMissing: active);
     if (installId == null) return !active;
     return _syncAudienceId(installId: installId, active: active);
+  }
+
+  /// Admin panelindeki kurulum / marka sayacı için cihaz varlığı.
+  /// Bildirim izninden bağımsız; uygulamayı açan her kurulum sayılır.
+  static Future<bool> syncInstallPresence() async {
+    if (!isFirebaseReady || kIsWeb) return false;
+    try {
+      final installId = await _installId();
+      if (installId == null) return false;
+      var brand = 'Other';
+      if (!kIsWeb && Platform.isIOS) {
+        brand = 'iPhone';
+      } else if (!kIsWeb && Platform.isAndroid) {
+        final oem = await AndroidOemSettingsService.getInfo();
+        brand = oem?.displayName ?? oem?.manufacturer ?? 'Other';
+      }
+      final callable = FirebaseFunctions.instanceFor(
+        region: _region,
+      ).httpsCallable('syncInstallPresence');
+      final result = await callable.call(<String, Object>{
+        'installId': installId,
+        'platform': _platform,
+        'brand': brand,
+      });
+      return result.data is Map && result.data['ok'] == true;
+    } catch (e) {
+      debugPrint('ProductMetricsService.syncInstallPresence başarısız: $e');
+      return false;
+    }
   }
 }

@@ -685,7 +685,7 @@
       "count": {"type": "int"}
     }
   },
-  "hilalDuelPlay": "ابحث عن منافس",
+  "hilalDuelPlay": "العب مباشرة",
   "hilalDuelWatchAdForHeart": "شاهد إعلاناً لتحصل على قلب واحد",
   "hilalDuelNeedHeartTitle": "تحتاج قلباً واحداً للعب",
   "hilalDuelNeedHeartHint": "شاهد إعلاناً قصيراً ← احصل على قلب واحد والعب فوراً",
@@ -781,10 +781,37 @@
       "count": {"type": "int"}
     }
   },
+  "hilalDuelAdminRemoveTitle": "إزالة من القائمة",
+  "hilalDuelAdminRemoveBody": "هل تريد إزالة “{name}” من ترتيب هذا الأسبوع؟ يتقدم من بعده مرتبة واحدة؛ ولن يظهر في القائمة هذا الأسبوع.",
+  "@hilalDuelAdminRemoveBody": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "hilalDuelAdminRemoveAction": "إزالة",
+  "hilalDuelAdminRemoved": "تمت إزالة اللاعب من القائمة.",
   "hilalDuelTitleTalebe": "طالب",
   "hilalDuelTitleIlimDostu": "صديق العلم",
   "hilalDuelYouLabel": "أنت",
   "hilalDuelOpponentLabel": "المنافس",
+  "hilalDuelChallengeAction": "تحدَّ",
+  "hilalDuelChallengeInboxTitle": "التحديات",
+  "hilalDuelChallengeAccept": "اقبل · حياة واحدة",
+  "hilalDuelChallengeContinue": "متابعة",
+  "hilalDuelChallengeWaiting": "بانتظار المنافس",
+  "hilalDuelChallengeYourTurn": "دورك",
+  "hilalDuelChallengeExpired": "انتهى الوقت — بلا نقاط",
+  "hilalDuelChallengeHint": "تحدَّ أحداً من القائمة. تستهلك حياة واحدة؛ إذا انتهى الوقت فلن يحصل أحد على نقاط. البوتات ترد تلقائياً بعد نحو 12 ساعة بنتيجة ضعيفة.",
+  "hilalDuelChallengePickTitle": "اختر منافساً",
+  "hilalDuelChallengePickHint": "اختر لاعباً للتحدي. تجيب أولاً. للبشر 24 ساعة؛ البوت يرد تلقائياً بعد نحو 12 ساعة.",
+  "hilalDuelChallengeSentTitle": "تم إرسال التحدي",
+  "hilalDuelChallengeSentBody": "ستظهر النتيجة عندما يجيب {name}.",
+  "@hilalDuelChallengeSentBody": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "hilalDuelChallengeSentOk": "حسناً",
   "languageChangedMessage": "تم تغيير اللغة إلى: {languageName}",
   "@languageChangedMessage": {
     "placeholders": {
@@ -1484,6 +1511,13 @@
   "surveyNotificationAllow": "متابعة",
   "surveyNotificationSkip": "تخطي الآن",
   "surveyNotificationOpenSettings": "فتح الإعدادات",
+  "surveyLockWidgetsTitle": "شاشة القفل",
+  "surveyLockWidgetsLead": "هل تريد أوقات الصلاة وكلمة اليوم على شاشة القفل؟",
+  "surveyLockWidgetsSubtitle": "لا يمكن إضافة ودجات حقيقية على شاشة القفل في أندرويد؛ تظهر اختياراتك كإشعارات دائمة. يمكنك تغييرها لاحقًا من مركز الودجات.",
+  "surveyLockWidgetsPrayerTitle": "وقت الصلاة",
+  "surveyLockWidgetsPrayerSubtitle": "يعرض الوقت التالي والعد التنازلي على شاشة القفل.",
+  "surveyLockWidgetsQuoteTitle": "كلمة اليوم",
+  "surveyLockWidgetsQuoteSubtitle": "يعرض كلمة اليوم على شاشة القفل.",
   "surveySave": "ابدأ ➔",
   "surveyGenderDecline": "أفضل عدم المشاركة",
   "surveyNameGreetingPrefix": "مرحبًا",

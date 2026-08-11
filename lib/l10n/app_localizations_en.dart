@@ -1387,7 +1387,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get hilalDuelPlay => 'Find opponent';
+  String get hilalDuelPlay => 'Play live';
 
   @override
   String get hilalDuelWatchAdForHeart => 'Watch ad for 1 heart';
@@ -1540,6 +1540,20 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get hilalDuelAdminRemoveTitle => 'Remove from board';
+
+  @override
+  String hilalDuelAdminRemoveBody(String name) {
+    return 'Remove “$name” from this week’s leaderboard? Players below move up one place; they won’t reappear on the board this week.';
+  }
+
+  @override
+  String get hilalDuelAdminRemoveAction => 'Remove';
+
+  @override
+  String get hilalDuelAdminRemoved => 'Player removed from the board.';
+
+  @override
   String get hilalDuelTitleTalebe => 'Student';
 
   @override
@@ -1550,6 +1564,49 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get hilalDuelOpponentLabel => 'Opponent';
+
+  @override
+  String get hilalDuelChallengeAction => 'Challenge';
+
+  @override
+  String get hilalDuelChallengeInboxTitle => 'Challenges';
+
+  @override
+  String get hilalDuelChallengeAccept => 'Accept · 1 life';
+
+  @override
+  String get hilalDuelChallengeContinue => 'Continue';
+
+  @override
+  String get hilalDuelChallengeWaiting => 'Waiting for opponent';
+
+  @override
+  String get hilalDuelChallengeYourTurn => 'Your turn';
+
+  @override
+  String get hilalDuelChallengeExpired => 'Time\'s up — no points';
+
+  @override
+  String get hilalDuelChallengeHint =>
+      'Challenge someone from the list. You spend 1 life; if time runs out, nobody scores. Bots auto-reply after about 12 hours with a weak score.';
+
+  @override
+  String get hilalDuelChallengePickTitle => 'Pick opponent';
+
+  @override
+  String get hilalDuelChallengePickHint =>
+      'Choose a player to challenge. You answer first. Humans have 24 hours; bots auto-reply after about 12 hours.';
+
+  @override
+  String get hilalDuelChallengeSentTitle => 'Challenge sent';
+
+  @override
+  String hilalDuelChallengeSentBody(String name) {
+    return 'You\'ll see the result when $name answers.';
+  }
+
+  @override
+  String get hilalDuelChallengeSentOk => 'OK';
 
   @override
   String get generalLoading => 'Loading...';
@@ -2981,6 +3038,31 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get surveyNotificationOpenSettings => 'Open settings';
+
+  @override
+  String get surveyLockWidgetsTitle => 'Lock screen';
+
+  @override
+  String get surveyLockWidgetsLead =>
+      'Would you like prayer times and the daily quote on your lock screen?';
+
+  @override
+  String get surveyLockWidgetsSubtitle =>
+      'Android can’t place real widgets on the lock screen; your choices appear as persistent notifications. You can change this anytime in Widget Center.';
+
+  @override
+  String get surveyLockWidgetsPrayerTitle => 'Prayer Time';
+
+  @override
+  String get surveyLockWidgetsPrayerSubtitle =>
+      'Shows the next prayer and countdown on the lock screen.';
+
+  @override
+  String get surveyLockWidgetsQuoteTitle => 'Daily Quote';
+
+  @override
+  String get surveyLockWidgetsQuoteSubtitle =>
+      'Shows today’s quote on the lock screen.';
 
   @override
   String get surveySave => 'Start ➔';

@@ -182,22 +182,40 @@ class WidgetAccessService {
 
   /// Native widget'ın ilk kez gerçekten çizildiği zamanı analytics/retention
   /// katmanına güvenli, salt-okunur şekilde açar.
+  ///
+  /// Not: Android kilit ekranı bildirimi de deneme kapısı için aynı anahtarı
+  /// yazar; ana ekran widget metrikleri için [lastRenderFor] kullanın.
   Future<DateTime?> firstUseFor(ArinWidgetAccessKind kind) =>
       _readWidgetFirstUse(kind);
 
-  /// Native provider'ın en son gerçek render/update heartbeat'i.
+  /// Ana ekran widget heartbeat'i (kilit yüzeyinden ayrı anahtar).
+  ///
+  /// Eski `arin_widget_last_render_ms_*` iOS kilit ailesi tarafından da
+  /// yazıldığı için kullanılmaz; yalnızca home kanıtı olan
+  /// `arin_widget_home_last_render_ms_*` okunur.
   Future<DateTime?> lastRenderFor(ArinWidgetAccessKind kind) async {
+    return _readEpochMs('arin_widget_home_last_render_ms_${kind.id}');
+  }
+
+  /// Kilit ekranı bildiriminin (Android) / accessory widget'ın (iOS) ilk
+  /// gösterim zamanı — admin metriklerinde ana ekrandan ayrı sayılır.
+  Future<DateTime?> lockNotifFirstUseFor(ArinWidgetAccessKind kind) =>
+      _readEpochMs('arin_lock_notif_first_use_ms_${kind.id}');
+
+  /// Kilit ekranı yüzeyinin en son gösterim heartbeat'i.
+  Future<DateTime?> lockNotifLastShowFor(ArinWidgetAccessKind kind) =>
+      _readEpochMs('arin_lock_notif_last_show_ms_${kind.id}');
+
+  Future<DateTime?> _readEpochMs(String key) async {
     if (kIsWeb) return null;
     try {
-      final raw = await HomeWidget.getWidgetData<String>(
-        'arin_widget_last_render_ms_${kind.id}',
-      );
+      final raw = await HomeWidget.getWidgetData<String>(key);
       if (raw == null || raw.isEmpty) return null;
       final ms = int.tryParse(raw) ?? double.tryParse(raw)?.toInt();
       if (ms == null || ms <= 0) return null;
       return DateTime.fromMillisecondsSinceEpoch(ms);
     } catch (e) {
-      debugPrint('WidgetAccessService.lastRenderFor(${kind.id}): $e');
+      debugPrint('WidgetAccessService._readEpochMs($key): $e');
       return null;
     }
   }

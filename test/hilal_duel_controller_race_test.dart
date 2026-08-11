@@ -117,6 +117,46 @@ class _RaceRepo implements HilalDuelRepositoryApi {
   }
 
   @override
+  Future<void> adminRemoveWeeklyEntry({
+    required String ownerHash,
+    String? reason,
+  }) async {
+    throw UnsupportedError('adminRemoveWeeklyEntry');
+  }
+
+  @override
+  Future<HilalDuelMatch> createChallenge({
+    required String name,
+    required String opponentOwnerHash,
+  }) async {
+    throw UnsupportedError('createChallenge');
+  }
+
+  @override
+  Future<HilalDuelMatch> acceptChallenge(String challengeId) async {
+    throw UnsupportedError('acceptChallenge');
+  }
+
+  @override
+  Future<HilalDuelMatch> loadChallenge(String challengeId) async {
+    throw UnsupportedError('loadChallenge');
+  }
+
+  @override
+  Future<HilalDuelMatch> submitChallengeAnswer({
+    required String challengeId,
+    required int round,
+    required int choice,
+  }) async {
+    throw UnsupportedError('submitChallengeAnswer');
+  }
+
+  @override
+  Future<List<HilalDuelChallengeSummary>> listChallenges() async {
+    return const [];
+  }
+
+  @override
   Future<HilalDuelRewardProof> beginReward({
     required String purpose,
     String? matchId,
@@ -137,6 +177,35 @@ void main() {
   setUp(() {
     SharedPreferences.setMockInitialValues({});
   });
+
+  test(
+    'cancel leaves matchmaking UI before cancel RPC completes',
+    () async {
+      final repo = _RaceRepo();
+      final controller = HilalDuelController(
+        repository: repo,
+        adMob: _FakeAdMob(),
+        displayName: () => 'Test',
+      );
+
+      await controller.bootstrap();
+      final startFuture = controller.startMatchmaking();
+      await Future<void>.delayed(Duration.zero);
+      expect(controller.phase, HilalDuelPhase.matchmaking);
+
+      final cancelFuture = controller.cancelMatchmaking();
+      // Senkron: RPC bitmeden lobi — anlık iptal tepkisi.
+      expect(controller.phase, HilalDuelPhase.lobby);
+      expect(repo.cancelCount, 0);
+
+      repo.startGate.complete();
+      await startFuture;
+      await cancelFuture;
+      expect(controller.phase, HilalDuelPhase.lobby);
+      expect(repo.cancelCount, 1);
+      controller.dispose();
+    },
+  );
 
   test(
     'cancel button awaits start: no premature cancel, single charge, refund',
@@ -161,6 +230,7 @@ void main() {
       final cancelFuture = controller.cancelMatchmaking();
       // Cancel must NOT hit the repo before start settles.
       await Future<void>.delayed(Duration.zero);
+      expect(controller.phase, HilalDuelPhase.lobby);
       expect(repo.cancelCount, 0, reason: 'cancel RPC before start completes');
       expect(repo.calls.where((c) => c == 'cancel'), isEmpty);
 

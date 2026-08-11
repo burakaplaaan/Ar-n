@@ -5,8 +5,8 @@ process.env.NODE_ENV = "test";
 const { _testables: t } = require("../index.js");
 const questions = require("../data/islamic_quiz_questions.json");
 
-test("question bank contains 380 valid and unique questions", () => {
-  assert.equal(questions.length, 380);
+test("question bank contains 500 valid and unique questions", () => {
+  assert.equal(questions.length, 500);
   const ids = new Set();
   const normalizedQuestions = new Set();
   const byDifficulty = { 1: 0, 2: 0, 3: 0 };
@@ -140,6 +140,105 @@ test("canAcceptAnswer rejects submits before roundStartedAtMs", () => {
     t.canAcceptAnswer(deadline + 2_000, start, deadline),
     { ok: false, reason: "expired" },
   );
+});
+
+test("perspective resolution choices survive map-key lookup", () => {
+  const lastResolution = {
+    round: 2,
+    choices: {
+      aaa111: 1,
+      bbb222: 3,
+    },
+  };
+  assert.deepEqual(
+    t.perspectiveResolutionChoices(lastResolution, "aaa111", "bbb222"),
+    { selfChoice: 1, opponentChoice: 3 },
+  );
+  assert.deepEqual(
+    t.perspectiveResolutionChoices(lastResolution, "bbb222", "aaa111"),
+    { selfChoice: 3, opponentChoice: 1 },
+  );
+  // Eksik oyuncu: null (challenge solo); timeout ile karıştırma.
+  assert.deepEqual(
+    t.perspectiveResolutionChoices(lastResolution, "missing", "bbb222"),
+    { selfChoice: null, opponentChoice: 3 },
+  );
+  assert.deepEqual(
+    t.perspectiveResolutionChoices({ round: 0 }, "aaa111", "bbb222"),
+    { selfChoice: null, opponentChoice: null },
+  );
+  assert.deepEqual(
+    t.perspectiveResolutionChoices(
+      { round: 1, choices: { aaa111: -1 } },
+      "aaa111",
+      "bbb222",
+    ),
+    { selfChoice: -1, opponentChoice: null },
+  );
+});
+
+test("answer grace keeps poll timeout and submit window aligned", () => {
+  const start = 1_000_000;
+  const deadline = start + 20_000;
+  assert.equal(t.ANSWER_GRACE_MS, 1_500);
+  // Deadline anında cevap hâlâ kabul; otomatik timeout YOK.
+  assert.deepEqual(
+    t.canAcceptAnswer(deadline, start, deadline),
+    { ok: true, reason: "ok" },
+  );
+  assert.equal(t.shouldAutoTimeoutAnswers(deadline, deadline), false);
+  assert.deepEqual(
+    t.canAcceptAnswer(deadline + 1_000, start, deadline),
+    { ok: true, reason: "ok" },
+  );
+  assert.equal(t.shouldAutoTimeoutAnswers(deadline + 1_000, deadline), false);
+  // Grace sınırında submit ok; hemen sonra timeout dolar.
+  assert.deepEqual(
+    t.canAcceptAnswer(deadline + t.ANSWER_GRACE_MS, start, deadline),
+    { ok: true, reason: "ok" },
+  );
+  assert.equal(
+    t.shouldAutoTimeoutAnswers(deadline + t.ANSWER_GRACE_MS, deadline),
+    false,
+  );
+  assert.deepEqual(
+    t.canAcceptAnswer(deadline + t.ANSWER_GRACE_MS + 1, start, deadline),
+    { ok: false, reason: "expired" },
+  );
+  assert.equal(
+    t.shouldAutoTimeoutAnswers(deadline + t.ANSWER_GRACE_MS + 1, deadline),
+    true,
+  );
+  assert.equal(t.isTimeoutAnswer({ choice: -1, correct: false }), true);
+  assert.equal(t.isTimeoutAnswer({ choice: 2, correct: true }), false);
+  assert.equal(
+    t.canReplaceTimeoutAnswer(
+      { choice: -1, correct: false },
+      deadline + 500,
+      start,
+      deadline,
+    ),
+    true,
+  );
+  assert.equal(
+    t.canReplaceTimeoutAnswer(
+      { choice: 1, correct: false },
+      deadline + 500,
+      start,
+      deadline,
+    ),
+    false,
+  );
+  const sampleId = questions[0].id;
+  assert.equal(
+    t.isChoiceCorrect(questions[0].correctIndex, sampleId),
+    true,
+  );
+  assert.equal(
+    t.isChoiceCorrect((questions[0].correctIndex + 1) % 4, sampleId),
+    false,
+  );
+  assert.equal(t.isChoiceCorrect(-1, sampleId), false);
 });
 
 test("round advances as soon as both players answer", () => {
@@ -297,24 +396,31 @@ test("queueAbandonAtMs prefers activeUntil over queuedAt+window", () => {
 test("weekly leaderboard keeps bots below humans without score inflation", () => {
   assert.equal(t.BOT_WEEKLY_CAP, 6);
   const ordered = t.orderWeeklyLeaderboard([
-    { name: "Elif Aydın", weeklyHilals: 6, isBot: true },
+    { name: "Elif", weeklyHilals: 6, isBot: true },
     { name: "Arın Oyuncusu", weeklyHilals: 2, isBot: false },
     { name: "Ahmet", weeklyHilals: 1, isBot: false },
     { name: "Zeynep", weeklyHilals: 4, isBot: true },
   ]);
   assert.deepEqual(
     ordered.map((row) => row.name),
-    ["Arın Oyuncusu", "Ahmet", "Elif Aydın", "Zeynep"],
+    ["Arın Oyuncusu", "Ahmet", "Elif", "Zeynep"],
   );
   assert.equal(ordered[0].rank, 1);
   assert.equal(ordered[2].isBot, true);
   assert.ok(ordered[0].weeklyHilals < ordered[2].weeklyHilals);
 });
 
+test("bot display names drop surnames", () => {
+  assert.equal(t.botDisplayName("Elif Aydın"), "Elif");
+  assert.equal(t.botDisplayName("  Mehmet   Kaya "), "Mehmet");
+  assert.equal(t.botDisplayName("Ayşe"), "Ayşe");
+  assert.ok(t.BOT_NAMES.every((name) => !/\s/u.test(name)));
+});
+
 test("stableBotId is deterministic per display name", () => {
-  const a = t.stableBotId("Elif Aydın");
-  const b = t.stableBotId("Elif Aydın");
-  const c = t.stableBotId("Ahmet Yılmaz");
+  const a = t.stableBotId("Elif");
+  const b = t.stableBotId("Elif Aydın"); // soyad düşülür → aynı id
+  const c = t.stableBotId("Ahmet");
   assert.match(a, /^bot_[a-f0-9]{20}$/);
   assert.equal(a, b);
   assert.notEqual(a, c);
@@ -410,6 +516,17 @@ test("quiz engagement stays non-spammy and prefers rank-drop copy", () => {
     }).send,
     false,
   );
+  const neverPlayed = t.decideQuizEngagement({
+    matchesCompleted: 0,
+    createdAtMs: now - t.ENGAGEMENT_NEVER_PLAYED_MIN_AGE_MS - 1_000,
+    lastMatchAtMs: 0,
+    lastPushAtMs: 0,
+    nowMs: now,
+    currentRank: 0,
+    bestWeeklyRank: 0,
+  });
+  assert.equal(neverPlayed.send, true);
+  assert.equal(neverPlayed.reason, "never_played");
   assert.equal(
     t.decideQuizEngagement({
       matchesCompleted: 1,
@@ -454,4 +571,113 @@ test("quiz engagement stays non-spammy and prefers rank-drop copy", () => {
   assert.equal(comeback.reason, "comeback");
   assert.match(t.quizEngagementCopy("tr", "rank_drop").title, /Sıralaman/);
   assert.match(t.quizEngagementCopy("tr", "comeback").body, /oyna/i);
+  assert.match(t.quizEngagementCopy("tr", "never_played").body, /hediye|ilk/i);
+});
+
+test("pending promo hearts grant once per seq", () => {
+  assert.equal(
+    t.pendingPromoHeartsGain({ claimedSeq: 0, promoSeq: 3, amount: 1 }),
+    1,
+  );
+  assert.equal(
+    t.pendingPromoHeartsGain({ claimedSeq: 3, promoSeq: 3, amount: 1 }),
+    0,
+  );
+  assert.equal(
+    t.pendingPromoHeartsGain({ claimedSeq: 2, promoSeq: 5, amount: 1 }),
+    1,
+  );
+  assert.equal(
+    t.pendingPromoHeartsGain({ claimedSeq: 0, promoSeq: 0, amount: 1 }),
+    0,
+  );
+});
+
+test("challenge rank bonus rewards beating higher ranks", () => {
+  assert.equal(t.challengeRankBonus(10, 2), 5);
+  assert.equal(t.challengeRankBonus(0, 2), 5);
+  assert.equal(t.challengeRankBonus(12, 8), 3);
+  assert.equal(t.challengeRankBonus(20, 15), 2);
+  assert.equal(t.challengeRankBonus(3, 10), 0);
+  assert.equal(t.challengeRankBonus(5, 0), 0);
+  assert.equal(t.CHALLENGE_TTL_MS, 24 * 60 * 60_000);
+  assert.equal(t.CHALLENGE_BOT_DELAY_MS, 12 * 60 * 60_000);
+  assert.equal(t.CHALLENGE_REMINDER_BEFORE_MS, 4 * 60 * 60_000);
+});
+
+test("bot challenge ids and weak plan (exactly one correct)", () => {
+  assert.equal(t.isBotId("bot_0123456789abcdef0123"), true);
+  assert.equal(t.isBotId("0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"), false);
+  assert.equal(t.isBotId("bot_short"), false);
+  assert.equal(
+    t.isChallengeBotOpponent({
+      challengedIsBot: true,
+      challengedId: "bot_0123456789abcdef0123",
+    }),
+    true,
+  );
+  assert.equal(
+    t.isChallengeBotOpponent({
+      challengedIsBot: false,
+      challengedId: "a".repeat(64),
+    }),
+    false,
+  );
+  // Accept path: bot opponent must be treated as non-acceptable invite target.
+  assert.equal(
+    t.isChallengeBotOpponent({ challengedId: "bot_0123456789abcdef0123" }),
+    true,
+  );
+  const respondAfter = 1_000_000;
+  const originalDeadline = respondAfter - 60_000; // shorter than 12h window
+  assert.equal(
+    t.challengeBotMinDeadlineMs(respondAfter, originalDeadline),
+    respondAfter + 5 * 60_000,
+  );
+  assert.equal(
+    t.challengeBotMinDeadlineMs(respondAfter, respondAfter + 10 * 60_000),
+    respondAfter + 10 * 60_000,
+  );
+  const ids = t.pickQuestions();
+  assert.equal(ids.length, 7);
+  const plan = t.challengeBotWeakPlan(ids);
+  assert.equal(plan.length, 7);
+  const correctCount = plan.filter((step) => step.correct === true).length;
+  assert.equal(correctCount, 1);
+  // Weak plan ⇒ bot rarely beats a human who scores ≥2; award stays soft.
+  assert.ok(correctCount < 2);
+  for (let i = 0; i < plan.length; i += 1) {
+    const step = plan[i];
+    assert.ok(Number.isInteger(step.choice));
+    assert.ok(step.choice >= 0 && step.choice <= 3);
+    assert.ok(step.elapsedMs > 0);
+    assert.equal(t.isChoiceCorrect(step.choice, ids[i]), step.correct);
+  }
+});
+
+test("challenge expiry and copy", () => {
+  const now = 1_000_000;
+  assert.equal(
+    t.challengeIsExpired({
+      status: "awaiting_opponent",
+      challengeDeadlineMs: now - 1,
+    }, now),
+    true,
+  );
+  assert.equal(
+    t.challengeIsExpired({
+      status: "completed",
+      challengeDeadlineMs: now - 1,
+    }, now),
+    false,
+  );
+  assert.equal(
+    t.challengeIsExpired({
+      status: "awaiting_opponent",
+      challengeDeadlineMs: now + 10_000,
+    }, now),
+    false,
+  );
+  assert.match(t.quizChallengeCopy("tr", "invited", { name: "Ayşe" }).body, /Ayşe/);
+  assert.match(t.quizChallengeCopy("tr", "reminder").body, /puan/i);
 });

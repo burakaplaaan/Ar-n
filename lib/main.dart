@@ -33,9 +33,11 @@ import 'data/models/habit_log_model.g.dart';
 import 'data/services/app_notification_channel_prefs.dart';
 import 'data/services/arin_local_notifications_plugin.dart';
 import 'data/services/admob_service.dart';
+import 'data/services/arin_lock_notification_service.dart';
 import 'data/services/arin_widget_sync.dart';
 import 'data/services/background_location_task.dart';
 import 'data/services/location_service.dart';
+import 'data/services/product_metrics_service.dart';
 import 'data/services/purchase_service.dart';
 import 'data/services/diyanet_district_matcher.dart';
 import 'data/services/fcm_token_service.dart';
@@ -422,6 +424,9 @@ Future<void> _runDeferredStartup(SharedPreferences prefs) async {
       // İzin Ver" verdiyse fiilen bir şey yapar; aksi halde no-op'tur — bu
       // yüzden her açılışta senkronize etmek güvenlidir.
       unawaited(BackgroundLocationTask.syncSchedule(LocationService()));
+
+      // Admin kurulum sayacı: marka + platform (manuel tahmin değil).
+      unawaited(ProductMetricsService.syncInstallPresence());
     }
   }
 
@@ -459,6 +464,7 @@ Future<void> _runDeferredStartup(SharedPreferences prefs) async {
   // bildirimler tetiklenmeye devam ederdi.
   if (!kIsWeb) {
     await _migrateNotificationsV1IfNeeded(prefs);
+    await ArinLockNotificationService.migrateLegacyDefaultsIfNeeded(prefs);
   }
 
   // Eski "Günlük" (Journal) kutusunu disk'ten sil — özellik artık yok.

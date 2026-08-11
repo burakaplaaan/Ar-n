@@ -15,6 +15,7 @@ import 'dart:io' show Platform;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:home_widget/home_widget.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'arin_local_notifications_plugin.dart';
 import 'local_notification_permission_gate.dart';
@@ -23,12 +24,41 @@ import 'widget_access_service.dart';
 abstract final class ArinLockNotificationService {
   static const _channel = MethodChannel('com.arin.arin/lock_notifications');
 
-  /// Namaz vakti ve Söz varsayılan olarak açık gelir; diğerleri kullanıcı
-  /// isterse kendisi açar. Native taraftaki `defaultEnabled` ile birebir
-  /// aynı kalmalıdır.
-  static bool defaultEnabled(ArinWidgetAccessKind kind) {
-    return kind == ArinWidgetAccessKind.prayer ||
-        kind == ArinWidgetAccessKind.quote;
+  /// Eski sürümde namaz/söz varsayılanı açıktı; yeni kurulumda kapalı.
+  /// Onboarding'i bitirmiş kullanıcıların anahtarsız tercihi bir kez korunur.
+  static const legacyDefaultsMigratedKey =
+      'lock_notif_defaults_off_v1_migrated';
+
+  /// Varsayılan: hepsi kapalı. Kullanıcı Widget Merkezi veya onboarding'de
+  /// açar. Native `defaultEnabled` ile birebir aynı kalmalıdır.
+  static bool defaultEnabled(ArinWidgetAccessKind kind) => false;
+
+  /// Onboarding'i bitirmiş eski kullanıcılar: anahtar yoksa eski varsayılan
+  /// (namaz + söz açık) bir kez yazılır. Yeni kurulumda dokunulmaz.
+  static Future<void> migrateLegacyDefaultsIfNeeded(
+    SharedPreferences prefs,
+  ) async {
+    if (kIsWeb || !Platform.isAndroid) return;
+    if (prefs.getBool(legacyDefaultsMigratedKey) == true) return;
+    try {
+      final onboarded = prefs.getBool('onboarding_completed') == true;
+      if (onboarded) {
+        for (final kind in const [
+          ArinWidgetAccessKind.prayer,
+          ArinWidgetAccessKind.quote,
+        ]) {
+          final raw = await HomeWidget.getWidgetData<String>(_key(kind));
+          if (raw == null) {
+            await HomeWidget.saveWidgetData<String>(_key(kind), '1');
+          }
+        }
+        await syncAll();
+      }
+    } catch (e) {
+      debugPrint('ArinLockNotificationService.migrateLegacyDefaults: $e');
+    } finally {
+      await prefs.setBool(legacyDefaultsMigratedKey, true);
+    }
   }
 
   static String _key(ArinWidgetAccessKind kind) =>

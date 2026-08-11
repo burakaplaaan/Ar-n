@@ -1,5 +1,70 @@
 import 'hilal_duel_repository.dart';
 
+/// Oyun içi / sonuç doğru-yanlış tahtası için tur durumu.
+enum HilalDuelRoundMark {
+  /// Henüz oynanmadı.
+  pending,
+
+  /// Sunucuda `correct: true`.
+  correct,
+
+  /// Cevap var ama yanlış.
+  wrong,
+
+  /// Süre doldu / cevap yok (`choice: -1`).
+  missed,
+}
+
+/// Sunucu `choice` + `correctIndex` → tahta işareti.
+HilalDuelRoundMark markFromServerChoice({
+  required int? choice,
+  required int? correctIndex,
+}) {
+  if (choice == null || choice < 0) return HilalDuelRoundMark.missed;
+  if (correctIndex != null && choice == correctIndex) {
+    return HilalDuelRoundMark.correct;
+  }
+  return HilalDuelRoundMark.wrong;
+}
+
+/// Reveal / SFX için sunucu seçimi. `-1` (timeout) → `null`; yerel optimistic
+/// seçime düşülmez — aksi halde doğru SFX + yeşil "Sen" skora yazılmadan
+/// görünür ve sonuçtaki "Doğru cevap sayısı" çelişir.
+///
+/// [preferPerspective]: `self` | `opponent` — serialize edilmiş sabit alanlar
+/// (map key kaybında bile çalışır). `null` ise yalnız [playerId] map lookup.
+int? serverChoiceForReveal({
+  required HilalDuelResolution resolution,
+  required String? playerId,
+  String? preferPerspective,
+}) {
+  int? fromPerspective;
+  if (preferPerspective == 'self') {
+    fromPerspective = resolution.selfChoice;
+  } else if (preferPerspective == 'opponent') {
+    fromPerspective = resolution.opponentChoice;
+  }
+  if (fromPerspective != null) {
+    return fromPerspective < 0 ? null : fromPerspective;
+  }
+
+  if (playerId == null) return null;
+  // Key tip/normalize farklarına karşı toString ile ara.
+  final key = playerId.toString();
+  int? choice = resolution.choices[key];
+  if (choice == null) {
+    for (final entry in resolution.choices.entries) {
+      if (entry.key.toString() == key) {
+        choice = entry.value;
+        break;
+      }
+    }
+  }
+  if (choice == null) return null;
+  if (choice < 0) return null;
+  return choice;
+}
+
 /// Sunucu `version` alanına göre eşzamanlı poll/submit yarışını çözer.
 /// [incoming] daha eskiyse [current] korunur.
 /// Aynı version'da cevaplı / ilerlemiş durum ezilmez.

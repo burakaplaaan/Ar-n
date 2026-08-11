@@ -11,8 +11,10 @@
        notif_primary -> alt satır: ana değer (geri sayım / söz / sayaç),
                         font boyutu ve satır sayısı native tarafta cihaz
                         genişliğine göre dinamik seçilir.
-     Metin renkleri sistem temasına bağlı (?android:attr/...) — koyu/açık
-     temada otomatik uyum sağlar.
+
+     RENK: ?android:attr/textColor* KULLANILMAZ. OEM SystemUI (MIUI vb.)
+     koyu modda bu attribute'ları koyu kart üzerinde koyu metne çözüp
+     metni görünmez yapabiliyor. Absolute @color + Kotlin setTextColor.
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/notif_root"
@@ -34,7 +36,7 @@
         android:ellipsize="end"
         android:textSize="9sp"
         android:textStyle="bold"
-        android:textColor="?android:attr/textColorSecondary"
+        android:textColor="@color/lock_notif_text_secondary"
         android:text="Arın" />
 
     <Chronometer
@@ -47,6 +49,6 @@
         android:fontFamily="sans-serif-medium"
         android:textSize="15sp"
         android:textStyle="bold"
-        android:textColor="?android:attr/textColorPrimary"
+        android:textColor="@color/lock_notif_text_primary"
         android:text="—" />
 </LinearLayout>

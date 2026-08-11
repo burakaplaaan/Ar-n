@@ -120,19 +120,36 @@ private func decodeWidgetJson<T: Decodable>(_ key: String, as type: T.Type) -> T
 /// aynı sona ulaşsın diye senkron.
 private let kWidgetTrialDurationMs: Double = 24 * 60 * 60 * 1000.0
 
-/// Bir widget'ın home ekranda ilk render'ı yapıldığında, ilgili kind için
-/// "kullanım başlangıcı" zaman damgasını App Group UserDefaults'a yazar.
-/// Aynı kind için tekrar çağrı no-op'tur (idempotent). Bu, her widget'ın
-/// trial sayacını yalnızca o widget kullanıma alındığında başlatır;
-/// kullanılmayan widget'lar trial'a girmez.
-private func recordWidgetFirstUse(_ kind: String) {
+/// Widget render heartbeat + deneme kapısı başlangıcı.
+///
+/// - Deneme kapısı (`arin_widget_first_use_ms_<kind>`) home ve kilit ailesi
+///   için ortaktır (aynı reklam turu ikisini de açar).
+/// - Ana ekran metrikleri: `arin_widget_home_last_render_ms_<kind>`
+///   (eski `arin_widget_last_render_ms_*` kilit ailesiyle karıştığı için
+///   kullanılmaz)
+/// - Kilit ekranı metrikleri: `arin_lock_notif_*` (admin panelde ayrı KPI)
+private func recordWidgetFirstUse(_ kind: String, family: WidgetFamily) {
   let u = suite()
-  let key = "arin_widget_first_use_ms_\(kind)"
-  let existing = Double(u?.string(forKey: key) ?? "") ?? 0
+  let gateKey = "arin_widget_first_use_ms_\(kind)"
+  let existing = Double(u?.string(forKey: gateKey) ?? "") ?? 0
   let nowMs = Date().timeIntervalSince1970 * 1000.0
-  u?.set(String(nowMs), forKey: "arin_widget_last_render_ms_\(kind)")
   if existing <= 0 {
-    u?.set(String(nowMs), forKey: key)
+    u?.set(String(nowMs), forKey: gateKey)
+  }
+  let isLockFamily: Bool
+  if #available(iOSApplicationExtension 16.0, *) {
+    isLockFamily = family == .accessoryRectangular
+  } else {
+    isLockFamily = false
+  }
+  if isLockFamily {
+    let lockFirstKey = "arin_lock_notif_first_use_ms_\(kind)"
+    if (Double(u?.string(forKey: lockFirstKey) ?? "") ?? 0) <= 0 {
+      u?.set(String(nowMs), forKey: lockFirstKey)
+    }
+    u?.set(String(nowMs), forKey: "arin_lock_notif_last_show_ms_\(kind)")
+  } else {
+    u?.set(String(nowMs), forKey: "arin_widget_home_last_render_ms_\(kind)")
   }
 }
 
@@ -290,7 +307,7 @@ struct QuoteProvider: TimelineProvider {
   }
 
   func getTimeline(in context: Context, completion: @escaping (Timeline<QuoteEntry>) -> Void) {
-    recordWidgetFirstUse("quote")
+    recordWidgetFirstUse("quote", family: context.family)
     if widgetLocked("quote") {
       let next = widgetGateRefreshDate("quote") ?? Date().addingTimeInterval(3600)
       completion(
@@ -570,7 +587,7 @@ struct PrayerProvider: TimelineProvider {
   }
 
   func getTimeline(in context: Context, completion: @escaping (Timeline<PrayerEntry>) -> Void) {
-    recordWidgetFirstUse("prayer")
+    recordWidgetFirstUse("prayer", family: context.family)
     if widgetLocked("prayer") {
       let next = widgetGateRefreshDate("prayer") ?? Date().addingTimeInterval(3600)
       completion(
@@ -886,7 +903,7 @@ struct ComboProvider: TimelineProvider {
   }
 
   func getTimeline(in context: Context, completion: @escaping (Timeline<ComboEntry>) -> Void) {
-    recordWidgetFirstUse("combo")
+    recordWidgetFirstUse("combo", family: context.family)
     let now = Date()
     if widgetLocked("combo") {
       let next = widgetGateRefreshDate("combo") ?? now.addingTimeInterval(3600)
@@ -1311,7 +1328,7 @@ struct TrackingProvider: TimelineProvider {
   }
 
   func getTimeline(in context: Context, completion: @escaping (Timeline<TrackingEntry>) -> Void) {
-    recordWidgetFirstUse("tracking")
+    recordWidgetFirstUse("tracking", family: context.family)
     let entry = loadEntry()
     let now = Date()
     let nextDay = Calendar.current.startOfDay(for: now).addingTimeInterval(86_400)
@@ -1537,7 +1554,7 @@ struct ZikirProvider: TimelineProvider {
   }
 
   func getTimeline(in context: Context, completion: @escaping (Timeline<ZikirEntry>) -> Void) {
-    recordWidgetFirstUse("zikir")
+    recordWidgetFirstUse("zikir", family: context.family)
     let entry = loadEntry()
     let now = Date()
     // Zikir uygulamadan güncellenir.

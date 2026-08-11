@@ -1,5 +1,6 @@
 // Yalnızca admin e-postaları — Firestore söz havuzları + Keşfet kartları.
 
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
@@ -138,6 +139,13 @@ class _AdminContentPageState extends ConsumerState<AdminContentPage>
   bool _quizHeartsGrantAllBusy = false;
   bool _quizHeartsGrantOneBusy = false;
   String? _quizHeartsLastResult;
+  bool _quizStatsLoading = false;
+  bool _quizStatsLoaded = false;
+  String? _quizStatsError;
+  int _quizTodayPlayers = 0;
+  int _quizWeekPlayers = 0;
+  String _quizTopScope = 'week';
+  List<_QuizTopPlayerRow> _quizTopPlayers = const [];
 
   @override
   void initState() {
@@ -171,6 +179,9 @@ class _AdminContentPageState extends ConsumerState<AdminContentPage>
         _premiumEntitlements.isEmpty &&
         _premiumInvites.isEmpty) {
       _loadPremiumGrants();
+    }
+    if (_tabs.index == 7 && !_quizStatsLoaded && !_quizStatsLoading) {
+      _loadQuizStats();
     }
     if (_tabs.index == 8 && !_auditLoading && !_auditLoaded) {
       _loadAuditRows();
@@ -2551,6 +2562,7 @@ class _AdminContentPageState extends ConsumerState<AdminContentPage>
             email: email,
             projectId: Firebase.app().options.projectId,
           ),
+          const _AdminInstallAudienceStrip(),
           Expanded(
             child: TabBarView(
               controller: _tabs,
@@ -3007,6 +3019,192 @@ class _AdminContentPageState extends ConsumerState<AdminContentPage>
     );
   }
 
+  Future<void> _loadQuizStats() async {
+    if (_quizStatsLoading) return;
+    setState(() {
+      _quizStatsLoading = true;
+      _quizStatsError = null;
+    });
+    try {
+      final callable = FirebaseFunctions.instanceFor(
+        region: _kFunctionsRegion,
+      ).httpsCallable('getAdminQuizStats');
+      final result = await callable.call(<String, Object>{});
+      final data = Map<String, dynamic>.from(result.data as Map? ?? const {});
+      final topRaw = (data['topPlayers'] as List?) ?? const [];
+      final top = topRaw
+          .whereType<Map>()
+          .map(
+            (item) => _QuizTopPlayerRow(
+              name: item['name']?.toString() ?? 'Oyuncu',
+              matches: (item['matches'] as num?)?.toInt() ?? 0,
+              hilals: (item['hilals'] as num?)?.toInt() ?? 0,
+            ),
+          )
+          .toList(growable: false);
+      if (!mounted) return;
+      setState(() {
+        _quizTodayPlayers = (data['todayPlayers'] as num?)?.toInt() ?? 0;
+        _quizWeekPlayers = (data['weekPlayers'] as num?)?.toInt() ?? 0;
+        _quizTopScope = data['topScope']?.toString() ?? 'week';
+        _quizTopPlayers = top;
+        _quizStatsLoaded = true;
+      });
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _quizStatsError = _friendlyAdminError(
+          e,
+          fallback: 'Düello istatistikleri alınamadı.',
+        );
+      });
+    } finally {
+      if (mounted) setState(() => _quizStatsLoading = false);
+    }
+  }
+
+  Widget _buildQuizStatsCard() {
+    final topLabel = _quizTopScope == 'all_time'
+        ? 'En çok oynayan 3 (tüm zamanlar)'
+        : 'En çok oynayan 3 (bu hafta)';
+    return Card(
+      color: const Color(0xFF0F2419),
+      child: Padding(
+        padding: const EdgeInsets.all(14),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    'Oynanma özeti',
+                    style: TextStyle(
+                      color: Colors.white.withValues(alpha: 0.92),
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+                IconButton(
+                  tooltip: 'Yenile',
+                  onPressed: _quizStatsLoading ? null : _loadQuizStats,
+                  icon: _quizStatsLoading
+                      ? const SizedBox(
+                          width: 16,
+                          height: 16,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : const Icon(Icons.refresh_rounded),
+                ),
+              ],
+            ),
+            if (_quizStatsError != null) ...[
+              Text(
+                _quizStatsError!,
+                style: TextStyle(
+                  color: Colors.orangeAccent.withValues(alpha: 0.9),
+                  fontSize: 12,
+                ),
+              ),
+              const SizedBox(height: 8),
+            ],
+            Row(
+              children: [
+                Expanded(
+                  child: _QuizStatTile(
+                    label: 'Bugün',
+                    value: '$_quizTodayPlayers',
+                    hint: 'kişi oynadı',
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: _QuizStatTile(
+                    label: 'Bu hafta',
+                    value: '$_quizWeekPlayers',
+                    hint: 'kişi oynadı',
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 14),
+            Text(
+              topLabel,
+              style: TextStyle(
+                color: Colors.white.withValues(alpha: 0.78),
+                fontWeight: FontWeight.w600,
+                fontSize: 12.5,
+              ),
+            ),
+            const SizedBox(height: 8),
+            if (_quizStatsLoading && !_quizStatsLoaded)
+              const Padding(
+                padding: EdgeInsets.symmetric(vertical: 12),
+                child: Center(
+                  child: SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  ),
+                ),
+              )
+            else if (_quizTopPlayers.isEmpty)
+              Text(
+                'Henüz yeterli oynanma yok.',
+                style: TextStyle(
+                  color: Colors.white.withValues(alpha: 0.55),
+                  fontSize: 12,
+                ),
+              )
+            else
+              ..._quizTopPlayers.asMap().entries.map((entry) {
+                final rank = entry.key + 1;
+                final row = entry.value;
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 6),
+                  child: Row(
+                    children: [
+                      SizedBox(
+                        width: 28,
+                        child: Text(
+                          '#$rank',
+                          style: TextStyle(
+                            color: AppColors.accentNeonGreen.withValues(
+                              alpha: 0.9,
+                            ),
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        child: Text(
+                          row.name,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            color: Colors.white.withValues(alpha: 0.9),
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                      Text(
+                        '${row.matches} maç',
+                        style: TextStyle(
+                          color: Colors.white.withValues(alpha: 0.75),
+                          fontWeight: FontWeight.w700,
+                          fontSize: 13,
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              }),
+          ],
+        ),
+      ),
+    );
+  }
+
   Future<void> _grantQuizHeartsAll() async {
     if (_quizHeartsGrantAllBusy) return;
     final confirmed = await showDialog<bool>(
@@ -3014,9 +3212,10 @@ class _AdminContentPageState extends ConsumerState<AdminContentPage>
       builder: (ctx) => AlertDialog(
         title: const Text('Herkese +1 can'),
         content: const Text(
-          'Tüm Bilgi Düellosu oyuncularına +1 can yazılır ve herkese '
-          '“can verildi / bilginle herkesi yen” bildirimi gönderilir.\n\n'
-          'Bildirime tıklanınca düello açılır. Emin misin?',
+          'Mevcut düello oyuncularına +1 can yazılır; ayrıca global hediye '
+          'kaydı oluşur (hiç oynamayan ilk açılışta canı alır).\n\n'
+          'Bildirim broadcast_all ile herkese gider — teşvik metni özellikle '
+          'yeni oyuncuya göre. Tıklanınca düello açılır. Emin misin?',
         ),
         actions: [
           TextButton(
@@ -3081,13 +3280,64 @@ class _AdminContentPageState extends ConsumerState<AdminContentPage>
     }
   }
 
+  List<String> _parseQuizHeartTargets(String raw) {
+    return raw
+        .split(RegExp(r'[,;\n]+'))
+        .map((s) => s.trim().toLowerCase())
+        .where((s) => s.isNotEmpty)
+        .toSet()
+        .toList(growable: false);
+  }
+
+  bool _isQuizHeartTargetValid(String target) {
+    if (RegExp(r'^[a-f0-9]{64}$').hasMatch(target)) return true;
+    return target.contains('@') && target.length >= 5 && target.length <= 120;
+  }
+
+  Future<void> _shareQuizHeartTarget() async {
+    final raw = _quizOwnerHashController.text.trim();
+    final amount = _quizHeartsAmountController.text.trim();
+    final text = StringBuffer()
+      ..writeln('Arın Bilgi Düellosu — can / ownerHash bilgisi')
+      ..writeln()
+      ..writeln(
+        'ownerHash = cihazın installId değerinin SHA-256 özeti '
+        '(quiz_players doküman id). E-posta değildir.',
+      )
+      ..writeln()
+      ..writeln('Hedef: ${raw.isEmpty ? '(boş)' : raw}')
+      ..writeln('Can: ${amount.isEmpty ? '(boş)' : amount}');
+    if (_quizHeartsLastResult != null) {
+      text
+        ..writeln()
+        ..writeln('Son işlem: $_quizHeartsLastResult');
+    }
+    await SharePlus.instance.share(
+      ShareParams(
+        text: text.toString(),
+        subject: 'Arın Bilgi Düellosu ownerHash / can',
+      ),
+    );
+  }
+
   Future<void> _grantQuizHeartsOne() async {
     if (_quizHeartsGrantOneBusy) return;
-    final ownerHash = _quizOwnerHashController.text.trim().toLowerCase();
+    final targets = _parseQuizHeartTargets(_quizOwnerHashController.text);
     final amount = int.tryParse(_quizHeartsAmountController.text.trim()) ?? 0;
-    final hexOk = RegExp(r'^[a-f0-9]{64}$').hasMatch(ownerHash);
-    if (!hexOk) {
-      _snack('ownerHash 64 karakter hex olmalı (installId SHA-256).');
+    if (targets.isEmpty) {
+      _snack('E-posta veya ownerHash girin.');
+      return;
+    }
+    if (targets.length > 10) {
+      _snack('Tek seferde en fazla 10 hedef.');
+      return;
+    }
+    final bad = targets.where((t) => !_isQuizHeartTargetValid(t)).toList();
+    if (bad.isNotEmpty) {
+      _snack(
+        'Geçersiz hedef: ${bad.first}. '
+        '64 karakter hex ownerHash veya e-posta kullanın.',
+      );
       return;
     }
     if (amount < 1 || amount > 20) {
@@ -3103,21 +3353,37 @@ class _AdminContentPageState extends ConsumerState<AdminContentPage>
       final callable = FirebaseFunctions.instanceFor(region: _kFunctionsRegion)
           .httpsCallable('adminGrantQuizHeartsOne');
       final res = await callable.call<Map<String, dynamic>>(<String, dynamic>{
-        'ownerHash': ownerHash,
+        'emails': targets,
         'amount': amount,
       });
       final data = res.data;
       if (!mounted) return;
-      setState(() {
-        _quizHeartsLastResult =
-            'Tekil can: ${data['amount']} → ${ownerHash.substring(0, 8)}… '
-            '(${data['beforeHearts']} → ${data['afterHearts']}'
-            '${data['existed'] == true ? '' : ', yeni kayıt'})';
-      });
-      _snack(
-        '+$amount can verildi '
-        '(${data['beforeHearts']} → ${data['afterHearts']}).',
-      );
+      final grantsRaw = data['grants'];
+      final grantLines = <String>[];
+      if (grantsRaw is List) {
+        for (final item in grantsRaw) {
+          if (item is! Map) continue;
+          final email = item['email']?.toString();
+          final hash = item['ownerHash']?.toString() ?? '';
+          final before = item['beforeHearts'];
+          final after = item['afterHearts'];
+          final label = (email != null && email.isNotEmpty)
+              ? email
+              : (hash.length >= 8 ? '${hash.substring(0, 8)}…' : hash);
+          grantLines.add('$label: $before → $after');
+        }
+      }
+      final hashStr = data['ownerHash']?.toString() ?? '';
+      final hashShort = hashStr.length >= 8
+          ? '${hashStr.substring(0, 8)}…'
+          : (hashStr.isEmpty ? '?' : hashStr);
+      final summary = grantLines.isEmpty
+          ? 'Tekil can: +$amount → $hashShort '
+                '(${data['beforeHearts']} → ${data['afterHearts']})'
+          : 'Tekil can +$amount (${grantLines.length} kurulum):\n'
+                '${grantLines.join('\n')}';
+      setState(() => _quizHeartsLastResult = summary);
+      _snack('+$amount can yazıldı (${data['grantCount'] ?? 1} kurulum).');
     } on FirebaseFunctionsException catch (e) {
       _snack('Hata (${e.code}): ${e.message ?? e.code}');
     } catch (e) {
@@ -3128,22 +3394,31 @@ class _AdminContentPageState extends ConsumerState<AdminContentPage>
   }
 
   Widget _buildQuizHeartsTab(AdminRole role) {
-    if (!role.canManageAdmins) {
+    final bottomInset = _shellBodyBottomInset(context);
+    if (!role.isAdmin) {
       return _buildAccessDenied(
         icon: Icons.favorite_outline_rounded,
-        title: 'Düello can yönetimi tam yetki ister',
-        subtitle:
-            'Can dağıtımı ve yayın bildirimi yalnızca developer rolünde açık.',
+        title: 'Düello yönetimi admin ister',
+        subtitle: 'İstatistikleri görmek için admin girişi gerekir.',
       );
     }
-    final bottomInset = _shellBodyBottomInset(context);
     final busy = _quizHeartsGrantAllBusy || _quizHeartsGrantOneBusy;
     return ListView(
       padding: EdgeInsets.fromLTRB(16, 16, 16, bottomInset + 16),
       children: [
+        _buildQuizStatsCard(),
+        const SizedBox(height: 16),
+        if (!role.canManageAdmins)
+          Text(
+            'Can dağıtımı yalnızca developer rolünde açık. '
+            'İstatistikleri her admin görebilir.',
+            style: TextStyle(color: Colors.white.withValues(alpha: 0.65)),
+          )
+        else ...[
         Text(
-          'Bilgi Düellosu canları. Herkese +1 yazınca broadcast bildirimi de '
-          'gider; tıklanınca düello açılır.',
+          'Bilgi Düellosu canları. Herkese +1, bildirim izni olan herkese '
+          '(broadcast_all) gider — hiç oynamayanlar dahil. Onlar düelloyu '
+          'ilk açınca hediye can otomatik yazılır. Tıklanınca düello açılır.',
           style: TextStyle(color: Colors.white.withValues(alpha: 0.72)),
         ),
         const SizedBox(height: 16),
@@ -3163,8 +3438,8 @@ class _AdminContentPageState extends ConsumerState<AdminContentPage>
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Metin: “Herkese 1 can verildi! Şimdi bilginle herkesi yen — '
-                  'düelloya gir.”',
+                  'Metin: “Sana 1 can hediye! Hiç denemediysen şimdi başla — '
+                  '7 soru, 20 saniye.” (genel bildirim kanalı)',
                   style: TextStyle(
                     color: Colors.white.withValues(alpha: 0.7),
                     fontSize: 12,
@@ -3207,7 +3482,10 @@ class _AdminContentPageState extends ConsumerState<AdminContentPage>
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'ownerHash = installId SHA-256 (quiz_players doküman id). '
+                  'ownerHash = cihaz installId SHA-256 (e-posta değil). '
+                  'Artık Google/Apple e-postası da yazılabilir; sunucu '
+                  'Auth → kurulum eşlemesiyle canı yazar. '
+                  'Birden fazla hedefi virgül veya satır ile ayırın. '
                   'Bildirim gitmez; sadece can artar.',
                   style: TextStyle(
                     color: Colors.white.withValues(alpha: 0.7),
@@ -3218,13 +3496,16 @@ class _AdminContentPageState extends ConsumerState<AdminContentPage>
                 TextField(
                   controller: _quizOwnerHashController,
                   enabled: !busy,
+                  minLines: 1,
+                  maxLines: 4,
+                  keyboardType: TextInputType.emailAddress,
                   style: const TextStyle(color: Colors.white),
                   decoration: InputDecoration(
-                    labelText: 'ownerHash',
+                    labelText: 'E-posta veya ownerHash',
                     labelStyle: TextStyle(
                       color: Colors.white.withValues(alpha: 0.7),
                     ),
-                    hintText: '64 karakter hex',
+                    hintText: 'ornek@gmail.com, diger@gmail.com',
                     hintStyle: TextStyle(
                       color: Colors.white.withValues(alpha: 0.35),
                     ),
@@ -3245,18 +3526,31 @@ class _AdminContentPageState extends ConsumerState<AdminContentPage>
                   ),
                 ),
                 const SizedBox(height: 12),
-                OutlinedButton.icon(
-                  onPressed: busy ? null : _grantQuizHeartsOne,
-                  icon: _quizHeartsGrantOneBusy
-                      ? const SizedBox(
-                          width: 16,
-                          height: 16,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        )
-                      : const Icon(Icons.favorite_rounded),
-                  label: Text(
-                    _quizHeartsGrantOneBusy ? 'Yazılıyor…' : 'Bu oyuncuya can ver',
-                  ),
+                Wrap(
+                  spacing: 10,
+                  runSpacing: 10,
+                  children: [
+                    OutlinedButton.icon(
+                      onPressed: busy ? null : _grantQuizHeartsOne,
+                      icon: _quizHeartsGrantOneBusy
+                          ? const SizedBox(
+                              width: 16,
+                              height: 16,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            )
+                          : const Icon(Icons.favorite_rounded),
+                      label: Text(
+                        _quizHeartsGrantOneBusy
+                            ? 'Yazılıyor…'
+                            : 'Bu oyuncuya can ver',
+                      ),
+                    ),
+                    OutlinedButton.icon(
+                      onPressed: busy ? null : _shareQuizHeartTarget,
+                      icon: const Icon(Icons.ios_share_rounded),
+                      label: const Text('Mail / paylaş'),
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -3271,6 +3565,13 @@ class _AdminContentPageState extends ConsumerState<AdminContentPage>
               fontSize: 13,
             ),
           ),
+          const SizedBox(height: 8),
+          TextButton.icon(
+            onPressed: _shareQuizHeartTarget,
+            icon: const Icon(Icons.mail_outline_rounded, size: 18),
+            label: const Text('Sonucu mail ile gönder'),
+          ),
+        ],
         ],
       ],
     );
@@ -3632,6 +3933,73 @@ class _AdminContentPageState extends ConsumerState<AdminContentPage>
 
 class _AdminVersionConflict implements Exception {
   const _AdminVersionConflict();
+}
+
+class _QuizTopPlayerRow {
+  const _QuizTopPlayerRow({
+    required this.name,
+    required this.matches,
+    required this.hilals,
+  });
+
+  final String name;
+  final int matches;
+  final int hilals;
+}
+
+class _QuizStatTile extends StatelessWidget {
+  const _QuizStatTile({
+    required this.label,
+    required this.value,
+    required this.hint,
+  });
+
+  final String label;
+  final String value;
+  final String hint;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+      decoration: BoxDecoration(
+        color: Colors.black.withValues(alpha: 0.22),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            label,
+            style: TextStyle(
+              color: Colors.white.withValues(alpha: 0.6),
+              fontSize: 11.5,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            value,
+            style: TextStyle(
+              color: AppColors.accentNeonGreen.withValues(alpha: 0.95),
+              fontSize: 26,
+              fontWeight: FontWeight.w900,
+              height: 1.1,
+            ),
+          ),
+          const SizedBox(height: 2),
+          Text(
+            hint,
+            style: TextStyle(
+              color: Colors.white.withValues(alpha: 0.55),
+              fontSize: 11,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }
 
 class _AdminGrantRow {

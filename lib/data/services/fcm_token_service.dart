@@ -283,23 +283,32 @@ abstract final class FcmTokenService {
     if (defaultTargetPlatform != TargetPlatform.android) return;
     try {
       final type = message.data['type']?.toString() ?? '';
+      final reason = message.data['reason']?.toString() ?? '';
       final isPrayerCircle = type == 'prayer_circle';
       final isHilalDuel = type == 'hilal_duel';
+      // Herkese hediye can: genel yayın kanalı (düello kanalı kapalı olsa da düşsün).
+      final isHilalPromo = isHilalDuel && reason == 'admin_heart_grant_all';
       final channelId = isPrayerCircle
           ? 'arin_prayer_circle'
-          : isHilalDuel
-              ? 'arin_hilal_duel'
-              : 'arin_ntf_broadcast';
+          : isHilalPromo
+              ? 'arin_ntf_broadcast'
+              : isHilalDuel
+                  ? 'arin_hilal_duel'
+                  : 'arin_ntf_broadcast';
       final channelName = isPrayerCircle
           ? 'Dua Halkası'
-          : isHilalDuel
-              ? 'Bilgi Düellosu'
-              : 'Ayet Bildirimleri';
+          : isHilalPromo
+              ? 'Ayet Bildirimleri'
+              : isHilalDuel
+                  ? 'Bilgi Düellosu'
+                  : 'Ayet Bildirimleri';
       final channelDescription = isPrayerCircle
           ? 'Dua taleplerine eşlik bildirimleri'
-          : isHilalDuel
-              ? 'Bilgi Düellosu sıralama ve hatırlatma bildirimleri'
-              : 'Günlük ayet ve anlık bildirimler';
+          : isHilalPromo
+              ? 'Günlük ayet ve anlık bildirimler'
+              : isHilalDuel
+                  ? 'Bilgi Düellosu sıralama ve hatırlatma bildirimleri'
+                  : 'Günlük ayet ve anlık bildirimler';
       await arinLocalNotificationsPlugin.show(
         DateTime.now().millisecondsSinceEpoch.remainder(1 << 31),
         ntf.title,

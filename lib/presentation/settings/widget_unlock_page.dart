@@ -67,8 +67,17 @@ class _WidgetUnlockPageState extends ConsumerState<WidgetUnlockPage> {
     }
   }
 
+  String _kindTitle(AppLocalizations l10n) => switch (widget.kind) {
+    ArinWidgetAccessKind.quote => l10n.widgetUnlockQuoteTitle,
+    ArinWidgetAccessKind.prayer => l10n.widgetUnlockPrayerTitle,
+    ArinWidgetAccessKind.combo => l10n.widgetUnlockComboTitle,
+    ArinWidgetAccessKind.tracking => l10n.widgetUnlockTrackingTitle,
+    ArinWidgetAccessKind.zikir => l10n.widgetUnlockZikirTitle,
+  };
+
   Future<void> _watchAd(BuildContext context) async {
     final l10n = AppLocalizations.of(context)!;
+    final kindTitle = _kindTitle(l10n);
     setState(() => _busy = true);
     try {
       bool premiumActive;
@@ -77,7 +86,9 @@ class _WidgetUnlockPageState extends ConsumerState<WidgetUnlockPage> {
           premiumEntitlementProvider.future,
         )).isActive;
       } catch (_) {
-        if (context.mounted) await _showAdUnavailableDialog(context);
+        if (context.mounted) {
+          await _showAdUnavailableDialog(context, title: kindTitle);
+        }
         return;
       }
       if (!context.mounted) return;
@@ -91,7 +102,10 @@ class _WidgetUnlockPageState extends ConsumerState<WidgetUnlockPage> {
         final prepared = await _prepareRewardedWithFeedback(context);
         if (!context.mounted) return;
         if (!prepared) {
-          final retry = await _showAdUnavailableDialog(context);
+          final retry = await _showAdUnavailableDialog(
+            context,
+            title: kindTitle,
+          );
           if (!context.mounted || !retry) return;
           continue;
         }
@@ -112,7 +126,10 @@ class _WidgetUnlockPageState extends ConsumerState<WidgetUnlockPage> {
         if (result == RewardedAdResult.rewarded) break;
         // Kullanıcı reklamı erken kapattıysa bu bir yükleme hatası değildir.
         if (result == RewardedAdResult.notRewarded) return;
-        final retry = await _showAdUnavailableDialog(context);
+        final retry = await _showAdUnavailableDialog(
+          context,
+          title: kindTitle,
+        );
         if (!context.mounted || !retry) return;
       }
 
@@ -130,14 +147,6 @@ class _WidgetUnlockPageState extends ConsumerState<WidgetUnlockPage> {
         isPremium: premium.isActive,
       );
       if (!context.mounted) return;
-
-      final kindTitle = switch (widget.kind) {
-        ArinWidgetAccessKind.quote => l10n.widgetUnlockQuoteTitle,
-        ArinWidgetAccessKind.prayer => l10n.widgetUnlockPrayerTitle,
-        ArinWidgetAccessKind.combo => l10n.widgetUnlockComboTitle,
-        ArinWidgetAccessKind.tracking => l10n.widgetUnlockTrackingTitle,
-        ArinWidgetAccessKind.zikir => l10n.widgetUnlockZikirTitle,
-      };
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -163,6 +172,7 @@ class _WidgetUnlockPageState extends ConsumerState<WidgetUnlockPage> {
     if (adMob.isRewardedReady) return true;
     return await showDialog<bool>(
           context: context,
+          useRootNavigator: true,
           barrierDismissible: false,
           builder: (_) => _RewardedPreparingDialog(
             prepare: adMob.prepareRewarded,
@@ -172,22 +182,33 @@ class _WidgetUnlockPageState extends ConsumerState<WidgetUnlockPage> {
         false;
   }
 
-  Future<bool> _showAdUnavailableDialog(BuildContext context) async {
+  /// iOS'ta bir diyalog kapanır kapanmaz yenisini açmak bazen sessizce
+  /// başarısız oluyor; bir frame + kısa settle beklenir.
+  Future<void> _awaitDialogRouteSettle() async {
+    await Future<void>.delayed(Duration.zero);
+    if (!mounted) return;
+    await WidgetsBinding.instance.endOfFrame;
+    if (!mounted) return;
+    await Future<void>.delayed(const Duration(milliseconds: 32));
+  }
+
+  Future<bool> _showAdUnavailableDialog(
+    BuildContext context, {
+    required String title,
+  }) async {
     final l10n = AppLocalizations.of(context)!;
+    await _awaitDialogRouteSettle();
+    if (!context.mounted) return false;
     return await showDialog<bool>(
           context: context,
-          builder: (dialogContext) => AlertDialog(
-            content: Text(l10n.widgetUnlockAdLoadFailed),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(dialogContext).pop(false),
-                child: Text(l10n.widgetUnlockAdLaterButton),
-              ),
-              FilledButton(
-                onPressed: () => Navigator.of(dialogContext).pop(true),
-                child: Text(l10n.widgetUnlockAdRetryButton),
-              ),
-            ],
+          useRootNavigator: true,
+          barrierDismissible: true,
+          barrierColor: Colors.black.withValues(alpha: 0.55),
+          builder: (dialogContext) => _WidgetUnlockAdUnavailableDialog(
+            title: title,
+            message: l10n.widgetUnlockAdLoadFailed,
+            laterLabel: l10n.widgetUnlockAdLaterButton,
+            retryLabel: l10n.widgetUnlockAdRetryButton,
           ),
         ) ??
         false;
@@ -230,13 +251,7 @@ class _WidgetUnlockPageState extends ConsumerState<WidgetUnlockPage> {
     final unlockHours = GlobalWidgetLockService.unlockHours(
       ref.read(sharedPreferencesProvider),
     );
-    final kindTitle = switch (widget.kind) {
-      ArinWidgetAccessKind.quote => l10n.widgetUnlockQuoteTitle,
-      ArinWidgetAccessKind.prayer => l10n.widgetUnlockPrayerTitle,
-      ArinWidgetAccessKind.combo => l10n.widgetUnlockComboTitle,
-      ArinWidgetAccessKind.tracking => l10n.widgetUnlockTrackingTitle,
-      ArinWidgetAccessKind.zikir => l10n.widgetUnlockZikirTitle,
-    };
+    final kindTitle = _kindTitle(l10n);
 
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -381,6 +396,77 @@ class _WidgetUnlockPageState extends ConsumerState<WidgetUnlockPage> {
   }
 }
 
+class _WidgetUnlockAdUnavailableDialog extends StatelessWidget {
+  const _WidgetUnlockAdUnavailableDialog({
+    required this.title,
+    required this.message,
+    required this.laterLabel,
+    required this.retryLabel,
+  });
+
+  final String title;
+  final String message;
+  final String laterLabel;
+  final String retryLabel;
+
+  @override
+  Widget build(BuildContext context) {
+    // Unlock sayfası koyu yeşil; sistem teması açık olsa bile diyalog her
+    // platformda (özellikle iOS) aynı, okunaklı Material popup olarak kalsın.
+    const surface = Color(0xFF1C2E28);
+    const onSurface = Colors.white;
+    const accent = AppColors.emeraldLight;
+
+    return AlertDialog(
+      backgroundColor: surface,
+      surfaceTintColor: Colors.transparent,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+      title: Text(
+        title,
+        style: const TextStyle(
+          color: onSurface,
+          fontSize: 18,
+          fontWeight: FontWeight.w700,
+          letterSpacing: -0.2,
+        ),
+      ),
+      content: Text(
+        message,
+        style: TextStyle(
+          color: onSurface.withValues(alpha: 0.88),
+          fontSize: 14.5,
+          height: 1.45,
+          fontWeight: FontWeight.w500,
+        ),
+      ),
+      actionsAlignment: MainAxisAlignment.end,
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context, rootNavigator: true).pop(false),
+          child: Text(
+            laterLabel,
+            style: const TextStyle(
+              color: accent,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+        FilledButton(
+          onPressed: () => Navigator.of(context, rootNavigator: true).pop(true),
+          style: FilledButton.styleFrom(
+            backgroundColor: accent,
+            foregroundColor: const Color(0xFF071815),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(999),
+            ),
+          ),
+          child: Text(retryLabel),
+        ),
+      ],
+    );
+  }
+}
+
 class _RewardedPreparingDialog extends StatefulWidget {
   const _RewardedPreparingDialog({
     required this.prepare,
@@ -404,23 +490,42 @@ class _RewardedPreparingDialogState extends State<_RewardedPreparingDialog> {
 
   Future<void> _prepare() async {
     final ready = await widget.prepare();
-    if (mounted) Navigator.of(context).pop(ready);
+    if (mounted) {
+      Navigator.of(context, rootNavigator: true).pop(ready);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    const surface = Color(0xFF1C2E28);
+    const onSurface = Colors.white;
     return PopScope(
       canPop: false,
       child: AlertDialog(
+        backgroundColor: surface,
+        surfaceTintColor: Colors.transparent,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
         content: Row(
           children: [
             const SizedBox(
               width: 24,
               height: 24,
-              child: CircularProgressIndicator(strokeWidth: 2.5),
+              child: CircularProgressIndicator(
+                strokeWidth: 2.5,
+                color: AppColors.emeraldLight,
+              ),
             ),
             const SizedBox(width: 16),
-            Expanded(child: Text(widget.message)),
+            Expanded(
+              child: Text(
+                widget.message,
+                style: TextStyle(
+                  color: onSurface.withValues(alpha: 0.9),
+                  fontSize: 14.5,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
           ],
         ),
       ),
