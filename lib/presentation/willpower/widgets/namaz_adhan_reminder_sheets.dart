@@ -1113,36 +1113,26 @@ class _PerPrayerReminderListSheetState
     setState(() {});
   }
 
-  static const _bronze = Color(0xFFC9A074);
-  static const _bronzeDeep = Color(0xFF8A6645);
-  static const _panelInk = Color(0xFFF3EDE4);
-
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final bottom = MediaQuery.paddingOf(context).bottom;
-    final maxH = MediaQuery.sizeOf(context).height * 0.74;
+    final maxH = MediaQuery.sizeOf(context).height * 0.72;
 
     return SafeArea(
       child: SizedBox(
         height: maxH,
         child: Padding(
-          padding: EdgeInsets.fromLTRB(16, 10, 16, bottom + 10),
+          padding: EdgeInsets.fromLTRB(16, 10, 16, bottom + 8),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Center(
                 child: Container(
-                  width: 42,
+                  width: 40,
                   height: 4,
                   decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [
-                        _bronzeDeep.withValues(alpha: 0.35),
-                        _bronze,
-                        _bronzeDeep.withValues(alpha: 0.35),
-                      ],
-                    ),
+                    color: Colors.white.withValues(alpha: 0.22),
                     borderRadius: BorderRadius.circular(99),
                   ),
                 ),
@@ -1156,7 +1146,7 @@ class _PerPrayerReminderListSheetState
                       child: Text(
                         l10n.commonCancel,
                         style: TextStyle(
-                          color: _panelInk.withValues(alpha: 0.78),
+                          color: AppColors.creamBase.withValues(alpha: 0.85),
                         ),
                       ),
                     ),
@@ -1181,118 +1171,69 @@ class _PerPrayerReminderListSheetState
                   alignment: Alignment.centerRight,
                   child: TextButton(
                     onPressed: () => Navigator.pop(context),
-                    style: TextButton.styleFrom(
-                      foregroundColor: _bronze.withValues(alpha: 0.9),
-                    ),
                     child: Text(l10n.commonClose),
                   ),
                 ),
               Text(
                 l10n.reminderDurationsPerPrayerTitle,
                 style: AppTextStyles.titleSmall.copyWith(
-                  color: _panelInk,
+                  color: AppColors.creamBase,
                   fontWeight: FontWeight.w800,
-                  letterSpacing: -0.2,
                 ),
               ),
-              const SizedBox(height: 6),
-              Container(
-                width: 48,
-                height: 2.5,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(99),
-                  gradient: const LinearGradient(
-                    colors: [_bronzeDeep, _bronze],
-                  ),
-                ),
-              ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 4),
               Text(
                 l10n.reminderDurationsPerPrayerSubtitle,
                 style: AppTextStyles.labelSmall.copyWith(
-                  color: _panelInk.withValues(alpha: 0.55),
-                  height: 1.4,
+                  color: AppColors.textOnDarkMuted,
+                  height: 1.35,
                 ),
               ),
-              const SizedBox(height: 14),
+              const SizedBox(height: 12),
               Expanded(
                 child: ListView.separated(
                   itemCount: PrayerReminderPrefs.slotCount,
-                  separatorBuilder: (_, __) => const SizedBox(height: 8),
+                  separatorBuilder: (_, __) => const SizedBox(height: 6),
                   itemBuilder: (ctx, i) {
                     return Material(
-                      color: Colors.transparent,
+                      color: Colors.white.withValues(alpha: 0.05),
+                      borderRadius: BorderRadius.circular(14),
                       child: InkWell(
-                        borderRadius: BorderRadius.circular(16),
+                        borderRadius: BorderRadius.circular(14),
                         onTap: () => _openEditor(i),
-                        child: Ink(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(16),
-                            gradient: LinearGradient(
-                              begin: Alignment.centerLeft,
-                              end: Alignment.centerRight,
-                              colors: [
-                                _bronzeDeep.withValues(alpha: 0.14),
-                                Colors.white.withValues(alpha: 0.04),
-                              ],
-                            ),
-                            border: Border.all(
-                              color: _bronze.withValues(alpha: 0.22),
-                            ),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 14,
+                            vertical: 12,
                           ),
-                          child: Padding(
-                            padding: const EdgeInsets.fromLTRB(12, 12, 10, 12),
-                            child: Row(
-                              children: [
-                                Container(
-                                  width: 3,
-                                  height: 34,
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(99),
-                                    gradient: const LinearGradient(
-                                      begin: Alignment.topCenter,
-                                      end: Alignment.bottomCenter,
-                                      colors: [_bronze, _bronzeDeep],
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      _prayerSlotLabel(l10n, i),
+                                      style: AppTextStyles.labelLarge.copyWith(
+                                        color: AppColors.creamBase,
+                                        fontWeight: FontWeight.w700,
+                                      ),
                                     ),
-                                  ),
-                                ),
-                                const SizedBox(width: 12),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        _prayerSlotLabel(l10n, i),
-                                        style: AppTextStyles.labelLarge
-                                            .copyWith(
-                                          color: _panelInk,
-                                          fontWeight: FontWeight.w700,
-                                        ),
+                                    const SizedBox(height: 2),
+                                    Text(
+                                      _pairLineForPrayer(widget.prefs, i, l10n),
+                                      style: AppTextStyles.labelSmall.copyWith(
+                                        color: AppColors.textOnDarkMuted,
                                       ),
-                                      const SizedBox(height: 3),
-                                      Text(
-                                        _pairLineForPrayer(
-                                          widget.prefs,
-                                          i,
-                                          l10n,
-                                        ),
-                                        style: AppTextStyles.labelSmall
-                                            .copyWith(
-                                          color: _panelInk.withValues(
-                                            alpha: 0.52,
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
+                                    ),
+                                  ],
                                 ),
-                                Icon(
-                                  Icons.chevron_right_rounded,
-                                  color: _bronze.withValues(alpha: 0.7),
-                                ),
-                              ],
-                            ),
+                              ),
+                              Icon(
+                                Icons.chevron_right_rounded,
+                                color: Colors.white.withValues(alpha: 0.35),
+                              ),
+                            ],
                           ),
                         ),
                       ),
@@ -1300,135 +1241,94 @@ class _PerPrayerReminderListSheetState
                   },
                 ),
               ),
-              const SizedBox(height: 14),
-              _ReminderSheetActionButton(
-                icon: Icons.done_all_rounded,
-                label: l10n.reminderApplyDurationsAllButton,
-                primary: true,
-                onTap: _applyDurationsToAllPrayers,
+              const SizedBox(height: 12),
+              Material(
+                color: Colors.white.withValues(alpha: 0.06),
+                borderRadius: BorderRadius.circular(14),
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(14),
+                  onTap: _applyDurationsToAllPrayers,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 14,
+                      vertical: 14,
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.done_all_rounded,
+                          color: AppColors.accentNeonGreen.withValues(
+                            alpha: 0.88,
+                          ),
+                          size: 22,
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Text(
+                            l10n.reminderApplyDurationsAllButton,
+                            style: AppTextStyles.labelLarge.copyWith(
+                              color: AppColors.creamBase,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        ),
+                        Icon(
+                          Icons.chevron_right_rounded,
+                          color: Colors.white.withValues(alpha: 0.35),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
               ),
-              const SizedBox(height: 10),
-              _ReminderSheetActionButton(
-                icon: Icons.graphic_eq_rounded,
-                label: l10n.prayerSoundPickerTitle,
-                primary: false,
-                onTap: () async {
-                  await widget.onBildirimSesi();
-                  if (mounted) setState(() {});
-                },
+              const SizedBox(height: 8),
+              Material(
+                color: Colors.white.withValues(alpha: 0.06),
+                borderRadius: BorderRadius.circular(14),
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(14),
+                  onTap: () async {
+                    await widget.onBildirimSesi();
+                    if (mounted) setState(() {});
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 14,
+                      vertical: 14,
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.graphic_eq_rounded,
+                          color: AppColors.accentNeonGreen.withValues(
+                            alpha: 0.88,
+                          ),
+                          size: 22,
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Text(
+                            l10n.prayerSoundPickerTitle,
+                            style: AppTextStyles.labelLarge.copyWith(
+                              color: AppColors.creamBase,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        ),
+                        Icon(
+                          Icons.chevron_right_rounded,
+                          color: Colors.white.withValues(alpha: 0.35),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
               ),
             ],
           ),
         ),
       ),
     ).animate().fadeIn(duration: 200.ms, curve: Curves.easeOutCubic);
-  }
-}
-
-/// Alt aksiyonlar: liste satırı değil, bronz çerçeveli belirgin buton.
-class _ReminderSheetActionButton extends StatelessWidget {
-  const _ReminderSheetActionButton({
-    required this.icon,
-    required this.label,
-    required this.onTap,
-    this.primary = false,
-  });
-
-  final IconData icon;
-  final String label;
-  final VoidCallback onTap;
-  final bool primary;
-
-  static const _bronze = Color(0xFFC9A074);
-  static const _bronzeDeep = Color(0xFF8A6645);
-
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(16),
-        splashColor: _bronze.withValues(alpha: 0.18),
-        highlightColor: _bronze.withValues(alpha: 0.08),
-        child: Ink(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(16),
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: primary
-                  ? [
-                      _bronzeDeep.withValues(alpha: 0.55),
-                      _bronze.withValues(alpha: 0.28),
-                      const Color(0xFF1A1612),
-                    ]
-                  : [
-                      const Color(0xFF1C1814),
-                      _bronzeDeep.withValues(alpha: 0.22),
-                    ],
-            ),
-            border: Border.all(
-              color: _bronze.withValues(alpha: primary ? 0.55 : 0.38),
-              width: primary ? 1.4 : 1.1,
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: _bronzeDeep.withValues(alpha: primary ? 0.28 : 0.14),
-                blurRadius: primary ? 14 : 8,
-                offset: const Offset(0, 4),
-              ),
-            ],
-          ),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 15),
-            child: Row(
-              children: [
-                Container(
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    gradient: LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [
-                        _bronze.withValues(alpha: 0.95),
-                        _bronzeDeep.withValues(alpha: 0.9),
-                      ],
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: _bronze.withValues(alpha: 0.28),
-                        blurRadius: 8,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  child: Icon(icon, color: const Color(0xFF1A120C), size: 20),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Text(
-                    label,
-                    style: AppTextStyles.labelLarge.copyWith(
-                      color: const Color(0xFFF3EDE4),
-                      fontWeight: FontWeight.w800,
-                      height: 1.25,
-                    ),
-                  ),
-                ),
-                Icon(
-                  Icons.arrow_forward_ios_rounded,
-                  size: 14,
-                  color: _bronze.withValues(alpha: 0.85),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
   }
 }
 

@@ -125,6 +125,22 @@ class _RaceRepo implements HilalDuelRepositoryApi {
   }
 
   @override
+  Future<HilalDuelProfile> adminGrantSelfHilals({
+    required String name,
+    required int amount,
+  }) async {
+    throw UnsupportedError('adminGrantSelfHilals');
+  }
+
+  @override
+  Future<HilalDuelProfile> adminSetSelfLevel({
+    required String name,
+    required int level,
+  }) async {
+    throw UnsupportedError('adminSetSelfLevel');
+  }
+
+  @override
   Future<HilalDuelMatch> createChallenge({
     required String name,
     required String opponentOwnerHash,

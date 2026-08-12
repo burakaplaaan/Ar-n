@@ -15,6 +15,7 @@ import '../../shared/providers/admob_providers.dart';
 import '../../shared/providers/auth_providers.dart';
 import '../../shared/providers/user_profile_providers.dart';
 import '../../shared/widgets/arin_permission_dialog.dart';
+import '../../shared/widgets/arin_shell_layout.dart';
 import '../qibla_hub_navigator_key.dart';
 import '../qibla_hub_page.dart';
 import 'hilal_duel_controller.dart';
@@ -331,6 +332,17 @@ String _localizedHilalTitle(AppLocalizations l10n, String? title) {
   return raw;
 }
 
+String _hilalDifficultyLabel(AppLocalizations l10n, int difficulty) {
+  switch (difficulty) {
+    case 1:
+      return l10n.hilalDuelDifficultyEasy;
+    case 3:
+      return l10n.hilalDuelDifficultyHard;
+    default:
+      return l10n.hilalDuelDifficultyMedium;
+  }
+}
+
 String _nextRewardLabel(AppLocalizations l10n, int level, bool maxLevel) {
   if (maxLevel) return l10n.hilalDuelMaxLevel;
   final next = nextRewardAfterLevel(level);
@@ -448,7 +460,7 @@ String _nameInitial(String name, {required String fallback}) {
   return String.fromCharCode(trimmed.runes.first).toUpperCase();
 }
 
-class _LobbyBody extends StatefulWidget {
+class _LobbyBody extends ConsumerStatefulWidget {
   const _LobbyBody({
     super.key,
     required this.controller,
@@ -467,10 +479,10 @@ class _LobbyBody extends StatefulWidget {
   final Future<void> Function() onBack;
 
   @override
-  State<_LobbyBody> createState() => _LobbyBodyState();
+  ConsumerState<_LobbyBody> createState() => _LobbyBodyState();
 }
 
-class _LobbyBodyState extends State<_LobbyBody>
+class _LobbyBodyState extends ConsumerState<_LobbyBody>
     with SingleTickerProviderStateMixin {
   late final AnimationController _heartsNudge;
   Timer? _heartsNudgeTimer;
@@ -585,6 +597,145 @@ class _LobbyBodyState extends State<_LobbyBody>
     );
   }
 
+  Future<void> _promptAdminGrantHilals() async {
+    final onDark = widget.onDark;
+    final bronze = _HilalPalette.bronze(onDark);
+    final amount = await showDialog<int>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: onDark ? const Color(0xFF101814) : Colors.white,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(18),
+          side: BorderSide(color: bronze.withValues(alpha: 0.45)),
+        ),
+        title: Text(
+          'Admin · Hilal ekle',
+          style: TextStyle(
+            color: _HilalPalette.ink(onDark),
+            fontWeight: FontWeight.w900,
+            fontSize: 18,
+          ),
+        ),
+        content: Text(
+          'Kendi toplam ve haftalık puanına eklenir.',
+          style: TextStyle(
+            color: _HilalPalette.muted(onDark),
+            fontSize: 13.5,
+            height: 1.35,
+          ),
+        ),
+        actionsAlignment: MainAxisAlignment.center,
+        actions: [
+          for (final n in const [10, 50, 100])
+            TextButton(
+              onPressed: () => Navigator.of(ctx).pop(n),
+              child: Text(
+                '+$n',
+                style: TextStyle(
+                  color: bronze,
+                  fontWeight: FontWeight.w900,
+                  fontSize: 15,
+                ),
+              ),
+            ),
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: Text(
+              widget.l10n.commonCancel,
+              style: TextStyle(
+                color: _HilalPalette.muted(onDark),
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+    if (amount == null || !mounted) return;
+    HapticFeedback.mediumImpact();
+    await widget.controller.adminGrantSelfHilals(amount);
+  }
+
+  Future<void> _promptAdminSetLevel() async {
+    final onDark = widget.onDark;
+    final bronze = _HilalPalette.bronze(onDark);
+    final current = widget.controller.profile?.level ?? 1;
+    final level = await showDialog<int>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: onDark ? const Color(0xFF101814) : Colors.white,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(18),
+          side: BorderSide(color: bronze.withValues(alpha: 0.45)),
+        ),
+        title: Text(
+          'Admin · Seviye ayarla',
+          style: TextStyle(
+            color: _HilalPalette.ink(onDark),
+            fontWeight: FontWeight.w900,
+            fontSize: 18,
+          ),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text(
+              'Toplam hilal seviye tabanına çekilir. Haftalık skor değişmez.',
+              style: TextStyle(
+                color: _HilalPalette.muted(onDark),
+                fontSize: 13.5,
+                height: 1.35,
+              ),
+            ),
+            const SizedBox(height: 14),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              alignment: WrapAlignment.center,
+              children: [
+                for (var n = 1; n <= kHilalDuelMaxLevel; n += 1)
+                  TextButton(
+                    style: TextButton.styleFrom(
+                      backgroundColor: n == current
+                          ? bronze.withValues(alpha: 0.22)
+                          : null,
+                      foregroundColor: bronze,
+                      minimumSize: const Size(44, 40),
+                    ),
+                    onPressed: () => Navigator.of(ctx).pop(n),
+                    child: Text(
+                      'LV$n',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w900,
+                        fontSize: 14,
+                        color: bronze,
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: Text(
+              widget.l10n.commonCancel,
+              style: TextStyle(
+                color: _HilalPalette.muted(onDark),
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+    if (level == null || !mounted) return;
+    HapticFeedback.mediumImpact();
+    await widget.controller.adminSetSelfLevel(level);
+  }
+
   @override
   Widget build(BuildContext context) {
     final controller = widget.controller;
@@ -594,6 +745,8 @@ class _LobbyBodyState extends State<_LobbyBody>
     final playerName = widget.playerName;
     final profile = controller.profile;
     final bronze = _HilalPalette.bronze(onDark);
+    final isAdmin =
+        ref.watch(isCurrentUserAdminProvider).asData?.value ?? false;
     return ListView(
       padding: const EdgeInsets.fromLTRB(20, 4, 20, 20),
       children: [
@@ -661,6 +814,12 @@ class _LobbyBodyState extends State<_LobbyBody>
             l10n: l10n,
             onDark: onDark,
             heartsAttention: _heartsNudge,
+            onHilalsTap: isAdmin
+                ? () => unawaited(_promptAdminGrantHilals())
+                : null,
+            onLevelTap: isAdmin
+                ? () => unawaited(_promptAdminSetLevel())
+                : null,
             onHeartsTap: profile.premium
                 ? null
                 : () {
@@ -705,7 +864,7 @@ class _LobbyBodyState extends State<_LobbyBody>
           },
         ),
         const SizedBox(height: 8),
-        _SecondaryButton(
+        _ChallengeLobbyButton(
           label: l10n.hilalDuelChallengeAction.toUpperCase(),
           busy: controller.busy,
           onDark: onDark,
@@ -754,7 +913,7 @@ class _LobbyBodyState extends State<_LobbyBody>
             ),
           ),
         ],
-        if (controller.challenges.isNotEmpty) ...[
+        if (controller.challenges.any((c) => c.isInboxVisible)) ...[
           const SizedBox(height: 14),
           _ChallengeInboxCard(
             controller: controller,
@@ -792,19 +951,27 @@ class _ChallengeInboxCard extends StatelessWidget {
 
   String _statusLabel(HilalDuelChallengeSummary item) {
     if (item.status == 'expired') return l10n.hilalDuelChallengeExpired;
+    if (item.status == 'completed') {
+      switch (item.outcome) {
+        case 'won':
+          return l10n.hilalDuelResultWin;
+        case 'lost':
+          return l10n.hilalDuelResultLose;
+        case 'draw':
+          return l10n.hilalDuelResultDraw;
+        default:
+          return l10n.hilalDuelChallengeSeeResult;
+      }
+    }
     if (item.canAccept) return l10n.hilalDuelChallengeAccept;
     if (item.myTurn) return l10n.hilalDuelChallengeYourTurn;
-    if (item.status == 'awaiting_opponent') {
-      return l10n.hilalDuelChallengeWaiting;
-    }
-    if (item.status == 'completed') return l10n.hilalDuelResultDraw;
-    return item.status;
+    return l10n.hilalDuelChallengeWaiting;
   }
 
   @override
   Widget build(BuildContext context) {
     final bronze = _HilalPalette.bronze(onDark);
-    final open = controller.challenges.where((c) => c.isOpen).toList();
+    final open = controller.challenges.where((c) => c.isInboxVisible).toList();
     if (open.isEmpty) return const SizedBox.shrink();
     return Container(
       padding: const EdgeInsets.fromLTRB(14, 14, 14, 10),
@@ -824,15 +991,6 @@ class _ChallengeInboxCard extends StatelessWidget {
               color: _HilalPalette.ink(onDark),
               fontWeight: FontWeight.w900,
               fontSize: 15,
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            l10n.hilalDuelChallengeHint,
-            style: TextStyle(
-              color: _HilalPalette.muted(onDark),
-              fontSize: 12,
-              height: 1.35,
             ),
           ),
           const SizedBox(height: 10),
@@ -866,41 +1024,42 @@ class _ChallengeInboxCard extends StatelessWidget {
                       ],
                     ),
                   ),
-                  TextButton(
-                    onPressed: controller.busy
-                        ? null
-                        : () {
-                            HapticFeedback.mediumImpact();
-                            final p = controller.profile;
-                            if (item.canAccept &&
-                                p != null &&
-                                !p.premium &&
-                                p.hearts <= 0) {
-                              onNeedHeart();
-                              unawaited(
-                                _promptNeedHeartDialog(
-                                  context: context,
-                                  l10n: l10n,
-                                  controller: controller,
-                                ),
-                              );
-                              return;
-                            }
-                            unawaited(controller.openChallenge(item.id));
-                          },
-                    child: Text(
-                      item.canAccept
-                          ? l10n.hilalDuelChallengeAccept
-                          : item.myTurn
-                              ? l10n.hilalDuelChallengeContinue
-                              : l10n.hilalDuelWeeklyTapHint,
-                      style: TextStyle(
-                        color: bronze,
-                        fontWeight: FontWeight.w800,
-                        fontSize: 12,
+                  if (item.canAccept || item.myTurn || item.status == 'completed')
+                    TextButton(
+                      onPressed: controller.busy
+                          ? null
+                          : () {
+                              HapticFeedback.mediumImpact();
+                              final p = controller.profile;
+                              if (item.canAccept &&
+                                  p != null &&
+                                  !p.premium &&
+                                  p.hearts <= 0) {
+                                onNeedHeart();
+                                unawaited(
+                                  _promptNeedHeartDialog(
+                                    context: context,
+                                    l10n: l10n,
+                                    controller: controller,
+                                  ),
+                                );
+                                return;
+                              }
+                              unawaited(controller.openChallenge(item.id));
+                            },
+                      child: Text(
+                        item.status == 'completed'
+                            ? l10n.hilalDuelChallengeSeeResult
+                            : item.canAccept
+                            ? l10n.hilalDuelChallengeAccept
+                            : l10n.hilalDuelChallengeContinue,
+                        style: TextStyle(
+                          color: bronze,
+                          fontWeight: FontWeight.w800,
+                          fontSize: 12,
+                        ),
                       ),
                     ),
-                  ),
                 ],
               ),
             );
@@ -920,6 +1079,8 @@ class _GamePlayerBanner extends StatelessWidget {
     required this.onDark,
     required this.heartsAttention,
     this.onHeartsTap,
+    this.onHilalsTap,
+    this.onLevelTap,
   });
 
   final HilalDuelProfile profile;
@@ -928,6 +1089,8 @@ class _GamePlayerBanner extends StatelessWidget {
   final bool onDark;
   final AnimationController heartsAttention;
   final VoidCallback? onHeartsTap;
+  final VoidCallback? onHilalsTap;
+  final VoidCallback? onLevelTap;
 
   @override
   Widget build(BuildContext context) {
@@ -1013,30 +1176,42 @@ class _GamePlayerBanner extends StatelessWidget {
                   Positioned(
                     right: -4,
                     bottom: -2,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 6,
-                        vertical: 2,
-                      ),
-                      decoration: BoxDecoration(
-                        color: bronze,
+                    child: Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                        onTap: onLevelTap == null
+                            ? null
+                            : () {
+                                HapticFeedback.selectionClick();
+                                onLevelTap!();
+                              },
                         borderRadius: BorderRadius.circular(99),
-                        border: Border.all(
-                          color: onDark
-                              ? const Color(0xFF0B1611)
-                              : Colors.white,
-                          width: 1.2,
-                        ),
-                      ),
-                      child: Text(
-                        'LV ${profile.level}',
-                        style: TextStyle(
-                          color: onDark
-                              ? const Color(0xFF1A1208)
-                              : Colors.white,
-                          fontSize: 9.5,
-                          fontWeight: FontWeight.w800,
-                          letterSpacing: 0.3,
+                        child: Ink(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 6,
+                            vertical: 2,
+                          ),
+                          decoration: BoxDecoration(
+                            color: bronze,
+                            borderRadius: BorderRadius.circular(99),
+                            border: Border.all(
+                              color: onDark
+                                  ? const Color(0xFF0B1611)
+                                  : Colors.white,
+                              width: 1.2,
+                            ),
+                          ),
+                          child: Text(
+                            'LV ${profile.level}',
+                            style: TextStyle(
+                              color: onDark
+                                  ? const Color(0xFF1A1208)
+                                  : Colors.white,
+                              fontSize: 9.5,
+                              fontWeight: FontWeight.w800,
+                              letterSpacing: 0.3,
+                            ),
+                          ),
                         ),
                       ),
                     ),
@@ -1079,6 +1254,7 @@ class _GamePlayerBanner extends StatelessWidget {
                           label: l10n.hilalDuelHilalsLabel(profile.hilals),
                           onDark: onDark,
                           accent: bronze,
+                          onTap: onHilalsTap,
                           leading: profile.specialHilalIcon
                               ? Icon(
                                   Icons.brightness_2_rounded,
@@ -1187,7 +1363,7 @@ class _WeeklyRankTheme {
   }
 }
 
-class _WeeklyLeaderCard extends StatefulWidget {
+class _WeeklyLeaderCard extends ConsumerStatefulWidget {
   const _WeeklyLeaderCard({
     required this.profile,
     required this.controller,
@@ -1201,10 +1377,10 @@ class _WeeklyLeaderCard extends StatefulWidget {
   final bool onDark;
 
   @override
-  State<_WeeklyLeaderCard> createState() => _WeeklyLeaderCardState();
+  ConsumerState<_WeeklyLeaderCard> createState() => _WeeklyLeaderCardState();
 }
 
-class _WeeklyLeaderCardState extends State<_WeeklyLeaderCard> {
+class _WeeklyLeaderCardState extends ConsumerState<_WeeklyLeaderCard> {
   late Future<HilalDuelWeeklyBoard> _previewFuture;
 
   @override
@@ -1227,6 +1403,8 @@ class _WeeklyLeaderCardState extends State<_WeeklyLeaderCard> {
     final profile = widget.profile;
     final l10n = widget.l10n;
     final onDark = widget.onDark;
+    final isAdmin =
+        ref.watch(isCurrentUserAdminProvider).asData?.value ?? false;
     final selfRank = profile.weeklyRank;
     final theme = _WeeklyRankTheme.forRank(selfRank, onDark);
     final rankText = selfRank > 0
@@ -1336,12 +1514,25 @@ class _WeeklyLeaderCardState extends State<_WeeklyLeaderCard> {
                   fontWeight: FontWeight.w600,
                 ),
               ),
+              const SizedBox(height: 4),
+              Text(
+                l10n.hilalDuelWeeklyPremiumRewardHint,
+                style: TextStyle(
+                  color: _HilalPalette.muted(onDark),
+                  fontSize: 11.5,
+                  fontWeight: FontWeight.w700,
+                  height: 1.35,
+                ),
+              ),
               const SizedBox(height: 12),
               FutureBuilder<HilalDuelWeeklyBoard>(
                 future: _previewFuture,
                 builder: (context, snap) {
-                  final top = snap.data?.top.take(3).toList(growable: false) ??
+                  final board = snap.data;
+                  final top = board?.top.take(3).toList(growable: false) ??
                       const <HilalDuelWeeklyEntry>[];
+                  final winners = board?.lastWeekWinners ??
+                      const <HilalDuelWeeklyLastWinner>[];
                   if (snap.connectionState != ConnectionState.done) {
                     return SizedBox(
                       height: 72,
@@ -1357,7 +1548,17 @@ class _WeeklyLeaderCardState extends State<_WeeklyLeaderCard> {
                       ),
                     );
                   }
-                  if (top.isEmpty) {
+                  if (snap.hasError) {
+                    return Text(
+                      l10n.hilalDuelRetry,
+                      style: TextStyle(
+                        color: _HilalPalette.muted(onDark),
+                        fontSize: 12.5,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    );
+                  }
+                  if (top.isEmpty && winners.isEmpty) {
                     return Text(
                       l10n.hilalDuelWeeklyEmpty,
                       style: TextStyle(
@@ -1370,26 +1571,38 @@ class _WeeklyLeaderCardState extends State<_WeeklyLeaderCard> {
                   return Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      Text(
-                        l10n.hilalDuelWeeklyTopPreview,
-                        style: TextStyle(
-                          color: theme.accent.withValues(alpha: 0.9),
-                          fontWeight: FontWeight.w800,
-                          fontSize: 11.5,
-                          letterSpacing: 0.3,
+                      if (winners.isNotEmpty) ...[
+                        _LastWeekWinnersPromo(
+                          winners: winners,
+                          onDark: onDark,
+                          l10n: l10n,
+                          compact: true,
                         ),
-                      ),
-                      const SizedBox(height: 8),
-                      ...top.map(
-                        (entry) => Padding(
-                          padding: const EdgeInsets.only(bottom: 6),
-                          child: _WeeklyPreviewRow(
-                            entry: entry,
-                            onDark: onDark,
-                            boardSize: snap.data?.top.length ?? 0,
+                        const SizedBox(height: 12),
+                      ],
+                      if (top.isNotEmpty) ...[
+                        Text(
+                          l10n.hilalDuelWeeklyTopPreview,
+                          style: TextStyle(
+                            color: theme.accent.withValues(alpha: 0.9),
+                            fontWeight: FontWeight.w800,
+                            fontSize: 11.5,
+                            letterSpacing: 0.3,
                           ),
                         ),
-                      ),
+                        const SizedBox(height: 8),
+                        ...top.map(
+                          (entry) => Padding(
+                            padding: const EdgeInsets.only(bottom: 6),
+                            child: _WeeklyPreviewRow(
+                              entry: entry,
+                              onDark: onDark,
+                              boardSize: board?.top.length ?? 0,
+                              showPremiumBadge: isAdmin && entry.premium,
+                            ),
+                          ),
+                        ),
+                      ],
                     ],
                   );
                 },
@@ -1427,16 +1640,301 @@ class _WeeklyLeaderCardState extends State<_WeeklyLeaderCard> {
   }
 }
 
+bool _isWeeklyMaxLevel(HilalDuelWeeklyEntry entry) =>
+    !entry.isBot && entry.level >= kHilalDuelMaxLevel;
+
+/// Seviye 10 — sıralamada altın parıltı.
+abstract final class _MaxLevelShine {
+  static const gold = Color(0xFFE0B35A);
+  static const goldDeep = Color(0xFFC4892A);
+  static const goldSoft = Color(0xFFF0D080);
+
+  static BoxDecoration rowDecoration({
+    required bool onDark,
+    required bool isSelf,
+    BorderRadius? radius,
+  }) {
+    return BoxDecoration(
+      borderRadius: radius ?? BorderRadius.circular(12),
+      gradient: LinearGradient(
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+        colors: onDark
+            ? [
+                gold.withValues(alpha: 0.28),
+                goldDeep.withValues(alpha: 0.14),
+                const Color(0xFF1A1408).withValues(alpha: 0.9),
+              ]
+            : [
+                goldSoft.withValues(alpha: 0.55),
+                gold.withValues(alpha: 0.22),
+                Colors.white.withValues(alpha: 0.95),
+              ],
+      ),
+      border: Border.all(
+        color: gold.withValues(alpha: isSelf ? 0.95 : 0.75),
+        width: isSelf ? 1.7 : 1.35,
+      ),
+      boxShadow: [
+        BoxShadow(
+          color: gold.withValues(alpha: onDark ? 0.42 : 0.28),
+          blurRadius: 14,
+          spreadRadius: 0.5,
+          offset: const Offset(0, 3),
+        ),
+      ],
+    );
+  }
+}
+
+class _MaxLevelBadge extends StatelessWidget {
+  const _MaxLevelBadge({this.compact = false});
+
+  final bool compact;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.symmetric(
+        horizontal: compact ? 5 : 6,
+        vertical: compact ? 2 : 3,
+      ),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(99),
+        gradient: const LinearGradient(
+          colors: [_MaxLevelShine.goldSoft, _MaxLevelShine.gold],
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: _MaxLevelShine.gold.withValues(alpha: 0.45),
+            blurRadius: 6,
+            offset: const Offset(0, 1),
+          ),
+        ],
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            Icons.auto_awesome_rounded,
+            size: compact ? 9 : 10,
+            color: const Color(0xFF1A1208),
+          ),
+          SizedBox(width: compact ? 2 : 3),
+          Text(
+            'LV$kHilalDuelMaxLevel',
+            style: TextStyle(
+              color: const Color(0xFF1A1208),
+              fontWeight: FontWeight.w900,
+              fontSize: compact ? 8.5 : 9.5,
+              letterSpacing: 0.2,
+              height: 1.1,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+String _lastWeekWinnerPrize(AppLocalizations l10n, int rank) {
+  switch (rank) {
+    case 1:
+      return l10n.hilalDuelWeeklyLastWinnerPrize1;
+    case 2:
+      return l10n.hilalDuelWeeklyLastWinnerPrize2;
+    case 3:
+      return l10n.hilalDuelWeeklyLastWinnerPrize3;
+    default:
+      return '';
+  }
+}
+
+/// Pazartesi sonrası: geçen haftanın kazananlarını tüm hafta gösterir.
+class _LastWeekWinnersPromo extends StatelessWidget {
+  const _LastWeekWinnersPromo({
+    required this.winners,
+    required this.onDark,
+    required this.l10n,
+    this.compact = false,
+  });
+
+  final List<HilalDuelWeeklyLastWinner> winners;
+  final bool onDark;
+  final AppLocalizations l10n;
+  final bool compact;
+
+  @override
+  Widget build(BuildContext context) {
+    if (winners.isEmpty) return const SizedBox.shrink();
+    const gold = Color(0xFFE0B35A);
+    return Container(
+      padding: EdgeInsets.fromLTRB(
+        compact ? 10 : 12,
+        compact ? 10 : 12,
+        compact ? 10 : 12,
+        compact ? 8 : 10,
+      ),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(14),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: onDark
+              ? [
+                  gold.withValues(alpha: 0.22),
+                  const Color(0xFF1A1408).withValues(alpha: 0.85),
+                ]
+              : [
+                  gold.withValues(alpha: 0.28),
+                  Colors.white.withValues(alpha: 0.92),
+                ],
+        ),
+        border: Border.all(color: gold.withValues(alpha: 0.75)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            children: [
+              Icon(
+                Icons.celebration_rounded,
+                size: compact ? 14 : 16,
+                color: gold,
+              ),
+              const SizedBox(width: 6),
+              Expanded(
+                child: Text(
+                  l10n.hilalDuelWeeklyLastWinnersTitle,
+                  style: TextStyle(
+                    color: gold,
+                    fontWeight: FontWeight.w900,
+                    fontSize: compact ? 11.5 : 13,
+                    letterSpacing: 0.2,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: compact ? 6 : 8),
+          ...winners.map((winner) {
+            final prize = winner.grantDays > 0
+                ? _lastWeekWinnerPrize(l10n, winner.rank)
+                : '';
+            final accent = winner.rank == 1
+                ? gold
+                : winner.rank == 2
+                    ? const Color(0xFFB0BEC5)
+                    : const Color(0xFFC48A5A);
+            return Padding(
+              padding: EdgeInsets.only(bottom: compact ? 4 : 6),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(
+                    width: compact ? 28 : 32,
+                    child: Text(
+                      '#${winner.rank}',
+                      style: TextStyle(
+                        color: accent,
+                        fontWeight: FontWeight.w900,
+                        fontSize: compact ? 12 : 13,
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    child: Text.rich(
+                      TextSpan(
+                        children: [
+                          TextSpan(
+                            text: winner.name,
+                            style: TextStyle(
+                              color: _HilalPalette.ink(onDark),
+                              fontWeight: FontWeight.w900,
+                              fontSize: compact ? 12 : 13,
+                            ),
+                          ),
+                          if (prize.isNotEmpty)
+                            TextSpan(
+                              text: ' — $prize',
+                              style: TextStyle(
+                                color: _HilalPalette.muted(onDark),
+                                fontWeight: FontWeight.w700,
+                                fontSize: compact ? 10.5 : 11.5,
+                              ),
+                            ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }),
+        ],
+      ),
+    );
+  }
+}
+
+/// Haftalık birincilik rozeti (sayaç).
+class _ChampionBadge extends StatelessWidget {
+  const _ChampionBadge({required this.count, this.compact = false});
+
+  final int count;
+  final bool compact;
+
+  @override
+  Widget build(BuildContext context) {
+    final n = count < 1 ? 1 : count;
+    return Container(
+      padding: EdgeInsets.symmetric(
+        horizontal: compact ? 5 : 6,
+        vertical: compact ? 2 : 3,
+      ),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(99),
+        gradient: const LinearGradient(
+          colors: [Color(0xFFFFE082), Color(0xFFE0B35A)],
+        ),
+        border: Border.all(color: const Color(0xFFC4892A).withValues(alpha: 0.85)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            Icons.emoji_events_rounded,
+            size: compact ? 9 : 11,
+            color: const Color(0xFF1A1208),
+          ),
+          SizedBox(width: compact ? 2 : 3),
+          Text(
+            '×$n',
+            style: TextStyle(
+              color: const Color(0xFF1A1208),
+              fontWeight: FontWeight.w900,
+              fontSize: compact ? 8.5 : 9.5,
+              height: 1.1,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class _WeeklyPreviewRow extends StatelessWidget {
   const _WeeklyPreviewRow({
     required this.entry,
     required this.onDark,
     required this.boardSize,
+    this.showPremiumBadge = false,
   });
 
   final HilalDuelWeeklyEntry entry;
   final bool onDark;
   final int boardSize;
+  final bool showPremiumBadge;
 
   @override
   Widget build(BuildContext context) {
@@ -1445,20 +1943,31 @@ class _WeeklyPreviewRow extends StatelessWidget {
       onDark,
       boardSize: boardSize,
     );
-    final podium = entry.rank == 1
-        ? const Color(0xFFE0B35A)
-        : entry.rank == 2
-            ? const Color(0xFFB0BEC5)
-            : entry.rank == 3
-                ? const Color(0xFFC48A5A)
-                : theme.accent;
+    final maxLevel = _isWeeklyMaxLevel(entry);
+    final podium = maxLevel
+        ? _MaxLevelShine.gold
+        : entry.rank == 1
+            ? const Color(0xFFE0B35A)
+            : entry.rank == 2
+                ? const Color(0xFFB0BEC5)
+                : entry.rank == 3
+                    ? const Color(0xFFC48A5A)
+                    : theme.accent;
+    final nameColor = maxLevel || entry.nameAccent || entry.isSelf
+        ? podium
+        : _HilalPalette.ink(onDark);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
-        color: podium.withValues(alpha: onDark ? 0.14 : 0.12),
-        border: Border.all(color: podium.withValues(alpha: 0.55)),
-      ),
+      decoration: maxLevel
+          ? _MaxLevelShine.rowDecoration(
+              onDark: onDark,
+              isSelf: entry.isSelf,
+            )
+          : BoxDecoration(
+              borderRadius: BorderRadius.circular(12),
+              color: podium.withValues(alpha: onDark ? 0.14 : 0.12),
+              border: Border.all(color: podium.withValues(alpha: 0.55)),
+            ),
       child: Row(
         children: [
           SizedBox(
@@ -1477,17 +1986,33 @@ class _WeeklyPreviewRow extends StatelessWidget {
             ),
           ),
           Expanded(
-            child: Text(
-              _leaderboardEntryName(entry),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                color: entry.isSelf
-                    ? podium
-                    : _HilalPalette.ink(onDark),
-                fontWeight: FontWeight.w800,
-                fontSize: 13,
-              ),
+            child: Row(
+              children: [
+                Flexible(
+                  child: Text(
+                    _leaderboardEntryName(entry),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      color: nameColor,
+                      fontWeight: FontWeight.w900,
+                      fontSize: 13,
+                    ),
+                  ),
+                ),
+                if (maxLevel) ...[
+                  const SizedBox(width: 6),
+                  const _MaxLevelBadge(compact: true),
+                ],
+                if (!entry.isBot && entry.championWeeks > 0) ...[
+                  const SizedBox(width: 6),
+                  _ChampionBadge(count: entry.championWeeks, compact: true),
+                ],
+                if (showPremiumBadge) ...[
+                  const SizedBox(width: 6),
+                  const _AdminPremiumBadge(compact: true),
+                ],
+              ],
             ),
           ),
           Text(
@@ -1499,6 +2024,39 @@ class _WeeklyPreviewRow extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// Admin-only: sıralamada premium oyuncu işareti.
+class _AdminPremiumBadge extends StatelessWidget {
+  const _AdminPremiumBadge({this.compact = false});
+
+  final bool compact;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.symmetric(
+        horizontal: compact ? 5 : 6,
+        vertical: compact ? 2 : 3,
+      ),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(99),
+        gradient: const LinearGradient(
+          colors: [Color(0xFFE0B35A), Color(0xFFC4892A)],
+        ),
+      ),
+      child: Text(
+        'PRO',
+        style: TextStyle(
+          color: const Color(0xFF1A1208),
+          fontWeight: FontWeight.w900,
+          fontSize: compact ? 9 : 10,
+          letterSpacing: 0.4,
+          height: 1.1,
+        ),
       ),
     );
   }
@@ -1660,8 +2218,11 @@ class _WeeklyLeaderSheetState extends ConsumerState<_WeeklyLeaderSheet> {
                 final selfWeekly = board.top.isEmpty && board.selfWeeklyHilals == 0
                     ? widget.fallbackWeekly
                     : board.selfWeeklyHilals;
+                // Shell alt nav SafeArea'ya dahil değil; son sıra bar altında kalmasın.
+                final bottomPad =
+                    ArinShellLayout.bottomContentPadding(context) + 12;
                 return ListView(
-                  padding: const EdgeInsets.fromLTRB(16, 4, 16, 24),
+                  padding: EdgeInsets.fromLTRB(16, 4, 16, bottomPad),
                   children: [
                     if (!widget.challengePickMode) ...[
                       Text(
@@ -1678,6 +2239,25 @@ class _WeeklyLeaderSheetState extends ConsumerState<_WeeklyLeaderSheet> {
                           fontSize: 14,
                         ),
                       ),
+                      const SizedBox(height: 10),
+                      Text(
+                        widget.l10n.hilalDuelWeeklyPremiumRewardHint,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: _HilalPalette.muted(widget.onDark),
+                          fontWeight: FontWeight.w700,
+                          fontSize: 12,
+                          height: 1.35,
+                        ),
+                      ),
+                      if (board.lastWeekWinners.isNotEmpty) ...[
+                        const SizedBox(height: 12),
+                        _LastWeekWinnersPromo(
+                          winners: board.lastWeekWinners,
+                          onDark: widget.onDark,
+                          l10n: widget.l10n,
+                        ),
+                      ],
                       const SizedBox(height: 14),
                     ],
                     if (board.top.isEmpty)
@@ -1703,31 +2283,48 @@ class _WeeklyLeaderSheetState extends ConsumerState<_WeeklyLeaderSheet> {
                           widget.onDark,
                           boardSize: board.top.length,
                         );
+                        final maxLevel = _isWeeklyMaxLevel(entry);
+                        final accent = maxLevel
+                            ? _MaxLevelShine.gold
+                            : rankTheme.accent;
+                        final nameColor = maxLevel || entry.nameAccent
+                            ? accent
+                            : _HilalPalette.ink(widget.onDark);
                         return Container(
                           margin: const EdgeInsets.only(bottom: 8),
                           padding: const EdgeInsets.symmetric(
                             horizontal: 12,
                             vertical: 12,
                           ),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(14),
-                            gradient: LinearGradient(
-                              colors: [
-                                rankTheme.fillA.withValues(
-                                  alpha: widget.onDark ? 0.85 : 0.95,
+                          decoration: maxLevel
+                              ? _MaxLevelShine.rowDecoration(
+                                  onDark: widget.onDark,
+                                  isSelf: entry.isSelf,
+                                  radius: BorderRadius.circular(14),
+                                )
+                              : BoxDecoration(
+                                  borderRadius: BorderRadius.circular(14),
+                                  gradient: LinearGradient(
+                                    colors: [
+                                      rankTheme.fillA.withValues(
+                                        alpha: widget.onDark ? 0.85 : 0.95,
+                                      ),
+                                      rankTheme.fillB.withValues(
+                                        alpha: widget.onDark ? 0.7 : 0.85,
+                                      ),
+                                    ],
+                                  ),
+                                  border: Border.all(
+                                    color: entry.isSelf
+                                        ? rankTheme.accent.withValues(
+                                            alpha: 0.9,
+                                          )
+                                        : rankTheme.accent.withValues(
+                                            alpha: 0.45,
+                                          ),
+                                    width: entry.isSelf ? 1.6 : 1,
+                                  ),
                                 ),
-                                rankTheme.fillB.withValues(
-                                  alpha: widget.onDark ? 0.7 : 0.85,
-                                ),
-                              ],
-                            ),
-                            border: Border.all(
-                              color: entry.isSelf
-                                  ? rankTheme.accent.withValues(alpha: 0.9)
-                                  : rankTheme.accent.withValues(alpha: 0.45),
-                              width: entry.isSelf ? 1.6 : 1,
-                            ),
-                          ),
                           child: Row(
                             children: [
                               SizedBox(
@@ -1738,7 +2335,7 @@ class _WeeklyLeaderSheetState extends ConsumerState<_WeeklyLeaderSheet> {
                                   softWrap: false,
                                   overflow: TextOverflow.visible,
                                   style: TextStyle(
-                                    color: rankTheme.accent,
+                                    color: accent,
                                     fontWeight: FontWeight.w900,
                                     fontSize: 15,
                                     height: 1.1,
@@ -1749,17 +2346,36 @@ class _WeeklyLeaderSheetState extends ConsumerState<_WeeklyLeaderSheet> {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Text(
-                                      _leaderboardEntryName(entry),
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: TextStyle(
-                                        color: entry.nameAccent
-                                            ? rankTheme.accent
-                                            : _HilalPalette.ink(widget.onDark),
-                                        fontWeight: FontWeight.w800,
-                                        fontSize: 14.5,
-                                      ),
+                                    Row(
+                                      children: [
+                                        Flexible(
+                                          child: Text(
+                                            _leaderboardEntryName(entry),
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                            style: TextStyle(
+                                              color: nameColor,
+                                              fontWeight: FontWeight.w900,
+                                              fontSize: 14.5,
+                                            ),
+                                          ),
+                                        ),
+                                        if (maxLevel) ...[
+                                          const SizedBox(width: 6),
+                                          const _MaxLevelBadge(),
+                                        ],
+                                        if (!entry.isBot &&
+                                            entry.championWeeks > 0) ...[
+                                          const SizedBox(width: 6),
+                                          _ChampionBadge(
+                                            count: entry.championWeeks,
+                                          ),
+                                        ],
+                                        if (isAdmin && entry.premium) ...[
+                                          const SizedBox(width: 6),
+                                          const _AdminPremiumBadge(),
+                                        ],
+                                      ],
                                     ),
                                     Text(
                                       [
@@ -1769,11 +2385,13 @@ class _WeeklyLeaderSheetState extends ConsumerState<_WeeklyLeaderSheet> {
                                         if (title.isNotEmpty) title,
                                       ].join(' · '),
                                       style: TextStyle(
-                                        color: _HilalPalette.muted(
-                                          widget.onDark,
-                                        ),
+                                        color: maxLevel
+                                            ? accent.withValues(alpha: 0.85)
+                                            : _HilalPalette.muted(
+                                                widget.onDark,
+                                              ),
                                         fontSize: 11.5,
-                                        fontWeight: FontWeight.w600,
+                                        fontWeight: FontWeight.w700,
                                       ),
                                     ),
                                   ],
@@ -1811,11 +2429,20 @@ class _WeeklyLeaderSheetState extends ConsumerState<_WeeklyLeaderSheet> {
                                           size: 22,
                                         ),
                                 ),
+                              Text(
+                                '${entry.weeklyHilals}',
+                                style: TextStyle(
+                                  color: accent,
+                                  fontWeight: FontWeight.w900,
+                                  fontSize: 16,
+                                ),
+                              ),
                               if (!entry.isSelf &&
-                                  entry.ownerHash.isNotEmpty)
+                                  entry.ownerHash.isNotEmpty) ...[
+                                const SizedBox(width: 8),
                                 _ChallengeActionButton(
                                   label: widget.l10n.hilalDuelChallengeAction,
-                                  accent: rankTheme.accent,
+                                  accent: accent,
                                   enabled: !widget.controller.busy,
                                   onPressed: () {
                                     HapticFeedback.mediumImpact();
@@ -1839,16 +2466,8 @@ class _WeeklyLeaderSheetState extends ConsumerState<_WeeklyLeaderSheet> {
                                       ),
                                     );
                                   },
-                                )
-                              else
-                                Text(
-                                  '${entry.weeklyHilals}',
-                                  style: TextStyle(
-                                    color: rankTheme.accent,
-                                    fontWeight: FontWeight.w900,
-                                    fontSize: 16,
-                                  ),
                                 ),
+                              ],
                             ],
                           ),
                         );
@@ -1948,16 +2567,18 @@ class _StatChip extends StatelessWidget {
     required this.onDark,
     required this.accent,
     this.leading,
+    this.onTap,
   });
 
   final String label;
   final bool onDark;
   final Color accent;
   final Widget? leading;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    final child = Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       decoration: BoxDecoration(
         color: accent.withValues(alpha: onDark ? 0.16 : 0.12),
@@ -1979,7 +2600,20 @@ class _StatChip extends StatelessWidget {
               fontWeight: FontWeight.w700,
             ),
           ),
+          if (onTap != null) ...[
+            const SizedBox(width: 3),
+            Icon(Icons.add_rounded, size: 14, color: accent),
+          ],
         ],
+      ),
+    );
+    if (onTap == null) return child;
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(99),
+        child: child,
       ),
     );
   }
@@ -2515,6 +3149,29 @@ class _PlayingBody extends StatelessWidget {
           onDark: onDark,
         ),
         const SizedBox(height: 14),
+        if (question != null) ...[
+          Align(
+            alignment: Alignment.center,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(999),
+                color: bronze.withValues(alpha: onDark ? 0.22 : 0.14),
+                border: Border.all(color: bronze.withValues(alpha: 0.45)),
+              ),
+              child: Text(
+                _hilalDifficultyLabel(l10n, question.difficulty),
+                style: TextStyle(
+                  color: bronze,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: 0.5,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 10),
+        ],
         Container(
           padding: const EdgeInsets.fromLTRB(14, 16, 14, 14),
           decoration: BoxDecoration(
@@ -2532,7 +3189,7 @@ class _PlayingBody extends StatelessWidget {
                   question!.category,
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    color: bronze,
+                    color: bronze.withValues(alpha: 0.85),
                     fontSize: 12,
                     fontWeight: FontWeight.w700,
                   ),
@@ -2896,8 +3553,7 @@ class _HudPlayerSide extends StatelessWidget {
     final initial = _nameInitial(displayName, fallback: alignEnd ? 'R' : 'S');
     final meta = [
       l10n.hilalDuelLevelLabel(player.level),
-      if (player.isBot || player.badge != null)
-        player.badge ?? l10n.hilalDuelFastOpponent,
+      if (title.isNotEmpty) title,
     ].join(' · ');
 
     final avatar = Container(
@@ -4191,6 +4847,100 @@ class _SecondaryButton extends StatelessWidget {
           style: const TextStyle(
             fontWeight: FontWeight.w700,
             fontSize: 13,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Lobideki ana "Meydan oku" — altın dolgu, rekabetçi vurgu (canlı yeşilden ayrı).
+class _ChallengeLobbyButton extends StatelessWidget {
+  const _ChallengeLobbyButton({
+    required this.label,
+    required this.onTap,
+    required this.onDark,
+    required this.busy,
+  });
+
+  final String label;
+  final VoidCallback onTap;
+  final bool onDark;
+  final bool busy;
+
+  @override
+  Widget build(BuildContext context) {
+    final accent = onDark
+        ? const Color(0xFFE0B35A)
+        : const Color(0xFFC4892A);
+    const fg = Color(0xFF1A1208);
+    return SizedBox(
+      width: double.infinity,
+      height: 44,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: busy ? null : onTap,
+          borderRadius: BorderRadius.circular(12),
+          child: Ink(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(12),
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: busy
+                    ? [
+                        accent.withValues(alpha: 0.45),
+                        accent.withValues(alpha: 0.32),
+                      ]
+                    : [
+                        accent,
+                        Color.lerp(accent, const Color(0xFFF0D080), 0.35) ??
+                            accent,
+                      ],
+              ),
+              border: Border.all(
+                color: Colors.white.withValues(alpha: busy ? 0.12 : 0.28),
+              ),
+              boxShadow: busy
+                  ? null
+                  : [
+                      BoxShadow(
+                        color: accent.withValues(alpha: 0.38),
+                        blurRadius: 14,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+            ),
+            child: Center(
+              child: busy
+                  ? SizedBox(
+                      width: 18,
+                      height: 18,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: fg.withValues(alpha: 0.7),
+                      ),
+                    )
+                  : Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.bolt_rounded, size: 18, color: fg),
+                        const SizedBox(width: 6),
+                        Text(
+                          label,
+                          style: TextStyle(
+                            color: fg,
+                            fontWeight: FontWeight.w900,
+                            fontSize: 13.5,
+                            letterSpacing: 0.6,
+                            height: 1.1,
+                          ),
+                        ),
+                      ],
+                    ),
+            ),
           ),
         ),
       ),

@@ -264,6 +264,10 @@ service cloud.firestore {
         allow read, write: if false;
       }
     }
+    // Haftalık 1. Premium ödül ledger'ı — yalnız Cloud Functions.
+    match /quiz_weekly_rewards/{weekId} {
+      allow read, write: if false;
+    }
     match /quiz_devices/{installationHash} {
       allow read, write: if false;
     }

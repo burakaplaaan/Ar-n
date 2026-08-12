@@ -2532,6 +2532,24 @@ abstract class AppLocalizations {
   /// **'Soru {current}/{total}'**
   String hilalDuelQuestionProgress(int current, int total);
 
+  /// No description provided for @hilalDuelDifficultyEasy.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kolay'**
+  String get hilalDuelDifficultyEasy;
+
+  /// No description provided for @hilalDuelDifficultyMedium.
+  ///
+  /// In tr, this message translates to:
+  /// **'Orta'**
+  String get hilalDuelDifficultyMedium;
+
+  /// No description provided for @hilalDuelDifficultyHard.
+  ///
+  /// In tr, this message translates to:
+  /// **'Zor'**
+  String get hilalDuelDifficultyHard;
+
   /// No description provided for @hilalDuelWaitingOpponent.
   ///
   /// In tr, this message translates to:
@@ -2724,6 +2742,36 @@ abstract class AppLocalizations {
   /// **'İlk 10 yeşil ligde — oyna, yüksel!'**
   String get hilalDuelWeeklyClimbHint;
 
+  /// No description provided for @hilalDuelWeeklyPremiumRewardHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'1. → 14 gün Premium + şampiyon rozeti\n2. → 7 gün Premium\n3. → 3 gün Premium'**
+  String get hilalDuelWeeklyPremiumRewardHint;
+
+  /// No description provided for @hilalDuelWeeklyLastWinnersTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Geçen haftanın kazananları'**
+  String get hilalDuelWeeklyLastWinnersTitle;
+
+  /// No description provided for @hilalDuelWeeklyLastWinnerPrize1.
+  ///
+  /// In tr, this message translates to:
+  /// **'14 gün Premium + şampiyon rozeti'**
+  String get hilalDuelWeeklyLastWinnerPrize1;
+
+  /// No description provided for @hilalDuelWeeklyLastWinnerPrize2.
+  ///
+  /// In tr, this message translates to:
+  /// **'7 gün Premium'**
+  String get hilalDuelWeeklyLastWinnerPrize2;
+
+  /// No description provided for @hilalDuelWeeklyLastWinnerPrize3.
+  ///
+  /// In tr, this message translates to:
+  /// **'3 gün Premium'**
+  String get hilalDuelWeeklyLastWinnerPrize3;
+
   /// No description provided for @hilalDuelWeeklyEmpty.
   ///
   /// In tr, this message translates to:
@@ -2808,6 +2856,12 @@ abstract class AppLocalizations {
   /// **'Devam et'**
   String get hilalDuelChallengeContinue;
 
+  /// No description provided for @hilalDuelChallengeSeeResult.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sonucu gör'**
+  String get hilalDuelChallengeSeeResult;
+
   /// No description provided for @hilalDuelChallengeWaiting.
   ///
   /// In tr, this message translates to:
@@ -2829,7 +2883,7 @@ abstract class AppLocalizations {
   /// No description provided for @hilalDuelChallengeHint.
   ///
   /// In tr, this message translates to:
-  /// **'Listeden birine meydan oku. Sen 1 can harcarsın; süre dolarsa kimse puan alamaz. Botlar yaklaşık 12 saat sonra otomatik ve zayıf cevap verir.'**
+  /// **'Listeden birine meydan oku. Sen 1 can harcarsın; süre dolarsa kimse puan alamaz.'**
   String get hilalDuelChallengeHint;
 
   /// No description provided for @hilalDuelChallengePickTitle.
@@ -2841,7 +2895,7 @@ abstract class AppLocalizations {
   /// No description provided for @hilalDuelChallengePickHint.
   ///
   /// In tr, this message translates to:
-  /// **'Meydan okumak için bir oyuncu seç. Önce sen çözersin. İnsan rakibe 24 saat, bota yaklaşık 12 saat sonra otomatik cevap.'**
+  /// **'Meydan okumak için bir oyuncu seç. Önce sen çözersin. Rakibin 24 saat içinde cevaplar.'**
   String get hilalDuelChallengePickHint;
 
   /// No description provided for @hilalDuelChallengeSentTitle.

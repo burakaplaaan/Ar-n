@@ -2562,7 +2562,6 @@ class _AdminContentPageState extends ConsumerState<AdminContentPage>
             email: email,
             projectId: Firebase.app().options.projectId,
           ),
-          const _AdminInstallAudienceStrip(),
           Expanded(
             child: TabBarView(
               controller: _tabs,

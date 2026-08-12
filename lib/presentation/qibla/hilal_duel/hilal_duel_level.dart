@@ -69,6 +69,22 @@ HilalDuelLevelProgress levelForHilals(int rawHilals) {
   );
 }
 
+/// Hedef seviyenin taban hilali (admin seviye ayarı; sunucu ile aynı).
+int hilalsFloorForLevel(int rawLevel) {
+  final target = rawLevel < 1
+      ? 1
+      : (rawLevel > kHilalDuelMaxLevel ? kHilalDuelMaxLevel : rawLevel);
+  var level = 1;
+  var floor = 0;
+  var nextCost = 40;
+  while (level < target) {
+    floor += nextCost;
+    level += 1;
+    nextCost = 40 + (level - 1) * 15;
+  }
+  return floor;
+}
+
 /// Maç hilal ödülü — sunucu `hilalAward` ile aynı.
 int hilalAward({
   required int correct,

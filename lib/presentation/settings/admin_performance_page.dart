@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/product_metric_features.dart';
+import 'admin_install_audience_strip.dart';
 
 class AdminPerformancePage extends StatefulWidget {
   const AdminPerformancePage({super.key});
@@ -119,51 +120,60 @@ class _AdminPerformancePageState extends State<AdminPerformancePage> {
         onRefresh: _load,
         child: ListView(
           physics: const AlwaysScrollableScrollPhysics(),
-          padding: const EdgeInsets.fromLTRB(14, 14, 14, 32),
+          padding: const EdgeInsets.fromLTRB(0, 0, 0, 32),
           children: [
-            _RangeSelector(
-              days: _days,
-              onChanged: (days) {
-                if (_days == days) return;
-                setState(() => _days = days);
-                _load();
-              },
-            ),
-            const SizedBox(height: 14),
-            if (_loading)
-              const Padding(
-                padding: EdgeInsets.only(top: 80),
-                child: Center(child: CircularProgressIndicator()),
-              )
-            else if (_error != null)
-              _ErrorCard(message: _error!, onRetry: _load)
-            else ...[
-              _buildOverview(),
-              const SizedBox(height: 14),
-              _buildDayUsage(),
-              const SizedBox(height: 14),
-              _buildNotifications(),
-              const SizedBox(height: 14),
-              _buildWidgets(),
-              const SizedBox(height: 14),
-              _buildContent(),
-              const SizedBox(height: 12),
-              Text(
-                'Günler İstanbul saatiyle gece 12’de değişir. Reklamlar “kaç '
-                'kez”, özellikler “o gün kaç kişi açtı” olarak sayılır. '
-                'Veriler bu sürüm yayınlandıktan sonra birikir. Bildirim hedef '
-                'kitlesi topic aboneliği tahminidir; FCM gerçek teslim edilen '
-                'kişi sayısını vermez. Android ve iOS widget kaldırılmasını '
-                'kesin olarak bildirmez. Bu nedenle “bıraktı”, daha önce '
-                'render edilmiş tüm widgetları 48 saat kilitli kalıp reklamla '
-                'veya premium ile açmayan kullanıcı tahminidir.',
-                style: TextStyle(
-                  color: Colors.white.withValues(alpha: 0.45),
-                  fontSize: 11,
-                  height: 1.4,
-                ),
+            const AdminInstallAudienceStrip(),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(14, 14, 14, 0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  _RangeSelector(
+                    days: _days,
+                    onChanged: (days) {
+                      if (_days == days) return;
+                      setState(() => _days = days);
+                      _load();
+                    },
+                  ),
+                  const SizedBox(height: 14),
+                  if (_loading)
+                    const Padding(
+                      padding: EdgeInsets.only(top: 80),
+                      child: Center(child: CircularProgressIndicator()),
+                    )
+                  else if (_error != null)
+                    _ErrorCard(message: _error!, onRetry: _load)
+                  else ...[
+                    _buildOverview(),
+                    const SizedBox(height: 14),
+                    _buildDayUsage(),
+                    const SizedBox(height: 14),
+                    _buildNotifications(),
+                    const SizedBox(height: 14),
+                    _buildWidgets(),
+                    const SizedBox(height: 14),
+                    _buildContent(),
+                    const SizedBox(height: 12),
+                    Text(
+                      'Günler İstanbul saatiyle gece 12’de değişir. Reklamlar “kaç '
+                      'kez”, özellikler “o gün kaç kişi açtı” olarak sayılır. '
+                      'Veriler bu sürüm yayınlandıktan sonra birikir. Bildirim hedef '
+                      'kitlesi topic aboneliği tahminidir; FCM gerçek teslim edilen '
+                      'kişi sayısını vermez. Android ve iOS widget kaldırılmasını '
+                      'kesin olarak bildirmez. Bu nedenle “bıraktı”, daha önce '
+                      'render edilmiş tüm widgetları 48 saat kilitli kalıp reklamla '
+                      'veya premium ile açmayan kullanıcı tahminidir.',
+                      style: TextStyle(
+                        color: Colors.white.withValues(alpha: 0.45),
+                        fontSize: 11,
+                        height: 1.4,
+                      ),
+                    ),
+                  ],
+                ],
               ),
-            ],
+            ),
           ],
         ),
       ),

@@ -1413,6 +1413,15 @@ class AppLocalizationsTr extends AppLocalizations {
   }
 
   @override
+  String get hilalDuelDifficultyEasy => 'Kolay';
+
+  @override
+  String get hilalDuelDifficultyMedium => 'Orta';
+
+  @override
+  String get hilalDuelDifficultyHard => 'Zor';
+
+  @override
   String get hilalDuelWaitingOpponent => 'Rakip cevaplıyor…';
 
   @override
@@ -1525,6 +1534,23 @@ class AppLocalizationsTr extends AppLocalizations {
   String get hilalDuelWeeklyClimbHint => 'İlk 10 yeşil ligde — oyna, yüksel!';
 
   @override
+  String get hilalDuelWeeklyPremiumRewardHint =>
+      '1. → 14 gün Premium + şampiyon rozeti\n2. → 7 gün Premium\n3. → 3 gün Premium';
+
+  @override
+  String get hilalDuelWeeklyLastWinnersTitle => 'Geçen haftanın kazananları';
+
+  @override
+  String get hilalDuelWeeklyLastWinnerPrize1 =>
+      '14 gün Premium + şampiyon rozeti';
+
+  @override
+  String get hilalDuelWeeklyLastWinnerPrize2 => '7 gün Premium';
+
+  @override
+  String get hilalDuelWeeklyLastWinnerPrize3 => '3 gün Premium';
+
+  @override
   String get hilalDuelWeeklyEmpty =>
       'Bu hafta henüz kimse hilal kazanmadı. İlk maçı sen bitir!';
 
@@ -1572,6 +1598,9 @@ class AppLocalizationsTr extends AppLocalizations {
   String get hilalDuelChallengeContinue => 'Devam et';
 
   @override
+  String get hilalDuelChallengeSeeResult => 'Sonucu gör';
+
+  @override
   String get hilalDuelChallengeWaiting => 'Rakip bekleniyor';
 
   @override
@@ -1582,14 +1611,14 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get hilalDuelChallengeHint =>
-      'Listeden birine meydan oku. Sen 1 can harcarsın; süre dolarsa kimse puan alamaz. Botlar yaklaşık 12 saat sonra otomatik ve zayıf cevap verir.';
+      'Listeden birine meydan oku. Sen 1 can harcarsın; süre dolarsa kimse puan alamaz.';
 
   @override
   String get hilalDuelChallengePickTitle => 'Rakip seç';
 
   @override
   String get hilalDuelChallengePickHint =>
-      'Meydan okumak için bir oyuncu seç. Önce sen çözersin. İnsan rakibe 24 saat, bota yaklaşık 12 saat sonra otomatik cevap.';
+      'Meydan okumak için bir oyuncu seç. Önce sen çözersin. Rakibin 24 saat içinde cevaplar.';
 
   @override
   String get hilalDuelChallengeSentTitle => 'Meydan okuma gönderildi';

@@ -700,6 +700,9 @@
       "total": {"type": "int"}
     }
   },
+  "hilalDuelDifficultyEasy": "Kolay",
+  "hilalDuelDifficultyMedium": "Orta",
+  "hilalDuelDifficultyHard": "Zor",
   "hilalDuelWaitingOpponent": "Rakip cevaplıyor…",
   "hilalDuelAnsweredBubble": "Cevapladı",
   "hilalDuelRoundCorrect": "Doğru",
@@ -773,6 +776,11 @@
   "hilalDuelWeeklyTapHint": "Sıralamayı gör",
   "hilalDuelWeeklyTopPreview": "İlk 3",
   "hilalDuelWeeklyClimbHint": "İlk 10 yeşil ligde — oyna, yüksel!",
+  "hilalDuelWeeklyPremiumRewardHint": "1. → 14 gün Premium + şampiyon rozeti\n2. → 7 gün Premium\n3. → 3 gün Premium",
+  "hilalDuelWeeklyLastWinnersTitle": "Geçen haftanın kazananları",
+  "hilalDuelWeeklyLastWinnerPrize1": "14 gün Premium + şampiyon rozeti",
+  "hilalDuelWeeklyLastWinnerPrize2": "7 gün Premium",
+  "hilalDuelWeeklyLastWinnerPrize3": "3 gün Premium",
   "hilalDuelWeeklyEmpty": "Bu hafta henüz kimse hilal kazanmadı. İlk maçı sen bitir!",
   "hilalDuelWeeklyYourPlace": "Senin sıran: #{rank} · {count} hilal",
   "@hilalDuelWeeklyYourPlace": {
@@ -798,12 +806,13 @@
   "hilalDuelChallengeInboxTitle": "Meydan okumalar",
   "hilalDuelChallengeAccept": "Kabul et · 1 can",
   "hilalDuelChallengeContinue": "Devam et",
+  "hilalDuelChallengeSeeResult": "Sonucu gör",
   "hilalDuelChallengeWaiting": "Rakip bekleniyor",
   "hilalDuelChallengeYourTurn": "Sıra sende",
   "hilalDuelChallengeExpired": "Süre doldu — puan yok",
-  "hilalDuelChallengeHint": "Listeden birine meydan oku. Sen 1 can harcarsın; süre dolarsa kimse puan alamaz. Botlar yaklaşık 12 saat sonra otomatik ve zayıf cevap verir.",
+  "hilalDuelChallengeHint": "Listeden birine meydan oku. Sen 1 can harcarsın; süre dolarsa kimse puan alamaz.",
   "hilalDuelChallengePickTitle": "Rakip seç",
-  "hilalDuelChallengePickHint": "Meydan okumak için bir oyuncu seç. Önce sen çözersin. İnsan rakibe 24 saat, bota yaklaşık 12 saat sonra otomatik cevap.",
+  "hilalDuelChallengePickHint": "Meydan okumak için bir oyuncu seç. Önce sen çözersin. Rakibin 24 saat içinde cevaplar.",
   "hilalDuelChallengeSentTitle": "Meydan okuma gönderildi",
   "hilalDuelChallengeSentBody": "{name} cevap verince sonuç görünür.",
   "@hilalDuelChallengeSentBody": {

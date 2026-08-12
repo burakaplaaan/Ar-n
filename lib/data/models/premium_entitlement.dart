@@ -7,6 +7,7 @@ class PremiumEntitlement {
     this.productId,
     this.platform,
     this.expiresAt,
+    this.hilalWeeklyBonusExpiresAt,
     this.updatedAt,
   });
 
@@ -15,9 +16,13 @@ class PremiumEntitlement {
   final String? productId;
   final String? platform;
   final DateTime? expiresAt;
+  /// Hilal düello haftalık 1. ödülü; RC webhook ana süreyi ezse bile geçerli.
+  final DateTime? hilalWeeklyBonusExpiresAt;
   final DateTime? updatedAt;
 
   bool get isActive {
+    final bonus = hilalWeeklyBonusExpiresAt;
+    if (bonus != null && bonus.isAfter(DateTime.now())) return true;
     if (!active) return false;
     final expiry = expiresAt;
     if (expiry == null) return true;
@@ -34,6 +39,7 @@ class PremiumEntitlement {
       productId: data['productId']?.toString(),
       platform: data['platform']?.toString(),
       expiresAt: _date(data['expiresAt']),
+      hilalWeeklyBonusExpiresAt: _date(data['hilalWeeklyBonusExpiresAt']),
       updatedAt: _date(data['updatedAt']),
     );
   }

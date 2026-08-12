@@ -2696,8 +2696,12 @@ function _prayerIpHash(req) {
 }
 
 function _premiumRecordActive(data) {
-  if (data?.active !== true) return false;
-  const expiresAt = data?.expiresAt;
+  if (!data) return false;
+  // Hilal haftalık ödül: RC webhook ana süreyi kısalt/iptal etse bile bonus geçerli.
+  const bonusMs = data.hilalWeeklyBonusExpiresAt?.toMillis?.() || 0;
+  if (bonusMs > Date.now()) return true;
+  if (data.active !== true) return false;
+  const expiresAt = data.expiresAt;
   return expiresAt == null || (expiresAt?.toMillis?.() || 0) > Date.now();
 }
 

@@ -5,8 +5,8 @@ process.env.NODE_ENV = "test";
 const { _testables: t } = require("../index.js");
 const questions = require("../data/islamic_quiz_questions.json");
 
-test("question bank contains 500 valid and unique questions", () => {
-  assert.equal(questions.length, 500);
+test("question bank contains 1000 valid and unique questions", () => {
+  assert.equal(questions.length, 1000);
   const ids = new Set();
   const normalizedQuestions = new Set();
   const byDifficulty = { 1: 0, 2: 0, 3: 0 };
@@ -55,6 +55,54 @@ test("match questions progress easy to hard without shuffle", () => {
   }
 });
 
+test("pickQuestions prefers unseen ids for the same player", () => {
+  const easy = questions.filter((q) => q.difficulty === 1);
+  assert.ok(easy.length >= 2);
+  const keepEasy = easy[0].id;
+  const excludeEasy = easy.slice(1).map((q) => q.id);
+  const ids = t.pickQuestions(excludeEasy);
+  const pickedEasy = ids.filter((id) => {
+    const item = questions.find((q) => q.id === id);
+    return item?.difficulty === 1;
+  });
+  assert.equal(pickedEasy.length, 1);
+  assert.equal(pickedEasy[0], keepEasy);
+  const merged = t.mergeSeenQuestionIds(["iq_001", "iq_002"], ["iq_002", "iq_003"], 7);
+  assert.deepEqual(merged, ["iq_001", "iq_002", "iq_003"]);
+  const capped = t.mergeSeenQuestionIds(
+    ["a", "b", "c", "d", "e", "f", "g"],
+    ["h"],
+    7,
+  );
+  assert.deepEqual(capped, ["b", "c", "d", "e", "f", "g", "h"]);
+  const allSeen = t.pickQuestions(questions.map((q) => q.id));
+  assert.equal(allSeen.length, 7);
+  assert.equal(new Set(allSeen).size, 7);
+});
+
+test("seen-question cap covers the full bank before repeats", () => {
+  assert.ok(t.SEEN_QUESTION_IDS_CAP >= questions.length);
+  const allIds = questions.map((q) => q.id);
+  const kept = t.mergeSeenQuestionIds(allIds, []);
+  assert.equal(kept.length, questions.length);
+  assert.equal(kept[0], allIds[0]);
+  assert.equal(kept[kept.length - 1], allIds[allIds.length - 1]);
+});
+
+test("question payload includes difficulty 1-3", () => {
+  const payload = t.questionPayload("iq_001");
+  assert.equal(payload.id, "iq_001");
+  assert.ok([1, 2, 3].includes(payload.difficulty));
+  assert.equal(payload.correctIndex, undefined);
+});
+
+test("iq_840 Nas ayah count is 6 in Hafs/Diyanet", () => {
+  const item = questions.find((q) => q.id === "iq_840");
+  assert.ok(item);
+  assert.equal(item.options[item.correctIndex], "6");
+  assert.match(item.explanation, /6 ayet/);
+});
+
 test("levelForHilals keeps early levels attainable", () => {
   assert.deepEqual(t.levelForHilals(0), {
     level: 1,
@@ -70,12 +118,234 @@ test("levelForHilals keeps early levels attainable", () => {
   assert.equal(t.MAX_LEVEL, 10);
   assert.equal(t.levelForHilals(900).level, 10);
   assert.equal(t.levelForHilals(900).maxLevel, true);
+  assert.equal(t.hilalsFloorForLevel(1), 0);
+  assert.equal(t.hilalsFloorForLevel(2), 40);
+  assert.equal(t.hilalsFloorForLevel(3), 95);
+  assert.equal(t.levelForHilals(t.hilalsFloorForLevel(10)).level, 10);
   assert.equal(t.cosmeticsForLevel(5).title, "Talebe");
   assert.equal(t.cosmeticsForLevel(10).title, "İlim Dostu");
   assert.equal(t.FORFEIT_PENALTY, 5);
   assert.match(
     t.weekIdIstanbul(new Date("2026-08-05T12:00:00+03:00")),
     /^\d{8}$/,
+  );
+});
+
+test("previousWeekIdIstanbul is seven calendar days before current weekId", () => {
+  // 2026-08-12 Çarşamba Istanbul → week 20260810; previous 20260803.
+  assert.equal(
+    t.weekIdIstanbul(new Date("2026-08-12T00:05:00+03:00")),
+    "20260810",
+  );
+  assert.equal(
+    t.previousWeekIdIstanbul(new Date("2026-08-12T00:05:00+03:00")),
+    "20260803",
+  );
+  // Pazartesi gece kapanışı: yeni hafta id'si, ödül önceki haftaya.
+  assert.equal(
+    t.previousWeekIdIstanbul(new Date("2026-08-10T00:05:00+03:00")),
+    "20260803",
+  );
+});
+
+test("pickWeeklyHumanWinner skips bots, excluded, and zero scores", () => {
+  const winner = t.pickWeeklyHumanWinner([
+    {
+      ownerHash: "bot_aaaaaaaaaaaaaaaaaaaa",
+      name: "Bot Ali",
+      weeklyHilals: 99,
+      isBot: true,
+    },
+    {
+      ownerHash: "a".repeat(64),
+      name: "Zeynep",
+      weeklyHilals: 12,
+      leaderboardExcluded: true,
+    },
+    {
+      ownerHash: "b".repeat(64),
+      name: "Ayşe",
+      weeklyHilals: 10,
+    },
+    {
+      ownerHash: "c".repeat(64),
+      name: "Burak",
+      weeklyHilals: 10,
+    },
+    {
+      ownerHash: "d".repeat(64),
+      name: "Boş",
+      weeklyHilals: 0,
+    },
+  ]);
+  // Aynı hilalde tr isim sırası: Ayşe < Burak.
+  assert.equal(winner.ownerHash, "b".repeat(64));
+  assert.equal(winner.name, "Ayşe");
+  assert.equal(t.pickWeeklyHumanWinner([]), null);
+  assert.equal(
+    t.pickWeeklyHumanWinner([{ ownerHash: "x", weeklyHilals: 0 }]),
+    null,
+  );
+});
+
+test("isGrantablePremiumUid rejects guest quiz_ uids", () => {
+  assert.equal(t.isGrantablePremiumUid("google-oauth2|abc"), true);
+  assert.equal(t.isGrantablePremiumUid("quiz_" + "a".repeat(40)), false);
+  assert.equal(t.isGrantablePremiumUid(""), false);
+  assert.equal(t.isGrantablePremiumUid(null), false);
+});
+
+test("weekly premium days by rank are 14/7/3", () => {
+  assert.equal(t.HILAL_WEEKLY_PREMIUM_DAYS, 14);
+  assert.equal(t.hilalWeeklyPremiumDaysForRank(1), 14);
+  assert.equal(t.hilalWeeklyPremiumDaysForRank(2), 7);
+  assert.equal(t.hilalWeeklyPremiumDaysForRank(3), 3);
+  assert.equal(t.hilalWeeklyPremiumDaysForRank(4), 0);
+  assert.equal(t.hilalWeeklyPremiumMsForRank(2), 7 * 24 * 60 * 60_000);
+});
+
+test("pickWeeklyHumanTop returns ordered humans up to limit", () => {
+  const top = t.pickWeeklyHumanTop([
+    {
+      ownerHash: "bot_aaaaaaaaaaaaaaaaaaaa",
+      name: "Bot",
+      weeklyHilals: 99,
+      isBot: true,
+    },
+    { ownerHash: "a".repeat(64), name: "Zeynep", weeklyHilals: 12 },
+    { ownerHash: "b".repeat(64), name: "Ayşe", weeklyHilals: 10 },
+    { ownerHash: "c".repeat(64), name: "Burak", weeklyHilals: 9 },
+    { ownerHash: "d".repeat(64), name: "Cem", weeklyHilals: 8 },
+  ], 3);
+  assert.equal(top.length, 3);
+  assert.equal(top[0].name, "Zeynep");
+  assert.equal(top[1].name, "Ayşe");
+  assert.equal(top[2].name, "Burak");
+});
+
+test("decideTop3RivalryNotifications overtaken and close_threat", () => {
+  const board = [
+    { ownerHash: "a".repeat(64), name: "Ali", weeklyHilals: 20, rank: 1 },
+    { ownerHash: "b".repeat(64), name: "Buse", weeklyHilals: 15, rank: 2 },
+    { ownerHash: "c".repeat(64), name: "Cem", weeklyHilals: 14, rank: 3 },
+  ];
+  const overtaken = t.decideTop3RivalryNotifications({
+    actorOwnerHash: "a".repeat(64),
+    actorName: "Ali",
+    actorRank: 1,
+    actorHilals: 20,
+    board,
+    lastPushAtByOwner: {},
+    nowMs: 1_000_000,
+    cooldownMs: 0,
+  });
+  assert.equal(overtaken.length, 1);
+  assert.equal(overtaken[0].reason, "overtaken");
+  assert.equal(overtaken[0].ownerHash, "b".repeat(64));
+
+  const threat = t.decideTop3RivalryNotifications({
+    actorOwnerHash: "c".repeat(64),
+    actorName: "Cem",
+    actorRank: 3,
+    actorHilals: 14,
+    board,
+    lastPushAtByOwner: {},
+    nowMs: 1_000_000,
+    cooldownMs: 0,
+    closeGap: 3,
+  });
+  assert.ok(
+    threat.some((n) => n.reason === "close_threat" && n.ownerHash === "b".repeat(64)),
+  );
+});
+
+test("computePremiumExtendExpiresAtMs stacks and preserves lifetime", () => {
+  const now = Date.parse("2026-08-12T00:05:00+03:00");
+  const day = 24 * 60 * 60_000;
+  // Yeni / süresi dolmuş → now + 14g (#1).
+  assert.equal(
+    t.computePremiumExtendExpiresAtMs({
+      existingActive: false,
+      existingExpiresAtMs: 0,
+      nowMs: now,
+      grantMs: t.HILAL_WEEKLY_PREMIUM_MS,
+    }),
+    now + 14 * day,
+  );
+  // Aktif kalan süre üzerine stack.
+  assert.equal(
+    t.computePremiumExtendExpiresAtMs({
+      existingActive: true,
+      existingExpiresAtMs: now + 3 * day,
+      nowMs: now,
+      grantMs: t.HILAL_WEEKLY_PREMIUM_MS,
+    }),
+    now + 17 * day,
+  );
+  // Süresiz aktif → dokunma.
+  assert.equal(
+    t.computePremiumExtendExpiresAtMs({
+      existingActive: true,
+      existingExpiresAtMs: null,
+      nowMs: now,
+      grantMs: t.HILAL_WEEKLY_PREMIUM_MS,
+    }),
+    null,
+  );
+});
+
+test("computeHilalWeeklyBonusExpiresAtMs stacks over RC and prior bonus", () => {
+  const now = Date.parse("2026-08-12T00:05:00+03:00");
+  const day = 24 * 60 * 60_000;
+  assert.equal(
+    t.computeHilalWeeklyBonusExpiresAtMs({
+      nowMs: now,
+      grantMs: t.HILAL_WEEKLY_PREMIUM_MS,
+      existingActive: true,
+      existingExpiresAtMs: now + 30 * day,
+      existingBonusExpiresAtMs: 0,
+    }),
+    now + 44 * day,
+  );
+  assert.equal(
+    t.computeHilalWeeklyBonusExpiresAtMs({
+      nowMs: now,
+      grantMs: t.HILAL_WEEKLY_PREMIUM_MS,
+      existingActive: false,
+      existingExpiresAtMs: 0,
+      existingBonusExpiresAtMs: now + 2 * day,
+    }),
+    now + 16 * day,
+  );
+  assert.equal(
+    t.computeHilalWeeklyBonusExpiresAtMs({
+      nowMs: now,
+      grantMs: t.HILAL_WEEKLY_PREMIUM_MS,
+      existingActive: true,
+      existingExpiresAtMs: null,
+      existingBonusExpiresAtMs: 0,
+    }),
+    null,
+  );
+});
+
+test("quiz premiumRecordActive honors hilalWeeklyBonusExpiresAt after RC revoke", () => {
+  const future = { toMillis: () => Date.now() + 60_000 };
+  const past = { toMillis: () => Date.now() - 60_000 };
+  assert.equal(
+    t.premiumRecordActive({
+      active: false,
+      expiresAt: past,
+      hilalWeeklyBonusExpiresAt: future,
+    }),
+    true,
+  );
+  assert.equal(
+    t.premiumRecordActive({
+      active: false,
+      hilalWeeklyBonusExpiresAt: past,
+    }),
+    false,
   );
 });
 
@@ -609,6 +879,21 @@ test("bot challenge ids and weak plan (exactly one correct)", () => {
   assert.equal(t.isBotId("bot_0123456789abcdef0123"), true);
   assert.equal(t.isBotId("0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"), false);
   assert.equal(t.isBotId("bot_short"), false);
+  // createQuizChallenge must accept bot weekly ids (not only 64-hex humans).
+  assert.equal(
+    t.validatedOpponentId("bot_0123456789abcdef0123"),
+    "bot_0123456789abcdef0123",
+  );
+  assert.equal(
+    t.validatedOpponentId("BOT_0123456789ABCDEF0123"),
+    "bot_0123456789abcdef0123",
+  );
+  const human = "a".repeat(64);
+  assert.equal(t.validatedOpponentId(human), human);
+  assert.throws(
+    () => t.validatedOpponentId("not-a-player"),
+    (err) => String(err?.message || "").includes("Geçersiz oyuncu kimliği"),
+  );
   assert.equal(
     t.isChallengeBotOpponent({
       challengedIsBot: true,
@@ -678,6 +963,179 @@ test("challenge expiry and copy", () => {
     }, now),
     false,
   );
+  // Eski kayıt: deadline yok → createdAt + 24s.
+  const late = 2_000_000_000_000;
+  assert.equal(
+    t.challengeDeadlineMsOf({
+      createdAt: { toMillis: () => late - t.CHALLENGE_TTL_MS - 5_000 },
+    }),
+    late - 5_000,
+  );
+  assert.equal(
+    t.challengeIsExpired({
+      status: "awaiting_opponent",
+      createdAt: { toMillis: () => late - t.CHALLENGE_TTL_MS - 5_000 },
+    }, late),
+    true,
+  );
   assert.match(t.quizChallengeCopy("tr", "invited", { name: "Ayşe" }).body, /Ayşe/);
   assert.match(t.quizChallengeCopy("tr", "reminder").body, /puan/i);
+  for (const lang of ["tr", "en", "ar"]) {
+    for (const kind of ["invited", "reminder", "won", "lost", "draw"]) {
+      const copy = t.quizChallengeCopy(lang, kind, { name: "Ayşe" });
+      assert.equal(/bot/i.test(copy.title + " " + copy.body), false);
+    }
+  }
+});
+
+test("createQuizChallenge skips expired-unfinalized as still open", () => {
+  const now = 2_000_000;
+  assert.equal(
+    t.isCountableOpenChallenge({
+      status: "awaiting_opponent",
+      challengeDeadlineMs: now + 10_000,
+    }, now),
+    true,
+  );
+  assert.equal(
+    t.isCountableOpenChallenge({
+      status: "awaiting_opponent",
+      challengeDeadlineMs: now - 1,
+    }, now),
+    false,
+  );
+  assert.equal(
+    t.isCountableOpenChallenge({
+      status: "completed",
+      challengeDeadlineMs: now + 10_000,
+    }, now),
+    false,
+  );
+  const me = "aa";
+  const other = "bb";
+  const tally = t.tallyCountableChallenges([
+    {
+      id: "c1",
+      data: {
+        status: "awaiting_opponent",
+        challengerId: me,
+        challengedId: "x",
+        challengeDeadlineMs: now + 1,
+      },
+    },
+    {
+      id: "c2",
+      data: {
+        status: "awaiting_opponent",
+        challengerId: me,
+        challengedId: other,
+        challengeDeadlineMs: now - 1,
+      },
+    },
+    {
+      id: "c3",
+      data: {
+        status: "challenger_playing",
+        challengerId: me,
+        challengedId: "y",
+        challengeDeadlineMs: now + 1,
+      },
+    },
+  ], me, other, now);
+  assert.equal(tally.outgoingOpen, 2);
+  assert.equal(tally.hasOpenPair, false);
+  assert.deepEqual(tally.openOutgoingIds, ["c1", "c3"]);
+  assert.equal(
+    t.openPeerChallengeId({ openChallengePeers: { bb: "c9" } }, "bb"),
+    "c9",
+  );
+  assert.equal(t.openPeerChallengeId({}, "bb"), "");
+});
+
+test("challenge inbox keeps completed 48h and hides expired", () => {
+  const now = 1_700_000_000_000;
+  assert.equal(t.CHALLENGE_INBOX_COMPLETED_MS, 48 * 60 * 60_000);
+  assert.equal(
+    t.shouldListChallengeInInbox({
+      status: "expired",
+      challengeDeadlineMs: now - 1,
+    }, now),
+    false,
+  );
+  assert.equal(
+    t.shouldListChallengeInInbox({
+      status: "awaiting_opponent",
+      challengeDeadlineMs: now - 1,
+    }, now),
+    false,
+  );
+  assert.equal(
+    t.shouldListChallengeInInbox({
+      status: "opponent_playing",
+      challengeDeadlineMs: now + 5_000,
+    }, now),
+    true,
+  );
+  assert.equal(
+    t.shouldListChallengeInInbox({
+      status: "completed",
+      updatedAt: { toMillis: () => now - 60_000 },
+    }, now),
+    true,
+  );
+  assert.equal(
+    t.shouldListChallengeInInbox({
+      status: "completed",
+      updatedAt: { toMillis: () => now - t.CHALLENGE_INBOX_COMPLETED_MS - 1 },
+    }, now),
+    false,
+  );
+  assert.equal(t.challengeInboxOutcome("completed", "me", "me"), "won");
+  assert.equal(t.challengeInboxOutcome("completed", "them", "me"), "lost");
+  assert.equal(t.challengeInboxOutcome("completed", "", "me"), "draw");
+  assert.equal(t.challengeInboxOutcome("awaiting_opponent", "me", "me"), null);
+});
+
+test("last-week promo grantDays is 0 unless premium was granted", () => {
+  const skipped = t.lastWeekWinnersFromLedgerData({
+    status: "settled",
+    placements: [
+      { rank: 1, name: "Ali", ownerHash: "aa", grantDays: 14, premiumStatus: "skipped_already_premium" },
+      { rank: 2, name: "Ece", ownerHash: "bb", grantDays: 7, premiumStatus: "granted" },
+      { rank: 3, name: "Can", ownerHash: "cc", grantDays: 3, premiumStatus: "skipped_no_auth" },
+    ],
+  });
+  assert.equal(skipped.length, 3);
+  assert.equal(skipped[0].grantDays, 0);
+  assert.equal(skipped[1].grantDays, 7);
+  assert.equal(skipped[2].grantDays, 0);
+  const granted = t.lastWeekWinnersFromLedgerData({
+    status: "granted",
+    ownerHash: "aa",
+    name: "Ali",
+    grantDays: 14,
+  });
+  assert.equal(granted.length, 1);
+  assert.equal(granted[0].grantDays, 14);
+  assert.equal(t.lastWeekWinnersFromLedgerData({ status: "pending" }), null);
+});
+
+test("match player payload never exposes a bot tell badge", () => {
+  const decorated = t.decoratePlayer({
+    id: "bot_0123456789abcdef0123",
+    name: "Elif",
+    hilals: 10,
+    level: 2,
+    isBot: true,
+    badge: "Hızlı Rakip",
+  });
+  assert.equal(decorated.badge, null);
+  assert.equal(decorated.isBot, true);
+});
+
+test("engagement gift copy uses heart not life in en/ar", () => {
+  assert.match(t.quizEngagementCopy("en", "never_played").body, /heart/i);
+  assert.equal(/life/i.test(t.quizEngagementCopy("en", "never_played").body), false);
+  assert.match(t.quizEngagementCopy("ar", "never_played").body, /قلب/);
+  assert.equal(/حياة/.test(t.quizEngagementCopy("ar", "never_played").body), false);
 });

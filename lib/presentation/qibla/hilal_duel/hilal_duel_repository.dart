@@ -131,6 +131,8 @@ class HilalDuelWeeklyEntry {
     required this.isSelf,
     this.ownerHash = '',
     this.isBot = false,
+    this.premium = false,
+    this.championWeeks = 0,
     this.title,
     this.avatarFrame = false,
     this.specialHilalIcon = false,
@@ -144,6 +146,10 @@ class HilalDuelWeeklyEntry {
   final bool isSelf;
   final String ownerHash;
   final bool isBot;
+  /// Yalnız sunucu admin yanıtında dolar; sıradan istemcide hep false.
+  final bool premium;
+  /// Haftalık birincilik sayısı (şampiyon rozeti).
+  final int championWeeks;
   final String? title;
   final bool avatarFrame;
   final bool specialHilalIcon;
@@ -158,6 +164,8 @@ class HilalDuelWeeklyEntry {
       isSelf: map['isSelf'] == true,
       ownerHash: map['ownerHash']?.toString() ?? '',
       isBot: map['isBot'] == true,
+      premium: map['premium'] == true,
+      championWeeks: (map['championWeeks'] as num?)?.toInt() ?? 0,
       title: map['title']?.toString(),
       avatarFrame: map['avatarFrame'] == true,
       specialHilalIcon: map['specialHilalIcon'] == true,
@@ -177,6 +185,7 @@ class HilalDuelChallengeSummary {
     this.canAccept = false,
     this.myTurn = false,
     this.result,
+    this.outcome,
   });
 
   final String id;
@@ -188,11 +197,25 @@ class HilalDuelChallengeSummary {
   final bool canAccept;
   final bool myTurn;
   final HilalDuelResult? result;
+  /// completed: won | lost | draw
+  final String? outcome;
 
-  bool get isOpen =>
-      status == 'challenger_playing' ||
-      status == 'awaiting_opponent' ||
-      status == 'opponent_playing';
+  bool get isOpen {
+    if (status == 'completed' || status == 'expired') return false;
+    if (challengeDeadlineMs > 0 &&
+        DateTime.now().millisecondsSinceEpoch > challengeDeadlineMs) {
+      return false;
+    }
+    return status == 'challenger_playing' ||
+        status == 'awaiting_opponent' ||
+        status == 'opponent_playing';
+  }
+
+  bool get isInboxVisible {
+    if (status == 'expired') return false;
+    if (status == 'completed') return true;
+    return isOpen;
+  }
 
   factory HilalDuelChallengeSummary.fromMap(Map<String, dynamic> map) {
     final rawResult = map['result'];
@@ -208,6 +231,33 @@ class HilalDuelChallengeSummary {
       result: rawResult is Map
           ? HilalDuelResult.fromMap(Map<String, dynamic>.from(rawResult))
           : null,
+      outcome: map['outcome']?.toString(),
+    );
+  }
+}
+
+class HilalDuelWeeklyLastWinner {
+  const HilalDuelWeeklyLastWinner({
+    required this.rank,
+    required this.name,
+    this.grantDays = 0,
+    this.champion = false,
+    this.ownerHash = '',
+  });
+
+  final int rank;
+  final String name;
+  final int grantDays;
+  final bool champion;
+  final String ownerHash;
+
+  factory HilalDuelWeeklyLastWinner.fromMap(Map<String, dynamic> map) {
+    return HilalDuelWeeklyLastWinner(
+      rank: (map['rank'] as num?)?.toInt() ?? 0,
+      name: map['name']?.toString() ?? 'Oyuncu',
+      grantDays: (map['grantDays'] as num?)?.toInt() ?? 0,
+      champion: map['champion'] == true,
+      ownerHash: map['ownerHash']?.toString() ?? '',
     );
   }
 }
@@ -218,14 +268,21 @@ class HilalDuelWeeklyBoard {
     required this.top,
     required this.selfWeeklyHilals,
     required this.selfRank,
+    this.lastWeekWinners = const [],
+    this.lastWeekId = '',
   });
 
   final String weekId;
   final List<HilalDuelWeeklyEntry> top;
   final int selfWeeklyHilals;
   final int selfRank;
+  /// Önceki haftanın settle edilmiş kazananları (tüm hafta reklam).
+  final List<HilalDuelWeeklyLastWinner> lastWeekWinners;
+  final String lastWeekId;
 
   factory HilalDuelWeeklyBoard.fromMap(Map<String, dynamic> map) {
+    final last = map['lastWeekWinners'];
+    final lastMap = last is Map ? Map<String, dynamic>.from(last) : null;
     return HilalDuelWeeklyBoard(
       weekId: map['weekId']?.toString() ?? '',
       top: ((map['top'] as List?) ?? const [])
@@ -238,6 +295,15 @@ class HilalDuelWeeklyBoard {
       selfWeeklyHilals:
           ((map['self'] as Map?)?['weeklyHilals'] as num?)?.toInt() ?? 0,
       selfRank: ((map['self'] as Map?)?['rank'] as num?)?.toInt() ?? 0,
+      lastWeekId: lastMap?['weekId']?.toString() ?? '',
+      lastWeekWinners: ((lastMap?['winners'] as List?) ?? const [])
+          .whereType<Map>()
+          .map(
+            (item) => HilalDuelWeeklyLastWinner.fromMap(
+              Map<String, dynamic>.from(item),
+            ),
+          )
+          .toList(growable: false),
     );
   }
 }
@@ -248,6 +314,7 @@ class HilalDuelQuestion {
     required this.category,
     required this.text,
     required this.options,
+    this.difficulty = 2,
     this.correctIndex,
     this.explanation,
     this.source,
@@ -257,11 +324,14 @@ class HilalDuelQuestion {
   final String category;
   final String text;
   final List<String> options;
+  /// 1 kolay, 2 orta, 3 zor
+  final int difficulty;
   final int? correctIndex;
   final String? explanation;
   final String? source;
 
   factory HilalDuelQuestion.fromMap(Map<String, dynamic> map) {
+    final rawDifficulty = (map['difficulty'] as num?)?.toInt() ?? 2;
     return HilalDuelQuestion(
       id: map['id']?.toString() ?? '',
       category: map['category']?.toString() ?? 'İslamiyet',
@@ -269,6 +339,7 @@ class HilalDuelQuestion {
       options: ((map['options'] as List?) ?? const [])
           .map((option) => option.toString())
           .toList(growable: false),
+      difficulty: rawDifficulty == 1 || rawDifficulty == 3 ? rawDifficulty : 2,
       correctIndex: (map['correctIndex'] as num?)?.toInt(),
       explanation: map['explanation']?.toString(),
       source: map['source']?.toString(),
@@ -531,6 +602,14 @@ abstract class HilalDuelRepositoryApi {
     required String ownerHash,
     String? reason,
   });
+  Future<HilalDuelProfile> adminGrantSelfHilals({
+    required String name,
+    required int amount,
+  });
+  Future<HilalDuelProfile> adminSetSelfLevel({
+    required String name,
+    required int level,
+  });
   Future<HilalDuelMatch> createChallenge({
     required String name,
     required String opponentOwnerHash,
@@ -754,6 +833,35 @@ class HilalDuelRepository implements HilalDuelRepositoryApi {
   }
 
   @override
+  Future<HilalDuelProfile> adminGrantSelfHilals({
+    required String name,
+    required int amount,
+  }) async {
+    await _call('adminGrantSelfQuizHilals', {
+      ...await _credentials(),
+      'name': _safeName(name),
+      'amount': amount,
+    });
+    // Level / cosmetics tam profilden gelsin.
+    final refreshed = await loadProfile(name);
+    return refreshed.profile;
+  }
+
+  @override
+  Future<HilalDuelProfile> adminSetSelfLevel({
+    required String name,
+    required int level,
+  }) async {
+    await _call('adminSetSelfQuizLevel', {
+      ...await _credentials(),
+      'name': _safeName(name),
+      'level': level,
+    });
+    final refreshed = await loadProfile(name);
+    return refreshed.profile;
+  }
+
+  @override
   Future<HilalDuelMatch> createChallenge({
     required String name,
     required String opponentOwnerHash,
@@ -761,7 +869,7 @@ class HilalDuelRepository implements HilalDuelRepositoryApi {
     final result = await _call('createQuizChallenge', {
       ...await _credentials(),
       'name': _safeName(name),
-      'opponentOwnerHash': opponentOwnerHash,
+      'opponentOwnerHash': opponentOwnerHash.trim().toLowerCase(),
     });
     return HilalDuelMatch.fromMap(
       Map<String, dynamic>.from((result['challenge'] as Map?) ?? const {}),

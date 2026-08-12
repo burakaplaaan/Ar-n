@@ -9,6 +9,7 @@ import '../../../core/analytics/arin_analytics.dart';
 import '../../../core/constants/product_metric_features.dart';
 import '../../../data/services/admob_service.dart';
 import '../../../data/services/product_metrics_service.dart';
+import 'hilal_duel_level.dart';
 import 'hilal_duel_repository.dart';
 import 'hilal_duel_sfx.dart';
 import 'hilal_duel_sync.dart';
@@ -1072,6 +1073,54 @@ class HilalDuelController extends ChangeNotifier {
     );
   }
 
+  /// Yönetici: kendi hilal puanını artırır (toplam + haftalık).
+  Future<void> adminGrantSelfHilals(int amount) async {
+    if (busy || _disposed || amount < 1) return;
+    busy = true;
+    errorMessage = null;
+    _safeNotify();
+    try {
+      final updated = await _repository.adminGrantSelfHilals(
+        name: _displayName(),
+        amount: amount,
+      );
+      if (_disposed) return;
+      profile = updated;
+      _safeNotify();
+    } catch (error) {
+      if (_disposed) return;
+      errorMessage = _friendlyError(error);
+      _safeNotify();
+    } finally {
+      busy = false;
+      if (!_disposed) _safeNotify();
+    }
+  }
+
+  /// Yönetici: kendi seviyesini ayarlar (toplam hilal = seviye tabanı).
+  Future<void> adminSetSelfLevel(int level) async {
+    if (busy || _disposed || level < 1 || level > kHilalDuelMaxLevel) return;
+    busy = true;
+    errorMessage = null;
+    _safeNotify();
+    try {
+      final updated = await _repository.adminSetSelfLevel(
+        name: _displayName(),
+        level: level,
+      );
+      if (_disposed) return;
+      profile = updated;
+      _safeNotify();
+    } catch (error) {
+      if (_disposed) return;
+      errorMessage = _friendlyError(error);
+      _safeNotify();
+    } finally {
+      busy = false;
+      if (!_disposed) _safeNotify();
+    }
+  }
+
   void _startQueuePolling() {
     _stopTimers();
     _queuePollInFlight = false;
@@ -1744,8 +1793,10 @@ class HilalDuelController extends ChangeNotifier {
       leave.complete(HilalDuelLeaveSettle.blockedRetry);
     }
     // Maç ortasında kapanırsa terk cezasını best-effort uygula.
+    // Meydan okuma quiz_challenges üzerinde; forfeitQuizMatch çağırma.
     final playingId = _activeMatchId;
-    if (phase == HilalDuelPhase.playing &&
+    if (!challengeMode &&
+        phase == HilalDuelPhase.playing &&
         playingId != null &&
         playingId.isNotEmpty) {
       unawaited(_repository.forfeitMatch(playingId));

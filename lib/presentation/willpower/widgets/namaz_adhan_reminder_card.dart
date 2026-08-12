@@ -154,10 +154,10 @@ Future<bool?> _openPerPrayerReminderList(
   return showModalBottomSheet<bool>(
     context: context,
     isScrollControlled: true,
-    backgroundColor: const Color(0xFF14110E),
-    barrierColor: Colors.black.withValues(alpha: 0.55),
+    backgroundColor: const Color(0xFF161B17),
+    barrierColor: Colors.black.withValues(alpha: 0.5),
     shape: const RoundedRectangleBorder(
-      borderRadius: BorderRadius.vertical(top: Radius.circular(26)),
+      borderRadius: BorderRadius.vertical(top: Radius.circular(22)),
     ),
     builder: (ctx) => _PerPrayerReminderListSheet(
       prefs: prefs,

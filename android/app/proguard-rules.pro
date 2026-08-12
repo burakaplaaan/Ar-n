@@ -78,3 +78,10 @@
 }
 -dontwarn com.google.firebase.**
 -dontwarn com.google.android.gms.**
+
+# ---- Meta Audience Network (gma_mediation_meta / Facebook Audience Network) ----
+# SDK, derleme-zamanı Infer Nullsafe annotation'larına referans veriyor;
+# runtime'da paket yok. R8 missing_rules.txt ile aynı.
+-dontwarn com.facebook.infer.annotation.Nullsafe
+-dontwarn com.facebook.infer.annotation.Nullsafe$Mode
+-dontwarn com.facebook.infer.annotation.**

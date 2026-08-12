@@ -132,6 +132,89 @@ class _HomePageState extends ConsumerState<HomePage> {
 
 // ─── Header ────────────────────────────────────────────────────────────────
 
+bool _homeDisplayNameEditOpen = false;
+
+/// Home + Hilal duel ile uyumlu: 2–32 karakter, sıkıştırılmış boşluk.
+String? _normalizeHomeDisplayName(String raw) {
+  final collapsed = raw.replaceAll(RegExp(r'\s+'), ' ').trim();
+  if (collapsed.length < 2) return null;
+  if (collapsed.length <= 32) return collapsed;
+  final clipped = collapsed.substring(0, 32).trim();
+  return clipped.length < 2 ? null : clipped;
+}
+
+Future<void> _editHomeDisplayName({
+  required BuildContext context,
+  required WidgetRef ref,
+  required String displayedName,
+  required bool isGuestLabel,
+}) async {
+  if (_homeDisplayNameEditOpen) return;
+  _homeDisplayNameEditOpen = true;
+
+  final l10n = AppLocalizations.of(context)!;
+  final controller = TextEditingController(
+    text: isGuestLabel ? '' : displayedName,
+  );
+  String? result;
+  try {
+    result = await showDialog<String>(
+      context: context,
+      builder: (ctx) {
+        return AlertDialog(
+          title: Text(l10n.surveyNameTitle),
+          content: TextField(
+            controller: controller,
+            autofocus: true,
+            textCapitalization: TextCapitalization.words,
+            textInputAction: TextInputAction.done,
+            maxLength: 32,
+            buildCounter:
+                (
+                  _, {
+                  required currentLength,
+                  required isFocused,
+                  required maxLength,
+                }) => null,
+            decoration: InputDecoration(hintText: l10n.surveyNameHint),
+            onSubmitted: (value) {
+              final normalized = _normalizeHomeDisplayName(value);
+              if (normalized == null) return;
+              Navigator.of(ctx).pop(normalized);
+            },
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(ctx).pop(),
+              child: Text(l10n.commonCancel),
+            ),
+            TextButton(
+              onPressed: () {
+                final normalized = _normalizeHomeDisplayName(controller.text);
+                if (normalized == null) return;
+                Navigator.of(ctx).pop(normalized);
+              },
+              child: Text(l10n.saveAction),
+            ),
+          ],
+        );
+      },
+    );
+  } finally {
+    controller.dispose();
+    _homeDisplayNameEditOpen = false;
+  }
+
+  final normalized = result == null
+      ? null
+      : _normalizeHomeDisplayName(result);
+  if (normalized == null || !context.mounted) return;
+
+  final prefs = ref.read(sharedPreferencesProvider);
+  await prefs.setBool(profileNameLockedByUserKey, true);
+  await ref.read(userProfileProvider.notifier).updateName(normalized);
+}
+
 class _HeaderSection extends ConsumerWidget {
   final String greeting;
   final bool isDarkShell;
@@ -152,6 +235,7 @@ class _HeaderSection extends ConsumerWidget {
         ?.value
         ?.displayName
         ?.trim();
+    final guestLabel = l10n.homeGuestUser;
     final userName =
         (isProfileNameLockedByUser &&
             profileName != null &&
@@ -159,7 +243,7 @@ class _HeaderSection extends ConsumerWidget {
         ? profileName
         : (authName != null && authName.isNotEmpty)
         ? authName
-        : l10n.homeGuestUser;
+        : guestLabel;
     final remaining = ref.watch(countdownProvider);
     final nextName = ref.watch(nextPrayerNameProvider);
     final isPremium = ref.watch(isPremiumProvider);
@@ -241,17 +325,26 @@ class _HeaderSection extends ConsumerWidget {
                     else
                       Text(greeting, style: greetingStyle),
                     const SizedBox(height: 6),
-                    Text(
-                      userName,
-                      style: TextStyle(
-                        color: ornament.withValues(alpha: 0.8),
-                        fontSize:
-                            Theme.of(context).platform == TargetPlatform.iOS
-                            ? 18
-                            : 16,
-                        fontWeight: FontWeight.w500,
+                    GestureDetector(
+                      behavior: HitTestBehavior.opaque,
+                      onTap: () => _editHomeDisplayName(
+                        context: context,
+                        ref: ref,
+                        displayedName: userName,
+                        isGuestLabel: userName == guestLabel,
                       ),
-                      overflow: TextOverflow.ellipsis,
+                      child: Text(
+                        userName,
+                        style: TextStyle(
+                          color: ornament.withValues(alpha: 0.8),
+                          fontSize:
+                              Theme.of(context).platform == TargetPlatform.iOS
+                              ? 21
+                              : 19,
+                          fontWeight: FontWeight.w500,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     ),
                   ],
                 ),

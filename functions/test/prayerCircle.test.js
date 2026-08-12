@@ -432,6 +432,15 @@ test("premiumRecordActive: treats missing expiresAt as active-forever, but rejec
   const past = { toMillis: () => Date.now() - 60_000 };
   assert.equal(t.premiumRecordActive({ active: true, expiresAt: future }), true);
   assert.equal(t.premiumRecordActive({ active: true, expiresAt: past }), false);
+  // Hilal haftalık bonus: RC active=false olsa bile geçerli.
+  assert.equal(
+    t.premiumRecordActive({
+      active: false,
+      expiresAt: past,
+      hilalWeeklyBonusExpiresAt: future,
+    }),
+    true,
+  );
 });
 
 test("normalizedWidgetUnlockHours: accepts only integer hours from 1 through 72", () => {

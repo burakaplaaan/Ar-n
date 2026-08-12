@@ -7498,5 +7498,7505 @@
     "correctIndex": 0,
     "explanation": "Taklîd, müçtehidin görüşünü delil araştırmadan izlemektir.",
     "source": "TDV İslam Ansiklopedisi, Taklîd"
+  },
+  {
+    "id": "iq_501",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Fatiha suresi Diyanet Mushaf'ında kaç ayettir?",
+    "options": [
+      "8",
+      "6",
+      "9",
+      "7"
+    ],
+    "correctIndex": 3,
+    "explanation": "Fatiha suresi Hafs rivayetine göre 7 ayettir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_502",
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "Fatiha suresi Mushaf sıralamasında kaçıncı suredir?",
+    "options": [
+      "2",
+      "3",
+      "6",
+      "1"
+    ],
+    "correctIndex": 3,
+    "explanation": "Fatiha suresi Mushaf'ta 1. sıradadır.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_503",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Mushaf sıralamasında 1. sure hangisidir?",
+    "options": [
+      "Fatiha",
+      "Ahkâf",
+      "Yûsuf",
+      "Kureyş"
+    ],
+    "correctIndex": 0,
+    "explanation": "1. sure Fatiha'dir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_504",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Bakara suresi Diyanet Mushaf'ında kaç ayettir?",
+    "options": [
+      "287",
+      "288",
+      "286",
+      "285"
+    ],
+    "correctIndex": 2,
+    "explanation": "Bakara suresi Hafs rivayetine göre 286 ayettir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_505",
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "Bakara suresi Mushaf sıralamasında kaçıncı suredir?",
+    "options": [
+      "3",
+      "1",
+      "4",
+      "2"
+    ],
+    "correctIndex": 3,
+    "explanation": "Bakara suresi Mushaf'ta 2. sıradadır.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_506",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Mushaf sıralamasında 2. sure hangisidir?",
+    "options": [
+      "Nebe",
+      "Ra'd",
+      "Bakara",
+      "Hicr"
+    ],
+    "correctIndex": 2,
+    "explanation": "2. sure Bakara'dir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_507",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Âl-i İmrân suresi Diyanet Mushaf'ında kaç ayettir?",
+    "options": [
+      "201",
+      "202",
+      "200",
+      "199"
+    ],
+    "correctIndex": 2,
+    "explanation": "Âl-i İmrân suresi Hafs rivayetine göre 200 ayettir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_508",
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "Âl-i İmrân suresi Mushaf sıralamasında kaçıncı suredir?",
+    "options": [
+      "4",
+      "2",
+      "5",
+      "3"
+    ],
+    "correctIndex": 3,
+    "explanation": "Âl-i İmrân suresi Mushaf'ta 3. sıradadır.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_509",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Mushaf sıralamasında 3. sure hangisidir?",
+    "options": [
+      "Vâkıa",
+      "Nisâ",
+      "Mücâdele",
+      "Âl-i İmrân"
+    ],
+    "correctIndex": 3,
+    "explanation": "3. sure Âl-i İmrân'dir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_510",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Nisâ suresi Diyanet Mushaf'ında kaç ayettir?",
+    "options": [
+      "177",
+      "178",
+      "176",
+      "175"
+    ],
+    "correctIndex": 2,
+    "explanation": "Nisâ suresi Hafs rivayetine göre 176 ayettir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_511",
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "Nisâ suresi Mushaf sıralamasında kaçıncı suredir?",
+    "options": [
+      "5",
+      "3",
+      "6",
+      "4"
+    ],
+    "correctIndex": 3,
+    "explanation": "Nisâ suresi Mushaf'ta 4. sıradadır.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_512",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Mushaf sıralamasında 4. sure hangisidir?",
+    "options": [
+      "Târık",
+      "Yâsîn",
+      "Nisâ",
+      "En'âm"
+    ],
+    "correctIndex": 2,
+    "explanation": "4. sure Nisâ'dir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_513",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Mâide suresi Diyanet Mushaf'ında kaç ayettir?",
+    "options": [
+      "121",
+      "122",
+      "120",
+      "119"
+    ],
+    "correctIndex": 2,
+    "explanation": "Mâide suresi Hafs rivayetine göre 120 ayettir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_514",
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "Mâide suresi Mushaf sıralamasında kaçıncı suredir?",
+    "options": [
+      "6",
+      "4",
+      "7",
+      "5"
+    ],
+    "correctIndex": 3,
+    "explanation": "Mâide suresi Mushaf'ta 5. sıradadır.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_515",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Mushaf sıralamasında 5. sure hangisidir?",
+    "options": [
+      "En'âm",
+      "Neml",
+      "Mâide",
+      "Tekâsür"
+    ],
+    "correctIndex": 2,
+    "explanation": "5. sure Mâide'dir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_516",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "En'âm suresi Diyanet Mushaf'ında kaç ayettir?",
+    "options": [
+      "166",
+      "167",
+      "165",
+      "164"
+    ],
+    "correctIndex": 2,
+    "explanation": "En'âm suresi Hafs rivayetine göre 165 ayettir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_517",
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "En'âm suresi Mushaf sıralamasında kaçıncı suredir?",
+    "options": [
+      "7",
+      "5",
+      "8",
+      "6"
+    ],
+    "correctIndex": 3,
+    "explanation": "En'âm suresi Mushaf'ta 6. sıradadır.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_518",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Mushaf sıralamasında 6. sure hangisidir?",
+    "options": [
+      "Kasas",
+      "En'âm",
+      "Yûsuf",
+      "İnşirâh"
+    ],
+    "correctIndex": 1,
+    "explanation": "6. sure En'âm'dir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_519",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "A'râf suresi Diyanet Mushaf'ında kaç ayettir?",
+    "options": [
+      "207",
+      "208",
+      "206",
+      "205"
+    ],
+    "correctIndex": 2,
+    "explanation": "A'râf suresi Hafs rivayetine göre 206 ayettir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_520",
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "A'râf suresi Mushaf sıralamasında kaçıncı suredir?",
+    "options": [
+      "8",
+      "6",
+      "9",
+      "7"
+    ],
+    "correctIndex": 3,
+    "explanation": "A'râf suresi Mushaf'ta 7. sıradadır.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_521",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Mushaf sıralamasında 7. sure hangisidir?",
+    "options": [
+      "Âl-i İmrân",
+      "A'râf",
+      "Nûr",
+      "Nahl"
+    ],
+    "correctIndex": 1,
+    "explanation": "7. sure A'râf'dir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_522",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Enfâl suresi Diyanet Mushaf'ında kaç ayettir?",
+    "options": [
+      "75",
+      "74",
+      "77",
+      "76"
+    ],
+    "correctIndex": 0,
+    "explanation": "Enfâl suresi Hafs rivayetine göre 75 ayettir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_523",
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "Enfâl suresi Mushaf sıralamasında kaçıncı suredir?",
+    "options": [
+      "8",
+      "7",
+      "10",
+      "9"
+    ],
+    "correctIndex": 0,
+    "explanation": "Enfâl suresi Mushaf'ta 8. sıradadır.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_524",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Mushaf sıralamasında 8. sure hangisidir?",
+    "options": [
+      "Meryem",
+      "Hucurât",
+      "Enfâl",
+      "Kâf"
+    ],
+    "correctIndex": 2,
+    "explanation": "8. sure Enfâl'dir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_525",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Tevbe suresi Diyanet Mushaf'ında kaç ayettir?",
+    "options": [
+      "130",
+      "131",
+      "129",
+      "128"
+    ],
+    "correctIndex": 2,
+    "explanation": "Tevbe suresi Hafs rivayetine göre 129 ayettir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_526",
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "Tevbe suresi Mushaf sıralamasında kaçıncı suredir?",
+    "options": [
+      "10",
+      "9",
+      "11",
+      "8"
+    ],
+    "correctIndex": 1,
+    "explanation": "Tevbe suresi Mushaf'ta 9. sıradadır.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_527",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Mushaf sıralamasında 9. sure hangisidir?",
+    "options": [
+      "Tevbe",
+      "Ahkâf",
+      "Nahl",
+      "Yûnus"
+    ],
+    "correctIndex": 0,
+    "explanation": "9. sure Tevbe'dir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_528",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Yûnus suresi Diyanet Mushaf'ında kaç ayettir?",
+    "options": [
+      "110",
+      "111",
+      "109",
+      "108"
+    ],
+    "correctIndex": 2,
+    "explanation": "Yûnus suresi Hafs rivayetine göre 109 ayettir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_529",
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "Yûnus suresi Mushaf sıralamasında kaçıncı suredir?",
+    "options": [
+      "9",
+      "12",
+      "11",
+      "10"
+    ],
+    "correctIndex": 3,
+    "explanation": "Yûnus suresi Mushaf'ta 10. sıradadır.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_530",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Mushaf sıralamasında 10. sure hangisidir?",
+    "options": [
+      "Kâria",
+      "Nisâ",
+      "Enbiyâ",
+      "Yûnus"
+    ],
+    "correctIndex": 3,
+    "explanation": "10. sure Yûnus'dir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_531",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Hûd suresi Diyanet Mushaf'ında kaç ayettir?",
+    "options": [
+      "124",
+      "125",
+      "123",
+      "122"
+    ],
+    "correctIndex": 2,
+    "explanation": "Hûd suresi Hafs rivayetine göre 123 ayettir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_532",
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "Hûd suresi Mushaf sıralamasında kaçıncı suredir?",
+    "options": [
+      "11",
+      "10",
+      "13",
+      "12"
+    ],
+    "correctIndex": 0,
+    "explanation": "Hûd suresi Mushaf'ta 11. sıradadır.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_533",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Mushaf sıralamasında 11. sure hangisidir?",
+    "options": [
+      "Âl-i İmrân",
+      "Hûd",
+      "Fatiha",
+      "Beled"
+    ],
+    "correctIndex": 1,
+    "explanation": "11. sure Hûd'dir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_534",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Yûsuf suresi Diyanet Mushaf'ında kaç ayettir?",
+    "options": [
+      "112",
+      "113",
+      "111",
+      "110"
+    ],
+    "correctIndex": 2,
+    "explanation": "Yûsuf suresi Hafs rivayetine göre 111 ayettir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_535",
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "Yûsuf suresi Mushaf sıralamasında kaçıncı suredir?",
+    "options": [
+      "12",
+      "11",
+      "14",
+      "13"
+    ],
+    "correctIndex": 0,
+    "explanation": "Yûsuf suresi Mushaf'ta 12. sıradadır.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_536",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Mushaf sıralamasında 12. sure hangisidir?",
+    "options": [
+      "Zuhruf",
+      "Nebe",
+      "Yûsuf",
+      "Meryem"
+    ],
+    "correctIndex": 2,
+    "explanation": "12. sure Yûsuf'dir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_537",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Ra'd suresi Diyanet Mushaf'ında kaç ayettir?",
+    "options": [
+      "43",
+      "42",
+      "45",
+      "44"
+    ],
+    "correctIndex": 0,
+    "explanation": "Ra'd suresi Hafs rivayetine göre 43 ayettir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_538",
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "Ra'd suresi Mushaf sıralamasında kaçıncı suredir?",
+    "options": [
+      "13",
+      "12",
+      "15",
+      "14"
+    ],
+    "correctIndex": 0,
+    "explanation": "Ra'd suresi Mushaf'ta 13. sıradadır.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_539",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Mushaf sıralamasında 13. sure hangisidir?",
+    "options": [
+      "Ra'd",
+      "Tûr",
+      "Kasas",
+      "Fatiha"
+    ],
+    "correctIndex": 0,
+    "explanation": "13. sure Ra'd'dir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_540",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "İbrâhîm suresi Diyanet Mushaf'ında kaç ayettir?",
+    "options": [
+      "52",
+      "51",
+      "54",
+      "53"
+    ],
+    "correctIndex": 0,
+    "explanation": "İbrâhîm suresi Hafs rivayetine göre 52 ayettir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_541",
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "İbrâhîm suresi Mushaf sıralamasında kaçıncı suredir?",
+    "options": [
+      "14",
+      "13",
+      "16",
+      "15"
+    ],
+    "correctIndex": 0,
+    "explanation": "İbrâhîm suresi Mushaf'ta 14. sıradadır.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_542",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Mushaf sıralamasında 14. sure hangisidir?",
+    "options": [
+      "Tebbet",
+      "Nisâ",
+      "Hadîd",
+      "İbrâhîm"
+    ],
+    "correctIndex": 3,
+    "explanation": "14. sure İbrâhîm'dir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_543",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Hicr suresi Diyanet Mushaf'ında kaç ayettir?",
+    "options": [
+      "98",
+      "100",
+      "99",
+      "101"
+    ],
+    "correctIndex": 2,
+    "explanation": "Hicr suresi Hafs rivayetine göre 99 ayettir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_544",
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "Hicr suresi Mushaf sıralamasında kaçıncı suredir?",
+    "options": [
+      "15",
+      "14",
+      "17",
+      "16"
+    ],
+    "correctIndex": 0,
+    "explanation": "Hicr suresi Mushaf'ta 15. sıradadır.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_545",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Mushaf sıralamasında 15. sure hangisidir?",
+    "options": [
+      "Şuarâ",
+      "Âl-i İmrân",
+      "Hicr",
+      "Kâf"
+    ],
+    "correctIndex": 2,
+    "explanation": "15. sure Hicr'dir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_546",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Nahl suresi Diyanet Mushaf'ında kaç ayettir?",
+    "options": [
+      "129",
+      "130",
+      "128",
+      "127"
+    ],
+    "correctIndex": 2,
+    "explanation": "Nahl suresi Hafs rivayetine göre 128 ayettir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_547",
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "Nahl suresi Mushaf sıralamasında kaçıncı suredir?",
+    "options": [
+      "16",
+      "15",
+      "18",
+      "17"
+    ],
+    "correctIndex": 0,
+    "explanation": "Nahl suresi Mushaf'ta 16. sıradadır.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_548",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Mushaf sıralamasında 16. sure hangisidir?",
+    "options": [
+      "Kıyâme",
+      "Mülk",
+      "Nâs",
+      "Nahl"
+    ],
+    "correctIndex": 3,
+    "explanation": "16. sure Nahl'dir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_549",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "İsrâ suresi Diyanet Mushaf'ında kaç ayettir?",
+    "options": [
+      "112",
+      "113",
+      "111",
+      "110"
+    ],
+    "correctIndex": 2,
+    "explanation": "İsrâ suresi Hafs rivayetine göre 111 ayettir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_550",
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "İsrâ suresi Mushaf sıralamasında kaçıncı suredir?",
+    "options": [
+      "17",
+      "16",
+      "19",
+      "18"
+    ],
+    "correctIndex": 0,
+    "explanation": "İsrâ suresi Mushaf'ta 17. sıradadır.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_551",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Mushaf sıralamasında 17. sure hangisidir?",
+    "options": [
+      "Fetih",
+      "Hûd",
+      "Mâide",
+      "İsrâ"
+    ],
+    "correctIndex": 3,
+    "explanation": "17. sure İsrâ'dir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_552",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Kehf suresi Diyanet Mushaf'ında kaç ayettir?",
+    "options": [
+      "111",
+      "112",
+      "110",
+      "109"
+    ],
+    "correctIndex": 2,
+    "explanation": "Kehf suresi Hafs rivayetine göre 110 ayettir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_553",
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "Kehf suresi Mushaf sıralamasında kaçıncı suredir?",
+    "options": [
+      "18",
+      "17",
+      "20",
+      "19"
+    ],
+    "correctIndex": 0,
+    "explanation": "Kehf suresi Mushaf'ta 18. sıradadır.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_554",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Mushaf sıralamasında 18. sure hangisidir?",
+    "options": [
+      "Enbiyâ",
+      "Nûh",
+      "Kehf",
+      "Âdiyât"
+    ],
+    "correctIndex": 2,
+    "explanation": "18. sure Kehf'dir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_555",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Meryem suresi Diyanet Mushaf'ında kaç ayettir?",
+    "options": [
+      "99",
+      "98",
+      "100",
+      "97"
+    ],
+    "correctIndex": 1,
+    "explanation": "Meryem suresi Hafs rivayetine göre 98 ayettir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_556",
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "Meryem suresi Mushaf sıralamasında kaçıncı suredir?",
+    "options": [
+      "19",
+      "18",
+      "21",
+      "20"
+    ],
+    "correctIndex": 0,
+    "explanation": "Meryem suresi Mushaf'ta 19. sıradadır.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_557",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Mushaf sıralamasında 19. sure hangisidir?",
+    "options": [
+      "Cin",
+      "Fetih",
+      "Meryem",
+      "Hicr"
+    ],
+    "correctIndex": 2,
+    "explanation": "19. sure Meryem'dir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_558",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Tâhâ suresi Diyanet Mushaf'ında kaç ayettir?",
+    "options": [
+      "136",
+      "137",
+      "135",
+      "134"
+    ],
+    "correctIndex": 2,
+    "explanation": "Tâhâ suresi Hafs rivayetine göre 135 ayettir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_559",
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "Tâhâ suresi Mushaf sıralamasında kaçıncı suredir?",
+    "options": [
+      "20",
+      "19",
+      "22",
+      "21"
+    ],
+    "correctIndex": 0,
+    "explanation": "Tâhâ suresi Mushaf'ta 20. sıradadır.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_560",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Mushaf sıralamasında 20. sure hangisidir?",
+    "options": [
+      "Tâhâ",
+      "Nahl",
+      "Enbiyâ",
+      "Nebe"
+    ],
+    "correctIndex": 0,
+    "explanation": "20. sure Tâhâ'dir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_561",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Enbiyâ suresi Diyanet Mushaf'ında kaç ayettir?",
+    "options": [
+      "113",
+      "114",
+      "112",
+      "111"
+    ],
+    "correctIndex": 2,
+    "explanation": "Enbiyâ suresi Hafs rivayetine göre 112 ayettir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_562",
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "Enbiyâ suresi Mushaf sıralamasında kaçıncı suredir?",
+    "options": [
+      "21",
+      "20",
+      "23",
+      "22"
+    ],
+    "correctIndex": 0,
+    "explanation": "Enbiyâ suresi Mushaf'ta 21. sıradadır.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_563",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Mushaf sıralamasında 21. sure hangisidir?",
+    "options": [
+      "Nûr",
+      "Ra'd",
+      "Âl-i İmrân",
+      "Enbiyâ"
+    ],
+    "correctIndex": 3,
+    "explanation": "21. sure Enbiyâ'dir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_564",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Hac suresi Diyanet Mushaf'ında kaç ayettir?",
+    "options": [
+      "78",
+      "77",
+      "80",
+      "79"
+    ],
+    "correctIndex": 0,
+    "explanation": "Hac suresi Hafs rivayetine göre 78 ayettir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_565",
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "Hac suresi Mushaf sıralamasında kaçıncı suredir?",
+    "options": [
+      "22",
+      "21",
+      "24",
+      "23"
+    ],
+    "correctIndex": 0,
+    "explanation": "Hac suresi Mushaf'ta 22. sıradadır.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_566",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Mushaf sıralamasında 22. sure hangisidir?",
+    "options": [
+      "Hac",
+      "Kâfirûn",
+      "Tâhâ",
+      "Cin"
+    ],
+    "correctIndex": 0,
+    "explanation": "22. sure Hac'dir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_567",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Mü'minûn suresi Diyanet Mushaf'ında kaç ayettir?",
+    "options": [
+      "119",
+      "120",
+      "118",
+      "117"
+    ],
+    "correctIndex": 2,
+    "explanation": "Mü'minûn suresi Hafs rivayetine göre 118 ayettir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_568",
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "Mü'minûn suresi Mushaf sıralamasında kaçıncı suredir?",
+    "options": [
+      "23",
+      "22",
+      "25",
+      "24"
+    ],
+    "correctIndex": 0,
+    "explanation": "Mü'minûn suresi Mushaf'ta 23. sıradadır.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_569",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Mushaf sıralamasında 23. sure hangisidir?",
+    "options": [
+      "Şûrâ",
+      "Mü'minûn",
+      "Hûd",
+      "Ra'd"
+    ],
+    "correctIndex": 1,
+    "explanation": "23. sure Mü'minûn'dir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_570",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Nûr suresi Diyanet Mushaf'ında kaç ayettir?",
+    "options": [
+      "64",
+      "63",
+      "66",
+      "65"
+    ],
+    "correctIndex": 0,
+    "explanation": "Nûr suresi Hafs rivayetine göre 64 ayettir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_571",
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "Nûr suresi Mushaf sıralamasında kaçıncı suredir?",
+    "options": [
+      "24",
+      "23",
+      "26",
+      "25"
+    ],
+    "correctIndex": 0,
+    "explanation": "Nûr suresi Mushaf'ta 24. sıradadır.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_572",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Mushaf sıralamasında 24. sure hangisidir?",
+    "options": [
+      "Nûr",
+      "Yûsuf",
+      "Nâs",
+      "Tebbet"
+    ],
+    "correctIndex": 0,
+    "explanation": "24. sure Nûr'dir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_573",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Furkân suresi Diyanet Mushaf'ında kaç ayettir?",
+    "options": [
+      "77",
+      "76",
+      "79",
+      "78"
+    ],
+    "correctIndex": 0,
+    "explanation": "Furkân suresi Hafs rivayetine göre 77 ayettir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_574",
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "Furkân suresi Mushaf sıralamasında kaçıncı suredir?",
+    "options": [
+      "25",
+      "24",
+      "27",
+      "26"
+    ],
+    "correctIndex": 0,
+    "explanation": "Furkân suresi Mushaf'ta 25. sıradadır.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_575",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Mushaf sıralamasında 25. sure hangisidir?",
+    "options": [
+      "Âl-i İmrân",
+      "Tegâbün",
+      "Furkân",
+      "Târık"
+    ],
+    "correctIndex": 2,
+    "explanation": "25. sure Furkân'dir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_576",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Şuarâ suresi Diyanet Mushaf'ında kaç ayettir?",
+    "options": [
+      "228",
+      "229",
+      "227",
+      "226"
+    ],
+    "correctIndex": 2,
+    "explanation": "Şuarâ suresi Hafs rivayetine göre 227 ayettir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_577",
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "Şuarâ suresi Mushaf sıralamasında kaçıncı suredir?",
+    "options": [
+      "26",
+      "25",
+      "28",
+      "27"
+    ],
+    "correctIndex": 0,
+    "explanation": "Şuarâ suresi Mushaf'ta 26. sıradadır.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_578",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Mushaf sıralamasında 26. sure hangisidir?",
+    "options": [
+      "Kevser",
+      "Şuarâ",
+      "Mülk",
+      "Zâriyât"
+    ],
+    "correctIndex": 1,
+    "explanation": "26. sure Şuarâ'dir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_579",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Neml suresi Diyanet Mushaf'ında kaç ayettir?",
+    "options": [
+      "93",
+      "92",
+      "95",
+      "94"
+    ],
+    "correctIndex": 0,
+    "explanation": "Neml suresi Hafs rivayetine göre 93 ayettir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_580",
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "Neml suresi Mushaf sıralamasında kaçıncı suredir?",
+    "options": [
+      "27",
+      "26",
+      "29",
+      "28"
+    ],
+    "correctIndex": 0,
+    "explanation": "Neml suresi Mushaf'ta 27. sıradadır.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_581",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Mushaf sıralamasında 27. sure hangisidir?",
+    "options": [
+      "Neml",
+      "Mâide",
+      "Nûh",
+      "Fatiha"
+    ],
+    "correctIndex": 0,
+    "explanation": "27. sure Neml'dir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_582",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Kasas suresi Diyanet Mushaf'ında kaç ayettir?",
+    "options": [
+      "88",
+      "87",
+      "90",
+      "89"
+    ],
+    "correctIndex": 0,
+    "explanation": "Kasas suresi Hafs rivayetine göre 88 ayettir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_583",
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "Kasas suresi Mushaf sıralamasında kaçıncı suredir?",
+    "options": [
+      "28",
+      "27",
+      "30",
+      "29"
+    ],
+    "correctIndex": 0,
+    "explanation": "Kasas suresi Mushaf'ta 28. sıradadır.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_584",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Mushaf sıralamasında 28. sure hangisidir?",
+    "options": [
+      "Mümtehine",
+      "Kasas",
+      "Hucurât",
+      "En'âm"
+    ],
+    "correctIndex": 1,
+    "explanation": "28. sure Kasas'dir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_585",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Ankebût suresi Diyanet Mushaf'ında kaç ayettir?",
+    "options": [
+      "69",
+      "68",
+      "71",
+      "70"
+    ],
+    "correctIndex": 0,
+    "explanation": "Ankebût suresi Hafs rivayetine göre 69 ayettir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_586",
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "Ankebût suresi Mushaf sıralamasında kaçıncı suredir?",
+    "options": [
+      "29",
+      "28",
+      "31",
+      "30"
+    ],
+    "correctIndex": 0,
+    "explanation": "Ankebût suresi Mushaf'ta 29. sıradadır.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_587",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Mushaf sıralamasında 29. sure hangisidir?",
+    "options": [
+      "Ra'd",
+      "Leyl",
+      "Ankebût",
+      "Mâide"
+    ],
+    "correctIndex": 2,
+    "explanation": "29. sure Ankebût'dir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_588",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Rûm suresi Diyanet Mushaf'ında kaç ayettir?",
+    "options": [
+      "60",
+      "59",
+      "62",
+      "61"
+    ],
+    "correctIndex": 0,
+    "explanation": "Rûm suresi Hafs rivayetine göre 60 ayettir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_589",
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "Rûm suresi Mushaf sıralamasında kaçıncı suredir?",
+    "options": [
+      "30",
+      "29",
+      "32",
+      "31"
+    ],
+    "correctIndex": 0,
+    "explanation": "Rûm suresi Mushaf'ta 30. sıradadır.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_590",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Mushaf sıralamasında 30. sure hangisidir?",
+    "options": [
+      "İnşikâk",
+      "Rûm",
+      "Şuarâ",
+      "En'âm"
+    ],
+    "correctIndex": 1,
+    "explanation": "30. sure Rûm'dir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_591",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Lokmân suresi Diyanet Mushaf'ında kaç ayettir?",
+    "options": [
+      "34",
+      "33",
+      "36",
+      "35"
+    ],
+    "correctIndex": 0,
+    "explanation": "Lokmân suresi Hafs rivayetine göre 34 ayettir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_592",
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "Lokmân suresi Mushaf sıralamasında kaçıncı suredir?",
+    "options": [
+      "31",
+      "30",
+      "33",
+      "32"
+    ],
+    "correctIndex": 0,
+    "explanation": "Lokmân suresi Mushaf'ta 31. sıradadır.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_593",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Mushaf sıralamasında 31. sure hangisidir?",
+    "options": [
+      "Vâkıa",
+      "Enbiyâ",
+      "Lokmân",
+      "İnşikâk"
+    ],
+    "correctIndex": 2,
+    "explanation": "31. sure Lokmân'dir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_594",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Secde suresi Diyanet Mushaf'ında kaç ayettir?",
+    "options": [
+      "30",
+      "29",
+      "32",
+      "31"
+    ],
+    "correctIndex": 0,
+    "explanation": "Secde suresi Hafs rivayetine göre 30 ayettir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_595",
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "Secde suresi Mushaf sıralamasında kaçıncı suredir?",
+    "options": [
+      "32",
+      "31",
+      "34",
+      "33"
+    ],
+    "correctIndex": 0,
+    "explanation": "Secde suresi Mushaf'ta 32. sıradadır.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_596",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Mushaf sıralamasında 32. sure hangisidir?",
+    "options": [
+      "Asr",
+      "Secde",
+      "Yûsuf",
+      "Müzzemmil"
+    ],
+    "correctIndex": 1,
+    "explanation": "32. sure Secde'dir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_597",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Ahzâb suresi Diyanet Mushaf'ında kaç ayettir?",
+    "options": [
+      "73",
+      "72",
+      "75",
+      "74"
+    ],
+    "correctIndex": 0,
+    "explanation": "Ahzâb suresi Hafs rivayetine göre 73 ayettir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_598",
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "Ahzâb suresi Mushaf sıralamasında kaçıncı suredir?",
+    "options": [
+      "33",
+      "32",
+      "35",
+      "34"
+    ],
+    "correctIndex": 0,
+    "explanation": "Ahzâb suresi Mushaf'ta 33. sıradadır.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_599",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Mushaf sıralamasında 33. sure hangisidir?",
+    "options": [
+      "Ahzâb",
+      "A'râf",
+      "Hümeze",
+      "İnşirâh"
+    ],
+    "correctIndex": 0,
+    "explanation": "33. sure Ahzâb'dir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_600",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Sebe' suresi Diyanet Mushaf'ında kaç ayettir?",
+    "options": [
+      "54",
+      "53",
+      "56",
+      "55"
+    ],
+    "correctIndex": 0,
+    "explanation": "Sebe' suresi Hafs rivayetine göre 54 ayettir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_601",
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "Sebe' suresi Mushaf sıralamasında kaçıncı suredir?",
+    "options": [
+      "34",
+      "33",
+      "36",
+      "35"
+    ],
+    "correctIndex": 0,
+    "explanation": "Sebe' suresi Mushaf'ta 34. sıradadır.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_602",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Mushaf sıralamasında 34. sure hangisidir?",
+    "options": [
+      "Kasas",
+      "Muhammed",
+      "Sebe'",
+      "Zâriyât"
+    ],
+    "correctIndex": 2,
+    "explanation": "34. sure Sebe''dir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_603",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Fâtır suresi Diyanet Mushaf'ında kaç ayettir?",
+    "options": [
+      "45",
+      "44",
+      "47",
+      "46"
+    ],
+    "correctIndex": 0,
+    "explanation": "Fâtır suresi Hafs rivayetine göre 45 ayettir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_604",
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "Fâtır suresi Mushaf sıralamasında kaçıncı suredir?",
+    "options": [
+      "35",
+      "34",
+      "37",
+      "36"
+    ],
+    "correctIndex": 0,
+    "explanation": "Fâtır suresi Mushaf'ta 35. sıradadır.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_605",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Mushaf sıralamasında 35. sure hangisidir?",
+    "options": [
+      "Ahkâf",
+      "Tegâbün",
+      "İnşikâk",
+      "Fâtır"
+    ],
+    "correctIndex": 3,
+    "explanation": "35. sure Fâtır'dir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_606",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Yâsîn suresi Diyanet Mushaf'ında kaç ayettir?",
+    "options": [
+      "83",
+      "82",
+      "85",
+      "84"
+    ],
+    "correctIndex": 0,
+    "explanation": "Yâsîn suresi Hafs rivayetine göre 83 ayettir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_607",
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "Yâsîn suresi Mushaf sıralamasında kaçıncı suredir?",
+    "options": [
+      "36",
+      "35",
+      "38",
+      "37"
+    ],
+    "correctIndex": 0,
+    "explanation": "Yâsîn suresi Mushaf'ta 36. sıradadır.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_608",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Mushaf sıralamasında 36. sure hangisidir?",
+    "options": [
+      "Hümeze",
+      "Secde",
+      "Nebe",
+      "Yâsîn"
+    ],
+    "correctIndex": 3,
+    "explanation": "36. sure Yâsîn'dir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_609",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Sâffât suresi Diyanet Mushaf'ında kaç ayettir?",
+    "options": [
+      "183",
+      "184",
+      "182",
+      "181"
+    ],
+    "correctIndex": 2,
+    "explanation": "Sâffât suresi Hafs rivayetine göre 182 ayettir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_610",
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "Sâffât suresi Mushaf sıralamasında kaçıncı suredir?",
+    "options": [
+      "37",
+      "36",
+      "39",
+      "38"
+    ],
+    "correctIndex": 0,
+    "explanation": "Sâffât suresi Mushaf'ta 37. sıradadır.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_611",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Mushaf sıralamasında 37. sure hangisidir?",
+    "options": [
+      "Sâffât",
+      "Tahrîm",
+      "Nasr",
+      "Lokmân"
+    ],
+    "correctIndex": 0,
+    "explanation": "37. sure Sâffât'dir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_612",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Sâd suresi Diyanet Mushaf'ında kaç ayettir?",
+    "options": [
+      "88",
+      "87",
+      "90",
+      "89"
+    ],
+    "correctIndex": 0,
+    "explanation": "Sâd suresi Hafs rivayetine göre 88 ayettir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_613",
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "Sâd suresi Mushaf sıralamasında kaçıncı suredir?",
+    "options": [
+      "38",
+      "37",
+      "40",
+      "39"
+    ],
+    "correctIndex": 0,
+    "explanation": "Sâd suresi Mushaf'ta 38. sıradadır.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_614",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Mushaf sıralamasında 38. sure hangisidir?",
+    "options": [
+      "İhlâs",
+      "Nisâ",
+      "Hümeze",
+      "Sâd"
+    ],
+    "correctIndex": 3,
+    "explanation": "38. sure Sâd'dir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_615",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Zümer suresi Diyanet Mushaf'ında kaç ayettir?",
+    "options": [
+      "75",
+      "74",
+      "77",
+      "76"
+    ],
+    "correctIndex": 0,
+    "explanation": "Zümer suresi Hafs rivayetine göre 75 ayettir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_616",
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "Zümer suresi Mushaf sıralamasında kaçıncı suredir?",
+    "options": [
+      "39",
+      "38",
+      "41",
+      "40"
+    ],
+    "correctIndex": 0,
+    "explanation": "Zümer suresi Mushaf'ta 39. sıradadır.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_617",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Mushaf sıralamasında 39. sure hangisidir?",
+    "options": [
+      "Kamer",
+      "Mâide",
+      "Zümer",
+      "Tahrîm"
+    ],
+    "correctIndex": 2,
+    "explanation": "39. sure Zümer'dir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_618",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Mü'min suresi Diyanet Mushaf'ında kaç ayettir?",
+    "options": [
+      "85",
+      "84",
+      "87",
+      "86"
+    ],
+    "correctIndex": 0,
+    "explanation": "Mü'min suresi Hafs rivayetine göre 85 ayettir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_619",
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "Mü'min suresi Mushaf sıralamasında kaçıncı suredir?",
+    "options": [
+      "40",
+      "39",
+      "42",
+      "41"
+    ],
+    "correctIndex": 0,
+    "explanation": "Mü'min suresi Mushaf'ta 40. sıradadır.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_620",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Mushaf sıralamasında 40. sure hangisidir?",
+    "options": [
+      "En'âm",
+      "Ankebût",
+      "Mü'min",
+      "Mutaffifîn"
+    ],
+    "correctIndex": 2,
+    "explanation": "40. sure Mü'min'dir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_621",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Fussilet suresi Diyanet Mushaf'ında kaç ayettir?",
+    "options": [
+      "54",
+      "53",
+      "56",
+      "55"
+    ],
+    "correctIndex": 0,
+    "explanation": "Fussilet suresi Hafs rivayetine göre 54 ayettir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_622",
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "Fussilet suresi Mushaf sıralamasında kaçıncı suredir?",
+    "options": [
+      "41",
+      "40",
+      "43",
+      "42"
+    ],
+    "correctIndex": 0,
+    "explanation": "Fussilet suresi Mushaf'ta 41. sıradadır.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_623",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Mushaf sıralamasında 41. sure hangisidir?",
+    "options": [
+      "Fussilet",
+      "Neml",
+      "Mâide",
+      "İnsan"
+    ],
+    "correctIndex": 0,
+    "explanation": "41. sure Fussilet'dir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_624",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Şûrâ suresi Diyanet Mushaf'ında kaç ayettir?",
+    "options": [
+      "53",
+      "52",
+      "55",
+      "54"
+    ],
+    "correctIndex": 0,
+    "explanation": "Şûrâ suresi Hafs rivayetine göre 53 ayettir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_625",
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "Şûrâ suresi Mushaf sıralamasında kaçıncı suredir?",
+    "options": [
+      "42",
+      "41",
+      "44",
+      "43"
+    ],
+    "correctIndex": 0,
+    "explanation": "Şûrâ suresi Mushaf'ta 42. sıradadır.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_626",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Mushaf sıralamasında 42. sure hangisidir?",
+    "options": [
+      "Şûrâ",
+      "İbrâhîm",
+      "Münâfikûn",
+      "Bakara"
+    ],
+    "correctIndex": 0,
+    "explanation": "42. sure Şûrâ'dir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_627",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Zuhruf suresi Diyanet Mushaf'ında kaç ayettir?",
+    "options": [
+      "89",
+      "88",
+      "91",
+      "90"
+    ],
+    "correctIndex": 0,
+    "explanation": "Zuhruf suresi Hafs rivayetine göre 89 ayettir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_628",
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "Zuhruf suresi Mushaf sıralamasında kaçıncı suredir?",
+    "options": [
+      "43",
+      "42",
+      "45",
+      "44"
+    ],
+    "correctIndex": 0,
+    "explanation": "Zuhruf suresi Mushaf'ta 43. sıradadır.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_629",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Mushaf sıralamasında 43. sure hangisidir?",
+    "options": [
+      "Zuhruf",
+      "Âl-i İmrân",
+      "Mâide",
+      "Duhân"
+    ],
+    "correctIndex": 0,
+    "explanation": "43. sure Zuhruf'dir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_630",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Duhân suresi Diyanet Mushaf'ında kaç ayettir?",
+    "options": [
+      "59",
+      "58",
+      "61",
+      "60"
+    ],
+    "correctIndex": 0,
+    "explanation": "Duhân suresi Hafs rivayetine göre 59 ayettir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_631",
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "Duhân suresi Mushaf sıralamasında kaçıncı suredir?",
+    "options": [
+      "44",
+      "43",
+      "46",
+      "45"
+    ],
+    "correctIndex": 0,
+    "explanation": "Duhân suresi Mushaf'ta 44. sıradadır.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_632",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Mushaf sıralamasında 44. sure hangisidir?",
+    "options": [
+      "İnşirâh",
+      "Fatiha",
+      "Mutaffifîn",
+      "Duhân"
+    ],
+    "correctIndex": 3,
+    "explanation": "44. sure Duhân'dir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_633",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Câsiye suresi Diyanet Mushaf'ında kaç ayettir?",
+    "options": [
+      "37",
+      "36",
+      "39",
+      "38"
+    ],
+    "correctIndex": 0,
+    "explanation": "Câsiye suresi Hafs rivayetine göre 37 ayettir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_634",
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "Câsiye suresi Mushaf sıralamasında kaçıncı suredir?",
+    "options": [
+      "45",
+      "44",
+      "47",
+      "46"
+    ],
+    "correctIndex": 0,
+    "explanation": "Câsiye suresi Mushaf'ta 45. sıradadır.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_635",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Mushaf sıralamasında 45. sure hangisidir?",
+    "options": [
+      "Câsiye",
+      "İnsan",
+      "Âl-i İmrân",
+      "Müddessir"
+    ],
+    "correctIndex": 0,
+    "explanation": "45. sure Câsiye'dir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_636",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Ahkâf suresi Diyanet Mushaf'ında kaç ayettir?",
+    "options": [
+      "35",
+      "34",
+      "37",
+      "36"
+    ],
+    "correctIndex": 0,
+    "explanation": "Ahkâf suresi Hafs rivayetine göre 35 ayettir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_637",
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "Ahkâf suresi Mushaf sıralamasında kaçıncı suredir?",
+    "options": [
+      "46",
+      "45",
+      "48",
+      "47"
+    ],
+    "correctIndex": 0,
+    "explanation": "Ahkâf suresi Mushaf'ta 46. sıradadır.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_638",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Mushaf sıralamasında 46. sure hangisidir?",
+    "options": [
+      "Ahkâf",
+      "Nûr",
+      "Beyyine",
+      "Nisâ"
+    ],
+    "correctIndex": 0,
+    "explanation": "46. sure Ahkâf'dir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_639",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Muhammed suresi Diyanet Mushaf'ında kaç ayettir?",
+    "options": [
+      "38",
+      "37",
+      "40",
+      "39"
+    ],
+    "correctIndex": 0,
+    "explanation": "Muhammed suresi Hafs rivayetine göre 38 ayettir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_640",
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "Muhammed suresi Mushaf sıralamasında kaçıncı suredir?",
+    "options": [
+      "47",
+      "46",
+      "49",
+      "48"
+    ],
+    "correctIndex": 0,
+    "explanation": "Muhammed suresi Mushaf'ta 47. sıradadır.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_641",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Mushaf sıralamasında 47. sure hangisidir?",
+    "options": [
+      "Muhammed",
+      "Hicr",
+      "Beyyine",
+      "Tevbe"
+    ],
+    "correctIndex": 0,
+    "explanation": "47. sure Muhammed'dir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_642",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Fetih suresi Diyanet Mushaf'ında kaç ayettir?",
+    "options": [
+      "29",
+      "28",
+      "31",
+      "30"
+    ],
+    "correctIndex": 0,
+    "explanation": "Fetih suresi Hafs rivayetine göre 29 ayettir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_643",
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "Fetih suresi Mushaf sıralamasında kaçıncı suredir?",
+    "options": [
+      "48",
+      "47",
+      "50",
+      "49"
+    ],
+    "correctIndex": 0,
+    "explanation": "Fetih suresi Mushaf'ta 48. sıradadır.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_644",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Mushaf sıralamasında 48. sure hangisidir?",
+    "options": [
+      "Mâide",
+      "Nûr",
+      "Fetih",
+      "Hadîd"
+    ],
+    "correctIndex": 2,
+    "explanation": "48. sure Fetih'dir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_645",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Hucurât suresi Diyanet Mushaf'ında kaç ayettir?",
+    "options": [
+      "18",
+      "17",
+      "20",
+      "19"
+    ],
+    "correctIndex": 0,
+    "explanation": "Hucurât suresi Hafs rivayetine göre 18 ayettir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_646",
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "Hucurât suresi Mushaf sıralamasında kaçıncı suredir?",
+    "options": [
+      "49",
+      "48",
+      "51",
+      "50"
+    ],
+    "correctIndex": 0,
+    "explanation": "Hucurât suresi Mushaf'ta 49. sıradadır.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_647",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Mushaf sıralamasında 49. sure hangisidir?",
+    "options": [
+      "Enbiyâ",
+      "Âdiyât",
+      "Kâf",
+      "Hucurât"
+    ],
+    "correctIndex": 3,
+    "explanation": "49. sure Hucurât'dir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_648",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Kâf suresi Diyanet Mushaf'ında kaç ayettir?",
+    "options": [
+      "45",
+      "44",
+      "47",
+      "46"
+    ],
+    "correctIndex": 0,
+    "explanation": "Kâf suresi Hafs rivayetine göre 45 ayettir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_649",
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "Kâf suresi Mushaf sıralamasında kaçıncı suredir?",
+    "options": [
+      "50",
+      "49",
+      "52",
+      "51"
+    ],
+    "correctIndex": 0,
+    "explanation": "Kâf suresi Mushaf'ta 50. sıradadır.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_650",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Mushaf sıralamasında 50. sure hangisidir?",
+    "options": [
+      "Tîn",
+      "Hac",
+      "Beled",
+      "Kâf"
+    ],
+    "correctIndex": 3,
+    "explanation": "50. sure Kâf'dir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_651",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Zâriyât suresi Diyanet Mushaf'ında kaç ayettir?",
+    "options": [
+      "60",
+      "59",
+      "62",
+      "61"
+    ],
+    "correctIndex": 0,
+    "explanation": "Zâriyât suresi Hafs rivayetine göre 60 ayettir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_652",
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "Zâriyât suresi Mushaf sıralamasında kaçıncı suredir?",
+    "options": [
+      "51",
+      "50",
+      "53",
+      "52"
+    ],
+    "correctIndex": 0,
+    "explanation": "Zâriyât suresi Mushaf'ta 51. sıradadır.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_653",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Mushaf sıralamasında 51. sure hangisidir?",
+    "options": [
+      "Nebe",
+      "Fatiha",
+      "Fâtır",
+      "Zâriyât"
+    ],
+    "correctIndex": 3,
+    "explanation": "51. sure Zâriyât'dir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_654",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Tûr suresi Diyanet Mushaf'ında kaç ayettir?",
+    "options": [
+      "49",
+      "48",
+      "51",
+      "50"
+    ],
+    "correctIndex": 0,
+    "explanation": "Tûr suresi Hafs rivayetine göre 49 ayettir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_655",
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "Tûr suresi Mushaf sıralamasında kaçıncı suredir?",
+    "options": [
+      "52",
+      "51",
+      "54",
+      "53"
+    ],
+    "correctIndex": 0,
+    "explanation": "Tûr suresi Mushaf'ta 52. sıradadır.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_656",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Mushaf sıralamasında 52. sure hangisidir?",
+    "options": [
+      "Tûr",
+      "Leyl",
+      "Bakara",
+      "Nisâ"
+    ],
+    "correctIndex": 0,
+    "explanation": "52. sure Tûr'dir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_657",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Necm suresi Diyanet Mushaf'ında kaç ayettir?",
+    "options": [
+      "62",
+      "61",
+      "64",
+      "63"
+    ],
+    "correctIndex": 0,
+    "explanation": "Necm suresi Hafs rivayetine göre 62 ayettir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_658",
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "Necm suresi Mushaf sıralamasında kaçıncı suredir?",
+    "options": [
+      "53",
+      "52",
+      "55",
+      "54"
+    ],
+    "correctIndex": 0,
+    "explanation": "Necm suresi Mushaf'ta 53. sıradadır.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_659",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Mushaf sıralamasında 53. sure hangisidir?",
+    "options": [
+      "Necm",
+      "Tekâsür",
+      "Nâs",
+      "Sâffât"
+    ],
+    "correctIndex": 0,
+    "explanation": "53. sure Necm'dir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_660",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Kamer suresi Diyanet Mushaf'ında kaç ayettir?",
+    "options": [
+      "55",
+      "54",
+      "57",
+      "56"
+    ],
+    "correctIndex": 0,
+    "explanation": "Kamer suresi Hafs rivayetine göre 55 ayettir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_661",
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "Kamer suresi Mushaf sıralamasında kaçıncı suredir?",
+    "options": [
+      "54",
+      "53",
+      "56",
+      "55"
+    ],
+    "correctIndex": 0,
+    "explanation": "Kamer suresi Mushaf'ta 54. sıradadır.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_662",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Mushaf sıralamasında 54. sure hangisidir?",
+    "options": [
+      "Kamer",
+      "Secde",
+      "Zâriyât",
+      "Mü'min"
+    ],
+    "correctIndex": 0,
+    "explanation": "54. sure Kamer'dir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_663",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Rahmân suresi Diyanet Mushaf'ında kaç ayettir?",
+    "options": [
+      "78",
+      "77",
+      "80",
+      "79"
+    ],
+    "correctIndex": 0,
+    "explanation": "Rahmân suresi Hafs rivayetine göre 78 ayettir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_664",
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "Rahmân suresi Mushaf sıralamasında kaçıncı suredir?",
+    "options": [
+      "55",
+      "54",
+      "57",
+      "56"
+    ],
+    "correctIndex": 0,
+    "explanation": "Rahmân suresi Mushaf'ta 55. sıradadır.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_665",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Mushaf sıralamasında 55. sure hangisidir?",
+    "options": [
+      "Zâriyât",
+      "Mü'minûn",
+      "Âdiyât",
+      "Rahmân"
+    ],
+    "correctIndex": 3,
+    "explanation": "55. sure Rahmân'dir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_666",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Vâkıa suresi Diyanet Mushaf'ında kaç ayettir?",
+    "options": [
+      "96",
+      "95",
+      "98",
+      "97"
+    ],
+    "correctIndex": 0,
+    "explanation": "Vâkıa suresi Hafs rivayetine göre 96 ayettir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_667",
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "Vâkıa suresi Mushaf sıralamasında kaçıncı suredir?",
+    "options": [
+      "56",
+      "55",
+      "58",
+      "57"
+    ],
+    "correctIndex": 0,
+    "explanation": "Vâkıa suresi Mushaf'ta 56. sıradadır.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_668",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Mushaf sıralamasında 56. sure hangisidir?",
+    "options": [
+      "Gâşiye",
+      "Tâhâ",
+      "Kalem",
+      "Vâkıa"
+    ],
+    "correctIndex": 3,
+    "explanation": "56. sure Vâkıa'dir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_669",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Hadîd suresi Diyanet Mushaf'ında kaç ayettir?",
+    "options": [
+      "29",
+      "28",
+      "31",
+      "30"
+    ],
+    "correctIndex": 0,
+    "explanation": "Hadîd suresi Hafs rivayetine göre 29 ayettir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_670",
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "Hadîd suresi Mushaf sıralamasında kaçıncı suredir?",
+    "options": [
+      "57",
+      "56",
+      "59",
+      "58"
+    ],
+    "correctIndex": 0,
+    "explanation": "Hadîd suresi Mushaf'ta 57. sıradadır.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_671",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Mushaf sıralamasında 57. sure hangisidir?",
+    "options": [
+      "Hadîd",
+      "Hûd",
+      "Fâtır",
+      "Neml"
+    ],
+    "correctIndex": 0,
+    "explanation": "57. sure Hadîd'dir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_672",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Mücâdele suresi Diyanet Mushaf'ında kaç ayettir?",
+    "options": [
+      "22",
+      "21",
+      "24",
+      "23"
+    ],
+    "correctIndex": 0,
+    "explanation": "Mücâdele suresi Hafs rivayetine göre 22 ayettir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_673",
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "Mücâdele suresi Mushaf sıralamasında kaçıncı suredir?",
+    "options": [
+      "58",
+      "57",
+      "60",
+      "59"
+    ],
+    "correctIndex": 0,
+    "explanation": "Mücâdele suresi Mushaf'ta 58. sıradadır.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_674",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Mushaf sıralamasında 58. sure hangisidir?",
+    "options": [
+      "Mücâdele",
+      "En'âm",
+      "Bakara",
+      "Duhân"
+    ],
+    "correctIndex": 0,
+    "explanation": "58. sure Mücâdele'dir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_675",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Haşr suresi Diyanet Mushaf'ında kaç ayettir?",
+    "options": [
+      "24",
+      "23",
+      "26",
+      "25"
+    ],
+    "correctIndex": 0,
+    "explanation": "Haşr suresi Hafs rivayetine göre 24 ayettir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_676",
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "Haşr suresi Mushaf sıralamasında kaçıncı suredir?",
+    "options": [
+      "59",
+      "58",
+      "61",
+      "60"
+    ],
+    "correctIndex": 0,
+    "explanation": "Haşr suresi Mushaf'ta 59. sıradadır.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_677",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Mushaf sıralamasında 59. sure hangisidir?",
+    "options": [
+      "Haşr",
+      "Âl-i İmrân",
+      "İnsan",
+      "A'râf"
+    ],
+    "correctIndex": 0,
+    "explanation": "59. sure Haşr'dir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_678",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Mümtehine suresi Diyanet Mushaf'ında kaç ayettir?",
+    "options": [
+      "13",
+      "12",
+      "15",
+      "14"
+    ],
+    "correctIndex": 0,
+    "explanation": "Mümtehine suresi Hafs rivayetine göre 13 ayettir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_679",
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "Mümtehine suresi Mushaf sıralamasında kaçıncı suredir?",
+    "options": [
+      "60",
+      "59",
+      "62",
+      "61"
+    ],
+    "correctIndex": 0,
+    "explanation": "Mümtehine suresi Mushaf'ta 60. sıradadır.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_680",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Mushaf sıralamasında 60. sure hangisidir?",
+    "options": [
+      "İbrâhîm",
+      "Sâffât",
+      "Fatiha",
+      "Mümtehine"
+    ],
+    "correctIndex": 3,
+    "explanation": "60. sure Mümtehine'dir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_681",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Saff suresi Diyanet Mushaf'ında kaç ayettir?",
+    "options": [
+      "14",
+      "13",
+      "16",
+      "15"
+    ],
+    "correctIndex": 0,
+    "explanation": "Saff suresi Hafs rivayetine göre 14 ayettir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_682",
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "Saff suresi Mushaf sıralamasında kaçıncı suredir?",
+    "options": [
+      "61",
+      "60",
+      "63",
+      "62"
+    ],
+    "correctIndex": 0,
+    "explanation": "Saff suresi Mushaf'ta 61. sıradadır.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_683",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Mushaf sıralamasında 61. sure hangisidir?",
+    "options": [
+      "İnsan",
+      "Mâide",
+      "Saff",
+      "A'râf"
+    ],
+    "correctIndex": 2,
+    "explanation": "61. sure Saff'dir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_684",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Cuma suresi Diyanet Mushaf'ında kaç ayettir?",
+    "options": [
+      "11",
+      "10",
+      "13",
+      "12"
+    ],
+    "correctIndex": 0,
+    "explanation": "Cuma suresi Hafs rivayetine göre 11 ayettir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_685",
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "Cuma suresi Mushaf sıralamasında kaçıncı suredir?",
+    "options": [
+      "62",
+      "61",
+      "64",
+      "63"
+    ],
+    "correctIndex": 0,
+    "explanation": "Cuma suresi Mushaf'ta 62. sıradadır.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_686",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Mushaf sıralamasında 62. sure hangisidir?",
+    "options": [
+      "Cuma",
+      "Münâfikûn",
+      "Kevser",
+      "Sebe'"
+    ],
+    "correctIndex": 0,
+    "explanation": "62. sure Cuma'dir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_687",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Münâfikûn suresi Diyanet Mushaf'ında kaç ayettir?",
+    "options": [
+      "11",
+      "10",
+      "13",
+      "12"
+    ],
+    "correctIndex": 0,
+    "explanation": "Münâfikûn suresi Hafs rivayetine göre 11 ayettir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_688",
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "Münâfikûn suresi Mushaf sıralamasında kaçıncı suredir?",
+    "options": [
+      "63",
+      "62",
+      "65",
+      "64"
+    ],
+    "correctIndex": 0,
+    "explanation": "Münâfikûn suresi Mushaf'ta 63. sıradadır.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_689",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Mushaf sıralamasında 63. sure hangisidir?",
+    "options": [
+      "Fâtır",
+      "A'râf",
+      "Münâfikûn",
+      "Ra'd"
+    ],
+    "correctIndex": 2,
+    "explanation": "63. sure Münâfikûn'dir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_690",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Tegâbün suresi Diyanet Mushaf'ında kaç ayettir?",
+    "options": [
+      "18",
+      "17",
+      "20",
+      "19"
+    ],
+    "correctIndex": 0,
+    "explanation": "Tegâbün suresi Hafs rivayetine göre 18 ayettir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_691",
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "Tegâbün suresi Mushaf sıralamasında kaçıncı suredir?",
+    "options": [
+      "64",
+      "63",
+      "66",
+      "65"
+    ],
+    "correctIndex": 0,
+    "explanation": "Tegâbün suresi Mushaf'ta 64. sıradadır.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_692",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Mushaf sıralamasında 64. sure hangisidir?",
+    "options": [
+      "Tegâbün",
+      "Yâsîn",
+      "Bakara",
+      "Tîn"
+    ],
+    "correctIndex": 0,
+    "explanation": "64. sure Tegâbün'dir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_693",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Talâk suresi Diyanet Mushaf'ında kaç ayettir?",
+    "options": [
+      "12",
+      "11",
+      "14",
+      "13"
+    ],
+    "correctIndex": 0,
+    "explanation": "Talâk suresi Hafs rivayetine göre 12 ayettir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_694",
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "Talâk suresi Mushaf sıralamasında kaçıncı suredir?",
+    "options": [
+      "65",
+      "64",
+      "67",
+      "66"
+    ],
+    "correctIndex": 0,
+    "explanation": "Talâk suresi Mushaf'ta 65. sıradadır.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_695",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Mushaf sıralamasında 65. sure hangisidir?",
+    "options": [
+      "Mü'minûn",
+      "Âl-i İmrân",
+      "Kasas",
+      "Talâk"
+    ],
+    "correctIndex": 3,
+    "explanation": "65. sure Talâk'dir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_696",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Tahrîm suresi Diyanet Mushaf'ında kaç ayettir?",
+    "options": [
+      "12",
+      "11",
+      "14",
+      "13"
+    ],
+    "correctIndex": 0,
+    "explanation": "Tahrîm suresi Hafs rivayetine göre 12 ayettir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_697",
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "Tahrîm suresi Mushaf sıralamasında kaçıncı suredir?",
+    "options": [
+      "66",
+      "65",
+      "68",
+      "67"
+    ],
+    "correctIndex": 0,
+    "explanation": "Tahrîm suresi Mushaf'ta 66. sıradadır.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_698",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Mushaf sıralamasında 66. sure hangisidir?",
+    "options": [
+      "Zilzâl",
+      "Târık",
+      "Kevser",
+      "Tahrîm"
+    ],
+    "correctIndex": 3,
+    "explanation": "66. sure Tahrîm'dir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_699",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Mülk suresi Diyanet Mushaf'ında kaç ayettir?",
+    "options": [
+      "30",
+      "29",
+      "32",
+      "31"
+    ],
+    "correctIndex": 0,
+    "explanation": "Mülk suresi Hafs rivayetine göre 30 ayettir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_700",
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "Mülk suresi Mushaf sıralamasında kaçıncı suredir?",
+    "options": [
+      "67",
+      "66",
+      "69",
+      "68"
+    ],
+    "correctIndex": 0,
+    "explanation": "Mülk suresi Mushaf'ta 67. sıradadır.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_701",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Mushaf sıralamasında 67. sure hangisidir?",
+    "options": [
+      "Nûh",
+      "Mâide",
+      "Mülk",
+      "Âl-i İmrân"
+    ],
+    "correctIndex": 2,
+    "explanation": "67. sure Mülk'dir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_702",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Kalem suresi Diyanet Mushaf'ında kaç ayettir?",
+    "options": [
+      "52",
+      "51",
+      "54",
+      "53"
+    ],
+    "correctIndex": 0,
+    "explanation": "Kalem suresi Hafs rivayetine göre 52 ayettir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_703",
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "Kalem suresi Mushaf sıralamasında kaçıncı suredir?",
+    "options": [
+      "68",
+      "67",
+      "70",
+      "69"
+    ],
+    "correctIndex": 0,
+    "explanation": "Kalem suresi Mushaf'ta 68. sıradadır.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_704",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Mushaf sıralamasında 68. sure hangisidir?",
+    "options": [
+      "Kalem",
+      "Beyyine",
+      "İnşirâh",
+      "Fussilet"
+    ],
+    "correctIndex": 0,
+    "explanation": "68. sure Kalem'dir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_705",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Hâkka suresi Diyanet Mushaf'ında kaç ayettir?",
+    "options": [
+      "52",
+      "51",
+      "54",
+      "53"
+    ],
+    "correctIndex": 0,
+    "explanation": "Hâkka suresi Hafs rivayetine göre 52 ayettir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_706",
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "Hâkka suresi Mushaf sıralamasında kaçıncı suredir?",
+    "options": [
+      "69",
+      "68",
+      "71",
+      "70"
+    ],
+    "correctIndex": 0,
+    "explanation": "Hâkka suresi Mushaf'ta 69. sıradadır.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_707",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Mushaf sıralamasında 69. sure hangisidir?",
+    "options": [
+      "Zümer",
+      "Neml",
+      "Hâkka",
+      "Hucurât"
+    ],
+    "correctIndex": 2,
+    "explanation": "69. sure Hâkka'dir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_708",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Meâric suresi Diyanet Mushaf'ında kaç ayettir?",
+    "options": [
+      "44",
+      "43",
+      "46",
+      "45"
+    ],
+    "correctIndex": 0,
+    "explanation": "Meâric suresi Hafs rivayetine göre 44 ayettir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_709",
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "Meâric suresi Mushaf sıralamasında kaçıncı suredir?",
+    "options": [
+      "70",
+      "69",
+      "72",
+      "71"
+    ],
+    "correctIndex": 0,
+    "explanation": "Meâric suresi Mushaf'ta 70. sıradadır.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_710",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Mushaf sıralamasında 70. sure hangisidir?",
+    "options": [
+      "Meâric",
+      "Nisâ",
+      "Neml",
+      "Bakara"
+    ],
+    "correctIndex": 0,
+    "explanation": "70. sure Meâric'dir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_711",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Nûh suresi Diyanet Mushaf'ında kaç ayettir?",
+    "options": [
+      "28",
+      "27",
+      "30",
+      "29"
+    ],
+    "correctIndex": 0,
+    "explanation": "Nûh suresi Hafs rivayetine göre 28 ayettir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_712",
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "Nûh suresi Mushaf sıralamasında kaçıncı suredir?",
+    "options": [
+      "71",
+      "70",
+      "73",
+      "72"
+    ],
+    "correctIndex": 0,
+    "explanation": "Nûh suresi Mushaf'ta 71. sıradadır.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_713",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Mushaf sıralamasında 71. sure hangisidir?",
+    "options": [
+      "Nûh",
+      "Âl-i İmrân",
+      "Leyl",
+      "Haşr"
+    ],
+    "correctIndex": 0,
+    "explanation": "71. sure Nûh'dir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_714",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Cin suresi Diyanet Mushaf'ında kaç ayettir?",
+    "options": [
+      "28",
+      "27",
+      "30",
+      "29"
+    ],
+    "correctIndex": 0,
+    "explanation": "Cin suresi Hafs rivayetine göre 28 ayettir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_715",
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "Cin suresi Mushaf sıralamasında kaçıncı suredir?",
+    "options": [
+      "72",
+      "71",
+      "74",
+      "73"
+    ],
+    "correctIndex": 0,
+    "explanation": "Cin suresi Mushaf'ta 72. sıradadır.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_716",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Mushaf sıralamasında 72. sure hangisidir?",
+    "options": [
+      "Yûsuf",
+      "Cin",
+      "Kureyş",
+      "Tahrîm"
+    ],
+    "correctIndex": 1,
+    "explanation": "72. sure Cin'dir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_717",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Müzzemmil suresi Diyanet Mushaf'ında kaç ayettir?",
+    "options": [
+      "20",
+      "19",
+      "22",
+      "21"
+    ],
+    "correctIndex": 0,
+    "explanation": "Müzzemmil suresi Hafs rivayetine göre 20 ayettir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_718",
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "Müzzemmil suresi Mushaf sıralamasında kaçıncı suredir?",
+    "options": [
+      "73",
+      "72",
+      "75",
+      "74"
+    ],
+    "correctIndex": 0,
+    "explanation": "Müzzemmil suresi Mushaf'ta 73. sıradadır.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_719",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Mushaf sıralamasında 73. sure hangisidir?",
+    "options": [
+      "Hûd",
+      "Müzzemmil",
+      "Furkân",
+      "İsrâ"
+    ],
+    "correctIndex": 1,
+    "explanation": "73. sure Müzzemmil'dir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_720",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Müddessir suresi Diyanet Mushaf'ında kaç ayettir?",
+    "options": [
+      "56",
+      "55",
+      "58",
+      "57"
+    ],
+    "correctIndex": 0,
+    "explanation": "Müddessir suresi Hafs rivayetine göre 56 ayettir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_721",
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "Müddessir suresi Mushaf sıralamasında kaçıncı suredir?",
+    "options": [
+      "74",
+      "73",
+      "76",
+      "75"
+    ],
+    "correctIndex": 0,
+    "explanation": "Müddessir suresi Mushaf'ta 74. sıradadır.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_722",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Mushaf sıralamasında 74. sure hangisidir?",
+    "options": [
+      "Müddessir",
+      "Meryem",
+      "İhlâs",
+      "A'râf"
+    ],
+    "correctIndex": 0,
+    "explanation": "74. sure Müddessir'dir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_723",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Kıyâme suresi Diyanet Mushaf'ında kaç ayettir?",
+    "options": [
+      "40",
+      "39",
+      "42",
+      "41"
+    ],
+    "correctIndex": 0,
+    "explanation": "Kıyâme suresi Hafs rivayetine göre 40 ayettir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_724",
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "Kıyâme suresi Mushaf sıralamasında kaçıncı suredir?",
+    "options": [
+      "75",
+      "74",
+      "77",
+      "76"
+    ],
+    "correctIndex": 0,
+    "explanation": "Kıyâme suresi Mushaf'ta 75. sıradadır.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_725",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Mushaf sıralamasında 75. sure hangisidir?",
+    "options": [
+      "Mâide",
+      "İsrâ",
+      "Kıyâme",
+      "Tebbet"
+    ],
+    "correctIndex": 2,
+    "explanation": "75. sure Kıyâme'dir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_726",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "İnsan suresi Diyanet Mushaf'ında kaç ayettir?",
+    "options": [
+      "31",
+      "30",
+      "33",
+      "32"
+    ],
+    "correctIndex": 0,
+    "explanation": "İnsan suresi Hafs rivayetine göre 31 ayettir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_727",
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "İnsan suresi Mushaf sıralamasında kaçıncı suredir?",
+    "options": [
+      "76",
+      "75",
+      "78",
+      "77"
+    ],
+    "correctIndex": 0,
+    "explanation": "İnsan suresi Mushaf'ta 76. sıradadır.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_728",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Mushaf sıralamasında 76. sure hangisidir?",
+    "options": [
+      "Bakara",
+      "Âdiyât",
+      "İnfitâr",
+      "İnsan"
+    ],
+    "correctIndex": 3,
+    "explanation": "76. sure İnsan'dir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_729",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Mürselât suresi Diyanet Mushaf'ında kaç ayettir?",
+    "options": [
+      "50",
+      "49",
+      "52",
+      "51"
+    ],
+    "correctIndex": 0,
+    "explanation": "Mürselât suresi Hafs rivayetine göre 50 ayettir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_730",
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "Mürselât suresi Mushaf sıralamasında kaçıncı suredir?",
+    "options": [
+      "77",
+      "76",
+      "79",
+      "78"
+    ],
+    "correctIndex": 0,
+    "explanation": "Mürselât suresi Mushaf'ta 77. sıradadır.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_731",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Mushaf sıralamasında 77. sure hangisidir?",
+    "options": [
+      "Âl-i İmrân",
+      "Mâûn",
+      "Mürselât",
+      "Haşr"
+    ],
+    "correctIndex": 2,
+    "explanation": "77. sure Mürselât'dir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_732",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Nebe suresi Diyanet Mushaf'ında kaç ayettir?",
+    "options": [
+      "40",
+      "39",
+      "42",
+      "41"
+    ],
+    "correctIndex": 0,
+    "explanation": "Nebe suresi Hafs rivayetine göre 40 ayettir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_733",
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "Nebe suresi Mushaf sıralamasında kaçıncı suredir?",
+    "options": [
+      "78",
+      "77",
+      "80",
+      "79"
+    ],
+    "correctIndex": 0,
+    "explanation": "Nebe suresi Mushaf'ta 78. sıradadır.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_734",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Mushaf sıralamasında 78. sure hangisidir?",
+    "options": [
+      "Bakara",
+      "Tâhâ",
+      "İbrâhîm",
+      "Nebe"
+    ],
+    "correctIndex": 3,
+    "explanation": "78. sure Nebe'dir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_735",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Nâziât suresi Diyanet Mushaf'ında kaç ayettir?",
+    "options": [
+      "46",
+      "45",
+      "48",
+      "47"
+    ],
+    "correctIndex": 0,
+    "explanation": "Nâziât suresi Hafs rivayetine göre 46 ayettir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_736",
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "Nâziât suresi Mushaf sıralamasında kaçıncı suredir?",
+    "options": [
+      "79",
+      "78",
+      "81",
+      "80"
+    ],
+    "correctIndex": 0,
+    "explanation": "Nâziât suresi Mushaf'ta 79. sıradadır.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_737",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Mushaf sıralamasında 79. sure hangisidir?",
+    "options": [
+      "Nâziât",
+      "Mutaffifîn",
+      "Enbiyâ",
+      "Âl-i İmrân"
+    ],
+    "correctIndex": 0,
+    "explanation": "79. sure Nâziât'dir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_738",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Abese suresi Diyanet Mushaf'ında kaç ayettir?",
+    "options": [
+      "42",
+      "41",
+      "44",
+      "43"
+    ],
+    "correctIndex": 0,
+    "explanation": "Abese suresi Hafs rivayetine göre 42 ayettir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_739",
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "Abese suresi Mushaf sıralamasında kaçıncı suredir?",
+    "options": [
+      "80",
+      "79",
+      "82",
+      "81"
+    ],
+    "correctIndex": 0,
+    "explanation": "Abese suresi Mushaf'ta 80. sıradadır.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_740",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Mushaf sıralamasında 80. sure hangisidir?",
+    "options": [
+      "Abese",
+      "Bürûc",
+      "Kasas",
+      "Nisâ"
+    ],
+    "correctIndex": 0,
+    "explanation": "80. sure Abese'dir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_741",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Tekvîr suresi Diyanet Mushaf'ında kaç ayettir?",
+    "options": [
+      "29",
+      "28",
+      "31",
+      "30"
+    ],
+    "correctIndex": 0,
+    "explanation": "Tekvîr suresi Hafs rivayetine göre 29 ayettir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_742",
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "Tekvîr suresi Mushaf sıralamasında kaçıncı suredir?",
+    "options": [
+      "81",
+      "80",
+      "83",
+      "82"
+    ],
+    "correctIndex": 0,
+    "explanation": "Tekvîr suresi Mushaf'ta 81. sıradadır.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_743",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Mushaf sıralamasında 81. sure hangisidir?",
+    "options": [
+      "Mâide",
+      "Âl-i İmrân",
+      "Enbiyâ",
+      "Tekvîr"
+    ],
+    "correctIndex": 3,
+    "explanation": "81. sure Tekvîr'dir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_744",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "İnfitâr suresi Diyanet Mushaf'ında kaç ayettir?",
+    "options": [
+      "19",
+      "18",
+      "21",
+      "20"
+    ],
+    "correctIndex": 0,
+    "explanation": "İnfitâr suresi Hafs rivayetine göre 19 ayettir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_745",
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "İnfitâr suresi Mushaf sıralamasında kaçıncı suredir?",
+    "options": [
+      "82",
+      "81",
+      "84",
+      "83"
+    ],
+    "correctIndex": 0,
+    "explanation": "İnfitâr suresi Mushaf'ta 82. sıradadır.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_746",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Mushaf sıralamasında 82. sure hangisidir?",
+    "options": [
+      "Nûr",
+      "Kâf",
+      "İnfitâr",
+      "Şems"
+    ],
+    "correctIndex": 2,
+    "explanation": "82. sure İnfitâr'dir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_747",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Mutaffifîn suresi Diyanet Mushaf'ında kaç ayettir?",
+    "options": [
+      "36",
+      "35",
+      "38",
+      "37"
+    ],
+    "correctIndex": 0,
+    "explanation": "Mutaffifîn suresi Hafs rivayetine göre 36 ayettir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_748",
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "Mutaffifîn suresi Mushaf sıralamasında kaçıncı suredir?",
+    "options": [
+      "83",
+      "82",
+      "85",
+      "84"
+    ],
+    "correctIndex": 0,
+    "explanation": "Mutaffifîn suresi Mushaf'ta 83. sıradadır.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_749",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Mushaf sıralamasında 83. sure hangisidir?",
+    "options": [
+      "Hicr",
+      "Hadîd",
+      "Mutaffifîn",
+      "Nâs"
+    ],
+    "correctIndex": 2,
+    "explanation": "83. sure Mutaffifîn'dir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_750",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "İnşikâk suresi Diyanet Mushaf'ında kaç ayettir?",
+    "options": [
+      "25",
+      "24",
+      "27",
+      "26"
+    ],
+    "correctIndex": 0,
+    "explanation": "İnşikâk suresi Hafs rivayetine göre 25 ayettir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_751",
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "İnşikâk suresi Mushaf sıralamasında kaçıncı suredir?",
+    "options": [
+      "84",
+      "83",
+      "86",
+      "85"
+    ],
+    "correctIndex": 0,
+    "explanation": "İnşikâk suresi Mushaf'ta 84. sıradadır.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_752",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Mushaf sıralamasında 84. sure hangisidir?",
+    "options": [
+      "İnşikâk",
+      "Yûnus",
+      "Yûsuf",
+      "Haşr"
+    ],
+    "correctIndex": 0,
+    "explanation": "84. sure İnşikâk'dir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_753",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Bürûc suresi Diyanet Mushaf'ında kaç ayettir?",
+    "options": [
+      "22",
+      "21",
+      "24",
+      "23"
+    ],
+    "correctIndex": 0,
+    "explanation": "Bürûc suresi Hafs rivayetine göre 22 ayettir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_754",
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "Bürûc suresi Mushaf sıralamasında kaçıncı suredir?",
+    "options": [
+      "85",
+      "84",
+      "87",
+      "86"
+    ],
+    "correctIndex": 0,
+    "explanation": "Bürûc suresi Mushaf'ta 85. sıradadır.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_755",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Mushaf sıralamasında 85. sure hangisidir?",
+    "options": [
+      "Câsiye",
+      "Mü'minûn",
+      "Bürûc",
+      "Fatiha"
+    ],
+    "correctIndex": 2,
+    "explanation": "85. sure Bürûc'dir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_756",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Târık suresi Diyanet Mushaf'ında kaç ayettir?",
+    "options": [
+      "17",
+      "16",
+      "19",
+      "18"
+    ],
+    "correctIndex": 0,
+    "explanation": "Târık suresi Hafs rivayetine göre 17 ayettir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_757",
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "Târık suresi Mushaf sıralamasında kaçıncı suredir?",
+    "options": [
+      "86",
+      "85",
+      "88",
+      "87"
+    ],
+    "correctIndex": 0,
+    "explanation": "Târık suresi Mushaf'ta 86. sıradadır.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_758",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Mushaf sıralamasında 86. sure hangisidir?",
+    "options": [
+      "Kâf",
+      "Târık",
+      "Münâfikûn",
+      "Müddessir"
+    ],
+    "correctIndex": 1,
+    "explanation": "86. sure Târık'dir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_759",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "A'lâ suresi Diyanet Mushaf'ında kaç ayettir?",
+    "options": [
+      "19",
+      "18",
+      "21",
+      "20"
+    ],
+    "correctIndex": 0,
+    "explanation": "A'lâ suresi Hafs rivayetine göre 19 ayettir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_760",
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "A'lâ suresi Mushaf sıralamasında kaçıncı suredir?",
+    "options": [
+      "87",
+      "86",
+      "89",
+      "88"
+    ],
+    "correctIndex": 0,
+    "explanation": "A'lâ suresi Mushaf'ta 87. sıradadır.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_761",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Mushaf sıralamasında 87. sure hangisidir?",
+    "options": [
+      "A'lâ",
+      "Tevbe",
+      "Gâşiye",
+      "A'râf"
+    ],
+    "correctIndex": 0,
+    "explanation": "87. sure A'lâ'dir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_762",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Gâşiye suresi Diyanet Mushaf'ında kaç ayettir?",
+    "options": [
+      "26",
+      "25",
+      "28",
+      "27"
+    ],
+    "correctIndex": 0,
+    "explanation": "Gâşiye suresi Hafs rivayetine göre 26 ayettir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_763",
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "Gâşiye suresi Mushaf sıralamasında kaçıncı suredir?",
+    "options": [
+      "88",
+      "87",
+      "90",
+      "89"
+    ],
+    "correctIndex": 0,
+    "explanation": "Gâşiye suresi Mushaf'ta 88. sıradadır.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_764",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Mushaf sıralamasında 88. sure hangisidir?",
+    "options": [
+      "Rûm",
+      "Mü'min",
+      "Gâşiye",
+      "Fatiha"
+    ],
+    "correctIndex": 2,
+    "explanation": "88. sure Gâşiye'dir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_765",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Fecr suresi Diyanet Mushaf'ında kaç ayettir?",
+    "options": [
+      "30",
+      "29",
+      "32",
+      "31"
+    ],
+    "correctIndex": 0,
+    "explanation": "Fecr suresi Hafs rivayetine göre 30 ayettir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_766",
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "Fecr suresi Mushaf sıralamasında kaçıncı suredir?",
+    "options": [
+      "89",
+      "88",
+      "91",
+      "90"
+    ],
+    "correctIndex": 0,
+    "explanation": "Fecr suresi Mushaf'ta 89. sıradadır.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_767",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Mushaf sıralamasında 89. sure hangisidir?",
+    "options": [
+      "Nâziât",
+      "Fecr",
+      "Bürûc",
+      "Fussilet"
+    ],
+    "correctIndex": 1,
+    "explanation": "89. sure Fecr'dir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_768",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Beled suresi Diyanet Mushaf'ında kaç ayettir?",
+    "options": [
+      "20",
+      "19",
+      "22",
+      "21"
+    ],
+    "correctIndex": 0,
+    "explanation": "Beled suresi Hafs rivayetine göre 20 ayettir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_769",
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "Beled suresi Mushaf sıralamasında kaçıncı suredir?",
+    "options": [
+      "90",
+      "89",
+      "92",
+      "91"
+    ],
+    "correctIndex": 0,
+    "explanation": "Beled suresi Mushaf'ta 90. sıradadır.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_770",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Mushaf sıralamasında 90. sure hangisidir?",
+    "options": [
+      "Beled",
+      "Saff",
+      "Hümeze",
+      "Nebe"
+    ],
+    "correctIndex": 0,
+    "explanation": "90. sure Beled'dir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_771",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Şems suresi Diyanet Mushaf'ında kaç ayettir?",
+    "options": [
+      "15",
+      "14",
+      "17",
+      "16"
+    ],
+    "correctIndex": 0,
+    "explanation": "Şems suresi Hafs rivayetine göre 15 ayettir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_772",
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "Şems suresi Mushaf sıralamasında kaçıncı suredir?",
+    "options": [
+      "91",
+      "90",
+      "93",
+      "92"
+    ],
+    "correctIndex": 0,
+    "explanation": "Şems suresi Mushaf'ta 91. sıradadır.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_773",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Mushaf sıralamasında 91. sure hangisidir?",
+    "options": [
+      "Münâfikûn",
+      "Bakara",
+      "Sâffât",
+      "Şems"
+    ],
+    "correctIndex": 3,
+    "explanation": "91. sure Şems'dir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_774",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Leyl suresi Diyanet Mushaf'ında kaç ayettir?",
+    "options": [
+      "21",
+      "20",
+      "23",
+      "22"
+    ],
+    "correctIndex": 0,
+    "explanation": "Leyl suresi Hafs rivayetine göre 21 ayettir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_775",
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "Leyl suresi Mushaf sıralamasında kaçıncı suredir?",
+    "options": [
+      "92",
+      "91",
+      "94",
+      "93"
+    ],
+    "correctIndex": 0,
+    "explanation": "Leyl suresi Mushaf'ta 92. sıradadır.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_776",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Mushaf sıralamasında 92. sure hangisidir?",
+    "options": [
+      "Leyl",
+      "Câsiye",
+      "İnsan",
+      "Fîl"
+    ],
+    "correctIndex": 0,
+    "explanation": "92. sure Leyl'dir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_777",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Duhâ suresi Diyanet Mushaf'ında kaç ayettir?",
+    "options": [
+      "11",
+      "10",
+      "13",
+      "12"
+    ],
+    "correctIndex": 0,
+    "explanation": "Duhâ suresi Hafs rivayetine göre 11 ayettir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_778",
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "Duhâ suresi Mushaf sıralamasında kaçıncı suredir?",
+    "options": [
+      "93",
+      "92",
+      "95",
+      "94"
+    ],
+    "correctIndex": 0,
+    "explanation": "Duhâ suresi Mushaf'ta 93. sıradadır.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_779",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Mushaf sıralamasında 93. sure hangisidir?",
+    "options": [
+      "Fatiha",
+      "Yûsuf",
+      "Duhâ",
+      "Neml"
+    ],
+    "correctIndex": 2,
+    "explanation": "93. sure Duhâ'dir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_780",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "İnşirâh suresi Diyanet Mushaf'ında kaç ayettir?",
+    "options": [
+      "8",
+      "7",
+      "10",
+      "9"
+    ],
+    "correctIndex": 0,
+    "explanation": "İnşirâh suresi Hafs rivayetine göre 8 ayettir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_781",
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "İnşirâh suresi Mushaf sıralamasında kaçıncı suredir?",
+    "options": [
+      "94",
+      "93",
+      "96",
+      "95"
+    ],
+    "correctIndex": 0,
+    "explanation": "İnşirâh suresi Mushaf'ta 94. sıradadır.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_782",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Mushaf sıralamasında 94. sure hangisidir?",
+    "options": [
+      "Nisâ",
+      "Yûnus",
+      "Nâziât",
+      "İnşirâh"
+    ],
+    "correctIndex": 3,
+    "explanation": "94. sure İnşirâh'dir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_783",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Tîn suresi Diyanet Mushaf'ında kaç ayettir?",
+    "options": [
+      "8",
+      "7",
+      "10",
+      "9"
+    ],
+    "correctIndex": 0,
+    "explanation": "Tîn suresi Hafs rivayetine göre 8 ayettir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_784",
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "Tîn suresi Mushaf sıralamasında kaçıncı suredir?",
+    "options": [
+      "95",
+      "94",
+      "97",
+      "96"
+    ],
+    "correctIndex": 0,
+    "explanation": "Tîn suresi Mushaf'ta 95. sıradadır.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_785",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Mushaf sıralamasında 95. sure hangisidir?",
+    "options": [
+      "Tîn",
+      "Fâtır",
+      "Tekâsür",
+      "Âdiyât"
+    ],
+    "correctIndex": 0,
+    "explanation": "95. sure Tîn'dir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_786",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Alak suresi Diyanet Mushaf'ında kaç ayettir?",
+    "options": [
+      "19",
+      "18",
+      "21",
+      "20"
+    ],
+    "correctIndex": 0,
+    "explanation": "Alak suresi Hafs rivayetine göre 19 ayettir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_787",
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "Alak suresi Mushaf sıralamasında kaçıncı suredir?",
+    "options": [
+      "96",
+      "95",
+      "98",
+      "97"
+    ],
+    "correctIndex": 0,
+    "explanation": "Alak suresi Mushaf'ta 96. sıradadır.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_788",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Mushaf sıralamasında 96. sure hangisidir?",
+    "options": [
+      "A'lâ",
+      "Tahrîm",
+      "Fîl",
+      "Alak"
+    ],
+    "correctIndex": 3,
+    "explanation": "96. sure Alak'dir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_789",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Kadr suresi Diyanet Mushaf'ında kaç ayettir?",
+    "options": [
+      "6",
+      "4",
+      "7",
+      "5"
+    ],
+    "correctIndex": 3,
+    "explanation": "Kadr suresi Hafs rivayetine göre 5 ayettir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_790",
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "Kadr suresi Mushaf sıralamasında kaçıncı suredir?",
+    "options": [
+      "97",
+      "96",
+      "99",
+      "98"
+    ],
+    "correctIndex": 0,
+    "explanation": "Kadr suresi Mushaf'ta 97. sıradadır.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_791",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Mushaf sıralamasında 97. sure hangisidir?",
+    "options": [
+      "Furkân",
+      "Âl-i İmrân",
+      "Mâide",
+      "Kadr"
+    ],
+    "correctIndex": 3,
+    "explanation": "97. sure Kadr'dir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_792",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Beyyine suresi Diyanet Mushaf'ında kaç ayettir?",
+    "options": [
+      "8",
+      "7",
+      "10",
+      "9"
+    ],
+    "correctIndex": 0,
+    "explanation": "Beyyine suresi Hafs rivayetine göre 8 ayettir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_793",
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "Beyyine suresi Mushaf sıralamasında kaçıncı suredir?",
+    "options": [
+      "99",
+      "98",
+      "100",
+      "97"
+    ],
+    "correctIndex": 1,
+    "explanation": "Beyyine suresi Mushaf'ta 98. sıradadır.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_794",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Mushaf sıralamasında 98. sure hangisidir?",
+    "options": [
+      "Beyyine",
+      "Tegâbün",
+      "Saff",
+      "En'âm"
+    ],
+    "correctIndex": 0,
+    "explanation": "98. sure Beyyine'dir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_795",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Zilzâl suresi Diyanet Mushaf'ında kaç ayettir?",
+    "options": [
+      "8",
+      "7",
+      "10",
+      "9"
+    ],
+    "correctIndex": 0,
+    "explanation": "Zilzâl suresi Hafs rivayetine göre 8 ayettir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_796",
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "Zilzâl suresi Mushaf sıralamasında kaçıncı suredir?",
+    "options": [
+      "98",
+      "100",
+      "99",
+      "101"
+    ],
+    "correctIndex": 2,
+    "explanation": "Zilzâl suresi Mushaf'ta 99. sıradadır.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_797",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Mushaf sıralamasında 99. sure hangisidir?",
+    "options": [
+      "Mâide",
+      "Saff",
+      "Zilzâl",
+      "Kureyş"
+    ],
+    "correctIndex": 2,
+    "explanation": "99. sure Zilzâl'dir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_798",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Âdiyât suresi Diyanet Mushaf'ında kaç ayettir?",
+    "options": [
+      "11",
+      "10",
+      "13",
+      "12"
+    ],
+    "correctIndex": 0,
+    "explanation": "Âdiyât suresi Hafs rivayetine göre 11 ayettir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_799",
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "Âdiyât suresi Mushaf sıralamasında kaçıncı suredir?",
+    "options": [
+      "100",
+      "102",
+      "99",
+      "101"
+    ],
+    "correctIndex": 0,
+    "explanation": "Âdiyât suresi Mushaf'ta 100. sıradadır.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_800",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Mushaf sıralamasında 100. sure hangisidir?",
+    "options": [
+      "Enbiyâ",
+      "Nisâ",
+      "Âdiyât",
+      "En'âm"
+    ],
+    "correctIndex": 2,
+    "explanation": "100. sure Âdiyât'dir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_801",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Kâria suresi Diyanet Mushaf'ında kaç ayettir?",
+    "options": [
+      "11",
+      "10",
+      "13",
+      "12"
+    ],
+    "correctIndex": 0,
+    "explanation": "Kâria suresi Hafs rivayetine göre 11 ayettir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_802",
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "Kâria suresi Mushaf sıralamasında kaçıncı suredir?",
+    "options": [
+      "102",
+      "103",
+      "101",
+      "100"
+    ],
+    "correctIndex": 2,
+    "explanation": "Kâria suresi Mushaf'ta 101. sıradadır.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_803",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Mushaf sıralamasında 101. sure hangisidir?",
+    "options": [
+      "Rahmân",
+      "Münâfikûn",
+      "Mülk",
+      "Kâria"
+    ],
+    "correctIndex": 3,
+    "explanation": "101. sure Kâria'dir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_804",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Tekâsür suresi Diyanet Mushaf'ında kaç ayettir?",
+    "options": [
+      "8",
+      "7",
+      "10",
+      "9"
+    ],
+    "correctIndex": 0,
+    "explanation": "Tekâsür suresi Hafs rivayetine göre 8 ayettir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_805",
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "Tekâsür suresi Mushaf sıralamasında kaçıncı suredir?",
+    "options": [
+      "103",
+      "104",
+      "102",
+      "101"
+    ],
+    "correctIndex": 2,
+    "explanation": "Tekâsür suresi Mushaf'ta 102. sıradadır.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_806",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Mushaf sıralamasında 102. sure hangisidir?",
+    "options": [
+      "Tekâsür",
+      "Sâd",
+      "Duhân",
+      "Hümeze"
+    ],
+    "correctIndex": 0,
+    "explanation": "102. sure Tekâsür'dir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_807",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Asr suresi Diyanet Mushaf'ında kaç ayettir?",
+    "options": [
+      "4",
+      "2",
+      "5",
+      "3"
+    ],
+    "correctIndex": 3,
+    "explanation": "Asr suresi Hafs rivayetine göre 3 ayettir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_808",
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "Asr suresi Mushaf sıralamasında kaçıncı suredir?",
+    "options": [
+      "104",
+      "105",
+      "103",
+      "102"
+    ],
+    "correctIndex": 2,
+    "explanation": "Asr suresi Mushaf'ta 103. sıradadır.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_809",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Mushaf sıralamasında 103. sure hangisidir?",
+    "options": [
+      "Asr",
+      "Talâk",
+      "Bürûc",
+      "İsrâ"
+    ],
+    "correctIndex": 0,
+    "explanation": "103. sure Asr'dir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_810",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Hümeze suresi Diyanet Mushaf'ında kaç ayettir?",
+    "options": [
+      "10",
+      "9",
+      "11",
+      "8"
+    ],
+    "correctIndex": 1,
+    "explanation": "Hümeze suresi Hafs rivayetine göre 9 ayettir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_811",
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "Hümeze suresi Mushaf sıralamasında kaçıncı suredir?",
+    "options": [
+      "105",
+      "106",
+      "104",
+      "103"
+    ],
+    "correctIndex": 2,
+    "explanation": "Hümeze suresi Mushaf'ta 104. sıradadır.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_812",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Mushaf sıralamasında 104. sure hangisidir?",
+    "options": [
+      "Bakara",
+      "Hadîd",
+      "Câsiye",
+      "Hümeze"
+    ],
+    "correctIndex": 3,
+    "explanation": "104. sure Hümeze'dir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_813",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Fîl suresi Diyanet Mushaf'ında kaç ayettir?",
+    "options": [
+      "6",
+      "4",
+      "7",
+      "5"
+    ],
+    "correctIndex": 3,
+    "explanation": "Fîl suresi Hafs rivayetine göre 5 ayettir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_814",
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "Fîl suresi Mushaf sıralamasında kaçıncı suredir?",
+    "options": [
+      "106",
+      "107",
+      "105",
+      "104"
+    ],
+    "correctIndex": 2,
+    "explanation": "Fîl suresi Mushaf'ta 105. sıradadır.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_815",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Mushaf sıralamasında 105. sure hangisidir?",
+    "options": [
+      "Fîl",
+      "Tevbe",
+      "Zâriyât",
+      "Meryem"
+    ],
+    "correctIndex": 0,
+    "explanation": "105. sure Fîl'dir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_816",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Kureyş suresi Diyanet Mushaf'ında kaç ayettir?",
+    "options": [
+      "5",
+      "3",
+      "6",
+      "4"
+    ],
+    "correctIndex": 3,
+    "explanation": "Kureyş suresi Hafs rivayetine göre 4 ayettir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_817",
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "Kureyş suresi Mushaf sıralamasında kaçıncı suredir?",
+    "options": [
+      "107",
+      "108",
+      "106",
+      "105"
+    ],
+    "correctIndex": 2,
+    "explanation": "Kureyş suresi Mushaf'ta 106. sıradadır.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_818",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Mushaf sıralamasında 106. sure hangisidir?",
+    "options": [
+      "Nisâ",
+      "Mülk",
+      "Kureyş",
+      "Duhâ"
+    ],
+    "correctIndex": 2,
+    "explanation": "106. sure Kureyş'dir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_819",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Mâûn suresi Diyanet Mushaf'ında kaç ayettir?",
+    "options": [
+      "8",
+      "6",
+      "9",
+      "7"
+    ],
+    "correctIndex": 3,
+    "explanation": "Mâûn suresi Hafs rivayetine göre 7 ayettir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_820",
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "Mâûn suresi Mushaf sıralamasında kaçıncı suredir?",
+    "options": [
+      "108",
+      "109",
+      "107",
+      "106"
+    ],
+    "correctIndex": 2,
+    "explanation": "Mâûn suresi Mushaf'ta 107. sıradadır.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_821",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Mushaf sıralamasında 107. sure hangisidir?",
+    "options": [
+      "Ra'd",
+      "Mâûn",
+      "Âl-i İmrân",
+      "Şuarâ"
+    ],
+    "correctIndex": 1,
+    "explanation": "107. sure Mâûn'dir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_822",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Kevser suresi Diyanet Mushaf'ında kaç ayettir?",
+    "options": [
+      "4",
+      "2",
+      "5",
+      "3"
+    ],
+    "correctIndex": 3,
+    "explanation": "Kevser suresi Hafs rivayetine göre 3 ayettir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_823",
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "Kevser suresi Mushaf sıralamasında kaçıncı suredir?",
+    "options": [
+      "109",
+      "110",
+      "108",
+      "107"
+    ],
+    "correctIndex": 2,
+    "explanation": "Kevser suresi Mushaf'ta 108. sıradadır.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_824",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Mushaf sıralamasında 108. sure hangisidir?",
+    "options": [
+      "Münâfikûn",
+      "Nisâ",
+      "Kevser",
+      "Ahkâf"
+    ],
+    "correctIndex": 2,
+    "explanation": "108. sure Kevser'dir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_825",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Kâfirûn suresi Diyanet Mushaf'ında kaç ayettir?",
+    "options": [
+      "7",
+      "5",
+      "8",
+      "6"
+    ],
+    "correctIndex": 3,
+    "explanation": "Kâfirûn suresi Hafs rivayetine göre 6 ayettir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_826",
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "Kâfirûn suresi Mushaf sıralamasında kaçıncı suredir?",
+    "options": [
+      "110",
+      "111",
+      "109",
+      "108"
+    ],
+    "correctIndex": 2,
+    "explanation": "Kâfirûn suresi Mushaf'ta 109. sıradadır.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_827",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Mushaf sıralamasında 109. sure hangisidir?",
+    "options": [
+      "Ankebût",
+      "Kâfirûn",
+      "Mürselât",
+      "Zuhruf"
+    ],
+    "correctIndex": 1,
+    "explanation": "109. sure Kâfirûn'dir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_828",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Nasr suresi Diyanet Mushaf'ında kaç ayettir?",
+    "options": [
+      "4",
+      "2",
+      "5",
+      "3"
+    ],
+    "correctIndex": 3,
+    "explanation": "Nasr suresi Hafs rivayetine göre 3 ayettir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_829",
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "Nasr suresi Mushaf sıralamasında kaçıncı suredir?",
+    "options": [
+      "111",
+      "112",
+      "110",
+      "109"
+    ],
+    "correctIndex": 2,
+    "explanation": "Nasr suresi Mushaf'ta 110. sıradadır.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_830",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Mushaf sıralamasında 110. sure hangisidir?",
+    "options": [
+      "Gâşiye",
+      "Bakara",
+      "Nasr",
+      "Zuhruf"
+    ],
+    "correctIndex": 2,
+    "explanation": "110. sure Nasr'dir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_831",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Tebbet suresi Diyanet Mushaf'ında kaç ayettir?",
+    "options": [
+      "6",
+      "4",
+      "7",
+      "5"
+    ],
+    "correctIndex": 3,
+    "explanation": "Tebbet suresi Hafs rivayetine göre 5 ayettir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_832",
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "Tebbet suresi Mushaf sıralamasında kaçıncı suredir?",
+    "options": [
+      "112",
+      "113",
+      "111",
+      "110"
+    ],
+    "correctIndex": 2,
+    "explanation": "Tebbet suresi Mushaf'ta 111. sıradadır.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_833",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Mushaf sıralamasında 111. sure hangisidir?",
+    "options": [
+      "Mâide",
+      "Fatiha",
+      "Tebbet",
+      "Ra'd"
+    ],
+    "correctIndex": 2,
+    "explanation": "111. sure Tebbet'dir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_834",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "İhlâs suresi Diyanet Mushaf'ında kaç ayettir?",
+    "options": [
+      "5",
+      "3",
+      "6",
+      "4"
+    ],
+    "correctIndex": 3,
+    "explanation": "İhlâs suresi Hafs rivayetine göre 4 ayettir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_835",
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "İhlâs suresi Mushaf sıralamasında kaçıncı suredir?",
+    "options": [
+      "113",
+      "114",
+      "112",
+      "111"
+    ],
+    "correctIndex": 2,
+    "explanation": "İhlâs suresi Mushaf'ta 112. sıradadır.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_836",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Mushaf sıralamasında 112. sure hangisidir?",
+    "options": [
+      "İhlâs",
+      "Zümer",
+      "Müddessir",
+      "Nisâ"
+    ],
+    "correctIndex": 0,
+    "explanation": "112. sure İhlâs'dir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_837",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Felak suresi Diyanet Mushaf'ında kaç ayettir?",
+    "options": [
+      "6",
+      "4",
+      "7",
+      "5"
+    ],
+    "correctIndex": 3,
+    "explanation": "Felak suresi Hafs rivayetine göre 5 ayettir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_838",
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "Felak suresi Mushaf sıralamasında kaçıncı suredir?",
+    "options": [
+      "114",
+      "115",
+      "113",
+      "112"
+    ],
+    "correctIndex": 2,
+    "explanation": "Felak suresi Mushaf'ta 113. sıradadır.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_839",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Mushaf sıralamasında 113. sure hangisidir?",
+    "options": [
+      "Zümer",
+      "Cuma",
+      "Felak",
+      "Hicr"
+    ],
+    "correctIndex": 2,
+    "explanation": "113. sure Felak'dir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_840",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Nâs suresi Diyanet Mushaf'ında kaç ayettir?",
+    "options": [
+      "6",
+      "4",
+      "7",
+      "5"
+    ],
+    "correctIndex": 0,
+    "explanation": "Nâs suresi Hafs rivayetine göre 6 ayettir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_841",
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "Nâs suresi Mushaf sıralamasında kaçıncı suredir?",
+    "options": [
+      "115",
+      "116",
+      "114",
+      "113"
+    ],
+    "correctIndex": 2,
+    "explanation": "Nâs suresi Mushaf'ta 114. sıradadır.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_842",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Mushaf sıralamasında 114. sure hangisidir?",
+    "options": [
+      "Gâşiye",
+      "İbrâhîm",
+      "Bakara",
+      "Nâs"
+    ],
+    "correctIndex": 3,
+    "explanation": "114. sure Nâs'dir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_843",
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 2,
+    "question": "Muharrem hicrî yılın kaçıncı ayıdır?",
+    "options": [
+      "2",
+      "3",
+      "6",
+      "1"
+    ],
+    "correctIndex": 3,
+    "explanation": "Muharrem 1. aydır.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_844",
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 2,
+    "question": "Safer hicrî yılın kaçıncı ayıdır?",
+    "options": [
+      "3",
+      "1",
+      "4",
+      "2"
+    ],
+    "correctIndex": 3,
+    "explanation": "Safer 2. aydır.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_845",
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 2,
+    "question": "Rebiülevvel hicrî yılın kaçıncı ayıdır?",
+    "options": [
+      "4",
+      "2",
+      "5",
+      "3"
+    ],
+    "correctIndex": 3,
+    "explanation": "Rebiülevvel 3. aydır.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_846",
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 2,
+    "question": "Rebiülahir hicrî yılın kaçıncı ayıdır?",
+    "options": [
+      "5",
+      "3",
+      "6",
+      "4"
+    ],
+    "correctIndex": 3,
+    "explanation": "Rebiülahir 4. aydır.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_847",
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 2,
+    "question": "Cemaziyelevvel hicrî yılın kaçıncı ayıdır?",
+    "options": [
+      "6",
+      "4",
+      "7",
+      "5"
+    ],
+    "correctIndex": 3,
+    "explanation": "Cemaziyelevvel 5. aydır.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_848",
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 2,
+    "question": "Cemaziyelahir hicrî yılın kaçıncı ayıdır?",
+    "options": [
+      "7",
+      "5",
+      "8",
+      "6"
+    ],
+    "correctIndex": 3,
+    "explanation": "Cemaziyelahir 6. aydır.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_849",
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 2,
+    "question": "Recep hicrî yılın kaçıncı ayıdır?",
+    "options": [
+      "8",
+      "6",
+      "9",
+      "7"
+    ],
+    "correctIndex": 3,
+    "explanation": "Recep 7. aydır.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_850",
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 2,
+    "question": "Şaban hicrî yılın kaçıncı ayıdır?",
+    "options": [
+      "8",
+      "7",
+      "10",
+      "9"
+    ],
+    "correctIndex": 0,
+    "explanation": "Şaban 8. aydır.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_851",
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 2,
+    "question": "Ramazan hicrî yılın kaçıncı ayıdır?",
+    "options": [
+      "10",
+      "9",
+      "11",
+      "8"
+    ],
+    "correctIndex": 1,
+    "explanation": "Ramazan 9. aydır.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_852",
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 2,
+    "question": "Şevval hicrî yılın kaçıncı ayıdır?",
+    "options": [
+      "9",
+      "12",
+      "11",
+      "10"
+    ],
+    "correctIndex": 3,
+    "explanation": "Şevval 10. aydır.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_853",
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 2,
+    "question": "Zilkade hicrî yılın kaçıncı ayıdır?",
+    "options": [
+      "11",
+      "10",
+      "13",
+      "12"
+    ],
+    "correctIndex": 0,
+    "explanation": "Zilkade 11. aydır.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_854",
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 2,
+    "question": "Zilhicce hicrî yılın kaçıncı ayıdır?",
+    "options": [
+      "12",
+      "11",
+      "14",
+      "13"
+    ],
+    "correctIndex": 0,
+    "explanation": "Zilhicce 12. aydır.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_855",
+    "category": "Peygamberler tarihi",
+    "difficulty": 2,
+    "question": "Âdem peygamber Kur'an-ı Kerim'de adı geçen peygamberlerden midir?",
+    "options": [
+      "Yalnızca hadislerde geçer",
+      "Yalnızca İsrailiyat'ta geçer",
+      "Evet",
+      "Hayır"
+    ],
+    "correctIndex": 2,
+    "explanation": "Âdem Kur'an'da anılır.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_856",
+    "category": "Peygamberler tarihi",
+    "difficulty": 2,
+    "question": "Hûd peygamber Kur'an-ı Kerim'de adı geçen peygamberlerden midir?",
+    "options": [
+      "Yalnızca hadislerde geçer",
+      "Yalnızca İsrailiyat'ta geçer",
+      "Evet",
+      "Hayır"
+    ],
+    "correctIndex": 2,
+    "explanation": "Hûd Kur'an'da anılır.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_857",
+    "category": "Peygamberler tarihi",
+    "difficulty": 2,
+    "question": "İbrâhîm peygamber Kur'an-ı Kerim'de adı geçen peygamberlerden midir?",
+    "options": [
+      "Yalnızca hadislerde geçer",
+      "Yalnızca İsrailiyat'ta geçer",
+      "Evet",
+      "Hayır"
+    ],
+    "correctIndex": 2,
+    "explanation": "İbrâhîm Kur'an'da anılır.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_858",
+    "category": "Peygamberler tarihi",
+    "difficulty": 2,
+    "question": "Ya'kûb peygamber Kur'an-ı Kerim'de adı geçen peygamberlerden midir?",
+    "options": [
+      "Yalnızca hadislerde geçer",
+      "Yalnızca İsrailiyat'ta geçer",
+      "Evet",
+      "Hayır"
+    ],
+    "correctIndex": 2,
+    "explanation": "Ya'kûb Kur'an'da anılır.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_859",
+    "category": "Peygamberler tarihi",
+    "difficulty": 2,
+    "question": "Şuayb peygamber Kur'an-ı Kerim'de adı geçen peygamberlerden midir?",
+    "options": [
+      "Yalnızca hadislerde geçer",
+      "Yalnızca İsrailiyat'ta geçer",
+      "Evet",
+      "Hayır"
+    ],
+    "correctIndex": 2,
+    "explanation": "Şuayb Kur'an'da anılır.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_860",
+    "category": "Peygamberler tarihi",
+    "difficulty": 2,
+    "question": "Dâvûd peygamber Kur'an-ı Kerim'de adı geçen peygamberlerden midir?",
+    "options": [
+      "Yalnızca hadislerde geçer",
+      "Yalnızca İsrailiyat'ta geçer",
+      "Evet",
+      "Hayır"
+    ],
+    "correctIndex": 2,
+    "explanation": "Dâvûd Kur'an'da anılır.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_861",
+    "category": "Peygamberler tarihi",
+    "difficulty": 2,
+    "question": "Elyesa peygamber Kur'an-ı Kerim'de adı geçen peygamberlerden midir?",
+    "options": [
+      "Yalnızca hadislerde geçer",
+      "Yalnızca İsrailiyat'ta geçer",
+      "Evet",
+      "Hayır"
+    ],
+    "correctIndex": 2,
+    "explanation": "Elyesa Kur'an'da anılır.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_862",
+    "category": "Peygamberler tarihi",
+    "difficulty": 2,
+    "question": "Zekeriyâ peygamber Kur'an-ı Kerim'de adı geçen peygamberlerden midir?",
+    "options": [
+      "Yalnızca hadislerde geçer",
+      "Yalnızca İsrailiyat'ta geçer",
+      "Evet",
+      "Hayır"
+    ],
+    "correctIndex": 2,
+    "explanation": "Zekeriyâ Kur'an'da anılır.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_863",
+    "category": "Peygamberler tarihi",
+    "difficulty": 2,
+    "question": "Muhammed peygamber Kur'an-ı Kerim'de adı geçen peygamberlerden midir?",
+    "options": [
+      "Yalnızca hadislerde geçer",
+      "Yalnızca İsrailiyat'ta geçer",
+      "Evet",
+      "Hayır"
+    ],
+    "correctIndex": 2,
+    "explanation": "Muhammed Kur'an'da anılır.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_864",
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 1,
+    "question": "Haccın yapıldığı belde hangisidir?",
+    "options": [
+      "Medine",
+      "Taif",
+      "Kudüs",
+      "Mekke"
+    ],
+    "correctIndex": 3,
+    "explanation": "Hac Mekke'de eda edilir.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_865",
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 1,
+    "question": "İkindi namazının farzı kaç rekâttır?",
+    "options": [
+      "2",
+      "3",
+      "6",
+      "4"
+    ],
+    "correctIndex": 3,
+    "explanation": "İkindi farzı 4 rekâttır.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_866",
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 1,
+    "question": "Yatsı namazının farzı kaç rekâttır?",
+    "options": [
+      "2",
+      "3",
+      "6",
+      "4"
+    ],
+    "correctIndex": 3,
+    "explanation": "Yatsı farzı 4 rekâttır.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_867",
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 2,
+    "question": "Bayram namazı kaç rekâttır?",
+    "options": [
+      "4",
+      "3",
+      "1",
+      "2"
+    ],
+    "correctIndex": 3,
+    "explanation": "Bayram namazı 2 rekâttır.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_868",
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 1,
+    "question": "Namazın yönü (kıble) neresidir?",
+    "options": [
+      "Kâbe",
+      "Mescid-i Aksâ",
+      "Mescid-i Nebevî",
+      "Uhud"
+    ],
+    "correctIndex": 0,
+    "explanation": "Kıble Kâbe'dir.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_869",
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 2,
+    "question": "Hicretten önce ilk kıble neresiydi?",
+    "options": [
+      "Kâbe",
+      "Mescid-i Aksâ",
+      "Bedir",
+      "Uhud"
+    ],
+    "correctIndex": 1,
+    "explanation": "İlk kıble Mescid-i Aksâ idi.",
+    "source": "Diyanet Siyer-i Nebi / İslam Tarihi"
+  },
+  {
+    "id": "iq_870",
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 2,
+    "question": "Hanefi mezhebine göre abdestin farzı kaçtır?",
+    "options": [
+      "3",
+      "6",
+      "7",
+      "4"
+    ],
+    "correctIndex": 3,
+    "explanation": "Hanefi'de abdestin 4 farzı vardır.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_871",
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 2,
+    "question": "Hanefi mezhebine göre vitir namazı hükmü nedir?",
+    "options": [
+      "Sünnet-i müekkede",
+      "Farz-ı ayn",
+      "Vacip",
+      "Nafile"
+    ],
+    "correctIndex": 2,
+    "explanation": "Hanefi'de vitir vaciptir.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_872",
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 1,
+    "question": "Zekât İslam'ın şartlarından midir?",
+    "options": [
+      "Hayır",
+      "Yalnızca sünnettir",
+      "Yalnızca nafiledir",
+      "Evet"
+    ],
+    "correctIndex": 3,
+    "explanation": "Zekât İslam'ın beş şartındandır.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_873",
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 1,
+    "question": "Kelime-i tevhid neyi ifade eder?",
+    "options": [
+      "Namaz vakitlerini",
+      "Hac menâsikini",
+      "Zekât nisabını",
+      "Allah'ın birliği"
+    ],
+    "correctIndex": 3,
+    "explanation": "Tevhid, Allah'ın birliğidir.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_874",
+    "category": "Kur'an bilgisi",
+    "difficulty": 1,
+    "question": "Kur'an-ı Kerim hangi dilde inmiştir?",
+    "options": [
+      "Arapça",
+      "Farsça",
+      "Türkçe",
+      "İbranice"
+    ],
+    "correctIndex": 0,
+    "explanation": "Kur'an Arapça inmiştir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_875",
+    "category": "Kur'an bilgisi",
+    "difficulty": 1,
+    "question": "İlk vahyin geldiği dağ hangisidir?",
+    "options": [
+      "Nur Dağı",
+      "Arafat",
+      "Sevr",
+      "Uhud"
+    ],
+    "correctIndex": 0,
+    "explanation": "İlk vahiy Nur Dağı'ndaki Hira'da geldi.",
+    "source": "Diyanet Siyer-i Nebi / İslam Tarihi"
+  },
+  {
+    "id": "iq_876",
+    "category": "Kur'an bilgisi",
+    "difficulty": 1,
+    "question": "Hira mağarası hangi dağdadır?",
+    "options": [
+      "Uhud",
+      "Merve",
+      "Sevr",
+      "Nur Dağı"
+    ],
+    "correctIndex": 3,
+    "explanation": "Hira, Nur Dağı'ndadır.",
+    "source": "Diyanet Siyer-i Nebi / İslam Tarihi"
+  },
+  {
+    "id": "iq_877",
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "İlk inen ayetler hangi surede yer alır?",
+    "options": [
+      "Alak",
+      "Fatiha",
+      "Müddessir",
+      "Kalem"
+    ],
+    "correctIndex": 0,
+    "explanation": "İlk vahiy Alak suresinin ilk ayetleridir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_878",
+    "category": "Kur'an bilgisi",
+    "difficulty": 1,
+    "question": "Fatiha suresi başka hangi adla anılır?",
+    "options": [
+      "Ümmü'l-Kitab",
+      "Seyyidü'l-Kur'an",
+      "Kalbu'l-Kur'an",
+      "Arûsü'l-Kur'an"
+    ],
+    "correctIndex": 0,
+    "explanation": "Fatiha, Ümmü'l-Kitab olarak da anılır.",
+    "source": "TDV İslam Ansiklopedisi"
+  },
+  {
+    "id": "iq_879",
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "Yâsîn suresi geleneksel olarak nasıl anılır?",
+    "options": [
+      "Ümmü'l-Kitab",
+      "Levh-i mahfuz",
+      "Kalbu'l-Kur'an",
+      "Seb'u'l-mesânî"
+    ],
+    "correctIndex": 2,
+    "explanation": "Yâsîn, Kalbu'l-Kur'an diye anılır.",
+    "source": "TDV İslam Ansiklopedisi"
+  },
+  {
+    "id": "iq_880",
+    "category": "Kur'an bilgisi",
+    "difficulty": 1,
+    "question": "Kevser suresi kaç ayettir?",
+    "options": [
+      "4",
+      "5",
+      "7",
+      "3"
+    ],
+    "correctIndex": 3,
+    "explanation": "Kevser 3 ayettir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_881",
+    "category": "Kur'an bilgisi",
+    "difficulty": 1,
+    "question": "Asr suresi kaç ayettir?",
+    "options": [
+      "4",
+      "5",
+      "8",
+      "3"
+    ],
+    "correctIndex": 3,
+    "explanation": "Asr 3 ayettir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_882",
+    "category": "Kur'an bilgisi",
+    "difficulty": 1,
+    "question": "İhlâs suresi kaç ayettir?",
+    "options": [
+      "3",
+      "5",
+      "6",
+      "4"
+    ],
+    "correctIndex": 3,
+    "explanation": "İhlâs 4 ayettir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_883",
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "Tevbe suresinin başında ne yoktur?",
+    "options": [
+      "Besmele",
+      "Secde ayeti",
+      "Elif-Lâm-Mîm",
+      "Nesih kaydı"
+    ],
+    "correctIndex": 0,
+    "explanation": "Tevbe suresinin başında besmele yoktur.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_884",
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "Kur'an'da secde ayeti bulunan surelerden biri hangisidir?",
+    "options": [
+      "Kevser",
+      "Kureyş",
+      "Asr",
+      "Secde"
+    ],
+    "correctIndex": 3,
+    "explanation": "Secde suresinde tilavet secdesi vardır.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_885",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Tilavet secdesi gereken ayetlerden biri hangi surededir?",
+    "options": [
+      "Alak",
+      "Nasr",
+      "Kevser",
+      "Kureyş"
+    ],
+    "correctIndex": 0,
+    "explanation": "Alak suresinin sonunda tilavet secdesi vardır.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_886",
+    "category": "Siyer",
+    "difficulty": 1,
+    "question": "Peygamber Efendimiz hangi şehirde doğmuştur?",
+    "options": [
+      "Medine",
+      "Kudüs",
+      "Taif",
+      "Mekke"
+    ],
+    "correctIndex": 3,
+    "explanation": "Hz. Muhammed Mekke'de doğmuştur.",
+    "source": "Diyanet Siyer-i Nebi / İslam Tarihi"
+  },
+  {
+    "id": "iq_887",
+    "category": "Siyer",
+    "difficulty": 1,
+    "question": "Peygamber Efendimiz hangi şehirde vefat etmiştir?",
+    "options": [
+      "Medine",
+      "Kudüs",
+      "Taif",
+      "Mekke"
+    ],
+    "correctIndex": 0,
+    "explanation": "Vefatı Medine'dedir.",
+    "source": "Diyanet Siyer-i Nebi / İslam Tarihi"
+  },
+  {
+    "id": "iq_888",
+    "category": "Siyer",
+    "difficulty": 2,
+    "question": "Hicrî takvimin başlangıcı hangi olaydır?",
+    "options": [
+      "Hicret",
+      "Bedir",
+      "Fetih",
+      "Veda Haccı"
+    ],
+    "correctIndex": 0,
+    "explanation": "Hicrî takvim Hicret'le başlar.",
+    "source": "Diyanet Siyer-i Nebi / İslam Tarihi"
+  },
+  {
+    "id": "iq_889",
+    "category": "Siyer",
+    "difficulty": 2,
+    "question": "Hicret miladi olarak hangi yıldır?",
+    "options": [
+      "610",
+      "632",
+      "622",
+      "630"
+    ],
+    "correctIndex": 2,
+    "explanation": "Hicret 622 miladîdir.",
+    "source": "Diyanet Siyer-i Nebi / İslam Tarihi"
+  },
+  {
+    "id": "iq_890",
+    "category": "Siyer",
+    "difficulty": 2,
+    "question": "İlk vahiy miladi olarak hangi yılda gelmiştir?",
+    "options": [
+      "622",
+      "571",
+      "610",
+      "632"
+    ],
+    "correctIndex": 2,
+    "explanation": "İlk vahiy 610 civarındadır.",
+    "source": "Diyanet Siyer-i Nebi / İslam Tarihi"
+  },
+  {
+    "id": "iq_891",
+    "category": "Siyer",
+    "difficulty": 1,
+    "question": "Peygamber Efendimiz'in babasının adı nedir?",
+    "options": [
+      "Abdülmuttalib",
+      "Abdullah",
+      "Hamza",
+      "Ebû Talib"
+    ],
+    "correctIndex": 1,
+    "explanation": "Babası Abdullah'tır.",
+    "source": "Diyanet Siyer-i Nebi / İslam Tarihi"
+  },
+  {
+    "id": "iq_892",
+    "category": "Siyer",
+    "difficulty": 1,
+    "question": "Peygamber Efendimiz'in annesinin adı nedir?",
+    "options": [
+      "Âmine",
+      "Fatıma",
+      "Hatice",
+      "Hâlime"
+    ],
+    "correctIndex": 0,
+    "explanation": "Annesi Âmine'dir.",
+    "source": "Diyanet Siyer-i Nebi / İslam Tarihi"
+  },
+  {
+    "id": "iq_893",
+    "category": "Siyer",
+    "difficulty": 1,
+    "question": "Peygamber Efendimiz'in sütannesinin adı nedir?",
+    "options": [
+      "Ümmü Seleme",
+      "Hâlime",
+      "Âmine",
+      "Sümeyye"
+    ],
+    "correctIndex": 1,
+    "explanation": "Sütannesi Hâlime'dir.",
+    "source": "Diyanet Siyer-i Nebi / İslam Tarihi"
+  },
+  {
+    "id": "iq_894",
+    "category": "Siyer",
+    "difficulty": 1,
+    "question": "İlk Müslüman kadın kimdir?",
+    "options": [
+      "Hatice",
+      "Âişe",
+      "Fatıma",
+      "Zeyneb"
+    ],
+    "correctIndex": 0,
+    "explanation": "İlk iman eden kadın Hz. Hatice'dir.",
+    "source": "Diyanet Siyer-i Nebi / İslam Tarihi"
+  },
+  {
+    "id": "iq_895",
+    "category": "Siyer",
+    "difficulty": 2,
+    "question": "İlk Müslüman çocuk kimdir?",
+    "options": [
+      "Hüseyin",
+      "Zeyd",
+      "Ali",
+      "Hasan"
+    ],
+    "correctIndex": 2,
+    "explanation": "İlk iman eden çocuk Hz. Ali'dir.",
+    "source": "Diyanet Siyer-i Nebi / İslam Tarihi"
+  },
+  {
+    "id": "iq_896",
+    "category": "Siyer",
+    "difficulty": 2,
+    "question": "İlk Müslüman köle kimdir?",
+    "options": [
+      "Selman",
+      "Suheyb",
+      "Bilal",
+      "Zeyd b. Hârise"
+    ],
+    "correctIndex": 3,
+    "explanation": "Zeyd b. Hârise ilk Müslüman kölelerdendir.",
+    "source": "Diyanet Siyer-i Nebi / İslam Tarihi"
+  },
+  {
+    "id": "iq_897",
+    "category": "Siyer",
+    "difficulty": 1,
+    "question": "İlk müezzin kimdir?",
+    "options": [
+      "Bilal-i Habeşî",
+      "Osman",
+      "Ömer",
+      "Ebû Bekir"
+    ],
+    "correctIndex": 0,
+    "explanation": "İlk müezzin Bilal-i Habeşî'dir.",
+    "source": "Diyanet Siyer-i Nebi / İslam Tarihi"
+  },
+  {
+    "id": "iq_898",
+    "category": "Siyer",
+    "difficulty": 2,
+    "question": "Habeşistan'a hicreti öneren peygamber hangisidir?",
+    "options": [
+      "Hz. Îsâ",
+      "Hz. Nûh",
+      "Hz. Muhammed",
+      "Hz. Mûsâ"
+    ],
+    "correctIndex": 2,
+    "explanation": "İlk Habeşistan hicreti Hz. Muhammed zamanındadır.",
+    "source": "Diyanet Siyer-i Nebi / İslam Tarihi"
+  },
+  {
+    "id": "iq_899",
+    "category": "Siyer",
+    "difficulty": 1,
+    "question": "Bedir Savaşı kiminle yapılmıştır?",
+    "options": [
+      "Rumlar",
+      "Habeşliler",
+      "Mekkeli müşrikler",
+      "Sâsânîler"
+    ],
+    "correctIndex": 2,
+    "explanation": "Bedir, Mekkeli müşriklerle yapılmıştır.",
+    "source": "Diyanet Siyer-i Nebi / İslam Tarihi"
+  },
+  {
+    "id": "iq_900",
+    "category": "Siyer",
+    "difficulty": 2,
+    "question": "Bedir Savaşı hicrî kaçıncı yıldadır?",
+    "options": [
+      "1",
+      "5",
+      "8",
+      "2"
+    ],
+    "correctIndex": 3,
+    "explanation": "Bedir hicrî 2. yıldadır.",
+    "source": "Diyanet Siyer-i Nebi / İslam Tarihi"
+  },
+  {
+    "id": "iq_901",
+    "category": "Siyer",
+    "difficulty": 2,
+    "question": "Uhud Savaşı hicrî kaçıncı yıldadır?",
+    "options": [
+      "2",
+      "5",
+      "8",
+      "3"
+    ],
+    "correctIndex": 3,
+    "explanation": "Uhud hicrî 3. yıldadır.",
+    "source": "Diyanet Siyer-i Nebi / İslam Tarihi"
+  },
+  {
+    "id": "iq_902",
+    "category": "Siyer",
+    "difficulty": 2,
+    "question": "Hendek (Ahzâb) Savaşı hicrî kaçıncı yıldadır?",
+    "options": [
+      "2",
+      "3",
+      "8",
+      "5"
+    ],
+    "correctIndex": 3,
+    "explanation": "Hendek hicrî 5. yıldadır.",
+    "source": "Diyanet Siyer-i Nebi / İslam Tarihi"
+  },
+  {
+    "id": "iq_903",
+    "category": "Siyer",
+    "difficulty": 2,
+    "question": "Mekke'nin fethi hicrî kaçıncı yıldadır?",
+    "options": [
+      "8",
+      "7",
+      "10",
+      "6"
+    ],
+    "correctIndex": 0,
+    "explanation": "Fetih hicrî 8. yıldadır.",
+    "source": "Diyanet Siyer-i Nebi / İslam Tarihi"
+  },
+  {
+    "id": "iq_904",
+    "category": "Siyer",
+    "difficulty": 2,
+    "question": "Veda Haccı hicrî kaçıncı yıldadır?",
+    "options": [
+      "9",
+      "8",
+      "10",
+      "11"
+    ],
+    "correctIndex": 2,
+    "explanation": "Veda Haccı hicrî 10. yıldadır.",
+    "source": "Diyanet Siyer-i Nebi / İslam Tarihi"
+  },
+  {
+    "id": "iq_905",
+    "category": "Siyer",
+    "difficulty": 2,
+    "question": "Hudeybiye Antlaşması hicrî kaçıncı yıldadır?",
+    "options": [
+      "6",
+      "8",
+      "10",
+      "5"
+    ],
+    "correctIndex": 0,
+    "explanation": "Hudeybiye hicrî 6. yıldadır.",
+    "source": "Diyanet Siyer-i Nebi / İslam Tarihi"
+  },
+  {
+    "id": "iq_906",
+    "category": "Siyer",
+    "difficulty": 1,
+    "question": "Uhud'da şehit düşen amca kimdir?",
+    "options": [
+      "Ebû Talib",
+      "Zübeyr",
+      "Hamza",
+      "Abbas"
+    ],
+    "correctIndex": 2,
+    "explanation": "Hz. Hamza Uhud'da şehit olmuştur.",
+    "source": "Diyanet Siyer-i Nebi / İslam Tarihi"
+  },
+  {
+    "id": "iq_907",
+    "category": "Siyer",
+    "difficulty": 2,
+    "question": "Peygamber Efendimiz kaç yaşında vefat etmiştir?",
+    "options": [
+      "63",
+      "53",
+      "73",
+      "40"
+    ],
+    "correctIndex": 0,
+    "explanation": "63 yaşında vefat etmiştir.",
+    "source": "Diyanet Siyer-i Nebi / İslam Tarihi"
+  },
+  {
+    "id": "iq_908",
+    "category": "Siyer",
+    "difficulty": 2,
+    "question": "Peygamber Efendimiz kaç yaşında peygamber olmuştur?",
+    "options": [
+      "40",
+      "33",
+      "63",
+      "25"
+    ],
+    "correctIndex": 0,
+    "explanation": "40 yaşında vahiy gelmiştir.",
+    "source": "Diyanet Siyer-i Nebi / İslam Tarihi"
+  },
+  {
+    "id": "iq_909",
+    "category": "Siyer",
+    "difficulty": 2,
+    "question": "Mekke dönemi peygamberlik kaç yıl sürmüştür?",
+    "options": [
+      "23",
+      "7",
+      "10",
+      "13"
+    ],
+    "correctIndex": 3,
+    "explanation": "Mekke dönemi 13 yıldır.",
+    "source": "Diyanet Siyer-i Nebi / İslam Tarihi"
+  },
+  {
+    "id": "iq_910",
+    "category": "Siyer",
+    "difficulty": 2,
+    "question": "Medine dönemi peygamberlik kaç yıl sürmüştür?",
+    "options": [
+      "23",
+      "7",
+      "13",
+      "10"
+    ],
+    "correctIndex": 3,
+    "explanation": "Medine dönemi 10 yıldır.",
+    "source": "Diyanet Siyer-i Nebi / İslam Tarihi"
+  },
+  {
+    "id": "iq_911",
+    "category": "Siyer",
+    "difficulty": 2,
+    "question": "Kur'an'ın mushaf hâlinde cem'ini emreden halife kimdir?",
+    "options": [
+      "Ebû Bekir",
+      "Osman",
+      "Ali",
+      "Ömer"
+    ],
+    "correctIndex": 0,
+    "explanation": "Cem'i Hz. Ebû Bekir döneminde başlamıştır.",
+    "source": "TDV İslam Ansiklopedisi"
+  },
+  {
+    "id": "iq_912",
+    "category": "Siyer",
+    "difficulty": 2,
+    "question": "Mushaf'ın çoğaltılıp vilayetlere gönderilmesini sağlayan halife kimdir?",
+    "options": [
+      "Ömer",
+      "Ali",
+      "Osman",
+      "Ebû Bekir"
+    ],
+    "correctIndex": 2,
+    "explanation": "İstinsah Hz. Osman dönemindedir.",
+    "source": "TDV İslam Ansiklopedisi"
+  },
+  {
+    "id": "iq_913",
+    "category": "İslam tarihi",
+    "difficulty": 2,
+    "question": "Emevî Devleti'nin ilk halifesi kimdir?",
+    "options": [
+      "Abdülmelik",
+      "Muaviye",
+      "Yezid",
+      "Mervan"
+    ],
+    "correctIndex": 1,
+    "explanation": "Muaviye b. Ebû Süfyan'dır.",
+    "source": "TDV İslam Ansiklopedisi"
+  },
+  {
+    "id": "iq_914",
+    "category": "İslam tarihi",
+    "difficulty": 2,
+    "question": "Abbasî Devleti'nin ilk halifesi kimdir?",
+    "options": [
+      "Harun Reşid",
+      "Seffah",
+      "Mansur",
+      "Me'mun"
+    ],
+    "correctIndex": 1,
+    "explanation": "Ebü'l-Abbas es-Seffah'tır.",
+    "source": "TDV İslam Ansiklopedisi"
+  },
+  {
+    "id": "iq_915",
+    "category": "İslam tarihi",
+    "difficulty": 3,
+    "question": "Endülüs Emevî Devleti'nin kurucusu kimdir?",
+    "options": [
+      "Musa b. Nusayr",
+      "II. Hakem",
+      "Tarık b. Ziyad",
+      "I. Abdurrahman"
+    ],
+    "correctIndex": 3,
+    "explanation": "I. Abdurrahman (Dâhil) kurmuştur.",
+    "source": "TDV İslam Ansiklopedisi"
+  },
+  {
+    "id": "iq_916",
+    "category": "İslam tarihi",
+    "difficulty": 2,
+    "question": "İstanbul'un fethi miladi hangi yıldır?",
+    "options": [
+      "1453",
+      "1299",
+      "1071",
+      "1517"
+    ],
+    "correctIndex": 0,
+    "explanation": "Feth 1453'tedir.",
+    "source": "TDV İslam Ansiklopedisi"
+  },
+  {
+    "id": "iq_917",
+    "category": "İslam tarihi",
+    "difficulty": 2,
+    "question": "Malazgirt Zaferi miladi hangi yıldır?",
+    "options": [
+      "1071",
+      "1299",
+      "1453",
+      "1517"
+    ],
+    "correctIndex": 0,
+    "explanation": "Malazgirt 1071'dedir.",
+    "source": "TDV İslam Ansiklopedisi"
+  },
+  {
+    "id": "iq_918",
+    "category": "Peygamberler tarihi",
+    "difficulty": 1,
+    "question": "İlk insan ve ilk peygamber kimdir?",
+    "options": [
+      "Âdem",
+      "Mûsâ",
+      "İbrâhîm",
+      "Nûh"
+    ],
+    "correctIndex": 0,
+    "explanation": "Hz. Âdem ilk insan ve peygamberdir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_919",
+    "category": "Peygamberler tarihi",
+    "difficulty": 1,
+    "question": "Tufan peygamberi kimdir?",
+    "options": [
+      "Sâlih",
+      "Lût",
+      "Hûd",
+      "Nûh"
+    ],
+    "correctIndex": 3,
+    "explanation": "Tufan Hz. Nûh ile anılır.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_920",
+    "category": "Peygamberler tarihi",
+    "difficulty": 1,
+    "question": "Kâbe'yi oğluyla birlikte yükselten peygamber kimdir?",
+    "options": [
+      "İbrâhîm",
+      "Dâvûd",
+      "Mûsâ",
+      "Nûh"
+    ],
+    "correctIndex": 0,
+    "explanation": "Hz. İbrâhîm ve İsmâil Kâbe'yi yükseltmiştir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_921",
+    "category": "Peygamberler tarihi",
+    "difficulty": 1,
+    "question": "Asâsıyla denizi yaran peygamber kimdir?",
+    "options": [
+      "Hârûn",
+      "Yûnus",
+      "Mûsâ",
+      "Yûsuf"
+    ],
+    "correctIndex": 2,
+    "explanation": "Hz. Mûsâ'dır.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_922",
+    "category": "Peygamberler tarihi",
+    "difficulty": 1,
+    "question": "Balık tarafından yutulan peygamber kimdir?",
+    "options": [
+      "Eyyûb",
+      "Şuayb",
+      "İlyas",
+      "Yûnus"
+    ],
+    "correctIndex": 3,
+    "explanation": "Hz. Yûnus'tur.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_923",
+    "category": "Peygamberler tarihi",
+    "difficulty": 1,
+    "question": "Kuyuya atılan peygamber kimdir?",
+    "options": [
+      "Yûsuf",
+      "Yahyâ",
+      "Yûnus",
+      "Zekeriyâ"
+    ],
+    "correctIndex": 0,
+    "explanation": "Hz. Yûsuf kuyuya atılmıştır.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_924",
+    "category": "Peygamberler tarihi",
+    "difficulty": 1,
+    "question": "Sabır timsali olarak anılan peygamber kimdir?",
+    "options": [
+      "Yûnus",
+      "Sâlih",
+      "Eyyûb",
+      "Hûd"
+    ],
+    "correctIndex": 2,
+    "explanation": "Hz. Eyyûb sabrıyla anılır.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_925",
+    "category": "Peygamberler tarihi",
+    "difficulty": 2,
+    "question": "Âd kavminin peygamberi kimdir?",
+    "options": [
+      "Sâlih",
+      "Lût",
+      "Hûd",
+      "Şuayb"
+    ],
+    "correctIndex": 2,
+    "explanation": "Âd kavmine Hz. Hûd gönderilmiştir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_926",
+    "category": "Peygamberler tarihi",
+    "difficulty": 2,
+    "question": "Semûd kavminin peygamberi kimdir?",
+    "options": [
+      "Şuayb",
+      "Lût",
+      "Hûd",
+      "Sâlih"
+    ],
+    "correctIndex": 3,
+    "explanation": "Semûd kavmine Hz. Sâlih gönderilmiştir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_927",
+    "category": "Peygamberler tarihi",
+    "difficulty": 2,
+    "question": "Medyen halkının peygamberi kimdir?",
+    "options": [
+      "Sâlih",
+      "Lût",
+      "Hûd",
+      "Şuayb"
+    ],
+    "correctIndex": 3,
+    "explanation": "Medyen'e Hz. Şuayb gönderilmiştir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_928",
+    "category": "Peygamberler tarihi",
+    "difficulty": 1,
+    "question": "İncil hangi peygambere verilmiştir?",
+    "options": [
+      "Îsâ",
+      "Dâvûd",
+      "Mûsâ",
+      "Yahyâ"
+    ],
+    "correctIndex": 0,
+    "explanation": "İncil Hz. Îsâ'ya verilmiştir.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_929",
+    "category": "Peygamberler tarihi",
+    "difficulty": 2,
+    "question": "Süleyman peygamberin babası kimdir?",
+    "options": [
+      "Yakub",
+      "Hârûn",
+      "İshak",
+      "Dâvûd"
+    ],
+    "correctIndex": 3,
+    "explanation": "Hz. Süleyman, Hz. Dâvûd'un oğludur.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_930",
+    "category": "Peygamberler tarihi",
+    "difficulty": 2,
+    "question": "Yûsuf peygamberin babası kimdir?",
+    "options": [
+      "İbrâhîm",
+      "İsmâil",
+      "Ya'kûb",
+      "İshak"
+    ],
+    "correctIndex": 2,
+    "explanation": "Hz. Yûsuf, Hz. Ya'kûb'un oğludur.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_931",
+    "category": "Dini kavramlar",
+    "difficulty": 1,
+    "question": "Meleklerin görevi nedir?",
+    "options": [
+      "Kendi iradeleriyle günah işlemek",
+      "Rızkı kendileri yaratmak",
+      "İnsanlara şefaat satmak",
+      "Allah'ın emirlerini yerine getirmek"
+    ],
+    "correctIndex": 3,
+    "explanation": "Melekler Allah'ın emrine âmâdedir.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_932",
+    "category": "Dini kavramlar",
+    "difficulty": 1,
+    "question": "Vahiy getiren melek kimdir?",
+    "options": [
+      "Mikâil",
+      "Azrâil",
+      "İsrâfil",
+      "Cebrâil"
+    ],
+    "correctIndex": 3,
+    "explanation": "Vahiy Cebrâil ile gelmiştir.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_933",
+    "category": "Dini kavramlar",
+    "difficulty": 1,
+    "question": "Rızıkla ilişkilendirilen melek kimdir?",
+    "options": [
+      "Mikâil",
+      "Cebrâil",
+      "İsrâfil",
+      "Azrâil"
+    ],
+    "correctIndex": 0,
+    "explanation": "Mikâil rızık ve yağmurla anılır.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_934",
+    "category": "Dini kavramlar",
+    "difficulty": 1,
+    "question": "Sûr'u üfleyecek melek kimdir?",
+    "options": [
+      "Cebrâil",
+      "Azrâil",
+      "Mikâil",
+      "İsrâfil"
+    ],
+    "correctIndex": 3,
+    "explanation": "Sûr İsrâfil'e aittir.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_935",
+    "category": "Dini kavramlar",
+    "difficulty": 1,
+    "question": "Ölüm meleği olarak anılan kimdir?",
+    "options": [
+      "Azrâil",
+      "Cebrâil",
+      "Mikâil",
+      "İsrâfil"
+    ],
+    "correctIndex": 0,
+    "explanation": "Azrâil ölüm meleği olarak anılır.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_936",
+    "category": "Dini kavramlar",
+    "difficulty": 1,
+    "question": "Şeytanın diğer adı nedir?",
+    "options": [
+      "Hârût",
+      "İblis",
+      "Kırâmen kâtibîn",
+      "Mârût"
+    ],
+    "correctIndex": 1,
+    "explanation": "İblis, şeytanın adıdır.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_937",
+    "category": "Dini kavramlar",
+    "difficulty": 2,
+    "question": "Kırâmen kâtibîn melekleri neyi yazar?",
+    "options": [
+      "Rızkı",
+      "Eceli",
+      "Yağmuru",
+      "Amelleri"
+    ],
+    "correctIndex": 3,
+    "explanation": "Sağ ve sol melekler amelleri yazar.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_938",
+    "category": "Dini kavramlar",
+    "difficulty": 1,
+    "question": "Ahiret gününe iman imanın şartlarından midir?",
+    "options": [
+      "Yalnızca sünnettir",
+      "Yalnızca âlimlere vaciptir",
+      "Hayır",
+      "Evet"
+    ],
+    "correctIndex": 3,
+    "explanation": "Ahirete iman imanın şartlarındandır.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_939",
+    "category": "Dini kavramlar",
+    "difficulty": 1,
+    "question": "Kadere iman imanın şartlarından midir?",
+    "options": [
+      "Yalnızca Mutezile'ye göredir",
+      "Kur'an'da yoktur",
+      "Hayır",
+      "Evet"
+    ],
+    "correctIndex": 3,
+    "explanation": "Kadere iman imanın altı şartındandır.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_940",
+    "category": "Dini kavramlar",
+    "difficulty": 2,
+    "question": "Farż ne demektir?",
+    "options": [
+      "Yapılması kesin emredilen",
+      "Yapılması yasak olan",
+      "Serbest bırakılan",
+      "Sadece tavsiye edilen"
+    ],
+    "correctIndex": 0,
+    "explanation": "Farz, kesin emirdir.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_941",
+    "category": "Dini kavramlar",
+    "difficulty": 2,
+    "question": "Cihad kelimesinin kök anlamı nedir?",
+    "options": [
+      "Çaba göstermek",
+      "Ticaret yapmak",
+      "Yalnızca savaşmak",
+      "Göç etmek"
+    ],
+    "correctIndex": 0,
+    "explanation": "Cihad, çaba ve gayrettir.",
+    "source": "TDV İslam Ansiklopedisi"
+  },
+  {
+    "id": "iq_942",
+    "category": "Dini kavramlar",
+    "difficulty": 1,
+    "question": "Selamın anlamı nedir?",
+    "options": [
+      "Savaş ilan etmek",
+      "Vedalaşmak",
+      "Esenlik dilemek",
+      "Borç istemek"
+    ],
+    "correctIndex": 2,
+    "explanation": "Selam esenliktir.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_943",
+    "category": "Dini kavramlar",
+    "difficulty": 1,
+    "question": "Âmin ne demektir?",
+    "options": [
+      "Bitir",
+      "Sus",
+      "Başla",
+      "Kabul eyle"
+    ],
+    "correctIndex": 3,
+    "explanation": "Âmin, 'kabul eyle' anlamındadır.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_944",
+    "category": "Dini kavramlar",
+    "difficulty": 2,
+    "question": "Tevbe ne demektir?",
+    "options": [
+      "Hacca gitmek",
+      "Oruç tutmak",
+      "Günahı bırakıp Allah'a dönmek",
+      "Sadaka vermek"
+    ],
+    "correctIndex": 2,
+    "explanation": "Tevbe, dönüş ve pişmanlıktır.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_945",
+    "category": "Dini kavramlar",
+    "difficulty": 1,
+    "question": "Sabrın zıddı hangisidir?",
+    "options": [
+      "Zikir",
+      "Sabırsızlık / sızlanma",
+      "Şükür",
+      "Tevbe"
+    ],
+    "correctIndex": 1,
+    "explanation": "Sabır, sızlanmamaktır.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_946",
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 2,
+    "question": "Hicrî yılın ilk ayı hangisidir?",
+    "options": [
+      "Ramazan",
+      "Zilhicce",
+      "Şevval",
+      "Muharrem"
+    ],
+    "correctIndex": 3,
+    "explanation": "Muharrem ilk aydır.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_947",
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 1,
+    "question": "Kurban Bayramı hangi aydadır?",
+    "options": [
+      "Ramazan",
+      "Muharrem",
+      "Şevval",
+      "Zilhicce"
+    ],
+    "correctIndex": 3,
+    "explanation": "Kurban Zilhicce'dedir.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_948",
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 1,
+    "question": "Ramazan Bayramı hangi ayın başındadır?",
+    "options": [
+      "Recep",
+      "Şaban",
+      "Şevval",
+      "Zilhicce"
+    ],
+    "correctIndex": 2,
+    "explanation": "Ramazan Bayramı Şevval'in biridir.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_949",
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 2,
+    "question": "Kandil gecelerinden biri hangisidir?",
+    "options": [
+      "Mevlid",
+      "Hendek",
+      "Bedir",
+      "Fetih"
+    ],
+    "correctIndex": 0,
+    "explanation": "Mevlid kandillerdendir.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_950",
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 2,
+    "question": "Regaib kandili hangi aydadır?",
+    "options": [
+      "Şaban",
+      "Muharrem",
+      "Recep",
+      "Ramazan"
+    ],
+    "correctIndex": 2,
+    "explanation": "Regaib Recep'tedir.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_951",
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 2,
+    "question": "Berat kandili hangi aydadır?",
+    "options": [
+      "Ramazan",
+      "Muharrem",
+      "Şaban",
+      "Recep"
+    ],
+    "correctIndex": 2,
+    "explanation": "Berat Şaban'dadır.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_952",
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 2,
+    "question": "Miraç kandili hangi aydadır?",
+    "options": [
+      "Ramazan",
+      "Zilhicce",
+      "Recep",
+      "Şaban"
+    ],
+    "correctIndex": 2,
+    "explanation": "Miraç Recep'tedir.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_953",
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 1,
+    "question": "Kadir Gecesi hangi aydadır?",
+    "options": [
+      "Ramazan",
+      "Recep",
+      "Şaban",
+      "Muharrem"
+    ],
+    "correctIndex": 0,
+    "explanation": "Kadir Gecesi Ramazan'dadır.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_954",
+    "category": "Kur'an bilgisi",
+    "difficulty": 1,
+    "question": "Kadir Gecesi hangi surede anlatılır?",
+    "options": [
+      "Alak",
+      "İhlâs",
+      "Kadr",
+      "Kevser"
+    ],
+    "correctIndex": 2,
+    "explanation": "Kadr suresi Kadir Gecesi'ni anlatır.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_955",
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "Kadir Gecesi bin aydan hayırlıdır ifadesi hangi surededir?",
+    "options": [
+      "Kadr",
+      "Duhâ",
+      "İnşirâh",
+      "Kadr değil Alak"
+    ],
+    "correctIndex": 0,
+    "explanation": "Kadr, 3. ayet.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_956",
+    "category": "Kur'an bilgisi",
+    "difficulty": 1,
+    "question": "Namazda okunan açılış suresi hangisidir?",
+    "options": [
+      "Fatiha",
+      "Nas",
+      "Kevser",
+      "İhlâs"
+    ],
+    "correctIndex": 0,
+    "explanation": "Her rekâtta Fatiha okunur.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_957",
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 2,
+    "question": "Namazda Fatiha'dan sonra kısa sure okumak Hanefi'de nedir?",
+    "options": [
+      "Farz",
+      "Mekruh tahrimen değil farz",
+      "Haram",
+      "Vacip"
+    ],
+    "correctIndex": 3,
+    "explanation": "Hanefi'de zamm-ı sure vaciptir.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_958",
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 1,
+    "question": "Ezandan sonra okunan dua kime salât içerir?",
+    "options": [
+      "Peygamber Efendimiz",
+      "Yalnızca sahabeye",
+      "Yalnızca meleklere",
+      "Yalnızca halifelere"
+    ],
+    "correctIndex": 0,
+    "explanation": "Ezân duasında peygambere salât vardır.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_959",
+    "category": "Siyer",
+    "difficulty": 2,
+    "question": "Mescid-i Nebevî hangi şehirdedir?",
+    "options": [
+      "Medine",
+      "Taif",
+      "Kudüs",
+      "Mekke"
+    ],
+    "correctIndex": 0,
+    "explanation": "Mescid-i Nebevî Medine'dedir.",
+    "source": "Diyanet Siyer-i Nebi / İslam Tarihi"
+  },
+  {
+    "id": "iq_960",
+    "category": "Siyer",
+    "difficulty": 1,
+    "question": "Mescid-i Haram hangi şehirdedir?",
+    "options": [
+      "Medine",
+      "Taif",
+      "Kudüs",
+      "Mekke"
+    ],
+    "correctIndex": 3,
+    "explanation": "Mescid-i Haram Mekke'dedir.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_961",
+    "category": "Siyer",
+    "difficulty": 1,
+    "question": "Mescid-i Aksâ hangi şehirdedir?",
+    "options": [
+      "Kudüs",
+      "Medine",
+      "Mekke",
+      "Şam"
+    ],
+    "correctIndex": 0,
+    "explanation": "Mescid-i Aksâ Kudüs'tedir.",
+    "source": "TDV İslam Ansiklopedisi"
+  },
+  {
+    "id": "iq_962",
+    "category": "Siyer",
+    "difficulty": 2,
+    "question": "Sevr mağarası hicrette kiminle paylaşılmıştır?",
+    "options": [
+      "Ebû Bekir",
+      "Ali",
+      "Osman",
+      "Ömer"
+    ],
+    "correctIndex": 0,
+    "explanation": "Sevr'de Hz. Ebû Bekir vardı.",
+    "source": "Diyanet Siyer-i Nebi / İslam Tarihi"
+  },
+  {
+    "id": "iq_963",
+    "category": "Siyer",
+    "difficulty": 2,
+    "question": "Medine'nin eski adı nedir?",
+    "options": [
+      "Yesrib",
+      "Fadak",
+      "Hayber",
+      "Tebük"
+    ],
+    "correctIndex": 0,
+    "explanation": "Medine, Yesrib idi.",
+    "source": "Diyanet Siyer-i Nebi / İslam Tarihi"
+  },
+  {
+    "id": "iq_964",
+    "category": "Siyer",
+    "difficulty": 2,
+    "question": "Hayber gazvesi kime karşıdır?",
+    "options": [
+      "Hayber Yahudileri",
+      "Rumlar",
+      "Sâsânîler",
+      "Mekkeli müşrikler"
+    ],
+    "correctIndex": 0,
+    "explanation": "Hayber, Hayber Yahudilerine karşıdır.",
+    "source": "Diyanet Siyer-i Nebi / İslam Tarihi"
+  },
+  {
+    "id": "iq_965",
+    "category": "Siyer",
+    "difficulty": 3,
+    "question": "Tebük Seferi hicrî kaçıncı yıldadır?",
+    "options": [
+      "9",
+      "8",
+      "10",
+      "6"
+    ],
+    "correctIndex": 0,
+    "explanation": "Tebük hicrî 9. yıldadır.",
+    "source": "Diyanet Siyer-i Nebi / İslam Tarihi"
+  },
+  {
+    "id": "iq_966",
+    "category": "Siyer",
+    "difficulty": 2,
+    "question": "Ashâb-ı Suffe nerede kalırdı?",
+    "options": [
+      "Kâbe'de",
+      "Hira'da",
+      "Uhud'da",
+      "Mescid-i Nebevî'nin suffesinde"
+    ],
+    "correctIndex": 3,
+    "explanation": "Suffe, Mescid-i Nebevî'dedir.",
+    "source": "Diyanet Siyer-i Nebi / İslam Tarihi"
+  },
+  {
+    "id": "iq_967",
+    "category": "Siyer",
+    "difficulty": 1,
+    "question": "Peygamber Efendimiz'in kızı Fatıma'nın eşi kimdir?",
+    "options": [
+      "Zübeyr",
+      "Sa'd",
+      "Talha",
+      "Ali"
+    ],
+    "correctIndex": 3,
+    "explanation": "Hz. Fatıma, Hz. Ali ile evlidir.",
+    "source": "Diyanet Siyer-i Nebi / İslam Tarihi"
+  },
+  {
+    "id": "iq_968",
+    "category": "Siyer",
+    "difficulty": 1,
+    "question": "Hasan ve Hüseyin'in babası kimdir?",
+    "options": [
+      "Ali",
+      "Ömer",
+      "Osman",
+      "Ebû Bekir"
+    ],
+    "correctIndex": 0,
+    "explanation": "Babaları Hz. Ali'dir.",
+    "source": "Diyanet Siyer-i Nebi / İslam Tarihi"
+  },
+  {
+    "id": "iq_969",
+    "category": "Siyer",
+    "difficulty": 2,
+    "question": "Aşere-i mübeşşere kaç kişidir?",
+    "options": [
+      "12",
+      "40",
+      "7",
+      "10"
+    ],
+    "correctIndex": 3,
+    "explanation": "On kişi cennetle müjdelenmiştir.",
+    "source": "TDV İslam Ansiklopedisi"
+  },
+  {
+    "id": "iq_970",
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "Elif-Lâm-Mîm ile başlayan surelerden biri hangisidir?",
+    "options": [
+      "Bakara",
+      "Nas",
+      "Kevser",
+      "İhlâs"
+    ],
+    "correctIndex": 0,
+    "explanation": "Bakara Elif-Lâm-Mîm ile başlar.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_971",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Hurûf-ı mukattaa nedir?",
+    "options": [
+      "Bazı sure başlarındaki kesik harfler",
+      "Kıraat farkları",
+      "Vakıf işaretleri",
+      "Neshedilmiş ayetler"
+    ],
+    "correctIndex": 0,
+    "explanation": "Mukattaa, sure başı harfleridir.",
+    "source": "TDV İslam Ansiklopedisi"
+  },
+  {
+    "id": "iq_972",
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "Kur'an'ın indirilişi kaç yılda tamamlanmıştır?",
+    "options": [
+      "23",
+      "10",
+      "40",
+      "13"
+    ],
+    "correctIndex": 0,
+    "explanation": "Vahiy yaklaşık 23 yıldır.",
+    "source": "Diyanet Siyer-i Nebi / İslam Tarihi"
+  },
+  {
+    "id": "iq_973",
+    "category": "Kur'an bilgisi",
+    "difficulty": 1,
+    "question": "Amenerrasulü hangi surenin sonundadır?",
+    "options": [
+      "Mâide",
+      "Bakara",
+      "Âl-i İmrân",
+      "Nisâ"
+    ],
+    "correctIndex": 1,
+    "explanation": "Amenerrasulü Bakara'nın sonudur.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_974",
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Âyetü'l-kürsî Bakara suresinin kaçıncı ayetidir?",
+    "options": [
+      "1",
+      "114",
+      "286",
+      "255"
+    ],
+    "correctIndex": 3,
+    "explanation": "Bakara 255'tir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_975",
+    "category": "Dini kavramlar",
+    "difficulty": 2,
+    "question": "Tecvid nedir?",
+    "options": [
+      "Kur'an'ı usulüne göre okuma ilmi",
+      "Hadis tenkidi",
+      "Fıkıh usulü",
+      "Siyer yazımı"
+    ],
+    "correctIndex": 0,
+    "explanation": "Tecvid, kıraat usulüdür.",
+    "source": "TDV İslam Ansiklopedisi"
+  },
+  {
+    "id": "iq_976",
+    "category": "Dini kavramlar",
+    "difficulty": 2,
+    "question": "Tefsir nedir?",
+    "options": [
+      "Kur'an'ı açıklama ilmi",
+      "Fıkıh ferâizi",
+      "Kelam polemiği",
+      "Hadis ezberleme"
+    ],
+    "correctIndex": 0,
+    "explanation": "Tefsir, açıklamadır.",
+    "source": "TDV İslam Ansiklopedisi"
+  },
+  {
+    "id": "iq_977",
+    "category": "Dini kavramlar",
+    "difficulty": 2,
+    "question": "Hadis nedir?",
+    "options": [
+      "Peygamber sözü, fiili ve takriri",
+      "Yalnızca rüya",
+      "Yalnızca Kur'an ayeti",
+      "Yalnızca sahabe sözü"
+    ],
+    "correctIndex": 0,
+    "explanation": "Hadis, sünnetin rivayetidir.",
+    "source": "TDV İslam Ansiklopedisi"
+  },
+  {
+    "id": "iq_978",
+    "category": "Dini kavramlar",
+    "difficulty": 3,
+    "question": "Mütevâtir haber nedir?",
+    "options": [
+      "Tek kişinin nakli",
+      "Uydurma haber",
+      "Yalan üzere birleşmesi mümkün olmayan kalabalıkça nakledilen",
+      "Zayıf rivayet"
+    ],
+    "correctIndex": 2,
+    "explanation": "Mütevâtir, kesin bilgi ifade eder.",
+    "source": "TDV İslam Ansiklopedisi"
+  },
+  {
+    "id": "iq_979",
+    "category": "Dini kavramlar",
+    "difficulty": 2,
+    "question": "Sıhhat açısından en sağlam hadis türü hangisidir?",
+    "options": [
+      "Mevzu",
+      "Zayıf",
+      "Sahih",
+      "Mürsel her zaman"
+    ],
+    "correctIndex": 2,
+    "explanation": "Sahih hadis makbuldür.",
+    "source": "TDV İslam Ansiklopedisi"
+  },
+  {
+    "id": "iq_980",
+    "category": "Dini kavramlar",
+    "difficulty": 3,
+    "question": "Mevzu hadis ne demektir?",
+    "options": [
+      "Sahih hadis",
+      "Mütevâtir hadis",
+      "Uydurma hadis",
+      "Hasen hadis"
+    ],
+    "correctIndex": 2,
+    "explanation": "Mevzu, uydurmadır.",
+    "source": "TDV İslam Ansiklopedisi"
+  },
+  {
+    "id": "iq_981",
+    "category": "İslam tarihi",
+    "difficulty": 2,
+    "question": "Dört büyük mezhep imamından biri hangisidir?",
+    "options": [
+      "İbn Sina",
+      "Kindî",
+      "Ebû Hanîfe",
+      "Farabi"
+    ],
+    "correctIndex": 2,
+    "explanation": "Ebû Hanîfe fıkıh imamıdır.",
+    "source": "TDV İslam Ansiklopedisi"
+  },
+  {
+    "id": "iq_982",
+    "category": "İslam tarihi",
+    "difficulty": 2,
+    "question": "Mâlikî mezhebinin imamı kimdir?",
+    "options": [
+      "Evzâî",
+      "Mâlik b. Enes",
+      "Şâfiî",
+      "Ahmed b. Hanbel"
+    ],
+    "correctIndex": 1,
+    "explanation": "İmam Mâlik'tir.",
+    "source": "TDV İslam Ansiklopedisi"
+  },
+  {
+    "id": "iq_983",
+    "category": "İslam tarihi",
+    "difficulty": 2,
+    "question": "Şâfiî mezhebinin imamı kimdir?",
+    "options": [
+      "Muhammed b. İdris eş-Şâfiî",
+      "Ahmed b. Hanbel",
+      "Ebû Hanîfe",
+      "Mâlik"
+    ],
+    "correctIndex": 0,
+    "explanation": "İmam Şâfiî'dir.",
+    "source": "TDV İslam Ansiklopedisi"
+  },
+  {
+    "id": "iq_984",
+    "category": "İslam tarihi",
+    "difficulty": 2,
+    "question": "Hanbelî mezhebinin imamı kimdir?",
+    "options": [
+      "Mâlik",
+      "Ebû Yûsuf",
+      "Şâfiî",
+      "Ahmed b. Hanbel"
+    ],
+    "correctIndex": 3,
+    "explanation": "İmam Ahmed'dir.",
+    "source": "TDV İslam Ansiklopedisi"
+  },
+  {
+    "id": "iq_985",
+    "category": "İslam tarihi",
+    "difficulty": 3,
+    "question": "Buhârî'nin hadis kitabının adı nedir?",
+    "options": [
+      "el-Müsned",
+      "el-Muvatta",
+      "el-Câmiu's-sahîh",
+      "Sünen-i Ebû Dâvûd"
+    ],
+    "correctIndex": 2,
+    "explanation": "Sahîh-i Buhârî diye anılır.",
+    "source": "TDV İslam Ansiklopedisi"
+  },
+  {
+    "id": "iq_986",
+    "category": "İslam tarihi",
+    "difficulty": 3,
+    "question": "Kütüb-i Sitte kaç kitaptır?",
+    "options": [
+      "4",
+      "5",
+      "9",
+      "6"
+    ],
+    "correctIndex": 3,
+    "explanation": "Altı temel hadis kitabıdır.",
+    "source": "TDV İslam Ansiklopedisi"
+  },
+  {
+    "id": "iq_987",
+    "category": "Peygamberler tarihi",
+    "difficulty": 2,
+    "question": "Kur'an'da adı geçen peygamber sayısı geleneksel tespite göre kaçtır?",
+    "options": [
+      "25",
+      "124000",
+      "40",
+      "12"
+    ],
+    "correctIndex": 0,
+    "explanation": "Kur'an'da 25 peygamber adı geçer.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_988",
+    "category": "Peygamberler tarihi",
+    "difficulty": 3,
+    "question": "Ulü'l-azm peygamberler kaçtır?",
+    "options": [
+      "5",
+      "7",
+      "10",
+      "3"
+    ],
+    "correctIndex": 0,
+    "explanation": "Nûh, İbrâhîm, Mûsâ, Îsâ, Muhammed.",
+    "source": "TDV İslam Ansiklopedisi"
+  },
+  {
+    "id": "iq_989",
+    "category": "Peygamberler tarihi",
+    "difficulty": 2,
+    "question": "Ulü'l-azm peygamberlerden biri hangisidir?",
+    "options": [
+      "Yûsuf",
+      "Hârûn",
+      "Yûnus",
+      "Nûh"
+    ],
+    "correctIndex": 3,
+    "explanation": "Nûh ulü'l-azmdandır.",
+    "source": "TDV İslam Ansiklopedisi"
+  },
+  {
+    "id": "iq_990",
+    "category": "Dini kavramlar",
+    "difficulty": 1,
+    "question": "Besmele hangi ifadeyle başlar?",
+    "options": [
+      "Bismillahirrahmanirrahim",
+      "Allahu ekber",
+      "Lâ ilâhe illallah",
+      "Elhamdülillah"
+    ],
+    "correctIndex": 0,
+    "explanation": "Besmele Rahman ve Rahim adıyla başlar.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_991",
+    "category": "Dini kavramlar",
+    "difficulty": 1,
+    "question": "Allahu ekber ne demektir?",
+    "options": [
+      "Allah rızık verendir",
+      "Allah en büyüktür",
+      "Allah birdir",
+      "Allah affedicidir"
+    ],
+    "correctIndex": 1,
+    "explanation": "Tekbir, Allahu ekber'dir.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_992",
+    "category": "Dini kavramlar",
+    "difficulty": 1,
+    "question": "Elhamdülillah ne demektir?",
+    "options": [
+      "Hamd Allah'adır",
+      "Bağışla yâ Rabbi",
+      "İşittik itaat ettik",
+      "Allah en büyüktür"
+    ],
+    "correctIndex": 0,
+    "explanation": "Hamd Allah'adır.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_993",
+    "category": "Dini kavramlar",
+    "difficulty": 1,
+    "question": "Sübhânallah ne demektir?",
+    "options": [
+      "Hamd Allah'adır",
+      "Allah birdir",
+      "Allah'ı noksanlıklardan tenzih ederim",
+      "Allah en büyüktür"
+    ],
+    "correctIndex": 2,
+    "explanation": "Tesbih tenzihtir.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_994",
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 2,
+    "question": "Tesbih namazı nafile midir?",
+    "options": [
+      "Farz-ı kifaye",
+      "Farz-ı ayn",
+      "Evet",
+      "Vacip"
+    ],
+    "correctIndex": 2,
+    "explanation": "Tesbih namazı nafiledir.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_995",
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 1,
+    "question": "Teravih hangi ayda kılınır?",
+    "options": [
+      "Ramazan",
+      "Recep",
+      "Şaban",
+      "Muharrem"
+    ],
+    "correctIndex": 0,
+    "explanation": "Teravih Ramazan'dadır.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_996",
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 2,
+    "question": "Teravih namazı hükmü nedir?",
+    "options": [
+      "Sünnet-i müekkede",
+      "Farz",
+      "Vacip",
+      "Haram"
+    ],
+    "correctIndex": 0,
+    "explanation": "Teravih müekked sünnettir.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_997",
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "Fatiha'dan sonra en çok okunan kısa surelerden biri hangisidir?",
+    "options": [
+      "Bakara",
+      "A'râf",
+      "Nisâ",
+      "İhlâs"
+    ],
+    "correctIndex": 3,
+    "explanation": "İhlâs kısa tevhid suresidir.",
+    "source": "Diyanet Temel Dini Bilgiler"
+  },
+  {
+    "id": "iq_998",
+    "category": "Kur'an bilgisi",
+    "difficulty": 1,
+    "question": "Felak ve Nâs sureleri birlikte nasıl anılır?",
+    "options": [
+      "Mufassal",
+      "Muavvizeteyn",
+      "Seb'u'l-mesânî",
+      "Tıvâl"
+    ],
+    "correctIndex": 1,
+    "explanation": "Felak ve Nâs, Muavvizeteyn'dir.",
+    "source": "TDV İslam Ansiklopedisi"
+  },
+  {
+    "id": "iq_999",
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "Kâfirûn suresinin temel konusu nedir?",
+    "options": [
+      "Namaz vakitleri",
+      "Hac menâsiki",
+      "Küfürden berâet / tevhid netliği",
+      "Zekât nisabı"
+    ],
+    "correctIndex": 2,
+    "explanation": "Kâfirûn, inanç ayrılığını bildirir.",
+    "source": "Diyanet Mushaf (Hafs)"
+  },
+  {
+    "id": "iq_1000",
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 1,
+    "question": "Niyet ibadetin geçerliliği için gerekli midir?",
+    "options": [
+      "Yalnızca zekâtta",
+      "Evet",
+      "Hayır",
+      "Yalnızca hacda"
+    ],
+    "correctIndex": 1,
+    "explanation": "Niyet ibadetin temelidir.",
+    "source": "Diyanet Temel Dini Bilgiler"
   }
 ]

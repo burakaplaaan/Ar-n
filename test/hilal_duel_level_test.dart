@@ -30,6 +30,14 @@ void main() {
       expect(mid.progress, lessThan(1));
       expect(levelForHilals(40).progress, 0);
     });
+
+    test('hilalsFloorForLevel seviye tabanını verir', () {
+      expect(hilalsFloorForLevel(1), 0);
+      expect(hilalsFloorForLevel(2), 40);
+      expect(hilalsFloorForLevel(3), 95);
+      expect(levelForHilals(hilalsFloorForLevel(5)).level, 5);
+      expect(levelForHilals(hilalsFloorForLevel(10)).level, 10);
+    });
   });
 
   group('hilalAward', () {
@@ -55,6 +63,23 @@ void main() {
       expect(profile.name, 'Ayşe');
       expect(profile.level, 2);
       expect(profile.levelProgress, 0);
+    });
+
+    test('soru zorluğunu parse eder', () {
+      final easy = HilalDuelQuestion.fromMap({
+        'id': 'iq_001',
+        'category': 'Kur\'an bilgisi',
+        'question': 'Kur\'an kaç suredir?',
+        'options': ['114', '120', '99', '110'],
+        'difficulty': 1,
+      });
+      expect(easy.difficulty, 1);
+      final fallback = HilalDuelQuestion.fromMap({
+        'id': 'iq_002',
+        'question': 'Test sorusu burada',
+        'options': ['a', 'b', 'c', 'd'],
+      });
+      expect(fallback.difficulty, 2);
     });
 
     test('maç sonucunu parse eder', () {
@@ -98,6 +123,56 @@ void main() {
       expect(match.opponent.isBot, isTrue);
       expect(match.result?.winnerId, 'a');
       expect(match.result?.players.first.hilalsAwarded, 15);
+    });
+  });
+
+  group('HilalDuelChallengeSummary inbox', () {
+    test('bitmiş meydan okuma 48s görünür kalır', () {
+      final completed = HilalDuelChallengeSummary.fromMap({
+        'id': 'c1',
+        'status': 'completed',
+        'role': 'challenger',
+        'opponentName': 'Ayşe',
+        'opponentLevel': 3,
+        'challengeDeadlineMs': 1,
+        'outcome': 'won',
+      });
+      expect(completed.isOpen, isFalse);
+      expect(completed.isInboxVisible, isTrue);
+      expect(completed.outcome, 'won');
+    });
+
+    test('süresi dolmuş açık davet inbox’tan düşer', () {
+      final expiredOpen = HilalDuelChallengeSummary.fromMap({
+        'id': 'c2',
+        'status': 'awaiting_opponent',
+        'role': 'challenged',
+        'opponentName': 'Ali',
+        'opponentLevel': 2,
+        'challengeDeadlineMs': 1,
+        'canAccept': true,
+      });
+      expect(expiredOpen.isOpen, isFalse);
+      expect(expiredOpen.isInboxVisible, isFalse);
+    });
+  });
+
+  group('HilalDuelWeeklyLastWinner', () {
+    test('grantDays 0 ise ödül metni yok sayılır', () {
+      final skipped = HilalDuelWeeklyLastWinner.fromMap({
+        'rank': 1,
+        'name': 'Ali',
+        'grantDays': 0,
+        'champion': true,
+      });
+      expect(skipped.grantDays, 0);
+      expect(skipped.champion, isTrue);
+      final granted = HilalDuelWeeklyLastWinner.fromMap({
+        'rank': 2,
+        'name': 'Ece',
+        'grantDays': 7,
+      });
+      expect(granted.grantDays, 7);
     });
   });
 }

@@ -1409,6 +1409,15 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String get hilalDuelDifficultyEasy => 'سهل';
+
+  @override
+  String get hilalDuelDifficultyMedium => 'متوسط';
+
+  @override
+  String get hilalDuelDifficultyHard => 'صعب';
+
+  @override
   String get hilalDuelWaitingOpponent => 'المنافس يجيب…';
 
   @override
@@ -1522,6 +1531,22 @@ class AppLocalizationsAr extends AppLocalizations {
       'أفضل 10 في الدوري الأخضر — العب وتقدّم!';
 
   @override
+  String get hilalDuelWeeklyPremiumRewardHint =>
+      '1 ← 14 يوم Premium + شارة البطل\n2 ← 7 أيام Premium\n3 ← 3 أيام Premium';
+
+  @override
+  String get hilalDuelWeeklyLastWinnersTitle => 'فائزو الأسبوع الماضي';
+
+  @override
+  String get hilalDuelWeeklyLastWinnerPrize1 => '14 يوم Premium + شارة البطل';
+
+  @override
+  String get hilalDuelWeeklyLastWinnerPrize2 => '7 أيام Premium';
+
+  @override
+  String get hilalDuelWeeklyLastWinnerPrize3 => '3 أيام Premium';
+
+  @override
   String get hilalDuelWeeklyEmpty =>
       'لم يكتسب أحد أهلة هذا الأسبوع بعد. أنهِ أول مباراة!';
 
@@ -1563,10 +1588,13 @@ class AppLocalizationsAr extends AppLocalizations {
   String get hilalDuelChallengeInboxTitle => 'التحديات';
 
   @override
-  String get hilalDuelChallengeAccept => 'اقبل · حياة واحدة';
+  String get hilalDuelChallengeAccept => 'اقبل · قلب واحد';
 
   @override
   String get hilalDuelChallengeContinue => 'متابعة';
+
+  @override
+  String get hilalDuelChallengeSeeResult => 'عرض النتيجة';
 
   @override
   String get hilalDuelChallengeWaiting => 'بانتظار المنافس';
@@ -1579,14 +1607,14 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get hilalDuelChallengeHint =>
-      'تحدَّ أحداً من القائمة. تستهلك حياة واحدة؛ إذا انتهى الوقت فلن يحصل أحد على نقاط. البوتات ترد تلقائياً بعد نحو 12 ساعة بنتيجة ضعيفة.';
+      'تحدَّ أحداً من القائمة. تستهلك قلباً واحداً؛ إذا انتهى الوقت فلن يحصل أحد على نقاط.';
 
   @override
   String get hilalDuelChallengePickTitle => 'اختر منافساً';
 
   @override
   String get hilalDuelChallengePickHint =>
-      'اختر لاعباً للتحدي. تجيب أولاً. للبشر 24 ساعة؛ البوت يرد تلقائياً بعد نحو 12 ساعة.';
+      'اختر لاعباً للتحدي. تجيب أولاً. لدى المنافس 24 ساعة للرد.';
 
   @override
   String get hilalDuelChallengeSentTitle => 'تم إرسال التحدي';
