@@ -131,6 +131,7 @@ test("levelForHilals keeps early levels attainable", () => {
   assert.equal(t.cosmeticsForLevel(4).avatarFrameTier, 2);
   assert.equal(t.cosmeticsForLevel(5).avatarGlow, false);
   assert.equal(t.cosmeticsForLevel(6).avatarGlow, true);
+  assert.equal(t.cosmeticsForLevel(6).nameAccentFaint, true);
   assert.equal(t.cosmeticsForLevel(6).nameAccentSoft, false);
   assert.equal(t.cosmeticsForLevel(7).nameAccentSoft, true);
   assert.equal(t.cosmeticsForLevel(7).nameAccent, false);

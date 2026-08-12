@@ -55,9 +55,10 @@ void main() {
 
       expect(cosmeticsForLevel(5).title, 'Talebe');
       expect(cosmeticsForLevel(5).avatarGlow, isFalse);
+      expect(cosmeticsForLevel(5).nameAccent, HilalDuelNameAccent.none);
 
       expect(cosmeticsForLevel(6).avatarGlow, isTrue);
-      expect(cosmeticsForLevel(6).nameAccent, HilalDuelNameAccent.none);
+      expect(cosmeticsForLevel(6).nameAccent, HilalDuelNameAccent.faint);
 
       expect(cosmeticsForLevel(7).nameAccent, HilalDuelNameAccent.soft);
       expect(cosmeticsForLevel(7).specialHilalIcon, isFalse);

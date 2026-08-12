@@ -40,7 +40,7 @@ enum HilalDuelRewardKind {
   titleIlimDostu,
 }
 
-enum HilalDuelNameAccent { none, soft, full }
+enum HilalDuelNameAccent { none, faint, soft, full }
 
 class HilalDuelLevelReward {
   const HilalDuelLevelReward({
@@ -79,6 +79,7 @@ class HilalDuelCosmetics {
   bool get avatarFrame => frameTier >= 1;
   bool get nameAccentFull => nameAccent == HilalDuelNameAccent.full;
   bool get nameAccentSoft => nameAccent == HilalDuelNameAccent.soft;
+  bool get nameAccentFaint => nameAccent == HilalDuelNameAccent.faint;
 
   @override
   bool operator ==(Object other) =>
@@ -177,6 +178,8 @@ HilalDuelCosmetics cosmeticsForLevel(int rawLevel, {bool isBot = false}) {
     accent = HilalDuelNameAccent.full;
   } else if (level >= 7) {
     accent = HilalDuelNameAccent.soft;
+  } else if (level >= 6) {
+    accent = HilalDuelNameAccent.faint;
   } else {
     accent = HilalDuelNameAccent.none;
   }

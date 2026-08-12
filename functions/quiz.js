@@ -403,6 +403,7 @@ function emptyCosmetics() {
     avatarGlow: false,
     title: null,
     specialHilalIcon: false,
+    nameAccentFaint: false,
     nameAccentSoft: false,
     nameAccent: false,
   };
@@ -416,6 +417,7 @@ function cosmeticsForLevel(rawLevel) {
     avatarGlow: level >= 6,
     title: level >= 10 ? "İlim Dostu" : level >= 9 ? "Müderris" : level >= 5 ? "Talebe" : null,
     specialHilalIcon: level >= 8,
+    nameAccentFaint: level >= 6,
     nameAccentSoft: level >= 7,
     nameAccent: level >= 10,
   };
@@ -428,6 +430,7 @@ function cosmeticsDocFields(cosmetics) {
     avatarFrameTier: Math.max(0, Math.floor(Number(cosmetics.avatarFrameTier) || 0)),
     avatarGlow: cosmetics.avatarGlow === true,
     specialHilalIcon: cosmetics.specialHilalIcon === true,
+    nameAccentFaint: cosmetics.nameAccentFaint === true,
     nameAccentSoft: cosmetics.nameAccentSoft === true,
     nameAccent: cosmetics.nameAccent === true,
   };

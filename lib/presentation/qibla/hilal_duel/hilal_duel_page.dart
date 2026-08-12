@@ -362,7 +362,13 @@ Color _hilalNameColor({
       return Color.lerp(
         _HilalPalette.ink(onDark),
         bronze,
-        onDark ? 0.46 : 0.58,
+        onDark ? 0.52 : 0.64,
+      )!;
+    case HilalDuelNameAccent.faint:
+      return Color.lerp(
+        _HilalPalette.ink(onDark),
+        bronze,
+        onDark ? 0.30 : 0.36,
       )!;
     case HilalDuelNameAccent.none:
       return _HilalPalette.ink(onDark);
