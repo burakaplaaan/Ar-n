@@ -1514,6 +1514,21 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String hilalDuelNextRewardFrameSilver(int level) {
+    return 'Next reward: Silver frame (LV $level)';
+  }
+
+  @override
+  String hilalDuelNextRewardGlow(int level) {
+    return 'Next reward: Avatar glow (LV $level)';
+  }
+
+  @override
+  String hilalDuelNextRewardNameAccent(int level) {
+    return 'Next reward: Name color (LV $level)';
+  }
+
+  @override
   String get hilalDuelWeeklyTitle => 'Player of the Week';
 
   @override
@@ -1581,6 +1596,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get hilalDuelTitleTalebe => 'Student';
+
+  @override
+  String get hilalDuelTitleMuderris => 'Mudarris';
 
   @override
   String get hilalDuelTitleIlimDostu => 'Friend of Knowledge';

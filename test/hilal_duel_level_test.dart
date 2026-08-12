@@ -21,6 +21,7 @@ void main() {
       expect(levelForHilals(50_000).level, 10);
       expect(nextRewardAfterLevel(4)?.level, 5);
       expect(titleForLevel(5), 'Talebe');
+      expect(titleForLevel(9), 'Müderris');
       expect(titleForLevel(10), 'İlim Dostu');
     });
 
@@ -37,6 +38,56 @@ void main() {
       expect(hilalsFloorForLevel(3), 95);
       expect(levelForHilals(hilalsFloorForLevel(5)).level, 5);
       expect(levelForHilals(hilalsFloorForLevel(10)).level, 10);
+    });
+  });
+
+  group('cosmeticsForLevel', () {
+    test('1–2 hediyesiz, 3–10 merdiveni kilitlenir', () {
+      expect(cosmeticsForLevel(1), HilalDuelCosmetics.none);
+      expect(cosmeticsForLevel(2).frameTier, 0);
+      expect(cosmeticsForLevel(2).title, isNull);
+
+      expect(cosmeticsForLevel(3).frameTier, 1);
+      expect(cosmeticsForLevel(3).avatarGlow, isFalse);
+
+      expect(cosmeticsForLevel(4).frameTier, 2);
+      expect(cosmeticsForLevel(4).title, isNull);
+
+      expect(cosmeticsForLevel(5).title, 'Talebe');
+      expect(cosmeticsForLevel(5).avatarGlow, isFalse);
+
+      expect(cosmeticsForLevel(6).avatarGlow, isTrue);
+      expect(cosmeticsForLevel(6).nameAccent, HilalDuelNameAccent.none);
+
+      expect(cosmeticsForLevel(7).nameAccent, HilalDuelNameAccent.soft);
+      expect(cosmeticsForLevel(7).specialHilalIcon, isFalse);
+
+      expect(cosmeticsForLevel(8).specialHilalIcon, isTrue);
+      expect(cosmeticsForLevel(8).title, 'Talebe');
+
+      expect(cosmeticsForLevel(9).title, 'Müderris');
+      expect(cosmeticsForLevel(9).nameAccent, HilalDuelNameAccent.soft);
+
+      expect(cosmeticsForLevel(10).title, 'İlim Dostu');
+      expect(cosmeticsForLevel(10).nameAccent, HilalDuelNameAccent.full);
+      expect(cosmeticsForLevel(10).frameTier, 2);
+      expect(cosmeticsForLevel(10).avatarGlow, isTrue);
+    });
+
+    test('haftalık bot kozmetik almaz', () {
+      expect(cosmeticsForLevel(10, isBot: true), HilalDuelCosmetics.none);
+    });
+
+    test('sonraki ödül her basamakta bir sonraki hediyeyi gösterir', () {
+      expect(nextRewardAfterLevel(1)?.kind, HilalDuelRewardKind.frame);
+      expect(nextRewardAfterLevel(3)?.kind, HilalDuelRewardKind.frameSilver);
+      expect(nextRewardAfterLevel(4)?.kind, HilalDuelRewardKind.titleTalebe);
+      expect(nextRewardAfterLevel(5)?.kind, HilalDuelRewardKind.avatarGlow);
+      expect(nextRewardAfterLevel(6)?.kind, HilalDuelRewardKind.nameAccentSoft);
+      expect(nextRewardAfterLevel(7)?.kind, HilalDuelRewardKind.specialHilal);
+      expect(nextRewardAfterLevel(8)?.kind, HilalDuelRewardKind.titleMuderris);
+      expect(nextRewardAfterLevel(9)?.kind, HilalDuelRewardKind.titleIlimDostu);
+      expect(nextRewardAfterLevel(10), isNull);
     });
   });
 

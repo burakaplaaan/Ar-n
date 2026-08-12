@@ -326,10 +326,47 @@ String _localizedHilalTitle(AppLocalizations l10n, String? title) {
   if (lower.contains('ilim') || lower.contains('knowledge')) {
     return l10n.hilalDuelTitleIlimDostu;
   }
+  if (lower.contains('müderris') ||
+      lower.contains('muderris') ||
+      lower.contains('mudarris') ||
+      lower.contains('مدر')) {
+    return l10n.hilalDuelTitleMuderris;
+  }
   if (lower.contains('talebe') || lower.contains('student') || lower.contains('طالب')) {
     return l10n.hilalDuelTitleTalebe;
   }
   return raw;
+}
+
+String _localizedTitleForLevel(
+  AppLocalizations l10n,
+  int level, {
+  bool isBot = false,
+}) {
+  if (isBot) return '';
+  return _localizedHilalTitle(l10n, titleForLevel(level));
+}
+
+Color _hilalNameColor({
+  required int level,
+  required bool onDark,
+  required Color bronze,
+  bool isBot = false,
+  Color? fullOverride,
+}) {
+  final cosmetics = cosmeticsForLevel(level, isBot: isBot);
+  switch (cosmetics.nameAccent) {
+    case HilalDuelNameAccent.full:
+      return fullOverride ?? bronze;
+    case HilalDuelNameAccent.soft:
+      return Color.lerp(
+        _HilalPalette.ink(onDark),
+        bronze,
+        onDark ? 0.46 : 0.58,
+      )!;
+    case HilalDuelNameAccent.none:
+      return _HilalPalette.ink(onDark);
+  }
 }
 
 String _hilalDifficultyLabel(AppLocalizations l10n, int difficulty) {
@@ -350,13 +387,24 @@ String _nextRewardLabel(AppLocalizations l10n, int level, bool maxLevel) {
   switch (next.kind) {
     case HilalDuelRewardKind.frame:
       return l10n.hilalDuelNextRewardFrame(next.level);
+    case HilalDuelRewardKind.frameSilver:
+      return l10n.hilalDuelNextRewardFrameSilver(next.level);
     case HilalDuelRewardKind.titleTalebe:
       return l10n.hilalDuelNextRewardTitle(
         l10n.hilalDuelTitleTalebe,
         next.level,
       );
+    case HilalDuelRewardKind.avatarGlow:
+      return l10n.hilalDuelNextRewardGlow(next.level);
+    case HilalDuelRewardKind.nameAccentSoft:
+      return l10n.hilalDuelNextRewardNameAccent(next.level);
     case HilalDuelRewardKind.specialHilal:
       return l10n.hilalDuelNextRewardHilalIcon(next.level);
+    case HilalDuelRewardKind.titleMuderris:
+      return l10n.hilalDuelNextRewardTitle(
+        l10n.hilalDuelTitleMuderris,
+        next.level,
+      );
     case HilalDuelRewardKind.titleIlimDostu:
       return l10n.hilalDuelNextRewardTitle(
         l10n.hilalDuelTitleIlimDostu,
@@ -1070,6 +1118,106 @@ class _ChallengeInboxCard extends StatelessWidget {
   }
 }
 
+/// Seviye kozmetiği: bronz çerçeve (3), gümüş çift halka (4), hale (6).
+class _HilalRankAvatar extends StatelessWidget {
+  const _HilalRankAvatar({
+    required this.level,
+    required this.size,
+    required this.child,
+    required this.onDark,
+    required this.fillColors,
+    this.answeredGlow,
+    this.fallbackBorder,
+  });
+
+  final int level;
+  final double size;
+  final Widget child;
+  final bool onDark;
+  final List<Color> fillColors;
+  final Color? answeredGlow;
+  final Color? fallbackBorder;
+
+  static const _gold = Color(0xFFE0B35A);
+  static const _silver = Color(0xFFB0BEC5);
+
+  @override
+  Widget build(BuildContext context) {
+    final cosmetics = cosmeticsForLevel(level);
+    final bronze = _HilalPalette.bronze(onDark);
+    final shadows = <BoxShadow>[
+      if (cosmetics.avatarGlow)
+        BoxShadow(
+          color: _gold.withValues(alpha: onDark ? 0.62 : 0.48),
+          blurRadius: size * 0.42,
+          spreadRadius: 1.2,
+        )
+      else if (cosmetics.frameTier >= 1)
+        BoxShadow(
+          color: (cosmetics.frameTier >= 2 ? _gold : bronze)
+              .withValues(alpha: 0.45),
+          blurRadius: 10,
+        ),
+      if (answeredGlow != null)
+        BoxShadow(
+          color: answeredGlow!,
+          blurRadius: 12,
+        ),
+    ];
+
+    final fill = DecoratedBox(
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: fillColors,
+        ),
+      ),
+      child: Center(child: child),
+    );
+
+    if (cosmetics.frameTier >= 2) {
+      return Container(
+        width: size,
+        height: size,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          border: Border.all(color: _silver, width: 2),
+          boxShadow: shadows.isEmpty ? null : shadows,
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(2.2),
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(color: _gold, width: 2),
+            ),
+            child: ClipOval(child: fill),
+          ),
+        ),
+      );
+    }
+
+    final borderColor = cosmetics.frameTier >= 1
+        ? _gold
+        : (fallbackBorder ?? bronze);
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        border: Border.all(
+          color: borderColor,
+          width: cosmetics.frameTier >= 1 ? 3.2 : (fallbackBorder != null ? 1.5 : 2),
+        ),
+        boxShadow: shadows.isEmpty ? null : shadows,
+      ),
+      child: ClipOval(child: fill),
+    );
+  }
+}
+
 /// Oyun lobisi oyuncu paneli — isim uygulama profilinden gelir.
 class _GamePlayerBanner extends StatelessWidget {
   const _GamePlayerBanner({
@@ -1097,13 +1245,16 @@ class _GamePlayerBanner extends StatelessWidget {
     final bronze = _HilalPalette.bronze(onDark);
     const emerald = AppColors.emeraldMid;
     final progress = profile.levelProgress.clamp(0.0, 1.0);
-    final title = _localizedHilalTitle(l10n, profile.title);
-    final nameColor = profile.nameAccent
-        ? bronze
-        : _HilalPalette.ink(onDark);
-    final frameColor = profile.avatarFrame
-        ? const Color(0xFFE0B35A)
-        : bronze;
+    final cosmetics = cosmeticsForLevel(profile.level);
+    final title = _localizedTitleForLevel(
+      l10n,
+      profile.level,
+    );
+    final nameColor = _hilalNameColor(
+      level: profile.level,
+      onDark: onDark,
+      bronze: bronze,
+    );
     return Container(
       padding: const EdgeInsets.fromLTRB(12, 12, 12, 10),
       decoration: BoxDecoration(
@@ -1135,38 +1286,19 @@ class _GamePlayerBanner extends StatelessWidget {
               Stack(
                 clipBehavior: Clip.none,
                 children: [
-                  Container(
-                    width: 52,
-                    height: 52,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      border: Border.all(
-                        color: frameColor,
-                        width: profile.avatarFrame ? 3.2 : 2,
-                      ),
-                      boxShadow: profile.avatarFrame
-                          ? [
-                              BoxShadow(
-                                color: frameColor.withValues(alpha: 0.45),
-                                blurRadius: 10,
-                              ),
-                            ]
-                          : null,
-                      gradient: LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [
-                          emerald.withValues(alpha: 0.55),
-                          bronze.withValues(alpha: 0.45),
-                          const Color(0xFF0E1A14),
-                        ],
-                      ),
-                    ),
-                    alignment: Alignment.center,
+                  _HilalRankAvatar(
+                    level: profile.level,
+                    size: 52,
+                    onDark: onDark,
+                    fillColors: [
+                      emerald.withValues(alpha: 0.55),
+                      bronze.withValues(alpha: 0.45),
+                      const Color(0xFF0E1A14),
+                    ],
                     child: CustomPaint(
                       size: const Size.square(22),
                       painter: _CrescentPainter(
-                        color: profile.specialHilalIcon
+                        color: cosmetics.specialHilalIcon
                             ? const Color(0xFFE0B35A)
                             : bronze,
                         stroke: false,
@@ -1255,7 +1387,7 @@ class _GamePlayerBanner extends StatelessWidget {
                           onDark: onDark,
                           accent: bronze,
                           onTap: onHilalsTap,
-                          leading: profile.specialHilalIcon
+                          leading: cosmetics.specialHilalIcon
                               ? Icon(
                                   Icons.brightness_2_rounded,
                                   size: 14,
@@ -1953,9 +2085,15 @@ class _WeeklyPreviewRow extends StatelessWidget {
                 : entry.rank == 3
                     ? const Color(0xFFC48A5A)
                     : theme.accent;
-    final nameColor = maxLevel || entry.nameAccent || entry.isSelf
+    final nameColor = maxLevel || entry.isSelf
         ? podium
-        : _HilalPalette.ink(onDark);
+        : _hilalNameColor(
+            level: entry.level,
+            onDark: onDark,
+            bronze: _HilalPalette.bronze(onDark),
+            isBot: entry.isBot,
+            fullOverride: podium,
+          );
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
       decoration: maxLevel
@@ -2274,9 +2412,10 @@ class _WeeklyLeaderSheetState extends ConsumerState<_WeeklyLeaderSheet> {
                       )
                     else
                       ...board.top.map((entry) {
-                        final title = _localizedHilalTitle(
+                        final title = _localizedTitleForLevel(
                           widget.l10n,
-                          entry.title,
+                          entry.level,
+                          isBot: entry.isBot,
                         );
                         final rankTheme = _WeeklyRankTheme.forRank(
                           entry.rank,
@@ -2287,9 +2426,15 @@ class _WeeklyLeaderSheetState extends ConsumerState<_WeeklyLeaderSheet> {
                         final accent = maxLevel
                             ? _MaxLevelShine.gold
                             : rankTheme.accent;
-                        final nameColor = maxLevel || entry.nameAccent
+                        final nameColor = maxLevel
                             ? accent
-                            : _HilalPalette.ink(widget.onDark);
+                            : _hilalNameColor(
+                                level: entry.level,
+                                onDark: widget.onDark,
+                                bronze: bronze,
+                                isBot: entry.isBot,
+                                fullOverride: accent,
+                              );
                         return Container(
                           margin: const EdgeInsets.only(bottom: 8),
                           padding: const EdgeInsets.symmetric(
@@ -3394,6 +3539,7 @@ class _DigitalMatchHud extends StatelessWidget {
         ],
       ),
       child: Stack(
+        clipBehavior: Clip.none,
         children: [
           Positioned.fill(
             child: IgnorePointer(
@@ -3549,34 +3695,27 @@ class _HudPlayerSide extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bronze = _HilalPalette.bronze(onDark);
-    final title = _localizedHilalTitle(l10n, player.title);
+    final title = _localizedTitleForLevel(
+      l10n,
+      player.level,
+    );
     final initial = _nameInitial(displayName, fallback: alignEnd ? 'R' : 'S');
     final meta = [
       l10n.hilalDuelLevelLabel(player.level),
       if (title.isNotEmpty) title,
     ].join(' · ');
 
-    final avatar = Container(
-      width: 40,
-      height: 40,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        gradient: RadialGradient(
-          colors: [
-            accent.withValues(alpha: onDark ? 0.34 : 0.22),
-            (onDark ? const Color(0xFF0B1A14) : Colors.white)
-                .withValues(alpha: 0.9),
-          ],
-        ),
-        border: Border.all(color: accent.withValues(alpha: 0.9), width: 1.5),
-        boxShadow: [
-          BoxShadow(
-            color: accent.withValues(alpha: answered ? 0.45 : 0.18),
-            blurRadius: answered ? 12 : 6,
-          ),
-        ],
-      ),
-      alignment: Alignment.center,
+    final avatar = _HilalRankAvatar(
+      level: player.level,
+      size: 40,
+      onDark: onDark,
+      answeredGlow: accent.withValues(alpha: answered ? 0.45 : 0.18),
+      fallbackBorder: accent.withValues(alpha: 0.9),
+      fillColors: [
+        accent.withValues(alpha: onDark ? 0.34 : 0.22),
+        (onDark ? const Color(0xFF0B1A14) : Colors.white)
+            .withValues(alpha: 0.9),
+      ],
       child: Text(
         initial,
         style: TextStyle(
@@ -3589,7 +3728,11 @@ class _HudPlayerSide extends StatelessWidget {
     );
 
     final nameStyle = TextStyle(
-      color: player.nameAccent ? bronze : _HilalPalette.ink(onDark),
+      color: _hilalNameColor(
+        level: player.level,
+        onDark: onDark,
+        bronze: bronze,
+      ),
       fontWeight: FontWeight.w800,
       fontSize: 13.5,
       height: 1.1,
@@ -3641,7 +3784,7 @@ class _HudPlayerSide extends StatelessWidget {
         ),
         const SizedBox(height: 2),
         Text(
-          title.isNotEmpty ? '$title · $meta' : meta,
+          meta,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
           textAlign: alignEnd ? TextAlign.end : TextAlign.start,

@@ -28,8 +28,19 @@ class HilalDuelLevelProgress {
   }
 }
 
-/// Seviye ödülleri — satılmaz, otomatik açılır.
-enum HilalDuelRewardKind { frame, titleTalebe, specialHilal, titleIlimDostu }
+/// Seviye ödülleri — satılmaz, otomatik açılır. LV 1–2 hediyesiz.
+enum HilalDuelRewardKind {
+  frame,
+  frameSilver,
+  titleTalebe,
+  avatarGlow,
+  nameAccentSoft,
+  specialHilal,
+  titleMuderris,
+  titleIlimDostu,
+}
+
+enum HilalDuelNameAccent { none, soft, full }
 
 class HilalDuelLevelReward {
   const HilalDuelLevelReward({
@@ -41,10 +52,61 @@ class HilalDuelLevelReward {
   final HilalDuelRewardKind kind;
 }
 
+class HilalDuelCosmetics {
+  const HilalDuelCosmetics({
+    required this.frameTier,
+    required this.avatarGlow,
+    required this.nameAccent,
+    required this.specialHilalIcon,
+    required this.title,
+  });
+
+  static const none = HilalDuelCosmetics(
+    frameTier: 0,
+    avatarGlow: false,
+    nameAccent: HilalDuelNameAccent.none,
+    specialHilalIcon: false,
+    title: null,
+  );
+
+  /// 0 yok, 1 bronz çerçeve (LV3), 2 gümüş çift halka (LV4+).
+  final int frameTier;
+  final bool avatarGlow;
+  final HilalDuelNameAccent nameAccent;
+  final bool specialHilalIcon;
+  final String? title;
+
+  bool get avatarFrame => frameTier >= 1;
+  bool get nameAccentFull => nameAccent == HilalDuelNameAccent.full;
+  bool get nameAccentSoft => nameAccent == HilalDuelNameAccent.soft;
+
+  @override
+  bool operator ==(Object other) =>
+      other is HilalDuelCosmetics &&
+      frameTier == other.frameTier &&
+      avatarGlow == other.avatarGlow &&
+      nameAccent == other.nameAccent &&
+      specialHilalIcon == other.specialHilalIcon &&
+      title == other.title;
+
+  @override
+  int get hashCode => Object.hash(
+        frameTier,
+        avatarGlow,
+        nameAccent,
+        specialHilalIcon,
+        title,
+      );
+}
+
 const List<HilalDuelLevelReward> kHilalDuelRewards = [
   HilalDuelLevelReward(level: 3, kind: HilalDuelRewardKind.frame),
+  HilalDuelLevelReward(level: 4, kind: HilalDuelRewardKind.frameSilver),
   HilalDuelLevelReward(level: 5, kind: HilalDuelRewardKind.titleTalebe),
+  HilalDuelLevelReward(level: 6, kind: HilalDuelRewardKind.avatarGlow),
+  HilalDuelLevelReward(level: 7, kind: HilalDuelRewardKind.nameAccentSoft),
   HilalDuelLevelReward(level: 8, kind: HilalDuelRewardKind.specialHilal),
+  HilalDuelLevelReward(level: 9, kind: HilalDuelRewardKind.titleMuderris),
   HilalDuelLevelReward(level: 10, kind: HilalDuelRewardKind.titleIlimDostu),
 ];
 
@@ -99,15 +161,46 @@ int hilalAward({
       (safeCorrect == roundCount ? 3 : 0);
 }
 
+int _clampedLevel(int rawLevel) {
+  if (rawLevel < 1) return 1;
+  if (rawLevel > kHilalDuelMaxLevel) return kHilalDuelMaxLevel;
+  return rawLevel;
+}
+
+/// Görsel kozmetikler seviyedendir; eski sunucu alanı olmasa da çalışır.
+/// Haftalık listedeki botlar kozmetik almaz (`isBot: true`).
+HilalDuelCosmetics cosmeticsForLevel(int rawLevel, {bool isBot = false}) {
+  if (isBot) return HilalDuelCosmetics.none;
+  final level = _clampedLevel(rawLevel);
+  final HilalDuelNameAccent accent;
+  if (level >= 10) {
+    accent = HilalDuelNameAccent.full;
+  } else if (level >= 7) {
+    accent = HilalDuelNameAccent.soft;
+  } else {
+    accent = HilalDuelNameAccent.none;
+  }
+  return HilalDuelCosmetics(
+    frameTier: level >= 4 ? 2 : (level >= 3 ? 1 : 0),
+    avatarGlow: level >= 6,
+    nameAccent: accent,
+    specialHilalIcon: level >= 8,
+    title: titleForLevel(level),
+  );
+}
+
 String? titleForLevel(int level) {
   if (level >= 10) return 'İlim Dostu';
+  if (level >= 9) return 'Müderris';
   if (level >= 5) return 'Talebe';
   return null;
 }
 
-bool hasAvatarFrame(int level) => level >= 3;
-bool hasSpecialHilalIcon(int level) => level >= 8;
-bool hasNameAccent(int level) => level >= 10;
+bool hasAvatarFrame(int level) => cosmeticsForLevel(level).avatarFrame;
+bool hasSpecialHilalIcon(int level) =>
+    cosmeticsForLevel(level).specialHilalIcon;
+bool hasNameAccent(int level) => cosmeticsForLevel(level).nameAccentFull;
+bool hasAvatarGlow(int level) => cosmeticsForLevel(level).avatarGlow;
 
 /// Bir sonraki kilitli ödül; yoksa null (maks seviye).
 HilalDuelLevelReward? nextRewardAfterLevel(int level) {

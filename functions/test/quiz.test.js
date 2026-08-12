@@ -123,7 +123,23 @@ test("levelForHilals keeps early levels attainable", () => {
   assert.equal(t.hilalsFloorForLevel(3), 95);
   assert.equal(t.levelForHilals(t.hilalsFloorForLevel(10)).level, 10);
   assert.equal(t.cosmeticsForLevel(5).title, "Talebe");
+  assert.equal(t.cosmeticsForLevel(9).title, "Müderris");
   assert.equal(t.cosmeticsForLevel(10).title, "İlim Dostu");
+  assert.equal(t.cosmeticsForLevel(2).avatarFrame, false);
+  assert.equal(t.cosmeticsForLevel(3).avatarFrame, true);
+  assert.equal(t.cosmeticsForLevel(3).avatarFrameTier, 1);
+  assert.equal(t.cosmeticsForLevel(4).avatarFrameTier, 2);
+  assert.equal(t.cosmeticsForLevel(5).avatarGlow, false);
+  assert.equal(t.cosmeticsForLevel(6).avatarGlow, true);
+  assert.equal(t.cosmeticsForLevel(6).nameAccentSoft, false);
+  assert.equal(t.cosmeticsForLevel(7).nameAccentSoft, true);
+  assert.equal(t.cosmeticsForLevel(7).nameAccent, false);
+  assert.equal(t.cosmeticsForLevel(9).specialHilalIcon, true);
+  assert.equal(t.cosmeticsForLevel(10).nameAccent, true);
+  const empty = t.emptyCosmetics();
+  assert.equal(empty.avatarFrame, false);
+  assert.equal(empty.avatarGlow, false);
+  assert.equal(t.cosmeticsDocFields(t.cosmeticsForLevel(10)).nameAccent, true);
   assert.equal(t.FORFEIT_PENALTY, 5);
   assert.match(
     t.weekIdIstanbul(new Date("2026-08-05T12:00:00+03:00")),

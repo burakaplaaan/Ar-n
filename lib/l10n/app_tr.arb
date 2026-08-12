@@ -759,6 +759,24 @@
       "level": {"type": "int"}
     }
   },
+  "hilalDuelNextRewardFrameSilver": "Sonraki ödül: Gümüş çerçeve (LV {level})",
+  "@hilalDuelNextRewardFrameSilver": {
+    "placeholders": {
+      "level": {"type": "int"}
+    }
+  },
+  "hilalDuelNextRewardGlow": "Sonraki ödül: Avatar ışıması (LV {level})",
+  "@hilalDuelNextRewardGlow": {
+    "placeholders": {
+      "level": {"type": "int"}
+    }
+  },
+  "hilalDuelNextRewardNameAccent": "Sonraki ödül: İsim rengi (LV {level})",
+  "@hilalDuelNextRewardNameAccent": {
+    "placeholders": {
+      "level": {"type": "int"}
+    }
+  },
   "hilalDuelWeeklyTitle": "Haftanın En İyisi",
   "hilalDuelWeeklyThisWeek": "Bu hafta: {count} hilal",
   "@hilalDuelWeeklyThisWeek": {
@@ -799,6 +817,7 @@
   "hilalDuelAdminRemoveAction": "Kaldır",
   "hilalDuelAdminRemoved": "Oyuncu listeden kaldırıldı.",
   "hilalDuelTitleTalebe": "Talebe",
+  "hilalDuelTitleMuderris": "Müderris",
   "hilalDuelTitleIlimDostu": "İlim Dostu",
   "hilalDuelYouLabel": "Sen",
   "hilalDuelOpponentLabel": "Rakip",

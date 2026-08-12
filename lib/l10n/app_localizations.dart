@@ -2700,6 +2700,24 @@ abstract class AppLocalizations {
   /// **'Sonraki ödül: Özel hilal ikonu (LV {level})'**
   String hilalDuelNextRewardHilalIcon(int level);
 
+  /// No description provided for @hilalDuelNextRewardFrameSilver.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sonraki ödül: Gümüş çerçeve (LV {level})'**
+  String hilalDuelNextRewardFrameSilver(int level);
+
+  /// No description provided for @hilalDuelNextRewardGlow.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sonraki ödül: Avatar ışıması (LV {level})'**
+  String hilalDuelNextRewardGlow(int level);
+
+  /// No description provided for @hilalDuelNextRewardNameAccent.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sonraki ödül: İsim rengi (LV {level})'**
+  String hilalDuelNextRewardNameAccent(int level);
+
   /// No description provided for @hilalDuelWeeklyTitle.
   ///
   /// In tr, this message translates to:
@@ -2813,6 +2831,12 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'Talebe'**
   String get hilalDuelTitleTalebe;
+
+  /// No description provided for @hilalDuelTitleMuderris.
+  ///
+  /// In tr, this message translates to:
+  /// **'Müderris'**
+  String get hilalDuelTitleMuderris;
 
   /// No description provided for @hilalDuelTitleIlimDostu.
   ///

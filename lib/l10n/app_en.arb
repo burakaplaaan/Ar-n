@@ -759,6 +759,24 @@
       "level": {"type": "int"}
     }
   },
+  "hilalDuelNextRewardFrameSilver": "Next reward: Silver frame (LV {level})",
+  "@hilalDuelNextRewardFrameSilver": {
+    "placeholders": {
+      "level": {"type": "int"}
+    }
+  },
+  "hilalDuelNextRewardGlow": "Next reward: Avatar glow (LV {level})",
+  "@hilalDuelNextRewardGlow": {
+    "placeholders": {
+      "level": {"type": "int"}
+    }
+  },
+  "hilalDuelNextRewardNameAccent": "Next reward: Name color (LV {level})",
+  "@hilalDuelNextRewardNameAccent": {
+    "placeholders": {
+      "level": {"type": "int"}
+    }
+  },
   "hilalDuelWeeklyTitle": "Player of the Week",
   "hilalDuelWeeklyThisWeek": "This week: {count} crescents",
   "@hilalDuelWeeklyThisWeek": {
@@ -799,6 +817,7 @@
   "hilalDuelAdminRemoveAction": "Remove",
   "hilalDuelAdminRemoved": "Player removed from the board.",
   "hilalDuelTitleTalebe": "Student",
+  "hilalDuelTitleMuderris": "Mudarris",
   "hilalDuelTitleIlimDostu": "Friend of Knowledge",
   "hilalDuelYouLabel": "You",
   "hilalDuelOpponentLabel": "Opponent",

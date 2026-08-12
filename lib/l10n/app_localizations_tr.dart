@@ -1509,6 +1509,21 @@ class AppLocalizationsTr extends AppLocalizations {
   }
 
   @override
+  String hilalDuelNextRewardFrameSilver(int level) {
+    return 'Sonraki ödül: Gümüş çerçeve (LV $level)';
+  }
+
+  @override
+  String hilalDuelNextRewardGlow(int level) {
+    return 'Sonraki ödül: Avatar ışıması (LV $level)';
+  }
+
+  @override
+  String hilalDuelNextRewardNameAccent(int level) {
+    return 'Sonraki ödül: İsim rengi (LV $level)';
+  }
+
+  @override
   String get hilalDuelWeeklyTitle => 'Haftanın En İyisi';
 
   @override
@@ -1575,6 +1590,9 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get hilalDuelTitleTalebe => 'Talebe';
+
+  @override
+  String get hilalDuelTitleMuderris => 'Müderris';
 
   @override
   String get hilalDuelTitleIlimDostu => 'İlim Dostu';

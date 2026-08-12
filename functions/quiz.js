@@ -396,13 +396,40 @@ function isLifetimePremium(data) {
   return data?.active === true && data?.expiresAt == null;
 }
 
+function emptyCosmetics() {
+  return {
+    avatarFrame: false,
+    avatarFrameTier: 0,
+    avatarGlow: false,
+    title: null,
+    specialHilalIcon: false,
+    nameAccentSoft: false,
+    nameAccent: false,
+  };
+}
+
 function cosmeticsForLevel(rawLevel) {
   const level = Math.max(1, Math.min(MAX_LEVEL, Math.floor(Number(rawLevel) || 1)));
   return {
     avatarFrame: level >= 3,
-    title: level >= 10 ? "İlim Dostu" : level >= 5 ? "Talebe" : null,
+    avatarFrameTier: level >= 4 ? 2 : level >= 3 ? 1 : 0,
+    avatarGlow: level >= 6,
+    title: level >= 10 ? "İlim Dostu" : level >= 9 ? "Müderris" : level >= 5 ? "Talebe" : null,
     specialHilalIcon: level >= 8,
+    nameAccentSoft: level >= 7,
     nameAccent: level >= 10,
+  };
+}
+
+function cosmeticsDocFields(cosmetics) {
+  return {
+    title: cosmetics.title,
+    avatarFrame: cosmetics.avatarFrame === true,
+    avatarFrameTier: Math.max(0, Math.floor(Number(cosmetics.avatarFrameTier) || 0)),
+    avatarGlow: cosmetics.avatarGlow === true,
+    specialHilalIcon: cosmetics.specialHilalIcon === true,
+    nameAccentSoft: cosmetics.nameAccentSoft === true,
+    nameAccent: cosmetics.nameAccent === true,
   };
 }
 
@@ -495,10 +522,7 @@ function _writeHilalDelta(tx, {
     matchesPlayed: prevWeeklyMatchCount + matchInc,
     level: progression.level,
     isBot: false,
-    title: cosmetics.title,
-    avatarFrame: cosmetics.avatarFrame,
-    specialHilalIcon: cosmetics.specialHilalIcon,
-    nameAccent: cosmetics.nameAccent,
+    ...cosmeticsDocFields(cosmetics),
     updatedAt: FieldValue.serverTimestamp(),
     expiresAt: Timestamp.fromMillis(Date.now() + WEEKLY_TTL_MS),
   }, { merge: true });
@@ -549,10 +573,7 @@ function _writeBotWeeklyDelta(tx, {
     weeklyHilals,
     level: safeLevel,
     isBot: true,
-    title: null,
-    avatarFrame: false,
-    specialHilalIcon: false,
-    nameAccent: false,
+    ...cosmeticsDocFields(emptyCosmetics()),
     updatedAt: FieldValue.serverTimestamp(),
     expiresAt: Timestamp.fromMillis(Date.now() + WEEKLY_TTL_MS),
   }, { merge: true });
@@ -3239,10 +3260,7 @@ const adminSetSelfQuizLevel = onCall(
           weeklyHilals,
           level,
           isBot: false,
-          title: cosmetics.title,
-          avatarFrame: cosmetics.avatarFrame,
-          specialHilalIcon: cosmetics.specialHilalIcon,
-          nameAccent: cosmetics.nameAccent,
+          ...cosmeticsDocFields(cosmetics),
           updatedAt: FieldValue.serverTimestamp(),
           expiresAt: Timestamp.fromMillis(Date.now() + WEEKLY_TTL_MS),
         }, { merge: true });
@@ -3290,30 +3308,14 @@ const getQuizWeeklyLeaderboard = onCall(
       const data = doc.data() || {};
       const level = Math.max(1, Math.floor(Number(data.level) || 1));
       const isBot = data.isBot === true || String(doc.id).startsWith("bot_");
-      const cosmetics = isBot
-        ? {
-          title: null,
-          avatarFrame: false,
-          specialHilalIcon: false,
-          nameAccent: false,
-        }
-        : cosmeticsForLevel(level);
+      const cosmetics = isBot ? emptyCosmetics() : cosmeticsForLevel(level);
       const rawName = String(data.name || "Oyuncu").slice(0, 32);
       return {
         ownerHash: doc.id,
         name: isBot ? _botDisplayName(rawName) : rawName,
         weeklyHilals: Math.floor(Number(data.weeklyHilals) || 0),
         level: isBot ? Math.min(3, level) : level,
-        title: isBot ? null : (data.title || cosmetics.title),
-        avatarFrame: isBot
-          ? false
-          : data.avatarFrame === true || cosmetics.avatarFrame,
-        specialHilalIcon: isBot
-          ? false
-          : data.specialHilalIcon === true || cosmetics.specialHilalIcon,
-        nameAccent: isBot
-          ? false
-          : data.nameAccent === true || cosmetics.nameAccent,
+        ...cosmeticsDocFields(cosmetics),
         isBot,
         isSelf: doc.id === ownerHash,
       };
@@ -5533,6 +5535,8 @@ module.exports = {
     HILAL_WEEKLY_PREMIUM_DAYS,
     HILAL_WEEKLY_PREMIUM_MS,
     cosmeticsForLevel,
+    emptyCosmetics,
+    cosmeticsDocFields,
     MAX_LEVEL,
     FORFEIT_PENALTY,
     BOT_WEEKLY_CAP,

@@ -759,6 +759,24 @@
       "level": {"type": "int"}
     }
   },
+  "hilalDuelNextRewardFrameSilver": "المكافأة التالية: إطار فضي (LV {level})",
+  "@hilalDuelNextRewardFrameSilver": {
+    "placeholders": {
+      "level": {"type": "int"}
+    }
+  },
+  "hilalDuelNextRewardGlow": "المكافأة التالية: توهج الصورة (LV {level})",
+  "@hilalDuelNextRewardGlow": {
+    "placeholders": {
+      "level": {"type": "int"}
+    }
+  },
+  "hilalDuelNextRewardNameAccent": "المكافأة التالية: لون الاسم (LV {level})",
+  "@hilalDuelNextRewardNameAccent": {
+    "placeholders": {
+      "level": {"type": "int"}
+    }
+  },
   "hilalDuelWeeklyTitle": "أفضل لاعب هذا الأسبوع",
   "hilalDuelWeeklyThisWeek": "هذا الأسبوع: {count} هلال",
   "@hilalDuelWeeklyThisWeek": {
@@ -799,6 +817,7 @@
   "hilalDuelAdminRemoveAction": "إزالة",
   "hilalDuelAdminRemoved": "تمت إزالة اللاعب من القائمة.",
   "hilalDuelTitleTalebe": "طالب",
+  "hilalDuelTitleMuderris": "مدرّس",
   "hilalDuelTitleIlimDostu": "صديق العلم",
   "hilalDuelYouLabel": "أنت",
   "hilalDuelOpponentLabel": "المنافس",
