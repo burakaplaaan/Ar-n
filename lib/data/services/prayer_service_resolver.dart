@@ -95,10 +95,15 @@ class PrayerServiceResolver {
 
     // İlk açılışta şehir/koordinat boşsa bir kez konum senkronu bekle;
     // aksi halde Aladhan'a boş şehirle gidip sürekli hata döngüsüne girer.
+    // Sistem izin diyaloğu burada açılmaz — aksi halde hazırlık ekranı
+    // ile ev ekranı aynı anda iki kez soruyordu.
     if (_location.savedCity.trim().isEmpty ||
         _location.savedCountry.trim().isEmpty ||
         (_location.savedLat == null || _location.savedLon == null)) {
-      await _location.syncPrayerLocation(forceRefresh: true);
+      await _location.syncPrayerLocation(
+        forceRefresh: true,
+        promptIfNeeded: false,
+      );
     }
 
     // 1) Bellek içi önbellek kontrolü — aynı takvim günü + aynı konum +
@@ -141,24 +146,41 @@ class PrayerServiceResolver {
 
     final lat = _location.savedLat;
     final lon = _location.savedLon;
-    try {
-      final m = lat != null && lon != null
-          ? await _aladhan.fetchByCoordinates(
-              latitude: lat,
-              longitude: lon,
-              cityLabel: _location.savedCity,
-            )
-          : await _aladhan.fetchByCity(
-              city: _location.savedCity,
-              country: _location.savedCountry,
-            );
-      final result = PrayerFetchResult(m, PrayerSource.aladhan);
-      _memCache = result;
-      _memCacheAt = now;
-      _memCacheLocationKey = fetchLocationKey;
-      return result;
-    } catch (_) {
-      // Ağ düştü → cache zincirine bak.
+    final city = _location.savedCity.trim();
+    final country = _location.savedCountry.trim();
+    final canQueryAladhan =
+        (lat != null && lon != null) || city.isNotEmpty;
+    if (canQueryAladhan) {
+      try {
+        final m = await _fetchAladhanToday(
+          lat: lat,
+          lon: lon,
+          city: city,
+          country: country,
+        );
+        final result = PrayerFetchResult(m, PrayerSource.aladhan);
+        _memCache = result;
+        _memCacheAt = now;
+        _memCacheLocationKey = fetchLocationKey;
+        return result;
+      } catch (_) {
+        try {
+          await Future<void>.delayed(const Duration(milliseconds: 700));
+          final m = await _fetchAladhanToday(
+            lat: lat,
+            lon: lon,
+            city: city,
+            country: country,
+          );
+          final result = PrayerFetchResult(m, PrayerSource.aladhan);
+          _memCache = result;
+          _memCacheAt = now;
+          _memCacheLocationKey = fetchLocationKey;
+          return result;
+        } catch (_) {
+          // Ağ düştü → cache zincirine bak.
+        }
+      }
     }
 
     // Cache zinciri — önce Diyanet (daha doğru), sonra Aladhan.
@@ -234,22 +256,25 @@ class PrayerServiceResolver {
 
     final lat = _location.savedLat;
     final lon = _location.savedLon;
-    try {
-      final list = lat != null && lon != null
-          ? await _aladhan.fetchUpcomingByCoordinates(
-              latitude: lat,
-              longitude: lon,
-              cityLabel: _location.savedCity,
-              days: days,
-            )
-          : await _aladhan.fetchUpcomingByCity(
-              city: _location.savedCity,
-              country: _location.savedCountry,
-              days: days,
-            );
-      if (list.isNotEmpty) return list;
-    } catch (_) {
-      // Tek gün fallback'ine düş.
+    final city = _location.savedCity.trim();
+    if ((lat != null && lon != null) || city.isNotEmpty) {
+      try {
+        final list = lat != null && lon != null
+            ? await _aladhan.fetchUpcomingByCoordinates(
+                latitude: lat,
+                longitude: lon,
+                cityLabel: _location.savedCity,
+                days: days,
+              )
+            : await _aladhan.fetchUpcomingByCity(
+                city: city,
+                country: _location.savedCountry,
+                days: days,
+              );
+        if (list.isNotEmpty) return list;
+      } catch (_) {
+        // Tek gün fallback'ine düş.
+      }
     }
 
     // Son çare — tek gün (eski davranış). Scheduler bunu tek elemanlı
@@ -264,6 +289,22 @@ class PrayerServiceResolver {
     final anyScope = _aladhan.tryLoadTodayCachedAnyScope();
     if (anyScope != null) return [anyScope];
     return const <PrayerTimesModel>[];
+  }
+
+  Future<PrayerTimesModel> _fetchAladhanToday({
+    required double? lat,
+    required double? lon,
+    required String city,
+    required String country,
+  }) {
+    if (lat != null && lon != null) {
+      return _aladhan.fetchByCoordinates(
+        latitude: lat,
+        longitude: lon,
+        cityLabel: city,
+      );
+    }
+    return _aladhan.fetchByCity(city: city, country: country);
   }
 
   static bool _isTurkey(String country) {

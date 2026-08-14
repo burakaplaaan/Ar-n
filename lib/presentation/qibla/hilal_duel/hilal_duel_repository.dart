@@ -431,6 +431,7 @@ class HilalDuelResult {
     required this.players,
     this.expired = false,
     this.rankBonus = 0,
+    this.roundMarks = const {},
   });
 
   final String? winnerId;
@@ -438,7 +439,17 @@ class HilalDuelResult {
   final bool expired;
   final int rankBonus;
 
+  /// Oyuncu id → tur token listesi (`correct` / `wrong` / `missed`).
+  final Map<String, List<String>> roundMarks;
+
   factory HilalDuelResult.fromMap(Map<String, dynamic> map) {
+    final rawMarks = map['roundMarks'];
+    final marks = <String, List<String>>{};
+    if (rawMarks is Map) {
+      for (final entry in rawMarks.entries) {
+        marks[entry.key.toString()] = _roundMarkTokens(entry.value);
+      }
+    }
     return HilalDuelResult(
       winnerId: map['winnerId']?.toString(),
       expired: map['expired'] == true,
@@ -450,6 +461,7 @@ class HilalDuelResult {
                 HilalDuelPlayerResult.fromMap(Map<String, dynamic>.from(item)),
           )
           .toList(growable: false),
+      roundMarks: marks,
     );
   }
 }
@@ -475,6 +487,8 @@ class HilalDuelMatch {
     this.question,
     this.lastResolution,
     this.result,
+    this.selfRoundMarks = const [],
+    this.opponentRoundMarks = const [],
   });
 
   final String id;
@@ -496,6 +510,10 @@ class HilalDuelMatch {
   final HilalDuelQuestion? question;
   final HilalDuelResolution? lastResolution;
   final HilalDuelResult? result;
+
+  /// Sunucu tur özeti: `correct` | `wrong` | `missed` | `pending`.
+  final List<String> selfRoundMarks;
+  final List<String> opponentRoundMarks;
 
   bool get isCompleted => status == 'completed' || status == 'expired';
   bool get isChallenge => kind == 'challenge';
@@ -539,8 +557,15 @@ class HilalDuelMatch {
       result: rawResult is Map
           ? HilalDuelResult.fromMap(Map<String, dynamic>.from(rawResult))
           : null,
+      selfRoundMarks: _roundMarkTokens(map['selfRoundMarks']),
+      opponentRoundMarks: _roundMarkTokens(map['opponentRoundMarks']),
     );
   }
+}
+
+List<String> _roundMarkTokens(Object? raw) {
+  if (raw is! List) return const [];
+  return raw.map((item) => item.toString()).toList(growable: false);
 }
 
 class HilalDuelProfileBundle {
@@ -613,6 +638,7 @@ abstract class HilalDuelRepositoryApi {
   Future<HilalDuelMatch> createChallenge({
     required String name,
     required String opponentOwnerHash,
+    bool autoPlay = false,
   });
   Future<HilalDuelMatch> acceptChallenge(String challengeId);
   Future<HilalDuelMatch> loadChallenge(String challengeId);
@@ -865,11 +891,13 @@ class HilalDuelRepository implements HilalDuelRepositoryApi {
   Future<HilalDuelMatch> createChallenge({
     required String name,
     required String opponentOwnerHash,
+    bool autoPlay = false,
   }) async {
     final result = await _call('createQuizChallenge', {
       ...await _credentials(),
       'name': _safeName(name),
       'opponentOwnerHash': opponentOwnerHash.trim().toLowerCase(),
+      if (autoPlay) 'autoPlay': true,
     });
     return HilalDuelMatch.fromMap(
       Map<String, dynamic>.from((result['challenge'] as Map?) ?? const {}),

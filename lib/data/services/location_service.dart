@@ -6,6 +6,8 @@
 // çifti `DiyanetDistrictMatcher` ile `ilceId`'ye eşlenir; sonuç Hive'a
 // yazılır ve `prayer_service_resolver` burada okur.
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geocoding/geocoding.dart';
@@ -16,6 +18,7 @@ import '../../core/utils/hive_boxes.dart';
 import '../../core/router/app_router.dart';
 import '../../presentation/shared/widgets/arin_permission_dialog.dart';
 import 'diyanet_district_matcher.dart';
+import 'startup_permission_policy.dart';
 
 /// GPS ile tespit edilen şehir, kaydedilen şehirden farklıysa döner.
 /// `applyLocationChange` ile kalıcı hale getirilir.
@@ -177,16 +180,41 @@ class LocationService {
     await _prefs.delete(_lastPrayerLocSyncMs);
   }
 
-  /// Senkronizasyon işlemi için mutex
-  bool _syncInProgress = false;
+  /// Senkronizasyon işlemi için mutex — ikinci çağrı erken dönmek yerine bekler.
+  Future<void>? _syncJob;
   int _syncGeneration = 0;
+
+  Completer<LocationPermission>? _permissionPromptInFlight;
+  bool _sessionDeclinedDisclosure = false;
 
   /// İzin varsa GPS alır; ters jeokod ile il/ülke güncellenir (Türkiye: çoğunlukla il).
   /// [forceRefresh]: true ise süre sınırı yok (yenileme hareketi).
   /// Oturumda ilk çağrıda bir kez GPS denenir (şehir değişimi / uygulamaya yeniden giriş).
-  Future<void> syncPrayerLocation({bool forceRefresh = false}) async {
-    if (_syncInProgress) return;
-    _syncInProgress = true;
+  Future<void> syncPrayerLocation({
+    bool forceRefresh = false,
+    bool promptIfNeeded = false,
+  }) async {
+    final existing = _syncJob;
+    if (existing != null) {
+      await existing;
+      if (!forceRefresh) return;
+    }
+    final job = _syncPrayerLocationBody(
+      forceRefresh: forceRefresh,
+      promptIfNeeded: promptIfNeeded,
+    );
+    _syncJob = job;
+    try {
+      await job;
+    } finally {
+      if (identical(_syncJob, job)) _syncJob = null;
+    }
+  }
+
+  Future<void> _syncPrayerLocationBody({
+    required bool forceRefresh,
+    required bool promptIfNeeded,
+  }) async {
     final currentGen = ++_syncGeneration;
     try {
       final oldLocationKey = _locationKey();
@@ -220,7 +248,7 @@ class LocationService {
         }
       }
 
-      final pos = await requestCurrentPosition();
+      final pos = await requestCurrentPosition(promptIfNeeded: promptIfNeeded);
       if (pos == null || currentGen != _syncGeneration) return;
 
       try {
@@ -261,10 +289,8 @@ class LocationService {
       } catch (_) {
         // Koordinatlar kayıtlı; Aladhan yine doğru vakit döner, şehir etiketi eski kalabilir.
       }
-    } finally {
-      if (currentGen == _syncGeneration) {
-        _syncInProgress = false;
-      }
+    } catch (_) {
+      // GPS/izin hatası üst katmanda cache veya ilçe seçimine düşer.
     }
   }
 
@@ -278,9 +304,8 @@ class LocationService {
   /// döndürür. Hiçbir şey kaydetmez — kullanıcı onayından sonra [applyLocationChange]
   /// çağrılmalıdır. İzin yoksa, GPS alınamazsa veya şehir aynıysa `null` döner.
   Future<LocationChangeResult?> detectLocationChange() async {
-    // Diğer lokasyon algılamaları arka planda çalışırken ezilmemesi için:
-    _syncGeneration++;
-    _syncInProgress = false;
+    // Namaz fetch'inin beklediği sync'i iptal etme — nesil artırmak
+    // Android açılışında vakitlerin yarım konumla düşmesine yol açıyordu.
     // Koordinatları Hive'a yazmadan konum al — kayıt yalnızca applyLocationChange'de.
     final pos = await _getCurrentPositionNoSave();
     if (pos == null) return null;
@@ -339,7 +364,6 @@ class LocationService {
   /// veya herhangi bir adım başarısız olursa sessizce `null` döner.
   Future<LocationChangeResult?> detectLocationChangeHeadless() async {
     _syncGeneration++;
-    _syncInProgress = false;
     try {
       if (!await hasAlwaysLocationPermission()) return null;
       if (!await Geolocator.isLocationServiceEnabled()) return null;
@@ -388,7 +412,6 @@ class LocationService {
   /// [detectLocationChange]'in sonucunu Hive'a kalıcı olarak yazar.
   Future<void> applyLocationChange(LocationChangeResult result) async {
     _syncGeneration++;
-    _syncInProgress = false;
     await saveCity(result.newCity, result.newCountry);
     await saveDistrictId(result.newDistrictId);
     await _prefs.put(_latKey, result.lat);
@@ -463,73 +486,121 @@ class LocationService {
     return 'Turkey';
   }
 
-  Future<LocationPermission> _requestLocationPermissionWithDisclosure() async {
+  Future<LocationPermission> _requestLocationPermissionWithDisclosure({
+    bool promptIfNeeded = true,
+  }) async {
+    final inFlight = _permissionPromptInFlight;
+    if (inFlight != null) return inFlight.future;
+
     var permission = await Geolocator.checkPermission();
     if (permission != LocationPermission.denied) return permission;
 
-    final ctx = rootNavigatorKey.currentContext;
-    if (ctx == null || !ctx.mounted) return LocationPermission.denied;
-    final l10n = AppLocalizations.of(ctx);
-    final confirmed = await showArinPermissionDialog(
-      context: ctx,
-      icon: Icons.location_on_rounded,
-      title: l10n?.locationPermissionRequiredTitle ?? 'Konum İzni Gerekli',
-      body:
-          l10n?.locationPermissionRequiredBody ??
-          'Arın, namaz vakitlerini ve kıble yönünü doğru hesaplayabilmek için '
-              'konumunuza erişim izni gerektirir. Konum verileriniz yalnızca '
-              'bu amaçlar için kullanılır ve cihazınızda işlenir.',
-      cancelLabel: l10n?.locationPermissionNotNow ?? 'Şimdi Değil',
-      confirmLabel: l10n?.locationPermissionContinue ?? 'Devam Et',
-    );
-    if (!confirmed) return LocationPermission.denied;
+    if (!shouldShowLocationDisclosure(
+      permissionDenied: true,
+      promptIfNeeded: promptIfNeeded,
+      sessionDeclined: _sessionDeclinedDisclosure,
+    )) {
+      return LocationPermission.denied;
+    }
 
-    permission = await Geolocator.requestPermission();
-    return permission;
+    final completer = Completer<LocationPermission>();
+    _permissionPromptInFlight = completer;
+    try {
+      permission = await Geolocator.checkPermission();
+      if (permission != LocationPermission.denied) {
+        completer.complete(permission);
+        return permission;
+      }
+
+      final ctx = rootNavigatorKey.currentContext;
+      if (ctx == null || !ctx.mounted) {
+        completer.complete(LocationPermission.denied);
+        return LocationPermission.denied;
+      }
+      final l10n = AppLocalizations.of(ctx);
+      final confirmed = await showArinPermissionDialog(
+        context: ctx,
+        icon: Icons.location_on_rounded,
+        title: l10n?.locationPermissionRequiredTitle ?? 'Konum İzni Gerekli',
+        body:
+            l10n?.locationPermissionRequiredBody ??
+            'Arın, namaz vakitlerini ve kıble yönünü doğru hesaplayabilmek için '
+                'konumunuza erişim izni gerektirir. Konum verileriniz yalnızca '
+                'bu amaçlar için kullanılır ve cihazınızda işlenir.',
+        cancelLabel: l10n?.locationPermissionNotNow ?? 'Şimdi Değil',
+        confirmLabel: l10n?.locationPermissionContinue ?? 'Devam Et',
+      );
+      if (!confirmed) {
+        _sessionDeclinedDisclosure = true;
+        completer.complete(LocationPermission.denied);
+        return LocationPermission.denied;
+      }
+
+      permission = await Geolocator.requestPermission();
+      completer.complete(permission);
+      return permission;
+    } catch (error, stack) {
+      if (!completer.isCompleted) completer.completeError(error, stack);
+      rethrow;
+    } finally {
+      if (identical(_permissionPromptInFlight, completer)) {
+        _permissionPromptInFlight = null;
+      }
+    }
+  }
+
+  Future<({double lat, double lon})?> _readGpsPosition() async {
+    try {
+      final pos = await Geolocator.getCurrentPosition(
+        locationSettings: const LocationSettings(
+          accuracy: LocationAccuracy.low,
+          timeLimit: Duration(seconds: 12),
+        ),
+      );
+      return (lat: pos.latitude, lon: pos.longitude);
+    } catch (_) {
+      try {
+        final last = await Geolocator.getLastKnownPosition();
+        if (last == null) return null;
+        return (lat: last.latitude, lon: last.longitude);
+      } catch (_) {
+        return null;
+      }
+    }
   }
 
   /// Konum iznini kontrol eder ve GPS'ten pozisyon alır — **Hive'a yazmaz**.
   /// Yalnızca [detectLocationChange] tarafından kullanılır; kayıt işlemi
   /// kullanıcı onayından sonra [applyLocationChange] üstlenir.
+  ///
+  /// Sistem diyaloğu göstermez — ev açılışında ikinci konum popup'ını önler.
   Future<({double lat, double lon})?> _getCurrentPositionNoSave() async {
-    final permission = await _requestLocationPermissionWithDisclosure();
+    final permission = await _requestLocationPermissionWithDisclosure(
+      promptIfNeeded: false,
+    );
     if (permission == LocationPermission.denied ||
         permission == LocationPermission.deniedForever) {
       return null;
     }
-    try {
-      final pos = await Geolocator.getCurrentPosition(
-        locationSettings: const LocationSettings(
-          accuracy: LocationAccuracy.low,
-          timeLimit: Duration(seconds: 12),
-        ),
-      );
-      return (lat: pos.latitude, lon: pos.longitude);
-    } catch (_) {
-      return null;
-    }
+    return _readGpsPosition();
   }
 
-  Future<({double lat, double lon})?> requestCurrentPosition() async {
-    final permission = await _requestLocationPermissionWithDisclosure();
+  Future<({double lat, double lon})?> requestCurrentPosition({
+    bool promptIfNeeded = true,
+  }) async {
+    final permission = await _requestLocationPermissionWithDisclosure(
+      promptIfNeeded: promptIfNeeded,
+    );
     if (permission == LocationPermission.denied ||
         permission == LocationPermission.deniedForever) {
       return null;
     }
 
-    try {
-      final pos = await Geolocator.getCurrentPosition(
-        locationSettings: const LocationSettings(
-          accuracy: LocationAccuracy.low,
-          timeLimit: Duration(seconds: 12),
-        ),
-      );
-      await _prefs.put(_latKey, pos.latitude);
-      await _prefs.put(_lonKey, pos.longitude);
-      return (lat: pos.latitude, lon: pos.longitude);
-    } catch (_) {
-      return null;
-    }
+    final pos = await _readGpsPosition();
+    if (pos == null) return null;
+    await _prefs.put(_latKey, pos.lat);
+    await _prefs.put(_lonKey, pos.lon);
+    return pos;
   }
 }
 

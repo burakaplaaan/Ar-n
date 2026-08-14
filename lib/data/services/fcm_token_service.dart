@@ -27,6 +27,7 @@ import '../../firebase_options.dart';
 import '../../core/router/app_router.dart';
 import 'arin_local_notifications_plugin.dart';
 import 'product_metrics_service.dart';
+import 'startup_permission_policy.dart';
 import 'widget_global_lock_push_service.dart';
 
 /// Uygulama arka planda iken gelen FCM mesajlarını işler.
@@ -466,7 +467,12 @@ abstract final class FcmTokenService {
   static Future<bool> requestBroadcastPermissionIfNeeded() async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      if (prefs.getBool(_broadcastPromptHandledKey) == true) {
+      final onboardingCompleted = prefs.getBool('onboarding_completed') == true;
+      final promptHandled = prefs.getBool(_broadcastPromptHandledKey) == true;
+      if (!shouldAutoRequestBroadcastPermission(
+        onboardingCompleted: onboardingCompleted,
+        promptAlreadyHandled: promptHandled,
+      )) {
         return syncBroadcastSubscriptionIfAuthorized();
       }
       final settings = await FirebaseMessaging.instance

@@ -229,6 +229,7 @@ class _OnboardingSurveyPageState extends ConsumerState<OnboardingSurveyPage>
       final prefs = ref.read(sharedPreferencesProvider);
       await prefs.setBool(profileNameLockedByUserKey, hasCustomName);
       await prefs.setBool('onboarding_completed', true);
+      await FcmTokenService.markBroadcastPermissionPromptHandled();
       // Funnel bitti — tamamlananlar için kritik ölçü.
       unawaited(ArinAnalytics.log('onboarding_complete'));
       if (!mounted) return;
@@ -561,7 +562,9 @@ class _OnboardingSurveyPageState extends ConsumerState<OnboardingSurveyPage>
                       ),
                     )
                   : Text(
-                      l10n.surveyNotificationAllow,
+                      _notificationPermissionEnabled
+                          ? l10n.surveyNext
+                          : l10n.surveyNotificationAllow,
                       style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
@@ -570,6 +573,34 @@ class _OnboardingSurveyPageState extends ConsumerState<OnboardingSurveyPage>
             ),
           ).animate().fadeIn(delay: 280.ms),
           const SizedBox(height: 10),
+          SizedBox(
+            width: double.infinity,
+            child: OutlinedButton(
+              onPressed: _permissionRequestInFlight
+                  ? null
+                  : () async {
+                      await FcmTokenService.markBroadcastPermissionPromptHandled();
+                      if (!mounted) return;
+                      setState(() => _notificationPermissionEnabled = false);
+                      _nextPage();
+                    },
+              style: OutlinedButton.styleFrom(
+                foregroundColor: Colors.white.withValues(alpha: 0.88),
+                side: BorderSide(color: Colors.white.withValues(alpha: 0.28)),
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+              ),
+              child: Text(
+                l10n.surveyNotificationSkip,
+                style: const TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ).animate().fadeIn(delay: 320.ms),
           TextButton(
             onPressed: () async {
               _refreshPermissionAfterSettingsReturn = true;
@@ -584,33 +615,6 @@ class _OnboardingSurveyPageState extends ConsumerState<OnboardingSurveyPage>
               style: TextStyle(color: Colors.white.withValues(alpha: 0.5)),
             ),
           ),
-          TextButton(
-            onPressed: () async {
-              // "Atla" sessizce geçersiz: Arın'ın ana özelliği namaz ezanı
-              // bildirimleri. Kullanıcı farkına varmadan geçip uygulamayı
-              // "bozuk" sanmasın diye uzun bir snackbar + aksiyon tuşu.
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(l10n.onboardingNotificationSkippedWarning),
-                  duration: const Duration(seconds: 6),
-                  behavior: SnackBarBehavior.floating,
-                  action: SnackBarAction(
-                    label: l10n.onboardingOpenNowAction,
-                    textColor: AppColors.accentNeonGreen,
-                    onPressed: _requestNotificationPermission,
-                  ),
-                ),
-              );
-              await FcmTokenService.markBroadcastPermissionPromptHandled();
-              if (!mounted) return;
-              setState(() => _notificationPermissionEnabled = false);
-              _nextPage();
-            },
-            child: Text(
-              l10n.surveyNotificationSkip,
-              style: TextStyle(color: Colors.white.withValues(alpha: 0.42)),
-            ),
-          ).animate().fadeIn(delay: 320.ms),
           const SizedBox(height: 12),
         ],
       ),
@@ -718,6 +722,36 @@ class _OnboardingSurveyPageState extends ConsumerState<OnboardingSurveyPage>
                     ),
             ),
           ).animate().fadeIn(delay: 300.ms),
+          const SizedBox(height: 10),
+          SizedBox(
+            width: double.infinity,
+            child: OutlinedButton(
+              onPressed: _lockWidgetsSaving
+                  ? null
+                  : () {
+                      setState(() {
+                        _lockPrayerEnabled = false;
+                        _lockQuoteEnabled = false;
+                      });
+                      unawaited(_continueFromLockWidgets());
+                    },
+              style: OutlinedButton.styleFrom(
+                foregroundColor: Colors.white.withValues(alpha: 0.88),
+                side: BorderSide(color: Colors.white.withValues(alpha: 0.28)),
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+              ),
+              child: Text(
+                l10n.surveyNotificationSkip,
+                style: const TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ).animate().fadeIn(delay: 340.ms),
         ],
       ),
     );

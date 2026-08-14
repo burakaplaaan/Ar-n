@@ -7,7 +7,6 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timezone/timezone.dart' as tz;
 
@@ -193,15 +192,8 @@ abstract final class AppLocalNotificationScheduler {
       await init();
       await configureArinLocalTimeZone();
 
-      if (Platform.isAndroid) {
-        final android = arinLocalNotificationsPlugin
-            .resolvePlatformSpecificImplementation<
-              AndroidFlutterLocalNotificationsPlugin
-            >();
-        await android?.requestNotificationsPermission();
-        await Permission.scheduleExactAlarm.request();
-        await android?.requestExactAlarmsPermission();
-      }
+      // Sessiz planlama: sistem izin kutusu açılmaz. İzin kullanıcı
+      // eyleminde (onboarding / ayarlar / ezan kartı) istenir.
 
       // Pool sync ağa bağlı — AWAIT edilirse Firestore timeout'una (10–30 sn)
       // kadar zikir/görev/milestone gibi havuzla ilgisi olmayan sabit saatli

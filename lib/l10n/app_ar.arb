@@ -735,6 +735,7 @@
   "hilalDuelDoubled": "تم مضاعفة الأهلة",
   "hilalDuelLobby": "العودة إلى الردهة",
   "hilalDuelRematch": "العب مجدداً",
+  "hilalDuelChallengeAgain": "تحدَّ مجدداً",
   "hilalDuelRetry": "أعد المحاولة",
   "hilalDuelPremiumUnlimited": "بريميوم: قلوب غير محدودة",
   "hilalDuelUpgradePremium": "الترقية إلى بريميوم • لعب بلا حدود",
@@ -778,6 +779,7 @@
     }
   },
   "hilalDuelWeeklyTitle": "أفضل لاعب هذا الأسبوع",
+  "hilalDuelWeeklyResetHint": "يُصفَّر يوم الاثنين",
   "hilalDuelWeeklyThisWeek": "هذا الأسبوع: {count} هلال",
   "@hilalDuelWeeklyThisWeek": {
     "placeholders": {
@@ -822,8 +824,12 @@
   "hilalDuelYouLabel": "أنت",
   "hilalDuelOpponentLabel": "المنافس",
   "hilalDuelChallengeAction": "تحدَّ",
+  "hilalDuelAdminChallengeTitle": "تحدٍّ",
+  "hilalDuelAdminChallengeBody": "العب بنفسك، أو أرسل تلقائياً بنتيجة 3–5 إجابات صحيحة لإثارة المنافس.",
+  "hilalDuelAdminChallengePlay": "العب فعلاً",
+  "hilalDuelAdminChallengeAuto": "إرسال تلقائي",
   "hilalDuelChallengeInboxTitle": "التحديات",
-  "hilalDuelChallengeAccept": "اقبل · قلب واحد",
+  "hilalDuelChallengeAccept": "اقبل",
   "hilalDuelChallengeContinue": "متابعة",
   "hilalDuelChallengeSeeResult": "عرض النتيجة",
   "hilalDuelChallengeWaiting": "بانتظار المنافس",
@@ -1536,7 +1542,7 @@
   "surveyNotificationTitle": "الإشعارات",
   "surveyNotificationLead": "ليصلك تذكير الصلاة ورسائل اليوم في وقتها.",
   "surveyNotificationSubtitle": "نحتاج إذن الإشعارات حتى لا تفوتك تنبيهات الأوقات واقتراحات المحتوى. يمكنك إيقافها في أي وقت من الإعدادات.",
-  "surveyNotificationAllow": "متابعة",
+  "surveyNotificationAllow": "تفعيل الإشعارات",
   "surveyNotificationSkip": "تخطي الآن",
   "surveyNotificationOpenSettings": "فتح الإعدادات",
   "surveyLockWidgetsTitle": "شاشة القفل",

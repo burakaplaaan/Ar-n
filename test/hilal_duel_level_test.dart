@@ -167,7 +167,29 @@ void main() {
             {'id': 'a', 'correct': 5, 'elapsedMs': 40000, 'hilalsAwarded': 15},
             {'id': 'b', 'correct': 4, 'elapsedMs': 50000, 'hilalsAwarded': 8},
           ],
+          'roundMarks': {
+            'a': ['correct', 'wrong', 'missed'],
+            'b': ['wrong', 'correct', 'correct'],
+          },
         },
+        'selfRoundMarks': [
+          'correct',
+          'wrong',
+          'missed',
+          'pending',
+          'correct',
+          'wrong',
+          'correct',
+        ],
+        'opponentRoundMarks': [
+          'wrong',
+          'correct',
+          'correct',
+          'missed',
+          'wrong',
+          'correct',
+          'wrong',
+        ],
       });
       expect(match.isCompleted, isTrue);
       expect(match.version, 12);
@@ -175,6 +197,17 @@ void main() {
       expect(match.opponent.isBot, isTrue);
       expect(match.result?.winnerId, 'a');
       expect(match.result?.players.first.hilalsAwarded, 15);
+      expect(match.result?.roundMarks['b']?[1], 'correct');
+      expect(match.selfRoundMarks, [
+        'correct',
+        'wrong',
+        'missed',
+        'pending',
+        'correct',
+        'wrong',
+        'correct',
+      ]);
+      expect(match.opponentRoundMarks[1], 'correct');
     });
   });
 

@@ -1484,6 +1484,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get hilalDuelRematch => 'Play again';
 
   @override
+  String get hilalDuelChallengeAgain => 'Challenge again';
+
+  @override
   String get hilalDuelRetry => 'Try again';
 
   @override
@@ -1530,6 +1533,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get hilalDuelWeeklyTitle => 'Player of the Week';
+
+  @override
+  String get hilalDuelWeeklyResetHint => 'Resets on Monday';
 
   @override
   String hilalDuelWeeklyThisWeek(int count) {
@@ -1613,10 +1619,23 @@ class AppLocalizationsEn extends AppLocalizations {
   String get hilalDuelChallengeAction => 'Challenge';
 
   @override
+  String get hilalDuelAdminChallengeTitle => 'Challenge';
+
+  @override
+  String get hilalDuelAdminChallengeBody =>
+      'Play it yourself, or auto-send a 3–5 correct run to provoke the opponent.';
+
+  @override
+  String get hilalDuelAdminChallengePlay => 'Play for real';
+
+  @override
+  String get hilalDuelAdminChallengeAuto => 'Auto-send';
+
+  @override
   String get hilalDuelChallengeInboxTitle => 'Challenges';
 
   @override
-  String get hilalDuelChallengeAccept => 'Accept · 1 heart';
+  String get hilalDuelChallengeAccept => 'Accept';
 
   @override
   String get hilalDuelChallengeContinue => 'Continue';
@@ -3078,7 +3097,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'We need notification permission so prayer alerts and content suggestions are not missed. You can turn it off anytime in settings.';
 
   @override
-  String get surveyNotificationAllow => 'Continue';
+  String get surveyNotificationAllow => 'Turn on notifications';
 
   @override
   String get surveyNotificationSkip => 'Skip for now';

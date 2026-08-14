@@ -47,19 +47,20 @@ class NotificationPermissionSnapshot {
       batteryOptimizationsIgnored;
 }
 
-/// Android: [requestNotificationsPermission] bazen `null` döner; [Permission.notification] ile
-/// doğrulama yapılır.
+/// Android: önce mevcut durumu oku; sistem kutusunu yalnız bir API ile bir kez aç.
 Future<bool> _androidNotificationsAllowed(
   AndroidFlutterLocalNotificationsPlugin? android,
 ) async {
-  final fromPlugin = await android?.requestNotificationsPermission();
-  if (fromPlugin == true) return true;
-
   var st = await Permission.notification.status;
-  if (st.isGranted) return true;
+  if (st.isGranted || st.isLimited || st.isProvisional) return true;
   if (st.isPermanentlyDenied) return false;
+
   st = await Permission.notification.request();
-  return st.isGranted;
+  if (st.isGranted || st.isLimited || st.isProvisional) return true;
+  if (st.isPermanentlyDenied || st.isDenied) return false;
+
+  final fromPlugin = await android?.requestNotificationsPermission();
+  return fromPlugin == true;
 }
 
 /// Namaz ve uygulama yerel bildirimleri için ortak çalışma zamanı izinleri.
@@ -82,7 +83,6 @@ Future<bool> requestLocalNotificationRuntimePermissions(
     if (!exactStatus.isGranted) {
       await Permission.scheduleExactAlarm.request();
     }
-    await android?.requestExactAlarmsPermission();
     return true;
   }
   if (Platform.isIOS) {

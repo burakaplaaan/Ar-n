@@ -735,6 +735,7 @@
   "hilalDuelDoubled": "Hilaller ikiye katlandı",
   "hilalDuelLobby": "Lobiye dön",
   "hilalDuelRematch": "Yeniden oyna",
+  "hilalDuelChallengeAgain": "Tekrar meydan oku",
   "hilalDuelRetry": "Tekrar dene",
   "hilalDuelPremiumUnlimited": "Premium: sınırsız can",
   "hilalDuelUpgradePremium": "Premium’a Geç • Sınırsız Oyna",
@@ -778,6 +779,7 @@
     }
   },
   "hilalDuelWeeklyTitle": "Haftanın En İyisi",
+  "hilalDuelWeeklyResetHint": "Pazartesi sıfırlanır",
   "hilalDuelWeeklyThisWeek": "Bu hafta: {count} hilal",
   "@hilalDuelWeeklyThisWeek": {
     "placeholders": {
@@ -822,8 +824,12 @@
   "hilalDuelYouLabel": "Sen",
   "hilalDuelOpponentLabel": "Rakip",
   "hilalDuelChallengeAction": "Meydan oku",
+  "hilalDuelAdminChallengeTitle": "Meydan okuma",
+  "hilalDuelAdminChallengeBody": "Gerçekten oyna veya rakibi kışkırtmak için otomatik 3–5 doğrulukla gönder.",
+  "hilalDuelAdminChallengePlay": "Gerçekten oyna",
+  "hilalDuelAdminChallengeAuto": "Otomatik gönder",
   "hilalDuelChallengeInboxTitle": "Meydan okumalar",
-  "hilalDuelChallengeAccept": "Kabul et · 1 can",
+  "hilalDuelChallengeAccept": "Kabul et",
   "hilalDuelChallengeContinue": "Devam et",
   "hilalDuelChallengeSeeResult": "Sonucu gör",
   "hilalDuelChallengeWaiting": "Rakip bekleniyor",
@@ -1536,7 +1542,7 @@
   "surveyNotificationTitle": "Bildirimler",
   "surveyNotificationLead": "Namaz hatırlatmaları ve günün mesajları zamanında ulaşsın.",
   "surveyNotificationSubtitle": "Vakit bildirimleri ile içerik önerilerinin kaçmaması için bildirim iznine ihtiyacımız var. İstediğin zaman ayarlardan kapatabilirsin.",
-  "surveyNotificationAllow": "Devam Et",
+  "surveyNotificationAllow": "Bildirimleri aç",
   "surveyNotificationSkip": "Şimdilik geç",
   "surveyNotificationOpenSettings": "Ayarlardan aç",
   "surveyLockWidgetsTitle": "Kilit ekranı",

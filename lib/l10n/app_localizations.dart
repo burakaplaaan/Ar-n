@@ -2652,6 +2652,12 @@ abstract class AppLocalizations {
   /// **'Yeniden oyna'**
   String get hilalDuelRematch;
 
+  /// No description provided for @hilalDuelChallengeAgain.
+  ///
+  /// In tr, this message translates to:
+  /// **'Tekrar meydan oku'**
+  String get hilalDuelChallengeAgain;
+
   /// No description provided for @hilalDuelRetry.
   ///
   /// In tr, this message translates to:
@@ -2723,6 +2729,12 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'Haftanın En İyisi'**
   String get hilalDuelWeeklyTitle;
+
+  /// No description provided for @hilalDuelWeeklyResetHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Pazartesi sıfırlanır'**
+  String get hilalDuelWeeklyResetHint;
 
   /// No description provided for @hilalDuelWeeklyThisWeek.
   ///
@@ -2862,6 +2874,30 @@ abstract class AppLocalizations {
   /// **'Meydan oku'**
   String get hilalDuelChallengeAction;
 
+  /// No description provided for @hilalDuelAdminChallengeTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Meydan okuma'**
+  String get hilalDuelAdminChallengeTitle;
+
+  /// No description provided for @hilalDuelAdminChallengeBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'Gerçekten oyna veya rakibi kışkırtmak için otomatik 3–5 doğrulukla gönder.'**
+  String get hilalDuelAdminChallengeBody;
+
+  /// No description provided for @hilalDuelAdminChallengePlay.
+  ///
+  /// In tr, this message translates to:
+  /// **'Gerçekten oyna'**
+  String get hilalDuelAdminChallengePlay;
+
+  /// No description provided for @hilalDuelAdminChallengeAuto.
+  ///
+  /// In tr, this message translates to:
+  /// **'Otomatik gönder'**
+  String get hilalDuelAdminChallengeAuto;
+
   /// No description provided for @hilalDuelChallengeInboxTitle.
   ///
   /// In tr, this message translates to:
@@ -2871,7 +2907,7 @@ abstract class AppLocalizations {
   /// No description provided for @hilalDuelChallengeAccept.
   ///
   /// In tr, this message translates to:
-  /// **'Kabul et · 1 can'**
+  /// **'Kabul et'**
   String get hilalDuelChallengeAccept;
 
   /// No description provided for @hilalDuelChallengeContinue.
@@ -5369,7 +5405,7 @@ abstract class AppLocalizations {
   /// No description provided for @surveyNotificationAllow.
   ///
   /// In tr, this message translates to:
-  /// **'Devam Et'**
+  /// **'Bildirimleri aç'**
   String get surveyNotificationAllow;
 
   /// No description provided for @surveyNotificationSkip.

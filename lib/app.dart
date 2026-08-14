@@ -25,6 +25,7 @@ import 'data/services/app_local_notification_scheduler.dart';
 import 'data/services/prayer_service_resolver.dart';
 import 'data/services/fcm_token_service.dart';
 import 'data/services/location_service.dart';
+import 'data/services/startup_permission_policy.dart';
 import 'data/services/prayer_notification_scheduler.dart';
 import 'data/services/prayer_reminder_prefs.dart';
 import 'data/services/purchase_service.dart';
@@ -406,7 +407,16 @@ class _ArinAppState extends ConsumerState<ArinApp> with WidgetsBindingObserver {
       // yeniden kuyruğa alınarak kaçırılmaz. Ayarlar sayfası toggle'ında
       // `force: true` kullanılır.
       unawaited(_runForegroundMaintenance(initial: false));
-      ref.invalidate(prayerTimesProvider);
+      final prayer = ref.read(prayerTimesProvider);
+      if (shouldInvalidatePrayerTimesOnResume(
+        isLoading: prayer.isLoading,
+        hasError: prayer.hasError,
+        hasData: prayer.hasValue,
+        cachedDateIso: prayer.valueOrNull?.date,
+        now: DateTime.now(),
+      )) {
+        ref.invalidate(prayerTimesProvider);
+      }
     }
   }
 
@@ -484,6 +494,8 @@ class _ArinAppState extends ConsumerState<ArinApp> with WidgetsBindingObserver {
           if (!isStillSignedInAsCurrentUser()) return;
           await UserCloudBackupService.syncAfterSignIn(uid: uid, prefs: prefs);
           if (!isStillSignedInAsCurrentUser()) return;
+          ref.read(prayerServiceResolverProvider).invalidateCache();
+          ref.invalidate(prayerTimesProvider);
           await InspirationEngagementSyncService.pullMergeLocal(
             uid: uid,
             prefs: prefs,

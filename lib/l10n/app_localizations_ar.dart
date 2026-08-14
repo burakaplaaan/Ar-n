@@ -1475,6 +1475,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get hilalDuelRematch => 'العب مجدداً';
 
   @override
+  String get hilalDuelChallengeAgain => 'تحدَّ مجدداً';
+
+  @override
   String get hilalDuelRetry => 'أعد المحاولة';
 
   @override
@@ -1521,6 +1524,9 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get hilalDuelWeeklyTitle => 'أفضل لاعب هذا الأسبوع';
+
+  @override
+  String get hilalDuelWeeklyResetHint => 'يُصفَّر يوم الاثنين';
 
   @override
   String hilalDuelWeeklyThisWeek(int count) {
@@ -1603,10 +1609,23 @@ class AppLocalizationsAr extends AppLocalizations {
   String get hilalDuelChallengeAction => 'تحدَّ';
 
   @override
+  String get hilalDuelAdminChallengeTitle => 'تحدٍّ';
+
+  @override
+  String get hilalDuelAdminChallengeBody =>
+      'العب بنفسك، أو أرسل تلقائياً بنتيجة 3–5 إجابات صحيحة لإثارة المنافس.';
+
+  @override
+  String get hilalDuelAdminChallengePlay => 'العب فعلاً';
+
+  @override
+  String get hilalDuelAdminChallengeAuto => 'إرسال تلقائي';
+
+  @override
   String get hilalDuelChallengeInboxTitle => 'التحديات';
 
   @override
-  String get hilalDuelChallengeAccept => 'اقبل · قلب واحد';
+  String get hilalDuelChallengeAccept => 'اقبل';
 
   @override
   String get hilalDuelChallengeContinue => 'متابعة';
@@ -3059,7 +3078,7 @@ class AppLocalizationsAr extends AppLocalizations {
       'نحتاج إذن الإشعارات حتى لا تفوتك تنبيهات الأوقات واقتراحات المحتوى. يمكنك إيقافها في أي وقت من الإعدادات.';
 
   @override
-  String get surveyNotificationAllow => 'متابعة';
+  String get surveyNotificationAllow => 'تفعيل الإشعارات';
 
   @override
   String get surveyNotificationSkip => 'تخطي الآن';

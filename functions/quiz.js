@@ -72,7 +72,7 @@ const CHALLENGE_INBOX_COMPLETED_MS = 48 * 60 * 60_000;
  */
 const CHALLENGE_BOT_DELAY_MS = 12 * 60 * 60_000;
 /** Bitişe bu kadar kala rakibe hatırlatma push'u. */
-const CHALLENGE_REMINDER_BEFORE_MS = 4 * 60 * 60_000;
+const CHALLENGE_REMINDER_BEFORE_MS = 2 * 60 * 60_000;
 /** Challenge dokümanı geçmişte görünsün; TTL silmesi 7 gün sonra. */
 const CHALLENGE_DOC_TTL_MS = 7 * 24 * 60 * 60_000;
 /** Aynı anda bekleyen giden meydan okuma limiti. */
@@ -1027,15 +1027,15 @@ function quizChallengeCopy(locale, kind, params = {}) {
     },
     reminder: {
       tr: {
-        title: "Bilgi Düellosu · Son 4 saat!",
+        title: "Bilgi Düellosu · Son 2 saat!",
         body: `${name} cevabını bekliyor. Süre dolarsa kimse puan alamaz.`,
       },
       en: {
-        title: "Knowledge Duel · Last 4 hours!",
+        title: "Knowledge Duel · Last 2 hours!",
         body: `${name} is waiting for your answer. If time runs out, no one scores.`,
       },
       ar: {
-        title: "مبارزة المعرفة · آخر 4 ساعات!",
+        title: "مبارزة المعرفة · آخر ساعتين!",
         body: `${name} بانتظار إجابتك. إذا انتهى الوقت فلن يحصل أحد على نقاط.`,
       },
     },
@@ -1516,54 +1516,43 @@ function _shuffleInPlace(list) {
 }
 
 /**
- * Maç içi sıra: kolay → zor.
+ * Tek havuz: zorluk kotası / kolay→zor sıra yok.
  * excludeIds: bu oyuncunun (PvP'de her iki insanın) gördüğü sorular —
  * önce hiç çıkmayanlar, havuz bitince en eskiler tekrar eder.
+ * Maç sırası karışık; chip için difficulty payload'da kalır.
  */
 function _pickQuestions(excludeIds = []) {
-  const exclude = new Set(normalizeQuestionIdList(
+  const excludeList = normalizeQuestionIdList(
     Array.isArray(excludeIds) ? excludeIds : [],
-  ));
-  const buckets = new Map([[1, []], [2, []], [3, []]]);
+  );
+  const exclude = new Set(excludeList);
+  const unseen = [];
+  const seenById = new Map();
   for (const item of questions) {
-    const difficulty = [1, 2, 3].includes(item.difficulty)
-      ? item.difficulty
-      : 2;
-    buckets.get(difficulty).push(item);
+    const id = String(item?.id || "").trim();
+    if (!id) continue;
+    if (exclude.has(id)) seenById.set(id, item);
+    else unseen.push(item);
   }
-  const selected = [];
-  const selectedIds = new Set();
-  const take = (difficulty, count) => {
-    const need = Math.max(0, Math.floor(Number(count) || 0));
-    if (need <= 0) return;
-    const pool = buckets.get(difficulty).filter((item) => !selectedIds.has(item.id));
-    const unseen = pool.filter((item) => !exclude.has(item.id));
-    const seen = pool.filter((item) => exclude.has(item.id));
-    _shuffleInPlace(unseen);
-    _shuffleInPlace(seen);
-    const ordered = unseen.concat(seen);
-    for (let i = 0; i < need && i < ordered.length; i += 1) {
-      const item = ordered[i];
-      selected.push(item);
-      selectedIds.add(item.id);
+  _shuffleInPlace(unseen);
+  const selected = unseen.slice(0, ROUND_COUNT);
+  if (selected.length < ROUND_COUNT) {
+    const used = new Set(selected.map((item) => item.id));
+    const oldestFirst = [];
+    for (const id of excludeList) {
+      const item = seenById.get(id);
+      if (!item || used.has(item.id)) continue;
+      oldestFirst.push(item);
+      used.add(item.id);
     }
-  };
-  take(1, 1);
-  take(2, 2);
-  take(3, 4);
-  for (const difficulty of [3, 2, 1]) {
-    while (selected.length < ROUND_COUNT) {
-      const before = selected.length;
-      take(difficulty, ROUND_COUNT - selected.length);
-      if (selected.length === before) break;
+    for (const item of seenById.values()) {
+      if (used.has(item.id)) continue;
+      oldestFirst.push(item);
+      used.add(item.id);
     }
+    selected.push(...oldestFirst.slice(0, ROUND_COUNT - selected.length));
   }
-  selected.sort((a, b) => {
-    const da = [1, 2, 3].includes(a.difficulty) ? a.difficulty : 2;
-    const db = [1, 2, 3].includes(b.difficulty) ? b.difficulty : 2;
-    if (da !== db) return da - db;
-    return String(a.id).localeCompare(String(b.id));
-  });
+  _shuffleInPlace(selected);
   return selected.slice(0, ROUND_COUNT).map((item) => item.id);
 }
 
@@ -1631,6 +1620,108 @@ function _challengeBotMinDeadlineMs(respondAfterMs, currentDeadlineMs) {
   const minDeadline = respondAfter + 5 * 60_000;
   const current = Math.floor(Number(currentDeadlineMs) || 0);
   return current > 0 && current >= minDeadline ? current : minDeadline;
+}
+
+/**
+ * Admin otomatik meydan okuma: 7 sorudan rastgele 3–5 doğru, kalanı yanlış.
+ * Karşı tarafı kışkırtmak için inandırıcı ama ezici olmayan skor.
+ */
+function _adminChallengeAutoPlan(questionIds) {
+  const ids = Array.isArray(questionIds) ? questionIds : [];
+  if (ids.length === 0) return [];
+  const wantCorrect = Math.min(ids.length, 3 + crypto.randomInt(3));
+  const order = ids.map((_, index) => index);
+  for (let i = order.length - 1; i > 0; i -= 1) {
+    const j = crypto.randomInt(i + 1);
+    const swap = order[i];
+    order[i] = order[j];
+    order[j] = swap;
+  }
+  const correctRounds = new Set(order.slice(0, wantCorrect));
+  return ids.map((questionId, index) => {
+    const question = QUESTION_BY_ID.get(questionId);
+    const correctIndex = Number.isInteger(question?.correctIndex)
+      ? question.correctIndex
+      : 0;
+    const isCorrect = correctRounds.has(index);
+    let choice = correctIndex;
+    if (!isCorrect) {
+      const alternatives = [0, 1, 2, 3].filter((i) => i !== correctIndex);
+      choice = alternatives.length > 0
+        ? alternatives[crypto.randomInt(alternatives.length)]
+        : (correctIndex + 1) % 4;
+    }
+    const elapsedMs = isCorrect
+      ? crypto.randomInt(3_500, 12_000)
+      : crypto.randomInt(6_000, 16_000);
+    return {
+      choice,
+      elapsedMs: Math.min(ROUND_DURATION_MS - 500, Math.max(2_200, elapsedMs)),
+      correct: isCorrect,
+    };
+  });
+}
+
+function _applyAdminAutoChallengeToDoc(doc, ownerHash, nowMs) {
+  const plan = _adminChallengeAutoPlan(doc.questionIds);
+  const answers = {};
+  for (let round = 0; round < ROUND_COUNT; round += 1) {
+    const step = plan[round] || {
+      choice: -1,
+      elapsedMs: ROUND_DURATION_MS,
+      correct: false,
+    };
+    answers[String(round)] = {
+      [ownerHash]: {
+        choice: step.choice,
+        elapsedMs: step.elapsedMs,
+        correct: step.correct === true,
+      },
+    };
+  }
+  const last = plan[ROUND_COUNT - 1] || { choice: -1, elapsedMs: 0 };
+  doc.answers = answers;
+  doc.status = "awaiting_opponent";
+  doc.activePlayerId = null;
+  doc.currentRound = 0;
+  doc.roundStartedAtMs = 0;
+  doc.deadlineMs = 0;
+  doc.adminAutoPlay = true;
+  doc.invitedPushSent = true;
+  doc.lastResolution = {
+    round: ROUND_COUNT - 1,
+    choices: { [ownerHash]: last.choice },
+    elapsedMs: { [ownerHash]: last.elapsedMs },
+  };
+  if (_isChallengeBotOpponent(doc)) {
+    const respondAfter = nowMs + CHALLENGE_BOT_DELAY_MS;
+    doc.botRespondAfterMs = respondAfter;
+    const nextDeadline = _challengeBotMinDeadlineMs(
+      respondAfter,
+      doc.challengeDeadlineMs,
+    );
+    if (nextDeadline !== Number(doc.challengeDeadlineMs)) {
+      doc.challengeDeadlineMs = nextDeadline;
+    }
+  }
+  return {
+    answers: doc.answers,
+    status: doc.status,
+    activePlayerId: FieldValue.delete(),
+    currentRound: 0,
+    roundStartedAtMs: 0,
+    deadlineMs: 0,
+    adminAutoPlay: true,
+    invitedPushSent: true,
+    lastResolution: doc.lastResolution,
+    updatedAt: Timestamp.fromMillis(nowMs),
+    ...(doc.botRespondAfterMs
+      ? {
+        botRespondAfterMs: doc.botRespondAfterMs,
+        challengeDeadlineMs: doc.challengeDeadlineMs,
+      }
+      : {}),
+  };
 }
 
 /**
@@ -3829,6 +3920,56 @@ function _challengePlayerStats(challenge, playerId) {
   return { id: playerId, correct, elapsedMs };
 }
 
+/** Sonuç tahtası: correct | wrong | missed | pending */
+function _challengeRoundMarkToken(challenge, round, playerId, missing) {
+  const answer = _challengeAnswerFor(challenge, round, playerId);
+  if (!answer) return missing;
+  if (isTimeoutAnswer(answer)) return "missed";
+  if (isChoiceCorrect(answer.choice, challenge.questionIds?.[round])) {
+    return "correct";
+  }
+  return "wrong";
+}
+
+function _pendingRoundMarks() {
+  return Array.from({ length: ROUND_COUNT }, () => "pending");
+}
+
+/**
+ * Meydan okuma tur işaretleri. Bitmemiş maçta cevaplanmamış tur `pending`;
+ * tamamlanmış / süresi dolmuşta boş tur `missed` (rakip tahtası için).
+ */
+function _challengeRoundMarks(challenge, playerId) {
+  const status = String(challenge.status || "");
+  const completed = status === "completed" || status === "expired";
+  const activeId = String(challenge.activePlayerId || "");
+  const playerFinished = completed ||
+    (status === "opponent_playing" && String(playerId) !== activeId) ||
+    (status === "awaiting_opponent" &&
+      String(playerId) === String(challenge.challengerId || ""));
+  const currentRound = Math.min(
+    Math.max(0, Number(challenge.currentRound) || 0),
+    ROUND_COUNT - 1,
+  );
+  const marks = [];
+  for (let round = 0; round < ROUND_COUNT; round += 1) {
+    const missing = playerFinished || round < currentRound ? "missed" : "pending";
+    marks.push(_challengeRoundMarkToken(challenge, round, playerId, missing));
+  }
+  return marks;
+}
+
+/** Meydan okunan taraf oynarken rakip (meydan okuyan) tahtası açık. */
+function _shouldRevealChallengeOpponentMarks(challenge, ownerHash, opponentId) {
+  const status = String(challenge.status || "");
+  if (status === "completed" || status === "expired") return true;
+  if (status === "opponent_playing") {
+    return String(ownerHash) === String(challenge.challengedId || "") &&
+      String(opponentId) === String(challenge.challengerId || "");
+  }
+  return false;
+}
+
 function _serializeChallenge(challengeId, challenge, ownerHash) {
   const challengerId = String(challenge.challengerId || "");
   const challengedId = String(challenge.challengedId || "");
@@ -3875,8 +4016,26 @@ function _serializeChallenge(challengeId, challenge, ownerHash) {
     ? _challengeAnswerFor(challenge, currentRound, ownerHash)
     : null;
   const lastResolution = challenge.lastResolution || null;
+  const revealOpponentMarks = _shouldRevealChallengeOpponentMarks(
+    challenge,
+    ownerHash,
+    opponent.id,
+  );
+  const resolutionChoices = { ...(lastResolution?.choices || {}) };
+  const resolutionElapsed = { ...(lastResolution?.elapsedMs || {}) };
+  if (revealOpponentMarks && lastResolution) {
+    const oppAnswer = _challengeAnswerFor(
+      challenge,
+      Number(lastResolution.round) || 0,
+      opponent.id,
+    );
+    if (oppAnswer) {
+      resolutionChoices[opponent.id] = Number(oppAnswer.choice);
+      resolutionElapsed[opponent.id] = Number(oppAnswer.elapsedMs) || 0;
+    }
+  }
   const perspective = _perspectiveResolutionChoices(
-    lastResolution,
+    { ...(lastResolution || {}), choices: resolutionChoices },
     ownerHash,
     opponent.id,
   );
@@ -3906,8 +4065,8 @@ function _serializeChallenge(challengeId, challenge, ownerHash) {
     lastResolution: lastResolution
       ? {
           round: Number(lastResolution.round) || 0,
-          choices: lastResolution.choices || {},
-          elapsedMs: lastResolution.elapsedMs || {},
+          choices: resolutionChoices,
+          elapsedMs: resolutionElapsed,
           selfChoice: perspective.selfChoice,
           opponentChoice: perspective.opponentChoice,
           question: _questionPayload(
@@ -3916,7 +4075,37 @@ function _serializeChallenge(challengeId, challenge, ownerHash) {
           ),
         }
       : null,
-    result: challenge.result || null,
+    result: _serializeChallengeResult(challenge, ownerHash, opponent.id),
+    // Meydan okunan taraf oynarken rakip (bitirmiş meydan okuyan) tahtası
+    // açık; ilk oyuncu sırasında rakip henüz cevaplamadı.
+    selfRoundMarks: _challengeRoundMarks(challenge, ownerHash),
+    opponentRoundMarks: revealOpponentMarks
+      ? _challengeRoundMarks(challenge, opponent.id)
+      : _pendingRoundMarks(),
+  };
+}
+
+function _serializeChallengeResult(challenge, selfId, opponentId) {
+  const raw = challenge.result && typeof challenge.result === "object"
+    ? { ...challenge.result }
+    : null;
+  const completed = String(challenge.status || "") === "completed" ||
+    String(challenge.status || "") === "expired";
+  if (!completed) return raw;
+  const stored = raw?.roundMarks && typeof raw.roundMarks === "object"
+    ? raw.roundMarks
+    : {};
+  return {
+    ...(raw || {
+      winnerId: null,
+      players: [],
+      expired: String(challenge.status || "") === "expired",
+    }),
+    roundMarks: {
+      ...stored,
+      [selfId]: _challengeRoundMarks(challenge, selfId),
+      [opponentId]: _challengeRoundMarks(challenge, opponentId),
+    },
   };
 }
 
@@ -4063,6 +4252,10 @@ async function _finalizeChallenge(tx, db, challengeRef, challenge, options = {})
       ...stat,
       hilalsAwarded: awards[stat.id] || 0,
     })),
+    roundMarks: {
+      [challengerId]: _challengeRoundMarks(challenge, challengerId),
+      [challengedId]: _challengeRoundMarks(challenge, challengedId),
+    },
   };
   challenge.updatedAt = Timestamp.now();
   tx.set(challengeRef, {
@@ -4230,6 +4423,100 @@ async function _maybeResolveBotChallenge(tx, db, challengeRef, challenge, nowMs)
   return { resolved: true, completed: true };
 }
 
+/** Davet/hatırlatma yalnız rakibe; sonuçta oyundaki kişiye push yok. */
+function challengePushRecipients({
+  kind,
+  challengerId,
+  challengedId,
+  exceptOwnerHash = "",
+}) {
+  const except = String(exceptOwnerHash || "").trim();
+  const invitedLike = kind === "invited" || kind === "reminder";
+  const raw = invitedLike
+    ? [challengedId]
+    : [challengerId, challengedId];
+  return [...new Set(
+    raw.map((id) => String(id || "").trim()).filter(Boolean),
+  )].filter((id) => !_isBotId(id) && id !== except);
+}
+
+function claimChallengeNotify(challenge, field) {
+  if (!challenge || challenge[field] === true) return false;
+  challenge[field] = true;
+  return true;
+}
+
+function _queueChallengeTransitionPushes(tx, challengeRef, challenge, resolved) {
+  let notifyAwaiting = false;
+  let notifyCompleted = false;
+  if (
+    resolved.awaitingOpponent &&
+    !_isChallengeBotOpponent(challenge) &&
+    claimChallengeNotify(challenge, "invitedPushSent")
+  ) {
+    notifyAwaiting = true;
+    tx.set(challengeRef, {
+      invitedPushSent: true,
+      updatedAt: FieldValue.serverTimestamp(),
+    }, { merge: true });
+  }
+  if (
+    resolved.completed &&
+    claimChallengeNotify(challenge, "completedPushSent")
+  ) {
+    notifyCompleted = true;
+    tx.set(challengeRef, {
+      completedPushSent: true,
+      updatedAt: FieldValue.serverTimestamp(),
+    }, { merge: true });
+  }
+  return { notifyAwaiting, notifyCompleted };
+}
+
+async function _deliverChallengeOutcomePushes(db, challenge, challengeId, {
+  notifyAwaiting = false,
+  notifyCompleted = false,
+  exceptOwnerHash = "",
+} = {}) {
+  if (notifyAwaiting) {
+    const targets = challengePushRecipients({
+      kind: "invited",
+      challengerId: challenge.challengerId,
+      challengedId: challenge.challengedId,
+      exceptOwnerHash,
+    });
+    await Promise.all(targets.map((id) => _deliverQuizChallengePush({
+      db,
+      ownerHash: id,
+      kind: "invited",
+      fromName: challenge.challengerName,
+      challengeId,
+    })));
+  }
+  if (notifyCompleted && challenge.result) {
+    const winnerId = String(challenge.result.winnerId || "");
+    const kindFor = (id) => {
+      if (!winnerId) return "draw";
+      return winnerId === id ? "won" : "lost";
+    };
+    const targets = challengePushRecipients({
+      kind: "completed",
+      challengerId: challenge.challengerId,
+      challengedId: challenge.challengedId,
+      exceptOwnerHash,
+    });
+    await Promise.all(targets.map((id) => _deliverQuizChallengePush({
+      db,
+      ownerHash: id,
+      kind: kindFor(id),
+      fromName: id === challenge.challengerId
+        ? challenge.challengedName
+        : challenge.challengerName,
+      challengeId,
+    })));
+  }
+}
+
 async function _deliverQuizChallengePush({
   db,
   ownerHash,
@@ -4280,6 +4567,13 @@ const createQuizChallenge = onCall(
   async (req) => {
     const db = getFirestore();
     const { ownerHash } = await _assertInstallation(db, req);
+    const autoPlay = req.data?.autoPlay === true;
+    if (autoPlay && !(await _quizCallerIsAdmin(db, req))) {
+      throw new HttpsError(
+        "permission-denied",
+        "Otomatik gönderim yalnız admin için.",
+      );
+    }
     await _assertQuizCallerRates(db, req, ownerHash, "challenge_create", 15);
     const name = _validatedName(req.data?.name);
     const opponentId = _validatedOpponentId(req.data?.opponentOwnerHash);
@@ -4476,8 +4770,18 @@ const createQuizChallenge = onCall(
         }, { merge: true });
       }
       tx.create(challengeRef, doc);
+      if (autoPlay) {
+        const patch = _applyAdminAutoChallengeToDoc(doc, ownerHash, nowMs);
+        tx.set(challengeRef, patch, { merge: true });
+      }
       return doc;
     });
+    if (autoPlay && !_isChallengeBotOpponent(challenge)) {
+      await _deliverChallengeOutcomePushes(db, challenge, challengeId, {
+        notifyAwaiting: true,
+        exceptOwnerHash: ownerHash,
+      });
+    }
     return {
       ok: true,
       challenge: _serializeChallenge(challengeId, challenge, ownerHash),
@@ -4608,13 +4912,18 @@ const getQuizChallenge = onCall(
         nowMs,
       );
       if (botResolved.completed) {
-        notifyCompleted = true;
+        const queued = _queueChallengeTransitionPushes(
+          tx,
+          challengeRef,
+          data,
+          { completed: true, awaitingOpponent: false },
+        );
+        notifyCompleted = queued.notifyCompleted;
         return data;
       }
       if (botResolved.expired) {
         return data;
       }
-      const before = String(data.status || "");
       const resolved = await _resolveChallengeRoundIfReady(
         tx,
         db,
@@ -4622,51 +4931,24 @@ const getQuizChallenge = onCall(
         data,
         nowMs,
       );
-      if (
-        resolved.awaitingOpponent &&
-        before === "challenger_playing" &&
-        !_isChallengeBotOpponent(data)
-      ) {
-        notifyAwaiting = true;
-      }
-      if (resolved.completed && before === "opponent_playing") {
-        notifyCompleted = true;
-      }
+      const queued = _queueChallengeTransitionPushes(
+        tx,
+        challengeRef,
+        data,
+        resolved,
+      );
+      notifyAwaiting = queued.notifyAwaiting;
+      notifyCompleted = queued.notifyCompleted;
       return data;
     });
-    if (notifyAwaiting) {
-      await _deliverQuizChallengePush({
-        db,
-        ownerHash: challenge.challengedId,
-        kind: "invited",
-        fromName: challenge.challengerName,
-        challengeId,
-      });
+    await _deliverChallengeOutcomePushes(db, challenge, challengeId, {
+      notifyAwaiting,
+      notifyCompleted,
+      exceptOwnerHash: ownerHash,
+    });
+    if (notifyCompleted) {
+      await _scheduleTop3RivalryFromChallenge(db, challengeRef, challenge);
     }
-    if (notifyCompleted && challenge.result) {
-      const winnerId = challenge.result.winnerId;
-      const kindFor = (id) => {
-        if (!winnerId) return "draw";
-        return winnerId === id ? "won" : "lost";
-      };
-      await Promise.all([
-        _deliverQuizChallengePush({
-          db,
-          ownerHash: challenge.challengerId,
-          kind: kindFor(challenge.challengerId),
-          fromName: challenge.challengedName,
-          challengeId,
-        }),
-        _deliverQuizChallengePush({
-          db,
-          ownerHash: challenge.challengedId,
-          kind: kindFor(challenge.challengedId),
-          fromName: challenge.challengerName,
-          challengeId,
-        }),
-      ]);
-    }
-    await _scheduleTop3RivalryFromChallenge(db, challengeRef, challenge);
     return {
       ok: true,
       challenge: _serializeChallenge(challengeId, challenge, ownerHash),
@@ -4728,10 +5010,14 @@ const submitQuizChallengeAnswer = onCall(
           data,
           nowMs,
         );
-        if (resolved.awaitingOpponent && !_isChallengeBotOpponent(data)) {
-          notifyAwaiting = true;
-        }
-        if (resolved.completed) notifyCompleted = true;
+        const queued = _queueChallengeTransitionPushes(
+          tx,
+          challengeRef,
+          data,
+          resolved,
+        );
+        notifyAwaiting = queued.notifyAwaiting;
+        notifyCompleted = queued.notifyCompleted;
         return data;
       }
       const gate = canAcceptAnswer(nowMs, data.roundStartedAtMs, data.deadlineMs);
@@ -4746,10 +5032,14 @@ const submitQuizChallengeAnswer = onCall(
           data,
           nowMs,
         );
-        if (resolved.awaitingOpponent && !_isChallengeBotOpponent(data)) {
-          notifyAwaiting = true;
-        }
-        if (resolved.completed) notifyCompleted = true;
+        const queued = _queueChallengeTransitionPushes(
+          tx,
+          challengeRef,
+          data,
+          resolved,
+        );
+        notifyAwaiting = queued.notifyAwaiting;
+        notifyCompleted = queued.notifyCompleted;
         return data;
       }
       const question = QUESTION_BY_ID.get(data.questionIds[round]);
@@ -4772,7 +5062,6 @@ const submitQuizChallengeAnswer = onCall(
           [ownerHash]: graded,
         },
       };
-      const before = status;
       const resolved = await _resolveChallengeRoundIfReady(
         tx,
         db,
@@ -4780,16 +5069,14 @@ const submitQuizChallengeAnswer = onCall(
         data,
         nowMs,
       );
-      if (
-        resolved.awaitingOpponent &&
-        before === "challenger_playing" &&
-        !_isChallengeBotOpponent(data)
-      ) {
-        notifyAwaiting = true;
-      }
-      if (resolved.completed && before === "opponent_playing") {
-        notifyCompleted = true;
-      }
+      const queued = _queueChallengeTransitionPushes(
+        tx,
+        challengeRef,
+        data,
+        resolved,
+      );
+      notifyAwaiting = queued.notifyAwaiting;
+      notifyCompleted = queued.notifyCompleted;
       if (!_challengeAnswerFor(data, round, ownerHash)) {
         data.version = _nextVersion(data);
         tx.set(challengeRef, {
@@ -4800,39 +5087,14 @@ const submitQuizChallengeAnswer = onCall(
       }
       return data;
     });
-    if (notifyAwaiting) {
-      await _deliverQuizChallengePush({
-        db,
-        ownerHash: challenge.challengedId,
-        kind: "invited",
-        fromName: challenge.challengerName,
-        challengeId,
-      });
+    await _deliverChallengeOutcomePushes(db, challenge, challengeId, {
+      notifyAwaiting,
+      notifyCompleted,
+      exceptOwnerHash: ownerHash,
+    });
+    if (notifyCompleted) {
+      await _scheduleTop3RivalryFromChallenge(db, challengeRef, challenge);
     }
-    if (notifyCompleted && challenge.result) {
-      const winnerId = challenge.result.winnerId;
-      const kindFor = (id) => {
-        if (!winnerId) return "draw";
-        return winnerId === id ? "won" : "lost";
-      };
-      await Promise.all([
-        _deliverQuizChallengePush({
-          db,
-          ownerHash: challenge.challengerId,
-          kind: kindFor(challenge.challengerId),
-          fromName: challenge.challengedName,
-          challengeId,
-        }),
-        _deliverQuizChallengePush({
-          db,
-          ownerHash: challenge.challengedId,
-          kind: kindFor(challenge.challengedId),
-          fromName: challenge.challengerName,
-          challengeId,
-        }),
-      ]);
-    }
-    await _scheduleTop3RivalryFromChallenge(db, challengeRef, challenge);
     return {
       ok: true,
       challenge: _serializeChallenge(challengeId, challenge, ownerHash),
@@ -4943,7 +5205,7 @@ const listQuizChallenges = onCall(
   },
 );
 
-/** Süresi dolanları kapat + son 4 saat hatırlatması. */
+/** Süresi dolanları kapat + son 2 saat hatırlatması. */
 const scanQuizChallenges = onSchedule(
   {
     region: REGION,
@@ -5005,27 +5267,26 @@ const scanQuizChallenges = onSchedule(
               );
               if (result.resolved) {
                 didResolve = true;
-                if (result.completed) completedChallenge = current;
+                if (result.completed) {
+                  const queued = _queueChallengeTransitionPushes(
+                    tx,
+                    doc.ref,
+                    current,
+                    { completed: true, awaitingOpponent: false },
+                  );
+                  if (queued.notifyCompleted) completedChallenge = current;
+                }
               }
             });
             if (didResolve) {
               botResolved += 1;
-              if (completedChallenge?.result) {
-                const winnerId = completedChallenge.result.winnerId;
-                const kind = !winnerId
-                  ? "draw"
-                  : (winnerId === completedChallenge.challengerId
-                    ? "won"
-                    : "lost");
-                await _deliverQuizChallengePush({
-                  db,
-                  ownerHash: completedChallenge.challengerId,
-                  kind,
-                  fromName: completedChallenge.challengedName,
-                  challengeId: doc.id,
-                });
-              }
               if (completedChallenge) {
+                await _deliverChallengeOutcomePushes(
+                  db,
+                  completedChallenge,
+                  doc.id,
+                  { notifyCompleted: true },
+                );
                 await _scheduleTop3RivalryFromChallenge(
                   db,
                   doc.ref,
@@ -5042,21 +5303,50 @@ const scanQuizChallenges = onSchedule(
           if (
             inReminderWindow &&
             data.reminderSent !== true &&
-            (status === "awaiting_opponent" || status === "opponent_playing") &&
+            status === "awaiting_opponent" &&
             !_isChallengeBotOpponent(data)
           ) {
-            await _deliverQuizChallengePush({
-              db,
-              ownerHash: data.challengedId,
-              kind: "reminder",
-              fromName: data.challengerName,
-              challengeId: doc.id,
+            let claimedReminder = false;
+            await db.runTransaction(async (tx) => {
+              const fresh = await tx.get(doc.ref);
+              const current = fresh.data() || {};
+              if (
+                current.reminderSent === true ||
+                String(current.status || "") !== "awaiting_opponent" ||
+                _isChallengeBotOpponent(current)
+              ) {
+                return;
+              }
+              const freshDeadline = challengeDeadlineMsOf(current);
+              const now = Date.now();
+              if (
+                !(freshDeadline > 0 &&
+                  now >= freshDeadline - CHALLENGE_REMINDER_BEFORE_MS &&
+                  now < freshDeadline)
+              ) {
+                return;
+              }
+              tx.set(doc.ref, {
+                reminderSent: true,
+                updatedAt: FieldValue.serverTimestamp(),
+              }, { merge: true });
+              claimedReminder = true;
             });
-            await doc.ref.set({
-              reminderSent: true,
-              updatedAt: FieldValue.serverTimestamp(),
-            }, { merge: true });
-            reminded += 1;
+            if (claimedReminder) {
+              const targets = challengePushRecipients({
+                kind: "reminder",
+                challengerId: data.challengerId,
+                challengedId: data.challengedId,
+              });
+              await Promise.all(targets.map((id) => _deliverQuizChallengePush({
+                db,
+                ownerHash: id,
+                kind: "reminder",
+                fromName: data.challengerName,
+                challengeId: doc.id,
+              })));
+              reminded += 1;
+            }
           }
         } catch (error) {
           console.error("[HilalDuel] challenge scan failed", doc.id, error);
@@ -5604,6 +5894,13 @@ module.exports = {
     isChallengeBotOpponent: _isChallengeBotOpponent,
     validatedOpponentId: _validatedOpponentId,
     challengeBotWeakPlan: _challengeBotWeakPlan,
+    adminChallengeAutoPlan: _adminChallengeAutoPlan,
+    applyAdminAutoChallengeToDoc: _applyAdminAutoChallengeToDoc,
     challengeBotMinDeadlineMs: _challengeBotMinDeadlineMs,
+    challengePushRecipients,
+    claimChallengeNotify,
+    challengeRoundMarks: _challengeRoundMarks,
+    shouldRevealChallengeOpponentMarks: _shouldRevealChallengeOpponentMarks,
+    serializeChallenge: _serializeChallenge,
   },
 };

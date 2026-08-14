@@ -27,6 +27,31 @@ HilalDuelRoundMark markFromServerChoice({
   return HilalDuelRoundMark.wrong;
 }
 
+/// Sunucu `selfRoundMarks` / `opponentRoundMarks` token → tahta işareti.
+HilalDuelRoundMark parseRoundMarkToken(Object? raw) {
+  switch (raw?.toString()) {
+    case 'correct':
+      return HilalDuelRoundMark.correct;
+    case 'wrong':
+      return HilalDuelRoundMark.wrong;
+    case 'missed':
+      return HilalDuelRoundMark.missed;
+    default:
+      return HilalDuelRoundMark.pending;
+  }
+}
+
+List<HilalDuelRoundMark> parseRoundMarks(Object? raw, {int total = 7}) {
+  final rounds = total > 0 ? total : 7;
+  final source = raw is List ? raw : const [];
+  return List<HilalDuelRoundMark>.generate(
+    rounds,
+    (index) => index < source.length
+        ? parseRoundMarkToken(source[index])
+        : HilalDuelRoundMark.pending,
+  );
+}
+
 /// Reveal / SFX için sunucu seçimi. `-1` (timeout) → `null`; yerel optimistic
 /// seçime düşülmez — aksi halde doğru SFX + yeşil "Sen" skora yazılmadan
 /// görünür ve sonuçtaki "Doğru cevap sayısı" çelişir.
@@ -85,6 +110,15 @@ HilalDuelMatch? selectFresherMatch(
       incoming.currentRound * 10;
   if (incomingProgress < currentProgress) return current;
   return incoming;
+}
+
+/// Meydan okuyan son soruyu bitirdi: lobiye dönmeden önce son tur
+/// doğru/yanlış reveal'ı gösterilmeli.
+bool shouldRevealBeforeChallengeSent({
+  required bool awaitingOpponent,
+  required bool hasLastResolution,
+}) {
+  return awaitingOpponent && hasLastResolution;
 }
 
 /// Önceki turun lastResolution'ı bir sonraki turun tamamında "gösterilmeli"

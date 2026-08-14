@@ -1479,6 +1479,9 @@ class AppLocalizationsTr extends AppLocalizations {
   String get hilalDuelRematch => 'Yeniden oyna';
 
   @override
+  String get hilalDuelChallengeAgain => 'Tekrar meydan oku';
+
+  @override
   String get hilalDuelRetry => 'Tekrar dene';
 
   @override
@@ -1525,6 +1528,9 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get hilalDuelWeeklyTitle => 'Haftanın En İyisi';
+
+  @override
+  String get hilalDuelWeeklyResetHint => 'Pazartesi sıfırlanır';
 
   @override
   String hilalDuelWeeklyThisWeek(int count) {
@@ -1607,10 +1613,23 @@ class AppLocalizationsTr extends AppLocalizations {
   String get hilalDuelChallengeAction => 'Meydan oku';
 
   @override
+  String get hilalDuelAdminChallengeTitle => 'Meydan okuma';
+
+  @override
+  String get hilalDuelAdminChallengeBody =>
+      'Gerçekten oyna veya rakibi kışkırtmak için otomatik 3–5 doğrulukla gönder.';
+
+  @override
+  String get hilalDuelAdminChallengePlay => 'Gerçekten oyna';
+
+  @override
+  String get hilalDuelAdminChallengeAuto => 'Otomatik gönder';
+
+  @override
   String get hilalDuelChallengeInboxTitle => 'Meydan okumalar';
 
   @override
-  String get hilalDuelChallengeAccept => 'Kabul et · 1 can';
+  String get hilalDuelChallengeAccept => 'Kabul et';
 
   @override
   String get hilalDuelChallengeContinue => 'Devam et';
@@ -3070,7 +3089,7 @@ class AppLocalizationsTr extends AppLocalizations {
       'Vakit bildirimleri ile içerik önerilerinin kaçmaması için bildirim iznine ihtiyacımız var. İstediğin zaman ayarlardan kapatabilirsin.';
 
   @override
-  String get surveyNotificationAllow => 'Devam Et';
+  String get surveyNotificationAllow => 'Bildirimleri aç';
 
   @override
   String get surveyNotificationSkip => 'Şimdilik geç';

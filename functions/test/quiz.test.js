@@ -35,38 +35,37 @@ test("question bank contains 1000 valid and unique questions", () => {
   assert.ok(byDifficulty[3] >= 60, `hard pool too small: ${byDifficulty[3]}`);
 });
 
-test("match questions progress easy to hard without shuffle", () => {
+test("pickQuestions draws a mixed 7 from the full bank", () => {
   assert.equal(t.ROUND_REVEAL_MS, 2_600);
   for (let i = 0; i < 20; i += 1) {
     const ids = t.pickQuestions();
     assert.equal(ids.length, 7);
     assert.equal(new Set(ids).size, 7);
-    const difficulties = ids.map((id) => {
-      const item = questions.find((q) => q.id === id);
-      assert.ok(item, `missing question ${id}`);
-      return item.difficulty;
-    });
-    for (let j = 1; j < difficulties.length; j += 1) {
-      assert.ok(
-        difficulties[j] >= difficulties[j - 1],
-        `not easy→hard: ${difficulties.join(",")}`,
-      );
+    for (const id of ids) {
+      assert.ok(questions.some((item) => item.id === id), `missing ${id}`);
     }
   }
 });
 
-test("pickQuestions prefers unseen ids for the same player", () => {
-  const easy = questions.filter((q) => q.difficulty === 1);
-  assert.ok(easy.length >= 2);
-  const keepEasy = easy[0].id;
-  const excludeEasy = easy.slice(1).map((q) => q.id);
-  const ids = t.pickQuestions(excludeEasy);
-  const pickedEasy = ids.filter((id) => {
-    const item = questions.find((q) => q.id === id);
-    return item?.difficulty === 1;
-  });
-  assert.equal(pickedEasy.length, 1);
-  assert.equal(pickedEasy[0], keepEasy);
+test("pickQuestions prefers unseen ids without a difficulty quota", () => {
+  const keep = questions.slice(0, 7).map((item) => item.id);
+  const exclude = questions.slice(7).map((item) => item.id);
+  const ids = t.pickQuestions(exclude);
+  assert.deepEqual(new Set(ids), new Set(keep));
+
+  const hard = questions.filter((item) => item.difficulty === 3).slice(0, 7);
+  assert.equal(hard.length, 7);
+  const hardIds = hard.map((item) => item.id);
+  const excludeAllButHard = questions
+    .map((item) => item.id)
+    .filter((id) => !hardIds.includes(id));
+  const allHard = t.pickQuestions(excludeAllButHard);
+  assert.deepEqual(new Set(allHard), new Set(hardIds));
+  assert.ok(allHard.every((id) => {
+    const item = questions.find((row) => row.id === id);
+    return item?.difficulty === 3;
+  }));
+
   const merged = t.mergeSeenQuestionIds(["iq_001", "iq_002"], ["iq_002", "iq_003"], 7);
   assert.deepEqual(merged, ["iq_001", "iq_002", "iq_003"]);
   const capped = t.mergeSeenQuestionIds(
@@ -78,6 +77,36 @@ test("pickQuestions prefers unseen ids for the same player", () => {
   const allSeen = t.pickQuestions(questions.map((q) => q.id));
   assert.equal(allSeen.length, 7);
   assert.equal(new Set(allSeen).size, 7);
+});
+
+test("pickQuestions shuffles difficulty order in the match list", () => {
+  const easy = questions.filter((item) => item.difficulty === 1).slice(0, 2);
+  const medium = questions.filter((item) => item.difficulty === 2).slice(0, 2);
+  const hard = questions.filter((item) => item.difficulty === 3).slice(0, 3);
+  const keep = [...easy, ...medium, ...hard].map((item) => item.id);
+  const exclude = questions
+    .map((item) => item.id)
+    .filter((id) => !keep.includes(id));
+  const isSorted = (ids) => {
+    const difficulties = ids.map((id) => {
+      const item = questions.find((row) => row.id === id);
+      return item.difficulty;
+    });
+    for (let i = 1; i < difficulties.length; i += 1) {
+      if (difficulties[i] < difficulties[i - 1]) return false;
+    }
+    return true;
+  };
+  let mixed = 0;
+  const signatures = new Set();
+  for (let i = 0; i < 40; i += 1) {
+    const ids = t.pickQuestions(exclude);
+    assert.deepEqual(new Set(ids), new Set(keep));
+    signatures.add(ids.join(","));
+    if (!isSorted(ids)) mixed += 1;
+  }
+  assert.ok(mixed >= 8, `difficulty order stayed sorted: mixed=${mixed}`);
+  assert.ok(signatures.size >= 3, `match order not shuffled: ${signatures.size}`);
 });
 
 test("seen-question cap covers the full bank before repeats", () => {
@@ -528,6 +557,129 @@ test("answer grace keeps poll timeout and submit window aligned", () => {
   assert.equal(t.isChoiceCorrect(-1, sampleId), false);
 });
 
+test("challenge round marks reveal opponent sheet only when finished", () => {
+  const q = questions[0];
+  const wrong = (q.correctIndex + 1) % 4;
+  const questionIds = Array.from({ length: 7 }, () => q.id);
+  const completed = {
+    status: "completed",
+    currentRound: 6,
+    questionIds,
+    answers: {
+      0: {
+        me: { choice: q.correctIndex, elapsedMs: 900 },
+        opp: { choice: wrong, elapsedMs: 1100 },
+      },
+      1: {
+        me: { choice: -1, elapsedMs: 20000 },
+        opp: { choice: q.correctIndex, elapsedMs: 800 },
+      },
+    },
+  };
+  assert.deepEqual(t.challengeRoundMarks(completed, "me"), [
+    "correct", "missed", "missed", "missed", "missed", "missed", "missed",
+  ]);
+  assert.deepEqual(t.challengeRoundMarks(completed, "opp"), [
+    "wrong", "correct", "missed", "missed", "missed", "missed", "missed",
+  ]);
+
+  const playing = {
+    ...completed,
+    status: "challenger_playing",
+    currentRound: 2,
+  };
+  assert.deepEqual(t.challengeRoundMarks(playing, "me"), [
+    "correct", "missed", "pending", "pending", "pending", "pending", "pending",
+  ]);
+
+  const serialized = t.serializeChallenge("c1", {
+    challengerId: "aaa",
+    challengedId: "bbb",
+    challengerName: "A",
+    challengedName: "B",
+    status: "completed",
+    currentRound: 6,
+    questionIds,
+    answers: {
+      0: {
+        aaa: { choice: q.correctIndex, elapsedMs: 1 },
+        bbb: { choice: wrong, elapsedMs: 2 },
+      },
+    },
+    result: { winnerId: "aaa", players: [] },
+  }, "aaa");
+  assert.equal(serialized.selfRoundMarks[0], "correct");
+  assert.equal(serialized.opponentRoundMarks[0], "wrong");
+  assert.equal(serialized.opponentRoundMarks[1], "missed");
+  assert.equal(serialized.result.roundMarks.aaa[0], "correct");
+  assert.equal(serialized.result.roundMarks.bbb[0], "wrong");
+
+  const live = t.serializeChallenge("c2", {
+    challengerId: "aaa",
+    challengedId: "bbb",
+    challengerName: "A",
+    challengedName: "B",
+    status: "challenger_playing",
+    activePlayerId: "aaa",
+    currentRound: 1,
+    questionIds,
+    answers: {
+      0: { aaa: { choice: q.correctIndex, elapsedMs: 1 } },
+    },
+  }, "aaa");
+  assert.equal(live.selfRoundMarks[0], "correct");
+  assert.deepEqual(live.opponentRoundMarks, [
+    "pending", "pending", "pending", "pending", "pending", "pending", "pending",
+  ]);
+
+  const challengedTurn = t.serializeChallenge("c3", {
+    challengerId: "aaa",
+    challengedId: "bbb",
+    challengerName: "A",
+    challengedName: "B",
+    status: "opponent_playing",
+    activePlayerId: "bbb",
+    currentRound: 2,
+    lastResolution: {
+      round: 1,
+      choices: { bbb: wrong },
+      elapsedMs: { bbb: 900 },
+    },
+    questionIds,
+    answers: {
+      0: {
+        aaa: { choice: q.correctIndex, elapsedMs: 1 },
+        bbb: { choice: wrong, elapsedMs: 2 },
+      },
+      1: {
+        aaa: { choice: wrong, elapsedMs: 3 },
+        bbb: { choice: wrong, elapsedMs: 900 },
+      },
+      2: { aaa: { choice: q.correctIndex, elapsedMs: 4 } },
+    },
+  }, "bbb");
+  assert.equal(challengedTurn.opponentRoundMarks[0], "correct");
+  assert.equal(challengedTurn.opponentRoundMarks[1], "wrong");
+  assert.equal(challengedTurn.opponentRoundMarks[2], "correct");
+  assert.equal(challengedTurn.lastResolution.opponentChoice, wrong);
+  assert.equal(
+    t.shouldRevealChallengeOpponentMarks(
+      { status: "opponent_playing", challengedId: "bbb", challengerId: "aaa" },
+      "bbb",
+      "aaa",
+    ),
+    true,
+  );
+  assert.equal(
+    t.shouldRevealChallengeOpponentMarks(
+      { status: "challenger_playing", challengedId: "bbb", challengerId: "aaa" },
+      "aaa",
+      "bbb",
+    ),
+    false,
+  );
+});
+
 test("round advances as soon as both players answer", () => {
   const players = [{ id: "a" }, { id: "b" }];
   assert.equal(t.ROUND_DURATION_MS, 20_000);
@@ -889,7 +1041,25 @@ test("challenge rank bonus rewards beating higher ranks", () => {
   assert.equal(t.challengeRankBonus(5, 0), 0);
   assert.equal(t.CHALLENGE_TTL_MS, 24 * 60 * 60_000);
   assert.equal(t.CHALLENGE_BOT_DELAY_MS, 12 * 60 * 60_000);
-  assert.equal(t.CHALLENGE_REMINDER_BEFORE_MS, 4 * 60 * 60_000);
+  assert.equal(t.CHALLENGE_REMINDER_BEFORE_MS, 2 * 60 * 60_000);
+});
+
+test("admin auto challenge plan scores 3-5 correct", () => {
+  const ids = t.pickQuestions([]);
+  const plan = t.adminChallengeAutoPlan(ids);
+  assert.equal(plan.length, 7);
+  const marked = plan.filter((step) => step.correct === true).length;
+  assert.ok(marked >= 3 && marked <= 5, `correct=${marked}`);
+  const graded = plan.filter((step, index) =>
+    t.isChoiceCorrect(step.choice, ids[index]),
+  ).length;
+  assert.equal(graded, marked);
+  for (const step of plan) {
+    assert.ok(Number.isInteger(step.choice));
+    assert.ok(step.choice >= 0 && step.choice <= 3);
+    assert.ok(step.elapsedMs >= 2_200);
+    assert.ok(step.elapsedMs < t.ROUND_DURATION_MS);
+  }
 });
 
 test("bot challenge ids and weak plan (exactly one correct)", () => {
@@ -997,6 +1167,36 @@ test("challenge expiry and copy", () => {
   );
   assert.match(t.quizChallengeCopy("tr", "invited", { name: "Ayşe" }).body, /Ayşe/);
   assert.match(t.quizChallengeCopy("tr", "reminder").body, /puan/i);
+  assert.equal(t.CHALLENGE_REMINDER_BEFORE_MS, 2 * 60 * 60_000);
+  assert.deepEqual(
+    t.challengePushRecipients({
+      kind: "completed",
+      challengerId: "aaa",
+      challengedId: "bbb",
+      exceptOwnerHash: "bbb",
+    }),
+    ["aaa"],
+  );
+  assert.deepEqual(
+    t.challengePushRecipients({
+      kind: "invited",
+      challengerId: "aaa",
+      challengedId: "bbb",
+      exceptOwnerHash: "aaa",
+    }),
+    ["bbb"],
+  );
+  assert.deepEqual(
+    t.challengePushRecipients({
+      kind: "completed",
+      challengerId: "aaa",
+      challengedId: "bot_aaaaaaaaaaaaaaaaaaaa",
+    }),
+    ["aaa"],
+  );
+  const flags = {};
+  assert.equal(t.claimChallengeNotify(flags, "completedPushSent"), true);
+  assert.equal(t.claimChallengeNotify(flags, "completedPushSent"), false);
   for (const lang of ["tr", "en", "ar"]) {
     for (const kind of ["invited", "reminder", "won", "lost", "draw"]) {
       const copy = t.quizChallengeCopy(lang, kind, { name: "Ayşe" });

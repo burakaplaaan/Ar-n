@@ -144,6 +144,7 @@ class _RaceRepo implements HilalDuelRepositoryApi {
   Future<HilalDuelMatch> createChallenge({
     required String name,
     required String opponentOwnerHash,
+    bool autoPlay = false,
   }) async {
     throw UnsupportedError('createChallenge');
   }

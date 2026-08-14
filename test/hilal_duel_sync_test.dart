@@ -463,4 +463,55 @@ void main() {
       );
     });
   });
+
+  group('shouldRevealBeforeChallengeSent', () {
+    test('son tur çözümü varken lobiye hemen dönülmez', () {
+      expect(
+        shouldRevealBeforeChallengeSent(
+          awaitingOpponent: true,
+          hasLastResolution: true,
+        ),
+        isTrue,
+      );
+      expect(
+        shouldRevealBeforeChallengeSent(
+          awaitingOpponent: true,
+          hasLastResolution: false,
+        ),
+        isFalse,
+      );
+      expect(
+        shouldRevealBeforeChallengeSent(
+          awaitingOpponent: false,
+          hasLastResolution: true,
+        ),
+        isFalse,
+      );
+    });
+  });
+
+  group('parseRoundMarks', () {
+    test('sunucu tokenlarını tahta işaretine çevirir', () {
+      expect(parseRoundMarkToken('correct'), HilalDuelRoundMark.correct);
+      expect(parseRoundMarkToken('wrong'), HilalDuelRoundMark.wrong);
+      expect(parseRoundMarkToken('missed'), HilalDuelRoundMark.missed);
+      expect(parseRoundMarkToken('pending'), HilalDuelRoundMark.pending);
+      expect(parseRoundMarkToken(null), HilalDuelRoundMark.pending);
+      expect(
+        parseRoundMarks(
+          ['correct', 'wrong', 'missed'],
+          total: 7,
+        ),
+        [
+          HilalDuelRoundMark.correct,
+          HilalDuelRoundMark.wrong,
+          HilalDuelRoundMark.missed,
+          HilalDuelRoundMark.pending,
+          HilalDuelRoundMark.pending,
+          HilalDuelRoundMark.pending,
+          HilalDuelRoundMark.pending,
+        ],
+      );
+    });
+  });
 }

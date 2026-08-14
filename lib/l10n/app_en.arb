@@ -735,6 +735,7 @@
   "hilalDuelDoubled": "Crescents doubled",
   "hilalDuelLobby": "Back to lobby",
   "hilalDuelRematch": "Play again",
+  "hilalDuelChallengeAgain": "Challenge again",
   "hilalDuelRetry": "Try again",
   "hilalDuelPremiumUnlimited": "Premium: unlimited hearts",
   "hilalDuelUpgradePremium": "Upgrade to Premium • Play Unlimited",
@@ -778,6 +779,7 @@
     }
   },
   "hilalDuelWeeklyTitle": "Player of the Week",
+  "hilalDuelWeeklyResetHint": "Resets on Monday",
   "hilalDuelWeeklyThisWeek": "This week: {count} crescents",
   "@hilalDuelWeeklyThisWeek": {
     "placeholders": {
@@ -822,8 +824,12 @@
   "hilalDuelYouLabel": "You",
   "hilalDuelOpponentLabel": "Opponent",
   "hilalDuelChallengeAction": "Challenge",
+  "hilalDuelAdminChallengeTitle": "Challenge",
+  "hilalDuelAdminChallengeBody": "Play it yourself, or auto-send a 3–5 correct run to provoke the opponent.",
+  "hilalDuelAdminChallengePlay": "Play for real",
+  "hilalDuelAdminChallengeAuto": "Auto-send",
   "hilalDuelChallengeInboxTitle": "Challenges",
-  "hilalDuelChallengeAccept": "Accept · 1 heart",
+  "hilalDuelChallengeAccept": "Accept",
   "hilalDuelChallengeContinue": "Continue",
   "hilalDuelChallengeSeeResult": "See result",
   "hilalDuelChallengeWaiting": "Waiting for opponent",
@@ -1536,7 +1542,7 @@
   "surveyNotificationTitle": "Notifications",
   "surveyNotificationLead": "Let prayer reminders and daily messages reach you on time.",
   "surveyNotificationSubtitle": "We need notification permission so prayer alerts and content suggestions are not missed. You can turn it off anytime in settings.",
-  "surveyNotificationAllow": "Continue",
+  "surveyNotificationAllow": "Turn on notifications",
   "surveyNotificationSkip": "Skip for now",
   "surveyNotificationOpenSettings": "Open settings",
   "surveyLockWidgetsTitle": "Lock screen",

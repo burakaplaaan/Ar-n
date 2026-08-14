@@ -42,6 +42,34 @@ Future<void> _promptNeedHeartDialog({
   }
 }
 
+/// Admin: `true` otomatik gönder, `false` gerçek oyna, `null` vazgeç.
+Future<bool?> _promptAdminChallengeMode({
+  required BuildContext context,
+  required AppLocalizations l10n,
+}) {
+  return showDialog<bool>(
+    context: context,
+    builder: (ctx) => AlertDialog(
+      title: Text(l10n.hilalDuelAdminChallengeTitle),
+      content: Text(l10n.hilalDuelAdminChallengeBody),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(ctx),
+          child: Text(l10n.commonCancel),
+        ),
+        TextButton(
+          onPressed: () => Navigator.pop(ctx, false),
+          child: Text(l10n.hilalDuelAdminChallengePlay),
+        ),
+        FilledButton(
+          onPressed: () => Navigator.pop(ctx, true),
+          child: Text(l10n.hilalDuelAdminChallengeAuto),
+        ),
+      ],
+    ),
+  );
+}
+
 final hilalDuelRepositoryProvider = Provider<HilalDuelRepository>((ref) {
   return HilalDuelRepository();
 });
@@ -286,6 +314,7 @@ class _HilalDuelPageState extends ConsumerState<HilalDuelPage>
           controller: c,
           l10n: l10n,
           onDark: onDark,
+          isAdmin: ref.watch(isCurrentUserAdminProvider).asData?.value ?? false,
           playerName: _hilalPlayerName(
             ref.watch(userProfileProvider).name,
             c.profile?.name,
@@ -1017,8 +1046,7 @@ class _ChallengeInboxCard extends StatelessWidget {
           return l10n.hilalDuelChallengeSeeResult;
       }
     }
-    if (item.canAccept) return l10n.hilalDuelChallengeAccept;
-    if (item.myTurn) return l10n.hilalDuelChallengeYourTurn;
+    if (item.canAccept || item.myTurn) return l10n.hilalDuelChallengeYourTurn;
     return l10n.hilalDuelChallengeWaiting;
   }
 
@@ -1079,46 +1107,100 @@ class _ChallengeInboxCard extends StatelessWidget {
                     ),
                   ),
                   if (item.canAccept || item.myTurn || item.status == 'completed')
-                    TextButton(
-                      onPressed: controller.busy
-                          ? null
-                          : () {
-                              HapticFeedback.mediumImpact();
-                              final p = controller.profile;
-                              if (item.canAccept &&
-                                  p != null &&
-                                  !p.premium &&
-                                  p.hearts <= 0) {
-                                onNeedHeart();
-                                unawaited(
-                                  _promptNeedHeartDialog(
-                                    context: context,
-                                    l10n: l10n,
-                                    controller: controller,
-                                  ),
-                                );
-                                return;
-                              }
-                              unawaited(controller.openChallenge(item.id));
-                            },
-                      child: Text(
-                        item.status == 'completed'
-                            ? l10n.hilalDuelChallengeSeeResult
-                            : item.canAccept
-                            ? l10n.hilalDuelChallengeAccept
-                            : l10n.hilalDuelChallengeContinue,
-                        style: TextStyle(
-                          color: bronze,
-                          fontWeight: FontWeight.w800,
-                          fontSize: 12,
-                        ),
-                      ),
+                    _InboxActionButton(
+                      label: item.status == 'completed'
+                          ? l10n.hilalDuelChallengeSeeResult
+                          : item.canAccept
+                          ? l10n.hilalDuelChallengeAccept
+                          : l10n.hilalDuelChallengeContinue,
+                      filled: item.canAccept,
+                      accent: bronze,
+                      enabled: !controller.busy,
+                      onPressed: () {
+                        HapticFeedback.mediumImpact();
+                        final p = controller.profile;
+                        if (item.canAccept &&
+                            p != null &&
+                            !p.premium &&
+                            p.hearts <= 0) {
+                          onNeedHeart();
+                          unawaited(
+                            _promptNeedHeartDialog(
+                              context: context,
+                              l10n: l10n,
+                              controller: controller,
+                            ),
+                          );
+                          return;
+                        }
+                        unawaited(controller.openChallenge(item.id));
+                      },
                     ),
                 ],
               ),
             );
           }),
         ],
+      ),
+    );
+  }
+}
+
+/// Inbox satır aksiyonu — kabul için dolu hap, diğerleri çerçeveli.
+class _InboxActionButton extends StatelessWidget {
+  const _InboxActionButton({
+    required this.label,
+    required this.accent,
+    required this.enabled,
+    required this.onPressed,
+    this.filled = false,
+  });
+
+  final String label;
+  final Color accent;
+  final bool enabled;
+  final bool filled;
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    const filledFg = Color(0xFF1A1208);
+    final fg = filled ? filledFg : accent;
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: enabled ? onPressed : null,
+        borderRadius: BorderRadius.circular(999),
+        child: Ink(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(999),
+            color: filled
+                ? (enabled ? accent : accent.withValues(alpha: 0.38))
+                : Colors.transparent,
+            border: Border.all(
+              color: accent.withValues(alpha: enabled ? 0.85 : 0.35),
+            ),
+            boxShadow: filled && enabled
+                ? [
+                    BoxShadow(
+                      color: accent.withValues(alpha: 0.32),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    ),
+                  ]
+                : null,
+          ),
+          child: Text(
+            label,
+            style: TextStyle(
+              color: enabled ? fg : fg.withValues(alpha: 0.45),
+              fontWeight: FontWeight.w800,
+              fontSize: 12,
+              height: 1.1,
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -1591,13 +1673,24 @@ class _WeeklyLeaderCardState extends ConsumerState<_WeeklyLeaderCard> {
                   ),
                   const SizedBox(width: 10),
                   Expanded(
-                    child: Text(
-                      l10n.hilalDuelWeeklyTitle,
-                      style: TextStyle(
-                        color: _HilalPalette.ink(onDark),
-                        fontWeight: FontWeight.w900,
-                        fontSize: 17,
-                      ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          l10n.hilalDuelWeeklyTitle,
+                          style: TextStyle(
+                            color: _HilalPalette.ink(onDark),
+                            fontWeight: FontWeight.w900,
+                            fontSize: 17,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        _WeeklyResetHint(
+                          label: l10n.hilalDuelWeeklyResetHint,
+                          onDark: onDark,
+                          accent: theme.accent,
+                        ),
+                      ],
                     ),
                   ),
                   Icon(
@@ -1885,6 +1978,50 @@ String _lastWeekWinnerPrize(AppLocalizations l10n, int rank) {
       return l10n.hilalDuelWeeklyLastWinnerPrize3;
     default:
       return '';
+  }
+}
+
+class _WeeklyResetHint extends StatelessWidget {
+  const _WeeklyResetHint({
+    required this.label,
+    required this.onDark,
+    required this.accent,
+    this.centered = false,
+  });
+
+  final String label;
+  final bool onDark;
+  final Color accent;
+  final bool centered;
+
+  @override
+  Widget build(BuildContext context) {
+    final chip = Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(99),
+        color: accent.withValues(alpha: onDark ? 0.18 : 0.12),
+        border: Border.all(color: accent.withValues(alpha: 0.45)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(Icons.event_repeat_rounded, size: 12, color: accent),
+          const SizedBox(width: 4),
+          Text(
+            label,
+            style: TextStyle(
+              color: accent,
+              fontWeight: FontWeight.w800,
+              fontSize: 11,
+              height: 1.1,
+            ),
+          ),
+        ],
+      ),
+    );
+    if (!centered) return chip;
+    return Align(alignment: Alignment.center, child: chip);
   }
 }
 
@@ -2323,6 +2460,15 @@ class _WeeklyLeaderSheetState extends ConsumerState<_WeeklyLeaderSheet> {
                     fontSize: 20,
                   ),
                 ),
+                if (!widget.challengePickMode) ...[
+                  const SizedBox(height: 8),
+                  _WeeklyResetHint(
+                    label: widget.l10n.hilalDuelWeeklyResetHint,
+                    onDark: widget.onDark,
+                    accent: bronze,
+                    centered: true,
+                  ),
+                ],
                 if (widget.challengePickMode) ...[
                   const SizedBox(height: 8),
                   Text(
@@ -2595,7 +2741,7 @@ class _WeeklyLeaderSheetState extends ConsumerState<_WeeklyLeaderSheet> {
                                   label: widget.l10n.hilalDuelChallengeAction,
                                   accent: accent,
                                   enabled: !widget.controller.busy,
-                                  onPressed: () {
+                                  onPressed: () async {
                                     HapticFeedback.mediumImpact();
                                     final p = widget.controller.profile;
                                     if (p != null &&
@@ -2610,10 +2756,22 @@ class _WeeklyLeaderSheetState extends ConsumerState<_WeeklyLeaderSheet> {
                                       );
                                       return;
                                     }
+                                    var autoPlay = false;
+                                    if (isAdmin) {
+                                      final mode =
+                                          await _promptAdminChallengeMode(
+                                        context: context,
+                                        l10n: widget.l10n,
+                                      );
+                                      if (mode == null) return;
+                                      autoPlay = mode;
+                                    }
+                                    if (!context.mounted) return;
                                     Navigator.of(context).pop();
                                     unawaited(
                                       widget.controller.createChallenge(
                                         entry.ownerHash,
+                                        autoPlay: autoPlay,
                                       ),
                                     );
                                   },
@@ -4323,12 +4481,14 @@ class _ResultBody extends StatefulWidget {
     required this.l10n,
     required this.onDark,
     required this.playerName,
+    this.isAdmin = false,
   });
 
   final HilalDuelController controller;
   final AppLocalizations l10n;
   final bool onDark;
   final String playerName;
+  final bool isAdmin;
 
   @override
   State<_ResultBody> createState() => _ResultBodyState();
@@ -4597,7 +4757,36 @@ class _ResultBodyState extends State<_ResultBody>
                 style: TextStyle(color: bronze, fontWeight: FontWeight.w600),
               ),
             const SizedBox(height: 12),
-            if (!controller.challengeMode)
+            if (controller.isChallengeResult)
+              _PrimaryButton(
+                label: l10n.hilalDuelChallengeAgain,
+                busy: controller.busy,
+                onDark: onDark,
+                onTap: () async {
+                  final p = controller.profile;
+                  if (p != null && !p.premium && p.hearts <= 0) {
+                    unawaited(
+                      _promptNeedHeartDialog(
+                        context: context,
+                        l10n: l10n,
+                        controller: controller,
+                      ),
+                    );
+                    return;
+                  }
+                  var autoPlay = false;
+                  if (widget.isAdmin) {
+                    final mode = await _promptAdminChallengeMode(
+                      context: context,
+                      l10n: l10n,
+                    );
+                    if (mode == null) return;
+                    autoPlay = mode;
+                  }
+                  unawaited(controller.challengeAgain(autoPlay: autoPlay));
+                },
+              )
+            else
               _PrimaryButton(
                 label: l10n.hilalDuelRematch,
                 busy: controller.busy,
@@ -4617,7 +4806,7 @@ class _ResultBodyState extends State<_ResultBody>
                   unawaited(controller.rematch());
                 },
               ),
-            if (!controller.challengeMode) const SizedBox(height: 10),
+            const SizedBox(height: 10),
             _SecondaryButton(
               label: l10n.hilalDuelLobby,
               busy: controller.busy,

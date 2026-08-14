@@ -6,7 +6,6 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timezone/timezone.dart' as tz;
 
@@ -1145,21 +1144,6 @@ abstract final class PrayerNotificationScheduler {
     if (!supported) return;
     await init();
     await AppLocalNotificationScheduler.init();
-    if (Platform.isAndroid) {
-      final android = arinLocalNotificationsPlugin
-          .resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin
-          >();
-      await android?.requestNotificationsPermission();
-      await Permission.scheduleExactAlarm.request();
-      await android?.requestExactAlarmsPermission();
-    } else if (Platform.isIOS) {
-      final ios = arinLocalNotificationsPlugin
-          .resolvePlatformSpecificImplementation<
-            IOSFlutterLocalNotificationsPlugin
-          >();
-      await ios?.requestPermissions(alert: true, badge: true, sound: true);
-    }
   }
 
   /// Önbellek yoksa ağdan vakitleri alır; namaz hatırlatıcıları açıksa 7

@@ -29,7 +29,11 @@ final prayerTimesProvider = FutureProvider<PrayerTimesModel>((ref) async {
 
   final prefs = ref.read(sharedPreferencesProvider);
 
-  final result = await resolver.fetchToday();
+  var result = await resolver.fetchToday();
+  if (result.model == null) {
+    await Future<void>.delayed(const Duration(milliseconds: 800));
+    result = await resolver.fetchToday();
+  }
   final raw = result.model;
   if (raw == null) {
     throw Exception(
