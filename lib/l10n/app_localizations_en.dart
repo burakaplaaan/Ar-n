@@ -3665,6 +3665,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get widgetUnlockCancelButton => 'Not now';
 
   @override
+  String get purchaseErrorLegacyPlan =>
+      'This plan is no longer sold. Existing subscribers keep their current price.';
+
+  @override
   String get purchaseErrorNotFound =>
       'Product not found. Please check your internet connection.';
 
@@ -4427,6 +4431,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get premiumCompareContestPremium => 'Unlimited';
+
+  @override
+  String get premiumGrandfatherNotice =>
+      'Your current Premium plan keeps the same price. New prices apply only to new subscriptions.';
+
+  @override
+  String get premiumLegacyOwnedPrice => 'Your launch price still applies';
 
   @override
   String get premiumFooterText1 =>

@@ -3657,6 +3657,10 @@ class AppLocalizationsTr extends AppLocalizations {
   String get widgetUnlockCancelButton => 'Şimdi değil';
 
   @override
+  String get purchaseErrorLegacyPlan =>
+      'Bu plan yeni satışa kapalı. Mevcut aboneler eski fiyatından devam eder.';
+
+  @override
   String get purchaseErrorNotFound =>
       'Ürün bulunamadı. İnternet bağlantınızı kontrol edin.';
 
@@ -4416,6 +4420,13 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get premiumCompareContestPremium => 'Sınırsız';
+
+  @override
+  String get premiumGrandfatherNotice =>
+      'Mevcut Premium planın aynı fiyattan devam eder. Yeni fiyatlar yalnızca yeni abonelikler içindir.';
+
+  @override
+  String get premiumLegacyOwnedPrice => 'Lansman fiyatın geçerli';
 
   @override
   String get premiumFooterText1 =>

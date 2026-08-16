@@ -11,4 +11,9 @@ void main() {
     );
     expect(info.monthlyEquivalentString, '41,67 ₺');
   });
+
+  test('binlik ayracı ile TRY biçimler', () {
+    expect(StorePriceInfo.formatTry(1299.99), '1.299,99');
+    expect(StorePriceInfo.formatTry(99.99), '99,99');
+  });
 }

@@ -90,7 +90,7 @@ Long-term: debug install (`flutter run`) + App Check debug token `8f3c2a91-6e4b-
 1. Hub card → lobby loads profile + resumes waiting/matched queue if present.
 2. Start match → heart consumed; cancel within search → heart refunded once; back/swipe during search awaits cancel.
 3. 15s search → bot with “Hızlı Rakip”; answers rejected before `roundStartedAtMs`.
-4. Result → optional double SSV once; rematch respects hearts; interstitial every 2 completed free matches on lobby return only.
+4. Result → optional double SSV once; rematch respects hearts. Ads only when the player chooses rewarded heart or double-hilal — no automatic interstitial.
 5. Free players receive hearts only from rewarded ads; Premium players have unlimited matches. There is no daily free-heart path.
 6. Google/Apple signed-in users keep real auth (custom token only if `currentUser == null`).
 

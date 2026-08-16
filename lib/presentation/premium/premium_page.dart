@@ -152,6 +152,18 @@ class _PremiumPageState extends ConsumerState<PremiumPage> {
     if (_busyProductId != null) return;
     final messenger = ScaffoldMessenger.of(context);
     final l10n = AppLocalizations.of(context)!;
+    if (RevenueCatIds.isLegacyProductId(productId) ||
+        !RevenueCatIds.canPurchaseInApp(productId)) {
+      messenger.showSnackBar(SnackBar(content: Text(l10n.purchaseErrorLegacyPlan)));
+      return;
+    }
+    final entitlement = ref.read(premiumEntitlementProvider).asData?.value;
+    final activeProductId = entitlement?.productId ?? '';
+    if (RevenueCatIds.isLegacyProductId(activeProductId) &&
+        _normalizeProductId(productId) != PremiumPage.lifetimeProductId) {
+      messenger.showSnackBar(SnackBar(content: Text(l10n.purchaseErrorLegacyPlan)));
+      return;
+    }
     if (_loadingProducts || !_containsProduct(productId)) {
       messenger.showSnackBar(
         SnackBar(
@@ -436,6 +448,9 @@ class _PremiumPageState extends ConsumerState<PremiumPage> {
     final hasLifetime =
         isPremium == true &&
         _ownsAny(activeProductId, RevenueCatIds.allLifetimeProductIds);
+    final hasLegacyPlan =
+        isPremium == true && RevenueCatIds.isLegacyProductId(activeProductId);
+    final canSwitchToYearly = hasMonthly && !hasLegacyPlan;
     final signedIn = ref.watch(authUserProvider).asData?.value != null;
 
     // Android/iOS'ta mağazadan gerçek fiyatlar kullanılır.
@@ -449,9 +464,12 @@ class _PremiumPageState extends ConsumerState<PremiumPage> {
       ..._storePriceByBaseId,
     };
     
-    final yearlyInfo = mergedPriceByBaseId[PremiumPage.yearlyProductId];
-    final monthlyInfo = mergedPriceByBaseId[PremiumPage.monthlyProductId];
-    final lifetimeInfo = mergedPriceByBaseId[PremiumPage.lifetimeProductId];
+    final yearlyInfo = mergedPriceByBaseId[PremiumPage.yearlyProductId] ??
+        StorePriceInfo.maybeCatalogFallback(PremiumPage.yearlyProductId);
+    final monthlyInfo = mergedPriceByBaseId[PremiumPage.monthlyProductId] ??
+        StorePriceInfo.maybeCatalogFallback(PremiumPage.monthlyProductId);
+    final lifetimeInfo = mergedPriceByBaseId[PremiumPage.lifetimeProductId] ??
+        StorePriceInfo.maybeCatalogFallback(PremiumPage.lifetimeProductId);
     final yearlyPrice = yearlyInfo?.priceString;
     final monthlyPrice = monthlyInfo?.priceString;
     final lifetimePrice = lifetimeInfo?.priceString;
@@ -548,6 +566,10 @@ class _PremiumPageState extends ConsumerState<PremiumPage> {
                             ),
                           ),
                           const SizedBox(height: 22),
+                          if (isPremium) ...[
+                            const _GrandfatherNotice(),
+                            const SizedBox(height: 14),
+                          ],
                           if (!isPremium && !signedIn) ...[
                             const _SignInRequiredNotice(),
                             const SizedBox(height: 14),
@@ -563,14 +585,16 @@ class _PremiumPageState extends ConsumerState<PremiumPage> {
                             title: l10n.premiumYearlyPlanTitle,
                             badge: hasYearly ? null : l10n.premiumMostAdvantageousBadge,
                             oldPrice: null,
-                            price: yearlyPrice ?? '—',
+                            price: hasYearly && hasLegacyPlan
+                                ? l10n.premiumLegacyOwnedPrice
+                                : yearlyPrice ?? '—',
                             subline: yearlyReady
                                 ? (yearlyPerMonth.isNotEmpty
                                     ? l10n.premiumYearlyPerMonth(yearlyPerMonth)
                                     : l10n.premiumYearlyPlanSubtitle)
                                 : l10n.premiumPlanComingSoon,
                             footnote: yearlyReady ? l10n.premiumYearlyTrialNote : null,
-                            saveHint: yearlyReady && !hasYearly
+                            saveHint: yearlyReady && !hasYearly && !hasLegacyPlan
                                 ? l10n.premiumYearlySaveVsMonthly
                                 : null,
                             productId: PremiumPage.yearlyProductId,
@@ -579,9 +603,9 @@ class _PremiumPageState extends ConsumerState<PremiumPage> {
                             enabled:
                                 yearlyReady &&
                                 !hasLifetime &&
-                                (!isPremium || hasMonthly) &&
+                                (!isPremium || canSwitchToYearly) &&
                                 !_loadingProducts,
-                            buttonLabel: hasMonthly
+                            buttonLabel: canSwitchToYearly
                                 ? l10n.premiumSwitchToYearly
                                 : l10n.premiumYearlyTrialCta,
                             busy: _busyProductId == PremiumPage.yearlyProductId,
@@ -594,7 +618,9 @@ class _PremiumPageState extends ConsumerState<PremiumPage> {
                           _PlanCard(
                             title: l10n.premiumMonthlyPlanTitle,
                             oldPrice: null,
-                            price: monthlyPrice ?? '—',
+                            price: hasMonthly && hasLegacyPlan
+                                ? l10n.premiumLegacyOwnedPrice
+                                : monthlyPrice ?? '—',
                             subline: monthlyReady
                                 ? l10n.premiumMonthlyPlanSubtitle
                                 : l10n.premiumPlanComingSoon,
@@ -969,6 +995,48 @@ class _FreePremiumCompare extends StatelessWidget {
               ),
             ),
           ],
+        ],
+      ),
+    );
+  }
+}
+
+class _GrandfatherNotice extends StatelessWidget {
+  const _GrandfatherNotice();
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final textColor = isDark
+        ? Colors.white.withValues(alpha: 0.78)
+        : AppColors.textSecondary;
+
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: AppColors.goldAccent.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: AppColors.goldAccent.withValues(alpha: 0.28),
+        ),
+      ),
+      child: Row(
+        children: [
+          Icon(
+            Icons.verified_outlined,
+            color: isDark ? AppColors.goldAccent : AppColors.emeraldDark,
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              AppLocalizations.of(context)!.premiumGrandfatherNotice,
+              style: TextStyle(
+                color: textColor,
+                height: 1.35,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
         ],
       ),
     );

@@ -1750,6 +1750,7 @@
   },
   "widgetUnlockPremiumButton": "Upgrade to Premium",
   "widgetUnlockCancelButton": "Not now",
+  "purchaseErrorLegacyPlan": "This plan is no longer sold. Existing subscribers keep their current price.",
   "purchaseErrorNotFound": "Product not found. Please check your internet connection.",
   "purchaseErrorUnexpected": "Unexpected error: {error}",
   "@purchaseErrorUnexpected": {
@@ -1989,6 +1990,8 @@
   "premiumCompareContest": "Contest plays",
   "premiumCompareContestFree": "Limited",
   "premiumCompareContestPremium": "Unlimited",
+  "premiumGrandfatherNotice": "Your current Premium plan keeps the same price. New prices apply only to new subscriptions.",
+  "premiumLegacyOwnedPrice": "Your launch price still applies",
   "premiumFooterText1": "New prices apply only to new subscriptions. Existing subscribers keep their current price. The subscription is managed through your store account and can be canceled at any time.",
   "premiumFooterText2": "The subscription renews automatically unless canceled at least 24 hours before the end of the period. The renewal fee is charged to your store account 24 hours before the end of the period. You can manage your subscriptions in App Store/Play account settings.",
   "premiumLaunchBadge": "3 DAYS FREE",

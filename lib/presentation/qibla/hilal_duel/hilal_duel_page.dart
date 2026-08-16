@@ -4811,8 +4811,7 @@ class _ResultBodyState extends State<_ResultBody>
               label: l10n.hilalDuelLobby,
               busy: controller.busy,
               onDark: onDark,
-              onTap: () =>
-                  unawaited(controller.returnToLobby(maybeInterstitial: true)),
+              onTap: () => unawaited(controller.returnToLobby()),
             ),
           ],
         ),

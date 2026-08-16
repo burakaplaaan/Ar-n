@@ -22,6 +22,7 @@ const {
 } = require("firebase-admin/firestore");
 const { getMessaging } = require("firebase-admin/messaging");
 const { getAuth } = require("firebase-admin/auth");
+const premiumWebhookPolicy = require("./premium_webhook_policy");
 
 initializeApp();
 
@@ -48,10 +49,6 @@ const _defaultTeaserTexts = [
   "Bu an geçmeden bir bak",
   "Seninle buluşmak için bir an var",
 ];
-const _kPremiumProductIds = new Set([
-  "arin_premium_monthly_launch",
-  "arin_premium_yearly_launch",
-]);
 const _kValidRcEnvironments = new Set(["PRODUCTION"]);
 function _safeEqual(a, b) {
   const sa = String(a || "");
@@ -103,13 +100,11 @@ async function _purgePremiumInviteByEmail(db, email) {
 }
 
 function _extractBaseProductId(productId) {
-  if (!productId || typeof productId !== "string") return null;
-  return productId.split(":")[0];
+  return premiumWebhookPolicy.extractBaseProductId(productId);
 }
 
 function _eventHasPremiumEntitlement(event) {
-  const ids = event && event.entitlement_ids;
-  return Array.isArray(ids) && ids.includes("premium");
+  return premiumWebhookPolicy.eventHasPremiumEntitlement(event);
 }
 
 function _resolveActiveUntilMs(event) {
@@ -135,13 +130,13 @@ async function _assertNotStaleForUid({ db, uid, eventTsMs }) {
   }
 }
 
+function _isLifetimeProductId(productId) {
+  return premiumWebhookPolicy.isLifetimeProductId(productId);
+}
+
 function _isPremiumSubscriptionEvent(event) {
   const rawProductId = event && event.product_id;
-  const baseProductId = _extractBaseProductId(rawProductId);
-  if (
-    (rawProductId && _kPremiumProductIds.has(rawProductId)) ||
-    (baseProductId && _kPremiumProductIds.has(baseProductId))
-  ) {
+  if (premiumWebhookPolicy.isPremiumProductId(rawProductId)) {
     return true;
   }
   return _eventHasPremiumEntitlement(event);
@@ -2254,10 +2249,16 @@ exports.revenuecatWebhook = onRequest(
       const transferredTo = Array.isArray(event.transferred_to)
         ? event.transferred_to
         : [];
-      const expiresAtMs = event.expiration_at_ms;
       const activeUntilMs = _resolveActiveUntilMs(event);
-      const expiresAt = activeUntilMs ? Timestamp.fromMillis(activeUntilMs) : null;
-      const isActiveUntilExpiry = activeUntilMs ? activeUntilMs > nowMs : false;
+      const destGrant = premiumWebhookPolicy.transferDestinationGrant({
+        productId,
+        entitlementIds: event.entitlement_ids,
+        activeUntilMs,
+        nowMs,
+      });
+      const destExpiresAt = destGrant.expiresAtMs
+        ? Timestamp.fromMillis(destGrant.expiresAtMs)
+        : null;
       const writes = [];
       for (const fromUid of transferredFrom) {
         if (!fromUid || String(fromUid).startsWith("$RCAnonymousID")) continue;
@@ -2291,14 +2292,29 @@ exports.revenuecatWebhook = onRequest(
           eventTsMs,
         });
         if (stale) continue;
+        const destSnap = await db
+          .collection("premium_entitlements")
+          .doc(normalizedUid)
+          .get();
+        if (
+          premiumWebhookPolicy.shouldPreserveLifetime({
+            existingData: destSnap.data(),
+            eventType: type,
+            incomingProductId: productId,
+          })
+        ) {
+          // lastEventTimestampMs bilinçli olarak güncellenmez; gecikmiş
+          // lifetime CANCELLATION hâlâ işlenebilsin.
+          continue;
+        }
         writes.push(
           db.collection("premium_entitlements").doc(normalizedUid).set(
             {
-              active: isActiveUntilExpiry,
+              active: destGrant.active,
               source: "revenuecat",
               productId: _extractBaseProductId(productId) ?? productId,
               platform: event.store ?? null,
-              expiresAt,
+              expiresAt: destExpiresAt,
               updatedAt: now,
               lastEventTimestampMs: eventTsMs,
             },
@@ -2348,11 +2364,13 @@ exports.revenuecatWebhook = onRequest(
 
     const activeTypes = new Set([
       "INITIAL_PURCHASE",
+      "NON_RENEWING_PURCHASE",
       "RENEWAL",
       "PRODUCT_CHANGE",
       "UNCANCELLATION",
     ]);
     const inactiveTypes = new Set(["EXPIRATION"]);
+    const isLifetime = _isLifetimeProductId(productId);
 
     // Sadece premium abonelik SKU'ları entitlement günceller.
     // Destek ürünleri (tip/non-subscription) bu koleksiyonu etkilememeli.
@@ -2364,8 +2382,36 @@ exports.revenuecatWebhook = onRequest(
       return;
     }
 
+    const existingSnap = await docRef.get();
+    if (
+      premiumWebhookPolicy.shouldPreserveLifetime({
+        existingData: existingSnap.data(),
+        eventType: type,
+        incomingProductId: productId,
+      })
+    ) {
+      // lastEventTimestampMs bilinçli olarak güncellenmez; gecikmiş
+      // lifetime CANCELLATION hâlâ işlenebilsin.
+      console.log(
+        `[RC Webhook] Ömür boyu kayıt korundu uid=${uid} incoming=${productId} (${type})`,
+      );
+      res.status(200).json({ ok: true, skipped: true, preserveLifetime: true });
+      return;
+    }
+
     if (activeTypes.has(type)) {
-      const expiresAtMs = event.expiration_at_ms;
+      const grant = premiumWebhookPolicy.subscriptionGrantExpiresAtMs({
+        isLifetime,
+        expirationAtMs: event.expiration_at_ms,
+      });
+      if (!grant.ok) {
+        console.log(
+          `[RC Webhook] ${type} expiry yok, abonelik event atlandı uid=${uid}`,
+        );
+        res.status(200).json({ ok: true, skipped: true, noExpiry: true });
+        return;
+      }
+      const expiresAtMs = grant.expiresAtMs;
       await docRef.set(
         {
           active: true,
@@ -2395,6 +2441,26 @@ exports.revenuecatWebhook = onRequest(
       );
       console.log(`[RC Webhook] ${type} → ${uid} (${email ?? "e-posta yok"}) premium pasif edildi`);
     } else if (type === "CANCELLATION" || type === "BILLING_ISSUE") {
+      if (isLifetime && type === "CANCELLATION") {
+        await docRef.set(
+          {
+            active: false,
+            source: "revenuecat",
+            email: email,
+            productId: _extractBaseProductId(productId) ?? productId,
+            platform: event.store ?? null,
+            expiresAt: now,
+            updatedAt: now,
+            lastEventTimestampMs: eventTsMs,
+          },
+          { merge: true },
+        );
+        console.log(
+          `[RC Webhook] ${type} → ${uid} (${email ?? "e-posta yok"}) ömür boyu premium iptal edildi`,
+        );
+        res.status(200).json({ ok: true });
+        return;
+      }
       const activeUntilMs = _resolveActiveUntilMs(event);
       if (!activeUntilMs) {
         console.log(

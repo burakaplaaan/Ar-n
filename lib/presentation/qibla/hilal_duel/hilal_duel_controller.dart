@@ -35,7 +35,6 @@ class HilalDuelController extends ChangeNotifier {
        _adMob = adMob,
        _displayName = displayName;
 
-  static const _interstitialFreeMatchKey = 'arin_hilal_duel_free_matches_v1';
   static const _pendingHeartProofKey =
       'arin_hilal_duel_pending_heart_proof_v1';
   static const _pendingHeartProofExpiryKey =
@@ -1016,12 +1015,9 @@ class HilalDuelController extends ChangeNotifier {
     }
   }
 
-  Future<void> returnToLobby({bool maybeInterstitial = false}) async {
+  Future<void> returnToLobby() async {
     _stopTimers();
     if (_disposed) return;
-    // Result→Lobby interstitial; rematch bunu false geçirir.
-    final shouldShowInterstitial =
-        maybeInterstitial && profile?.premium != true;
     phase = HilalDuelPhase.lobby;
     match = null;
     challengeMode = false;
@@ -1040,14 +1036,10 @@ class HilalDuelController extends ChangeNotifier {
     _safeNotify();
     await refreshProfile();
     await refreshChallenges();
-    if (shouldShowInterstitial && !_disposed) {
-      await _maybeShowInterstitial();
-    }
   }
 
   Future<void> rematch() async {
-    // Counter _onMatchCompleted'da yazıldı; rematch interstitial atlar.
-    await returnToLobby(maybeInterstitial: false);
+    await returnToLobby();
     await startMatchmaking();
   }
 
@@ -1897,37 +1889,10 @@ class HilalDuelController extends ChangeNotifier {
             .firstOrNull ??
         0;
     unawaited(ArinAnalytics.hilalDuelMatchComplete(correct: selfCorrect));
-    // Counter rematch'ten önce yazılır; Result→Lobby interstitial bunu kullanır.
-    await _incrementFreeMatchCounter();
     await refreshProfile();
     if (!_disposed && _opponentMarksUnresolved) {
       await _refreshChallengeRoundMarks();
     }
-  }
-
-  Future<void> _incrementFreeMatchCounter() async {
-    if (profile?.premium == true) return;
-    final prefs = await SharedPreferences.getInstance();
-    final current = prefs.getInt(_interstitialFreeMatchKey) ?? 0;
-    await prefs.setInt(_interstitialFreeMatchKey, current + 1);
-  }
-
-  Future<void> _maybeShowInterstitial() async {
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      final count = prefs.getInt(_interstitialFreeMatchKey) ?? 0;
-      // Her 2 tamamlanan ücretsiz maçta bir; yalnızca Result→Lobby çağrısında.
-      if (count < 2 || count % 2 != 0) return;
-      final shown = await _adMob.showInterstitial(
-        ArinAdUnit.exploreInterstitial,
-      );
-      if (shown) {
-        unawaited(ArinAnalytics.hilalDuelInterstitial());
-        unawaited(
-          ProductMetricsService.adWatch(ProductMetricFeatures.hilalDuel),
-        );
-      }
-    } catch (_) {}
   }
 
   double matchmakingProgress() {

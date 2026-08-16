@@ -1750,6 +1750,7 @@
   },
   "widgetUnlockPremiumButton": "Premium'a geç",
   "widgetUnlockCancelButton": "Şimdi değil",
+  "purchaseErrorLegacyPlan": "Bu plan yeni satışa kapalı. Mevcut aboneler eski fiyatından devam eder.",
   "purchaseErrorNotFound": "Ürün bulunamadı. İnternet bağlantınızı kontrol edin.",
   "purchaseErrorUnexpected": "Beklenmedik hata: {error}",
   "@purchaseErrorUnexpected": {
@@ -1989,6 +1990,8 @@
   "premiumCompareContest": "Yarışma hakkı",
   "premiumCompareContestFree": "Sınırlı",
   "premiumCompareContestPremium": "Sınırsız",
+  "premiumGrandfatherNotice": "Mevcut Premium planın aynı fiyattan devam eder. Yeni fiyatlar yalnızca yeni abonelikler içindir.",
+  "premiumLegacyOwnedPrice": "Lansman fiyatın geçerli",
   "premiumFooterText1": "Yeni fiyatlar yalnızca yeni abonelikler içindir. Mevcut abonelerin fiyatı değişmez. Abonelik mağaza hesabın üzerinden yönetilir ve istediğin zaman iptal edilebilir.",
   "premiumFooterText2": "Abonelik, dönem bitiminden en az 24 saat önce iptal edilmezse otomatik yenilenir. Yenileme ücreti dönem bitimine 24 saat kala mağaza hesabından tahsil edilir. Aboneliklerini App Store/Play hesap ayarlarından yönetebilirsin.",
   "premiumLaunchBadge": "3 GÜN ÜCRETSİZ",

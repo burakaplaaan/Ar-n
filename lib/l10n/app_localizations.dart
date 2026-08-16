@@ -6416,6 +6416,12 @@ abstract class AppLocalizations {
   /// **'Şimdi değil'**
   String get widgetUnlockCancelButton;
 
+  /// No description provided for @purchaseErrorLegacyPlan.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu plan yeni satışa kapalı. Mevcut aboneler eski fiyatından devam eder.'**
+  String get purchaseErrorLegacyPlan;
+
   /// No description provided for @purchaseErrorNotFound.
   ///
   /// In tr, this message translates to:
@@ -7789,6 +7795,18 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'Sınırsız'**
   String get premiumCompareContestPremium;
+
+  /// No description provided for @premiumGrandfatherNotice.
+  ///
+  /// In tr, this message translates to:
+  /// **'Mevcut Premium planın aynı fiyattan devam eder. Yeni fiyatlar yalnızca yeni abonelikler içindir.'**
+  String get premiumGrandfatherNotice;
+
+  /// No description provided for @premiumLegacyOwnedPrice.
+  ///
+  /// In tr, this message translates to:
+  /// **'Lansman fiyatın geçerli'**
+  String get premiumLegacyOwnedPrice;
 
   /// No description provided for @premiumFooterText1.
   ///

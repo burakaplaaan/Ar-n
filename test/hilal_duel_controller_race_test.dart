@@ -9,8 +9,13 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class _FakeAdMob extends AdMobService {
+  int interstitialCalls = 0;
+
   @override
-  Future<bool> showInterstitial(ArinAdUnit unit) async => false;
+  Future<bool> showInterstitial(ArinAdUnit unit) async {
+    interstitialCalls += 1;
+    return false;
+  }
 
   @override
   Future<RewardedAdResult> showRewardedDetailed(
@@ -365,5 +370,19 @@ void main() {
   test('cancelMayIssueRpc gated on pending start', () {
     expect(cancelMayIssueRpc(startFuturePending: true), isFalse);
     expect(cancelMayIssueRpc(startFuturePending: false), isTrue);
+  });
+
+  test('returnToLobby never shows an interstitial', () async {
+    final repo = _RaceRepo();
+    final adMob = _FakeAdMob();
+    final controller = HilalDuelController(
+      repository: repo,
+      adMob: adMob,
+      displayName: () => 'Test',
+    );
+    await controller.bootstrap();
+    await controller.returnToLobby();
+    expect(adMob.interstitialCalls, 0);
+    controller.dispose();
   });
 }

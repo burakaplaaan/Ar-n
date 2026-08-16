@@ -12,6 +12,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 
 import '../../core/analytics/meta_app_events.dart';
+import '../../core/constants/premium_catalog.dart';
 import '../../core/constants/revenuecat_ids.dart';
 import '../../l10n/app_localizations.dart';
 import '../models/premium_entitlement.dart';
@@ -140,21 +141,62 @@ class PurchaseService {
     final ready = await _waitUntilConfigured();
     if (!ready) return {};
     try {
-      final products = await Purchases.getProducts(
-        productIds,
-        productCategory: productCategory,
-      );
+      final wanted = productIds
+          .map(_baseProductId)
+          .where((id) => id.isNotEmpty)
+          .toSet();
+      final asked = <String>{
+        for (final id in wanted)
+          ...PremiumCatalog.storeQueryIds(id, android: Platform.isAndroid),
+      };
+      final byBase = <String, StoreProduct>{};
+
+      void ingest(Iterable<StoreProduct> products) {
+        for (final product in products) {
+          final base = _baseProductId(product.identifier);
+          if (wanted.contains(base)) {
+            byBase[base] = product;
+          }
+        }
+      }
+
+      // Android'de billing client ısınması için birkaç deneme.
+      final attempts = Platform.isAndroid ? 3 : 1;
+      for (var attempt = 0; attempt < attempts; attempt++) {
+        try {
+          ingest(
+            await Purchases.getProducts(
+              asked.toList(),
+              productCategory: productCategory,
+            ),
+          );
+        } catch (e) {
+          debugPrint(
+            '[PurchaseService] fetchStorePrices getProducts '
+            'attempt ${attempt + 1} error: $e',
+          );
+        }
+        if (byBase.length >= wanted.length) break;
+        if (attempt < attempts - 1) {
+          await Future<void>.delayed(const Duration(seconds: 2));
+        }
+      }
+
+      if (byBase.length < wanted.length) {
+        ingest(await _productsFromOfferings(wanted));
+      }
+
       debugPrint(
         '[PurchaseService] fetchStorePrices($productCategory) '
-        'asked=${productIds.join(',')} got=${products.map((p) => p.identifier).join(',')}',
+        'asked=${asked.join(',')} got=${byBase.keys.join(',')}',
       );
       return {
-        for (final p in products)
-          p.identifier: StorePriceInfo(
-            productId: p.identifier,
-            priceString: p.priceString,
-            price: p.price,
-            currencyCode: p.currencyCode,
+        for (final entry in byBase.entries)
+          entry.key: StorePriceInfo(
+            productId: entry.key,
+            priceString: entry.value.priceString,
+            price: entry.value.price,
+            currencyCode: entry.value.currencyCode,
           ),
       };
     } catch (e) {
@@ -180,6 +222,13 @@ class PurchaseService {
   /// Verilen productId için abonelik satın alma başlatır.
   /// Kullanıcı iptal ederse [PurchaseOutcome.cancelled] döner.
   Future<PurchaseOutcome> purchase(String productId, {AppLocalizations? l10n}) async {
+    if (RevenueCatIds.isLegacyProductId(productId) ||
+        !RevenueCatIds.canPurchaseInApp(productId)) {
+      return PurchaseOutcome.error(
+        l10n?.purchaseErrorLegacyPlan ??
+            'Bu plan yeni satışa kapalı. Mevcut aboneler eski fiyatından devam eder.',
+      );
+    }
     if (!_isSupportedPlatform) {
       return PurchaseOutcome.error(l10n?.purchaseErrorNotSupported ?? 'Bu platformda satın alma desteklenmiyor.');
     }
@@ -189,19 +238,21 @@ class PurchaseService {
     }
 
     // Offerings yerine doğrudan getProducts kullanılıyor.
-    // Varsayılan ProductCategory.subscription, abonelik ürünleri getirir.
+    // Android'de ürün:basePlan (örn. arin_premium_yearly:p1y) de denenir.
     // Billing client bağlantısı için 3 deneme × 2 sn retry.
+    final queryIds = PremiumCatalog.storeQueryIds(
+      productId,
+      android: Platform.isAndroid,
+    );
     StoreProduct? product;
     for (var attempt = 0; attempt < 3; attempt++) {
       try {
-        final products = await Purchases.getProducts([productId]);
+        final products = await Purchases.getProducts(queryIds);
         debugPrint(
-          '[PurchaseService] purchase getProducts($productId) attempt ${attempt + 1} → ${products.length} ürün',
+          '[PurchaseService] purchase getProducts($queryIds) attempt ${attempt + 1} → ${products.length} ürün',
         );
-        if (products.isNotEmpty) {
-          product = products.first;
-          break;
-        }
+        product = _matchStoreProduct(products, productId);
+        if (product != null) break;
       } catch (e) {
         debugPrint(
           '[PurchaseService] purchase getProducts($productId) attempt ${attempt + 1} error: $e',
@@ -209,6 +260,10 @@ class PurchaseService {
       }
       if (attempt < 2) await Future<void>.delayed(const Duration(seconds: 2));
     }
+    product ??= _matchStoreProduct(
+      await _productsFromOfferings({_baseProductId(productId)}),
+      productId,
+    );
 
     if (product == null) {
       return PurchaseOutcome.error(l10n?.purchaseErrorNotFound ?? 'Ürün bulunamadı. İnternet bağlantınızı kontrol edin.');
@@ -254,6 +309,13 @@ class PurchaseService {
   /// Tek seferlik destek ürünü satın alır (Non-Consumable).
   /// Abonelikten farklı olarak doğrudan [productId] ile product fetch eder.
   Future<PurchaseOutcome> purchaseSupportProduct(String productId, {AppLocalizations? l10n}) async {
+    if (RevenueCatIds.isLegacyProductId(productId) ||
+        !RevenueCatIds.canPurchaseInApp(productId)) {
+      return PurchaseOutcome.error(
+        l10n?.purchaseErrorLegacyPlan ??
+            'Bu plan yeni satışa kapalı. Mevcut aboneler eski fiyatından devam eder.',
+      );
+    }
     if (!_isSupportedPlatform) {
       return PurchaseOutcome.error(l10n?.purchaseErrorNotSupported ?? 'Bu platformda satın alma desteklenmiyor.');
     }
@@ -284,11 +346,16 @@ class PurchaseService {
         if (products.isNotEmpty) break;
         if (attempt < 2) await Future<void>.delayed(const Duration(seconds: 2));
       }
-      if (products.isEmpty) {
+      var product = _matchStoreProduct(products, productId);
+      product ??= _matchStoreProduct(
+        await _productsFromOfferings({_baseProductId(productId)}),
+        productId,
+      );
+      if (product == null) {
         return PurchaseOutcome.error(l10n?.purchaseErrorNotFound ?? 'Ürün bulunamadı [ID: $productId]. Mağaza tarafında ürün aktif olmayabilir veya bağlantı sorunu olabilir.');
       }
       final result = await Purchases.purchase(
-        PurchaseParams.storeProduct(products.first),
+        PurchaseParams.storeProduct(product),
       );
       final baseId = _baseProductId(productId);
       var purchased = result.customerInfo.nonSubscriptionTransactions.any(
@@ -309,7 +376,7 @@ class PurchaseService {
           '[PurchaseService] support purchase verification still pending for $productId; returning success to prevent duplicate charges.',
         );
       }
-      _logMetaPurchase(products.first, result.customerInfo);
+      _logMetaPurchase(product, result.customerInfo);
       return const PurchaseOutcome.success();
     } on PlatformException catch (e) {
       final code = PurchasesErrorHelper.getErrorCode(e);
@@ -457,6 +524,40 @@ class PurchaseService {
     final idx = productId.indexOf(':');
     if (idx <= 0) return productId;
     return productId.substring(0, idx);
+  }
+
+  static StoreProduct? _matchStoreProduct(
+    Iterable<StoreProduct> products,
+    String productId,
+  ) {
+    final wanted = _baseProductId(productId);
+    for (final product in products) {
+      if (_baseProductId(product.identifier) == wanted) return product;
+    }
+    return null;
+  }
+
+  static Future<List<StoreProduct>> _productsFromOfferings(
+    Set<String> wantedBaseIds,
+  ) async {
+    if (wantedBaseIds.isEmpty) return const [];
+    try {
+      final offerings = await Purchases.getOfferings();
+      final found = <String, StoreProduct>{};
+      for (final offering in offerings.all.values) {
+        for (final package in offering.availablePackages) {
+          final product = package.storeProduct;
+          final base = _baseProductId(product.identifier);
+          if (wantedBaseIds.contains(base)) {
+            found[base] = product;
+          }
+        }
+      }
+      return found.values.toList();
+    } catch (e) {
+      debugPrint('[PurchaseService] offerings fallback error: $e');
+      return const [];
+    }
   }
 
   bool _hasPremium(CustomerInfo info) {

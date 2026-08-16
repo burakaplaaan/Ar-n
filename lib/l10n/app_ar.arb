@@ -1750,6 +1750,7 @@
   },
   "widgetUnlockPremiumButton": "الترقية إلى النسخة المميزة",
   "widgetUnlockCancelButton": "ليس الآن",
+  "purchaseErrorLegacyPlan": "هذه الخطة لم تعد تُباع. يبقى سعر المشتركين الحاليين كما هو.",
   "purchaseErrorNotFound": "لم يتم العثور على المنتج. يرجى التحقق من اتصالك بالإنترنت.",
   "purchaseErrorUnexpected": "خطأ غير متوقع: {error}",
   "@purchaseErrorUnexpected": {
@@ -1989,6 +1990,8 @@
   "premiumCompareContest": "حق المسابقة",
   "premiumCompareContestFree": "محدود",
   "premiumCompareContestPremium": "غير محدود",
+  "premiumGrandfatherNotice": "تبقى خطة Premium الحالية بنفس السعر. الأسعار الجديدة تنطبق فقط على الاشتراكات الجديدة.",
+  "premiumLegacyOwnedPrice": "سعر الإطلاق ما زال ساريًا",
   "premiumFooterText1": "الأسعار الجديدة تنطبق فقط على الاشتراكات الجديدة. يبقى سعر المشتركين الحاليين كما هو. تتم إدارة الاشتراك من خلال حساب المتجر ويمكن إلغاؤه في أي وقت.",
   "premiumFooterText2": "يتم تجديد الاشتراك تلقائيًا ما لم يتم إلغاؤه قبل 24 ساعة على الأقل من نهاية الفترة. يتم خصم رسوم التجديد من حساب المتجر الخاص بك قبل 24 ساعة من نهاية الفترة. يمكنك إدارة اشتراكاتك في إعدادات حساب App Store/Play.",
   "premiumLaunchBadge": "3 أيام مجانًا",

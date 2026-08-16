@@ -3651,6 +3651,10 @@ class AppLocalizationsAr extends AppLocalizations {
   String get widgetUnlockCancelButton => 'ليس الآن';
 
   @override
+  String get purchaseErrorLegacyPlan =>
+      'هذه الخطة لم تعد تُباع. يبقى سعر المشتركين الحاليين كما هو.';
+
+  @override
   String get purchaseErrorNotFound =>
       'لم يتم العثور على المنتج. يرجى التحقق من اتصالك بالإنترنت.';
 
@@ -4409,6 +4413,13 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get premiumCompareContestPremium => 'غير محدود';
+
+  @override
+  String get premiumGrandfatherNotice =>
+      'تبقى خطة Premium الحالية بنفس السعر. الأسعار الجديدة تنطبق فقط على الاشتراكات الجديدة.';
+
+  @override
+  String get premiumLegacyOwnedPrice => 'سعر الإطلاق ما زال ساريًا';
 
   @override
   String get premiumFooterText1 =>

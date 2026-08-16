@@ -168,7 +168,4 @@ abstract final class ArinAnalytics {
   /// Hilal Düellosu çift hilal ödülü (SSV sonrası).
   static Future<void> hilalDuelRewardDouble() =>
       log('hilal_duel_reward_double');
-
-  /// Hilal Düellosu ara reklamı gösterildi.
-  static Future<void> hilalDuelInterstitial() => log('hilal_duel_interstitial');
 }
