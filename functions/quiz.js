@@ -66,7 +66,7 @@ const QUIZ_DEVICE_TTL_MS = 45 * 24 * 60 * 60_000;
 /** Meydan okuma: davetten itibaren toplam süre. Dolarsa kimseye puan yok. */
 const CHALLENGE_TTL_MS = 24 * 60 * 60_000;
 /** Biten meydan okuma lobide bu kadar süre sonuç olarak kalsın. */
-const CHALLENGE_INBOX_COMPLETED_MS = 48 * 60 * 60_000;
+const CHALLENGE_INBOX_COMPLETED_MS = 24 * 60 * 60_000;
 /**
  * Bota meydan okunduğunda cevap gecikmesi.
  * Bot bilinçli zayıf oynar (yalnızca 1 doğru) — liderlik tablosunu ezmesin.
@@ -1014,7 +1014,7 @@ function challengeInboxOutcome(status, winnerId, ownerHash) {
   return winner === ownerHash ? "won" : "lost";
 }
 
-/** listQuizChallenges: açık + 48s bitmiş sonuç; expired gizlenir. */
+/** listQuizChallenges: açık + 24s bitmiş sonuç; expired gizlenir. */
 function shouldListChallengeInInbox(fresh, nowMs = Date.now()) {
   const status = String(fresh?.status || "");
   if (status === "expired") return false;
@@ -2048,6 +2048,7 @@ async function _createMatchInTransaction({
   bot = false,
   ownerHashOverride = null,
   chargeRecordsPreRead = null,
+  afterReads = null,
 }) {
   const firstOwner = String(
     ownerHashOverride || firstQueue.ownerHash || "",
@@ -2122,6 +2123,12 @@ async function _createMatchInTransaction({
     ...normalizeQuestionIdList(firstPlayerSnap.data()?.seenQuestionIds),
     ...normalizeQuestionIdList(secondPlayerSnap?.data()?.seenQuestionIds),
   ]);
+  // Çağıran (startQuizMatch) can düşümü / charge create yazısını burada,
+  // maç yazılarından önce ama tüm okumalardan sonra uygular. Aksi halde
+  // Firestore "reads before writes" ihlali callable'ı INTERNAL yapar.
+  if (typeof afterReads === "function") {
+    await afterReads();
+  }
   const match = {
     players: [firstPlayer, secondPlayer],
     questionIds,
@@ -2817,7 +2824,8 @@ const startQuizMatch = onCall(
       });
     const candidate = candidates[0] || null;
 
-    return db.runTransaction(async (tx) => {
+    try {
+      return await db.runTransaction(async (tx) => {
       const freshPlayer = await tx.get(playerRef);
       const freshQueue = await tx.get(queueRef);
       const freshCandidate = candidate ? await tx.get(candidate.ref) : null;
@@ -2908,21 +2916,23 @@ const startQuizMatch = onCall(
       const activeUntil = Timestamp.fromMillis(
         queuedAt.toMillis() + QUEUE_ABANDON_MS,
       );
-      tx.set(playerRef, {
-        name,
-        ...(premium ? {} : { adHearts: FieldValue.increment(-1) }),
-        updatedAt: FieldValue.serverTimestamp(),
-        ...(player.createdAt ? {} : { createdAt: FieldValue.serverTimestamp() }),
-      }, { merge: true });
-      if (chargeRef) {
-        tx.create(chargeRef, {
-          ownerHash,
-          heartSource,
-          status: "charged",
-          createdAt: FieldValue.serverTimestamp(),
-          expiresAt: Timestamp.fromMillis(Date.now() + 30 * 86400000),
-        });
-      }
+      const applyHeartCharge = () => {
+        tx.set(playerRef, {
+          name,
+          ...(premium ? {} : { adHearts: FieldValue.increment(-1) }),
+          updatedAt: FieldValue.serverTimestamp(),
+          ...(player.createdAt ? {} : { createdAt: FieldValue.serverTimestamp() }),
+        }, { merge: true });
+        if (chargeRef) {
+          tx.create(chargeRef, {
+            ownerHash,
+            heartSource,
+            status: "charged",
+            createdAt: FieldValue.serverTimestamp(),
+            expiresAt: Timestamp.fromMillis(Date.now() + 30 * 86400000),
+          });
+        }
+      };
       const queueData = {
         ownerHash,
         name,
@@ -2944,15 +2954,20 @@ const startQuizMatch = onCall(
         candidateFundingValid &&
         !shouldRefundAbandonedQueue(freshCandidate.data(), Date.now())
       ) {
+        // Can/charge yazısı afterReads ile, oyuncu okumalarından sonra.
+        // Önce yazıp sonra _createMatchInTransaction içinde tx.get yapmak
+        // Firestore kuralını bozar ve INTERNAL döner.
         const result = await _createMatchInTransaction({
           tx,
           db,
           firstQueue: queueData,
           secondQueue: freshCandidate.data(),
           chargeRecordsPreRead,
+          afterReads: applyHeartCharge,
         });
         return { ok: true, status: "matched", matchId: result.matchId };
       }
+      applyHeartCharge();
       // Yeni/replaced waiting dokümanında matchId alanına ihtiyaç yok.
       // FieldValue.delete(), mergesiz set() içinde geçersizdir ve callable'ı
       // INTERNAL ile düşürür.
@@ -2963,6 +2978,14 @@ const startQuizMatch = onCall(
         queuedAtMs: queueData.queuedAt.toMillis(),
       };
     });
+    } catch (error) {
+      if (error instanceof HttpsError) throw error;
+      console.error("[HilalDuel] startQuizMatch failed:", error);
+      throw new HttpsError(
+        "internal",
+        "Eşleşme başlatılamadı. Tekrar dene.",
+      );
+    }
   },
 );
 
@@ -5942,6 +5965,7 @@ module.exports = {
     ROUND_DURATION_MS,
     ROUND_REVEAL_MS,
     pickQuestions: _pickQuestions,
+    createMatchInTransaction: _createMatchInTransaction,
     questionPayload: _questionPayload,
     mergeSeenQuestionIds,
     normalizeQuestionIdList,

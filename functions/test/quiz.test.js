@@ -1287,9 +1287,9 @@ test("createQuizChallenge skips expired-unfinalized as still open", () => {
   assert.equal(t.openPeerChallengeId({}, "bb"), "");
 });
 
-test("challenge inbox keeps completed 48h and hides expired", () => {
+test("challenge inbox keeps completed 24h and hides expired", () => {
   const now = 1_700_000_000_000;
-  assert.equal(t.CHALLENGE_INBOX_COMPLETED_MS, 48 * 60 * 60_000);
+  assert.equal(t.CHALLENGE_INBOX_COMPLETED_MS, 24 * 60 * 60_000);
   assert.equal(
     t.shouldListChallengeInInbox({
       status: "expired",
@@ -1315,6 +1315,13 @@ test("challenge inbox keeps completed 48h and hides expired", () => {
     t.shouldListChallengeInInbox({
       status: "completed",
       updatedAt: { toMillis: () => now - 60_000 },
+    }, now),
+    true,
+  );
+  assert.equal(
+    t.shouldListChallengeInInbox({
+      status: "completed",
+      updatedAt: { toMillis: () => now - t.CHALLENGE_INBOX_COMPLETED_MS + 1 },
     }, now),
     true,
   );
@@ -1366,6 +1373,91 @@ test("match player payload never exposes a bot tell badge", () => {
   });
   assert.equal(decorated.badge, null);
   assert.equal(decorated.isBot, true);
+});
+
+test("createMatchInTransaction applies afterReads only after reads", async () => {
+  const events = [];
+  const fakeDb = {
+    collection(col) {
+      return {
+        doc(id) {
+          return { path: `${col}/${id}`, id };
+        },
+      };
+    },
+  };
+  const tx = {
+    async get(ref) {
+      events.push(`get:${ref.path}`);
+      return { exists: true, data: () => ({ seenQuestionIds: [] }) };
+    },
+    create(ref) {
+      events.push(`create:${ref.path}`);
+    },
+    set(ref) {
+      events.push(`set:${ref.path}`);
+    },
+  };
+  const firstOwner = "a".repeat(64);
+  const secondOwner = "b".repeat(64);
+  const firstCharge = "c".repeat(32);
+  const secondCharge = "d".repeat(32);
+  const firstQueue = {
+    ownerHash: firstOwner,
+    name: "Ali",
+    hilals: 10,
+    level: 2,
+    status: "waiting",
+    heartSource: "ad",
+    heartChargeId: firstCharge,
+  };
+  const secondQueue = {
+    ownerHash: secondOwner,
+    name: "Ece",
+    hilals: 8,
+    level: 2,
+    status: "waiting",
+    heartSource: "ad",
+    heartChargeId: secondCharge,
+  };
+  const chargeRecordsPreRead = new Map([
+    [firstCharge, {
+      ownerHash: firstOwner,
+      heartSource: "ad",
+      status: "charged",
+    }],
+    [secondCharge, {
+      ownerHash: secondOwner,
+      heartSource: "ad",
+      status: "charged",
+    }],
+  ]);
+  const created = await t.createMatchInTransaction({
+    tx,
+    db: fakeDb,
+    firstQueue,
+    secondQueue,
+    chargeRecordsPreRead,
+    afterReads: () => {
+      events.push("afterReads");
+    },
+  });
+  assert.equal(typeof created.matchId, "string");
+  assert.equal(created.matchId.length, 32);
+  const afterReadsAt = events.indexOf("afterReads");
+  assert.ok(afterReadsAt >= 0, "afterReads must run");
+  const firstWrite = events.findIndex((item) =>
+    item.startsWith("create:") || item.startsWith("set:")
+  );
+  assert.ok(firstWrite > afterReadsAt, "writes must start after afterReads");
+  assert.ok(
+    events.slice(0, afterReadsAt).every((item) => item.startsWith("get:")),
+    "only reads may happen before afterReads",
+  );
+  assert.deepEqual(
+    events.filter((item) => item.startsWith("get:")).sort(),
+    [`get:quiz_players/${firstOwner}`, `get:quiz_players/${secondOwner}`].sort(),
+  );
 });
 
 test("engagement gift copy uses heart not life in en/ar", () => {

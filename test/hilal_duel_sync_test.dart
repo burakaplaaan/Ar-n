@@ -514,4 +514,30 @@ void main() {
       );
     });
   });
+
+  group('hilalDuelFriendlyFunctionsMessage', () {
+    test('hides raw INTERNAL from the lobby', () {
+      expect(
+        hilalDuelFriendlyFunctionsMessage(
+          code: 'internal',
+          message: 'INTERNAL',
+        ),
+        'Eşleşme başlatılamadı. Tekrar dene.',
+      );
+      expect(
+        hilalDuelFriendlyFunctionsMessage(
+          code: 'internal',
+          message: 'Eşleşme başlatılamadı. Tekrar dene.',
+        ),
+        'Eşleşme başlatılamadı. Tekrar dene.',
+      );
+      expect(
+        hilalDuelFriendlyFunctionsMessage(
+          code: 'unknown',
+          message: 'INTERNAL',
+        ),
+        'Bir hata oluştu. Tekrar dene.',
+      );
+    });
+  });
 }

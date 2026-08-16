@@ -301,3 +301,53 @@ int computeRevealHoldMs({
   if (untilStart <= 0) return 1;
   return untilStart.clamp(1, maxHoldMs);
 }
+
+/// Cloud Functions kod/mesaj → lobiye güvenle basılacak metin.
+/// Ham `INTERNAL` / `UNKNOWN` kullanıcıya gösterilmez.
+String hilalDuelFriendlyFunctionsMessage({
+  required String code,
+  required String message,
+  bool debugMode = false,
+  String needHeartToken = 'NEED_HEART',
+}) {
+  final normalizedCode = code.toLowerCase().trim();
+  final trimmed = message.trim();
+  final lowerMessage = trimmed.toLowerCase();
+  if (normalizedCode == 'unauthenticated' ||
+      lowerMessage.contains('unauthenticated')) {
+    if (debugMode) {
+      return 'App Check doğrulanamadı. Debug token Console\'a ekli mi? '
+          'Release APK emülatörde çalışmaz — flutter run kullan.';
+    }
+    return 'Güvenli oturum gerekli. Tekrar dene.';
+  }
+  switch (normalizedCode) {
+    case 'resource-exhausted':
+      return trimmed.contains('can') ||
+              trimmed.contains('Oynamak') ||
+              lowerMessage.contains('heart')
+          ? needHeartToken
+          : 'Çok hızlı işlem yapıldı. Kısa süre sonra tekrar dene.';
+    case 'unavailable':
+      return 'Bağlantı kurulamadı. Tekrar dene.';
+    case 'permission-denied':
+      return trimmed.isNotEmpty
+          ? trimmed
+          : 'Bu işlem için yetki doğrulanamadı. Tekrar dene.';
+    case 'internal':
+      return _isRawFunctionsCode(lowerMessage)
+          ? 'Eşleşme başlatılamadı. Tekrar dene.'
+          : trimmed;
+    default:
+      return trimmed.isEmpty || _isRawFunctionsCode(lowerMessage)
+          ? 'Bir hata oluştu. Tekrar dene.'
+          : trimmed;
+  }
+}
+
+bool _isRawFunctionsCode(String lowerMessage) {
+  return lowerMessage.isEmpty ||
+      lowerMessage == 'internal' ||
+      lowerMessage == 'unknown' ||
+      lowerMessage == 'internal error';
+}

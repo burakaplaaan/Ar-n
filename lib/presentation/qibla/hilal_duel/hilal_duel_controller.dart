@@ -1914,37 +1914,12 @@ class HilalDuelController extends ChangeNotifier {
 
   String _friendlyError(Object error) {
     if (error is FirebaseFunctionsException) {
-      final code = error.code.toLowerCase();
-      final message = (error.message ?? '').trim();
-      final lowerMessage = message.toLowerCase();
-      // App Check / auth gateway bazen İngilizce "Unauthenticated" döner.
-      // Emülatörde release APK veya kayıtsız debug token aynı kodu üretir.
-      if (code == 'unauthenticated' ||
-          lowerMessage.contains('unauthenticated')) {
-        if (kDebugMode) {
-          return 'App Check doğrulanamadı. Debug token Console\'a ekli mi? '
-              'Release APK emülatörde çalışmaz — flutter run kullan.';
-        }
-        return 'Güvenli oturum gerekli. Tekrar dene.';
-      }
-      switch (code) {
-        case 'resource-exhausted':
-          return message.contains('can') ||
-                  message.contains('Oynamak') ||
-                  lowerMessage.contains('heart')
-              ? needHeartErrorToken
-              : 'Çok hızlı işlem yapıldı. Kısa süre sonra tekrar dene.';
-        case 'unavailable':
-          return 'Bağlantı kurulamadı. Tekrar dene.';
-        case 'permission-denied':
-          return message.isNotEmpty
-              ? message
-              : 'Bu işlem için yetki doğrulanamadı. Tekrar dene.';
-        default:
-          return message.isNotEmpty
-              ? message
-              : 'Bir hata oluştu. Tekrar dene.';
-      }
+      return hilalDuelFriendlyFunctionsMessage(
+        code: error.code,
+        message: error.message ?? '',
+        debugMode: kDebugMode,
+        needHeartToken: needHeartErrorToken,
+      );
     }
     return 'Bir hata oluştu. Tekrar dene.';
   }
