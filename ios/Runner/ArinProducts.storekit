@@ -1,0 +1,113 @@
+{
+  "identifier" : "A81B3C4D",
+  "nonRenewingSubscriptions" : [
+
+  ],
+  "products" : [
+    {
+      "displayPrice" : "1299.99",
+      "familyShareable" : false,
+      "internalID" : "L1F3T1M3",
+      "localizations" : [
+        {
+          "description" : "Tek seferlik satın alma. Premium sonsuza kadar kalır, yenilenmez.",
+          "displayName" : "Ömür Boyu Premium",
+          "locale" : "tr"
+        },
+        {
+          "description" : "One-time purchase. Premium stays forever and does not renew.",
+          "displayName" : "Lifetime Premium",
+          "locale" : "en_US"
+        }
+      ],
+      "productID" : "arin_premium_lifetime",
+      "referenceName" : "Ömür Boyu Premium",
+      "type" : "NonConsumable"
+    }
+  ],
+  "settings" : {
+    "_locale" : "tr",
+    "_storefront" : "TUR",
+    "_timeRate" : 0
+  },
+  "subscriptionGroups" : [
+    {
+      "id" : "PR3M1UMG",
+      "localizations" : [
+
+      ],
+      "name" : "premium",
+      "subscriptions" : [
+        {
+          "adHocOffers" : [
+
+          ],
+          "codeOffers" : [
+
+          ],
+          "displayPrice" : "99.99",
+          "familyShareable" : false,
+          "groupNumber" : 1,
+          "internalID" : "M0NTHLY1",
+          "introductoryOffer" : null,
+          "localizations" : [
+            {
+              "description" : "Aylık yenilenir",
+              "displayName" : "Aylık Premium",
+              "locale" : "tr"
+            },
+            {
+              "description" : "Renews monthly",
+              "displayName" : "Monthly Premium",
+              "locale" : "en_US"
+            }
+          ],
+          "productID" : "arin_premium_monthly",
+          "recurringSubscriptionPeriod" : "P1M",
+          "referenceName" : "Aylık Premium",
+          "subscriptionGroupID" : "PR3M1UMG",
+          "type" : "RecurringSubscription"
+        },
+        {
+          "adHocOffers" : [
+
+          ],
+          "codeOffers" : [
+
+          ],
+          "displayPrice" : "499.99",
+          "familyShareable" : false,
+          "groupNumber" : 1,
+          "internalID" : "Y3ARLY01",
+          "introductoryOffer" : {
+            "displayPrice" : "0",
+            "internalID" : "TR1AL3D1",
+            "paymentMode" : "free",
+            "subscriptionPeriod" : "P3D"
+          },
+          "localizations" : [
+            {
+              "description" : "3 gün ücretsiz dene, sonra yıllık yenilenir",
+              "displayName" : "Yıllık Premium",
+              "locale" : "tr"
+            },
+            {
+              "description" : "3-day free trial, then yearly renewal",
+              "displayName" : "Yearly Premium",
+              "locale" : "en_US"
+            }
+          ],
+          "productID" : "arin_premium_yearly",
+          "recurringSubscriptionPeriod" : "P1Y",
+          "referenceName" : "Yıllık Premium",
+          "subscriptionGroupID" : "PR3M1UMG",
+          "type" : "RecurringSubscription"
+        }
+      ]
+    }
+  ],
+  "version" : {
+    "major" : 3,
+    "minor" : 0
+  }
+}

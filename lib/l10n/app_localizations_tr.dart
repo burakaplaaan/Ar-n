@@ -1474,6 +1474,33 @@ class AppLocalizationsTr extends AppLocalizations {
       'Terapi tonları, ambiyans ve uyku zamanlayıcısı ile sakin bir oturum';
 
   @override
+  String get qiblaHubAiTitle => 'İslami Yapay Zeka';
+
+  @override
+  String get qiblaHubAiSubtitle =>
+      'Dini sorularına kaynaklı, fetva olmayan yanıtlar — Premium';
+
+  @override
+  String get islamicAiComingSoonTitle => 'İslami Yapay Zeka';
+
+  @override
+  String get islamicAiComingSoonBody =>
+      'Bu özellik hazırlanıyor. Premium’un var; arkadaşın kodu birleştirilince sohbet burada açılacak.';
+
+  @override
+  String get widgetThemeSectionTitle => 'Widget temaları';
+
+  @override
+  String get widgetThemeSectionSubtitle =>
+      'Klasik tema herkese açık. Diğer temalar Premium’a özeldir ve iPhone ile Android’de aynı görünür.';
+
+  @override
+  String get widgetThemeApplied => 'Widget teması güncellendi.';
+
+  @override
+  String get widgetThemePremiumRequired => 'Bu tema Premium’a özel.';
+
+  @override
   String get qiblaHubHilalDuelTitle => 'Bilgi Düellosu';
 
   @override
@@ -4254,6 +4281,30 @@ class AppLocalizationsTr extends AppLocalizations {
   String get premiumYearlyPlanSubtitle => 'Yıllık Abonelik';
 
   @override
+  String premiumYearlyPerMonth(String price) {
+    return 'ayda $price';
+  }
+
+  @override
+  String get premiumYearlyTrialCta => '3 günlük denemeyi başlat';
+
+  @override
+  String get premiumYearlyTrialNote =>
+      '3 gün ücretsiz dene. Deneme bitince yıllık plan otomatik yenilenir; istediğin zaman iptal edebilirsin.';
+
+  @override
+  String get premiumMonthlyCta => 'Aylık abone ol';
+
+  @override
+  String get premiumCloseSemantics => 'Kapat';
+
+  @override
+  String get premiumBenefitAi => 'İslami yapay zeka';
+
+  @override
+  String get premiumBenefitThemes => 'Premium widget temaları';
+
+  @override
   String get premiumSwitchToYearly => 'Yıllığa geç';
 
   @override
@@ -4263,19 +4314,123 @@ class AppLocalizationsTr extends AppLocalizations {
   String get premiumMonthlyPlanSubtitle => 'Aylık Abonelik';
 
   @override
+  String get premiumLifetimePlanTitle => 'Ömür Boyu Premium';
+
+  @override
+  String get premiumLifetimePlanSubtitle =>
+      'Tek seferlik satın alma, yenileme yok';
+
+  @override
+  String get premiumLifetimeCta => 'Ömür boyu aç';
+
+  @override
+  String get premiumLifetimeNote =>
+      'Bir kez öde, Premium sonsuza kadar kalsın. Abonelik değildir, otomatik yenilenmez.';
+
+  @override
+  String get premiumLifetimeBadge => 'TEK ÖDEME';
+
+  @override
+  String get premiumPlanComingSoon => 'Yakında';
+
+  @override
+  String get premiumYearlySaveVsMonthly => 'Aylığa göre daha avantajlı';
+
+  @override
+  String get premiumCompareTitle => 'Ücretsiz ve Premium';
+
+  @override
+  String get premiumCompareColFree => 'Ücretsiz';
+
+  @override
+  String get premiumCompareColPremium => 'Premium';
+
+  @override
+  String get premiumCompareAds => 'Reklamlar';
+
+  @override
+  String get premiumCompareAdsFree => 'Var';
+
+  @override
+  String get premiumCompareAdsPremium => 'Yok';
+
+  @override
+  String get premiumCompareWidgets => 'Widget\'lar';
+
+  @override
+  String get premiumCompareWidgetsFree => 'Kilitli';
+
+  @override
+  String get premiumCompareWidgetsPremium => 'Açık';
+
+  @override
+  String get premiumCompareThemes => 'Widget temaları';
+
+  @override
+  String get premiumCompareThemesFree => 'Klasik';
+
+  @override
+  String get premiumCompareThemesPremium => '6 tema';
+
+  @override
+  String get premiumCompareAi => 'İslami yapay zeka';
+
+  @override
+  String get premiumCompareAiFree => 'Kilitli';
+
+  @override
+  String get premiumCompareAiPremium => 'Yakında';
+
+  @override
+  String get premiumCompareExplore => 'Keşfet';
+
+  @override
+  String get premiumCompareExploreFree => 'Reklamlı';
+
+  @override
+  String get premiumCompareExplorePremium => 'Kesintisiz';
+
+  @override
+  String get premiumCompareAdhan => '2. ezan alarmı';
+
+  @override
+  String get premiumCompareAdhanFree => 'Kilitli';
+
+  @override
+  String get premiumCompareAdhanPremium => 'Açık';
+
+  @override
+  String get premiumComparePrayer => 'Dua Halkası';
+
+  @override
+  String get premiumComparePrayerFree => 'Sınırlı';
+
+  @override
+  String get premiumComparePrayerPremium => 'Sınırsız';
+
+  @override
+  String get premiumCompareContest => 'Yarışma hakkı';
+
+  @override
+  String get premiumCompareContestFree => 'Sınırlı';
+
+  @override
+  String get premiumCompareContestPremium => 'Sınırsız';
+
+  @override
   String get premiumFooterText1 =>
-      'Lansman fiyatları sınırlı süre geçerlidir. Abonelik mağaza hesabın üzerinden yönetilir ve istediğin zaman iptal edilebilir.';
+      'Yeni fiyatlar yalnızca yeni abonelikler içindir. Mevcut abonelerin fiyatı değişmez. Abonelik mağaza hesabın üzerinden yönetilir ve istediğin zaman iptal edilebilir.';
 
   @override
   String get premiumFooterText2 =>
       'Abonelik, dönem bitiminden en az 24 saat önce iptal edilmezse otomatik yenilenir. Yenileme ücreti dönem bitimine 24 saat kala mağaza hesabından tahsil edilir. Aboneliklerini App Store/Play hesap ayarlarından yönetebilirsin.';
 
   @override
-  String get premiumLaunchBadge => 'LANSMANA ÖZEL';
+  String get premiumLaunchBadge => '3 GÜN ÜCRETSİZ';
 
   @override
   String get premiumCountdownNotice =>
-      'Bu fiyat sınırlı süre geçerli. Lansman bitmeden premiumu en avantajlı fiyatla aç.';
+      'Yıllık planda 3 gün ücretsiz dene. Mevcut abonelerin fiyatı değişmez.';
 
   @override
   String get premiumBenefitAdFree => 'Reklamsız kullanım';

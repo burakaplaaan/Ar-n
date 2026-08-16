@@ -186,14 +186,92 @@ private func widgetGateRefreshDate(_ kind: String) -> Date? {
 
 // MARK: - Shared chrome
 
+private struct ArinWidgetPalette {
+  let background: Color?
+  let primary: Color
+  let isClassic: Bool
+}
+
+private func currentWidgetPalette() -> ArinWidgetPalette {
+  let id = suite()?.string(forKey: "arin_widget_theme_id") ?? "classic"
+  switch id {
+  case "emerald":
+    return ArinWidgetPalette(
+      background: Color(red: 15 / 255, green: 36 / 255, blue: 25 / 255),
+      primary: Color(red: 232 / 255, green: 213 / 255, blue: 163 / 255),
+      isClassic: false
+    )
+  case "gold":
+    return ArinWidgetPalette(
+      background: Color(red: 61 / 255, green: 42 / 255, blue: 18 / 255),
+      primary: Color(red: 240 / 255, green: 212 / 255, blue: 138 / 255),
+      isClassic: false
+    )
+  case "midnight":
+    return ArinWidgetPalette(
+      background: Color(red: 11 / 255, green: 18 / 255, blue: 32 / 255),
+      primary: Color(red: 213 / 255, green: 220 / 255, blue: 232 / 255),
+      isClassic: false
+    )
+  case "rose":
+    return ArinWidgetPalette(
+      background: Color(red: 58 / 255, green: 31 / 255, blue: 40 / 255),
+      primary: Color(red: 240 / 255, green: 201 / 255, blue: 192 / 255),
+      isClassic: false
+    )
+  case "sand":
+    return ArinWidgetPalette(
+      background: Color(red: 243 / 255, green: 230 / 255, blue: 200 / 255),
+      primary: Color(red: 58 / 255, green: 42 / 255, blue: 20 / 255),
+      isClassic: false
+    )
+  case "ocean":
+    return ArinWidgetPalette(
+      background: Color(red: 12 / 255, green: 42 / 255, blue: 50 / 255),
+      primary: Color(red: 183 / 255, green: 228 / 255, blue: 224 / 255),
+      isClassic: false
+    )
+  default:
+    return ArinWidgetPalette(background: nil, primary: .white, isClassic: true)
+  }
+}
+
+private func widgetPrimaryText(colorScheme: ColorScheme, family: WidgetFamily) -> Color {
+  if family == .accessoryRectangular {
+    return colorScheme == .dark ? Color(red: 0.88, green: 0.90, blue: 0.93) : .white
+  }
+  let theme = currentWidgetPalette()
+  if theme.isClassic {
+    return colorScheme == .dark ? Color(red: 0.88, green: 0.90, blue: 0.93) : .white
+  }
+  return theme.primary
+}
+
+private struct ArinWidgetSurfaceModifier: ViewModifier {
+  @Environment(\.widgetFamily) private var family
+
+  @ViewBuilder
+  func body(content: Content) -> some View {
+    let theme = currentWidgetPalette()
+    let useClear = family == .accessoryRectangular || theme.isClassic || theme.background == nil
+    if useClear {
+      if #available(iOSApplicationExtension 17.0, *) {
+        content.containerBackground(for: .widget) { Color.clear }
+      } else {
+        content.background(Color.clear)
+      }
+    } else if #available(iOSApplicationExtension 17.0, *) {
+      content.containerBackground(for: .widget) { theme.background! }
+    } else {
+      content.background(theme.background)
+    }
+  }
+}
+
 private extension View {
   @ViewBuilder
   func arinTransparentWidgetSurface() -> some View {
-    if #available(iOSApplicationExtension 17.0, *) {
-      self.containerBackground(for: .widget) { Color.clear }
-    } else {
-      self.background(Color.clear)
-    }
+    modifier(ArinWidgetSurfaceModifier())
   }
 }
 
@@ -216,7 +294,7 @@ struct LockedWidgetView: View {
   @Environment(\.colorScheme) private var colorScheme
 
   private var primaryTextColor: Color {
-    colorScheme == .dark ? Color(red: 0.88, green: 0.90, blue: 0.93) : .white
+    widgetPrimaryText(colorScheme: colorScheme, family: family)
   }
 
   private var textShadowOpacity: Double {
@@ -412,7 +490,7 @@ struct QuoteWidgetView: View {
   @Environment(\.colorScheme) private var colorScheme
 
   private var primaryTextColor: Color {
-    colorScheme == .dark ? Color(red: 0.88, green: 0.90, blue: 0.93) : .white
+    widgetPrimaryText(colorScheme: colorScheme, family: family)
   }
 
   private var secondaryTextColor: Color {
@@ -724,7 +802,7 @@ struct PrayerWidgetView: View {
   @Environment(\.colorScheme) private var colorScheme
 
   private var primaryTextColor: Color {
-    colorScheme == .dark ? Color(red: 0.88, green: 0.90, blue: 0.93) : .white
+    widgetPrimaryText(colorScheme: colorScheme, family: family)
   }
 
   private var secondaryTextColor: Color {
@@ -1125,7 +1203,7 @@ struct ComboWidgetView: View {
   @Environment(\.colorScheme) private var colorScheme
 
   private var primaryTextColor: Color {
-    colorScheme == .dark ? Color(red: 0.88, green: 0.90, blue: 0.93) : .white
+    widgetPrimaryText(colorScheme: colorScheme, family: family)
   }
 
   private var secondaryTextColor: Color {
@@ -1409,7 +1487,7 @@ struct TrackingWidgetView: View {
   @Environment(\.colorScheme) private var colorScheme
 
   private var primaryTextColor: Color {
-    colorScheme == .dark ? Color(red: 0.88, green: 0.90, blue: 0.93) : .white
+    widgetPrimaryText(colorScheme: colorScheme, family: family)
   }
 
   private var secondaryTextColor: Color {
@@ -1598,7 +1676,7 @@ struct ZikirWidgetView: View {
   @Environment(\.colorScheme) private var colorScheme
 
   private var primaryTextColor: Color {
-    colorScheme == .dark ? Color(red: 0.88, green: 0.90, blue: 0.93) : .white
+    widgetPrimaryText(colorScheme: colorScheme, family: family)
   }
 
   private var secondaryTextColor: Color {

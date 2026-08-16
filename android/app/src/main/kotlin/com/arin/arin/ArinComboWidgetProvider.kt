@@ -115,6 +115,18 @@ class ArinComboWidgetProvider : HomeWidgetProvider() {
                 views.setViewVisibility(R.id.widget_combo_content, View.GONE)
                 views.setViewVisibility(R.id.widget_lock_overlay, View.VISIBLE)
                 views.setOnClickPendingIntent(R.id.widget_combo_root, contentPi)
+                ArinWidgetTheme.apply(
+                    views,
+                    widgetData,
+                    R.id.widget_combo_root,
+                    intArrayOf(
+                        R.id.widget_combo_prayer_title,
+                        R.id.widget_combo_countdown,
+                        R.id.widget_combo_quote_text,
+                        R.id.widget_combo_quote_source,
+                        R.id.widget_lock_note,
+                    ),
+                )
                 appWidgetManager.updateAppWidget(widgetId, views)
                 continue
             }
@@ -163,6 +175,18 @@ class ArinComboWidgetProvider : HomeWidgetProvider() {
             }
             views.setViewVisibility(R.id.widget_combo_quote_source, View.GONE)
             views.setOnClickPendingIntent(R.id.widget_combo_root, contentPi)
+            ArinWidgetTheme.apply(
+                views,
+                widgetData,
+                R.id.widget_combo_root,
+                intArrayOf(
+                    R.id.widget_combo_prayer_title,
+                    R.id.widget_combo_countdown,
+                    R.id.widget_combo_quote_text,
+                    R.id.widget_combo_quote_source,
+                    R.id.widget_lock_note,
+                ),
+            )
             appWidgetManager.updateAppWidget(widgetId, views)
         }
 

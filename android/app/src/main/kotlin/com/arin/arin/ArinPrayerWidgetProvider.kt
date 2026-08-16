@@ -111,6 +111,17 @@ class ArinPrayerWidgetProvider : HomeWidgetProvider() {
                 views.setViewVisibility(R.id.widget_prayer_content, View.GONE)
                 views.setViewVisibility(R.id.widget_lock_overlay, View.VISIBLE)
                 views.setOnClickPendingIntent(R.id.widget_prayer_root, contentPi)
+                ArinWidgetTheme.apply(
+                    views,
+                    widgetData,
+                    R.id.widget_prayer_root,
+                    intArrayOf(
+                        R.id.widget_prayer_next_name,
+                        R.id.widget_prayer_countdown,
+                        R.id.widget_prayer_location,
+                        R.id.widget_lock_note,
+                    ),
+                )
                 appWidgetManager.updateAppWidget(widgetId, views)
                 continue
             }
@@ -139,6 +150,17 @@ class ArinPrayerWidgetProvider : HomeWidgetProvider() {
             }
             views.setTextViewText(R.id.widget_prayer_location, safeLocation)
             views.setOnClickPendingIntent(R.id.widget_prayer_root, contentPi)
+            ArinWidgetTheme.apply(
+                views,
+                widgetData,
+                R.id.widget_prayer_root,
+                intArrayOf(
+                    R.id.widget_prayer_next_name,
+                    R.id.widget_prayer_countdown,
+                    R.id.widget_prayer_location,
+                    R.id.widget_lock_note,
+                ),
+            )
             appWidgetManager.updateAppWidget(widgetId, views)
         }
 

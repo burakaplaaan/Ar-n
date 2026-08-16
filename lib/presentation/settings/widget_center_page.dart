@@ -10,14 +10,19 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/providers/shared_preferences_provider.dart';
 import '../../core/theme/arin_shell_background.dart';
+import '../../data/models/widget_theme.dart';
 import '../../data/repositories/salat_log_repository.dart';
 import '../../data/services/android_oem_settings_service.dart';
 import '../../data/services/arin_lock_notification_service.dart';
 import '../../data/services/local_notification_permission_gate.dart';
+import '../../data/services/paywall_prompt_service.dart';
 import '../../data/services/tracking_widget_service.dart';
 import '../../data/services/widget_access_service.dart';
+import '../../l10n/app_localizations.dart';
 import '../kaza/kaza_tracking_provider.dart';
 import '../shared/providers/habit_providers.dart';
+import '../shared/providers/premium_providers.dart';
+import '../shared/providers/widget_theme_providers.dart';
 import '../shared/widgets/arin_shell_layout.dart';
 
 class WidgetCenterPage extends ConsumerStatefulWidget {
@@ -129,6 +134,8 @@ class _WidgetCenterPageState extends ConsumerState<WidgetCenterPage> {
                         .animate()
                         .fadeIn(duration: 420.ms, delay: 80.ms)
                         .slideY(begin: 0.05, end: 0),
+                    const SizedBox(height: 22),
+                    _WidgetThemeSection(onDark: onDark, muted: muted),
                     const SizedBox(height: 22),
                     if (Platform.isIOS) ...[
                       _SectionTitle('Mevcut widgetlar', muted: muted),
@@ -346,6 +353,153 @@ class _HeroCard extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _WidgetThemeSection extends ConsumerWidget {
+  const _WidgetThemeSection({required this.onDark, required this.muted});
+
+  final bool onDark;
+  final Color muted;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
+    final isPremium = ref.watch(isPremiumProvider);
+    final selected = ref.watch(effectiveWidgetThemeProvider);
+    final languageCode = Localizations.localeOf(context).languageCode;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _SectionTitle(l10n.widgetThemeSectionTitle, muted: muted),
+        const SizedBox(height: 8),
+        Text(
+          l10n.widgetThemeSectionSubtitle,
+          style: GoogleFonts.plusJakartaSans(
+            fontSize: 13,
+            height: 1.42,
+            color: muted,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+        const SizedBox(height: 12),
+        Wrap(
+          spacing: 10,
+          runSpacing: 10,
+          children: [
+            for (final theme in ArinWidgetTheme.all)
+              _ThemeChip(
+                theme: theme,
+                selected: selected.id == theme.id,
+                locked: theme.premiumOnly && !isPremium,
+                languageCode: languageCode,
+                onDark: onDark,
+                onTap: () async {
+                  if (theme.premiumOnly && !isPremium) {
+                    await PaywallPromptService.showForLockedFeature(context);
+                    return;
+                  }
+                  await ref.read(widgetThemeServiceProvider).select(
+                    themeId: theme.id,
+                    isPremium: isPremium,
+                  );
+                  ref.invalidate(effectiveWidgetThemeProvider);
+                  if (!context.mounted) return;
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text(l10n.widgetThemeApplied)),
+                  );
+                },
+              ),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+class _ThemeChip extends StatelessWidget {
+  const _ThemeChip({
+    required this.theme,
+    required this.selected,
+    required this.locked,
+    required this.languageCode,
+    required this.onDark,
+    required this.onTap,
+  });
+
+  final ArinWidgetTheme theme;
+  final bool selected;
+  final bool locked;
+  final String languageCode;
+  final bool onDark;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final bg = theme.id == ArinWidgetTheme.classicId
+        ? (onDark ? const Color(0xFF1A1F1C) : const Color(0xFF2F3A33))
+        : theme.previewBackground;
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(16),
+        child: Ink(
+          width: 104,
+          padding: const EdgeInsets.fromLTRB(10, 10, 10, 8),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16),
+            color: bg,
+            border: Border.all(
+              color: selected
+                  ? AppColors.goldAccent
+                  : Colors.white.withValues(alpha: 0.12),
+              width: selected ? 2 : 1,
+            ),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      theme.localizedName(languageCode),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: theme.previewForeground,
+                        fontWeight: FontWeight.w800,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ),
+                  if (locked)
+                    Icon(
+                      Icons.lock_rounded,
+                      size: 13,
+                      color: theme.previewForeground.withValues(alpha: 0.85),
+                    ),
+                ],
+              ),
+              const SizedBox(height: 10),
+              Text(
+                '“Sabır güzeldir.”',
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  color: theme.previewForeground.withValues(alpha: 0.88),
+                  fontSize: 11,
+                  height: 1.25,
+                  fontFamily: 'serif',
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

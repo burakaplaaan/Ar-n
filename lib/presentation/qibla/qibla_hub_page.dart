@@ -9,6 +9,8 @@ import 'package:go_router/go_router.dart';
 
 import '../../core/router/app_router.dart';
 import '../../data/services/audio_session_coordinator.dart';
+import '../../data/services/paywall_prompt_service.dart';
+import 'islamic_ai/islamic_ai_page.dart';
 import 'qibla_hub_navigator_key.dart';
 import 'qibla_page.dart';
 import 'qibla_tools_dashboard_page.dart';
@@ -28,6 +30,7 @@ abstract final class QiblaHubRoutes {
   static const String healing = '/healing';
   static const String prayerCircle = '/prayer-circle';
   static const String hilalDuel = '/hilal-duel';
+  static const String islamicAi = '/islamic-ai';
 }
 
 /// [Navigator] gözlemcisi: araç paneli dışına çıkıldığında shell kaydırmayı kilitler.
@@ -60,6 +63,19 @@ class _QiblaHubShellSwipeObserver extends NavigatorObserver {
   void didPop(Route<dynamic> route, Route<dynamic>? previousRoute) {
     _pauseHealingIfLeaving(route, previousRoute);
     _applyForTop(previousRoute);
+    if (previousRoute?.settings.name == QiblaHubRoutes.dashboard &&
+        route.settings.name != QiblaHubRoutes.islamicAi) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        final ctx = qiblaHubNavigatorKey.currentContext;
+        if (ctx == null || !ctx.mounted) return;
+        unawaited(
+          PaywallPromptService.maybeShowAfterFeatureUse(
+            context: ctx,
+            ref: _ref,
+          ),
+        );
+      });
+    }
   }
 
   @override
@@ -153,6 +169,12 @@ class _QiblaHubPageState extends ConsumerState<QiblaHubPage> {
             return _toolRoute(
               settings: settings,
               builder: (_) => const HilalDuelPage(),
+            );
+          case QiblaHubRoutes.islamicAi:
+            return _toolRoute(
+              settings: settings,
+              builder: (_) =>
+                  const QiblaNestedSwipeBack(child: IslamicAiPage()),
             );
           case QiblaHubRoutes.dashboard:
           default:

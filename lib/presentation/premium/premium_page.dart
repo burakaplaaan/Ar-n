@@ -11,9 +11,10 @@ import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../core/constants/app_colors.dart';
-import '../../core/constants/app_text_styles.dart';
+import '../../core/constants/revenuecat_ids.dart';
 import '../../core/router/app_router.dart';
 import '../../data/models/purchase_result.dart' show PurchaseOutcomeX;
+import '../../data/models/store_price_info.dart';
 import '../../data/services/purchase_service.dart';
 import '../../l10n/app_localizations.dart';
 import '../shared/providers/auth_providers.dart';
@@ -21,19 +22,23 @@ import '../shared/providers/premium_providers.dart';
 
 /// Android/iOS'ta mağazadan gerçek fiyatları çeker.
 final _premiumPricesProvider =
-    FutureProvider.autoDispose<Map<String, String>>((ref) async {
+    FutureProvider.autoDispose<Map<String, StorePriceInfo>>((ref) async {
   if (kIsWeb || !(Platform.isAndroid || Platform.isIOS)) return {};
-  return PurchaseService().fetchProductPriceStrings([
+  final service = PurchaseService();
+  final subscriptions = await service.fetchStorePrices([
     PremiumPage.yearlyProductId,
     PremiumPage.monthlyProductId,
   ]);
+  final lifetime = await service.fetchLifetimeStorePrices();
+  return {...subscriptions, ...lifetime};
 });
 
 class PremiumPage extends ConsumerStatefulWidget {
   const PremiumPage({super.key});
 
-  static const monthlyProductId = 'arin_premium_monthly_launch';
-  static const yearlyProductId = 'arin_premium_yearly_launch';
+  static const monthlyProductId = RevenueCatIds.monthlyProductId;
+  static const yearlyProductId = RevenueCatIds.yearlyProductId;
+  static const lifetimeProductId = RevenueCatIds.lifetimeProductId;
 
   @override
   ConsumerState<PremiumPage> createState() => _PremiumPageState();
@@ -45,9 +50,17 @@ class _PremiumPageState extends ConsumerState<PremiumPage> {
 
   String? _busyProductId;
   bool _loadingProducts = true;
+  int _incompleteRetryCount = 0;
   final Set<String> _availableProductIds = <String>{};
-  final Map<String, String> _storePriceByBaseId = <String, String>{};
+  final Map<String, StorePriceInfo> _storePriceByBaseId = <String, StorePriceInfo>{};
   Timer? _productRetryTimer;
+
+  static const _expectedProductIds = [
+    PremiumPage.yearlyProductId,
+    PremiumPage.monthlyProductId,
+    PremiumPage.lifetimeProductId,
+  ];
+  static const _maxIncompleteRetries = 4;
 
   @override
   void initState() {
@@ -61,49 +74,60 @@ class _PremiumPageState extends ConsumerState<PremiumPage> {
     super.dispose();
   }
 
-  Future<void> _loadPremiumProducts() async {
-    final ids = <String>[
-      PremiumPage.yearlyProductId,
-      PremiumPage.monthlyProductId,
-    ];
+  bool get _catalogComplete =>
+      _expectedProductIds.every(_availableProductIds.contains);
+
+  Future<void> _loadPremiumProducts({bool showSpinner = false}) async {
+    if (showSpinner && mounted) {
+      setState(() => _loadingProducts = true);
+    }
     await PurchaseService.initialize();
-    final prices = await ref
-        .read(purchaseServiceProvider)
-        .fetchProductPriceStrings(ids);
+    final service = ref.read(purchaseServiceProvider);
+    final prices = {
+      ...await service.fetchStorePrices([
+        PremiumPage.yearlyProductId,
+        PremiumPage.monthlyProductId,
+      ]),
+      ...await service.fetchLifetimeStorePrices(),
+    };
     if (!mounted) return;
     setState(() {
       _loadingProducts = false;
-      _availableProductIds
-        ..clear()
-        ..addAll(
-          prices.keys.map((id) => _normalizeProductId(id)).where((id) => id.isNotEmpty),
-        );
-      _storePriceByBaseId
-        ..clear()
-        ..addEntries(
-          prices.entries.map(
-            (e) => MapEntry(_normalizeProductId(e.key), e.value),
-          ),
-        );
+      _availableProductIds.addAll(
+        prices.keys.map((id) => _normalizeProductId(id)).where((id) => id.isNotEmpty),
+      );
+      _storePriceByBaseId.addEntries(
+        prices.entries.map(
+          (e) => MapEntry(_normalizeProductId(e.key), e.value),
+        ),
+      );
     });
-    if (prices.isEmpty) {
-      _productRetryTimer?.cancel();
-      _productRetryTimer = Timer(const Duration(seconds: 2), () {
-        if (!mounted || _busyProductId != null || _availableProductIds.isNotEmpty) {
+    _scheduleIncompleteRetry();
+  }
+
+  void _scheduleIncompleteRetry() {
+    if (_catalogComplete || _incompleteRetryCount >= _maxIncompleteRetries) {
+      return;
+    }
+    _productRetryTimer?.cancel();
+    _productRetryTimer = Timer(
+      Duration(seconds: 2 + _incompleteRetryCount),
+      () {
+        if (!mounted || _busyProductId != null || _catalogComplete) {
           return;
         }
-        setState(() => _loadingProducts = true);
-        unawaited(_loadPremiumProducts());
-      });
-    }
+        _incompleteRetryCount += 1;
+        unawaited(_loadPremiumProducts(showSpinner: !_catalogComplete && _availableProductIds.isEmpty));
+      },
+    );
   }
 
   Future<void> _retryLoadProductsNow() async {
     if (_busyProductId != null) return;
     _productRetryTimer?.cancel();
+    _incompleteRetryCount = 0;
     if (!mounted) return;
-    setState(() => _loadingProducts = true);
-    await _loadPremiumProducts();
+    await _loadPremiumProducts(showSpinner: _availableProductIds.isEmpty);
   }
 
   Future<void> _openExternalUrl(String rawUrl) async {
@@ -153,9 +177,10 @@ class _PremiumPageState extends ConsumerState<PremiumPage> {
 
     setState(() => _busyProductId = productId);
     try {
-      final result = await ref
-          .read(purchaseServiceProvider)
-          .purchase(productId, l10n: l10n);
+      final service = ref.read(purchaseServiceProvider);
+      final result = _normalizeProductId(productId) == PremiumPage.lifetimeProductId
+          ? await service.purchaseLifetime(l10n: l10n)
+          : await service.purchase(productId, l10n: l10n);
 
       if (!mounted) return;
 
@@ -240,6 +265,12 @@ class _PremiumPageState extends ConsumerState<PremiumPage> {
 
   bool _containsProduct(String productId) =>
       _availableProductIds.contains(_normalizeProductId(productId));
+
+  bool _ownsAny(String activeProductId, List<String> candidates) {
+    final base = _normalizeProductId(activeProductId);
+    if (base.isEmpty) return false;
+    return candidates.any((id) => base == id || base.startsWith(id));
+  }
 
   Future<void> _showSuccessDialog() async {
     if (!mounted) return;
@@ -395,16 +426,21 @@ class _PremiumPageState extends ConsumerState<PremiumPage> {
     final activeProductId = entitlement?.productId ?? '';
 
     // Google Play subscription id'leri basePlan id'si ile birleşip gelebilir
-    // (örn: arin_premium_yearly_launch:p1y). Bu yüzden startsWith kullanıyoruz.
+    // (örn: arin_premium_yearly:p1y). Eski lansman SKU'ları da sahiplik sayılır.
     final hasYearly =
-        isPremium == true && activeProductId.startsWith(PremiumPage.yearlyProductId);
+        isPremium == true &&
+        _ownsAny(activeProductId, RevenueCatIds.allYearlyProductIds);
     final hasMonthly =
-        isPremium == true && activeProductId.startsWith(PremiumPage.monthlyProductId);
+        isPremium == true &&
+        _ownsAny(activeProductId, RevenueCatIds.allMonthlyProductIds);
+    final hasLifetime =
+        isPremium == true &&
+        _ownsAny(activeProductId, RevenueCatIds.allLifetimeProductIds);
     final signedIn = ref.watch(authUserProvider).asData?.value != null;
 
     // Android/iOS'ta mağazadan gerçek fiyatlar kullanılır.
     final prices = ref.watch(_premiumPricesProvider).asData?.value ?? {};
-    final providerPriceByBaseId = <String, String>{
+    final providerPriceByBaseId = <String, StorePriceInfo>{
       for (final entry in prices.entries)
         _normalizeProductId(entry.key): entry.value,
     };
@@ -413,8 +449,20 @@ class _PremiumPageState extends ConsumerState<PremiumPage> {
       ..._storePriceByBaseId,
     };
     
-    final yearlyPrice = mergedPriceByBaseId[PremiumPage.yearlyProductId];
-    final monthlyPrice = mergedPriceByBaseId[PremiumPage.monthlyProductId];
+    final yearlyInfo = mergedPriceByBaseId[PremiumPage.yearlyProductId];
+    final monthlyInfo = mergedPriceByBaseId[PremiumPage.monthlyProductId];
+    final lifetimeInfo = mergedPriceByBaseId[PremiumPage.lifetimeProductId];
+    final yearlyPrice = yearlyInfo?.priceString;
+    final monthlyPrice = monthlyInfo?.priceString;
+    final lifetimePrice = lifetimeInfo?.priceString;
+    final yearlyPerMonth = yearlyInfo?.monthlyEquivalentString ?? '';
+    final yearlyReady =
+        yearlyPrice != null && _containsProduct(PremiumPage.yearlyProductId);
+    final monthlyReady =
+        monthlyPrice != null && _containsProduct(PremiumPage.monthlyProductId);
+    final lifetimeReady =
+        lifetimePrice != null && _containsProduct(PremiumPage.lifetimeProductId);
+    final anyProductReady = yearlyReady || monthlyReady || lifetimeReady;
 
     final titleTextColor = isDark ? Colors.white : AppColors.textPrimary;
     final subtitleTextColor = isDark
@@ -443,7 +491,7 @@ class _PremiumPageState extends ConsumerState<PremiumPage> {
                       children: [
                         Row(
                           children: [
-                            IconButton(
+                            _PremiumCloseButton(
                               onPressed: () {
                                 if (context.canPop()) {
                                   context.pop();
@@ -451,8 +499,6 @@ class _PremiumPageState extends ConsumerState<PremiumPage> {
                                 }
                                 context.go(AppRoutes.home);
                               },
-                              icon: const Icon(Icons.close_rounded),
-                              color: isDark ? Colors.white : AppColors.emeraldDark,
                             ),
                             const Spacer(),
                             TextButton.icon(
@@ -502,15 +548,11 @@ class _PremiumPageState extends ConsumerState<PremiumPage> {
                             ),
                           ),
                           const SizedBox(height: 22),
-                          const _CountdownLikeNotice(),
-                          const SizedBox(height: 22),
-                          const _PremiumBenefits(),
-                          const SizedBox(height: 22),
                           if (!isPremium && !signedIn) ...[
                             const _SignInRequiredNotice(),
                             const SizedBox(height: 14),
                           ],
-                          if (yearlyPrice == null || monthlyPrice == null) ...[
+                          if (!anyProductReady) ...[
                             _ProductsLoadingCard(
                               loading: _loadingProducts,
                               onRetry: _retryLoadProductsNow,
@@ -521,45 +563,83 @@ class _PremiumPageState extends ConsumerState<PremiumPage> {
                             title: l10n.premiumYearlyPlanTitle,
                             badge: hasYearly ? null : l10n.premiumMostAdvantageousBadge,
                             oldPrice: null,
-                            price: yearlyPrice ?? '---',
-                            subline: l10n.premiumYearlyPlanSubtitle,
+                            price: yearlyPrice ?? '—',
+                            subline: yearlyReady
+                                ? (yearlyPerMonth.isNotEmpty
+                                    ? l10n.premiumYearlyPerMonth(yearlyPerMonth)
+                                    : l10n.premiumYearlyPlanSubtitle)
+                                : l10n.premiumPlanComingSoon,
+                            footnote: yearlyReady ? l10n.premiumYearlyTrialNote : null,
+                            saveHint: yearlyReady && !hasYearly
+                                ? l10n.premiumYearlySaveVsMonthly
+                                : null,
                             productId: PremiumPage.yearlyProductId,
                             highlighted: !hasYearly,
                             isOwned: hasYearly,
                             enabled:
-                                yearlyPrice != null &&
+                                yearlyReady &&
+                                !hasLifetime &&
                                 (!isPremium || hasMonthly) &&
-                                (!_loadingProducts &&
-                                    _containsProduct(PremiumPage.yearlyProductId)),
-                            buttonLabel: hasMonthly ? l10n.premiumSwitchToYearly : null,
+                                !_loadingProducts,
+                            buttonLabel: hasMonthly
+                                ? l10n.premiumSwitchToYearly
+                                : l10n.premiumYearlyTrialCta,
                             busy: _busyProductId == PremiumPage.yearlyProductId,
-                            productReady:
-                                yearlyPrice != null &&
-                                _containsProduct(PremiumPage.yearlyProductId),
+                            productReady: yearlyReady,
                             currentlyPremium: isPremium == true,
                             onPressed: () => _startPurchase(PremiumPage.yearlyProductId),
+                            onRetry: yearlyReady ? null : _retryLoadProductsNow,
                           ),
                           const SizedBox(height: 12),
                           _PlanCard(
                             title: l10n.premiumMonthlyPlanTitle,
                             oldPrice: null,
-                            price: monthlyPrice ?? '---',
-                            subline: l10n.premiumMonthlyPlanSubtitle,
+                            price: monthlyPrice ?? '—',
+                            subline: monthlyReady
+                                ? l10n.premiumMonthlyPlanSubtitle
+                                : l10n.premiumPlanComingSoon,
                             productId: PremiumPage.monthlyProductId,
                             highlighted: false,
                             isOwned: hasMonthly,
                             enabled:
-                                monthlyPrice != null &&
+                                monthlyReady &&
                                 !isPremium &&
-                                (!_loadingProducts &&
-                                    _containsProduct(PremiumPage.monthlyProductId)),
+                                !hasLifetime &&
+                                !_loadingProducts,
+                            buttonLabel: l10n.premiumMonthlyCta,
                             busy: _busyProductId == PremiumPage.monthlyProductId,
-                            productReady:
-                                monthlyPrice != null &&
-                                _containsProduct(PremiumPage.monthlyProductId),
+                            productReady: monthlyReady,
                             currentlyPremium: isPremium == true,
                             onPressed: () => _startPurchase(PremiumPage.monthlyProductId),
+                            onRetry: monthlyReady ? null : _retryLoadProductsNow,
                           ),
+                          const SizedBox(height: 12),
+                          _PlanCard(
+                            title: l10n.premiumLifetimePlanTitle,
+                            badge: hasLifetime ? null : l10n.premiumLifetimeBadge,
+                            oldPrice: null,
+                            price: lifetimePrice ?? '—',
+                            subline: lifetimeReady
+                                ? l10n.premiumLifetimePlanSubtitle
+                                : l10n.premiumPlanComingSoon,
+                            footnote: lifetimeReady ? l10n.premiumLifetimeNote : null,
+                            productId: PremiumPage.lifetimeProductId,
+                            highlighted: false,
+                            isOwned: hasLifetime,
+                            enabled:
+                                lifetimeReady &&
+                                !hasLifetime &&
+                                !_loadingProducts,
+                            buttonLabel: l10n.premiumLifetimeCta,
+                            busy: _busyProductId == PremiumPage.lifetimeProductId,
+                            productReady: lifetimeReady,
+                            currentlyPremium: isPremium == true,
+                            onPressed: () =>
+                                _startPurchase(PremiumPage.lifetimeProductId),
+                            onRetry: lifetimeReady ? null : _retryLoadProductsNow,
+                          ),
+                          const SizedBox(height: 22),
+                          const _FreePremiumCompare(),
                           const SizedBox(height: 18),
                         ],
                         Text(
@@ -686,6 +766,43 @@ class _Glow extends StatelessWidget {
   }
 }
 
+class _PremiumCloseButton extends StatelessWidget {
+  const _PremiumCloseButton({required this.onPressed});
+
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final l10n = AppLocalizations.of(context)!;
+    return Semantics(
+      button: true,
+      label: l10n.premiumCloseSemantics,
+      child: Material(
+        color: isDark
+            ? Colors.white.withValues(alpha: 0.14)
+            : Colors.white.withValues(alpha: 0.92),
+        shape: const CircleBorder(),
+        elevation: 2,
+        shadowColor: Colors.black.withValues(alpha: 0.18),
+        child: InkWell(
+          customBorder: const CircleBorder(),
+          onTap: onPressed,
+          child: SizedBox(
+            width: 46,
+            height: 46,
+            child: Icon(
+              Icons.close_rounded,
+              size: 28,
+              color: isDark ? Colors.white : AppColors.emeraldDark,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class _LaunchBadge extends StatelessWidget {
   const _LaunchBadge();
 
@@ -715,113 +832,145 @@ class _LaunchBadge extends StatelessWidget {
   }
 }
 
-class _CountdownLikeNotice extends StatelessWidget {
-  const _CountdownLikeNotice();
+class _FreePremiumCompare extends StatelessWidget {
+  const _FreePremiumCompare();
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bgColor = isDark
-        ? Colors.white.withValues(alpha: 0.08)
-        : AppColors.creamSurface;
-    final borderColor = isDark
-        ? Colors.white.withValues(alpha: 0.12)
-        : AppColors.creamDark;
-    final textColor = isDark
-        ? Colors.white.withValues(alpha: 0.82)
-        : AppColors.textSecondary;
-
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: bgColor,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: borderColor),
-      ),
-      child: Row(
-        children: [
-          const Icon(Icons.hourglass_top_rounded, color: AppColors.goldAccent),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Text(
-              AppLocalizations.of(context)!.premiumCountdownNotice,
-              style: TextStyle(
-                color: textColor,
-                height: 1.35,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _PremiumBenefits extends StatelessWidget {
-  const _PremiumBenefits();
-
-  @override
-  Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final textColor = isDark
-        ? Colors.white.withValues(alpha: 0.92)
-        : AppColors.textPrimary;
     final l10n = AppLocalizations.of(context)!;
-
-    final items = [
-      (Icons.block_rounded, l10n.premiumBenefitAdFree),
-      (Icons.widgets_rounded, l10n.premiumBenefitWidgets),
-      (Icons.explore_rounded, l10n.premiumBenefitExplore),
-      (Icons.notifications_active_rounded, l10n.premiumBenefitAdhan),
-      (Icons.volunteer_activism_rounded, l10n.premiumBenefitPrayerCircle),
-      (Icons.emoji_events_rounded, l10n.premiumBenefitContest),
-      (Icons.spa_rounded, l10n.premiumBenefitExtras),
-      (Icons.auto_awesome_rounded, l10n.premiumBenefitAssistant),
+    final titleColor = isDark ? Colors.white : AppColors.textPrimary;
+    final freeColor = isDark
+        ? Colors.white.withValues(alpha: 0.52)
+        : AppColors.textMuted;
+    final premiumColor = isDark
+        ? AppColors.goldAccent
+        : AppColors.emeraldDark;
+    final rows = [
+      (l10n.premiumCompareAds, l10n.premiumCompareAdsFree, l10n.premiumCompareAdsPremium),
+      (l10n.premiumCompareWidgets, l10n.premiumCompareWidgetsFree, l10n.premiumCompareWidgetsPremium),
+      (l10n.premiumCompareThemes, l10n.premiumCompareThemesFree, l10n.premiumCompareThemesPremium),
+      (l10n.premiumCompareAi, l10n.premiumCompareAiFree, l10n.premiumCompareAiPremium),
+      (l10n.qiblaHubAssistantTitle, l10n.premiumCompareWidgetsFree, l10n.premiumCompareWidgetsPremium),
+      (l10n.premiumCompareExplore, l10n.premiumCompareExploreFree, l10n.premiumCompareExplorePremium),
+      (l10n.premiumCompareAdhan, l10n.premiumCompareAdhanFree, l10n.premiumCompareAdhanPremium),
+      (l10n.premiumComparePrayer, l10n.premiumComparePrayerFree, l10n.premiumComparePrayerPremium),
+      (l10n.premiumCompareContest, l10n.premiumCompareContestFree, l10n.premiumCompareContestPremium),
     ];
 
-    final labelStyle = AppTextStyles.titleSmall.copyWith(
-      color: textColor,
-      fontSize: 15,
-      fontWeight: FontWeight.w600,
-      height: 1.28,
-      letterSpacing: -0.15,
-    );
-
-    return Column(
-      children: [
-        for (final item in items)
-          Padding(
-            padding: const EdgeInsets.only(bottom: 11),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Container(
-                  width: 34,
-                  height: 34,
-                  decoration: BoxDecoration(
-                    color: AppColors.accentNeonGreen.withValues(alpha: 0.15),
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(
-                    item.$1,
-                    color: isDark
-                        ? AppColors.accentNeonGreen
-                        : AppColors.accentGreenOnLight,
-                    size: 18,
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Text(
-                    item.$2,
-                    style: labelStyle,
-                  ),
-                ),
-              ],
+    return Container(
+      padding: const EdgeInsets.fromLTRB(16, 18, 16, 10),
+      decoration: BoxDecoration(
+        color: isDark
+            ? Colors.white.withValues(alpha: 0.06)
+            : AppColors.creamSurface.withValues(alpha: 0.92),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(
+          color: isDark
+              ? AppColors.goldAccent.withValues(alpha: 0.28)
+              : AppColors.goldAccent.withValues(alpha: 0.4),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text(
+            l10n.premiumCompareTitle,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: titleColor,
+              fontSize: 18,
+              fontWeight: FontWeight.w900,
+              letterSpacing: -0.3,
             ),
           ),
-      ],
+          const SizedBox(height: 16),
+          Row(
+            children: [
+              const Expanded(flex: 5, child: SizedBox.shrink()),
+              Expanded(
+                flex: 3,
+                child: Text(
+                  l10n.premiumCompareColFree,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: freeColor,
+                    fontSize: 11,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 0.3,
+                  ),
+                ),
+              ),
+              Expanded(
+                flex: 3,
+                child: Text(
+                  l10n.premiumCompareColPremium,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: premiumColor,
+                    fontSize: 11,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: 0.3,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          for (var i = 0; i < rows.length; i++) ...[
+            if (i > 0)
+              Divider(
+                height: 1,
+                color: isDark
+                    ? Colors.white.withValues(alpha: 0.08)
+                    : AppColors.creamDark.withValues(alpha: 0.7),
+              ),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 11),
+              child: Row(
+                children: [
+                  Expanded(
+                    flex: 5,
+                    child: Text(
+                      rows[i].$1,
+                      style: TextStyle(
+                        color: titleColor,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w700,
+                        height: 1.25,
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    flex: 3,
+                    child: Text(
+                      rows[i].$2,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: freeColor,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    flex: 3,
+                    child: Text(
+                      rows[i].$3,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: premiumColor,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ],
+      ),
     );
   }
 }
@@ -1044,12 +1193,17 @@ class _PlanCard extends StatelessWidget {
     this.buttonLabel,
     this.productReady = true,
     this.currentlyPremium = false,
+    this.footnote,
+    this.saveHint,
+    this.onRetry,
   });
 
   final String title;
   final String? oldPrice;
   final String price;
   final String subline;
+  final String? footnote;
+  final String? saveHint;
   final String productId;
   final bool highlighted;
   final bool enabled;
@@ -1062,6 +1216,7 @@ class _PlanCard extends StatelessWidget {
   final String? buttonLabel;
   final bool productReady;
   final bool currentlyPremium;
+  final VoidCallback? onRetry;
 
   @override
   Widget build(BuildContext context) {
@@ -1183,23 +1338,50 @@ class _PlanCard extends StatelessWidget {
                   ? (isDark
                         ? AppColors.accentNeonGreen
                         : AppColors.accentGreenOnLight)
-                  : (!enabled
-                        ? (isDark
-                              ? Colors.white24
-                              : Colors.black26)
-                        : (highlighted
-                              ? AppColors.goldAccent
-                              : (isDark
-                                    ? AppColors.accentNeonGreen
-                                    : AppColors.accentGreenOnLight))),
+                  : (highlighted
+                        ? AppColors.goldAccent
+                        : (isDark
+                              ? AppColors.accentNeonGreen
+                              : AppColors.accentGreenOnLight)),
               fontWeight: FontWeight.w800,
             ),
           ),
+          if (saveHint != null) ...[
+            const SizedBox(height: 8),
+            Text(
+              saveHint!,
+              style: TextStyle(
+                color: isDark
+                    ? Colors.white.withValues(alpha: 0.72)
+                    : AppColors.textSecondary,
+                fontSize: 12,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ],
+          if (footnote != null) ...[
+            const SizedBox(height: 6),
+            Text(
+              footnote!,
+              style: TextStyle(
+                color: isDark
+                    ? Colors.white.withValues(alpha: 0.62)
+                    : AppColors.textSecondary,
+                fontSize: 12,
+                height: 1.35,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
           const SizedBox(height: 14),
           SizedBox(
             width: double.infinity,
             child: FilledButton(
-              onPressed: enabled && !busy ? onPressed : null,
+              onPressed: busy
+                  ? null
+                  : (!isOwned && !productReady
+                        ? onRetry
+                        : (enabled ? onPressed : null)),
               style: FilledButton.styleFrom(
                 backgroundColor: highlighted
                     ? AppColors.goldAccent
@@ -1216,13 +1398,15 @@ class _PlanCard extends StatelessWidget {
                   : Text(
                       isOwned
                           ? AppLocalizations.of(context)!.premiumActivePlanButton
-                          : (enabled
-                                ? (buttonLabel ?? AppLocalizations.of(context)!.premiumStartWithLaunchPrice)
-                                : (productReady
-                                      ? (currentlyPremium
+                          : (!productReady
+                                ? (onRetry != null
+                                      ? AppLocalizations.of(context)!.asyncErrorRetryAction
+                                      : AppLocalizations.of(context)!.premiumPlanComingSoon)
+                                : (enabled
+                                      ? (buttonLabel ?? AppLocalizations.of(context)!.premiumStartWithLaunchPrice)
+                                      : (currentlyPremium
                                             ? AppLocalizations.of(context)!.premiumIsActiveButton
-                                            : AppLocalizations.of(context)!.premiumProductNotReadyError)
-                                      : AppLocalizations.of(context)!.premiumProductNotReadyError)),
+                                            : (buttonLabel ?? AppLocalizations.of(context)!.premiumStartWithLaunchPrice)))),
                       style: const TextStyle(fontWeight: FontWeight.w900),
                     ),
             ),
