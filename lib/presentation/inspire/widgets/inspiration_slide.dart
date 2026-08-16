@@ -13,6 +13,29 @@ import '../inspiration_share_service.dart';
 import '../inspiration_text_layouts.dart';
 import 'inspiration_reels_layer.dart';
 
+/// Viewer kapanış/açılış progress'ine göre söz ve aksiyonları soldurur.
+class InspirationViewerChromeScope extends InheritedWidget {
+  const InspirationViewerChromeScope({
+    super.key,
+    required this.opacity,
+    required super.child,
+  });
+
+  final double opacity;
+
+  static double opacityOf(BuildContext context) {
+    return context
+            .dependOnInheritedWidgetOfExactType<InspirationViewerChromeScope>()
+            ?.opacity ??
+        1;
+  }
+
+  @override
+  bool updateShouldNotify(InspirationViewerChromeScope oldWidget) {
+    return (oldWidget.opacity - opacity).abs() > 0.01;
+  }
+}
+
 class InspirationSlide extends ConsumerStatefulWidget {
   const InspirationSlide({
     super.key,
@@ -116,23 +139,21 @@ class _InspirationSlideState extends ConsumerState<InspirationSlide> {
   }
 
   Widget _gradientOverlay(bool lightTxt) {
-    return Positioned.fill(
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: lightTxt
-                ? [
-                    Colors.black.withValues(alpha: 0.1),
-                    Colors.black.withValues(alpha: 0.36),
-                  ]
-                : [
-                    Colors.white.withValues(alpha: 0.05),
-                    Colors.black.withValues(alpha: 0.12),
-                  ],
-            stops: const [0.35, 1.0],
-          ),
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: lightTxt
+              ? [
+                  Colors.black.withValues(alpha: 0.1),
+                  Colors.black.withValues(alpha: 0.36),
+                ]
+              : [
+                  Colors.white.withValues(alpha: 0.05),
+                  Colors.black.withValues(alpha: 0.12),
+                ],
+          stops: const [0.35, 1.0],
         ),
       ),
     );
@@ -176,7 +197,22 @@ class _InspirationSlideState extends ConsumerState<InspirationSlide> {
     );
   }
 
+  Widget _chromeLayer({
+    required double opacity,
+    required List<Widget> children,
+  }) {
+    final layer = Stack(fit: StackFit.expand, children: children);
+    if (opacity >= 0.999) return layer;
+    return Opacity(
+      opacity: opacity,
+      child: IgnorePointer(ignoring: opacity < 0.05, child: layer),
+    );
+  }
+
   Widget _buildReelsStack(bool lightTxt, Alignment textAnchor) {
+    final chromeOpacity = InspirationViewerChromeScope.opacityOf(
+      context,
+    ).clamp(0.0, 1.0);
     return Stack(
       fit: StackFit.expand,
       children: [
@@ -189,22 +225,32 @@ class _InspirationSlideState extends ConsumerState<InspirationSlide> {
                 card: _displayCard,
                 useLightPlaceholder: lightTxt,
               ),
-              _gradientOverlay(lightTxt),
-              _watermark(lightTxt),
-              InspirationReelsQuoteBlock(
-                card: _displayCard,
-                useLightTextOnImage: lightTxt,
-                textAnchor: textAnchor,
-                scrollEnabled: widget.reelsTextScrollEnabled,
+              _chromeLayer(
+                opacity: chromeOpacity,
+                children: [
+                  Positioned.fill(child: _gradientOverlay(lightTxt)),
+                  _watermark(lightTxt),
+                  InspirationReelsQuoteBlock(
+                    card: _displayCard,
+                    useLightTextOnImage: lightTxt,
+                    textAnchor: textAnchor,
+                    scrollEnabled: widget.reelsTextScrollEnabled,
+                  ),
+                ],
               ),
             ],
           ),
         ),
-        InspirationReelsActionRail(
-          card: _displayCard,
-          lightOnImage: lightTxt,
-          onRemixBackground: _remixBackground,
-          onShare: _onSharePressed,
+        _chromeLayer(
+          opacity: chromeOpacity,
+          children: [
+            InspirationReelsActionRail(
+              card: _displayCard,
+              lightOnImage: lightTxt,
+              onRemixBackground: _remixBackground,
+              onShare: _onSharePressed,
+            ),
+          ],
         ),
       ],
     );
@@ -233,7 +279,7 @@ class _InspirationSlideState extends ConsumerState<InspirationSlide> {
         fit: StackFit.expand,
         children: [
           _SlideBackground(card: widget.card, useLightPlaceholder: light),
-          _gradientOverlay(light),
+          Positioned.fill(child: _gradientOverlay(light)),
           SafeArea(
             child: LayoutBuilder(
               builder: (context, constraints) {

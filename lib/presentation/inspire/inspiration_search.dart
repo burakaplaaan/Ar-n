@@ -1,4 +1,5 @@
 import 'dart:math' as math;
+import 'dart:ui' show Rect;
 
 import '../../data/models/inspiration_card_model.dart';
 
@@ -84,7 +85,9 @@ bool _termMatches(String term, InspirationCardModel card) {
   for (final tag in card.searchTags) {
     final nt = inspirationSearchNormalize(tag);
     if (nt.isEmpty) continue;
-    if (nt == term || nt.contains(term) || (term.length >= 3 && term.contains(nt))) {
+    if (nt == term ||
+        nt.contains(term) ||
+        (term.length >= 3 && term.contains(nt))) {
       return true;
     }
     if (_tokenFuzzyMatches(term, nt)) return true;
@@ -159,8 +162,12 @@ class InspireViewerDeckExtra {
   const InspireViewerDeckExtra({
     required this.cards,
     required this.initialIndex,
+    this.originRect,
   });
 
   final List<InspirationCardModel> cards;
   final int initialIndex;
+
+  /// Tıklanan ızgara hücresinin global dikdörtgeni (Instagram kapanış hedefi).
+  final Rect? originRect;
 }

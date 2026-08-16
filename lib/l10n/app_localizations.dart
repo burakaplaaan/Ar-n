@@ -2418,6 +2418,228 @@ abstract class AppLocalizations {
   /// **'4-7-8 nefes döngüsü ile sakinleş, odağını toparla'**
   String get qiblaHubBreathingSubtitle;
 
+  /// No description provided for @qiblaHubAssistantTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Arın Asistanı'**
+  String get qiblaHubAssistantTitle;
+
+  /// No description provided for @qiblaHubAssistantSubtitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sohbet; namaz, bildirim ve hatırlatıcıları yönet'**
+  String get qiblaHubAssistantSubtitle;
+
+  /// No description provided for @assistantTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Arın Asistanı'**
+  String get assistantTitle;
+
+  /// No description provided for @assistantSubtitle.
+  ///
+  /// In tr, this message translates to:
+  /// **''**
+  String get assistantSubtitle;
+
+  /// No description provided for @assistantAskChip.
+  ///
+  /// In tr, this message translates to:
+  /// **'Asistan'**
+  String get assistantAskChip;
+
+  /// No description provided for @assistantInputHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kısaca yaz…'**
+  String get assistantInputHint;
+
+  /// No description provided for @assistantEmptyTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Merhaba'**
+  String get assistantEmptyTitle;
+
+  /// No description provided for @assistantEmptyBody.
+  ///
+  /// In tr, this message translates to:
+  /// **''**
+  String get assistantEmptyBody;
+
+  /// No description provided for @assistantHello.
+  ///
+  /// In tr, this message translates to:
+  /// **'Merhaba'**
+  String get assistantHello;
+
+  /// No description provided for @assistantHelloName.
+  ///
+  /// In tr, this message translates to:
+  /// **'Merhaba {name}'**
+  String assistantHelloName(String name);
+
+  /// No description provided for @assistantNeedSignIn.
+  ///
+  /// In tr, this message translates to:
+  /// **'Asistan için hesabını bağla.'**
+  String get assistantNeedSignIn;
+
+  /// No description provided for @assistantNeedPremium.
+  ///
+  /// In tr, this message translates to:
+  /// **'Arın Asistanı Premium içindir.'**
+  String get assistantNeedPremium;
+
+  /// No description provided for @assistantGateHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Giriş yapıp Premium açınca yazılı sohbet başlar. Konuşma kaydedilmez.'**
+  String get assistantGateHint;
+
+  /// No description provided for @assistantOpenPremium.
+  ///
+  /// In tr, this message translates to:
+  /// **'Premium’u aç'**
+  String get assistantOpenPremium;
+
+  /// No description provided for @assistantSignIn.
+  ///
+  /// In tr, this message translates to:
+  /// **'Giriş yap'**
+  String get assistantSignIn;
+
+  /// No description provided for @assistantGenericError.
+  ///
+  /// In tr, this message translates to:
+  /// **'Asistan şu an yanıt veremedi.'**
+  String get assistantGenericError;
+
+  /// No description provided for @assistantQuotaReached.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bugünkü mesaj hakkın doldu.'**
+  String get assistantQuotaReached;
+
+  /// No description provided for @assistantMessageTooLong.
+  ///
+  /// In tr, this message translates to:
+  /// **'Mesajı kısalt (en fazla 100 harf).'**
+  String get assistantMessageTooLong;
+
+  /// No description provided for @assistantNotReady.
+  ///
+  /// In tr, this message translates to:
+  /// **'Asistan henüz hazır değil.'**
+  String get assistantNotReady;
+
+  /// No description provided for @assistantWordCount.
+  ///
+  /// In tr, this message translates to:
+  /// **'{count}/{max} harf'**
+  String assistantWordCount(int count, int max);
+
+  /// No description provided for @assistantRemainingToday.
+  ///
+  /// In tr, this message translates to:
+  /// **'{count} kaldı'**
+  String assistantRemainingToday(int count);
+
+  /// No description provided for @assistantActionFailed.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu işlemi yapamadım.'**
+  String get assistantActionFailed;
+
+  /// No description provided for @assistantActionUnknownPage.
+  ///
+  /// In tr, this message translates to:
+  /// **'O sayfayı açamadım.'**
+  String get assistantActionUnknownPage;
+
+  /// No description provided for @assistantActionCancelled.
+  ///
+  /// In tr, this message translates to:
+  /// **'İşlem iptal edildi.'**
+  String get assistantActionCancelled;
+
+  /// No description provided for @assistantSalatHabitMissing.
+  ///
+  /// In tr, this message translates to:
+  /// **'Önce namaz programını başlat.'**
+  String get assistantSalatHabitMissing;
+
+  /// No description provided for @assistantPrayerMarked.
+  ///
+  /// In tr, this message translates to:
+  /// **'Namazı kılındı işaretledim.'**
+  String get assistantPrayerMarked;
+
+  /// No description provided for @assistantPrayerUnmarked.
+  ///
+  /// In tr, this message translates to:
+  /// **'Namaz işaretini kaldırdım.'**
+  String get assistantPrayerUnmarked;
+
+  /// No description provided for @assistantAlarmDefaultTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Arın hatırlatıcı'**
+  String get assistantAlarmDefaultTitle;
+
+  /// No description provided for @assistantAlarmBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kurduğun hatırlatıcı.'**
+  String get assistantAlarmBody;
+
+  /// No description provided for @assistantAlarmPermissionDenied.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bildirim izni olmadan alarm kuramam.'**
+  String get assistantAlarmPermissionDenied;
+
+  /// No description provided for @assistantAlarmSet.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hatırlatıcı {time} için kuruldu.'**
+  String assistantAlarmSet(String time);
+
+  /// No description provided for @assistantNotificationsOn.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bildirim açıldı.'**
+  String get assistantNotificationsOn;
+
+  /// No description provided for @assistantNotificationsOff.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bildirim kapatıldı.'**
+  String get assistantNotificationsOff;
+
+  /// No description provided for @assistantConfirmDisablePrayerTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Namaz bildirimleri kapansın mı?'**
+  String get assistantConfirmDisablePrayerTitle;
+
+  /// No description provided for @assistantConfirmDisablePrayerBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'Tüm vakit hatırlatıcıları kapanır.'**
+  String get assistantConfirmDisablePrayerBody;
+
+  /// No description provided for @assistantCancel.
+  ///
+  /// In tr, this message translates to:
+  /// **'Vazgeç'**
+  String get assistantCancel;
+
+  /// No description provided for @assistantConfirm.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kapat'**
+  String get assistantConfirm;
+
   /// No description provided for @qiblaHubHealingTitle.
   ///
   /// In tr, this message translates to:
@@ -3045,7 +3267,7 @@ abstract class AppLocalizations {
   /// No description provided for @settingsPrivacyThirdPartyBody.
   ///
   /// In tr, this message translates to:
-  /// **'Arin; oturum açma, bildirimler ve veri eşitleme için Firebase servislerini (Authentication, Firestore), kullanım analizi ve çökme tanılama için Firebase Analytics/Crashlytics\'i, reklamlar için Google AdMob\'u, abonelik ve uygulama içi satın alma doğrulaması için RevenueCat\'i ve namaz vakitleri için Aladhan/Diyanet API\'lerini kullanır.'**
+  /// **'Arin; oturum açma, bildirimler ve veri eşitleme için Firebase servislerini (Authentication, Firestore), kullanım analizi ve çökme tanılama için Firebase Analytics/Crashlytics\'i, reklamlar için Google AdMob\'u, abonelik ve uygulama içi satın alma doğrulaması için RevenueCat\'i ve namaz vakitleri için Aladhan/Diyanet API\'lerini kullanır. Premium Arın Asistanı mesajları Google Gemini’ye iletilir; sohbet metni uygulamada saklanmaz. Ücretsiz Gemini katmanında bu içerik Google’ın ürünlerini geliştirmek için kullanılabilir.'**
   String get settingsPrivacyThirdPartyBody;
 
   /// No description provided for @settingsPrivacyControlsTitle.
@@ -7339,6 +7561,12 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'Zikir, pusula ve frekanslarda reklam yok'**
   String get premiumBenefitExtras;
+
+  /// No description provided for @premiumBenefitAssistant.
+  ///
+  /// In tr, this message translates to:
+  /// **'Arın Asistanı: yazılı sohbet ve uygulama yönetimi'**
+  String get premiumBenefitAssistant;
 
   /// No description provided for @premiumSignInRequiredNotice.
   ///

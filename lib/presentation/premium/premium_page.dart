@@ -777,6 +777,7 @@ class _PremiumBenefits extends StatelessWidget {
       (Icons.volunteer_activism_rounded, l10n.premiumBenefitPrayerCircle),
       (Icons.emoji_events_rounded, l10n.premiumBenefitContest),
       (Icons.spa_rounded, l10n.premiumBenefitExtras),
+      (Icons.auto_awesome_rounded, l10n.premiumBenefitAssistant),
     ];
 
     final labelStyle = AppTextStyles.titleSmall.copyWith(

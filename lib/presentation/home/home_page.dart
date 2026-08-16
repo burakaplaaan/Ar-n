@@ -24,6 +24,8 @@ import '../shared/providers/auth_providers.dart';
 import '../shared/providers/premium_providers.dart';
 import '../shared/providers/prayer_time_providers.dart';
 import '../shared/providers/user_profile_providers.dart';
+import '../assistant/widgets/assistant_home_bubble.dart';
+import '../shared/widgets/arin_shell_layout.dart';
 import '../shared/widgets/ornate_frame.dart';
 import '../willpower/widgets/namaz_adhan_reminder_card.dart';
 import 'widgets/daily_namaz_wisdom_card.dart';
@@ -72,11 +74,12 @@ class _HomePageState extends ConsumerState<HomePage> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     // Tek Scaffold ArinShell'de; iç içe Scaffold + extendBody bazı cihazlarda boş gövde verebiliyor.
-    final bottomPad = MediaQuery.paddingOf(context).bottom;
     return SizedBox.expand(
       child: ArinShellBackground.buildLayered(
         context,
-        child: RefreshIndicator(
+        child: Stack(
+          children: [
+            RefreshIndicator(
           color: ArinShellBackground.isLight(context)
               ? AppColors.accentGreenOnLight
               : AppColors.accentNeonGreen,
@@ -116,7 +119,10 @@ class _HomePageState extends ConsumerState<HomePage> {
                         const HomeNamazRitualSection(),
                         const SizedBox(height: 12),
                         const HomePrayerTimesBlock(),
-                        SizedBox(height: 72 + bottomPad),
+                        SizedBox(
+                          height:
+                              ArinShellLayout.bottomContentPadding(context) + 52,
+                        ),
                       ],
                     ),
                   ),
@@ -124,6 +130,15 @@ class _HomePageState extends ConsumerState<HomePage> {
               ),
             ],
           ),
+        ),
+            Positioned(
+              right: 16,
+              bottom: ArinShellLayout.bottomContentPadding(context),
+              child: AssistantHomeBubble(
+                onTap: () => context.push(AppRoutes.assistant),
+              ),
+            ),
+          ],
         ),
       ),
     );

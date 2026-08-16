@@ -3,6 +3,15 @@ import 'package:flutter/material.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../data/models/inspiration_card_model.dart';
 
+/// Izgara hücresinin ekran koordinatındaki dikdörtgeni (viewer Hero-benzeri kapanış).
+Rect? inspirationTileOriginRect(BuildContext context) {
+  final box = context.findRenderObject();
+  if (box is! RenderBox || !box.hasSize) return null;
+  final rect = box.localToGlobal(Offset.zero) & box.size;
+  if (rect.width < 8 || rect.height < 8) return null;
+  return rect;
+}
+
 /// Keşfet ızgarası — tüm hücreler aynı en-boy; görsel `BoxFit.cover` + ortala (dosya kırpılmaz).
 class InspirationGridTile extends StatelessWidget {
   const InspirationGridTile({
@@ -12,12 +21,12 @@ class InspirationGridTile extends StatelessWidget {
   });
 
   final InspirationCardModel card;
-  final VoidCallback onTap;
+  final ValueChanged<Rect?> onTap;
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: onTap,
+      onTap: () => onTap(inspirationTileOriginRect(context)),
       behavior: HitTestBehavior.opaque,
       child: Stack(
         fit: StackFit.expand,

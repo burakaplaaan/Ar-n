@@ -660,6 +660,66 @@
   "qiblaHubZikirFeatureSubtitle": "Dijital sayaç; zikir bilgisi, tur geçmişi ve hedef (33/99)",
   "qiblaHubBreathingTitle": "Nefes Egzersizi",
   "qiblaHubBreathingSubtitle": "4-7-8 nefes döngüsü ile sakinleş, odağını toparla",
+  "qiblaHubAssistantTitle": "Arın Asistanı",
+  "qiblaHubAssistantSubtitle": "Sohbet; namaz, bildirim ve hatırlatıcıları yönet",
+  "assistantTitle": "Arın Asistanı",
+  "assistantSubtitle": "",
+  "assistantAskChip": "Asistan",
+  "assistantInputHint": "Kısaca yaz…",
+  "assistantEmptyTitle": "Merhaba",
+  "assistantEmptyBody": "",
+  "assistantHello": "Merhaba",
+  "assistantHelloName": "Merhaba {name}",
+  "@assistantHelloName": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "assistantNeedSignIn": "Asistan için hesabını bağla.",
+  "assistantNeedPremium": "Arın Asistanı Premium içindir.",
+  "assistantGateHint": "Giriş yapıp Premium açınca yazılı sohbet başlar. Konuşma kaydedilmez.",
+  "assistantOpenPremium": "Premium’u aç",
+  "assistantSignIn": "Giriş yap",
+  "assistantGenericError": "Asistan şu an yanıt veremedi.",
+  "assistantQuotaReached": "Bugünkü mesaj hakkın doldu.",
+  "assistantMessageTooLong": "Mesajı kısalt (en fazla 100 harf).",
+  "assistantNotReady": "Asistan henüz hazır değil.",
+  "assistantWordCount": "{count}/{max} harf",
+  "@assistantWordCount": {
+    "placeholders": {
+      "count": {"type": "int"},
+      "max": {"type": "int"}
+    }
+  },
+  "assistantRemainingToday": "{count} kaldı",
+  "@assistantRemainingToday": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "assistantActionFailed": "Bu işlemi yapamadım.",
+  "assistantActionUnknownPage": "O sayfayı açamadım.",
+  "assistantActionCancelled": "İşlem iptal edildi.",
+  "assistantSalatHabitMissing": "Önce namaz programını başlat.",
+  "assistantPrayerMarked": "Namazı kılındı işaretledim.",
+  "assistantPrayerUnmarked": "Namaz işaretini kaldırdım.",
+  "assistantAlarmDefaultTitle": "Arın hatırlatıcı",
+  "assistantAlarmBody": "Kurduğun hatırlatıcı.",
+  "assistantAlarmPermissionDenied": "Bildirim izni olmadan alarm kuramam.",
+  "assistantAlarmSet": "Hatırlatıcı {time} için kuruldu.",
+  "@assistantAlarmSet": {
+    "placeholders": {
+      "time": {"type": "String"}
+    }
+  },
+  "assistantNotificationsOn": "Bildirim açıldı.",
+  "assistantNotificationsOff": "Bildirim kapatıldı.",
+  "assistantConfirmDisablePrayerTitle": "Namaz bildirimleri kapansın mı?",
+  "assistantConfirmDisablePrayerBody": "Tüm vakit hatırlatıcıları kapanır.",
+  "assistantCancel": "Vazgeç",
+  "assistantConfirm": "Kapat",
   "qiblaHubHealingTitle": "İyileştirici Frekanslar",
   "qiblaHubHealingSubtitle": "Terapi tonları, ambiyans ve uyku zamanlayıcısı ile sakin bir oturum",
   "qiblaHubHilalDuelTitle": "Bilgi Düellosu",
@@ -857,7 +917,7 @@
   "settingsPrivacyStorageTitle": "Saklama ve süre",
   "settingsPrivacyStorageBody": "Alışkanlık, zikir ve tercih verilerinin büyük kısmı cihazınızda tutulur. Hesapla giriş yaparsanız seçili veriler Firebase servisleriyle eşitlenebilir. Veriler, uygulama içinden silene veya hesabınızı kaldırana kadar saklanır.",
   "settingsPrivacyThirdPartyTitle": "Üçüncü taraf servisler",
-  "settingsPrivacyThirdPartyBody": "Arin; oturum açma, bildirimler ve veri eşitleme için Firebase servislerini (Authentication, Firestore), kullanım analizi ve çökme tanılama için Firebase Analytics/Crashlytics'i, reklamlar için Google AdMob'u, abonelik ve uygulama içi satın alma doğrulaması için RevenueCat'i ve namaz vakitleri için Aladhan/Diyanet API'lerini kullanır.",
+  "settingsPrivacyThirdPartyBody": "Arin; oturum açma, bildirimler ve veri eşitleme için Firebase servislerini (Authentication, Firestore), kullanım analizi ve çökme tanılama için Firebase Analytics/Crashlytics'i, reklamlar için Google AdMob'u, abonelik ve uygulama içi satın alma doğrulaması için RevenueCat'i ve namaz vakitleri için Aladhan/Diyanet API'lerini kullanır. Premium Arın Asistanı mesajları Google Gemini’ye iletilir; sohbet metni uygulamada saklanmaz. Ücretsiz Gemini katmanında bu içerik Google’ın ürünlerini geliştirmek için kullanılabilir.",
   "settingsPrivacyControlsTitle": "Kullanıcı kontrolü",
   "settingsPrivacyControlsBody": "Konum ve bildirim izinlerini cihaz ayarlarından kapatabilir, Ayarlar ekranından çıkış yapabilir veya hesabınızı ve yerel verilerinizi silebilirsiniz.",
   "settingsPrivacyChildrenTitle": "Çocukların gizliliği",
@@ -1884,6 +1944,7 @@
   "premiumBenefitPrayerCircle": "Dua Halkası: sınırsız dua isteme",
   "premiumBenefitContest": "Sınırsız yarışma hakkı",
   "premiumBenefitExtras": "Zikir, pusula ve frekanslarda reklam yok",
+  "premiumBenefitAssistant": "Arın Asistanı: yazılı sohbet ve uygulama yönetimi",
   "premiumSignInRequiredNotice": "Satın alma için giriş zorunlu değil. Premiumu bu cihazda hemen kullanabilirsin; istersen sonrasında hesabını bağlayıp diğer cihazlarda da erişebilirsin.",
   "premiumSignInSheetTitle": "Premium için hesabını bağla",
   "premiumSignInSheetSubtitle": "Hesabını bağlarsan premiumun diğer cihazlarında da daha kolay geri yüklenir. Satın alma için giriş zorunlu değildir.",

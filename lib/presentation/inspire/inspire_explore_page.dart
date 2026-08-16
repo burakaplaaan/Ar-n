@@ -24,7 +24,11 @@ import 'widgets/inspiration_grid_tile.dart';
 
 /// Instagram Keşfet tarzı ızgara — ara kutusu, Türkçe uyumlu arama, shell + alt bar.
 class InspireExplorePage extends ConsumerStatefulWidget {
-  const InspireExplorePage({super.key});
+  const InspireExplorePage({super.key, this.shellTab = false});
+
+  /// Shell [PageView] içindeki asıl ızgara. GoRouter kopyası viewer açıkken
+  /// boyanmaz; böylece shrink animasyonu tıklanan kareye oturur.
+  final bool shellTab;
 
   @override
   ConsumerState<InspireExplorePage> createState() => _InspireExplorePageState();
@@ -139,6 +143,12 @@ class _InspireExplorePageState extends ConsumerState<InspireExplorePage> {
 
   @override
   Widget build(BuildContext context) {
+    if (!widget.shellTab) {
+      final path = GoRouterState.of(context).uri.path;
+      if (path.contains('/inspire/view')) {
+        return const SizedBox.shrink();
+      }
+    }
     final l10n = AppLocalizations.of(context)!;
     final async = ref.watch(inspirationShuffledGridProvider);
     final filter = ref.watch(exploreContentFilterProvider);
@@ -384,7 +394,7 @@ class _InspireExplorePageState extends ConsumerState<InspireExplorePage> {
                             final card = filtered[pickedIndex];
                             return InspirationGridTile(
                               card: card,
-                              onTap: () {
+                              onTap: (originRect) {
                                 final openNonce =
                                     DateTime.now().microsecondsSinceEpoch;
                                 final viewerCards =
@@ -401,6 +411,7 @@ class _InspireExplorePageState extends ConsumerState<InspireExplorePage> {
                                       filter == ExploreContentFilter.mixed
                                       ? 0
                                       : pickedIndex,
+                                  originRect: originRect,
                                 );
                                 ref
                                         .read(

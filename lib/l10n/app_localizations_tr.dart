@@ -1343,6 +1343,130 @@ class AppLocalizationsTr extends AppLocalizations {
       '4-7-8 nefes döngüsü ile sakinleş, odağını toparla';
 
   @override
+  String get qiblaHubAssistantTitle => 'Arın Asistanı';
+
+  @override
+  String get qiblaHubAssistantSubtitle =>
+      'Sohbet; namaz, bildirim ve hatırlatıcıları yönet';
+
+  @override
+  String get assistantTitle => 'Arın Asistanı';
+
+  @override
+  String get assistantSubtitle => '';
+
+  @override
+  String get assistantAskChip => 'Asistan';
+
+  @override
+  String get assistantInputHint => 'Kısaca yaz…';
+
+  @override
+  String get assistantEmptyTitle => 'Merhaba';
+
+  @override
+  String get assistantEmptyBody => '';
+
+  @override
+  String get assistantHello => 'Merhaba';
+
+  @override
+  String assistantHelloName(String name) {
+    return 'Merhaba $name';
+  }
+
+  @override
+  String get assistantNeedSignIn => 'Asistan için hesabını bağla.';
+
+  @override
+  String get assistantNeedPremium => 'Arın Asistanı Premium içindir.';
+
+  @override
+  String get assistantGateHint =>
+      'Giriş yapıp Premium açınca yazılı sohbet başlar. Konuşma kaydedilmez.';
+
+  @override
+  String get assistantOpenPremium => 'Premium’u aç';
+
+  @override
+  String get assistantSignIn => 'Giriş yap';
+
+  @override
+  String get assistantGenericError => 'Asistan şu an yanıt veremedi.';
+
+  @override
+  String get assistantQuotaReached => 'Bugünkü mesaj hakkın doldu.';
+
+  @override
+  String get assistantMessageTooLong => 'Mesajı kısalt (en fazla 100 harf).';
+
+  @override
+  String get assistantNotReady => 'Asistan henüz hazır değil.';
+
+  @override
+  String assistantWordCount(int count, int max) {
+    return '$count/$max harf';
+  }
+
+  @override
+  String assistantRemainingToday(int count) {
+    return '$count kaldı';
+  }
+
+  @override
+  String get assistantActionFailed => 'Bu işlemi yapamadım.';
+
+  @override
+  String get assistantActionUnknownPage => 'O sayfayı açamadım.';
+
+  @override
+  String get assistantActionCancelled => 'İşlem iptal edildi.';
+
+  @override
+  String get assistantSalatHabitMissing => 'Önce namaz programını başlat.';
+
+  @override
+  String get assistantPrayerMarked => 'Namazı kılındı işaretledim.';
+
+  @override
+  String get assistantPrayerUnmarked => 'Namaz işaretini kaldırdım.';
+
+  @override
+  String get assistantAlarmDefaultTitle => 'Arın hatırlatıcı';
+
+  @override
+  String get assistantAlarmBody => 'Kurduğun hatırlatıcı.';
+
+  @override
+  String get assistantAlarmPermissionDenied =>
+      'Bildirim izni olmadan alarm kuramam.';
+
+  @override
+  String assistantAlarmSet(String time) {
+    return 'Hatırlatıcı $time için kuruldu.';
+  }
+
+  @override
+  String get assistantNotificationsOn => 'Bildirim açıldı.';
+
+  @override
+  String get assistantNotificationsOff => 'Bildirim kapatıldı.';
+
+  @override
+  String get assistantConfirmDisablePrayerTitle =>
+      'Namaz bildirimleri kapansın mı?';
+
+  @override
+  String get assistantConfirmDisablePrayerBody =>
+      'Tüm vakit hatırlatıcıları kapanır.';
+
+  @override
+  String get assistantCancel => 'Vazgeç';
+
+  @override
+  String get assistantConfirm => 'Kapat';
+
+  @override
   String get qiblaHubHealingTitle => 'İyileştirici Frekanslar';
 
   @override
@@ -1707,7 +1831,7 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get settingsPrivacyThirdPartyBody =>
-      'Arin; oturum açma, bildirimler ve veri eşitleme için Firebase servislerini (Authentication, Firestore), kullanım analizi ve çökme tanılama için Firebase Analytics/Crashlytics\'i, reklamlar için Google AdMob\'u, abonelik ve uygulama içi satın alma doğrulaması için RevenueCat\'i ve namaz vakitleri için Aladhan/Diyanet API\'lerini kullanır.';
+      'Arin; oturum açma, bildirimler ve veri eşitleme için Firebase servislerini (Authentication, Firestore), kullanım analizi ve çökme tanılama için Firebase Analytics/Crashlytics\'i, reklamlar için Google AdMob\'u, abonelik ve uygulama içi satın alma doğrulaması için RevenueCat\'i ve namaz vakitleri için Aladhan/Diyanet API\'lerini kullanır. Premium Arın Asistanı mesajları Google Gemini’ye iletilir; sohbet metni uygulamada saklanmaz. Ücretsiz Gemini katmanında bu içerik Google’ın ürünlerini geliştirmek için kullanılabilir.';
 
   @override
   String get settingsPrivacyControlsTitle => 'Kullanıcı kontrolü';
@@ -4173,6 +4297,10 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get premiumBenefitExtras => 'Zikir, pusula ve frekanslarda reklam yok';
+
+  @override
+  String get premiumBenefitAssistant =>
+      'Arın Asistanı: yazılı sohbet ve uygulama yönetimi';
 
   @override
   String get premiumSignInRequiredNotice =>

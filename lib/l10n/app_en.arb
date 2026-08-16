@@ -660,6 +660,66 @@
   "qiblaHubZikirFeatureSubtitle": "Digital counter with dhikr details, round history, and target (33/99)",
   "qiblaHubBreathingTitle": "Breathing Exercise",
   "qiblaHubBreathingSubtitle": "Calm down and refocus with the 4-7-8 breathing cycle",
+  "qiblaHubAssistantTitle": "Arın Assistant",
+  "qiblaHubAssistantSubtitle": "Chat; manage prayer, alerts, and reminders",
+  "assistantTitle": "Arın Assistant",
+  "assistantSubtitle": "",
+  "assistantAskChip": "Assistant",
+  "assistantInputHint": "Write briefly…",
+  "assistantEmptyTitle": "Hello",
+  "assistantEmptyBody": "",
+  "assistantHello": "Hello",
+  "assistantHelloName": "Hello {name}",
+  "@assistantHelloName": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "assistantNeedSignIn": "Sign in to use the assistant.",
+  "assistantNeedPremium": "Arın Assistant is for Premium.",
+  "assistantGateHint": "Sign in and unlock Premium to start a written chat. Conversations are not saved.",
+  "assistantOpenPremium": "Open Premium",
+  "assistantSignIn": "Sign in",
+  "assistantGenericError": "The assistant could not reply right now.",
+  "assistantQuotaReached": "Today’s message limit is used up.",
+  "assistantMessageTooLong": "Shorten the message (100 characters max).",
+  "assistantNotReady": "The assistant is not ready yet.",
+  "assistantWordCount": "{count}/{max} characters",
+  "@assistantWordCount": {
+    "placeholders": {
+      "count": {"type": "int"},
+      "max": {"type": "int"}
+    }
+  },
+  "assistantRemainingToday": "{count} left",
+  "@assistantRemainingToday": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "assistantActionFailed": "I could not do that.",
+  "assistantActionUnknownPage": "I could not open that page.",
+  "assistantActionCancelled": "Cancelled.",
+  "assistantSalatHabitMissing": "Start the prayer program first.",
+  "assistantPrayerMarked": "Marked that prayer as done.",
+  "assistantPrayerUnmarked": "Removed the prayer mark.",
+  "assistantAlarmDefaultTitle": "Arın reminder",
+  "assistantAlarmBody": "The reminder you set.",
+  "assistantAlarmPermissionDenied": "I cannot set an alarm without notification permission.",
+  "assistantAlarmSet": "Reminder set for {time}.",
+  "@assistantAlarmSet": {
+    "placeholders": {
+      "time": {"type": "String"}
+    }
+  },
+  "assistantNotificationsOn": "Notification turned on.",
+  "assistantNotificationsOff": "Notification turned off.",
+  "assistantConfirmDisablePrayerTitle": "Turn off prayer alerts?",
+  "assistantConfirmDisablePrayerBody": "All prayer-time reminders will be turned off.",
+  "assistantCancel": "Cancel",
+  "assistantConfirm": "Turn off",
   "qiblaHubHealingTitle": "Healing Frequencies",
   "qiblaHubHealingSubtitle": "A calming session with therapy tones, ambience, and sleep timer",
   "qiblaHubHilalDuelTitle": "Knowledge Duel",
@@ -1336,7 +1396,7 @@
   "settingsPrivacyStorageTitle": "Storage and retention",
   "settingsPrivacyStorageBody": "Most habit, zikr, and preference data is stored on your device. If you sign in, selected data may be synced with Firebase services. Data is kept until you delete it in the app or remove your account.",
   "settingsPrivacyThirdPartyTitle": "Third-party services",
-  "settingsPrivacyThirdPartyBody": "Arin uses Firebase services (Authentication, Firestore) for sign-in, notifications, and sync, Firebase Analytics/Crashlytics for analytics and crash diagnostics, Google AdMob for ads, RevenueCat for subscription and in-app purchase verification, and Aladhan/Diyanet APIs for prayer times.",
+  "settingsPrivacyThirdPartyBody": "Arin uses Firebase services (Authentication, Firestore) for sign-in, notifications, and sync, Firebase Analytics/Crashlytics for analytics and crash diagnostics, Google AdMob for ads, RevenueCat for subscription and in-app purchase verification, and Aladhan/Diyanet APIs for prayer times. Premium Arın Assistant messages are sent to Google Gemini; chat text is not stored in the app. On Gemini’s free tier, this content may be used to improve Google’s products.",
   "settingsPrivacyControlsTitle": "User control",
   "settingsPrivacyControlsBody": "You can disable location and notification permissions from device settings, sign out from Settings, or delete your account and local data.",
   "settingsPrivacyChildrenTitle": "Children's privacy",
@@ -1884,6 +1944,7 @@
   "premiumBenefitPrayerCircle": "Prayer Circle: unlimited requests",
   "premiumBenefitContest": "Unlimited contest plays",
   "premiumBenefitExtras": "No ads in zikr, compass, and frequencies",
+  "premiumBenefitAssistant": "Arın Assistant: written chat and in-app actions",
   "premiumSignInRequiredNotice": "Sign-in is not required for purchase. You can use Premium on this device right away; optionally link your account afterward to access it on your other devices.",
   "premiumSignInSheetTitle": "Link your account for Premium",
   "premiumSignInSheetSubtitle": "Linking your account makes it easier to restore Premium on your other devices. Sign-in is optional for purchase.",

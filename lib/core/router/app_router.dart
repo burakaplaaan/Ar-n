@@ -51,6 +51,7 @@ import '../../presentation/inspire/inspiration_search.dart';
 import '../../presentation/inspire/inspire_viewer_page.dart';
 import '../../presentation/inspire/inspire_viewer_session_provider.dart';
 import '../../presentation/moment_verse/moment_verse_page.dart';
+import '../../presentation/assistant/assistant_page.dart';
 import '../../presentation/premium/premium_page.dart';
 import '../../presentation/shared/providers/auth_providers.dart';
 import '../../presentation/shared/providers/willpower_hub_nav_provider.dart';
@@ -71,6 +72,7 @@ abstract final class AppRoutes {
     queryParameters: {'request': requestId},
   ).toString();
   static const String hilalDuel = '/qibla/hilal-duel';
+  static const String assistant = '/assistant';
   static const String habits = '/habits';
 
   /// Irade hub’ında Arınma sekmesini aç (Gelişim’e sıfırlamayı önler).
@@ -329,6 +331,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                 _page(state, const HilalDuelPage()),
           ),
           GoRoute(
+            path: AppRoutes.assistant,
+            pageBuilder: (context, state) =>
+                _page(state, const AssistantPage()),
+          ),
+          GoRoute(
             path: AppRoutes.habits,
             pageBuilder: (context, state) =>
                 _page(state, const WillpowerHubPage()),
@@ -429,8 +436,16 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           ),
           GoRoute(
             path: AppRoutes.inspire,
-            pageBuilder: (context, state) =>
-                _page(state, const InspireExplorePage()),
+            pageBuilder: (context, state) => CustomTransitionPage<void>(
+              key: state.pageKey,
+              opaque: false,
+              barrierColor: Colors.transparent,
+              transitionDuration: Duration.zero,
+              reverseTransitionDuration: Duration.zero,
+              transitionsBuilder:
+                  (context, animation, secondaryAnimation, child) => child,
+              child: const InspireExplorePage(),
+            ),
             routes: [
               GoRoute(
                 path: 'view/:index',
@@ -459,7 +474,9 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                         key: ValueKey<String>('inspire_deck_${state.uri}'),
                         initialIndex: safe,
                         deckOverride: deck.cards,
+                        originRect: deck.originRect,
                       ),
+                      expandFromOrigin: deck.originRect != null,
                     );
                   }
                   return _inspireViewerPage(
@@ -467,7 +484,9 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                     InspireViewerPage(
                       key: ValueKey<String>('inspire_cat_${state.uri}'),
                       initialIndex: pathIdx < 0 ? 0 : pathIdx,
+                      originRect: fromSession?.originRect,
                     ),
+                    expandFromOrigin: fromSession?.originRect != null,
                   );
                 },
               ),
@@ -555,14 +574,18 @@ MaterialPage<void> _page(GoRouterState state, Widget child) =>
 
 CustomTransitionPage<void> _inspireViewerPage(
   GoRouterState state,
-  Widget child,
-) => CustomTransitionPage<void>(
+  Widget child, {
+  bool expandFromOrigin = false,
+}) => CustomTransitionPage<void>(
   key: state.pageKey,
   opaque: false,
   barrierColor: Colors.transparent,
-  transitionDuration: const Duration(milliseconds: 220),
-  reverseTransitionDuration: const Duration(milliseconds: 160),
+  transitionDuration: expandFromOrigin
+      ? Duration.zero
+      : const Duration(milliseconds: 220),
+  reverseTransitionDuration: Duration.zero,
   transitionsBuilder: (context, animation, secondaryAnimation, child) {
+    if (expandFromOrigin) return child;
     final eased = CurvedAnimation(
       parent: animation,
       curve: Curves.easeOutCubic,

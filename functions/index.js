@@ -257,6 +257,7 @@ const _kProductFeatures = new Set([
   "widget",
   "lock_widget",
   "hilal_duel",
+  "assistant",
   "prayer_circle",
   "qibla",
   "healing",
@@ -3801,6 +3802,7 @@ if (process.env.NODE_ENV === "test") {
 //   • Belirli ownerHash'e N can
 // ─────────────────────────────────────────────────────────────────────────────
 const quizModule = require("./quiz");
+const assistantModule = require("./assistant");
 const _kQuizOwnerHashRe = /^[a-f0-9]{64}$/i;
 
 function _quizWeekIdIstanbul(now = new Date()) {
@@ -4348,6 +4350,8 @@ exports.adminGrantQuizHeartsOne = onCall(
 
 // Hilal Düellosu callable'ları quiz modülünden dışa aktarılır.
 Object.assign(exports, quizModule.functions);
+Object.assign(exports, assistantModule.functions);
 if (process.env.NODE_ENV === "test") {
   Object.assign(exports._testables, quizModule.testables);
+  Object.assign(exports._testables, assistantModule.testables);
 }

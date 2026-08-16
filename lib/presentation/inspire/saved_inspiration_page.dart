@@ -30,10 +30,7 @@ class SavedInspirationPage extends ConsumerWidget {
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [
-              AppColors.homeGradientTop,
-              AppColors.homeGradientBottom,
-            ],
+            colors: [AppColors.homeGradientTop, AppColors.homeGradientBottom],
             stops: [0.0, 0.65],
           ),
         ),
@@ -83,39 +80,39 @@ class SavedInspirationPage extends ConsumerWidget {
                     sliver: SliverGrid(
                       gridDelegate:
                           const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 3,
-                        mainAxisSpacing: 0,
-                        crossAxisSpacing: 0,
-                        childAspectRatio: 0.75,
-                      ),
-                      delegate: SliverChildBuilderDelegate(
-                        (context, index) {
-                          final card = cards[index];
-                          return InspirationGridTile(
-                            card: card,
-                            onTap: () {
-                              final openNonce =
-                                  DateTime.now().microsecondsSinceEpoch;
-                              final deck = InspireViewerDeckExtra(
-                                cards: cards,
-                                initialIndex: index,
-                              );
-                              ref
-                                  .read(inspireViewerDeckSessionProvider
-                                      .notifier)
-                                  .state = deck;
-                              context.push(
-                                AppRoutes.inspireView(
-                                  index,
-                                  openNonce: openNonce,
-                                ),
-                                extra: deck,
-                              );
-                            },
-                          );
-                        },
-                        childCount: cards.length,
-                      ),
+                            crossAxisCount: 3,
+                            mainAxisSpacing: 0,
+                            crossAxisSpacing: 0,
+                            childAspectRatio: 0.75,
+                          ),
+                      delegate: SliverChildBuilderDelegate((context, index) {
+                        final card = cards[index];
+                        return InspirationGridTile(
+                          card: card,
+                          onTap: (originRect) {
+                            final openNonce =
+                                DateTime.now().microsecondsSinceEpoch;
+                            final deck = InspireViewerDeckExtra(
+                              cards: cards,
+                              initialIndex: index,
+                              originRect: originRect,
+                            );
+                            ref
+                                    .read(
+                                      inspireViewerDeckSessionProvider.notifier,
+                                    )
+                                    .state =
+                                deck;
+                            context.push(
+                              AppRoutes.inspireView(
+                                index,
+                                openNonce: openNonce,
+                              ),
+                              extra: deck,
+                            );
+                          },
+                        );
+                      }, childCount: cards.length),
                     ),
                   ),
                 const SliverToBoxAdapter(child: SizedBox(height: 88)),
@@ -176,29 +173,29 @@ class _SavedEmptyState extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Container(
-                width: 112,
-                height: 112,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  gradient: RadialGradient(
-                    colors: [
-                      accent.withValues(alpha: 0.22),
-                      accent.withValues(alpha: 0.04),
-                      Colors.transparent,
-                    ],
-                    stops: const [0.0, 0.55, 1.0],
-                  ),
-                  border: Border.all(
-                    color: accent.withValues(alpha: 0.38),
-                    width: 1.2,
-                  ),
-                ),
-                child: Icon(
-                  Icons.bookmark_add_outlined,
-                  size: 48,
-                  color: accent.withValues(alpha: 0.92),
-                ),
-              )
+                    width: 112,
+                    height: 112,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: RadialGradient(
+                        colors: [
+                          accent.withValues(alpha: 0.22),
+                          accent.withValues(alpha: 0.04),
+                          Colors.transparent,
+                        ],
+                        stops: const [0.0, 0.55, 1.0],
+                      ),
+                      border: Border.all(
+                        color: accent.withValues(alpha: 0.38),
+                        width: 1.2,
+                      ),
+                    ),
+                    child: Icon(
+                      Icons.bookmark_add_outlined,
+                      size: 48,
+                      color: accent.withValues(alpha: 0.92),
+                    ),
+                  )
                   .animate()
                   .scale(
                     begin: const Offset(0.6, 0.6),
@@ -230,25 +227,28 @@ class _SavedEmptyState extends StatelessWidget {
               ).animate().fadeIn(delay: 220.ms, duration: 420.ms),
               const SizedBox(height: 26),
               FilledButton.icon(
-                onPressed: onExplore,
-                icon: const Icon(Icons.explore_outlined, size: 18),
-                label: Text(l10n.savedInspirationGoExploreAction),
-                style: FilledButton.styleFrom(
-                  backgroundColor: accent.withValues(alpha: 0.92),
-                  foregroundColor: AppColors.anthraciteDark,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 22,
-                    vertical: 13,
-                  ),
-                  textStyle: GoogleFonts.plusJakartaSans(
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: 0.2,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(13),
-                  ),
-                ),
-              ).animate().fadeIn(delay: 320.ms, duration: 400.ms).slideY(
+                    onPressed: onExplore,
+                    icon: const Icon(Icons.explore_outlined, size: 18),
+                    label: Text(l10n.savedInspirationGoExploreAction),
+                    style: FilledButton.styleFrom(
+                      backgroundColor: accent.withValues(alpha: 0.92),
+                      foregroundColor: AppColors.anthraciteDark,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 22,
+                        vertical: 13,
+                      ),
+                      textStyle: GoogleFonts.plusJakartaSans(
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 0.2,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(13),
+                      ),
+                    ),
+                  )
+                  .animate()
+                  .fadeIn(delay: 320.ms, duration: 400.ms)
+                  .slideY(
                     begin: 0.25,
                     end: 0,
                     duration: 420.ms,

@@ -2,9 +2,11 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:go_router/go_router.dart';
 import 'package:arin/l10n/app_localizations.dart';
 
 import '../../core/constants/app_colors.dart';
+import '../../core/router/app_router.dart';
 import '../../core/theme/arin_shell_background.dart';
 import '../shared/widgets/arin_shell_layout.dart';
 import '../shared/widgets/zikirmatik_silhouette_icon.dart';
@@ -27,7 +29,15 @@ abstract final class _QiblaHubCardStyle {
 
 const double _kDiamondAngle = 0.7853981633974483;
 
-enum _QiblaActionMotif { compass, tasbeeh, breath, prayer, frequency, hilal }
+enum _QiblaActionMotif {
+  compass,
+  tasbeeh,
+  breath,
+  prayer,
+  frequency,
+  hilal,
+  assistant,
+}
 
 /// Yeşil paleti bozmadan sıcaklık katan bronz/kahverengi tonlar.
 /// Koyu temada açık bronz, açık temada koyu kahve — kontrast korunur.
@@ -66,6 +76,18 @@ class QiblaToolsDashboardPage extends StatelessWidget {
                   delegate: SliverChildListDelegate([
                     _SpiritualHeader(onDark: onDark),
                     const SizedBox(height: 16),
+                    _QiblaFeatureCard(
+                      onDark: onDark,
+                      accent: accent,
+                      title: l10n.qiblaHubAssistantTitle,
+                      subtitle: l10n.qiblaHubAssistantSubtitle,
+                      motif: _QiblaActionMotif.assistant,
+                      onTap: () {
+                        HapticFeedback.lightImpact();
+                        context.push(AppRoutes.assistant);
+                      },
+                    ),
+                    const SizedBox(height: 10),
                     _QiblaFeatureCard(
                       onDark: onDark,
                       accent: accent,
@@ -604,6 +626,11 @@ class _QiblaToolGlyphPainter extends CustomPainter {
         final innerCut = Path()..addOval(const Rect.fromLTWH(14.5, 8, 16, 20));
         canvas.drawPath(innerCut, primaryStroke);
         canvas.drawCircle(const Offset(24.5, 11.5), 1.6, bronzeFill);
+      case _QiblaActionMotif.assistant:
+        final outer = Path()..addOval(const Rect.fromLTWH(8, 6, 20, 24));
+        canvas.drawPath(outer, bronzeStroke);
+        final innerCut = Path()..addOval(const Rect.fromLTWH(14.5, 8, 16, 20));
+        canvas.drawPath(innerCut, primaryStroke);
     }
   }
 
@@ -755,6 +782,23 @@ class _CardMotifPatternPainter extends CustomPainter {
             center: Offset(size.width * 0.58, size.height * 0.45),
             width: 10,
             height: 12,
+          ),
+          greenPaint,
+        );
+      case _QiblaActionMotif.assistant:
+        canvas.drawOval(
+          Rect.fromCenter(
+            center: Offset(size.width * 0.52, size.height * 0.48),
+            width: 12,
+            height: 14,
+          ),
+          bronzePaint,
+        );
+        canvas.drawOval(
+          Rect.fromCenter(
+            center: Offset(size.width * 0.62, size.height * 0.42),
+            width: 9,
+            height: 11,
           ),
           greenPaint,
         );

@@ -33,12 +33,16 @@ class InspireViewerPage extends ConsumerStatefulWidget {
     super.key,
     required this.initialIndex,
     this.deckOverride,
+    this.originRect,
   });
 
   final int initialIndex;
 
   /// Arama sonrası ızgara; null ise tüm karışık katalog kullanılır.
   final List<InspirationCardModel>? deckOverride;
+
+  /// Tıklanan ızgara hücresi — açılış/kapanış bu dikdörtgene doğru küçülür.
+  final Rect? originRect;
 
   @override
   ConsumerState<InspireViewerPage> createState() => _InspireViewerPageState();
@@ -79,6 +83,10 @@ class _InspireViewerPageState extends ConsumerState<InspireViewerPage> {
     final override = widget.deckOverride;
     final initial = widget.initialIndex;
 
+    final originRect =
+        widget.originRect ??
+        ref.watch(inspireViewerDeckSessionProvider)?.originRect;
+
     if (override != null) {
       if (override.isEmpty) {
         return Scaffold(
@@ -92,7 +100,11 @@ class _InspireViewerPageState extends ConsumerState<InspireViewerPage> {
       final safe = initial.clamp(0, override.length - 1);
       return Scaffold(
         backgroundColor: Colors.transparent,
-        body: _ViewerBody(cards: override, initialIndex: safe),
+        body: _ViewerBody(
+          cards: override,
+          initialIndex: safe,
+          originRect: originRect,
+        ),
       );
     }
 
@@ -114,6 +126,7 @@ class _InspireViewerPageState extends ConsumerState<InspireViewerPage> {
               0,
               cards.isEmpty ? 0 : cards.length - 1,
             ),
+            originRect: originRect,
           );
         },
         loading: () => const ColoredBox(
@@ -137,10 +150,15 @@ class _InspireViewerPageState extends ConsumerState<InspireViewerPage> {
 }
 
 class _ViewerBody extends ConsumerStatefulWidget {
-  const _ViewerBody({required this.cards, required this.initialIndex});
+  const _ViewerBody({
+    required this.cards,
+    required this.initialIndex,
+    this.originRect,
+  });
 
   final List<InspirationCardModel> cards;
   final int initialIndex;
+  final Rect? originRect;
 
   @override
   ConsumerState<_ViewerBody> createState() => _ViewerBodyState();
@@ -156,6 +174,10 @@ class _ViewerBodyState extends ConsumerState<_ViewerBody>
   bool _initialPrecacheDone = false;
   bool _warmedAds = false;
   bool _isDismissing = false;
+  bool _lockVerticalScroll = false;
+
+  static const double _dismissCommitProgress = 0.22;
+  static const double _dismissFlickVelocity = 700;
 
   @override
   void initState() {
@@ -164,10 +186,17 @@ class _ViewerBodyState extends ConsumerState<_ViewerBody>
     final safe = widget.initialIndex.clamp(0, widget.cards.length - 1);
     _settledPage = safe;
     _pc = PageController(initialPage: safe, viewportFraction: 1);
-    _dismissController = AnimationController.unbounded(vsync: this);
+    final hasOrigin = _usableOrigin(widget.originRect) != null;
+    _dismissController = AnimationController(
+      vsync: this,
+      value: hasOrigin ? 1 : 0,
+    );
+    _lockVerticalScroll = hasOrigin;
+    _dismissController.addListener(_syncVerticalScrollLock);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _recordView(safe);
       _maybeShowExploreAdGate();
+      _playOpenFromOrigin();
     });
   }
 
@@ -191,6 +220,7 @@ class _ViewerBodyState extends ConsumerState<_ViewerBody>
   @override
   void dispose() {
     maybeRequestReviewOnExit();
+    _dismissController.removeListener(_syncVerticalScrollLock);
     _dismissController.dispose();
     _pc?.dispose();
     super.dispose();
@@ -211,51 +241,112 @@ class _ViewerBodyState extends ConsumerState<_ViewerBody>
     }
   }
 
+  void _syncVerticalScrollLock() {
+    final lock = _isDismissing || _dismissController.value > 0.02;
+    if (lock == _lockVerticalScroll || !mounted) return;
+    setState(() => _lockVerticalScroll = lock);
+  }
+
+  Rect? _usableOrigin(Rect? raw) {
+    if (raw == null || raw.width < 8 || raw.height < 8) return null;
+    return raw;
+  }
+
+  Rect _localOriginRect(
+    BuildContext context,
+    Size screen, {
+    required bool rtl,
+  }) {
+    final raw = _usableOrigin(widget.originRect);
+    if (raw != null) {
+      final box = context.findRenderObject();
+      if (box is RenderBox && box.hasSize) {
+        final local = Rect.fromPoints(
+          box.globalToLocal(raw.topLeft),
+          box.globalToLocal(raw.bottomRight),
+        );
+        final bounds = (Offset.zero & screen).inflate(80);
+        if (local.width >= 8 && local.height >= 8 && local.overlaps(bounds)) {
+          return local;
+        }
+      } else if (raw.overlaps((Offset.zero & screen).inflate(80))) {
+        return raw;
+      }
+    }
+    final w = screen.width * 0.78;
+    final h = screen.height * 0.78;
+    final left = rtl ? screen.width * -0.08 : screen.width * 0.30;
+    return Rect.fromLTWH(left, (screen.height - h) / 2, w, h);
+  }
+
+  void _playOpenFromOrigin() {
+    if (!mounted || _isDismissing) return;
+    if (_usableOrigin(widget.originRect) == null) return;
+    if (_dismissController.value <= 0) return;
+    unawaited(
+      _dismissController.animateTo(
+        0,
+        duration: const Duration(milliseconds: 320),
+        curve: Curves.easeOutCubic,
+      ),
+    );
+  }
+
+  double _signedDelta(double dx, bool rtl) => rtl ? -dx : dx;
+
   void _updateDismissDrag(DragUpdateDetails details, double width) {
     if (_isDismissing || width <= 0) return;
-    final next = _dismissController.value + details.delta.dx;
-    _dismissController.value = next.clamp(-width, 0);
+    final rtl = Directionality.of(context) == TextDirection.rtl;
+    final next =
+        _dismissController.value + _signedDelta(details.delta.dx, rtl) / width;
+    _dismissController.value = next.clamp(0.0, 1.0);
   }
 
   void _endDismissDrag(DragEndDetails details, double width) {
     if (_isDismissing || width <= 0) return;
-    final velocity = details.primaryVelocity ?? 0;
-    final progress = (-_dismissController.value / width).clamp(0.0, 1.0);
-    final shouldDismiss = progress >= 0.22 || velocity <= -700;
+    final rtl = Directionality.of(context) == TextDirection.rtl;
+    final velocity = _signedDelta(details.primaryVelocity ?? 0, rtl);
+    final progress = _dismissController.value;
+    final shouldDismiss =
+        progress >= _dismissCommitProgress || velocity >= _dismissFlickVelocity;
 
     if (shouldDismiss) {
-      unawaited(_completeDismiss(width));
+      unawaited(_completeDismiss());
       return;
     }
-    _restoreDismissPosition(velocity);
+    _restoreDismissPosition(velocity / width);
   }
 
-  void _restoreDismissPosition([double velocity = 0]) {
+  void _restoreDismissPosition([double progressVelocity = 0]) {
     if (_isDismissing) return;
     _dismissController.animateWith(
       SpringSimulation(
         const SpringDescription(mass: 1, stiffness: 460, damping: 44),
         _dismissController.value,
         0,
-        velocity > 0 ? 0 : velocity,
+        progressVelocity,
       ),
     );
   }
 
-  Future<void> _completeDismiss(double width) async {
+  Future<void> _completeDismiss() async {
     if (_isDismissing) return;
     _isDismissing = true;
+    _syncVerticalScrollLock();
     HapticFeedback.lightImpact();
+    final remaining = (1 - _dismissController.value).clamp(0.0, 1.0);
     try {
       await _dismissController.animateTo(
-        -width * 1.05,
-        duration: const Duration(milliseconds: 180),
+        1,
+        duration: Duration(
+          milliseconds: (240 * remaining).round().clamp(90, 260),
+        ),
         curve: Curves.easeOutCubic,
       );
     } on TickerCanceled {
       return;
     }
-    if (mounted) context.pop();
+    if (mounted) Navigator.of(context).pop();
   }
 
   void _maybeShowExploreAdGate() {
@@ -347,10 +438,12 @@ class _ViewerBodyState extends ConsumerState<_ViewerBody>
             itemCount: cards.length,
             allowImplicitScrolling: false,
             dragStartBehavior: DragStartBehavior.down,
-            physics: _InstagramLikePageScrollPhysics(
-              settledPage: () => _settledPage,
-              parent: const BouncingScrollPhysics(),
-            ),
+            physics: _lockVerticalScroll
+                ? const NeverScrollableScrollPhysics()
+                : _InstagramLikePageScrollPhysics(
+                    settledPage: () => _settledPage,
+                    parent: const BouncingScrollPhysics(),
+                  ),
             onPageChanged: (page) {
               _settledPage = page;
               _recordView(page);
@@ -365,72 +458,96 @@ class _ViewerBodyState extends ConsumerState<_ViewerBody>
               );
             },
           ),
-          Align(
-            alignment: Alignment.topLeft,
-            child: SafeArea(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(4, 2, 8, 0),
-                child: ArinBackButton(
-                  onPressed: () => context.pop(),
-                  semanticLabel: AppLocalizations.of(context)!.viewerBackAction,
-                  variant: ArinBackButtonVariant.overlaySubtle,
-                ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildBackButton(double opacity) {
+    if (opacity <= 0) return const SizedBox.shrink();
+    return Align(
+      alignment: Alignment.topLeft,
+      child: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(4, 2, 8, 0),
+          child: Opacity(
+            opacity: opacity,
+            child: IgnorePointer(
+              ignoring: opacity < 0.08,
+              child: ArinBackButton(
+                onPressed: () => unawaited(_completeDismiss()),
+                semanticLabel: AppLocalizations.of(context)!.viewerBackAction,
+                variant: ArinBackButtonVariant.overlaySubtle,
               ),
             ),
           ),
-        ],
+        ),
       ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    ref.listen<int>(inspireViewerCloseRequestProvider, (previous, next) {
+      if (previous == next) return;
+      unawaited(_completeDismiss());
+    });
     final cards = widget.cards;
-    final width = MediaQuery.sizeOf(context).width;
+    final size = MediaQuery.sizeOf(context);
+    final width = size.width;
+    final rtl = Directionality.of(context) == TextDirection.rtl;
 
-    return GestureDetector(
-      behavior: HitTestBehavior.translucent,
-      onHorizontalDragStart: (_) {
-        if (!_isDismissing) _dismissController.stop();
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, _) {
+        if (didPop || _isDismissing) return;
+        unawaited(_completeDismiss());
       },
-      onHorizontalDragUpdate: (details) => _updateDismissDrag(details, width),
-      onHorizontalDragEnd: (details) => _endDismissDrag(details, width),
-      onHorizontalDragCancel: _restoreDismissPosition,
-      child: AnimatedBuilder(
-        animation: _dismissController,
-        child: _buildViewerContent(cards),
-        builder: (context, child) {
-          final dragProgress = width <= 0
-              ? 0.0
-              : (-_dismissController.value / width).clamp(0.0, 1.0);
-          final easedProgress = Curves.easeOutCubic.transform(dragProgress);
-          final scale = 1 - (0.16 * easedProgress);
-          final radius = 28 * easedProgress;
-          final backgroundOpacity = (1 - (0.72 * easedProgress)).clamp(
-            0.0,
-            1.0,
-          );
-          final offsetDx = _dismissController.value.clamp(-width, 0.0);
-
-          return Stack(
-            fit: StackFit.expand,
-            children: [
-              ColoredBox(
-                color: Colors.black.withValues(alpha: backgroundOpacity),
-              ),
-              Transform.translate(
-                offset: Offset(offsetDx, 0),
-                child: Transform.scale(
-                  scale: scale,
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(radius),
-                    child: child,
-                  ),
-                ),
-              ),
-            ],
-          );
+      child: GestureDetector(
+        behavior: HitTestBehavior.translucent,
+        onHorizontalDragStart: (_) {
+          if (!_isDismissing) _dismissController.stop();
         },
+        onHorizontalDragUpdate: (details) => _updateDismissDrag(details, width),
+        onHorizontalDragEnd: (details) => _endDismissDrag(details, width),
+        onHorizontalDragCancel: _restoreDismissPosition,
+        child: AnimatedBuilder(
+          animation: _dismissController,
+          child: _buildViewerContent(cards),
+          builder: (context, child) {
+            final progress = _dismissController.value.clamp(0.0, 1.0);
+            final easedProgress = Curves.easeOutCubic.transform(progress);
+            final origin = _localOriginRect(context, size, rtl: rtl);
+            final frame = Rect.lerp(Offset.zero & size, origin, easedProgress)!;
+            final radius = 12 * easedProgress;
+            final backgroundOpacity = (1 - (0.92 * easedProgress)).clamp(
+              0.0,
+              1.0,
+            );
+            final chromeOpacity = (1 - (easedProgress * 2.2)).clamp(0.0, 1.0);
+            final backOpacity = (1 - (easedProgress * 3.2)).clamp(0.0, 1.0);
+
+            return InspirationViewerChromeScope(
+              opacity: chromeOpacity,
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  ColoredBox(
+                    color: Colors.black.withValues(alpha: backgroundOpacity),
+                  ),
+                  Positioned.fromRect(
+                    rect: frame,
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(radius),
+                      child: child,
+                    ),
+                  ),
+                  _buildBackButton(backOpacity),
+                ],
+              ),
+            );
+          },
+        ),
       ),
     );
   }

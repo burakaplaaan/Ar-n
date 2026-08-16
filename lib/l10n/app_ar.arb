@@ -660,6 +660,66 @@
   "qiblaHubZikirFeatureSubtitle": "عداد رقمي مع تفاصيل الذكر، سجل الجولات، والهدف (33/99)",
   "qiblaHubBreathingTitle": "تمرين التنفس",
   "qiblaHubBreathingSubtitle": "اهدأ واستعد تركيزك عبر دورة التنفس 4-7-8",
+  "qiblaHubAssistantTitle": "مساعد أرِن",
+  "qiblaHubAssistantSubtitle": "محادثة؛ إدارة الصلاة والتنبيهات والتذكيرات",
+  "assistantTitle": "مساعد أرِن",
+  "assistantSubtitle": "",
+  "assistantAskChip": "المساعد",
+  "assistantInputHint": "اكتب باختصار…",
+  "assistantEmptyTitle": "مرحبا",
+  "assistantEmptyBody": "",
+  "assistantHello": "مرحبا",
+  "assistantHelloName": "مرحبا {name}",
+  "@assistantHelloName": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "assistantNeedSignIn": "سجّل الدخول لاستخدام المساعد.",
+  "assistantNeedPremium": "مساعد أرِن مخصص للبريميوم.",
+  "assistantGateHint": "سجّل الدخول وفعّل البريميوم لبدء الدردشة الكتابية. لا تُحفظ المحادثات.",
+  "assistantOpenPremium": "افتح البريميوم",
+  "assistantSignIn": "تسجيل الدخول",
+  "assistantGenericError": "تعذّر على المساعد الرد الآن.",
+  "assistantQuotaReached": "انتهى حد رسائل اليوم.",
+  "assistantMessageTooLong": "اختصر الرسالة (100 حرف كحد أقصى).",
+  "assistantNotReady": "المساعد غير جاهز بعد.",
+  "assistantWordCount": "{count}/{max} حرف",
+  "@assistantWordCount": {
+    "placeholders": {
+      "count": {"type": "int"},
+      "max": {"type": "int"}
+    }
+  },
+  "assistantRemainingToday": "بقي {count}",
+  "@assistantRemainingToday": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "assistantActionFailed": "تعذّر تنفيذ ذلك.",
+  "assistantActionUnknownPage": "تعذّر فتح تلك الصفحة.",
+  "assistantActionCancelled": "تم الإلغاء.",
+  "assistantSalatHabitMissing": "ابدأ برنامج الصلاة أولاً.",
+  "assistantPrayerMarked": "تم تعليم الصلاة كمُؤدّاة.",
+  "assistantPrayerUnmarked": "أزلت علامة الصلاة.",
+  "assistantAlarmDefaultTitle": "تذكير أرِن",
+  "assistantAlarmBody": "التذكير الذي ضبطته.",
+  "assistantAlarmPermissionDenied": "لا يمكن ضبط منبّه دون إذن الإشعارات.",
+  "assistantAlarmSet": "تم ضبط التذكير عند {time}.",
+  "@assistantAlarmSet": {
+    "placeholders": {
+      "time": {"type": "String"}
+    }
+  },
+  "assistantNotificationsOn": "تم تفعيل الإشعار.",
+  "assistantNotificationsOff": "تم إيقاف الإشعار.",
+  "assistantConfirmDisablePrayerTitle": "إيقاف تنبيهات الصلاة؟",
+  "assistantConfirmDisablePrayerBody": "ستُوقف كل تذكيرات أوقات الصلاة.",
+  "assistantCancel": "إلغاء",
+  "assistantConfirm": "إيقاف",
   "qiblaHubHealingTitle": "ترددات الشفاء",
   "qiblaHubHealingSubtitle": "جلسة هادئة مع نغمات علاجية، أجواء صوتية، ومؤقت نوم",
   "qiblaHubHilalDuelTitle": "مبارزة المعرفة",
@@ -1336,7 +1396,7 @@
   "settingsPrivacyStorageTitle": "التخزين والاحتفاظ",
   "settingsPrivacyStorageBody": "يتم حفظ معظم بيانات العادات والذكر والتفضيلات على جهازك. إذا سجّلت الدخول، قد تتم مزامنة بيانات محددة مع خدمات Firebase. يتم الاحتفاظ بالبيانات حتى تحذفها من التطبيق أو تزيل حسابك.",
   "settingsPrivacyThirdPartyTitle": "خدمات الطرف الثالث",
-  "settingsPrivacyThirdPartyBody": "تستخدم Arin خدمات Firebase (Authentication وFirestore) لتسجيل الدخول والإشعارات والمزامنة، وFirebase Analytics/Crashlytics للتحليلات وتشخيص الأعطال، وGoogle AdMob للإعلانات، وRevenueCat للتحقق من الاشتراكات وعمليات الشراء داخل التطبيق، وواجهات Aladhan/Diyanet لمواقيت الصلاة.",
+  "settingsPrivacyThirdPartyBody": "تستخدم Arin خدمات Firebase (Authentication وFirestore) لتسجيل الدخول والإشعارات والمزامنة، وFirebase Analytics/Crashlytics للتحليلات وتشخيص الأعطال، وGoogle AdMob للإعلانات، وRevenueCat للتحقق من الاشتراكات وعمليات الشراء داخل التطبيق، وواجهات Aladhan/Diyanet لمواقيت الصلاة. تُرسل رسائل مساعد أرِن في البريميوم إلى Google Gemini ولا يُحفظ نص المحادثة في التطبيق. في الطبقة المجانية من Gemini قد يُستخدم هذا المحتوى لتحسين منتجات Google.",
   "settingsPrivacyControlsTitle": "تحكم المستخدم",
   "settingsPrivacyControlsBody": "يمكنك إيقاف أذونات الموقع والإشعارات من إعدادات الجهاز، أو تسجيل الخروج من صفحة الإعدادات، أو حذف حسابك وبياناتك المحلية.",
   "settingsPrivacyChildrenTitle": "خصوصية الأطفال",
@@ -1884,6 +1944,7 @@
   "premiumBenefitPrayerCircle": "حلقة الدعاء: طلبات غير محدودة",
   "premiumBenefitContest": "مشاركات مسابقة غير محدودة",
   "premiumBenefitExtras": "بدون إعلانات في الذكر والبوصلة والترددات",
+  "premiumBenefitAssistant": "مساعد أرِن: دردشة كتابية وإدارة التطبيق",
   "premiumSignInRequiredNotice": "تسجيل الدخول غير مطلوب للشراء. يمكنك استخدام Premium على هذا الجهاز فورًا، ويمكنك ربط حسابك لاحقًا لاستخدامه على أجهزتك الأخرى.",
   "premiumSignInSheetTitle": "اربط حسابك لـ Premium",
   "premiumSignInSheetSubtitle": "ربط الحساب يجعل استعادة Premium على أجهزتك الأخرى أسهل. تسجيل الدخول اختياري لإتمام الشراء.",

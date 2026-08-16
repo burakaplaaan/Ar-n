@@ -1348,6 +1348,131 @@ class AppLocalizationsEn extends AppLocalizations {
       'Calm down and refocus with the 4-7-8 breathing cycle';
 
   @override
+  String get qiblaHubAssistantTitle => 'Arın Assistant';
+
+  @override
+  String get qiblaHubAssistantSubtitle =>
+      'Chat; manage prayer, alerts, and reminders';
+
+  @override
+  String get assistantTitle => 'Arın Assistant';
+
+  @override
+  String get assistantSubtitle => '';
+
+  @override
+  String get assistantAskChip => 'Assistant';
+
+  @override
+  String get assistantInputHint => 'Write briefly…';
+
+  @override
+  String get assistantEmptyTitle => 'Hello';
+
+  @override
+  String get assistantEmptyBody => '';
+
+  @override
+  String get assistantHello => 'Hello';
+
+  @override
+  String assistantHelloName(String name) {
+    return 'Hello $name';
+  }
+
+  @override
+  String get assistantNeedSignIn => 'Sign in to use the assistant.';
+
+  @override
+  String get assistantNeedPremium => 'Arın Assistant is for Premium.';
+
+  @override
+  String get assistantGateHint =>
+      'Sign in and unlock Premium to start a written chat. Conversations are not saved.';
+
+  @override
+  String get assistantOpenPremium => 'Open Premium';
+
+  @override
+  String get assistantSignIn => 'Sign in';
+
+  @override
+  String get assistantGenericError =>
+      'The assistant could not reply right now.';
+
+  @override
+  String get assistantQuotaReached => 'Today’s message limit is used up.';
+
+  @override
+  String get assistantMessageTooLong =>
+      'Shorten the message (100 characters max).';
+
+  @override
+  String get assistantNotReady => 'The assistant is not ready yet.';
+
+  @override
+  String assistantWordCount(int count, int max) {
+    return '$count/$max characters';
+  }
+
+  @override
+  String assistantRemainingToday(int count) {
+    return '$count left';
+  }
+
+  @override
+  String get assistantActionFailed => 'I could not do that.';
+
+  @override
+  String get assistantActionUnknownPage => 'I could not open that page.';
+
+  @override
+  String get assistantActionCancelled => 'Cancelled.';
+
+  @override
+  String get assistantSalatHabitMissing => 'Start the prayer program first.';
+
+  @override
+  String get assistantPrayerMarked => 'Marked that prayer as done.';
+
+  @override
+  String get assistantPrayerUnmarked => 'Removed the prayer mark.';
+
+  @override
+  String get assistantAlarmDefaultTitle => 'Arın reminder';
+
+  @override
+  String get assistantAlarmBody => 'The reminder you set.';
+
+  @override
+  String get assistantAlarmPermissionDenied =>
+      'I cannot set an alarm without notification permission.';
+
+  @override
+  String assistantAlarmSet(String time) {
+    return 'Reminder set for $time.';
+  }
+
+  @override
+  String get assistantNotificationsOn => 'Notification turned on.';
+
+  @override
+  String get assistantNotificationsOff => 'Notification turned off.';
+
+  @override
+  String get assistantConfirmDisablePrayerTitle => 'Turn off prayer alerts?';
+
+  @override
+  String get assistantConfirmDisablePrayerBody =>
+      'All prayer-time reminders will be turned off.';
+
+  @override
+  String get assistantCancel => 'Cancel';
+
+  @override
+  String get assistantConfirm => 'Turn off';
+
+  @override
   String get qiblaHubHealingTitle => 'Healing Frequencies';
 
   @override
@@ -1713,7 +1838,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settingsPrivacyThirdPartyBody =>
-      'Arin uses Firebase services (Authentication, Firestore) for sign-in, notifications, and sync, Firebase Analytics/Crashlytics for analytics and crash diagnostics, Google AdMob for ads, RevenueCat for subscription and in-app purchase verification, and Aladhan/Diyanet APIs for prayer times.';
+      'Arin uses Firebase services (Authentication, Firestore) for sign-in, notifications, and sync, Firebase Analytics/Crashlytics for analytics and crash diagnostics, Google AdMob for ads, RevenueCat for subscription and in-app purchase verification, and Aladhan/Diyanet APIs for prayer times. Premium Arın Assistant messages are sent to Google Gemini; chat text is not stored in the app. On Gemini’s free tier, this content may be used to improve Google’s products.';
 
   @override
   String get settingsPrivacyControlsTitle => 'User control';
@@ -4184,6 +4309,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get premiumBenefitExtras => 'No ads in zikr, compass, and frequencies';
+
+  @override
+  String get premiumBenefitAssistant =>
+      'Arın Assistant: written chat and in-app actions';
 
   @override
   String get premiumSignInRequiredNotice =>

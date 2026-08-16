@@ -1339,6 +1339,129 @@ class AppLocalizationsAr extends AppLocalizations {
       'اهدأ واستعد تركيزك عبر دورة التنفس 4-7-8';
 
   @override
+  String get qiblaHubAssistantTitle => 'مساعد أرِن';
+
+  @override
+  String get qiblaHubAssistantSubtitle =>
+      'محادثة؛ إدارة الصلاة والتنبيهات والتذكيرات';
+
+  @override
+  String get assistantTitle => 'مساعد أرِن';
+
+  @override
+  String get assistantSubtitle => '';
+
+  @override
+  String get assistantAskChip => 'المساعد';
+
+  @override
+  String get assistantInputHint => 'اكتب باختصار…';
+
+  @override
+  String get assistantEmptyTitle => 'مرحبا';
+
+  @override
+  String get assistantEmptyBody => '';
+
+  @override
+  String get assistantHello => 'مرحبا';
+
+  @override
+  String assistantHelloName(String name) {
+    return 'مرحبا $name';
+  }
+
+  @override
+  String get assistantNeedSignIn => 'سجّل الدخول لاستخدام المساعد.';
+
+  @override
+  String get assistantNeedPremium => 'مساعد أرِن مخصص للبريميوم.';
+
+  @override
+  String get assistantGateHint =>
+      'سجّل الدخول وفعّل البريميوم لبدء الدردشة الكتابية. لا تُحفظ المحادثات.';
+
+  @override
+  String get assistantOpenPremium => 'افتح البريميوم';
+
+  @override
+  String get assistantSignIn => 'تسجيل الدخول';
+
+  @override
+  String get assistantGenericError => 'تعذّر على المساعد الرد الآن.';
+
+  @override
+  String get assistantQuotaReached => 'انتهى حد رسائل اليوم.';
+
+  @override
+  String get assistantMessageTooLong => 'اختصر الرسالة (100 حرف كحد أقصى).';
+
+  @override
+  String get assistantNotReady => 'المساعد غير جاهز بعد.';
+
+  @override
+  String assistantWordCount(int count, int max) {
+    return '$count/$max حرف';
+  }
+
+  @override
+  String assistantRemainingToday(int count) {
+    return 'بقي $count';
+  }
+
+  @override
+  String get assistantActionFailed => 'تعذّر تنفيذ ذلك.';
+
+  @override
+  String get assistantActionUnknownPage => 'تعذّر فتح تلك الصفحة.';
+
+  @override
+  String get assistantActionCancelled => 'تم الإلغاء.';
+
+  @override
+  String get assistantSalatHabitMissing => 'ابدأ برنامج الصلاة أولاً.';
+
+  @override
+  String get assistantPrayerMarked => 'تم تعليم الصلاة كمُؤدّاة.';
+
+  @override
+  String get assistantPrayerUnmarked => 'أزلت علامة الصلاة.';
+
+  @override
+  String get assistantAlarmDefaultTitle => 'تذكير أرِن';
+
+  @override
+  String get assistantAlarmBody => 'التذكير الذي ضبطته.';
+
+  @override
+  String get assistantAlarmPermissionDenied =>
+      'لا يمكن ضبط منبّه دون إذن الإشعارات.';
+
+  @override
+  String assistantAlarmSet(String time) {
+    return 'تم ضبط التذكير عند $time.';
+  }
+
+  @override
+  String get assistantNotificationsOn => 'تم تفعيل الإشعار.';
+
+  @override
+  String get assistantNotificationsOff => 'تم إيقاف الإشعار.';
+
+  @override
+  String get assistantConfirmDisablePrayerTitle => 'إيقاف تنبيهات الصلاة؟';
+
+  @override
+  String get assistantConfirmDisablePrayerBody =>
+      'ستُوقف كل تذكيرات أوقات الصلاة.';
+
+  @override
+  String get assistantCancel => 'إلغاء';
+
+  @override
+  String get assistantConfirm => 'إيقاف';
+
+  @override
   String get qiblaHubHealingTitle => 'ترددات الشفاء';
 
   @override
@@ -1703,7 +1826,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get settingsPrivacyThirdPartyBody =>
-      'تستخدم Arin خدمات Firebase (Authentication وFirestore) لتسجيل الدخول والإشعارات والمزامنة، وFirebase Analytics/Crashlytics للتحليلات وتشخيص الأعطال، وGoogle AdMob للإعلانات، وRevenueCat للتحقق من الاشتراكات وعمليات الشراء داخل التطبيق، وواجهات Aladhan/Diyanet لمواقيت الصلاة.';
+      'تستخدم Arin خدمات Firebase (Authentication وFirestore) لتسجيل الدخول والإشعارات والمزامنة، وFirebase Analytics/Crashlytics للتحليلات وتشخيص الأعطال، وGoogle AdMob للإعلانات، وRevenueCat للتحقق من الاشتراكات وعمليات الشراء داخل التطبيق، وواجهات Aladhan/Diyanet لمواقيت الصلاة. تُرسل رسائل مساعد أرِن في البريميوم إلى Google Gemini ولا يُحفظ نص المحادثة في التطبيق. في الطبقة المجانية من Gemini قد يُستخدم هذا المحتوى لتحسين منتجات Google.';
 
   @override
   String get settingsPrivacyControlsTitle => 'تحكم المستخدم';
@@ -4168,6 +4291,10 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get premiumBenefitExtras => 'بدون إعلانات في الذكر والبوصلة والترددات';
+
+  @override
+  String get premiumBenefitAssistant =>
+      'مساعد أرِن: دردشة كتابية وإدارة التطبيق';
 
   @override
   String get premiumSignInRequiredNotice =>

@@ -15,6 +15,7 @@ import '../../../core/router/app_router.dart';
 import '../../../data/services/audio_session_coordinator.dart';
 import '../../home/home_page.dart';
 import '../../inspire/inspire_explore_page.dart';
+import '../../inspire/inspire_viewer_session_provider.dart';
 import '../../qibla/qibla_hub_back_dispatcher.dart';
 import '../../qibla/qibla_hub_page.dart';
 import '../../qibla/qibla_shell_swipe_provider.dart';
@@ -29,7 +30,7 @@ const List<Widget> _kShellPages = [
   HomePage(),
   QiblaHubPage(),
   WillpowerHubPage(),
-  InspireExplorePage(),
+  InspireExplorePage(shellTab: true),
   SettingsPage(),
 ];
 
@@ -67,6 +68,7 @@ class ArinShell extends StatefulWidget {
 class _ArinShellState extends State<ArinShell> {
   PageController? _pageController;
   String? _prevShellPath;
+  bool _keepPageViewMounted = false;
 
   /// Ana sekmede (`/home`) çıkmayı iki adıma bölmek için son geri zamanı.
   DateTime? _lastExitBackPressAt;
@@ -184,6 +186,13 @@ class _ArinShellState extends State<ArinShell> {
       return;
     }
     final router = GoRouter.of(context);
+    if (path.contains('/inspire/view')) {
+      _lastExitBackPressAt = null;
+      ProviderScope.containerOf(
+        context,
+      ).read(inspireViewerCloseRequestProvider.notifier).state++;
+      return;
+    }
     if (router.canPop()) {
       _lastExitBackPressAt = null;
       router.pop();
@@ -196,6 +205,11 @@ class _ArinShellState extends State<ArinShell> {
     if (path == AppRoutes.prayerCircle || path == AppRoutes.hilalDuel) {
       _lastExitBackPressAt = null;
       context.go(AppRoutes.qibla);
+      return;
+    }
+    if (path == AppRoutes.assistant) {
+      _lastExitBackPressAt = null;
+      context.go(AppRoutes.home);
       return;
     }
 
@@ -266,17 +280,26 @@ class _ArinShellState extends State<ArinShell> {
   Widget build(BuildContext context) {
     final path = GoRouterState.of(context).uri.path;
     final swipeRoot = _isShellSwipeRoot(path);
+    final onInspireView = path.contains('/inspire/view');
+    final keepPageView = swipeRoot || onInspireView;
     final currentIndex = _currentIndex(context);
 
-    if (swipeRoot) {
-      final idx = _shellIndexFromPath(path);
-      _pageController ??= PageController(initialPage: idx);
-      if (_prevShellPath != path) {
+    if (keepPageView) {
+      final idx = onInspireView ? 3 : _shellIndexFromPath(path);
+      if (_pageController == null) {
+        _pageController = PageController(initialPage: idx);
+      } else if (!_keepPageViewMounted) {
+        _pageController!.dispose();
+        _pageController = PageController(initialPage: idx);
+      }
+      _keepPageViewMounted = true;
+      if (swipeRoot && _prevShellPath != path) {
         _prevShellPath = path;
         _syncPageToRoute(path);
       }
     } else {
       _prevShellPath = null;
+      _keepPageViewMounted = false;
     }
 
     return Consumer(
@@ -300,16 +323,24 @@ class _ArinShellState extends State<ArinShell> {
             );
           }
         }
-        final pagePhysics = currentIndex == 1 && blockShellSwipeOnQibla
+        final pagePhysics =
+            onInspireView || (currentIndex == 1 && blockShellSwipeOnQibla)
             ? const NeverScrollableScrollPhysics()
             : const BouncingScrollPhysics();
 
-        final innerBody = swipeRoot
-            ? PageView.builder(
+        // PageView aynı Stack yuvasında kalsın; aksi halde kapanışta
+        // initialPage=0 (Home) ile yeniden kurulup bir kare flaşlar.
+        final Widget innerBody;
+        if (keepPageView) {
+          innerBody = Stack(
+            fit: StackFit.expand,
+            children: [
+              PageView.builder(
                 controller: _pageController!,
                 physics: pagePhysics,
                 itemCount: 5,
                 onPageChanged: (i) {
+                  if (onInspireView) return;
                   HapticFeedback.selectionClick();
                   _navBarSolidity.value = 1.0;
                   final next = _shellPathForIndex(i);
@@ -320,8 +351,13 @@ class _ArinShellState extends State<ArinShell> {
                 itemBuilder: (context, index) {
                   return _KeepAlivePage(child: _kShellPages[index]);
                 },
-              )
-            : SizedBox.expand(child: widget.child);
+              ),
+              if (!swipeRoot) widget.child,
+            ],
+          );
+        } else {
+          innerBody = SizedBox.expand(child: widget.child);
+        }
 
         final body = NotificationListener<ScrollNotification>(
           onNotification: _onShellScrollNotification,

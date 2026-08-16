@@ -255,6 +255,9 @@ service cloud.firestore {
     match /quiz_rate_limits/{docId} {
       allow read, write: if false;
     }
+    match /assistant_usage/{userId} {
+      allow read, write: if false;
+    }
     match /quiz_heart_charges/{docId} {
       allow read, write: if false;
     }
