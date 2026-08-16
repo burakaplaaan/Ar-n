@@ -119,6 +119,7 @@
 		A1B2C3D01CF9000F007C1203 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		A1B2C3D01CF9000F007C1204 /* tr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = tr; path = tr.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		A1B2C3D01CF9000F007C1205 /* ar */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ar; path = ar.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		A8F1E2012C8E0001000A0101 /* ArinProducts.storekit */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = ArinProducts.storekit; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -223,6 +224,7 @@
 				74858FAE1ED2DC5600515810 /* AppDelegate.swift */,
 				7884E8672EC3CC0400C636F2 /* SceneDelegate.swift */,
 				74858FAD1ED2DC5600515810 /* Runner-Bridging-Header.h */,
+				A8F1E2012C8E0001000A0101 /* ArinProducts.storekit */,
 				CD1E01001CF9000F007C1101 /* prayer_ntf_adhan_turkish.wav */,
 				CD1E01011CF9000F007C1102 /* prayer_ntf_adhan_dubai.wav */,
 				CD1E01021CF9000F007C1103 /* prayer_ntf_ambient_flute.wav */,

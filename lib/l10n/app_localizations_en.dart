@@ -1355,6 +1355,33 @@ class AppLocalizationsEn extends AppLocalizations {
       'A calming session with therapy tones, ambience, and sleep timer';
 
   @override
+  String get qiblaHubAiTitle => 'Islamic AI';
+
+  @override
+  String get qiblaHubAiSubtitle =>
+      'Source-based answers to religious questions — not a fatwa. Premium.';
+
+  @override
+  String get islamicAiComingSoonTitle => 'Islamic AI';
+
+  @override
+  String get islamicAiComingSoonBody =>
+      'This feature is being prepared. You already have Premium; the chat will open here after the code is merged.';
+
+  @override
+  String get widgetThemeSectionTitle => 'Widget themes';
+
+  @override
+  String get widgetThemeSectionSubtitle =>
+      'The classic theme is free. Other themes are Premium-only and look the same on iPhone and Android.';
+
+  @override
+  String get widgetThemeApplied => 'Widget theme updated.';
+
+  @override
+  String get widgetThemePremiumRequired => 'This theme is Premium-only.';
+
+  @override
   String get qiblaHubHilalDuelTitle => 'Knowledge Duel';
 
   @override
@@ -4141,6 +4168,30 @@ class AppLocalizationsEn extends AppLocalizations {
   String get premiumYearlyPlanSubtitle => 'Yearly Subscription';
 
   @override
+  String premiumYearlyPerMonth(String price) {
+    return '$price / month';
+  }
+
+  @override
+  String get premiumYearlyTrialCta => 'Start 3-day free trial';
+
+  @override
+  String get premiumYearlyTrialNote =>
+      'Try free for 3 days. After the trial the yearly plan renews automatically; you can cancel anytime.';
+
+  @override
+  String get premiumMonthlyCta => 'Subscribe monthly';
+
+  @override
+  String get premiumCloseSemantics => 'Close';
+
+  @override
+  String get premiumBenefitAi => 'Islamic AI';
+
+  @override
+  String get premiumBenefitThemes => 'Premium widget themes';
+
+  @override
   String get premiumSwitchToYearly => 'Switch to Yearly';
 
   @override
@@ -4150,19 +4201,122 @@ class AppLocalizationsEn extends AppLocalizations {
   String get premiumMonthlyPlanSubtitle => 'Monthly Subscription';
 
   @override
+  String get premiumLifetimePlanTitle => 'Lifetime Premium';
+
+  @override
+  String get premiumLifetimePlanSubtitle => 'One-time purchase, no renewal';
+
+  @override
+  String get premiumLifetimeCta => 'Unlock for life';
+
+  @override
+  String get premiumLifetimeNote =>
+      'Pay once and keep Premium forever. This is not a subscription and does not auto-renew.';
+
+  @override
+  String get premiumLifetimeBadge => 'ONE PAYMENT';
+
+  @override
+  String get premiumPlanComingSoon => 'Coming soon';
+
+  @override
+  String get premiumYearlySaveVsMonthly => 'Better value than monthly';
+
+  @override
+  String get premiumCompareTitle => 'Free vs Premium';
+
+  @override
+  String get premiumCompareColFree => 'Free';
+
+  @override
+  String get premiumCompareColPremium => 'Premium';
+
+  @override
+  String get premiumCompareAds => 'Ads';
+
+  @override
+  String get premiumCompareAdsFree => 'Yes';
+
+  @override
+  String get premiumCompareAdsPremium => 'None';
+
+  @override
+  String get premiumCompareWidgets => 'Widgets';
+
+  @override
+  String get premiumCompareWidgetsFree => 'Locked';
+
+  @override
+  String get premiumCompareWidgetsPremium => 'Unlocked';
+
+  @override
+  String get premiumCompareThemes => 'Widget themes';
+
+  @override
+  String get premiumCompareThemesFree => 'Classic';
+
+  @override
+  String get premiumCompareThemesPremium => '6 themes';
+
+  @override
+  String get premiumCompareAi => 'Islamic AI';
+
+  @override
+  String get premiumCompareAiFree => 'Locked';
+
+  @override
+  String get premiumCompareAiPremium => 'Coming soon';
+
+  @override
+  String get premiumCompareExplore => 'Explore';
+
+  @override
+  String get premiumCompareExploreFree => 'With ads';
+
+  @override
+  String get premiumCompareExplorePremium => 'Uninterrupted';
+
+  @override
+  String get premiumCompareAdhan => '2nd adhan alarm';
+
+  @override
+  String get premiumCompareAdhanFree => 'Locked';
+
+  @override
+  String get premiumCompareAdhanPremium => 'Included';
+
+  @override
+  String get premiumComparePrayer => 'Prayer Circle';
+
+  @override
+  String get premiumComparePrayerFree => 'Limited';
+
+  @override
+  String get premiumComparePrayerPremium => 'Unlimited';
+
+  @override
+  String get premiumCompareContest => 'Contest plays';
+
+  @override
+  String get premiumCompareContestFree => 'Limited';
+
+  @override
+  String get premiumCompareContestPremium => 'Unlimited';
+
+  @override
   String get premiumFooterText1 =>
-      'Launch prices are valid for a limited time. The subscription is managed through your store account and can be canceled at any time.';
+      'New prices apply only to new subscriptions. Existing subscribers keep their current price. The subscription is managed through your store account and can be canceled at any time.';
 
   @override
   String get premiumFooterText2 =>
       'The subscription renews automatically unless canceled at least 24 hours before the end of the period. The renewal fee is charged to your store account 24 hours before the end of the period. You can manage your subscriptions in App Store/Play account settings.';
 
   @override
-  String get premiumLaunchBadge => 'LAUNCH SPECIAL';
+  String get premiumLaunchBadge => '3 DAYS FREE';
 
   @override
   String get premiumCountdownNotice =>
-      'This price is valid for a limited time. Unlock premium with the best price before the launch ends.';
+      'Try the yearly plan free for 3 days. Existing subscribers keep their current price.';
 
   @override
   String get premiumBenefitAdFree => 'Ad-free usage';

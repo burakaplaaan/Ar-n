@@ -18,10 +18,30 @@ abstract final class RevenueCatIds {
   static const String premiumEntitlement = 'premium';
 
   // ─── Product IDs ─────────────────────────────────────────────────────────
-  /// Play Console / App Store Connect'te tanımlı ürün ID'leri.
-  /// RevenueCat Dashboard → Products'a da eklenmeli.
-  static const String monthlyProductId = 'arin_premium_monthly_launch';
-  static const String yearlyProductId = 'arin_premium_yearly_launch';
+  /// Yeni fiyatlandırma (aylık 99,99 ₺ / yıllık 499,99 ₺ + 3 gün deneme /
+  /// ömür boyu 1.299,99 ₺).
+  /// Eski lansman SKU'ları satılmaz; mevcut aboneler o fiyattan devam eder.
+  static const String monthlyProductId = 'arin_premium_monthly';
+  static const String yearlyProductId = 'arin_premium_yearly';
+  static const String lifetimeProductId = 'arin_premium_lifetime';
+
+  /// Eski lansman ürünleri — yalnızca sahiplik tespiti için.
+  static const String legacyMonthlyProductId = 'arin_premium_monthly_launch';
+  static const String legacyYearlyProductId = 'arin_premium_yearly_launch';
+
+  static const List<String> allMonthlyProductIds = [
+    monthlyProductId,
+    legacyMonthlyProductId,
+  ];
+
+  static const List<String> allYearlyProductIds = [
+    yearlyProductId,
+    legacyYearlyProductId,
+  ];
+
+  static const List<String> allLifetimeProductIds = [
+    lifetimeProductId,
+  ];
 
   // ─── Support / Tip Product IDs ───────────────────────────────────────────
   /// Tek seferlik destek ürünleri (Non-Consumable).

@@ -86,13 +86,13 @@ class AdGateService {
 
   final SharedPreferences _prefs;
 
-  static const int exploreSwipeFreeCount = 12;
+  static const int exploreSwipeFreeCount = 8;
   static const Duration widgetTrialDuration = Duration(hours: 24);
   static const Duration _legacyWidgetUnlockDuration = Duration(
     hours: GlobalWidgetLockService.legacyUnlockHours,
   );
   static const Duration secondAlarmUnlockDuration = Duration(days: 7);
-  static const Duration sessionAdCooldown = Duration(hours: 12);
+  static const Duration sessionAdCooldown = Duration(hours: 6);
   static const Duration exploreInterstitialCooldown = Duration(minutes: 6);
   static const String _exploreViewCountKey = 'ad_gate_explore_swipe_view_count';
 

@@ -55,6 +55,7 @@ abstract final class ArinWidgetKeys {
   static const widgetGateGlobalLocked = 'arin_widget_gate_global_locked';
   static const widgetGateGlobalRevision = 'arin_widget_gate_global_revision';
   static const widgetGateUnlockHours = 'arin_widget_gate_unlock_hours';
+  static const themeId = 'arin_widget_theme_id';
 }
 
 abstract final class ArinWidgetSync {
@@ -654,6 +655,8 @@ abstract final class ArinWidgetSync {
       release.complete();
     }
   }
+
+  static Future<void> refreshAllWidgets() => _updateAllWidgets();
 
   static Future<void> _updateAllWidgets() async {
     await Future.wait([

@@ -86,6 +86,16 @@ class ArinQuoteWidgetProvider : HomeWidgetProvider() {
                 )
             }
             views.setOnClickPendingIntent(R.id.widget_root, contentPi)
+            ArinWidgetTheme.apply(
+                views,
+                widgetData,
+                R.id.widget_root,
+                intArrayOf(
+                    R.id.widget_quote_text,
+                    R.id.widget_quote_source,
+                    R.id.widget_lock_note,
+                ),
+            )
             appWidgetManager.updateAppWidget(widgetId, views)
         }
 

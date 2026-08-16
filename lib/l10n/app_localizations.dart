@@ -2430,6 +2430,54 @@ abstract class AppLocalizations {
   /// **'Terapi tonları, ambiyans ve uyku zamanlayıcısı ile sakin bir oturum'**
   String get qiblaHubHealingSubtitle;
 
+  /// No description provided for @qiblaHubAiTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'İslami Yapay Zeka'**
+  String get qiblaHubAiTitle;
+
+  /// No description provided for @qiblaHubAiSubtitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Dini sorularına kaynaklı, fetva olmayan yanıtlar — Premium'**
+  String get qiblaHubAiSubtitle;
+
+  /// No description provided for @islamicAiComingSoonTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'İslami Yapay Zeka'**
+  String get islamicAiComingSoonTitle;
+
+  /// No description provided for @islamicAiComingSoonBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu özellik hazırlanıyor. Premium’un var; arkadaşın kodu birleştirilince sohbet burada açılacak.'**
+  String get islamicAiComingSoonBody;
+
+  /// No description provided for @widgetThemeSectionTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Widget temaları'**
+  String get widgetThemeSectionTitle;
+
+  /// No description provided for @widgetThemeSectionSubtitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Klasik tema herkese açık. Diğer temalar Premium’a özeldir ve iPhone ile Android’de aynı görünür.'**
+  String get widgetThemeSectionSubtitle;
+
+  /// No description provided for @widgetThemeApplied.
+  ///
+  /// In tr, this message translates to:
+  /// **'Widget teması güncellendi.'**
+  String get widgetThemeApplied;
+
+  /// No description provided for @widgetThemePremiumRequired.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu tema Premium’a özel.'**
+  String get widgetThemePremiumRequired;
+
   /// No description provided for @qiblaHubHilalDuelTitle.
   ///
   /// In tr, this message translates to:
@@ -7256,6 +7304,48 @@ abstract class AppLocalizations {
   /// **'Yıllık Abonelik'**
   String get premiumYearlyPlanSubtitle;
 
+  /// No description provided for @premiumYearlyPerMonth.
+  ///
+  /// In tr, this message translates to:
+  /// **'ayda {price}'**
+  String premiumYearlyPerMonth(String price);
+
+  /// No description provided for @premiumYearlyTrialCta.
+  ///
+  /// In tr, this message translates to:
+  /// **'3 günlük denemeyi başlat'**
+  String get premiumYearlyTrialCta;
+
+  /// No description provided for @premiumYearlyTrialNote.
+  ///
+  /// In tr, this message translates to:
+  /// **'3 gün ücretsiz dene. Deneme bitince yıllık plan otomatik yenilenir; istediğin zaman iptal edebilirsin.'**
+  String get premiumYearlyTrialNote;
+
+  /// No description provided for @premiumMonthlyCta.
+  ///
+  /// In tr, this message translates to:
+  /// **'Aylık abone ol'**
+  String get premiumMonthlyCta;
+
+  /// No description provided for @premiumCloseSemantics.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kapat'**
+  String get premiumCloseSemantics;
+
+  /// No description provided for @premiumBenefitAi.
+  ///
+  /// In tr, this message translates to:
+  /// **'İslami yapay zeka'**
+  String get premiumBenefitAi;
+
+  /// No description provided for @premiumBenefitThemes.
+  ///
+  /// In tr, this message translates to:
+  /// **'Premium widget temaları'**
+  String get premiumBenefitThemes;
+
   /// No description provided for @premiumSwitchToYearly.
   ///
   /// In tr, this message translates to:
@@ -7274,10 +7364,214 @@ abstract class AppLocalizations {
   /// **'Aylık Abonelik'**
   String get premiumMonthlyPlanSubtitle;
 
+  /// No description provided for @premiumLifetimePlanTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ömür Boyu Premium'**
+  String get premiumLifetimePlanTitle;
+
+  /// No description provided for @premiumLifetimePlanSubtitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Tek seferlik satın alma, yenileme yok'**
+  String get premiumLifetimePlanSubtitle;
+
+  /// No description provided for @premiumLifetimeCta.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ömür boyu aç'**
+  String get premiumLifetimeCta;
+
+  /// No description provided for @premiumLifetimeNote.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bir kez öde, Premium sonsuza kadar kalsın. Abonelik değildir, otomatik yenilenmez.'**
+  String get premiumLifetimeNote;
+
+  /// No description provided for @premiumLifetimeBadge.
+  ///
+  /// In tr, this message translates to:
+  /// **'TEK ÖDEME'**
+  String get premiumLifetimeBadge;
+
+  /// No description provided for @premiumPlanComingSoon.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yakında'**
+  String get premiumPlanComingSoon;
+
+  /// No description provided for @premiumYearlySaveVsMonthly.
+  ///
+  /// In tr, this message translates to:
+  /// **'Aylığa göre daha avantajlı'**
+  String get premiumYearlySaveVsMonthly;
+
+  /// No description provided for @premiumCompareTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ücretsiz ve Premium'**
+  String get premiumCompareTitle;
+
+  /// No description provided for @premiumCompareColFree.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ücretsiz'**
+  String get premiumCompareColFree;
+
+  /// No description provided for @premiumCompareColPremium.
+  ///
+  /// In tr, this message translates to:
+  /// **'Premium'**
+  String get premiumCompareColPremium;
+
+  /// No description provided for @premiumCompareAds.
+  ///
+  /// In tr, this message translates to:
+  /// **'Reklamlar'**
+  String get premiumCompareAds;
+
+  /// No description provided for @premiumCompareAdsFree.
+  ///
+  /// In tr, this message translates to:
+  /// **'Var'**
+  String get premiumCompareAdsFree;
+
+  /// No description provided for @premiumCompareAdsPremium.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yok'**
+  String get premiumCompareAdsPremium;
+
+  /// No description provided for @premiumCompareWidgets.
+  ///
+  /// In tr, this message translates to:
+  /// **'Widget\'lar'**
+  String get premiumCompareWidgets;
+
+  /// No description provided for @premiumCompareWidgetsFree.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kilitli'**
+  String get premiumCompareWidgetsFree;
+
+  /// No description provided for @premiumCompareWidgetsPremium.
+  ///
+  /// In tr, this message translates to:
+  /// **'Açık'**
+  String get premiumCompareWidgetsPremium;
+
+  /// No description provided for @premiumCompareThemes.
+  ///
+  /// In tr, this message translates to:
+  /// **'Widget temaları'**
+  String get premiumCompareThemes;
+
+  /// No description provided for @premiumCompareThemesFree.
+  ///
+  /// In tr, this message translates to:
+  /// **'Klasik'**
+  String get premiumCompareThemesFree;
+
+  /// No description provided for @premiumCompareThemesPremium.
+  ///
+  /// In tr, this message translates to:
+  /// **'6 tema'**
+  String get premiumCompareThemesPremium;
+
+  /// No description provided for @premiumCompareAi.
+  ///
+  /// In tr, this message translates to:
+  /// **'İslami yapay zeka'**
+  String get premiumCompareAi;
+
+  /// No description provided for @premiumCompareAiFree.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kilitli'**
+  String get premiumCompareAiFree;
+
+  /// No description provided for @premiumCompareAiPremium.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yakında'**
+  String get premiumCompareAiPremium;
+
+  /// No description provided for @premiumCompareExplore.
+  ///
+  /// In tr, this message translates to:
+  /// **'Keşfet'**
+  String get premiumCompareExplore;
+
+  /// No description provided for @premiumCompareExploreFree.
+  ///
+  /// In tr, this message translates to:
+  /// **'Reklamlı'**
+  String get premiumCompareExploreFree;
+
+  /// No description provided for @premiumCompareExplorePremium.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kesintisiz'**
+  String get premiumCompareExplorePremium;
+
+  /// No description provided for @premiumCompareAdhan.
+  ///
+  /// In tr, this message translates to:
+  /// **'2. ezan alarmı'**
+  String get premiumCompareAdhan;
+
+  /// No description provided for @premiumCompareAdhanFree.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kilitli'**
+  String get premiumCompareAdhanFree;
+
+  /// No description provided for @premiumCompareAdhanPremium.
+  ///
+  /// In tr, this message translates to:
+  /// **'Açık'**
+  String get premiumCompareAdhanPremium;
+
+  /// No description provided for @premiumComparePrayer.
+  ///
+  /// In tr, this message translates to:
+  /// **'Dua Halkası'**
+  String get premiumComparePrayer;
+
+  /// No description provided for @premiumComparePrayerFree.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sınırlı'**
+  String get premiumComparePrayerFree;
+
+  /// No description provided for @premiumComparePrayerPremium.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sınırsız'**
+  String get premiumComparePrayerPremium;
+
+  /// No description provided for @premiumCompareContest.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yarışma hakkı'**
+  String get premiumCompareContest;
+
+  /// No description provided for @premiumCompareContestFree.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sınırlı'**
+  String get premiumCompareContestFree;
+
+  /// No description provided for @premiumCompareContestPremium.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sınırsız'**
+  String get premiumCompareContestPremium;
+
   /// No description provided for @premiumFooterText1.
   ///
   /// In tr, this message translates to:
-  /// **'Lansman fiyatları sınırlı süre geçerlidir. Abonelik mağaza hesabın üzerinden yönetilir ve istediğin zaman iptal edilebilir.'**
+  /// **'Yeni fiyatlar yalnızca yeni abonelikler içindir. Mevcut abonelerin fiyatı değişmez. Abonelik mağaza hesabın üzerinden yönetilir ve istediğin zaman iptal edilebilir.'**
   String get premiumFooterText1;
 
   /// No description provided for @premiumFooterText2.
@@ -7289,13 +7583,13 @@ abstract class AppLocalizations {
   /// No description provided for @premiumLaunchBadge.
   ///
   /// In tr, this message translates to:
-  /// **'LANSMANA ÖZEL'**
+  /// **'3 GÜN ÜCRETSİZ'**
   String get premiumLaunchBadge;
 
   /// No description provided for @premiumCountdownNotice.
   ///
   /// In tr, this message translates to:
-  /// **'Bu fiyat sınırlı süre geçerli. Lansman bitmeden premiumu en avantajlı fiyatla aç.'**
+  /// **'Yıllık planda 3 gün ücretsiz dene. Mevcut abonelerin fiyatı değişmez.'**
   String get premiumCountdownNotice;
 
   /// No description provided for @premiumBenefitAdFree.

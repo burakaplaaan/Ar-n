@@ -16,6 +16,7 @@ import '../../core/constants/revenuecat_ids.dart';
 import '../../l10n/app_localizations.dart';
 import '../models/premium_entitlement.dart';
 import '../models/purchase_result.dart';
+import '../models/store_price_info.dart';
 
 // ─── Provider ────────────────────────────────────────────────────────────────
 
@@ -129,6 +130,49 @@ class PurchaseService {
       debugPrint('[PurchaseService] fetchProductPriceStrings error: $e');
       return {};
     }
+  }
+
+  Future<Map<String, StorePriceInfo>> fetchStorePrices(
+    List<String> productIds, {
+    ProductCategory productCategory = ProductCategory.subscription,
+  }) async {
+    if (!_isSupportedPlatform) return {};
+    final ready = await _waitUntilConfigured();
+    if (!ready) return {};
+    try {
+      final products = await Purchases.getProducts(
+        productIds,
+        productCategory: productCategory,
+      );
+      debugPrint(
+        '[PurchaseService] fetchStorePrices($productCategory) '
+        'asked=${productIds.join(',')} got=${products.map((p) => p.identifier).join(',')}',
+      );
+      return {
+        for (final p in products)
+          p.identifier: StorePriceInfo(
+            productId: p.identifier,
+            priceString: p.priceString,
+            price: p.price,
+            currencyCode: p.currencyCode,
+          ),
+      };
+    } catch (e) {
+      debugPrint('[PurchaseService] fetchStorePrices error: $e');
+      return {};
+    }
+  }
+
+  Future<Map<String, StorePriceInfo>> fetchLifetimeStorePrices() {
+    return fetchStorePrices(
+      [RevenueCatIds.lifetimeProductId],
+      productCategory: ProductCategory.nonSubscription,
+    );
+  }
+
+  /// Ömür boyu Premium: tek seferlik (non-subscription) ürün.
+  Future<PurchaseOutcome> purchaseLifetime({AppLocalizations? l10n}) {
+    return purchaseSupportProduct(RevenueCatIds.lifetimeProductId, l10n: l10n);
   }
 
   // ── Purchase ──────────────────────────────────────────────────────────────

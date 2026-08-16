@@ -74,6 +74,17 @@ class ArinTrackingWidgetProvider : HomeWidgetProvider() {
                 )
             }
             views.setOnClickPendingIntent(R.id.widget_tracking_root, contentPi)
+            ArinWidgetTheme.apply(
+                views,
+                widgetData,
+                R.id.widget_tracking_root,
+                intArrayOf(
+                    R.id.widget_tracking_title,
+                    R.id.widget_tracking_value,
+                    R.id.widget_tracking_note,
+                    R.id.widget_lock_note,
+                ),
+            )
             appWidgetManager.updateAppWidget(widgetId, views)
         }
 

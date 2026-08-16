@@ -1346,6 +1346,33 @@ class AppLocalizationsAr extends AppLocalizations {
       'جلسة هادئة مع نغمات علاجية، أجواء صوتية، ومؤقت نوم';
 
   @override
+  String get qiblaHubAiTitle => 'الذكاء الاصطناعي الإسلامي';
+
+  @override
+  String get qiblaHubAiSubtitle =>
+      'إجابات مستندة إلى مصادر للأسئلة الدينية — ليست فتوى. Premium.';
+
+  @override
+  String get islamicAiComingSoonTitle => 'الذكاء الاصطناعي الإسلامي';
+
+  @override
+  String get islamicAiComingSoonBody =>
+      'هذه الميزة قيد الإعداد. Premium لديك مفعّل؛ ستُفتح المحادثة هنا بعد دمج الشيفرة.';
+
+  @override
+  String get widgetThemeSectionTitle => 'سمات الأدوات';
+
+  @override
+  String get widgetThemeSectionSubtitle =>
+      'السمة الكلاسيكية مجانية. السمات الأخرى خاصة بـ Premium وتظهر بنفس الشكل على iPhone وAndroid.';
+
+  @override
+  String get widgetThemeApplied => 'تم تحديث سمة الأداة.';
+
+  @override
+  String get widgetThemePremiumRequired => 'هذه السمة خاصة بـ Premium.';
+
+  @override
   String get qiblaHubHilalDuelTitle => 'مبارزة المعرفة';
 
   @override
@@ -4125,6 +4152,30 @@ class AppLocalizationsAr extends AppLocalizations {
   String get premiumYearlyPlanSubtitle => 'اشتراك سنوي';
 
   @override
+  String premiumYearlyPerMonth(String price) {
+    return '$price / شهر';
+  }
+
+  @override
+  String get premiumYearlyTrialCta => 'ابدأ التجربة المجانية لـ 3 أيام';
+
+  @override
+  String get premiumYearlyTrialNote =>
+      'جرّب مجانًا لمدة 3 أيام. بعد التجربة يتجدد الاشتراك السنوي تلقائيًا ويمكنك الإلغاء في أي وقت.';
+
+  @override
+  String get premiumMonthlyCta => 'اشترك شهريًا';
+
+  @override
+  String get premiumCloseSemantics => 'إغلاق';
+
+  @override
+  String get premiumBenefitAi => 'الذكاء الاصطناعي الإسلامي';
+
+  @override
+  String get premiumBenefitThemes => 'سمات الأدوات المميزة';
+
+  @override
   String get premiumSwitchToYearly => 'التبديل إلى السنوي';
 
   @override
@@ -4134,19 +4185,122 @@ class AppLocalizationsAr extends AppLocalizations {
   String get premiumMonthlyPlanSubtitle => 'اشتراك شهري';
 
   @override
+  String get premiumLifetimePlanTitle => 'Premium مدى الحياة';
+
+  @override
+  String get premiumLifetimePlanSubtitle => 'شراء لمرة واحدة، بدون تجديد';
+
+  @override
+  String get premiumLifetimeCta => 'افتح مدى الحياة';
+
+  @override
+  String get premiumLifetimeNote =>
+      'ادفع مرة واحدة واحتفظ بـ Premium إلى الأبد. هذا ليس اشتراكًا ولا يتجدد تلقائيًا.';
+
+  @override
+  String get premiumLifetimeBadge => 'دفعة واحدة';
+
+  @override
+  String get premiumPlanComingSoon => 'قريبًا';
+
+  @override
+  String get premiumYearlySaveVsMonthly => 'أوفر من الاشتراك الشهري';
+
+  @override
+  String get premiumCompareTitle => 'مجاني و Premium';
+
+  @override
+  String get premiumCompareColFree => 'مجاني';
+
+  @override
+  String get premiumCompareColPremium => 'Premium';
+
+  @override
+  String get premiumCompareAds => 'الإعلانات';
+
+  @override
+  String get premiumCompareAdsFree => 'موجودة';
+
+  @override
+  String get premiumCompareAdsPremium => 'بدون';
+
+  @override
+  String get premiumCompareWidgets => 'الأدوات';
+
+  @override
+  String get premiumCompareWidgetsFree => 'مقفل';
+
+  @override
+  String get premiumCompareWidgetsPremium => 'مفتوح';
+
+  @override
+  String get premiumCompareThemes => 'سمات الأدوات';
+
+  @override
+  String get premiumCompareThemesFree => 'كلاسيكي';
+
+  @override
+  String get premiumCompareThemesPremium => '6 سمات';
+
+  @override
+  String get premiumCompareAi => 'الذكاء الاصطناعي الإسلامي';
+
+  @override
+  String get premiumCompareAiFree => 'مقفل';
+
+  @override
+  String get premiumCompareAiPremium => 'قريبًا';
+
+  @override
+  String get premiumCompareExplore => 'استكشف';
+
+  @override
+  String get premiumCompareExploreFree => 'مع إعلانات';
+
+  @override
+  String get premiumCompareExplorePremium => 'بدون انقطاع';
+
+  @override
+  String get premiumCompareAdhan => 'منبه الأذان الثاني';
+
+  @override
+  String get premiumCompareAdhanFree => 'مقفل';
+
+  @override
+  String get premiumCompareAdhanPremium => 'مفتوح';
+
+  @override
+  String get premiumComparePrayer => 'حلقة الدعاء';
+
+  @override
+  String get premiumComparePrayerFree => 'محدود';
+
+  @override
+  String get premiumComparePrayerPremium => 'غير محدود';
+
+  @override
+  String get premiumCompareContest => 'حق المسابقة';
+
+  @override
+  String get premiumCompareContestFree => 'محدود';
+
+  @override
+  String get premiumCompareContestPremium => 'غير محدود';
+
+  @override
   String get premiumFooterText1 =>
-      'أسعار الإطلاق صالحة لفترة محدودة. تتم إدارة الاشتراك من خلال حساب المتجر الخاص بك ويمكن إلغاؤه في أي وقت.';
+      'الأسعار الجديدة تنطبق فقط على الاشتراكات الجديدة. يبقى سعر المشتركين الحاليين كما هو. تتم إدارة الاشتراك من خلال حساب المتجر ويمكن إلغاؤه في أي وقت.';
 
   @override
   String get premiumFooterText2 =>
       'يتم تجديد الاشتراك تلقائيًا ما لم يتم إلغاؤه قبل 24 ساعة على الأقل من نهاية الفترة. يتم خصم رسوم التجديد من حساب المتجر الخاص بك قبل 24 ساعة من نهاية الفترة. يمكنك إدارة اشتراكاتك في إعدادات حساب App Store/Play.';
 
   @override
-  String get premiumLaunchBadge => 'خاص بالإطلاق';
+  String get premiumLaunchBadge => '3 أيام مجانًا';
 
   @override
   String get premiumCountdownNotice =>
-      'هذا السعر صالح لفترة محدودة. فعّل Premium بأفضل سعر قبل انتهاء الإطلاق.';
+      'جرّب الخطة السنوية مجانًا لمدة 3 أيام. يبقى سعر المشتركين الحاليين كما هو.';
 
   @override
   String get premiumBenefitAdFree => 'استخدام بدون إعلانات';

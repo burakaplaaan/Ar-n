@@ -40,6 +40,7 @@ import 'data/services/tracking_widget_service.dart';
 import 'data/services/user_cloud_backup_service.dart';
 import 'data/services/widget_access_service.dart';
 import 'data/services/widget_metrics_service.dart';
+import 'data/services/widget_theme_service.dart';
 import 'data/repositories/salat_log_repository.dart';
 import 'presentation/inspire/explore_bgm_controller.dart';
 import 'presentation/inspire/inspiration_engagement_provider.dart';
@@ -534,6 +535,11 @@ class _ArinAppState extends ConsumerState<ArinApp> with WidgetsBindingObserver {
         WidgetAccessService(
           ref.read(sharedPreferencesProvider),
         ).syncAll(isPremium: entitlement.isActive),
+      );
+      unawaited(
+        WidgetThemeService(
+          ref.read(sharedPreferencesProvider),
+        ).syncToWidgets(isPremium: entitlement.isActive),
       );
     });
 

@@ -1,11 +1,18 @@
 // lib/presentation/qibla/qibla_tools_dashboard_page.dart
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:arin/l10n/app_localizations.dart';
 
 import '../../core/constants/app_colors.dart';
 import '../../core/theme/arin_shell_background.dart';
+import '../../data/services/ad_gate_service.dart';
+import '../../data/services/paywall_prompt_service.dart';
+import '../../data/services/session_ad_prompt.dart';
+import '../shared/providers/premium_providers.dart';
 import '../shared/widgets/arin_shell_layout.dart';
 import '../shared/widgets/zikirmatik_silhouette_icon.dart';
 import 'qibla_hub_page.dart';
@@ -27,7 +34,7 @@ abstract final class _QiblaHubCardStyle {
 
 const double _kDiamondAngle = 0.7853981633974483;
 
-enum _QiblaActionMotif { compass, tasbeeh, breath, prayer, frequency, hilal }
+enum _QiblaActionMotif { compass, tasbeeh, breath, prayer, frequency, hilal, ai }
 
 /// Yeşil paleti bozmadan sıcaklık katan bronz/kahverengi tonlar.
 /// Koyu temada açık bronz, açık temada koyu kahve — kontrast korunur.
@@ -38,14 +45,29 @@ abstract final class _QiblaWarm {
       onDark ? const Color(0xFF8A6545) : const Color(0xFFC9A27A);
 }
 
-class QiblaToolsDashboardPage extends StatelessWidget {
+class QiblaToolsDashboardPage extends ConsumerWidget {
   const QiblaToolsDashboardPage({super.key});
 
+  Future<void> _openTool(
+    BuildContext context,
+    WidgetRef ref, {
+    required String route,
+    AdGatePlacement? adPlacement,
+  }) async {
+    HapticFeedback.lightImpact();
+    if (adPlacement != null) {
+      await SessionAdPrompt.maybeShow(ref: ref, placement: adPlacement);
+      if (!context.mounted) return;
+    }
+    Navigator.of(context).pushNamed(route);
+  }
+
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final onDark = !ArinShellBackground.isLight(context);
     final l10n = AppLocalizations.of(context)!;
     const accent = AppColors.accentNeonGreen;
+    final isPremium = ref.watch(isPremiumProvider);
 
     // extendBody alt çubuğu gövdenin üstüne bindirdiği için son kart
     // (Bilgi Düellosu) sistem nav + shell bar yüksekliği kadar yukarıda bitmeli.
@@ -69,13 +91,37 @@ class QiblaToolsDashboardPage extends StatelessWidget {
                     _QiblaFeatureCard(
                       onDark: onDark,
                       accent: accent,
+                      title: l10n.qiblaHubAiTitle,
+                      subtitle: l10n.qiblaHubAiSubtitle,
+                      motif: _QiblaActionMotif.ai,
+                      locked: !isPremium,
+                      onTap: () async {
+                        HapticFeedback.lightImpact();
+                        if (!isPremium) {
+                          await PaywallPromptService.showForLockedFeature(
+                            context,
+                          );
+                          return;
+                        }
+                        if (!context.mounted) return;
+                        Navigator.of(context).pushNamed(
+                          QiblaHubRoutes.islamicAi,
+                        );
+                      },
+                    ),
+                    const SizedBox(height: 10),
+                    _QiblaFeatureCard(
+                      onDark: onDark,
+                      accent: accent,
                       title: l10n.qiblaHubCompassTitle,
                       subtitle: l10n.qiblaHubCompassSubtitle,
                       motif: _QiblaActionMotif.compass,
-                      onTap: () {
-                        HapticFeedback.lightImpact();
-                        Navigator.of(context).pushNamed(QiblaHubRoutes.compass);
-                      },
+                      onTap: () => _openTool(
+                        context,
+                        ref,
+                        route: QiblaHubRoutes.compass,
+                        adPlacement: AdGatePlacement.qiblaSession,
+                      ),
                     ),
                     const SizedBox(height: 10),
                     _QiblaFeatureCard(
@@ -84,10 +130,12 @@ class QiblaToolsDashboardPage extends StatelessWidget {
                       title: l10n.qiblaHubZikirTitle,
                       subtitle: l10n.qiblaHubZikirFeatureSubtitle,
                       motif: _QiblaActionMotif.tasbeeh,
-                      onTap: () {
-                        HapticFeedback.lightImpact();
-                        Navigator.of(context).pushNamed(QiblaHubRoutes.zikir);
-                      },
+                      onTap: () => _openTool(
+                        context,
+                        ref,
+                        route: QiblaHubRoutes.zikir,
+                        adPlacement: AdGatePlacement.zikirSession,
+                      ),
                     ),
                     const SizedBox(height: 10),
                     _QiblaFeatureCard(
@@ -124,10 +172,12 @@ class QiblaToolsDashboardPage extends StatelessWidget {
                       title: l10n.qiblaHubHealingTitle,
                       subtitle: l10n.qiblaHubHealingSubtitle,
                       motif: _QiblaActionMotif.frequency,
-                      onTap: () {
-                        HapticFeedback.lightImpact();
-                        Navigator.of(context).pushNamed(QiblaHubRoutes.healing);
-                      },
+                      onTap: () => _openTool(
+                        context,
+                        ref,
+                        route: QiblaHubRoutes.healing,
+                        adPlacement: AdGatePlacement.healingSession,
+                      ),
                     ),
                     const SizedBox(height: 10),
                     _QiblaFeatureCard(
@@ -241,6 +291,7 @@ class _QiblaFeatureCard extends StatelessWidget {
     required this.subtitle,
     required this.motif,
     required this.onTap,
+    this.locked = false,
   });
 
   final bool onDark;
@@ -249,6 +300,7 @@ class _QiblaFeatureCard extends StatelessWidget {
   final String subtitle;
   final _QiblaActionMotif motif;
   final VoidCallback onTap;
+  final bool locked;
 
   @override
   Widget build(BuildContext context) {
@@ -397,6 +449,16 @@ class _QiblaFeatureCard extends StatelessWidget {
                                       ),
                                     ),
                                   ),
+                                  if (locked) ...[
+                                    const SizedBox(width: 8),
+                                    Icon(
+                                      Icons.lock_rounded,
+                                      size: 15,
+                                      color: AppColors.goldAccent.withValues(
+                                        alpha: 0.9,
+                                      ),
+                                    ),
+                                  ],
                                 ],
                               ),
                               const SizedBox(height: 6),
@@ -462,6 +524,13 @@ class _QiblaToolGlyph extends StatelessWidget {
   Widget build(BuildContext context) {
     if (motif == _QiblaActionMotif.tasbeeh) {
       return const ZikirmatikSilhouetteIcon(size: 30);
+    }
+    if (motif == _QiblaActionMotif.ai) {
+      return Icon(
+        Icons.auto_awesome_rounded,
+        size: 28,
+        color: onDark ? Colors.white : AppColors.emeraldDark,
+      );
     }
 
     return CustomPaint(
@@ -604,6 +673,9 @@ class _QiblaToolGlyphPainter extends CustomPainter {
         final innerCut = Path()..addOval(const Rect.fromLTWH(14.5, 8, 16, 20));
         canvas.drawPath(innerCut, primaryStroke);
         canvas.drawCircle(const Offset(24.5, 11.5), 1.6, bronzeFill);
+
+      case _QiblaActionMotif.ai:
+        return;
     }
   }
 
@@ -756,6 +828,18 @@ class _CardMotifPatternPainter extends CustomPainter {
             width: 10,
             height: 12,
           ),
+          greenPaint,
+        );
+
+      case _QiblaActionMotif.ai:
+        canvas.drawCircle(
+          Offset(size.width * 0.5, size.height * 0.45),
+          3.2,
+          bronzePaint,
+        );
+        canvas.drawCircle(
+          Offset(size.width * 0.72, size.height * 0.28),
+          1.6,
           greenPaint,
         );
     }

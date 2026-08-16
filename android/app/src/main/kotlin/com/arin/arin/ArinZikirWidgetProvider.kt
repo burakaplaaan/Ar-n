@@ -92,6 +92,16 @@ class ArinZikirWidgetProvider : HomeWidgetProvider() {
             }
             views.setOnClickPendingIntent(R.id.widget_zikir_root, contentPi)
             views.setOnClickPendingIntent(R.id.widget_zikir_tick, tickPi)
+            ArinWidgetTheme.apply(
+                views,
+                widgetData,
+                R.id.widget_zikir_root,
+                intArrayOf(
+                    R.id.widget_zikir_phrase,
+                    R.id.widget_zikir_count,
+                    R.id.widget_lock_note,
+                ),
+            )
             appWidgetManager.updateAppWidget(widgetId, views)
         }
 
