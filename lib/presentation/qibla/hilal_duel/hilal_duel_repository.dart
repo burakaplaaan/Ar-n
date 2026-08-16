@@ -1012,12 +1012,28 @@ class HilalDuelRepository implements HilalDuelRepositoryApi {
     );
   }
 
+  Future<String> _appLocaleCode() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final raw = (prefs.getString('arin_app_locale') ?? '').trim().toLowerCase();
+      if (raw.startsWith('ar')) return 'ar';
+      if (raw.startsWith('en')) return 'en';
+      return 'tr';
+    } catch (_) {
+      return 'tr';
+    }
+  }
+
   Future<Map<String, dynamic>> _call(
     String functionName,
     Map<String, dynamic> data,
   ) async {
     try {
-      final result = await _functions.httpsCallable(functionName).call(data);
+      final payload = <String, dynamic>{
+        ...data,
+        if (!data.containsKey('locale')) 'locale': await _appLocaleCode(),
+      };
+      final result = await _functions.httpsCallable(functionName).call(payload);
       return Map<String, dynamic>.from(result.data as Map);
     } on FirebaseFunctionsException catch (error) {
       if (error.code == 'unauthenticated') {

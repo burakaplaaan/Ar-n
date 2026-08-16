@@ -854,15 +854,17 @@ class _LobbyBodyState extends ConsumerState<_LobbyBody>
                       height: 1.1,
                     ),
                   ),
-                  const SizedBox(height: 2),
-                  Text(
-                    l10n.hilalDuelLanguageNote,
-                    style: TextStyle(
-                      color: _HilalPalette.muted(onDark),
-                      fontSize: 11,
-                      fontWeight: FontWeight.w500,
+                  if (Localizations.localeOf(context).languageCode != 'ar') ...[
+                    const SizedBox(height: 2),
+                    Text(
+                      l10n.hilalDuelLanguageNote,
+                      style: TextStyle(
+                        color: _HilalPalette.muted(onDark),
+                        fontSize: 11,
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
-                  ),
+                  ],
                 ],
               ),
             ),

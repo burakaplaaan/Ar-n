@@ -10,6 +10,7 @@ const {
 } = require("firebase-admin/firestore");
 
 const questions = require("./data/islamic_quiz_questions.json");
+const questionsAr = require("./data/islamic_quiz_questions_ar.json");
 
 const REGION = "europe-west1";
 // TEMP (emülatör): Play Integrity emülatörde fail → Unauthenticated.
@@ -136,8 +137,30 @@ function _assertQuestionBank() {
   }
 }
 
+function _assertArabicQuestionBank() {
+  if (!questionsAr || typeof questionsAr !== "object") {
+    throw new Error("Hilal Düellosu Arabic question bank is missing.");
+  }
+  for (const item of questions) {
+    const ar = questionsAr[item.id];
+    if (
+      !ar ||
+      typeof ar.question !== "string" ||
+      ar.question.trim().length < 8 ||
+      !Array.isArray(ar.options) ||
+      ar.options.length !== 4 ||
+      typeof ar.category !== "string" ||
+      typeof ar.explanation !== "string"
+    ) {
+      throw new Error(`Invalid Arabic Hilal Düellosu question: ${item.id}`);
+    }
+  }
+}
+
 _assertQuestionBank();
+_assertArabicQuestionBank();
 const QUESTION_BY_ID = new Map(questions.map((item) => [item.id, item]));
+const QUESTION_AR_BY_ID = new Map(Object.entries(questionsAr));
 
 function _sha256(value) {
   return crypto.createHash("sha256").update(String(value), "utf8").digest("hex");
@@ -612,6 +635,10 @@ function _validatedQuizLocale(raw) {
   if (value.startsWith("ar")) return "ar";
   if (value.startsWith("en")) return "en";
   return "tr";
+}
+
+function _requestLocale(req) {
+  return _validatedQuizLocale(req?.data?.locale);
 }
 
 /**
@@ -1801,20 +1828,26 @@ function _botAnswerElapsedMs({
   return Math.min(ROUND_DURATION_MS, Math.max(800, Math.min(planned, wall || planned)));
 }
 
-function _questionPayload(questionId, includeAnswer = false) {
+function _questionPayload(questionId, includeAnswer = false, locale = "tr") {
   const question = QUESTION_BY_ID.get(questionId);
   if (!question) throw new Error(`Question not found: ${questionId}`);
+  const lang = _validatedQuizLocale(locale);
+  const ar = lang === "ar" ? QUESTION_AR_BY_ID.get(questionId) : null;
+  const pick = (field) => {
+    if (ar && ar[field] != null && String(ar[field]).length > 0) return ar[field];
+    return question[field];
+  };
   return {
     id: question.id,
-    category: question.category,
+    category: pick("category"),
     difficulty: [1, 2, 3].includes(question.difficulty) ? question.difficulty : 2,
-    question: question.question,
-    options: question.options,
+    question: pick("question"),
+    options: pick("options"),
     ...(includeAnswer
       ? {
           correctIndex: question.correctIndex,
-          explanation: question.explanation,
-          source: question.source,
+          explanation: pick("explanation"),
+          source: pick("source"),
         }
       : {}),
   };
@@ -1849,7 +1882,13 @@ function _perspectiveResolutionChoices(lastResolution, ownerHash, opponentId) {
   };
 }
 
-function _serializeLastResolution(match, lastResolution, ownerHash, opponentId) {
+function _serializeLastResolution(
+  match,
+  lastResolution,
+  ownerHash,
+  opponentId,
+  locale = "tr",
+) {
   if (!lastResolution) return null;
   const perspective = _perspectiveResolutionChoices(
     lastResolution,
@@ -1866,11 +1905,12 @@ function _serializeLastResolution(match, lastResolution, ownerHash, opponentId) 
     question: _questionPayload(
       match.questionIds[lastResolution.round],
       true,
+      locale,
     ),
   };
 }
 
-function _serializeMatch(matchId, match, ownerHash) {
+function _serializeMatch(matchId, match, ownerHash, locale = "tr") {
   const selfIndex = match.players.findIndex((player) => player.id === ownerHash);
   if (selfIndex < 0) {
     throw new HttpsError("permission-denied", "Bu karşılaşmaya erişemezsiniz.");
@@ -1896,7 +1936,7 @@ function _serializeMatch(matchId, match, ownerHash) {
     opponent: _decoratePlayer(match.players[opponentIndex]),
     question: match.status === "completed"
       ? null
-      : _questionPayload(match.questionIds[currentRound]),
+      : _questionPayload(match.questionIds[currentRound], false, locale),
     selfAnswered: Boolean(selfAnswer),
     opponentAnswered: Boolean(opponentAnswer),
     doubled: match.doubledBy?.[ownerHash] === true,
@@ -1905,6 +1945,7 @@ function _serializeMatch(matchId, match, ownerHash) {
       lastResolution,
       ownerHash,
       opponentId,
+      locale,
     ),
     result: match.result || null,
   };
@@ -3089,7 +3130,10 @@ const getQuizMatch = onCall(
       return data;
     });
     await _scheduleTop3RivalryFromMatch(db, matchRef, match);
-    return { ok: true, match: _serializeMatch(matchId, match, ownerHash) };
+    return {
+      ok: true,
+      match: _serializeMatch(matchId, match, ownerHash, _requestLocale(req)),
+    };
   },
 );
 
@@ -3181,7 +3225,10 @@ const submitQuizAnswer = onCall(
       return data;
     });
     await _scheduleTop3RivalryFromMatch(db, matchRef, match);
-    return { ok: true, match: _serializeMatch(matchId, match, ownerHash) };
+    return {
+      ok: true,
+      match: _serializeMatch(matchId, match, ownerHash, _requestLocale(req)),
+    };
   },
 );
 
@@ -3216,7 +3263,10 @@ const forfeitQuizMatch = onCall(
       return data;
     });
     await _scheduleTop3RivalryFromMatch(db, matchRef, match);
-    return { ok: true, match: _serializeMatch(matchId, match, ownerHash) };
+    return {
+      ok: true,
+      match: _serializeMatch(matchId, match, ownerHash, _requestLocale(req)),
+    };
   },
 );
 
@@ -3970,7 +4020,7 @@ function _shouldRevealChallengeOpponentMarks(challenge, ownerHash, opponentId) {
   return false;
 }
 
-function _serializeChallenge(challengeId, challenge, ownerHash) {
+function _serializeChallenge(challengeId, challenge, ownerHash, locale = "tr") {
   const challengerId = String(challenge.challengerId || "");
   const challengedId = String(challenge.challengedId || "");
   if (ownerHash !== challengerId && ownerHash !== challengedId) {
@@ -4057,7 +4107,7 @@ function _serializeChallenge(challengeId, challenge, ownerHash) {
       ownerHash === challengedId &&
       !challengedIsBot,
     question: playing && myTurn
-      ? _questionPayload(challenge.questionIds[currentRound])
+      ? _questionPayload(challenge.questionIds[currentRound], false, locale)
       : null,
     // Solo tur: rakip yok; istemci "rakip bekleniyor"a düşmesin.
     selfAnswered: Boolean(selfAnswer),
@@ -4072,6 +4122,7 @@ function _serializeChallenge(challengeId, challenge, ownerHash) {
           question: _questionPayload(
             challenge.questionIds[lastResolution.round],
             true,
+            locale,
           ),
         }
       : null,
@@ -4784,7 +4835,12 @@ const createQuizChallenge = onCall(
     }
     return {
       ok: true,
-      challenge: _serializeChallenge(challengeId, challenge, ownerHash),
+      challenge: _serializeChallenge(
+        challengeId,
+        challenge,
+        ownerHash,
+        _requestLocale(req),
+      ),
     };
   },
 );
@@ -4868,7 +4924,12 @@ const acceptQuizChallenge = onCall(
     }
     return {
       ok: true,
-      challenge: _serializeChallenge(challengeId, acceptOutcome.challenge, ownerHash),
+      challenge: _serializeChallenge(
+        challengeId,
+        acceptOutcome.challenge,
+        ownerHash,
+        _requestLocale(req),
+      ),
     };
   },
 );
@@ -4951,7 +5012,12 @@ const getQuizChallenge = onCall(
     }
     return {
       ok: true,
-      challenge: _serializeChallenge(challengeId, challenge, ownerHash),
+      challenge: _serializeChallenge(
+        challengeId,
+        challenge,
+        ownerHash,
+        _requestLocale(req),
+      ),
     };
   },
 );
@@ -5097,7 +5163,12 @@ const submitQuizChallengeAnswer = onCall(
     }
     return {
       ok: true,
-      challenge: _serializeChallenge(challengeId, challenge, ownerHash),
+      challenge: _serializeChallenge(
+        challengeId,
+        challenge,
+        ownerHash,
+        _requestLocale(req),
+      ),
     };
   },
 );

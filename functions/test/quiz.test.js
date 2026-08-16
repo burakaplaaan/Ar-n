@@ -125,6 +125,24 @@ test("question payload includes difficulty 1-3", () => {
   assert.equal(payload.correctIndex, undefined);
 });
 
+test("arabic locale localizes question text and keeps answer index", () => {
+  const questionsAr = require("../data/islamic_quiz_questions_ar.json");
+  assert.equal(Object.keys(questionsAr).length, questions.length);
+  const tr = t.questionPayload("iq_001", true, "tr");
+  const ar = t.questionPayload("iq_001", true, "ar");
+  const fallback = t.questionPayload("iq_001", true, "de");
+  assert.equal(tr.question, "Kur'an-ı Kerim kaç sureden oluşur?");
+  assert.match(ar.question, /القرآن/);
+  assert.notEqual(ar.question, tr.question);
+  assert.equal(ar.category, "معرفة القرآن");
+  assert.equal(ar.correctIndex, tr.correctIndex);
+  assert.equal(ar.options[ar.correctIndex], "114");
+  assert.equal(fallback.question, tr.question);
+  const kadir = t.questionPayload("iq_955", false, "ar");
+  assert.match(kadir.question, /ليلة القدر/);
+  assert.equal(kadir.options[0], "القدر");
+});
+
 test("iq_840 Nas ayah count is 6 in Hafs/Diyanet", () => {
   const item = questions.find((q) => q.id === "iq_840");
   assert.ok(item);

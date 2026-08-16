@@ -57,43 +57,98 @@ const List<String> _kZikirDailyReflections = <String>[
   'Kalbin en derin odasında yankılanan o tek isim, tüm soruların en huzurlu cevabıdır.',
 ];
 
-int _dailyReflectionIndex() {
-  final d = DateTime.now();
-  final day = DateTime(d.year, d.month, d.day);
+const List<String> _kZikirDailyReflectionsEn = <String>[
+  'Dhikr is the art of quieting the heart’s endless, restless murmur.',
+  'Every word that leaves the tongue is a raindrop washing the dust from the soul.',
+  'When you are lost in the world’s noise, you find yourself by remembering His name, not your own.',
+  'Dhikr is the most sincere and deepest whisper echoing inside silence.',
+  'Turning each heartbeat into a bead of praise brings a calm rhythm to life.',
+  'As the words fall from the lips, you feel that vast inner emptiness fill with mercy.',
+  'Dhikr is the shortest path out of the mind’s labyrinths and into the wide plains of the heart.',
+  'When you are drowning in forgetfulness, remembering with a single word is the soul’s lifeline.',
+  'If you want to still the storms within, train the tongue on the dhikr of peace.',
+  'Each remembrance is a small, graceful candle left in the dark corners of the soul.',
+  'Against time’s harsh current, it is an unbreakable bond tying the heart to eternity.',
+  'Dhikr is the most meaningful and quiet pause a person can give themselves.',
+  'Every beautiful word you say is a flower opening in the garden of the soul.',
+  'When the mind is heavy with thoughts, dhikr sets the excess aside.',
+  'Polishing the heart with the power of words lets you see the world more clearly.',
+  'Dhikr is a hidden companion whispering, in the middle of loneliness, that you are not abandoned.',
+  'It is the gentlest cleansing: it wipes rust from the heart and brightens the soul’s mirror.',
+  'Remembering Him with every breath turns each second of life into a meaningful poem.',
+  'Dhikr is the thin line where anxiety ends and trust begins.',
+  'Every meeting of tongue and palate is a meeting of the soul with the sky.',
+  'For eyes tired of the world’s false colors, dhikr is the purest white.',
+  'Finding a “Hu” in every heartbeat is touching the essence of being.',
+  'Dhikr is a soft, peaceful velvet laid over the heart.',
+  'To reach that deep silence beyond words, dhikr is the surest bridge.',
+  'Making peace with oneself begins when the tongue remembers love.',
+  'Dhikr is a balm that binds the soul’s wound and eases what is bleeding.',
+  'It is holding onto that greatest power the eye cannot see and the heart can feel.',
+  'Each prayer bead is letting a tired worry slip from the fingertips.',
+  'Dhikr reminds us that breathing is not only biological, but spiritual.',
+  'That single name echoing in the heart’s deepest room is the most peaceful answer.',
+];
+
+const List<String> _kZikirDailyReflectionsAr = <String>[
+  'الذكر فنّ تهدئة همهمة القلب التي لا تعرف الكلل.',
+  'كل كلمة تخرج من اللسان قطرة مطر تنظّف غبار الروح شيئاً فشيئاً.',
+  'إذا تِهتَ في ضجيج الدنيا وجدتَ نفسك بذكر اسمه لا باسمك.',
+  'الذكر أصدق همسة وأعمقها تتردد في داخل الصمت.',
+  'تحويل نبضات القلب إلى حبّات تسبيح يمنح الحياة إيقاعاً من السكينة.',
+  'كلما تساقطت الكلمات من الشفتين شعرتَ أن الفراغ الواسع في داخلك يمتلئ رحمة.',
+  'الذكر أقصر طريق للخروج من متاهات العقل إلى سهول القلب الواسعة.',
+  'حين تغرق في بحر النسيان يكون التذكّر بكلمة واحدة طوق نجاة الروح.',
+  'إن أردت تسكين العواصف في داخلك فعوّد لسانك على ذكر السكينة.',
+  'كل ذكر شمعة صغيرة رقيقة تُترك في زوايا الروح المظلمة.',
+  'في وجه جريان الزمن القاسي هو رباط لا ينقطع يربط القلب بالأبد.',
+  'الذكر أعمق وأهدأ استراحة يهبها الإنسان لنفسه.',
+  'كل كلمة جميلة تقولها زهرة تتفتح في حديقة روحك.',
+  'إذا ثقل العقل بأعباء الأفكار نحّى الذكر كل الزوائد جانباً.',
+  'جلاء القلب بقوة الكلمات يجعلك ترى الدنيا أوضح.',
+  'الذكر رفيق خفيّ يهمس في وسط الوحدة أنك لست وحيداً.',
+  'هو ألطف تطهير: يمسح صدأ القلب ويُشرق مرآة الروح.',
+  'ذكره مع كل نفس يحوّل كل ثانية من الحياة إلى قصيدة ذات معنى.',
+  'الذكر ذلك الخط الرفيع حيث ينتهي القلق ويبدأ الاطمئنان.',
+  'كل التقاء للسان بالحنك التقاء للروح بالسماء.',
+  'لعيون تعبت من ألوان الدنيا الزائفة الذكر هو الأبيض الأنقى.',
+  'أن تجد «هو» في كل نبضة قلب هو أن تلمس جوهر الوجود.',
+  'الذكر غطاء مخملي ناعم هادئ يُفرش على القلب.',
+  'للوصول إلى ذلك الصمت العميق وراء الكلمات، الذكر هو الجسر الأكثر أماناً.',
+  'التصالح مع الذات يبدأ حين يذكر اللسان الحب.',
+  'الذكر مرهم يضمّد جرح الروح ويسكّن ما ينزف.',
+  'هو التمسك بتلك القوة العظمى التي لا تراها العين ويشعر بها القلب.',
+  'كل حبّة سبحة هي ترك همّ يتعبك ينزلق من أطراف أصابعك.',
+  'الذكر يذكّرنا أن التنفس ليس فعلاً بيولوجياً فحسب، بل روحياً.',
+  'ذلك الاسم الواحد الذي يتردد في أعمق غرفة في القلب هو الجواب الأكثر سلاماً.',
+];
+
+int zikirDailyReflectionIndex({
+  required DateTime now,
+  required int length,
+}) {
+  if (length <= 0) return 0;
+  final day = DateTime(now.year, now.month, now.day);
   final origin = DateTime(2020, 1, 1);
-  final i = day.difference(origin).inDays.abs() % _kZikirDailyReflections.length;
-  return i;
+  return day.difference(origin).inDays.abs() % length;
 }
 
 List<String> _zikirDailyReflections(BuildContext context) {
-  final l10n = AppLocalizations.of(context)!;
-  // Temporary fallback logic for zikir daily reflections depending on locale.
-  // Idealy these should be fully localized in ARB, but as a quick fix,
-  // we check the locale name and return english or arabic arrays if needed.
-  if (l10n.localeName.startsWith('en')) {
-    return [
-      'Zikr is a soft and peaceful velvet cover laid upon the heart.',
-      'To reach that deep silence beyond words, zikr is the surest bridge.',
-      'Making peace with oneself begins with the tongue reciting love.',
-      'Zikr is an ointment that heals the wounds of the soul.',
-      'It is the state of holding onto that greatest unseen power felt with the heart.',
-      'With each bead, you let go of a worry that tires you.',
-      'Zikr reminds us that breathing is not just a biological act, but a spiritual one.',
-      'That single name echoing in the deepest room of the heart is the most peaceful answer.'
-    ];
-  } else if (l10n.localeName.startsWith('ar')) {
-    return [
-      'الذكر هو غطاء ناعم وهادئ يوضع على القلب.',
-      'للوصول إلى ذلك الصمت العميق وراء الكلمات، الذكر هو الجسر الأكثر أماناً.',
-      'التصالح مع الذات يبدأ بذكر اللسان للحب.',
-      'الذكر مرهم يشفي جراح الروح.',
-      'إنه حالة التمسك بتلك القوة الخفية العظمى التي تشعر بها بالقلب.',
-      'مع كل حبة سبحة، تتخلى عن قلق يتعبك.',
-      'الذكر يذكرنا بأن التنفس ليس مجرد فعل بيولوجي، بل روحي.',
-      'ذلك الاسم الواحد الذي يتردد في أعمق غرفة في القلب هو الجواب الأكثر سلاماً.'
-    ];
-  }
+  final locale = Localizations.localeOf(context).languageCode;
+  if (locale == 'en') return _kZikirDailyReflectionsEn;
+  if (locale == 'ar') return _kZikirDailyReflectionsAr;
   return _kZikirDailyReflections;
+}
+
+String _zikirDateLocale(BuildContext context) {
+  switch (Localizations.localeOf(context).languageCode) {
+    case 'ar':
+      return 'ar';
+    case 'en':
+      return 'en';
+    default:
+      return 'tr';
+  }
 }
 
 class _TurAnalytics {
@@ -252,7 +307,8 @@ class _ZikirBilgisiPageState extends ConsumerState<ZikirBilgisiPage>
   Future<void> _shareArchive(ZikirMatikRecord r) async {
     final l10n = AppLocalizations.of(context)!;
     final d = r.savedAt;
-    final dateStr = DateFormat('dd.MM.yyyy HH:mm', 'tr_TR').format(d);
+    final dateStr =
+        DateFormat('dd.MM.yyyy HH:mm', _zikirDateLocale(context)).format(d);
     final text =
         '${r.phrase}\n${r.totalCount} ${l10n.zikirmatikDhikr}\n'
         '${l10n.zikirmatikRound}: ${r.tur}\n'
@@ -313,10 +369,13 @@ class _ZikirBilgisiPageState extends ConsumerState<ZikirBilgisiPage>
     }
 
     final l10n = AppLocalizations.of(context)!;
-    final idx = _dailyReflectionIndex();
-    final text = _zikirDailyReflections(context)[idx];
+    final reflections = _zikirDailyReflections(context);
+    final text = reflections[zikirDailyReflectionIndex(
+      now: DateTime.now(),
+      length: reflections.length,
+    )];
     final analytics = _computeAnalytics(_turLogs);
-    final dateFmt = DateFormat('dd MMM yyyy · HH:mm', 'tr_TR');
+    final dateFmt = DateFormat('dd MMM yyyy · HH:mm', _zikirDateLocale(context));
 
     final curve = CurvedAnimation(parent: _intro, curve: Curves.easeOutCubic);
 
@@ -621,7 +680,7 @@ class _AnalyticsCard extends StatelessWidget {
         first.value > second.value &&
         second.value > 0) {
       final diff = first.value - second.value;
-      compareLine = l10n.zikirmatikCompareLine(first.key, second.key, diff);
+      compareLine = l10n.zikirmatikCompareLine(diff, first.key, second.key);
     } else if (first != null && top.length == 1) {
       compareLine = l10n.zikirmatikOnlyOneRecord(first.key);
     }
@@ -805,7 +864,8 @@ class _ArchiveTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final d = record.savedAt;
-    final line = DateFormat('dd.MM.yyyy HH:mm', 'tr_TR').format(d);
+    final line =
+        DateFormat('dd.MM.yyyy HH:mm', _zikirDateLocale(context)).format(d);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
       decoration: BoxDecoration(
