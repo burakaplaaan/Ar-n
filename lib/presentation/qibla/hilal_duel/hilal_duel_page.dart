@@ -14,6 +14,7 @@ import '../../../data/services/product_metrics_service.dart';
 import '../../shared/providers/admob_providers.dart';
 import '../../shared/providers/auth_providers.dart';
 import '../../shared/providers/user_profile_providers.dart';
+import '../../assistant/assistant_session.dart';
 import '../../shared/widgets/arin_permission_dialog.dart';
 import '../../shared/widgets/arin_shell_layout.dart';
 import '../qibla_hub_navigator_key.dart';
@@ -22,6 +23,7 @@ import 'hilal_duel_controller.dart';
 import 'hilal_duel_level.dart';
 import 'hilal_duel_repository.dart';
 import 'hilal_duel_sync.dart';
+import 'package:arin/presentation/shared/widgets/arin_loader.dart';
 
 /// 0 can: eşleşme ekranına girmeden uyarı; isterse reklam izlet.
 Future<void> _promptNeedHeartDialog({
@@ -139,6 +141,7 @@ class _HilalDuelPageState extends ConsumerState<HilalDuelPage>
   /// Önce Kıble hub Navigator, yoksa GoRouter / qibla fallback.
   void _popRoute() {
     if (!mounted) return;
+    if (popToAssistantIfNeeded(context)) return;
     final hubNav = qiblaHubNavigatorKey.currentState;
     if (hubNav != null) {
       Route<dynamic>? top;
@@ -244,7 +247,7 @@ class _HilalDuelPageState extends ConsumerState<HilalDuelPage>
             context,
             child: SafeArea(
               child: c == null
-                  ? const Center(child: CircularProgressIndicator())
+                  ? const Center(child: ArinLoader())
                   : AnimatedSwitcher(
                       // İptal → lobi geçişi kısa tutulsun (anlık tepki).
                       duration: const Duration(milliseconds: 120),
@@ -269,7 +272,7 @@ class _HilalDuelPageState extends ConsumerState<HilalDuelPage>
       case HilalDuelPhase.loading:
         return const Center(
           key: ValueKey('loading'),
-          child: CircularProgressIndicator(),
+          child: ArinLoader(),
         );
       case HilalDuelPhase.error:
         return _ErrorBody(
@@ -1773,7 +1776,7 @@ class _WeeklyLeaderCardState extends ConsumerState<_WeeklyLeaderCard> {
                         child: SizedBox(
                           width: 18,
                           height: 18,
-                          child: CircularProgressIndicator(
+                          child: ArinLoader(
                             strokeWidth: 2,
                             color: theme.accent,
                           ),
@@ -2491,7 +2494,7 @@ class _WeeklyLeaderSheetState extends ConsumerState<_WeeklyLeaderSheet> {
               future: _future,
               builder: (context, snap) {
                 if (snap.connectionState != ConnectionState.done) {
-                  return const Center(child: CircularProgressIndicator());
+                  return const Center(child: ArinLoader());
                 }
                 if (snap.hasError || snap.data == null) {
                   return Center(
@@ -2715,7 +2718,7 @@ class _WeeklyLeaderSheetState extends ConsumerState<_WeeklyLeaderSheet> {
                                       ? SizedBox(
                                           width: 18,
                                           height: 18,
-                                          child: CircularProgressIndicator(
+                                          child: ArinLoader(
                                             strokeWidth: 2,
                                             color: rankTheme.accent,
                                           ),
@@ -3393,7 +3396,7 @@ class _PlayingBody extends StatelessWidget {
   Widget build(BuildContext context) {
     final match = controller.match;
     if (match == null) {
-      return const Center(child: CircularProgressIndicator());
+      return const Center(child: ArinLoader());
     }
     final bronze = _HilalPalette.bronze(onDark);
     final now = DateTime.now().millisecondsSinceEpoch;
@@ -5137,7 +5140,7 @@ class _PrimaryButton extends StatelessWidget {
             ? const SizedBox(
                 width: 18,
                 height: 18,
-                child: CircularProgressIndicator(strokeWidth: 2),
+                child: ArinLoader(strokeWidth: 2),
               )
             : Text(
                 label,
@@ -5256,7 +5259,7 @@ class _ChallengeLobbyButton extends StatelessWidget {
                   ? SizedBox(
                       width: 18,
                       height: 18,
-                      child: CircularProgressIndicator(
+                      child: ArinLoader(
                         strokeWidth: 2,
                         color: fg.withValues(alpha: 0.7),
                       ),

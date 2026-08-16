@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../core/constants/app_colors.dart';
+import 'package:arin/presentation/shared/widgets/arin_loader.dart';
 
 /// Canlı kurulum özeti — `syncInstallPresence` + `getAdminInstallAudience`.
 /// Manuel / tahmin rakam yok; son 90 günde uygulamayı açan cihazlar.
@@ -119,7 +120,7 @@ class _AdminInstallAudienceStripState extends State<AdminInstallAudienceStrip> {
                         child: SizedBox(
                           width: 18,
                           height: 18,
-                          child: CircularProgressIndicator(
+                          child: ArinLoader(
                             strokeWidth: 2,
                             color: AppColors.accentNeonGreen.withValues(
                               alpha: 0.85,

@@ -9,6 +9,7 @@ import 'package:arin/l10n/app_localizations.dart';
 
 import '../../../core/constants/app_colors.dart';
 import '../../../data/services/local_notification_permission_gate.dart';
+import 'package:arin/presentation/shared/widgets/arin_loader.dart';
 
 class PermissionGateCard extends StatelessWidget {
   const PermissionGateCard({
@@ -266,7 +267,7 @@ class _PermissionRow extends StatelessWidget {
             SizedBox(
               width: 16,
               height: 16,
-              child: CircularProgressIndicator(
+              child: ArinLoader(
                 strokeWidth: 2,
                 color: muted.withValues(alpha: 0.7),
               ),

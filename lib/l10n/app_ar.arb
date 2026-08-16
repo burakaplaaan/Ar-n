@@ -408,6 +408,36 @@
       }
     }
   },
+  "quitProgramElapsedDHms": "{days} ي {hours} س {minutes} د {seconds} ث",
+  "@quitProgramElapsedDHms": {
+    "placeholders": {
+      "days": { "type": "int" },
+      "hours": { "type": "int" },
+      "minutes": { "type": "int" },
+      "seconds": { "type": "int" }
+    }
+  },
+  "quitProgramElapsedMdHms": "{months} ش {days} ي {hours} س {minutes} د {seconds} ث",
+  "@quitProgramElapsedMdHms": {
+    "placeholders": {
+      "months": { "type": "int" },
+      "days": { "type": "int" },
+      "hours": { "type": "int" },
+      "minutes": { "type": "int" },
+      "seconds": { "type": "int" }
+    }
+  },
+  "quitProgramElapsedYmdHms": "{years} سنة {months} ش {days} ي {hours} س {minutes} د {seconds} ث",
+  "@quitProgramElapsedYmdHms": {
+    "placeholders": {
+      "years": { "type": "int" },
+      "months": { "type": "int" },
+      "days": { "type": "int" },
+      "hours": { "type": "int" },
+      "minutes": { "type": "int" },
+      "seconds": { "type": "int" }
+    }
+  },
   "quitProgramTabProgress": "التقدم",
   "quitProgramTabTips": "نصائح",
   "quitProgramTipsLoadFailed": "تعذر تحميل المحتوى",
@@ -666,10 +696,13 @@
   "assistantSubtitle": "",
   "assistantAskChip": "المساعد",
   "assistantInputHint": "اكتب باختصار…",
-  "assistantEmptyTitle": "مرحبا",
-  "assistantEmptyBody": "",
-  "assistantHello": "مرحبا",
-  "assistantHelloName": "مرحبا {name}",
+  "assistantEmptyTitle": "السلام عليكم!",
+  "assistantEmptyBody": "أنا ذكاء اصطناعي إسلامي.",
+  "assistantHello": "السلام عليكم!",
+  "assistantHelloName": "السلام عليكم! {name}",
+  "assistantPromptLockVerse": "كيف أضع آية على شاشة القفل؟",
+  "assistantPromptInshirah": "اشرح سورة الانشراح.",
+  "assistantPromptRamadan": "كم يوماً بقي لرمضان؟",
   "@assistantHelloName": {
     "placeholders": {
       "name": {
@@ -701,6 +734,85 @@
   },
   "assistantActionFailed": "تعذّر تنفيذ ذلك.",
   "assistantActionUnknownPage": "تعذّر فتح تلك الصفحة.",
+  "assistantNavigatingThere": "أفتحها الآن.",
+  "assistantLockVerseGuide": "يمكنك فعل ذلك من أرِن. من الإعدادات → مركز الأدوات أضف آية شاشة القفل. لا تحتاج تطبيقاً آخر.",
+  "assistantRamadanDays": "اليوم {today}. تبقّى {days} يوماً لرمضان. البداية التقريبية {date}؛ قد يتأخر الهلال يوماً.",
+  "@assistantRamadanDays": {
+    "placeholders": {
+      "today": {"type": "String"},
+      "days": {"type": "int"},
+      "date": {"type": "String"}
+    }
+  },
+  "assistantRamadanTomorrow": "اليوم {today}. رمضان يبدأ غداً (تقريباً {date}).",
+  "@assistantRamadanTomorrow": {
+    "placeholders": {
+      "today": {"type": "String"},
+      "date": {"type": "String"}
+    }
+  },
+  "assistantRamadanToday": "اليوم {today}. رمضان يبدأ اليوم.",
+  "@assistantRamadanToday": {
+    "placeholders": {
+      "today": {"type": "String"}
+    }
+  },
+  "assistantRamadanOngoing": "اليوم {today}. نحن في رمضان؛ هذا اليوم {day}.",
+  "assistantPrayerTimesMissing": "مواقيت الصلاة غير جاهزة بعد. فعّل الموقع وانتظر قليلاً.",
+  "assistantPrayerCountdown": "{label} {remaining}. الوقت {time}.",
+  "@assistantPrayerCountdown": {
+    "placeholders": {
+      "label": {"type": "String"},
+      "remaining": {"type": "String"},
+      "time": {"type": "String"}
+    }
+  },
+  "assistantPrayerCountdownTomorrow": "{label} {remaining}. غداً الساعة {time}.",
+  "@assistantPrayerCountdownTomorrow": {
+    "placeholders": {
+      "label": {"type": "String"},
+      "remaining": {"type": "String"},
+      "time": {"type": "String"}
+    }
+  },
+  "assistantPrayerLabelIftar": "إلى الإفطار",
+  "assistantPrayerLabelImsak": "إلى الإمساك",
+  "assistantPrayerLabelDhuhr": "إلى الظهر",
+  "assistantPrayerLabelAsr": "إلى العصر",
+  "assistantPrayerLabelMaghrib": "إلى المغرب",
+  "assistantPrayerLabelIsha": "إلى العشاء",
+  "assistantPrayerLabelNext": "إلى الصلاة التالية ({name})",
+  "@assistantPrayerLabelNext": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "assistantDurationHm": "{hours} س {minutes} د",
+  "@assistantDurationHm": {
+    "placeholders": {
+      "hours": {"type": "int"},
+      "minutes": {"type": "int"}
+    }
+  },
+  "assistantDurationH": "{hours} س",
+  "@assistantDurationH": {
+    "placeholders": {
+      "hours": {"type": "int"}
+    }
+  },
+  "assistantDurationM": "{minutes} د",
+  "@assistantDurationM": {
+    "placeholders": {
+      "minutes": {"type": "int"}
+    }
+  },
+  "assistantDurationSoon": "أقل من دقيقة",
+  "@assistantRamadanOngoing": {
+    "placeholders": {
+      "today": {"type": "String"},
+      "day": {"type": "int"}
+    }
+  },
   "assistantActionCancelled": "تم الإلغاء.",
   "assistantSalatHabitMissing": "ابدأ برنامج الصلاة أولاً.",
   "assistantPrayerMarked": "تم تعليم الصلاة كمُؤدّاة.",
@@ -1441,7 +1553,7 @@
   "notificationsArinmaDailyTitle": "تذكير يومي",
   "notificationsArinmaDailySubtitle": "مرتان يوميًا، مقولة عشوائية أو تحفيز قصير.",
   "notificationsMilestoneTitle": "إشعارات الإنجاز",
-  "notificationsMilestoneSubtitle": "مثل رسائل متباعدة عند 24 ساعة أو أسبوع في رحلة الإقلاع.",
+  "notificationsMilestoneSubtitle": "عتبات التزكية ونسب التعافي والتحفيز الشهري ونصائح أو إلهام من حين لآخر.",
   "notificationsTaskTitle": "تذكير المهام",
   "notificationsTaskSubtitle": "بحد أقصى تنبيه واحد يوميًا للمهام غير المكتملة.",
   "notificationsZikirTitle": "تذكير الذكر",
@@ -2292,5 +2404,67 @@
   "prayerCircleSlowDown": "تجري العمليات بسرعة كبيرة. حاول مرة أخرى بعد قليل.",
   "prayerCircleContentRejected": "راجع النص واحذف المعلومات الشخصية أو معلومات الاتصال أو الدفع.",
   "prayerCircleExpired": "ربما انتهت مدة طلب الدعاء هذا.",
-  "prayerCircleGenericError": "تعذر إكمال العملية. تحقق من اتصالك وحاول مجددًا."
+  "prayerCircleGenericError": "تعذر إكمال العملية. تحقق من اتصالك وحاول مجددًا.",
+  "appTourNext": "التالي",
+  "appTourSkip": "تخطي",
+  "appTourLetsStart": "هيا نبدأ!",
+  "appTourProgress": "{current}/{total}",
+  "@appTourProgress": {
+    "placeholders": {
+      "current": { "type": "int" },
+      "total": { "type": "int" }
+    }
+  },
+  "appTourHomeHeaderTitle": "شاشتك الرئيسية",
+  "appTourHomeHeaderBody": "التحية واسمك وعدّاد الصلاة التالية هنا. اضغط على الاسم لتغيير طريقة مخاطبتك.",
+  "appTourHomeWisdomTitle": "حكمة اليوم",
+  "appTourHomeWisdomBody": "حكمة عن الصلاة كل يوم. اسحب البطاقة للتحديث أو الحفظ.",
+  "appTourHomeNamazTitle": "متابعة الصلاة",
+  "appTourHomeNamazBody": "علّم الأوقات واحفظ سلسلتك. القضاء والتذكيرات هنا أيضًا.",
+  "appTourHomePrayerTimesTitle": "مواقيت الصلاة",
+  "appTourHomePrayerTimesBody": "المواقيت حسب منطقتك. يمكنك تغيير الموقع من الإعدادات.",
+  "appTourNavToolsTitle": "الأدوات",
+  "appTourNavToolsBody": "القبلة والذكر وحلقة الدعاء وبقية الأدوات الروحية في هذا التبويب.",
+  "appTourQiblaAssistantTitle": "مساعد أرِن",
+  "appTourQiblaAssistantBody": "أدِر الصلاة والإشعارات والتذكيرات عبر المحادثة.",
+  "appTourQiblaAiTitle": "الذكاء الاصطناعي الإسلامي",
+  "appTourQiblaAiBody": "إجابات مستندة إلى مصادر إسلامية. تُفتح مع Premium.",
+  "appTourQiblaCompassTitle": "بوصلة القبلة",
+  "appTourQiblaCompassBody": "تُظهر اتجاه الكعبة من موقعك.",
+  "appTourQiblaZikirTitle": "عداد الذكر",
+  "appTourQiblaZikirBody": "تسبيح رقمي مع الأهداف والجولات وملاحظات الذكر.",
+  "appTourQiblaHilalTitle": "مبارزة المعرفة",
+  "appTourQiblaHilalBody": "اختبر نفسك بأسئلة إسلامية وثبّت ما تعرفه.",
+  "appTourQiblaPrayerCircleTitle": "حلقة الدعاء",
+  "appTourQiblaPrayerCircleBody": "شارك نيتك دون اسم، وقل آمين لأدعية الآخرين.",
+  "appTourQiblaHealingTitle": "ترددات الشفاء",
+  "appTourQiblaHealingBody": "أصوات مهدئة لجمع نفسك وتركيزك.",
+  "appTourQiblaBreathingTitle": "تمرين التنفس",
+  "appTourQiblaBreathingBody": "استخدم دورة 4-7-8 للهدوء في لحظة توتر.",
+  "appTourNavWillpowerTitle": "النمو والتزكية",
+  "appTourNavWillpowerBody": "متابعة العادات وبرامج الترك في هذا المثلث.",
+  "appTourWillpowerTabsTitle": "النمو والتزكية",
+  "appTourWillpowerTabsBody": "النمو للعادات التي تريد تثبيتها، والتزكية لما تريد تركه.",
+  "appTourWillpowerBreathingTitle": "التنفس",
+  "appTourWillpowerBreathingBody": "في اللحظة الصعبة افتح تمرين التنفس من هنا.",
+  "appTourWillpowerAddTitle": "برنامج جديد",
+  "appTourWillpowerAddBody": "استخدم علامة الزائد لإضافة عادة نمو أو برنامج تزكية.",
+  "appTourNavExploreTitle": "اكتشف",
+  "appTourNavExploreBody": "آيات وأحاديث وكلمات — اسحب واحفظ وشارك.",
+  "appTourInspireSearchTitle": "بحث",
+  "appTourInspireSearchBody": "اكتب كلمة؛ البحث دون تشكيل يعمل أيضًا.",
+  "appTourInspireFilterTitle": "تصفية",
+  "appTourInspireFilterBody": "ضيّق التدفق إلى كلمة أو آية أو حديث.",
+  "appTourNavSettingsTitle": "الإعدادات",
+  "appTourNavSettingsBody": "الإشعارات واللغة والودجات وحسابك هنا.",
+  "appTourSettingsNotificationsTitle": "الإشعارات",
+  "appTourSettingsNotificationsBody": "أدِر تذكيرات الأذان والتزكية والذكر من هنا.",
+  "appTourSettingsWidgetsTitle": "مركز الودجات",
+  "appTourSettingsWidgetsBody": "افتح ودجات الشاشة الرئيسية وشاشة القفل من هنا.",
+  "appTourSettingsLanguageTitle": "اللغة",
+  "appTourSettingsLanguageBody": "اختر التركية أو الإنجليزية أو العربية.",
+  "appTourAssistantFabTitle": "فقاعة المساعد",
+  "appTourAssistantFabBody": "اختصار قابل للسحب يفتح المساعد في أي تبويب.",
+  "appTourFinaleTitle": "أنت جاهز",
+  "appTourFinaleBody": "انتهت الجولة. تابع من أي تبويب — سنذكّرك ونرافقك."
 }

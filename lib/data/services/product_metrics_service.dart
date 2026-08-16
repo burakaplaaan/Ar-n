@@ -83,6 +83,9 @@ abstract final class ProductMetricsService {
   static Future<bool> contentLike(String cardId) =>
       _record('content_like', cardId: cardId);
 
+  static Future<bool> contentUnlike(String cardId) =>
+      _record('content_unlike', cardId: cardId);
+
   static Future<bool> contentSave(String cardId) =>
       _record('content_save', cardId: cardId);
 

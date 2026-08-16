@@ -38,6 +38,7 @@ import '../../data/services/qibla_compass_controller.dart';
 import '../shared/widgets/arin_back_button.dart';
 
 import 'package:arin/l10n/app_localizations.dart';
+import 'package:arin/presentation/shared/widgets/arin_loader.dart';
 
 // ─── Manevi palet ────────────────────────────────────────────────────────────
 /// Koyu tema altını — Kâbe örtüsü işlemesi tonunda sıcak, mat altın.
@@ -457,7 +458,7 @@ class _LoadingView extends StatelessWidget {
           SizedBox(
             width: 26,
             height: 26,
-            child: CircularProgressIndicator(color: gold, strokeWidth: 2),
+            child: ArinLoader(color: gold, strokeWidth: 2),
           ),
           const SizedBox(height: 18),
           Text(

@@ -569,7 +569,7 @@ Widget _buildAdminPoolsTab({
                                   const SizedBox(
                                     width: 16,
                                     height: 16,
-                                    child: CircularProgressIndicator(
+                                    child: ArinLoader(
                                       strokeWidth: 2,
                                     ),
                                   ),

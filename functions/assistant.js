@@ -36,6 +36,7 @@ const ALLOWED_PAGES = new Set([
   "kaza",
   "settings",
   "notifications",
+  "widgets",
   "inspire",
   "premium",
 ]);
@@ -68,7 +69,13 @@ const FULL_ACCESS_EMAILS = new Set([
   "seyirteknikerr@gmail.com",
 ]);
 
-const SYSTEM_PROMPT = `Sen Arın Asistanısın. Namaz ve sakin eşlik uygulamasının yazılı yoldaşı.
+const SYSTEM_PROMPT = `Sen Arın Asistanısın. Kullanıcı şu an Arın uygulamasının içindedir. Sen bu uygulamanın parçasısın.
+
+Kimlik:
+- Arın; namaz, zikir, arınma, widget ve kilit ekranı ayeti sunan İslami bir uygulamadır.
+- Asla başka uygulama, başka yapay zeka veya "mağazadan İslami uygulama indir" deme.
+- Kilit ekranı / ayet widget: Ayarlar → Widget Merkezi. open_page(widgets) çağır.
+- Zikirmatik, kıble, nefes, frekans, dua halkası, bilgi düellosu Arın içindedir.
 
 Üslup:
 - Sıcak, sade, sohbet gibi yaz. Kullanıcının dilinde (locale).
@@ -85,8 +92,16 @@ Dini konular:
 - Tıbbi teşhis ve hukuki tavsiye yok.
 
 Araçlar:
-- Uygulama işlemi istenirse ilgili aracı çağır, sonra ne yaptığını söyle.
-- Namaz bildirimlerini toptan kapatmada aracı çağır; onay istemcide.`;
+- Bir ekranı aç / gönder / götür / yönlendir dendiğinde MUTLAKA open_page çağır. Sadece "yönlendiriyorum" yazmak yetmez.
+- Sayfalar: home, qibla, zikir (zikirmatik), breathing, healing, prayer_circle, hilal_duel, habits, namaz, kaza, settings, notifications, widgets (kilit ekranı ayeti), inspire, premium.
+- Namaz bildirimlerini toptan kapatmada aracı çağır; onay istemcide.
+
+Tarih:
+- Sistem mesajındaki "ŞU AN" satırı gerçektir. Yıl/ay/gün uydurma.
+- Kullanıcı başka bir yıl derse düzelt; onun yılına uyma.
+- "Kaç gün var?" sorusunda önce sayıyı söyle, sonra tarihi.
+- İftar/imsak/namaz "kaç saat" sorusunda context'teki vakitleri kullan; uydurma.
+- Ramazan/bayram tarihi hilale göre 1 gün kayabilir; takribi de.`;
 
 function countWords(text) {
   return String(text || "")
@@ -181,14 +196,55 @@ function parseHourMinute(value) {
   return null;
 }
 
-function sanitizeContext(raw) {
-  if (!raw || typeof raw !== "object") return {};
+function clockContext(ms = Date.now()) {
+  const fmt = new Intl.DateTimeFormat("en-GB", {
+    timeZone: "Europe/Istanbul",
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    hourCycle: "h23",
+  });
+  const iso = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Europe/Istanbul",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  });
+  const bag = {};
+  for (const part of fmt.formatToParts(new Date(ms))) {
+    if (part.type !== "literal") bag[part.type] = part.value;
+  }
+  const today = iso.format(new Date(ms));
+  return {
+    today,
+    weekday: String(bag.weekday || ""),
+    year: Number(bag.year || 0),
+    now: `${today} ${bag.hour || "00"}:${bag.minute || "00"} Europe/Istanbul`,
+  };
+}
+
+function sanitizeContext(raw, ms = Date.now()) {
+  if (!raw || typeof raw !== "object") raw = {};
   const name = String(raw.name || "").trim().slice(0, 40);
   const locale = String(raw.locale || "tr").trim().slice(0, 8);
   const nextPrayer = String(raw.nextPrayer || "").trim().slice(0, 80);
   const prayers = String(raw.prayers || "").trim().slice(0, 80);
   const habits = String(raw.habits || "").trim().slice(0, 160);
-  return { name, locale, nextPrayer, prayers, habits };
+  const imsak = String(raw.imsak || "").trim().slice(0, 8);
+  const maghrib = String(raw.maghrib || "").trim().slice(0, 8);
+  return {
+    name,
+    locale,
+    nextPrayer,
+    prayers,
+    habits,
+    imsak,
+    maghrib,
+    ...clockContext(ms),
+  };
 }
 
 function millisOf(value) {
@@ -293,7 +349,8 @@ function toolDeclarations() {
   return [
     {
       name: "open_page",
-      description: "Uygulamada bir ekranı aç.",
+      description:
+        "Arın içinde bir ekranı gerçekten aç. Kullanıcı gönder/aç/götür derse veya kilit ekranı ayeti sorarsa çağır. zikir=zikirmatik, widgets=Widget Merkezi / kilit ayeti.",
       parameters: {
         type: "OBJECT",
         properties: {
@@ -434,8 +491,11 @@ async function callGemini({ history, message, context }) {
     }],
   });
 
+  const clockLine = context?.now
+    ? `\n\nŞU AN (güvenilir, Europe/Istanbul): ${context.now}. Takvim yılı ${context.year}.`
+    : "";
   const baseBody = {
-    systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
+    systemInstruction: { parts: [{ text: `${SYSTEM_PROMPT}${clockLine}` }] },
     contents,
     tools: [{ functionDeclarations: toolDeclarations() }],
     generationConfig: {
@@ -583,6 +643,7 @@ module.exports = {
     assertUserMessage,
     sanitizeHistory,
     sanitizeContext,
+    clockContext,
     sanitizeActions,
     parseLooseBool,
     parseHourMinute,

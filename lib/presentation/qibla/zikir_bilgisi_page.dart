@@ -15,6 +15,7 @@ import '../../data/repositories/zikir_matik_repository.dart';
 import '../shared/widgets/arin_back_button.dart';
 
 import 'package:arin/l10n/app_localizations.dart';
+import 'package:arin/presentation/shared/widgets/arin_loader.dart';
 
 abstract final class _Zc {
   static const pageBg = Color(0xFF1A2B34);
@@ -363,7 +364,7 @@ class _ZikirBilgisiPageState extends ConsumerState<ZikirBilgisiPage>
       return const Scaffold(
         backgroundColor: _Zc.pageBg,
         body: Center(
-          child: CircularProgressIndicator(color: _Zc.outer),
+          child: ArinLoader(color: _Zc.outer),
         ),
       );
     }

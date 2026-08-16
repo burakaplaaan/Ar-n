@@ -55,6 +55,7 @@ import '../../presentation/assistant/assistant_page.dart';
 import '../../presentation/premium/premium_page.dart';
 import '../../presentation/shared/providers/auth_providers.dart';
 import '../../presentation/shared/providers/willpower_hub_nav_provider.dart';
+import '../../presentation/assistant/widgets/assistant_fab_host.dart';
 import '../../presentation/shared/widgets/arin_shell.dart';
 
 final GlobalKey<NavigatorState> rootNavigatorKey = GlobalKey<NavigatorState>();
@@ -66,6 +67,12 @@ abstract final class AppRoutes {
   static const String home = '/home';
   static const String premium = '/premium';
   static const String qibla = '/qibla';
+
+  /// Kıble hub içinde iç araç aç (`zikir`, `healing`, `compass`…).
+  static String qiblaOpen(String tool) => Uri(
+    path: qibla,
+    queryParameters: {'open': tool},
+  ).toString();
   static const String prayerCircle = '/qibla/prayer-circle';
   static String prayerCircleRequest(String requestId) => Uri(
     path: prayerCircle,
@@ -97,7 +104,13 @@ abstract final class AppRoutes {
   static String willQuitOnboarding(String habitId) =>
       '/habits/will/quit/$habitId/onboarding';
 
-  static String willQuitHome(String habitId) => '/habits/will/quit/$habitId';
+  static String willQuitHome(String habitId, {String? tab}) {
+    if (tab == null || tab.isEmpty) return '/habits/will/quit/$habitId';
+    return Uri(
+      path: '/habits/will/quit/$habitId',
+      queryParameters: {'tab': tab},
+    ).toString();
+  }
 
   /// [programId] isteğe bağlı sorgu parametresi.
   static String willBreathing([String? programId]) {
@@ -290,7 +303,8 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: AppRoutes.premium,
-        pageBuilder: (context, state) => _page(state, const PremiumPage()),
+        pageBuilder: (context, state) =>
+            _page(state, const AssistantFabHost(child: PremiumPage())),
       ),
       GoRoute(
         path: '/widget-unlock/:kind',
@@ -298,12 +312,16 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           final kindId = state.pathParameters['kind'] ?? '';
           final kind =
               ArinWidgetAccessKind.fromId(kindId) ?? ArinWidgetAccessKind.quote;
-          return _page(state, WidgetUnlockPage(kind: kind));
+          return _page(
+            state,
+            AssistantFabHost(child: WidgetUnlockPage(kind: kind)),
+          );
         },
       ),
       GoRoute(
         path: AppRoutes.momentVerse,
-        pageBuilder: (context, state) => _page(state, const MomentVersePage()),
+        pageBuilder: (context, state) =>
+            _page(state, const AssistantFabHost(child: MomentVersePage())),
       ),
       ShellRoute(
         builder: (context, state, child) => ArinShell(child: child),
@@ -404,7 +422,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                 path: 'will/quit/:habitId',
                 pageBuilder: (context, state) {
                   final id = state.pathParameters['habitId']!;
-                  return _page(state, QuitProgramHomePage(habitId: id));
+                  final tab = state.uri.queryParameters['tab'];
+                  return _page(
+                    state,
+                    QuitProgramHomePage(habitId: id, initialTab: tab),
+                  );
                 },
               ),
               GoRoute(

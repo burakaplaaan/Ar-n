@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/product_metric_features.dart';
 import 'admin_install_audience_strip.dart';
+import 'package:arin/presentation/shared/widgets/arin_loader.dart';
 
 class AdminPerformancePage extends StatefulWidget {
   const AdminPerformancePage({super.key});
@@ -140,7 +141,7 @@ class _AdminPerformancePageState extends State<AdminPerformancePage> {
                   if (_loading)
                     const Padding(
                       padding: EdgeInsets.only(top: 80),
-                      child: Center(child: CircularProgressIndicator()),
+                      child: Center(child: ArinLoader()),
                     )
                   else if (_error != null)
                     _ErrorCard(message: _error!, onRetry: _load)

@@ -408,6 +408,36 @@
       }
     }
   },
+  "quitProgramElapsedDHms": "{days} gün {hours} sa {minutes} dk {seconds} sn",
+  "@quitProgramElapsedDHms": {
+    "placeholders": {
+      "days": { "type": "int" },
+      "hours": { "type": "int" },
+      "minutes": { "type": "int" },
+      "seconds": { "type": "int" }
+    }
+  },
+  "quitProgramElapsedMdHms": "{months} ay {days} gün {hours} sa {minutes} dk {seconds} sn",
+  "@quitProgramElapsedMdHms": {
+    "placeholders": {
+      "months": { "type": "int" },
+      "days": { "type": "int" },
+      "hours": { "type": "int" },
+      "minutes": { "type": "int" },
+      "seconds": { "type": "int" }
+    }
+  },
+  "quitProgramElapsedYmdHms": "{years} yıl {months} ay {days} gün {hours} sa {minutes} dk {seconds} sn",
+  "@quitProgramElapsedYmdHms": {
+    "placeholders": {
+      "years": { "type": "int" },
+      "months": { "type": "int" },
+      "days": { "type": "int" },
+      "hours": { "type": "int" },
+      "minutes": { "type": "int" },
+      "seconds": { "type": "int" }
+    }
+  },
   "quitProgramTabProgress": "İlerleme",
   "quitProgramTabTips": "İpuçları",
   "quitProgramTipsLoadFailed": "İçerik yüklenemedi",
@@ -666,10 +696,13 @@
   "assistantSubtitle": "",
   "assistantAskChip": "Asistan",
   "assistantInputHint": "Kısaca yaz…",
-  "assistantEmptyTitle": "Merhaba",
-  "assistantEmptyBody": "",
-  "assistantHello": "Merhaba",
-  "assistantHelloName": "Merhaba {name}",
+  "assistantEmptyTitle": "Selamün Aleyküm!",
+  "assistantEmptyBody": "Ben İslami bir yapay zekâyım.",
+  "assistantHello": "Selamün Aleyküm!",
+  "assistantHelloName": "Selamün Aleyküm! {name}",
+  "assistantPromptLockVerse": "Kilit ekranına ayet nasıl koyulur?",
+  "assistantPromptInshirah": "İnşirah suresini açıkla.",
+  "assistantPromptRamadan": "Ramazana kaç gün var?",
   "@assistantHelloName": {
     "placeholders": {
       "name": {
@@ -701,6 +734,85 @@
   },
   "assistantActionFailed": "Bu işlemi yapamadım.",
   "assistantActionUnknownPage": "O sayfayı açamadım.",
+  "assistantNavigatingThere": "Hemen açıyorum.",
+  "assistantLockVerseGuide": "Bunu Arın’dan yapabilirsin. Ayarlar → Widget Merkezi’nden kilit ekranı ayetini ekle. Başka bir uygulama indirmen gerekmez.",
+  "assistantRamadanDays": "Bugün {today}. Ramazana {days} gün var. Takribi başlangıç {date}; hilal bir gün kaydırabilir.",
+  "@assistantRamadanDays": {
+    "placeholders": {
+      "today": {"type": "String"},
+      "days": {"type": "int"},
+      "date": {"type": "String"}
+    }
+  },
+  "assistantRamadanTomorrow": "Bugün {today}. Ramazan yarın başlıyor (takribi {date}).",
+  "@assistantRamadanTomorrow": {
+    "placeholders": {
+      "today": {"type": "String"},
+      "date": {"type": "String"}
+    }
+  },
+  "assistantRamadanToday": "Bugün {today}. Ramazan bugün başlıyor.",
+  "@assistantRamadanToday": {
+    "placeholders": {
+      "today": {"type": "String"}
+    }
+  },
+  "assistantRamadanOngoing": "Bugün {today}. Ramazandayız; {day}. günündeyiz.",
+  "assistantPrayerTimesMissing": "Namaz vakitleri henüz yok. Konumu açıp biraz bekle.",
+  "assistantPrayerCountdown": "{label} {remaining} var. Vakit {time}.",
+  "@assistantPrayerCountdown": {
+    "placeholders": {
+      "label": {"type": "String"},
+      "remaining": {"type": "String"},
+      "time": {"type": "String"}
+    }
+  },
+  "assistantPrayerCountdownTomorrow": "{label} {remaining} var. Yarın {time}.",
+  "@assistantPrayerCountdownTomorrow": {
+    "placeholders": {
+      "label": {"type": "String"},
+      "remaining": {"type": "String"},
+      "time": {"type": "String"}
+    }
+  },
+  "assistantPrayerLabelIftar": "İftara",
+  "assistantPrayerLabelImsak": "İmsake",
+  "assistantPrayerLabelDhuhr": "Öğleye",
+  "assistantPrayerLabelAsr": "İkindiye",
+  "assistantPrayerLabelMaghrib": "Akşama",
+  "assistantPrayerLabelIsha": "Yatsıya",
+  "assistantPrayerLabelNext": "Sıradaki namaza ({name})",
+  "@assistantPrayerLabelNext": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "assistantDurationHm": "{hours} sa {minutes} dk",
+  "@assistantDurationHm": {
+    "placeholders": {
+      "hours": {"type": "int"},
+      "minutes": {"type": "int"}
+    }
+  },
+  "assistantDurationH": "{hours} sa",
+  "@assistantDurationH": {
+    "placeholders": {
+      "hours": {"type": "int"}
+    }
+  },
+  "assistantDurationM": "{minutes} dk",
+  "@assistantDurationM": {
+    "placeholders": {
+      "minutes": {"type": "int"}
+    }
+  },
+  "assistantDurationSoon": "bir dakikadan az",
+  "@assistantRamadanOngoing": {
+    "placeholders": {
+      "today": {"type": "String"},
+      "day": {"type": "int"}
+    }
+  },
   "assistantActionCancelled": "İşlem iptal edildi.",
   "assistantSalatHabitMissing": "Önce namaz programını başlat.",
   "assistantPrayerMarked": "Namazı kılındı işaretledim.",
@@ -962,7 +1074,7 @@
   "notificationsArinmaDailyTitle": "Günlük hatırlatıcı",
   "notificationsArinmaDailySubtitle": "Gün içinde 2 defa rastgele bir söz ya da kısa motivasyon.",
   "notificationsMilestoneTitle": "Alışkanlık bildirimleri",
-  "notificationsMilestoneSubtitle": "Örn. bırakma yolculuğunda 24 saat, 1 hafta gibi seyrek mesajlar.",
+  "notificationsMilestoneSubtitle": "Arınma eşikleri, toparlanma yüzdeleri, aylık motivasyon ve ara sıra ipucu / ilham.",
   "notificationsTaskTitle": "Görev hatırlatıcısı",
   "notificationsTaskSubtitle": "Tamamlanmamış görev için günde en fazla bir uyarı.",
   "notificationsZikirTitle": "Zikir hatırlatıcısı",
@@ -2292,5 +2404,67 @@
   "prayerCircleSlowDown": "Çok hızlı işlem yaptın. Kısa süre sonra tekrar dene.",
   "prayerCircleContentRejected": "Metni kontrol et; kişisel, iletişim veya ödeme bilgisi paylaşma.",
   "prayerCircleExpired": "Bu dua talebinin süresi dolmuş olabilir.",
-  "prayerCircleGenericError": "İşlem tamamlanamadı. Bağlantını kontrol edip tekrar dene."
+  "prayerCircleGenericError": "İşlem tamamlanamadı. Bağlantını kontrol edip tekrar dene.",
+  "appTourNext": "İlerle",
+  "appTourSkip": "Atla",
+  "appTourLetsStart": "Hadi başlayalım!",
+  "appTourProgress": "{current}/{total}",
+  "@appTourProgress": {
+    "placeholders": {
+      "current": { "type": "int" },
+      "total": { "type": "int" }
+    }
+  },
+  "appTourHomeHeaderTitle": "Ana ekranın",
+  "appTourHomeHeaderBody": "Selam, ismin ve sıradaki namaz geri sayımı burada. İsme dokunarak hitabı değiştirebilirsin.",
+  "appTourHomeWisdomTitle": "Günün sözü",
+  "appTourHomeWisdomBody": "Her gün bir namaz hikmeti. Kartı kaydırarak yenileyebilir, kaydedebilirsin.",
+  "appTourHomeNamazTitle": "Namaz takibi",
+  "appTourHomeNamazBody": "Vakitleri işaretle, serini koru. Kaza ve hatırlatmalar da burada.",
+  "appTourHomePrayerTimesTitle": "Namaz vakitleri",
+  "appTourHomePrayerTimesBody": "İlçene göre vakitler. Konumu Ayarlar’dan değiştirebilirsin.",
+  "appTourNavToolsTitle": "Araçlar",
+  "appTourNavToolsBody": "Kıble, zikir, dua halkası ve diğer manevi araçlar bu sekmede.",
+  "appTourQiblaAssistantTitle": "Arın Asistanı",
+  "appTourQiblaAssistantBody": "Namaz, bildirim ve hatırlatıcıları sohbetle yönet.",
+  "appTourQiblaAiTitle": "İslami Yapay Zeka",
+  "appTourQiblaAiBody": "Sorularına İslami kaynaklarla yanıt. Premium ile açılır.",
+  "appTourQiblaCompassTitle": "Kıble pusulası",
+  "appTourQiblaCompassBody": "Konumunla Kâbe yönünü gösterir.",
+  "appTourQiblaZikirTitle": "Zikirmatik",
+  "appTourQiblaZikirBody": "Dijital tesbih; hedef, tur ve zikir bilgisi.",
+  "appTourQiblaHilalTitle": "Bilgi düellosu",
+  "appTourQiblaHilalBody": "İslami sorularla yarış, bilgilerini pekiştir.",
+  "appTourQiblaPrayerCircleTitle": "Dua halkası",
+  "appTourQiblaPrayerCircleBody": "Niyetini anonim paylaş; başkalarının dualarına amin de.",
+  "appTourQiblaHealingTitle": "Şifa frekansları",
+  "appTourQiblaHealingBody": "Sakinleştirici seslerle nefesini ve odağını toparla.",
+  "appTourQiblaBreathingTitle": "Nefes egzersizi",
+  "appTourQiblaBreathingBody": "4-7-8 döngüsüyle stres anında sakinleş.",
+  "appTourNavWillpowerTitle": "Gelişim ve Arınma",
+  "appTourNavWillpowerBody": "Alışkanlık takibi ve bırakma programları bu üçgende.",
+  "appTourWillpowerTabsTitle": "Gelişim ve Arınma",
+  "appTourWillpowerTabsBody": "Gelişim’de hayır katan alışkanlıklar; Arınma’da bırakmak istediğin şeyler.",
+  "appTourWillpowerBreathingTitle": "Nefes",
+  "appTourWillpowerBreathingBody": "Kriz anında buradan nefes egzersizine geç.",
+  "appTourWillpowerAddTitle": "Yeni program",
+  "appTourWillpowerAddBody": "Artı ile gelişim alışkanlığı veya arınma programı ekle.",
+  "appTourNavExploreTitle": "Keşfet",
+  "appTourNavExploreBody": "Ayet, hadis ve sözler — kaydır, kaydet, paylaş.",
+  "appTourInspireSearchTitle": "Ara",
+  "appTourInspireSearchBody": "Kelime yaz; şekilsiz arama da çalışır.",
+  "appTourInspireFilterTitle": "Filtre",
+  "appTourInspireFilterBody": "Söz, ayet veya hadis olarak akışı daralt.",
+  "appTourNavSettingsTitle": "Ayarlar",
+  "appTourNavSettingsBody": "Bildirim, dil, widget ve hesabın burada.",
+  "appTourSettingsNotificationsTitle": "Bildirimler",
+  "appTourSettingsNotificationsBody": "Ezan, arınma ve zikir hatırlatmalarını buradan yönet.",
+  "appTourSettingsWidgetsTitle": "Widget Merkezi",
+  "appTourSettingsWidgetsBody": "Ana ekran ve kilit widget’larını buradan aç.",
+  "appTourSettingsLanguageTitle": "Dil",
+  "appTourSettingsLanguageBody": "Türkçe, İngilizce veya Arapça seç.",
+  "appTourAssistantFabTitle": "Asistan balonu",
+  "appTourAssistantFabBody": "Sürüklenebilir kısayol — her sekmede asistanı açar.",
+  "appTourFinaleTitle": "Hazırsın",
+  "appTourFinaleBody": "Tur bitti. İstediğin sekmeden devam et; biz hatırlatır ve eşlik ederiz."
 }

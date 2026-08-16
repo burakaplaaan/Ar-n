@@ -42,6 +42,7 @@ import 'data/services/purchase_service.dart';
 import 'data/services/diyanet_district_matcher.dart';
 import 'data/services/fcm_token_service.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:arin/presentation/shared/widgets/arin_loader.dart';
 
 Future<void> main() async {
   // Runtime fetch AÇIK: pubspec'te yalnızca Variable font bundle edilmiş.
@@ -238,7 +239,7 @@ class _BootstrapSplash extends StatelessWidget {
                     const SizedBox(
                       width: 22,
                       height: 22,
-                      child: CircularProgressIndicator(
+                      child: ArinLoader(
                         strokeWidth: 2.2,
                         color: Color(0xFF9BE7C3),
                       ),

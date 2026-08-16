@@ -12,6 +12,7 @@ import '../../data/services/audio_session_coordinator.dart';
 import '../../data/services/paywall_prompt_service.dart';
 import 'islamic_ai/islamic_ai_page.dart';
 import 'qibla_hub_navigator_key.dart';
+import 'qibla_hub_open.dart';
 import 'qibla_page.dart';
 import 'qibla_tools_dashboard_page.dart';
 import 'qibla_nested_swipe_back.dart';
@@ -43,6 +44,11 @@ class _QiblaHubShellSwipeObserver extends NavigatorObserver {
     final name = top?.settings.name;
     final atDashboard = name == QiblaHubRoutes.dashboard;
     _ref.read(qiblaHubBlocksShellSwipeProvider.notifier).state = !atDashboard;
+    final duel = name == QiblaHubRoutes.hilalDuel;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_ref.read(hilalDuelActiveProvider) == duel) return;
+      _ref.read(hilalDuelActiveProvider.notifier).state = duel;
+    });
   }
 
   void _pauseHealingIfLeaving(Route<dynamic>? from, Route<dynamic>? to) {
@@ -101,6 +107,7 @@ class QiblaHubPage extends ConsumerStatefulWidget {
 
 class _QiblaHubPageState extends ConsumerState<QiblaHubPage> {
   _QiblaHubShellSwipeObserver? _shellSwipeObserver;
+  String? _consumedOpenQuery;
 
   _QiblaHubShellSwipeObserver get _observer =>
       _shellSwipeObserver ??= _QiblaHubShellSwipeObserver(ref);
@@ -111,6 +118,7 @@ class _QiblaHubPageState extends ConsumerState<QiblaHubPage> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       ref.read(qiblaHubBlocksShellSwipeProvider.notifier).state = false;
+      _openFromQuery();
     });
   }
 
@@ -118,6 +126,42 @@ class _QiblaHubPageState extends ConsumerState<QiblaHubPage> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     _shellSwipeObserver ??= _QiblaHubShellSwipeObserver(ref);
+    _openFromQuery();
+  }
+
+  void _openFromQuery() {
+    String? open;
+    try {
+      open = GoRouterState.of(context).uri.queryParameters['open'];
+    } catch (_) {
+      return;
+    }
+    if (open == null || open.isEmpty) {
+      _consumedOpenQuery = null;
+      return;
+    }
+    if (open == _consumedOpenQuery) return;
+    final route = switch (open) {
+      'zikir' => QiblaHubRoutes.zikir,
+      'healing' => QiblaHubRoutes.healing,
+      'compass' => QiblaHubRoutes.compass,
+      'breathing' => QiblaHubRoutes.breathing,
+      'prayer-circle' || 'prayer_circle' => QiblaHubRoutes.prayerCircle,
+      'hilal-duel' || 'hilal_duel' => QiblaHubRoutes.hilalDuel,
+      'islamic-ai' => QiblaHubRoutes.islamicAi,
+      _ => null,
+    };
+    if (route == null) return;
+    _consumedOpenQuery = open;
+    unawaited(() async {
+      final ok = await pushQiblaHubRoute(route);
+      if (!mounted) return;
+      if (!ok) {
+        _consumedOpenQuery = null;
+        return;
+      }
+      context.go(AppRoutes.qibla);
+    }());
   }
 
   @override

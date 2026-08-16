@@ -24,6 +24,7 @@ import 'zikir_bilgisi_page.dart';
 import '../shared/mixins/review_prompt_on_exit_mixin.dart';
 import '../shared/widgets/tasbeeh_zikirmatik_device_frame.dart';
 import '../shared/widgets/arin_back_button.dart';
+import 'package:arin/presentation/shared/widgets/arin_loader.dart';
 
 part 'zikir_matik_phrase_widgets.dart';
 part 'zikir_matik_target_sheet.dart';
@@ -749,7 +750,7 @@ class _ZikirMatikPageState extends ConsumerState<ZikirMatikPage>
       return const Scaffold(
         backgroundColor: _ZikirmatikColors.pageBg,
         body: Center(
-          child: CircularProgressIndicator(
+          child: ArinLoader(
             color: _ZikirmatikColors.outer,
             strokeWidth: 2.5,
           ),

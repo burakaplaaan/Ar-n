@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:arin/l10n/app_localizations.dart';
 
@@ -8,9 +7,7 @@ import '../../../core/theme/arin_shell_background.dart';
 import 'assistant_hilal_mark.dart';
 
 class AssistantHomeBubble extends StatelessWidget {
-  const AssistantHomeBubble({super.key, required this.onTap});
-
-  final VoidCallback onTap;
+  const AssistantHomeBubble({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -25,50 +22,42 @@ class AssistantHomeBubble extends StatelessWidget {
       0.55,
     )!.withValues(alpha: 0.5);
     final text = onDark ? Colors.white.withValues(alpha: 0.94) : AppColors.emeraldDark;
+    final glow = bronze.withValues(alpha: onDark ? 0.28 : 0.18);
 
     return Semantics(
       button: true,
       label: l10n.assistantTitle,
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: () {
-            HapticFeedback.lightImpact();
-            onTap();
-          },
+      child: DecoratedBox(
+        decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(999),
-          child: Ink(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(999),
-              color: fill.withValues(alpha: onDark ? 0.94 : 0.97),
-              border: Border.all(color: ring, width: 1.1),
-              boxShadow: [
-                BoxShadow(
-                  color: bronze.withValues(alpha: onDark ? 0.22 : 0.16),
-                  blurRadius: 16,
-                  offset: const Offset(0, 6),
+          color: fill.withValues(alpha: onDark ? 0.94 : 0.97),
+          border: Border.all(color: ring, width: 1.1),
+          boxShadow: [
+            BoxShadow(
+              color: glow,
+              blurRadius: 14,
+              spreadRadius: -2,
+              offset: const Offset(0, 5),
+            ),
+          ],
+        ),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(12, 9, 14, 9),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              AssistantHilalMark(size: 20, color: mark),
+              const SizedBox(width: 8),
+              Text(
+                l10n.assistantAskChip,
+                style: GoogleFonts.plusJakartaSans(
+                  color: text,
+                  fontSize: 13.5,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: -0.2,
                 ),
-              ],
-            ),
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(12, 9, 14, 9),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  AssistantHilalMark(size: 20, color: mark),
-                  const SizedBox(width: 8),
-                  Text(
-                    l10n.assistantAskChip,
-                    style: GoogleFonts.plusJakartaSans(
-                      color: text,
-                      fontSize: 13.5,
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: -0.2,
-                    ),
-                  ),
-                ],
               ),
-            ),
+            ],
           ),
         ),
       ),

@@ -50,6 +50,9 @@ class AssistantContextSnapshot {
     this.nextPrayer,
     this.prayers,
     this.habits,
+    this.today,
+    this.imsak,
+    this.maghrib,
   });
 
   final String? name;
@@ -57,6 +60,9 @@ class AssistantContextSnapshot {
   final String? nextPrayer;
   final String? prayers;
   final String? habits;
+  final String? today;
+  final String? imsak;
+  final String? maghrib;
 
   Map<String, dynamic> toWire() => {
     if (name != null && name!.trim().isNotEmpty) 'name': name!.trim(),
@@ -64,5 +70,8 @@ class AssistantContextSnapshot {
     if (nextPrayer != null && nextPrayer!.isNotEmpty) 'nextPrayer': nextPrayer,
     if (prayers != null && prayers!.isNotEmpty) 'prayers': prayers,
     if (habits != null && habits!.isNotEmpty) 'habits': habits,
+    if (today != null && today!.isNotEmpty) 'today': today,
+    if (imsak != null && imsak!.isNotEmpty) 'imsak': imsak,
+    if (maghrib != null && maghrib!.isNotEmpty) 'maghrib': maghrib,
   };
 }

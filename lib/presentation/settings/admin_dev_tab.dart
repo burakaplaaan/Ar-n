@@ -19,6 +19,7 @@ import '../../data/services/location_service.dart';
 import '../../data/services/prayer_notification_scheduler.dart';
 import '../../l10n/app_localizations.dart';
 import '../shared/providers/prayer_time_providers.dart';
+import 'package:arin/presentation/shared/widgets/arin_loader.dart';
 
 /// [ArinShell] alt barı için alt boşluk.
 double _shellBodyBottomInset(BuildContext context) {
@@ -463,7 +464,7 @@ class _DiagnosticsCardState extends State<_DiagnosticsCard> {
                     ? const SizedBox(
                         width: 14,
                         height: 14,
-                        child: CircularProgressIndicator(strokeWidth: 2),
+                        child: ArinLoader(strokeWidth: 2),
                       )
                     : const Icon(Icons.refresh_rounded),
                 onPressed: _loading ? null : _refresh,

@@ -33,14 +33,21 @@ import '../../data/services/inspiration_engagement_sync_service.dart';
 import '../../data/services/local_data_wipe_service.dart';
 import '../../data/services/location_service.dart';
 import '../../data/services/user_cloud_backup_service.dart';
+import '../onboarding/app_tour/app_tour_anchor.dart';
+import '../onboarding/app_tour/app_tour_controller.dart';
+import '../onboarding/app_tour/app_tour_keys.dart';
 import '../settings/widgets/district_picker_sheet.dart';
 import '../shared/providers/auth_providers.dart';
 import '../shared/providers/habit_providers.dart';
 import '../inspire/inspiration_engagement_provider.dart';
+import '../inspire/inspiration_like_totals_provider.dart';
 import '../kaza/kaza_tracking_provider.dart';
 import '../shared/providers/prayer_time_providers.dart';
 import '../shared/providers/premium_providers.dart';
 import '../shared/providers/user_profile_providers.dart';
+import 'package:arin/presentation/shared/widgets/arin_loader.dart';
+import '../shared/widgets/arin_pressable.dart';
+import '../shared/widgets/arin_premium_mark.dart';
 
 class SettingsPage extends ConsumerStatefulWidget {
   const SettingsPage({super.key});
@@ -215,7 +222,9 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
     ref.invalidate(prayerTimesProvider);
     ref.invalidate(inspirationSavedIdsProvider);
     ref.invalidate(inspirationLikedIdsProvider);
+    ref.invalidate(inspirationLikeTotalsProvider);
     ref.invalidate(kazaTrackingProvider);
+    ref.invalidate(appTourControllerProvider);
   }
 
   Future<void> _deleteAccount() async {
@@ -298,7 +307,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                 const SizedBox(
                   width: 28,
                   height: 28,
-                  child: CircularProgressIndicator(strokeWidth: 2.4),
+                  child: ArinLoader(strokeWidth: 2.4),
                 ),
                 const SizedBox(width: 18),
                 Expanded(
@@ -722,7 +731,9 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                         color: muted,
                       ).animate().fadeIn(delay: 240.ms),
                       const SizedBox(height: 12),
-                      _SettingsMenuTile(
+                      AppTourAnchor(
+                        id: AppTourTargetId.settingsNotifications,
+                        child: _SettingsMenuTile(
                         onDark: onDark,
                         icon: Icons.notifications_none_rounded,
                         iconColor: _settingsMenuIconTint(onDark),
@@ -733,10 +744,11 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                         onTap: () =>
                             context.push(AppRoutes.settingsNotifications),
                       ),
+                      ),
                       const SizedBox(height: 10),
                       _SettingsMenuTile(
                         onDark: onDark,
-                        icon: Icons.workspace_premium_outlined,
+                        iconWidget: const ArinPremiumMark(size: 22),
                         iconColor: AppColors.goldAccent,
                         iconBgColor: AppColors.goldAccent.withValues(
                           alpha: onDark ? 0.14 : 0.2,
@@ -758,7 +770,9 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                         onTap: () => context.push(AppRoutes.settingsAbout),
                       ),
                       const SizedBox(height: 10),
-                      _SettingsMenuTile(
+                      AppTourAnchor(
+                        id: AppTourTargetId.settingsWidgets,
+                        child: _SettingsMenuTile(
                         onDark: onDark,
                         icon: Icons.widgets_outlined,
                         iconColor: AppColors.accentNeonGreen,
@@ -769,6 +783,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                         subtitle: l10n.settingsMenuWidgetsSubtitle,
                         delayMs: 285,
                         onTap: () => context.push(AppRoutes.settingsWidgets),
+                      ),
                       ),
                       const SizedBox(height: 10),
                       _SettingsMenuTile(
@@ -818,7 +833,9 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                         onTap: () => context.push(AppRoutes.settingsContact),
                       ),
                       const SizedBox(height: 10),
-                      _SettingsMenuTile(
+                      AppTourAnchor(
+                        id: AppTourTargetId.settingsLanguage,
+                        child: _SettingsMenuTile(
                         onDark: onDark,
                         icon: Icons.translate_rounded,
                         iconColor: _settingsMenuIconTint(onDark),
@@ -827,6 +844,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                         subtitle: _languageLabelForLocale(context, appLocale),
                         delayMs: 340,
                         onTap: () => context.push(AppRoutes.settingsLanguage),
+                      ),
                       ),
                       const SizedBox(height: 10),
                       _SettingsMenuTile(
@@ -1072,27 +1090,28 @@ class _OAuthSignInTile extends StatelessWidget {
         : AppColors.creamDark.withValues(alpha: 0.7);
     final fg = onDark ? Colors.white : AppColors.emeraldDark;
 
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: busy
-            ? null
-            : () {
-                HapticFeedback.lightImpact();
-                onTap();
-              },
-        borderRadius: BorderRadius.circular(14),
-        child: Ink(
+    return ArinPressable(
+      enabled: !busy,
+      haptic: false,
+      onTap: busy
+          ? null
+          : () {
+              HapticFeedback.lightImpact();
+              onTap();
+            },
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: border, width: 1.1),
+          color: onDark
+              ? Colors.white.withValues(alpha: 0.04)
+              : Colors.white.withValues(alpha: 0.55),
+        ),
+        child: SizedBox(
           height: 48,
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: border, width: 1.1),
-            color: onDark
-                ? Colors.white.withValues(alpha: 0.04)
-                : Colors.white.withValues(alpha: 0.55),
-          ),
-          child: Row(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Row(
             children: [
               Opacity(opacity: busy ? 0.45 : 1, child: icon),
               const SizedBox(width: 14),
@@ -1111,7 +1130,7 @@ class _OAuthSignInTile extends StatelessWidget {
                 SizedBox(
                   width: 20,
                   height: 20,
-                  child: CircularProgressIndicator(
+                  child: ArinLoader(
                     strokeWidth: 2,
                     color: fg.withValues(alpha: 0.6),
                   ),
@@ -1123,6 +1142,7 @@ class _OAuthSignInTile extends StatelessWidget {
                   color: fg.withValues(alpha: 0.35),
                 ),
             ],
+            ),
           ),
         ),
       ),
@@ -1445,17 +1465,8 @@ class _LocationCardState extends State<_LocationCard> {
                             itemCount: opts.length,
                             itemBuilder: (context, index) {
                               final opt = opts[index];
-                              return InkWell(
+                              return ArinPressable(
                                 onTap: () => onSelected(opt),
-                                borderRadius: index == 0
-                                    ? const BorderRadius.vertical(
-                                        top: Radius.circular(13),
-                                      )
-                                    : index == opts.length - 1
-                                    ? const BorderRadius.vertical(
-                                        bottom: Radius.circular(13),
-                                      )
-                                    : null,
                                 child: Padding(
                                   padding: const EdgeInsets.symmetric(
                                     horizontal: 14,
@@ -1561,17 +1572,19 @@ Color _settingsMenuIconCircle(bool onDark) => onDark
 class _SettingsMenuTile extends StatelessWidget {
   const _SettingsMenuTile({
     required this.onDark,
-    required this.icon,
+    this.icon,
+    this.iconWidget,
     required this.iconColor,
     required this.iconBgColor,
     required this.title,
     required this.subtitle,
     required this.delayMs,
     required this.onTap,
-  });
+  }) : assert(icon != null || iconWidget != null);
 
   final bool onDark;
-  final IconData icon;
+  final IconData? icon;
+  final Widget? iconWidget;
   final Color iconColor;
   final Color iconBgColor;
   final String title;
@@ -1589,23 +1602,23 @@ class _SettingsMenuTile extends StatelessWidget {
         ? AppColors.cardSurface.withValues(alpha: 0.42)
         : Colors.white.withValues(alpha: 0.65);
 
-    return Material(
-          color: Colors.transparent,
-          child: InkWell(
-            onTap: enabled
-                ? () {
-                    HapticFeedback.selectionClick();
-                    onTap?.call();
-                  }
-                : null,
-            borderRadius: BorderRadius.circular(18),
-            child: Ink(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+    return ArinPressable(
+          enabled: enabled,
+          haptic: false,
+          onTap: enabled
+              ? () {
+                  HapticFeedback.selectionClick();
+                  onTap?.call();
+                }
+              : null,
+          child: DecoratedBox(
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(18),
                 color: fill,
                 border: Border.all(color: border),
               ),
+              child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
               child: Row(
                 children: [
                   Container(
@@ -1615,7 +1628,8 @@ class _SettingsMenuTile extends StatelessWidget {
                       shape: BoxShape.circle,
                       color: iconBgColor,
                     ),
-                    child: Icon(icon, color: iconColor, size: 23),
+                    child: iconWidget ??
+                        Icon(icon, color: iconColor, size: 23),
                   ),
                   const SizedBox(width: 14),
                   Expanded(
@@ -1692,23 +1706,23 @@ class _LocateGlossButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     const size = 52.0;
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: loading
-            ? null
-            : () async {
-                HapticFeedback.mediumImpact();
-                await onTap();
-              },
-        onLongPress: loading
-            ? null
-            : () async {
-                HapticFeedback.selectionClick();
-                await onLongPress();
-              },
-        customBorder: const CircleBorder(),
-        child: Ink(
+    return ArinPressable(
+      enabled: !loading,
+      haptic: false,
+      scale: 0.92,
+      onTap: loading
+          ? null
+          : () async {
+              HapticFeedback.mediumImpact();
+              await onTap();
+            },
+      onLongPress: loading
+          ? null
+          : () async {
+              HapticFeedback.selectionClick();
+              await onLongPress();
+            },
+      child: Container(
           width: size,
           height: size,
           decoration: BoxDecoration(
@@ -1742,7 +1756,7 @@ class _LocateGlossButton extends StatelessWidget {
           child: loading
               ? const Padding(
                   padding: EdgeInsets.all(14),
-                  child: CircularProgressIndicator(
+                  child: ArinLoader(
                     strokeWidth: 2.2,
                     color: Colors.white,
                   ),
@@ -1752,7 +1766,6 @@ class _LocateGlossButton extends StatelessWidget {
                   color: Colors.white.withValues(alpha: 0.96),
                   size: 26,
                 ),
-        ),
       ),
     );
   }

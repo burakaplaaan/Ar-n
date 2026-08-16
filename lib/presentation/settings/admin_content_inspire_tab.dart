@@ -31,7 +31,7 @@ Widget _buildAdminInspireTab({
 }) {
   final l10n = AppLocalizations.of(context)!;
   if (inspireLoading && allRowCount == 0) {
-    return const Center(child: CircularProgressIndicator());
+    return const Center(child: ArinLoader());
   }
   final quality = _inspireQualityWarnings(inspireRows);
   final unsaved = inspireRows.where((row) => row.hasUnsavedChanges).length;

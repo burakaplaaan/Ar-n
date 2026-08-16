@@ -10,6 +10,7 @@ import '../../core/constants/willpower_templates.dart';
 import '../../data/models/habit_model.dart';
 import '../../data/willpower/willpower_content_loader.dart';
 import '../shared/providers/habit_providers.dart';
+import 'package:arin/presentation/shared/widgets/arin_loader.dart';
 
 class BuildProgramDetailPage extends ConsumerStatefulWidget {
   const BuildProgramDetailPage({super.key, required this.habitId});
@@ -121,7 +122,7 @@ class _BuildProgramDetailPageState extends ConsumerState<BuildProgramDetailPage>
       ),
       body: _loading || _content == null
           ? const Center(
-              child: CircularProgressIndicator(color: AppColors.emeraldDark),
+              child: ArinLoader(color: AppColors.emeraldDark),
             )
           : TabBarView(
               controller: _tabController,

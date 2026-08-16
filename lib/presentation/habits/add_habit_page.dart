@@ -12,6 +12,7 @@ import '../../core/constants/app_text_styles.dart';
 import '../../core/router/app_router.dart';
 import '../../data/models/habit_model.dart';
 import '../shared/providers/habit_providers.dart';
+import 'package:arin/presentation/shared/widgets/arin_loader.dart';
 
 const Color _kArinmaAccent = Color(0xFFFF5252);
 
@@ -305,7 +306,7 @@ class _AddHabitPageState extends ConsumerState<AddHabitPage>
                 ? SizedBox(
                     width: 20,
                     height: 20,
-                    child: CircularProgressIndicator(
+                    child: ArinLoader(
                       strokeWidth: 2,
                       color: _accent,
                     ),

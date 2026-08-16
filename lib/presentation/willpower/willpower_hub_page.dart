@@ -16,6 +16,7 @@ import '../../core/theme/arin_shell_background.dart';
 import '../../core/constants/app_text_styles.dart';
 import '../../core/constants/willpower_templates.dart';
 import '../../core/router/app_router.dart';
+import '../../core/willpower/quit_elapsed_format.dart';
 import '../../data/models/habit_model.dart';
 import '../../data/services/habit_cloud_sync_service.dart';
 import '../../data/willpower/habit_insights_catalog.dart';
@@ -23,7 +24,10 @@ import '../shared/providers/habit_insights_provider.dart';
 import '../shared/providers/auth_providers.dart';
 import '../shared/providers/habit_providers.dart';
 import '../shared/providers/prayer_time_providers.dart';
+import '../onboarding/app_tour/app_tour_anchor.dart';
+import '../onboarding/app_tour/app_tour_keys.dart';
 import '../shared/providers/willpower_hub_nav_provider.dart';
+import '../shared/widgets/arin_pressable.dart';
 import '../shared/widgets/arin_shell_layout.dart';
 import '../kaza/kaza_tracking_provider.dart';
 import 'salat_celebration.dart';
@@ -54,17 +58,17 @@ class _HubResetOptionTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
+    return ArinPressable(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
-      child: Ink(
-        padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
+      child: DecoratedBox(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(12),
           border: Border.all(color: color.withValues(alpha: 0.45)),
           color: color.withValues(alpha: 0.1),
         ),
-        child: Row(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
+          child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Icon(icon, color: color, size: 20),
@@ -93,6 +97,7 @@ class _HubResetOptionTile extends StatelessWidget {
             ),
           ],
         ),
+        ),
       ),
     );
   }
@@ -105,17 +110,10 @@ const Color _kQuitHubTimerElite = Color(0xFF9DB0A8);
 const int _kQuitHubProgressYearSeconds = 86400 * 365;
 
 String _formatQuitHubHmsLocalized({
-  required int hours,
-  required int minutes,
-  required int seconds,
+  required Duration elapsed,
   required AppLocalizations l10n,
 }) {
-  final h = hours;
-  final m = minutes;
-  final s = seconds;
-  if (h > 0) return l10n.quitProgramElapsedHms(h, m, s);
-  if (m > 0) return l10n.quitProgramElapsedMs(m, s);
-  return l10n.quitProgramElapsedS(s);
+  return formatQuitElapsed(elapsed, l10n);
 }
 
 String _localizedHabitTitle(AppLocalizations l10n, HabitModel habit) {
@@ -303,23 +301,29 @@ class _QuitHubLiveTimerState extends State<_QuitHubLiveTimer> {
           ),
         );
       },
-      child: Text(
-        label,
-        key: ValueKey<int>(sec),
-        style: AppTextStyles.labelLarge.copyWith(
-          color: _kQuitHubTimerElite,
-          fontWeight: FontWeight.w700,
-          height: 1.15,
-          letterSpacing: 0.55,
-          fontSize: 15,
-          fontFeatures: const [FontFeature.tabularFigures()],
-          shadows: [
-            Shadow(
-              color: _kQuitHubTimerElite.withValues(alpha: 0.35),
-              blurRadius: 10,
-              offset: const Offset(0, 0),
-            ),
-          ],
+      child: FittedBox(
+        fit: BoxFit.scaleDown,
+        alignment: Alignment.centerLeft,
+        child: Text(
+          label,
+          key: ValueKey<int>(sec),
+          maxLines: 1,
+          softWrap: false,
+          style: AppTextStyles.labelLarge.copyWith(
+            color: _kQuitHubTimerElite,
+            fontWeight: FontWeight.w700,
+            height: 1.15,
+            letterSpacing: 0.55,
+            fontSize: 15,
+            fontFeatures: const [FontFeature.tabularFigures()],
+            shadows: [
+              Shadow(
+                color: _kQuitHubTimerElite.withValues(alpha: 0.35),
+                blurRadius: 10,
+                offset: const Offset(0, 0),
+              ),
+            ],
+          ),
         ),
       )
           .animate(key: ValueKey<int>(sec))
@@ -852,7 +856,12 @@ class _WillpowerHubPageState extends ConsumerState<WillpowerHubPage>
                                   delay: 80.ms,
                                   duration: 320.ms,
                                 ),
-                                _HubNefesEgzersiziRow(summary: summary),
+                                AppTourAnchor(
+                                  id: AppTourTargetId.willpowerBreathing,
+                                  child: _HubNefesEgzersiziRow(
+                                    summary: summary,
+                                  ),
+                                ),
                                 const SizedBox(height: 4),
                               ],
                             ),
@@ -863,7 +872,9 @@ class _WillpowerHubPageState extends ConsumerState<WillpowerHubPage>
                         preferredSize: const Size.fromHeight(60),
                         child: Padding(
                           padding: const EdgeInsets.fromLTRB(20, 0, 20, 8),
-                          child: AnimatedBuilder(
+                          child: AppTourAnchor(
+                            id: AppTourTargetId.willpowerTabs,
+                            child: AnimatedBuilder(
                             animation:
                                 _tabController.animation ?? _tabController,
                             builder: (context, _) {
@@ -871,11 +882,12 @@ class _WillpowerHubPageState extends ConsumerState<WillpowerHubPage>
                                   _tabController.animation?.value ??
                                   _tabController.index.toDouble();
                               return _HubPillTabs(
-                                controller: _tabController,
-                                dragPosition: t,
-                                accent: _tabAccent,
+                                  controller: _tabController,
+                                  dragPosition: t,
+                                  accent: _tabAccent,
                               );
                             },
+                          ),
                           ),
                         ),
                       ),
@@ -939,7 +951,14 @@ class _WillpowerHubPageState extends ConsumerState<WillpowerHubPage>
               ),
             ),
           ),
-          Positioned(right: 16, bottom: hubFabBottom, child: hubFabButton()),
+          Positioned(
+            right: 16,
+            bottom: hubFabBottom,
+            child: AppTourAnchor(
+              id: AppTourTargetId.willpowerAdd,
+              child: hubFabButton(),
+            ),
+          ),
         ],
       ),
     );
@@ -1635,15 +1654,9 @@ class _GelisimEmptyCtaButton extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
     const accent = AppColors.accentNeonGreen;
     final labelC = AppColors.shellOnCanvasPrimary(context);
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onPressed,
-        borderRadius: BorderRadius.circular(16),
-        splashColor: accent.withValues(alpha: 0.15),
-        highlightColor: accent.withValues(alpha: 0.08),
-        child: Ink(
-          padding: const EdgeInsets.symmetric(vertical: 17, horizontal: 22),
+    return ArinPressable(
+      onTap: onPressed,
+      child: DecoratedBox(
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
@@ -1652,6 +1665,8 @@ class _GelisimEmptyCtaButton extends StatelessWidget {
             ),
             color: accent.withValues(alpha: 0.07),
           ),
+          child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 17, horizontal: 22),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             mainAxisSize: MainAxisSize.min,
@@ -1690,15 +1705,9 @@ class _ArinmaEmptyCtaButton extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
     const accent = _kQuitAccent;
     final labelC = AppColors.shellOnCanvasPrimary(context);
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onPressed,
-        borderRadius: BorderRadius.circular(16),
-        splashColor: accent.withValues(alpha: 0.15),
-        highlightColor: accent.withValues(alpha: 0.08),
-        child: Ink(
-          padding: const EdgeInsets.symmetric(vertical: 17, horizontal: 22),
+    return ArinPressable(
+      onTap: onPressed,
+      child: DecoratedBox(
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
@@ -1707,6 +1716,8 @@ class _ArinmaEmptyCtaButton extends StatelessWidget {
             ),
             color: accent.withValues(alpha: 0.07),
           ),
+          child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 17, horizontal: 22),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             mainAxisSize: MainAxisSize.min,
@@ -2727,9 +2738,7 @@ class _WillHabitTile extends ConsumerWidget {
                               _QuitHubLiveTimer(
                                 clockStartedAt: quitClockStartedAt,
                                 format: (d) => _formatQuitHubHmsLocalized(
-                                  hours: d.inHours,
-                                  minutes: d.inMinutes.remainder(60),
-                                  seconds: d.inSeconds.remainder(60),
+                                  elapsed: d,
                                   l10n: l10n,
                                 ),
                               ),
@@ -2993,11 +3002,7 @@ class _WillHabitTile extends ConsumerWidget {
                                               clockStartedAt: quitClockStartedAt,
                                               format: (d) =>
                                                   _formatQuitHubHmsLocalized(
-                                                    hours: d.inHours,
-                                                    minutes: d.inMinutes
-                                                        .remainder(60),
-                                                    seconds: d.inSeconds
-                                                        .remainder(60),
+                                                    elapsed: d,
                                                     l10n: l10n,
                                                   ),
                                             ),

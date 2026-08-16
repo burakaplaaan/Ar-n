@@ -20,8 +20,15 @@ import '../../qibla/qibla_hub_back_dispatcher.dart';
 import '../../qibla/qibla_hub_page.dart';
 import '../../qibla/qibla_shell_swipe_provider.dart';
 import '../../settings/settings_page.dart';
+import '../../assistant/assistant_session.dart';
+import '../../assistant/widgets/assistant_fab_host.dart';
+import '../../onboarding/app_tour/app_tour_anchor.dart';
+import '../../onboarding/app_tour/app_tour_controller.dart';
+import '../../onboarding/app_tour/app_tour_keys.dart';
+import '../../onboarding/app_tour/app_tour_overlay.dart';
 import '../../willpower/breathing_bottom_nav_provider.dart';
 import '../../willpower/willpower_hub_page.dart';
+import 'arin_pressable.dart';
 import 'offline_banner.dart';
 import 'prayer_schedule_listener.dart';
 
@@ -147,6 +154,7 @@ class _ArinShellState extends State<ArinShell> {
   }
 
   void _onTabTap(BuildContext context, int index) {
+    clearAssistantReturnPending(context);
     HapticFeedback.selectionClick();
     switch (index) {
       case 0:
@@ -179,9 +187,17 @@ class _ArinShellState extends State<ArinShell> {
   void _onSystemBack(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     if (!mounted) return;
+    final tourActive = ProviderScope.containerOf(context, listen: false)
+        .read(appTourControllerProvider)
+        .active;
+    if (tourActive) return;
     final path = GoRouterState.of(context).uri.path;
     final visible = _visibleShellPageIndex();
     if (dispatchQiblaHubBack(currentPath: path, isQiblaVisible: visible == 1)) {
+      _lastExitBackPressAt = null;
+      return;
+    }
+    if (popToAssistantIfNeeded(context)) {
       _lastExitBackPressAt = null;
       return;
     }
@@ -323,8 +339,25 @@ class _ArinShellState extends State<ArinShell> {
             );
           }
         }
+        final tourActive = ref.watch(
+          appTourControllerProvider.select((s) => s.active),
+        );
+        if (tourActive) {
+          _navBarSolidity.value = 1.0;
+        }
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (!context.mounted) return;
+          final controller = ref.read(appTourControllerProvider.notifier);
+          controller.maybeStart();
+          final started = ref.read(appTourControllerProvider);
+          if (started.active && started.step != null && path != started.step!.route) {
+            context.go(started.step!.route);
+          }
+        });
         final pagePhysics =
-            onInspireView || (currentIndex == 1 && blockShellSwipeOnQibla)
+            onInspireView ||
+                tourActive ||
+                (currentIndex == 1 && blockShellSwipeOnQibla)
             ? const NeverScrollableScrollPhysics()
             : const BouncingScrollPhysics();
 
@@ -385,12 +418,16 @@ class _ArinShellState extends State<ArinShell> {
             if (didPop) return;
             _onSystemBack(context);
           },
-          child: AnnotatedRegion<SystemUiOverlayStyle>(
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              AnnotatedRegion<SystemUiOverlayStyle>(
             value: overlay,
             child: Scaffold(
               backgroundColor: Colors.transparent,
               extendBody: true,
-              body: Stack(
+              body: AssistantFabHost(
+                child: Stack(
                 children: [
                   body,
                   const Positioned.fill(
@@ -410,6 +447,7 @@ class _ArinShellState extends State<ArinShell> {
                     ),
                   ),
                 ],
+              ),
               ),
               bottomNavigationBar: hideBottomBar
                   ? null
@@ -435,6 +473,9 @@ class _ArinShellState extends State<ArinShell> {
                       ),
                     ),
             ),
+          ),
+              const AppTourOverlay(),
+            ],
           ),
         );
       },
@@ -580,7 +621,9 @@ class _ArinBottomNav extends StatelessWidget {
                 isSelected: currentIndex == 0,
                 onTap: () => onTap(0),
               ),
-              _NavIconButton(
+              AppTourAnchor(
+                id: AppTourTargetId.navTools,
+                child: _NavIconButton(
                 // "Araçlar" sekmesi — pusula + zikirmatik + rahatlatıcı
                 // frekansları aynı hub altında topluyor. Tek araçla (pusula)
                 // sınırlı bir ikon yerine ızgara metaforu kullanıyoruz:
@@ -594,8 +637,17 @@ class _ArinBottomNav extends StatelessWidget {
                 isSelected: currentIndex == 1,
                 onTap: () => onTap(1),
               ),
-              _CenterFab(onTap: () => onTap(2), isSelected: currentIndex == 2),
-              _NavIconButton(
+              ),
+              AppTourAnchor(
+                id: AppTourTargetId.navWillpower,
+                child: _CenterFab(
+                  onTap: () => onTap(2),
+                  isSelected: currentIndex == 2,
+                ),
+              ),
+              AppTourAnchor(
+                id: AppTourTargetId.navExplore,
+                child: _NavIconButton(
                 customIcon: Icon(
                   Icons.search_rounded,
                   size: 26,
@@ -604,13 +656,17 @@ class _ArinBottomNav extends StatelessWidget {
                 isSelected: currentIndex == 3,
                 onTap: () => onTap(3),
               ),
-              _NavIconButton(
+              ),
+              AppTourAnchor(
+                id: AppTourTargetId.navSettings,
+                child: _NavIconButton(
                 customIcon: _SettingsHubIcon(
                   color: _navIconColor(isLightShell, currentIndex == 4),
                   active: currentIndex == 4,
                 ),
                 isSelected: currentIndex == 4,
                 onTap: () => onTap(4),
+              ),
               ),
             ],
           ),
@@ -659,26 +715,25 @@ class _NavIconButtonState extends State<_NavIconButton>
     final Widget mark =
         widget.customIcon ?? Icon(widget.icon!, color: color, size: 23);
 
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: () {
-          triggerWiggle();
-          widget.onTap();
-        },
-        customBorder: const CircleBorder(),
-        child: AnimatedScale(
-          scale: widget.isSelected ? 1.08 : 1.0,
-          duration: const Duration(milliseconds: 280),
-          curve: Curves.easeOutCubic,
-          child: Padding(
-            padding: const EdgeInsets.all(8),
-            child: AnimatedBuilder(
-              animation: wiggleAnimation,
-              builder: (context, child) =>
-                  Transform.rotate(angle: wiggleAnimation.value, child: child),
-              child: mark,
-            ),
+    return ArinPressable(
+      scale: 0.88,
+      sink: 1.0,
+      haptic: false,
+      onTap: () {
+        triggerWiggle();
+        widget.onTap();
+      },
+      child: AnimatedScale(
+        scale: widget.isSelected ? 1.08 : 1.0,
+        duration: const Duration(milliseconds: 280),
+        curve: Curves.easeOutCubic,
+        child: Padding(
+          padding: const EdgeInsets.all(8),
+          child: AnimatedBuilder(
+            animation: wiggleAnimation,
+            builder: (context, child) =>
+                Transform.rotate(angle: wiggleAnimation.value, child: child),
+            child: mark,
           ),
         ),
       ),
@@ -749,6 +804,32 @@ class _UpTriangleClipper extends CustomClipper<Path> {
   bool shouldReclip(covariant CustomClipper<Path> oldClipper) => false;
 }
 
+class _TriangleGlowPainter extends CustomPainter {
+  const _TriangleGlowPainter({required this.color});
+
+  final Color color;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final path = Path()
+      ..moveTo(size.width / 2, 2)
+      ..lineTo(size.width - 2, size.height - 2)
+      ..lineTo(2, size.height - 2)
+      ..close();
+    canvas.drawPath(
+      path.shift(const Offset(0, 5)),
+      Paint()
+        ..color = color
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 9)
+        ..style = PaintingStyle.fill,
+    );
+  }
+
+  @override
+  bool shouldRepaint(covariant _TriangleGlowPainter oldDelegate) =>
+      oldDelegate.color != color;
+}
+
 class _TriangleBorderPainter extends CustomPainter {
   _TriangleBorderPainter({required this.color});
 
@@ -800,7 +881,10 @@ class _CenterFabState extends State<_CenterFab>
   Widget build(BuildContext context) {
     return Transform.translate(
       offset: const Offset(0, -12),
-      child: GestureDetector(
+      child: ArinPressable(
+        scale: 0.92,
+        sink: 1.2,
+        haptic: false,
         onTap: () {
           triggerWiggle();
           widget.onTap();
@@ -816,20 +900,16 @@ class _CenterFabState extends State<_CenterFab>
             child: SizedBox(
               width: _CenterFab._w,
               height: _CenterFab._h,
-              child: Container(
-                decoration: BoxDecoration(
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppColors.accentGlowGreen.withValues(alpha: 0.36),
-                      blurRadius: 18,
-                      offset: const Offset(0, 8),
-                    ),
-                  ],
-                ),
-                child: Stack(
+              child: Stack(
                   alignment: Alignment.center,
                   clipBehavior: Clip.none,
                   children: [
+                    CustomPaint(
+                      size: const Size(_CenterFab._w, _CenterFab._h),
+                      painter: _TriangleGlowPainter(
+                        color: AppColors.accentGlowGreen.withValues(alpha: 0.42),
+                      ),
+                    ),
                     ClipPath(
                       clipper: _UpTriangleClipper(),
                       child: Container(
@@ -873,7 +953,6 @@ class _CenterFabState extends State<_CenterFab>
                     ),
                   ],
                 ),
-              ),
             ),
           ),
         ),

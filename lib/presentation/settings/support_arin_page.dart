@@ -11,6 +11,7 @@ import '../../core/constants/revenuecat_ids.dart';
 import '../../data/models/purchase_result.dart';
 import '../../data/services/purchase_service.dart';
 import '../../l10n/app_localizations.dart';
+import 'package:arin/presentation/shared/widgets/arin_loader.dart';
 
 class SupportArinPage extends ConsumerStatefulWidget {
   const SupportArinPage({super.key});
@@ -501,7 +502,7 @@ class _SupportCard extends StatelessWidget {
                             ? const SizedBox(
                                 width: 18,
                                 height: 18,
-                                child: CircularProgressIndicator(
+                                child: ArinLoader(
                                   strokeWidth: 2,
                                   color: Color(0xFF07110B),
                                 ),
@@ -566,7 +567,7 @@ class _SupportCard extends StatelessWidget {
                 ? const SizedBox(
                     width: 18,
                     height: 18,
-                    child: CircularProgressIndicator(
+                    child: ArinLoader(
                       strokeWidth: 2,
                       color: Color(0xFF07110B),
                     ),
@@ -611,7 +612,7 @@ class _SupportProductsLoadingCard extends StatelessWidget {
             const SizedBox(
               width: 18,
               height: 18,
-              child: CircularProgressIndicator(strokeWidth: 2),
+              child: ArinLoader(strokeWidth: 2),
             )
           else
             const Icon(Icons.info_outline_rounded, color: AppColors.goldAccent),

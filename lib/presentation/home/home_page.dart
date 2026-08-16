@@ -24,10 +24,14 @@ import '../shared/providers/auth_providers.dart';
 import '../shared/providers/premium_providers.dart';
 import '../shared/providers/prayer_time_providers.dart';
 import '../shared/providers/user_profile_providers.dart';
-import '../assistant/widgets/assistant_home_bubble.dart';
+import '../shared/widgets/arin_skeleton.dart';
 import '../shared/widgets/arin_shell_layout.dart';
+import '../shared/widgets/arin_pressable.dart';
+import '../shared/widgets/arin_premium_mark.dart';
 import '../shared/widgets/ornate_frame.dart';
 import '../willpower/widgets/namaz_adhan_reminder_card.dart';
+import '../onboarding/app_tour/app_tour_anchor.dart';
+import '../onboarding/app_tour/app_tour_keys.dart';
 import 'widgets/daily_namaz_wisdom_card.dart';
 import 'widgets/home_namaz_ritual_section.dart';
 
@@ -77,9 +81,7 @@ class _HomePageState extends ConsumerState<HomePage> {
     return SizedBox.expand(
       child: ArinShellBackground.buildLayered(
         context,
-        child: Stack(
-          children: [
-            RefreshIndicator(
+        child: RefreshIndicator(
           color: ArinShellBackground.isLight(context)
               ? AppColors.accentGreenOnLight
               : AppColors.accentNeonGreen,
@@ -109,19 +111,30 @@ class _HomePageState extends ConsumerState<HomePage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        _HeaderSection(
-                          greeting: _greeting(l10n),
-                          isDarkShell: !ArinShellBackground.isLight(context),
+                        AppTourAnchor(
+                          id: AppTourTargetId.homeHeader,
+                          child: _HeaderSection(
+                            greeting: _greeting(l10n),
+                            isDarkShell: !ArinShellBackground.isLight(context),
+                          ),
                         ),
                         const SizedBox(height: 16),
-                        const DailyNamazWisdomCard(),
+                        const AppTourAnchor(
+                          id: AppTourTargetId.homeWisdom,
+                          child: DailyNamazWisdomCard(),
+                        ),
                         const SizedBox(height: 12),
-                        const HomeNamazRitualSection(),
+                        const AppTourAnchor(
+                          id: AppTourTargetId.homeNamaz,
+                          child: HomeNamazRitualSection(),
+                        ),
                         const SizedBox(height: 12),
-                        const HomePrayerTimesBlock(),
+                        const AppTourAnchor(
+                          id: AppTourTargetId.homePrayerTimes,
+                          child: HomePrayerTimesBlock(),
+                        ),
                         SizedBox(
-                          height:
-                              ArinShellLayout.bottomContentPadding(context) + 52,
+                          height: ArinShellLayout.bottomContentPadding(context),
                         ),
                       ],
                     ),
@@ -130,15 +143,6 @@ class _HomePageState extends ConsumerState<HomePage> {
               ),
             ],
           ),
-        ),
-            Positioned(
-              right: 16,
-              bottom: ArinShellLayout.bottomContentPadding(context),
-              child: AssistantHomeBubble(
-                onTap: () => context.push(AppRoutes.assistant),
-              ),
-            ),
-          ],
         ),
       ),
     );
@@ -368,12 +372,10 @@ class _HeaderSection extends ConsumerWidget {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  Material(
-                    color: Colors.transparent,
-                    child: InkWell(
-                      borderRadius: BorderRadius.circular(20),
-                      onTap: () => context.push(AppRoutes.premium),
-                      child: Container(
+                  ArinPressable(
+                    scale: 0.94,
+                    onTap: () => context.push(AppRoutes.premium),
+                    child: Container(
                         padding: const EdgeInsets.symmetric(
                           horizontal: 10,
                           vertical: 5,
@@ -388,8 +390,7 @@ class _HeaderSection extends ConsumerWidget {
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Icon(
-                              Icons.workspace_premium_rounded,
+                            ArinPremiumMark(
                               color: ornament,
                               size: 16,
                             ),
@@ -405,7 +406,6 @@ class _HeaderSection extends ConsumerWidget {
                             ),
                           ],
                         ),
-                      ),
                     ),
                   ),
                   const SizedBox(height: 10),
@@ -1031,17 +1031,18 @@ class _PrayerTimesSkeleton extends StatelessWidget {
                       color: Colors.white.withValues(alpha: 0.08),
                     ),
                   ),
-                  child: Center(
-                    child: i == 0
-                        ? const SizedBox(
-                            width: 20,
-                            height: 20,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              color: AppColors.accentNeonGreen,
-                            ),
-                          )
-                        : const SizedBox.shrink(),
+                  child: const Padding(
+                    padding: EdgeInsets.fromLTRB(10, 12, 10, 10),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        ArinSkeletonCircle(diameter: 22),
+                        SizedBox(height: 10),
+                        ArinSkeleton(height: 10, width: 52, borderRadius: 99),
+                        SizedBox(height: 6),
+                        ArinSkeleton(height: 8, width: 36, borderRadius: 99),
+                      ],
+                    ),
                   ),
                 );
               },
@@ -1174,12 +1175,9 @@ class _LocationRow extends ConsumerWidget {
     final label = _resolveLabel(districtId);
     final freshness = _syncFreshnessLabel(context, location.lastPrayerSyncAt);
 
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: () => _openPicker(context, ref),
-        borderRadius: BorderRadius.circular(8),
-        child: Padding(
+    return ArinPressable(
+      onTap: () => _openPicker(context, ref),
+      child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 0),
           child: Row(
             children: [
@@ -1227,7 +1225,6 @@ class _LocationRow extends ConsumerWidget {
             ],
           ),
         ),
-      ),
     );
   }
 

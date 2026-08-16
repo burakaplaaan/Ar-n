@@ -8,6 +8,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../../data/models/habit_model.dart';
 import '../../../data/repositories/habit_repository.dart';
 import '../../../data/repositories/salat_log_repository.dart';
+import '../../../core/constants/willpower_templates.dart';
+import '../../../data/services/app_local_notification_scheduler.dart';
+import '../../../data/services/app_notification_channel_prefs.dart';
 import '../../../data/services/tracking_widget_service.dart';
 import '../../../core/providers/shared_preferences_provider.dart';
 
@@ -113,7 +116,20 @@ class HabitSummaryNotifier
       onboardingCompleted: onboardingCompleted,
     );
     _reload();
+    if (WillpowerTemplates.isFullQuitProgram(templateId)) {
+      unawaited(_enableArinmaNotificationsAndReschedule(force: true));
+    }
     return h;
+  }
+
+  Future<void> _enableArinmaNotificationsAndReschedule({
+    bool force = false,
+  }) async {
+    await AppNotificationChannelPrefs.enableArinmaNotificationsForQuit(
+      _prefs,
+      force: force,
+    );
+    await AppLocalNotificationScheduler.rescheduleAll(_prefs, force: true);
   }
 
   Future<void> completeQuitOnboarding({
@@ -127,6 +143,7 @@ class HabitSummaryNotifier
       quitMethod: quitMethod,
     );
     _reload();
+    unawaited(_enableArinmaNotificationsAndReschedule(force: true));
   }
 
   Future<void> toggleToday(String habitId) async {
@@ -137,12 +154,14 @@ class HabitSummaryNotifier
   Future<void> setQuitClockNow(String habitId, [DateTime? when]) async {
     await _repo.setQuitClockNow(habitId, when);
     _reload();
+    unawaited(_enableArinmaNotificationsAndReschedule(force: true));
   }
 
   /// Onboarding'i tamamlamadan sadece sayacı başlat — kriz anı kısa yol.
   Future<void> quickStartQuitClock(String habitId) async {
     await _repo.quickStartQuitClock(habitId);
     _reload();
+    unawaited(_enableArinmaNotificationsAndReschedule(force: true));
   }
 
   Future<void> restartQuitProgram(
@@ -151,11 +170,17 @@ class HabitSummaryNotifier
   }) async {
     await _repo.restartQuitProgram(habitId, preserveHistory: preserveHistory);
     _reload();
+    unawaited(
+      AppLocalNotificationScheduler.rescheduleAll(_prefs, force: true),
+    );
   }
 
   Future<void> deleteHabitPermanently(String habitId) async {
     await _repo.deletePermanently(habitId);
     _reload();
+    unawaited(
+      AppLocalNotificationScheduler.rescheduleAll(_prefs, force: true),
+    );
   }
 
   void refresh() => _reload();

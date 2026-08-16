@@ -33,7 +33,7 @@ Widget _buildAdminWidgetOverrideTab({
   final updatedAt = _adminDateFromValue(doc?['updatedAt']);
 
   if (loading && doc == null) {
-    return const Center(child: CircularProgressIndicator());
+    return const Center(child: ArinLoader());
   }
 
   return RefreshIndicator(
@@ -111,7 +111,7 @@ Widget _buildAdminWidgetOverrideTab({
                     ? const SizedBox(
                         width: 16,
                         height: 16,
-                        child: CircularProgressIndicator(strokeWidth: 2),
+                        child: ArinLoader(strokeWidth: 2),
                       )
                     : const Icon(Icons.campaign_outlined),
                 label: const Text('Geçici mesajı yayına al'),
@@ -271,7 +271,7 @@ Widget _globalLockSectionCard({
                 const SizedBox(
                   width: 18,
                   height: 18,
-                  child: CircularProgressIndicator(strokeWidth: 2),
+                  child: ArinLoader(strokeWidth: 2),
                 ),
             ],
           ),
@@ -355,7 +355,7 @@ Widget _globalLockSectionCard({
                       ? const SizedBox(
                           width: 16,
                           height: 16,
-                          child: CircularProgressIndicator(
+                          child: ArinLoader(
                             strokeWidth: 2,
                             color: Colors.white,
                           ),
@@ -380,7 +380,7 @@ Widget _globalLockSectionCard({
                       ? const SizedBox(
                           width: 16,
                           height: 16,
-                          child: CircularProgressIndicator(
+                          child: ArinLoader(
                             strokeWidth: 2,
                             color: Colors.white54,
                           ),

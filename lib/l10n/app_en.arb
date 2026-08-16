@@ -408,6 +408,36 @@
       }
     }
   },
+  "quitProgramElapsedDHms": "{days} d {hours} h {minutes} min {seconds} sec",
+  "@quitProgramElapsedDHms": {
+    "placeholders": {
+      "days": { "type": "int" },
+      "hours": { "type": "int" },
+      "minutes": { "type": "int" },
+      "seconds": { "type": "int" }
+    }
+  },
+  "quitProgramElapsedMdHms": "{months} mo {days} d {hours} h {minutes} min {seconds} sec",
+  "@quitProgramElapsedMdHms": {
+    "placeholders": {
+      "months": { "type": "int" },
+      "days": { "type": "int" },
+      "hours": { "type": "int" },
+      "minutes": { "type": "int" },
+      "seconds": { "type": "int" }
+    }
+  },
+  "quitProgramElapsedYmdHms": "{years} y {months} mo {days} d {hours} h {minutes} min {seconds} sec",
+  "@quitProgramElapsedYmdHms": {
+    "placeholders": {
+      "years": { "type": "int" },
+      "months": { "type": "int" },
+      "days": { "type": "int" },
+      "hours": { "type": "int" },
+      "minutes": { "type": "int" },
+      "seconds": { "type": "int" }
+    }
+  },
   "quitProgramTabProgress": "Progress",
   "quitProgramTabTips": "Tips",
   "quitProgramTipsLoadFailed": "Content failed to load",
@@ -666,10 +696,13 @@
   "assistantSubtitle": "",
   "assistantAskChip": "Assistant",
   "assistantInputHint": "Write briefly…",
-  "assistantEmptyTitle": "Hello",
-  "assistantEmptyBody": "",
-  "assistantHello": "Hello",
-  "assistantHelloName": "Hello {name}",
+  "assistantEmptyTitle": "Assalamu alaikum!",
+  "assistantEmptyBody": "I am an Islamic AI.",
+  "assistantHello": "Assalamu alaikum!",
+  "assistantHelloName": "Assalamu alaikum! {name}",
+  "assistantPromptLockVerse": "How do I put a verse on the lock screen?",
+  "assistantPromptInshirah": "Explain Surah Ash-Sharh.",
+  "assistantPromptRamadan": "How many days until Ramadan?",
   "@assistantHelloName": {
     "placeholders": {
       "name": {
@@ -701,6 +734,85 @@
   },
   "assistantActionFailed": "I could not do that.",
   "assistantActionUnknownPage": "I could not open that page.",
+  "assistantNavigatingThere": "Opening it now.",
+  "assistantLockVerseGuide": "You can do this in Arın. Open Settings → Widget Center and add the lock-screen verse. You do not need another app.",
+  "assistantRamadanDays": "Today is {today}. There are {days} days until Ramadan. Approximate start: {date}; the crescent may shift it by a day.",
+  "@assistantRamadanDays": {
+    "placeholders": {
+      "today": {"type": "String"},
+      "days": {"type": "int"},
+      "date": {"type": "String"}
+    }
+  },
+  "assistantRamadanTomorrow": "Today is {today}. Ramadan starts tomorrow (about {date}).",
+  "@assistantRamadanTomorrow": {
+    "placeholders": {
+      "today": {"type": "String"},
+      "date": {"type": "String"}
+    }
+  },
+  "assistantRamadanToday": "Today is {today}. Ramadan starts today.",
+  "@assistantRamadanToday": {
+    "placeholders": {
+      "today": {"type": "String"}
+    }
+  },
+  "assistantRamadanOngoing": "Today is {today}. We are in Ramadan; it is day {day}.",
+  "assistantPrayerTimesMissing": "Prayer times are not ready yet. Turn on location and wait a moment.",
+  "assistantPrayerCountdown": "{label} {remaining}. Time: {time}.",
+  "@assistantPrayerCountdown": {
+    "placeholders": {
+      "label": {"type": "String"},
+      "remaining": {"type": "String"},
+      "time": {"type": "String"}
+    }
+  },
+  "assistantPrayerCountdownTomorrow": "{label} {remaining}. Tomorrow at {time}.",
+  "@assistantPrayerCountdownTomorrow": {
+    "placeholders": {
+      "label": {"type": "String"},
+      "remaining": {"type": "String"},
+      "time": {"type": "String"}
+    }
+  },
+  "assistantPrayerLabelIftar": "Until iftar:",
+  "assistantPrayerLabelImsak": "Until imsak:",
+  "assistantPrayerLabelDhuhr": "Until Dhuhr:",
+  "assistantPrayerLabelAsr": "Until Asr:",
+  "assistantPrayerLabelMaghrib": "Until Maghrib:",
+  "assistantPrayerLabelIsha": "Until Isha:",
+  "assistantPrayerLabelNext": "Until the next prayer ({name}):",
+  "@assistantPrayerLabelNext": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "assistantDurationHm": "{hours}h {minutes}m",
+  "@assistantDurationHm": {
+    "placeholders": {
+      "hours": {"type": "int"},
+      "minutes": {"type": "int"}
+    }
+  },
+  "assistantDurationH": "{hours}h",
+  "@assistantDurationH": {
+    "placeholders": {
+      "hours": {"type": "int"}
+    }
+  },
+  "assistantDurationM": "{minutes}m",
+  "@assistantDurationM": {
+    "placeholders": {
+      "minutes": {"type": "int"}
+    }
+  },
+  "assistantDurationSoon": "less than a minute",
+  "@assistantRamadanOngoing": {
+    "placeholders": {
+      "today": {"type": "String"},
+      "day": {"type": "int"}
+    }
+  },
   "assistantActionCancelled": "Cancelled.",
   "assistantSalatHabitMissing": "Start the prayer program first.",
   "assistantPrayerMarked": "Marked that prayer as done.",
@@ -1441,7 +1553,7 @@
   "notificationsArinmaDailyTitle": "Daily reminder",
   "notificationsArinmaDailySubtitle": "Twice a day, a random quote or short motivation.",
   "notificationsMilestoneTitle": "Milestone notifications",
-  "notificationsMilestoneSubtitle": "For example, sparse messages like 24 hours or 1 week on your quit journey.",
+  "notificationsMilestoneSubtitle": "Quit milestones, recovery percentages, monthly encouragement, and occasional tips or inspiration.",
   "notificationsTaskTitle": "Task reminder",
   "notificationsTaskSubtitle": "At most one alert per day for incomplete tasks.",
   "notificationsZikirTitle": "Zikr reminder",
@@ -2292,5 +2404,67 @@
   "prayerCircleSlowDown": "You are acting too quickly. Please try again shortly.",
   "prayerCircleContentRejected": "Check the text and remove personal, contact, or payment information.",
   "prayerCircleExpired": "This prayer request may have expired.",
-  "prayerCircleGenericError": "The action could not be completed. Check your connection and try again."
+  "prayerCircleGenericError": "The action could not be completed. Check your connection and try again.",
+  "appTourNext": "Continue",
+  "appTourSkip": "Skip",
+  "appTourLetsStart": "Let's get started!",
+  "appTourProgress": "{current}/{total}",
+  "@appTourProgress": {
+    "placeholders": {
+      "current": { "type": "int" },
+      "total": { "type": "int" }
+    }
+  },
+  "appTourHomeHeaderTitle": "Your home",
+  "appTourHomeHeaderBody": "Your greeting, name, and next-prayer countdown live here. Tap your name to change how we address you.",
+  "appTourHomeWisdomTitle": "Daily wisdom",
+  "appTourHomeWisdomBody": "A prayer insight each day. Swipe the card to refresh or save it.",
+  "appTourHomeNamazTitle": "Prayer tracking",
+  "appTourHomeNamazBody": "Mark the prayers, keep your streak. Makeup prayers and reminders are here too.",
+  "appTourHomePrayerTimesTitle": "Prayer times",
+  "appTourHomePrayerTimesBody": "Times for your district. You can change the location in Settings.",
+  "appTourNavToolsTitle": "Tools",
+  "appTourNavToolsBody": "Qibla, dhikr, the prayer circle, and other spiritual tools live on this tab.",
+  "appTourQiblaAssistantTitle": "Arin Assistant",
+  "appTourQiblaAssistantBody": "Manage prayer, notifications, and reminders through chat.",
+  "appTourQiblaAiTitle": "Islamic AI",
+  "appTourQiblaAiBody": "Answers grounded in Islamic sources. Unlocks with Premium.",
+  "appTourQiblaCompassTitle": "Qibla compass",
+  "appTourQiblaCompassBody": "Shows the direction of the Kaaba from your location.",
+  "appTourQiblaZikirTitle": "Dhikr counter",
+  "appTourQiblaZikirBody": "A digital tasbih with goals, rounds, and dhikr notes.",
+  "appTourQiblaHilalTitle": "Knowledge duel",
+  "appTourQiblaHilalBody": "Quiz yourself with Islamic questions and sharpen what you know.",
+  "appTourQiblaPrayerCircleTitle": "Prayer circle",
+  "appTourQiblaPrayerCircleBody": "Share an intention anonymously, and say amen to others.",
+  "appTourQiblaHealingTitle": "Healing frequencies",
+  "appTourQiblaHealingBody": "Calming sounds to gather your breath and focus.",
+  "appTourQiblaBreathingTitle": "Breathing exercise",
+  "appTourQiblaBreathingBody": "Use the 4-7-8 cycle to settle in a stressful moment.",
+  "appTourNavWillpowerTitle": "Growth and purification",
+  "appTourNavWillpowerBody": "Habit tracking and quit programs live in this triangle.",
+  "appTourWillpowerTabsTitle": "Growth and purification",
+  "appTourWillpowerTabsBody": "Growth is for habits you want to keep. Purification is for what you want to leave.",
+  "appTourWillpowerBreathingTitle": "Breath",
+  "appTourWillpowerBreathingBody": "In a hard moment, open the breathing exercise from here.",
+  "appTourWillpowerAddTitle": "New program",
+  "appTourWillpowerAddBody": "Use plus to add a growth habit or a purification program.",
+  "appTourNavExploreTitle": "Explore",
+  "appTourNavExploreBody": "Verses, hadith, and quotes — swipe, save, and share.",
+  "appTourInspireSearchTitle": "Search",
+  "appTourInspireSearchBody": "Type a word; unaccented search works too.",
+  "appTourInspireFilterTitle": "Filter",
+  "appTourInspireFilterBody": "Narrow the feed to quotes, verses, or hadith.",
+  "appTourNavSettingsTitle": "Settings",
+  "appTourNavSettingsBody": "Notifications, language, widgets, and your account are here.",
+  "appTourSettingsNotificationsTitle": "Notifications",
+  "appTourSettingsNotificationsBody": "Manage adhan, purification, and dhikr reminders here.",
+  "appTourSettingsWidgetsTitle": "Widget Center",
+  "appTourSettingsWidgetsBody": "Unlock home-screen and lock-screen widgets here.",
+  "appTourSettingsLanguageTitle": "Language",
+  "appTourSettingsLanguageBody": "Choose Turkish, English, or Arabic.",
+  "appTourAssistantFabTitle": "Assistant bubble",
+  "appTourAssistantFabBody": "A draggable shortcut that opens the assistant on any tab.",
+  "appTourFinaleTitle": "You are ready",
+  "appTourFinaleBody": "The tour is over. Continue from any tab — we will remind you and walk with you."
 }

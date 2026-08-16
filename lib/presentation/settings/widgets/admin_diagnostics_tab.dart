@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../data/services/admin_notification_diagnostics_log.dart';
 import '../../../l10n/app_localizations.dart';
+import 'package:arin/presentation/shared/widgets/arin_loader.dart';
 
 bool _isSkipLikeOutcome(String outcome) {
   return outcome == 'cooldown_skip' ||
@@ -306,7 +307,7 @@ class AdminDiagnosticsTab extends StatelessWidget {
                       ? const SizedBox(
                           width: 14,
                           height: 14,
-                          child: CircularProgressIndicator(strokeWidth: 2),
+                          child: ArinLoader(strokeWidth: 2),
                         )
                       : const Icon(Icons.refresh_rounded),
                   label: Text(l10n.adminRefreshAction),

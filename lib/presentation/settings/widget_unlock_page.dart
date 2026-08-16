@@ -19,6 +19,7 @@ import '../../data/services/widget_metrics_service.dart';
 import '../shared/providers/admob_providers.dart';
 import '../shared/providers/premium_providers.dart';
 import '../shared/providers/widget_access_providers.dart';
+import 'package:arin/presentation/shared/widgets/arin_loader.dart';
 
 class WidgetUnlockPage extends ConsumerStatefulWidget {
   const WidgetUnlockPage({required this.kind, super.key});
@@ -328,7 +329,7 @@ class _WidgetUnlockPageState extends ConsumerState<WidgetUnlockPage> {
                               ? const SizedBox(
                                   width: 18,
                                   height: 18,
-                                  child: CircularProgressIndicator(
+                                  child: ArinLoader(
                                     strokeWidth: 2,
                                     color: Colors.white,
                                   ),
@@ -510,7 +511,7 @@ class _RewardedPreparingDialogState extends State<_RewardedPreparingDialog> {
             const SizedBox(
               width: 24,
               height: 24,
-              child: CircularProgressIndicator(
+              child: ArinLoader(
                 strokeWidth: 2.5,
                 color: AppColors.emeraldLight,
               ),

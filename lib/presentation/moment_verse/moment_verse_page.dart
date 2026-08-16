@@ -16,6 +16,7 @@ import 'package:go_router/go_router.dart';
 import 'package:arin/l10n/app_localizations.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/router/app_router.dart';
+import 'package:arin/presentation/shared/widgets/arin_loader.dart';
 
 // ── Veri Modeli ───────────────────────────────────────────────────────────────
 
@@ -218,7 +219,7 @@ class _MomentVersePageState extends State<MomentVersePage>
             child: SizedBox(
               width: 24,
               height: 24,
-              child: CircularProgressIndicator(
+              child: ArinLoader(
                 strokeWidth: 2,
                 color: AppColors.accentNeonGreen,
               ),

@@ -69,6 +69,28 @@ abstract final class RecoveryProgress {
         (1825, 100),
       ]);
 
+  /// [percentAt] monoton artan kabul edilir. [target] ilk kez
+  /// `>= target` olduğu tam gün; hiç ulaşılmazsa null.
+  static int? firstDayAtOrAbove(
+    double Function(int elapsedDays) percentAt,
+    double target,
+  ) {
+    if (target <= 0) return 0;
+    const maxDay = 4000;
+    if (percentAt(maxDay) < target) return null;
+    var lo = 0;
+    var hi = maxDay;
+    while (lo < hi) {
+      final mid = (lo + hi) >> 1;
+      if (percentAt(mid) >= target) {
+        hi = mid;
+      } else {
+        lo = mid + 1;
+      }
+    }
+    return lo;
+  }
+
   static String medicalDisclaimerTr() =>
       'Tahmini iyileşme göstergesidir; tıbbi teşhis veya tedavi yerine geçmez.';
 
@@ -257,7 +279,7 @@ abstract final class RecoveryProgress {
         (365, 100),
       ]);
 
-  static double zinaTawbaSteadfastPercent(int elapsedDays) =>
+      static double zinaTawbaSteadfastPercent(int elapsedDays) =>
       _piecewisePercent(elapsedDays, const [
         (0, 0),
         (1, 8),
@@ -268,4 +290,105 @@ abstract final class RecoveryProgress {
         (180, 88),
         (365, 100),
       ]);
+}
+
+/// Bildirim planı için şablon → toparlanma alanları (UI ikonlarından bağımsız).
+class QuitRecoveryMetricDef {
+  const QuitRecoveryMetricDef({
+    required this.id,
+    required this.percentAt,
+  });
+
+  final String id;
+  final double Function(int elapsedDays) percentAt;
+}
+
+List<QuitRecoveryMetricDef> quitRecoveryMetricsFor(String templateId) {
+  switch (templateId) {
+    case 'quit_smoking':
+      return const [
+        QuitRecoveryMetricDef(id: 'lung', percentAt: RecoveryProgress.smokingLungPercent),
+        QuitRecoveryMetricDef(id: 'heart', percentAt: RecoveryProgress.smokingHeartPercent),
+        QuitRecoveryMetricDef(id: 'teeth', percentAt: RecoveryProgress.smokingTeethPercent),
+        QuitRecoveryMetricDef(
+          id: 'smell',
+          percentAt: RecoveryProgress.smokingSmellTastePercent,
+        ),
+      ];
+    case 'quit_screen':
+      return const [
+        QuitRecoveryMetricDef(id: 'focus', percentAt: RecoveryProgress.screenFocusPercent),
+        QuitRecoveryMetricDef(
+          id: 'sleep',
+          percentAt: RecoveryProgress.screenSleepRhythmPercent,
+        ),
+        QuitRecoveryMetricDef(
+          id: 'awareness',
+          percentAt: RecoveryProgress.screenAwarenessPercent,
+        ),
+        QuitRecoveryMetricDef(
+          id: 'calm',
+          percentAt: RecoveryProgress.screenInnerCalmPercent,
+        ),
+      ];
+    case 'quit_alcohol':
+      return const [
+        QuitRecoveryMetricDef(
+          id: 'liver',
+          percentAt: RecoveryProgress.alcoholLiverRecoveryPercent,
+        ),
+        QuitRecoveryMetricDef(
+          id: 'sleep',
+          percentAt: RecoveryProgress.alcoholSleepStabilityPercent,
+        ),
+        QuitRecoveryMetricDef(
+          id: 'mood',
+          percentAt: RecoveryProgress.alcoholMoodBalancePercent,
+        ),
+        QuitRecoveryMetricDef(
+          id: 'clarity',
+          percentAt: RecoveryProgress.alcoholClarityPercent,
+        ),
+      ];
+    case 'quit_substance':
+      return const [
+        QuitRecoveryMetricDef(
+          id: 'body',
+          percentAt: RecoveryProgress.substanceBodyStabilizationPercent,
+        ),
+        QuitRecoveryMetricDef(
+          id: 'sleep',
+          percentAt: RecoveryProgress.substanceSleepRhythmPercent,
+        ),
+        QuitRecoveryMetricDef(
+          id: 'urge',
+          percentAt: RecoveryProgress.substanceUrgeControlPercent,
+        ),
+        QuitRecoveryMetricDef(
+          id: 'support',
+          percentAt: RecoveryProgress.substanceSupportPathPercent,
+        ),
+      ];
+    case 'quit_zina':
+      return const [
+        QuitRecoveryMetricDef(
+          id: 'discipline',
+          percentAt: RecoveryProgress.zinaDisciplinePercent,
+        ),
+        QuitRecoveryMetricDef(
+          id: 'boundary',
+          percentAt: RecoveryProgress.zinaBoundaryStrengthPercent,
+        ),
+        QuitRecoveryMetricDef(
+          id: 'heart',
+          percentAt: RecoveryProgress.zinaHeartCalmPercent,
+        ),
+        QuitRecoveryMetricDef(
+          id: 'tawba',
+          percentAt: RecoveryProgress.zinaTawbaSteadfastPercent,
+        ),
+      ];
+    default:
+      return const [];
+  }
 }

@@ -10,6 +10,7 @@ import '../../core/analytics/arin_analytics.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/theme/arin_shell_background.dart';
 import '../../l10n/app_localizations.dart';
+import 'package:arin/presentation/shared/widgets/arin_loader.dart';
 
 class ContactSupportPage extends StatefulWidget {
   const ContactSupportPage({super.key});
@@ -168,7 +169,7 @@ class _ContactSupportPageState extends State<ContactSupportPage> {
                                 ? const SizedBox(
                                     width: 16,
                                     height: 16,
-                                    child: CircularProgressIndicator(
+                                    child: ArinLoader(
                                       strokeWidth: 2,
                                     ),
                                   )

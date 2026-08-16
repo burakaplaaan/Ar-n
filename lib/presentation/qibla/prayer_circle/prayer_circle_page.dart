@@ -20,7 +20,9 @@ import '../../shared/providers/auth_providers.dart';
 import '../../shared/providers/premium_providers.dart';
 import '../../shared/widgets/arin_back_button.dart';
 import '../../shared/widgets/arin_shell_layout.dart';
+import '../../shared/widgets/arin_top_toast.dart';
 import 'prayer_circle_repository.dart';
+import 'package:arin/presentation/shared/widgets/arin_loader.dart';
 
 /// Mirrors server-side `_validatedPrayerText` contact/link checks (pre-ad).
 bool _prayerTextFailsContentPolicy(String value) {
@@ -286,7 +288,7 @@ class _PrayerCirclePageState extends ConsumerState<PrayerCirclePage> {
                             const SliverFillRemaining(
                               hasScrollBody: false,
                               child: Center(
-                                child: CircularProgressIndicator(
+                                child: ArinLoader(
                                   color: AppColors.accentNeonGreen,
                                 ),
                               ),
@@ -351,7 +353,7 @@ class _PrayerCirclePageState extends ConsumerState<PrayerCirclePage> {
                                               ? const SizedBox.square(
                                                   dimension: 15,
                                                   child:
-                                                      CircularProgressIndicator(
+                                                      ArinLoader(
                                                         strokeWidth: 2,
                                                       ),
                                                 )
@@ -802,9 +804,8 @@ class _PrayerCirclePageState extends ConsumerState<PrayerCirclePage> {
   }
 
   void _showMessage(String text) {
-    ScaffoldMessenger.of(context)
-      ..hideCurrentSnackBar()
-      ..showSnackBar(SnackBar(content: Text(text)));
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+    showArinTopToast(context, text);
   }
 }
 
@@ -1235,7 +1236,7 @@ class _PrayerRequestCard extends StatelessWidget {
                   icon: busy
                       ? const SizedBox.square(
                           dimension: 14,
-                          child: CircularProgressIndicator(strokeWidth: 2),
+                          child: ArinLoader(strokeWidth: 2),
                         )
                       : Icon(
                           prayed
@@ -1350,9 +1351,9 @@ class _CreatePrayerButton extends StatelessWidget {
             borderRadius: BorderRadius.circular(999),
             boxShadow: [
               BoxShadow(
-                color: AppColors.accentGlowGreen.withValues(alpha: 0.28),
-                blurRadius: 20,
-                offset: const Offset(0, 7),
+                color: AppColors.accentGlowGreen.withValues(alpha: 0.24),
+                blurRadius: 16,
+                offset: const Offset(0, 5),
               ),
             ],
           ),
@@ -1361,7 +1362,7 @@ class _CreatePrayerButton extends StatelessWidget {
             icon: busy
                 ? const SizedBox.square(
                     dimension: 18,
-                    child: CircularProgressIndicator(
+                    child: ArinLoader(
                       strokeWidth: 2,
                       color: Colors.white,
                     ),
@@ -1371,8 +1372,13 @@ class _CreatePrayerButton extends StatelessWidget {
             style: FilledButton.styleFrom(
               backgroundColor: AppColors.emeraldMid,
               foregroundColor: Colors.white,
-              minimumSize: const Size(220, 50),
-              textStyle: const TextStyle(fontWeight: FontWeight.w800),
+              minimumSize: const Size(0, 40),
+              padding: const EdgeInsets.fromLTRB(14, 8, 16, 8),
+              visualDensity: VisualDensity.compact,
+              textStyle: const TextStyle(
+                fontWeight: FontWeight.w800,
+                fontSize: 14,
+              ),
             ),
           ),
         ),

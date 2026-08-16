@@ -17,10 +17,11 @@ import '../../data/services/prayer_reminder_prefs.dart';
 import '../shared/providers/habit_providers.dart';
 import '../shared/providers/prayer_time_providers.dart';
 import '../shared/providers/quotes_providers.dart';
-import '../qibla/qibla_hub_navigator_key.dart';
-import '../qibla/qibla_hub_page.dart';
 import '../willpower/salat_providers.dart';
+import '../qibla/qibla_hub_open.dart';
+import '../qibla/qibla_hub_page.dart';
 import 'assistant_models.dart';
+import 'assistant_session.dart';
 
 const _prayerIndex = {
   'fajr': 0,
@@ -60,70 +61,78 @@ class AssistantToolExecutor {
     }
   }
 
-  void _openQiblaTool(String route) {
-    context.go(AppRoutes.qibla);
-    _pushQiblaToolWhenReady(route);
+  void _go(String location, {String? returnTool}) {
+    if (returnTool != null) markAssistantReturnPending(ref, returnTool);
+    final ctx = rootNavigatorKey.currentContext ?? context;
+    ctx.go(location);
   }
 
-  static void _pushQiblaToolWhenReady(String route, [int attempts = 0]) {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final nav = qiblaHubNavigatorKey.currentState;
-      if (nav == null) {
-        if (attempts < 25) {
-          Future<void>.delayed(
-            const Duration(milliseconds: 120),
-            () => _pushQiblaToolWhenReady(route, attempts + 1),
-          );
-        }
-        return;
-      }
-      nav.popUntil((r) => r.isFirst);
-      nav.pushNamed(route);
-    });
+  void _push(String location, {required String returnTool}) {
+    markAssistantReturnPending(ref, returnTool);
+    final ctx = rootNavigatorKey.currentContext ?? context;
+    ctx.push(location);
   }
 
-  String? _openPage(String page) {
+  Future<String?> _openPage(String page) async {
     final l10n = AppLocalizations.of(context)!;
     switch (page) {
       case 'home':
-        context.go(AppRoutes.home);
+        _go(AppRoutes.home);
+        return null;
       case 'qibla':
-        context.go(AppRoutes.qibla);
+        _go(AppRoutes.qibla);
+        return null;
       case 'zikir':
-        _openQiblaTool(QiblaHubRoutes.zikir);
+        _go(AppRoutes.qibla, returnTool: 'zikir');
+        await pushQiblaHubRoute(QiblaHubRoutes.zikir);
+        return null;
       case 'breathing':
-        context.go(AppRoutes.willBreathing());
+        _push(AppRoutes.willBreathing(), returnTool: 'breathing');
+        return null;
       case 'healing':
-        _openQiblaTool(QiblaHubRoutes.healing);
+        _go(AppRoutes.qibla, returnTool: 'healing');
+        await pushQiblaHubRoute(QiblaHubRoutes.healing);
+        return null;
       case 'prayer_circle':
-        context.go(AppRoutes.prayerCircle);
+        _push(AppRoutes.prayerCircle, returnTool: 'prayer_circle');
+        return null;
       case 'hilal_duel':
-        context.go(AppRoutes.hilalDuel);
+        _push(AppRoutes.hilalDuel, returnTool: 'hilal_duel');
+        return null;
       case 'habits':
-        context.go(AppRoutes.habits);
+        _go(AppRoutes.habits);
+        return null;
       case 'namaz':
         final habit = ref
             .read(habitRepositoryProvider)
             .findActiveByTemplateId(WillpowerTemplates.salatDaily);
         if (habit != null) {
-          context.go(AppRoutes.willNamaz(habit.id));
+          _push(AppRoutes.willNamaz(habit.id), returnTool: 'namaz');
         } else {
-          context.go(AppRoutes.habitsGelisimTab);
+          _go(AppRoutes.habitsGelisimTab);
         }
+        return null;
       case 'kaza':
-        context.go(AppRoutes.kazaTracker);
+        _push(AppRoutes.kazaTracker, returnTool: 'kaza');
+        return null;
       case 'settings':
-        context.go(AppRoutes.settings);
+        _go(AppRoutes.settings);
+        return null;
       case 'notifications':
-        context.go(AppRoutes.settingsNotifications);
+        _push(AppRoutes.settingsNotifications, returnTool: 'notifications');
+        return null;
+      case 'widgets':
+        _push(AppRoutes.settingsWidgets, returnTool: 'widgets');
+        return null;
       case 'inspire':
-        context.go(AppRoutes.inspire);
+        _go(AppRoutes.inspire);
+        return null;
       case 'premium':
-        context.push(AppRoutes.premium);
+        _push(AppRoutes.premium, returnTool: 'premium');
+        return null;
       default:
         return l10n.assistantActionUnknownPage;
     }
-    return null;
   }
 
   Future<String?> _markPrayer(AssistantAction action) async {

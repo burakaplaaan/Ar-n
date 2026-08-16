@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/theme/arin_shell_background.dart';
+import 'arin_pressable.dart';
 
 enum ArinBackButtonVariant { adaptive, overlaySubtle }
 
@@ -48,8 +49,9 @@ class ArinBackButton extends StatelessWidget {
       onTap: onPressed,
       child: Tooltip(
         message: label,
-        child: GestureDetector(
-          behavior: HitTestBehavior.opaque,
+        child: ArinPressable(
+          haptic: false,
+          scale: 0.90,
           onTap: () {
             HapticFeedback.selectionClick();
             onPressed();

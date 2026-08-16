@@ -27,6 +27,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../core/constants/app_colors.dart';
 import '../../core/firebase/firebase_bootstrap.dart';
+import 'package:arin/presentation/shared/widgets/arin_loader.dart';
 
 // ── Sabitler ──────────────────────────────────────────────────────────────────
 
@@ -700,7 +701,7 @@ class _AdminNotificationsPageState
             if (_poolLoading && _poolDocs.isEmpty)
               const SliverFillRemaining(
                 hasScrollBody: false,
-                child: Center(child: CircularProgressIndicator()),
+                child: Center(child: ArinLoader()),
               )
             else if (filtered.isEmpty)
               SliverFillRemaining(
@@ -731,7 +732,7 @@ class _AdminNotificationsPageState
           child: SizedBox(
             width: 14,
             height: 14,
-            child: CircularProgressIndicator(strokeWidth: 2),
+            child: ArinLoader(strokeWidth: 2),
           ),
         ),
       );
@@ -951,7 +952,7 @@ class _AdminNotificationsPageState
                       ? const SizedBox(
                           width: 14,
                           height: 14,
-                          child: CircularProgressIndicator(strokeWidth: 2),
+                          child: ArinLoader(strokeWidth: 2),
                         )
                       : const Text('Kaydet'),
                 ),
@@ -1085,7 +1086,7 @@ class _AdminNotificationsPageState
                   ? const SizedBox(
                       width: 14,
                       height: 14,
-                      child: CircularProgressIndicator(
+                      child: ArinLoader(
                         strokeWidth: 2,
                         color: Colors.black,
                       ),
@@ -1179,7 +1180,7 @@ class _AdminNotificationsPageState
                   ? const SizedBox(
                       width: 14,
                       height: 14,
-                      child: CircularProgressIndicator(
+                      child: ArinLoader(
                         strokeWidth: 2,
                         color: Colors.black,
                       ),
@@ -1380,7 +1381,7 @@ class _AdminNotificationsPageState
                         ? const SizedBox(
                             width: 14,
                             height: 14,
-                            child: CircularProgressIndicator(strokeWidth: 2),
+                            child: ArinLoader(strokeWidth: 2),
                           )
                         : const Text('Ekle'),
                   ),

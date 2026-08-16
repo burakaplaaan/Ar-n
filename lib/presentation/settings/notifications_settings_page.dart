@@ -29,6 +29,7 @@ import '../shared/providers/quotes_providers.dart';
 import '../shared/widgets/arin_clock_time_sheet.dart';
 import '../shared/widgets/arin_permission_dialog.dart';
 import 'widgets/permission_gate_card.dart';
+import 'package:arin/presentation/shared/widgets/arin_loader.dart';
 
 class NotificationsSettingsPage extends ConsumerStatefulWidget {
   const NotificationsSettingsPage({super.key});
@@ -471,7 +472,7 @@ class _NotificationsSettingsPageState
                                 const SizedBox(
                                   width: 18,
                                   height: 18,
-                                  child: CircularProgressIndicator(
+                                  child: ArinLoader(
                                     strokeWidth: 2,
                                   ),
                                 ),

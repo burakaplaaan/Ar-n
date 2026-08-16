@@ -44,6 +44,7 @@ import 'data/services/widget_theme_service.dart';
 import 'data/repositories/salat_log_repository.dart';
 import 'presentation/inspire/explore_bgm_controller.dart';
 import 'presentation/inspire/inspiration_engagement_provider.dart';
+import 'presentation/inspire/inspiration_like_totals_provider.dart';
 import 'presentation/shared/providers/auth_providers.dart';
 import 'presentation/shared/providers/habit_providers.dart';
 import 'presentation/shared/providers/quotes_providers.dart';
@@ -53,6 +54,7 @@ import 'presentation/shared/providers/user_profile_providers.dart';
 import 'presentation/shared/widgets/global_edge_swipe_back.dart';
 import 'presentation/shared/widgets/location_change_listener.dart';
 import 'presentation/shared/widgets/widget_launch_gate_listener.dart';
+import 'presentation/onboarding/app_tour/app_tour_controller.dart';
 import 'presentation/qibla/qibla_hub_back_dispatcher.dart';
 import 'main.dart' show runDeferredStartupIfNeeded;
 
@@ -508,6 +510,7 @@ class _ArinAppState extends ConsumerState<ArinApp> with WidgetsBindingObserver {
           if (!isStillSignedInAsCurrentUser()) return;
           ref.invalidate(inspirationSavedIdsProvider);
           ref.invalidate(inspirationLikedIdsProvider);
+          ref.invalidate(inspirationLikeTotalsProvider);
           ref.read(habitSummaryProvider.notifier).refresh();
           unawaited(_warmupPoolsAndReschedule());
           if (PrayerReminderPrefs.isEnabled(prefs)) {
@@ -577,6 +580,9 @@ class _ArinAppState extends ConsumerState<ArinApp> with WidgetsBindingObserver {
             ),
             child: GlobalEdgeSwipeBack(
               onBackRequested: () async {
+                if (ref.read(appTourControllerProvider).active) {
+                  return true;
+                }
                 final currentPath =
                     router.routeInformationProvider.value.uri.path;
                 if (dispatchQiblaHubBack(currentPath: currentPath)) {

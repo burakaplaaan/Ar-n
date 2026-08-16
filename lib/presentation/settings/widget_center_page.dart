@@ -9,6 +9,8 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../core/constants/app_colors.dart';
 import '../../core/providers/shared_preferences_provider.dart';
+import '../../core/router/app_router.dart';
+import '../assistant/assistant_session.dart';
 import '../../core/theme/arin_shell_background.dart';
 import '../../data/models/widget_theme.dart';
 import '../../data/repositories/salat_log_repository.dart';
@@ -24,6 +26,7 @@ import '../shared/providers/habit_providers.dart';
 import '../shared/providers/premium_providers.dart';
 import '../shared/providers/widget_theme_providers.dart';
 import '../shared/widgets/arin_shell_layout.dart';
+import 'package:arin/presentation/shared/widgets/arin_loader.dart';
 
 class WidgetCenterPage extends ConsumerStatefulWidget {
   const WidgetCenterPage({super.key});
@@ -99,7 +102,14 @@ class _WidgetCenterPageState extends ConsumerState<WidgetCenterPage> {
                     ? Colors.black.withValues(alpha: 0.25)
                     : Colors.white.withValues(alpha: 0.55),
                 leading: IconButton(
-                  onPressed: () => context.pop(),
+                  onPressed: () {
+                    if (popToAssistantIfNeeded(context)) return;
+                    if (context.canPop()) {
+                      context.pop();
+                    } else {
+                      context.go(AppRoutes.settings);
+                    }
+                  },
                   icon: Icon(
                     Icons.arrow_back_ios_new_rounded,
                     color: titleColor.withValues(alpha: 0.88),
@@ -700,7 +710,7 @@ class _LockNotificationTile extends StatelessWidget {
           ? const SizedBox(
               width: 20,
               height: 20,
-              child: CircularProgressIndicator(strokeWidth: 2),
+              child: ArinLoader(strokeWidth: 2),
             )
           : Switch.adaptive(
               value: value,
@@ -1227,7 +1237,7 @@ class _LoadingCard extends StatelessWidget {
       trailing: const SizedBox(
         width: 18,
         height: 18,
-        child: CircularProgressIndicator(strokeWidth: 2),
+        child: ArinLoader(strokeWidth: 2),
       ),
     );
   }

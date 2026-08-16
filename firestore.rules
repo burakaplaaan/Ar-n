@@ -275,6 +275,15 @@ service cloud.firestore {
       allow read, write: if false;
     }
 
+    // Keşfet ortak beğeni sayacı. Yazma yalnız Cloud Functions (Admin SDK).
+    match /inspiration_like_counts/{cardId} {
+      allow read: if true;
+      allow write: if false;
+    }
+    match /inspiration_like_votes/{voteId} {
+      allow read, write: if false;
+    }
+
     // Genel app_public belgeleri (quotes_bundle, widget_override vb.)
     match /app_public/{docId} {
       allow read: if true;

@@ -21,6 +21,7 @@ import '../shared/widgets/arin_shell_layout.dart';
 import '../shared/widgets/commitment_seal_widget.dart';
 import 'widgets/commitment_example_chips.dart';
 import 'widgets/commitment_input_tokens.dart';
+import 'package:arin/presentation/shared/widgets/arin_loader.dart';
 
 class QuitOnboardingFlowPage extends ConsumerStatefulWidget {
   const QuitOnboardingFlowPage({super.key, required this.habitId});
@@ -286,7 +287,7 @@ class _QuitOnboardingFlowPageState
       return const Scaffold(
         backgroundColor: AppColors.anthraciteDark,
         body: Center(
-          child: CircularProgressIndicator(color: AppColors.accentNeonGreen),
+          child: ArinLoader(color: AppColors.accentNeonGreen),
         ),
       );
     }

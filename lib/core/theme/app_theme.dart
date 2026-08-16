@@ -160,7 +160,7 @@ abstract final class AppTheme {
     final base = ThemeData.light(useMaterial3: true);
     final textTheme = _buildTextTheme(base.textTheme, isLight: true);
 
-    return base.copyWith(
+    return withoutMaterialRipple(base.copyWith(
       colorScheme: const ColorScheme.light(
         primary: AppColors.emeraldDark,
         primaryContainer: AppColors.emeraldMid,
@@ -309,7 +309,7 @@ abstract final class AppTheme {
           TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
         },
       ),
-    );
+    ));
   }
 
   // ────────────────────────────────────────────────────────────────────
@@ -319,7 +319,7 @@ abstract final class AppTheme {
     final base = ThemeData.dark(useMaterial3: true);
     final textTheme = _buildTextTheme(base.textTheme, isLight: false);
 
-    return base.copyWith(
+    return withoutMaterialRipple(base.copyWith(
       colorScheme: const ColorScheme.dark(
         primary: AppColors.emeraldLight,
         primaryContainer: AppColors.emeraldMid,
@@ -405,6 +405,46 @@ abstract final class AppTheme {
           TargetPlatform.android: CupertinoPageTransitionsBuilder(),
           TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
         },
+      ),
+    ));
+  }
+
+  /// InkWell / IconButton / Material butonlardaki "içine dolma" ripple'ı kapatır.
+  /// Basma hissi [ArinPressable] ölçek/göçük animasyonuyla verilir.
+  static ThemeData withoutMaterialRipple(ThemeData theme) {
+    const transparentOverlay = WidgetStatePropertyAll<Color>(Colors.transparent);
+    ButtonStyle withoutOverlay(ButtonStyle? style) {
+      return (style ?? const ButtonStyle()).copyWith(
+        overlayColor: transparentOverlay,
+        splashFactory: NoSplash.splashFactory,
+      );
+    }
+
+    return theme.copyWith(
+      splashFactory: NoSplash.splashFactory,
+      splashColor: Colors.transparent,
+      highlightColor: Colors.transparent,
+      hoverColor: Colors.transparent,
+      focusColor: Colors.transparent,
+      iconButtonTheme: IconButtonThemeData(
+        style: withoutOverlay(theme.iconButtonTheme.style),
+      ),
+      elevatedButtonTheme: ElevatedButtonThemeData(
+        style: withoutOverlay(theme.elevatedButtonTheme.style),
+      ),
+      outlinedButtonTheme: OutlinedButtonThemeData(
+        style: withoutOverlay(theme.outlinedButtonTheme.style),
+      ),
+      textButtonTheme: TextButtonThemeData(
+        style: withoutOverlay(theme.textButtonTheme.style),
+      ),
+      filledButtonTheme: FilledButtonThemeData(
+        style: withoutOverlay(theme.filledButtonTheme.style),
+      ),
+      floatingActionButtonTheme: theme.floatingActionButtonTheme.copyWith(
+        splashColor: Colors.transparent,
+        focusColor: Colors.transparent,
+        hoverColor: Colors.transparent,
       ),
     );
   }

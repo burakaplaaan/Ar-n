@@ -796,6 +796,34 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String quitProgramElapsedDHms(int days, int hours, int minutes, int seconds) {
+    return '$days d $hours h $minutes min $seconds sec';
+  }
+
+  @override
+  String quitProgramElapsedMdHms(
+    int months,
+    int days,
+    int hours,
+    int minutes,
+    int seconds,
+  ) {
+    return '$months mo $days d $hours h $minutes min $seconds sec';
+  }
+
+  @override
+  String quitProgramElapsedYmdHms(
+    int years,
+    int months,
+    int days,
+    int hours,
+    int minutes,
+    int seconds,
+  ) {
+    return '$years y $months mo $days d $hours h $minutes min $seconds sec';
+  }
+
+  @override
   String get quitProgramTabProgress => 'Progress';
 
   @override
@@ -1367,18 +1395,28 @@ class AppLocalizationsEn extends AppLocalizations {
   String get assistantInputHint => 'Write briefly…';
 
   @override
-  String get assistantEmptyTitle => 'Hello';
+  String get assistantEmptyTitle => 'Assalamu alaikum!';
 
   @override
-  String get assistantEmptyBody => '';
+  String get assistantEmptyBody => 'I am an Islamic AI.';
 
   @override
-  String get assistantHello => 'Hello';
+  String get assistantHello => 'Assalamu alaikum!';
 
   @override
   String assistantHelloName(String name) {
-    return 'Hello $name';
+    return 'Assalamu alaikum! $name';
   }
+
+  @override
+  String get assistantPromptLockVerse =>
+      'How do I put a verse on the lock screen?';
+
+  @override
+  String get assistantPromptInshirah => 'Explain Surah Ash-Sharh.';
+
+  @override
+  String get assistantPromptRamadan => 'How many days until Ramadan?';
 
   @override
   String get assistantNeedSignIn => 'Sign in to use the assistant.';
@@ -1425,6 +1463,92 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get assistantActionUnknownPage => 'I could not open that page.';
+
+  @override
+  String get assistantNavigatingThere => 'Opening it now.';
+
+  @override
+  String get assistantLockVerseGuide =>
+      'You can do this in Arın. Open Settings → Widget Center and add the lock-screen verse. You do not need another app.';
+
+  @override
+  String assistantRamadanDays(String today, int days, String date) {
+    return 'Today is $today. There are $days days until Ramadan. Approximate start: $date; the crescent may shift it by a day.';
+  }
+
+  @override
+  String assistantRamadanTomorrow(String today, String date) {
+    return 'Today is $today. Ramadan starts tomorrow (about $date).';
+  }
+
+  @override
+  String assistantRamadanToday(String today) {
+    return 'Today is $today. Ramadan starts today.';
+  }
+
+  @override
+  String assistantRamadanOngoing(String today, int day) {
+    return 'Today is $today. We are in Ramadan; it is day $day.';
+  }
+
+  @override
+  String get assistantPrayerTimesMissing =>
+      'Prayer times are not ready yet. Turn on location and wait a moment.';
+
+  @override
+  String assistantPrayerCountdown(String label, String remaining, String time) {
+    return '$label $remaining. Time: $time.';
+  }
+
+  @override
+  String assistantPrayerCountdownTomorrow(
+    String label,
+    String remaining,
+    String time,
+  ) {
+    return '$label $remaining. Tomorrow at $time.';
+  }
+
+  @override
+  String get assistantPrayerLabelIftar => 'Until iftar:';
+
+  @override
+  String get assistantPrayerLabelImsak => 'Until imsak:';
+
+  @override
+  String get assistantPrayerLabelDhuhr => 'Until Dhuhr:';
+
+  @override
+  String get assistantPrayerLabelAsr => 'Until Asr:';
+
+  @override
+  String get assistantPrayerLabelMaghrib => 'Until Maghrib:';
+
+  @override
+  String get assistantPrayerLabelIsha => 'Until Isha:';
+
+  @override
+  String assistantPrayerLabelNext(String name) {
+    return 'Until the next prayer ($name):';
+  }
+
+  @override
+  String assistantDurationHm(int hours, int minutes) {
+    return '${hours}h ${minutes}m';
+  }
+
+  @override
+  String assistantDurationH(int hours) {
+    return '${hours}h';
+  }
+
+  @override
+  String assistantDurationM(int minutes) {
+    return '${minutes}m';
+  }
+
+  @override
+  String get assistantDurationSoon => 'less than a minute';
 
   @override
   String get assistantActionCancelled => 'Cancelled.';
@@ -1989,7 +2113,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get notificationsMilestoneSubtitle =>
-      'For example, sparse messages like 24 hours or 1 week on your quit journey.';
+      'Quit milestones, recovery percentages, monthly encouragement, and occasional tips or inspiration.';
 
   @override
   String get notificationsTaskTitle => 'Task reminder';
@@ -5403,4 +5527,200 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get prayerCircleGenericError =>
       'The action could not be completed. Check your connection and try again.';
+
+  @override
+  String get appTourNext => 'Continue';
+
+  @override
+  String get appTourSkip => 'Skip';
+
+  @override
+  String get appTourLetsStart => 'Let\'s get started!';
+
+  @override
+  String appTourProgress(int current, int total) {
+    return '$current/$total';
+  }
+
+  @override
+  String get appTourHomeHeaderTitle => 'Your home';
+
+  @override
+  String get appTourHomeHeaderBody =>
+      'Your greeting, name, and next-prayer countdown live here. Tap your name to change how we address you.';
+
+  @override
+  String get appTourHomeWisdomTitle => 'Daily wisdom';
+
+  @override
+  String get appTourHomeWisdomBody =>
+      'A prayer insight each day. Swipe the card to refresh or save it.';
+
+  @override
+  String get appTourHomeNamazTitle => 'Prayer tracking';
+
+  @override
+  String get appTourHomeNamazBody =>
+      'Mark the prayers, keep your streak. Makeup prayers and reminders are here too.';
+
+  @override
+  String get appTourHomePrayerTimesTitle => 'Prayer times';
+
+  @override
+  String get appTourHomePrayerTimesBody =>
+      'Times for your district. You can change the location in Settings.';
+
+  @override
+  String get appTourNavToolsTitle => 'Tools';
+
+  @override
+  String get appTourNavToolsBody =>
+      'Qibla, dhikr, the prayer circle, and other spiritual tools live on this tab.';
+
+  @override
+  String get appTourQiblaAssistantTitle => 'Arin Assistant';
+
+  @override
+  String get appTourQiblaAssistantBody =>
+      'Manage prayer, notifications, and reminders through chat.';
+
+  @override
+  String get appTourQiblaAiTitle => 'Islamic AI';
+
+  @override
+  String get appTourQiblaAiBody =>
+      'Answers grounded in Islamic sources. Unlocks with Premium.';
+
+  @override
+  String get appTourQiblaCompassTitle => 'Qibla compass';
+
+  @override
+  String get appTourQiblaCompassBody =>
+      'Shows the direction of the Kaaba from your location.';
+
+  @override
+  String get appTourQiblaZikirTitle => 'Dhikr counter';
+
+  @override
+  String get appTourQiblaZikirBody =>
+      'A digital tasbih with goals, rounds, and dhikr notes.';
+
+  @override
+  String get appTourQiblaHilalTitle => 'Knowledge duel';
+
+  @override
+  String get appTourQiblaHilalBody =>
+      'Quiz yourself with Islamic questions and sharpen what you know.';
+
+  @override
+  String get appTourQiblaPrayerCircleTitle => 'Prayer circle';
+
+  @override
+  String get appTourQiblaPrayerCircleBody =>
+      'Share an intention anonymously, and say amen to others.';
+
+  @override
+  String get appTourQiblaHealingTitle => 'Healing frequencies';
+
+  @override
+  String get appTourQiblaHealingBody =>
+      'Calming sounds to gather your breath and focus.';
+
+  @override
+  String get appTourQiblaBreathingTitle => 'Breathing exercise';
+
+  @override
+  String get appTourQiblaBreathingBody =>
+      'Use the 4-7-8 cycle to settle in a stressful moment.';
+
+  @override
+  String get appTourNavWillpowerTitle => 'Growth and purification';
+
+  @override
+  String get appTourNavWillpowerBody =>
+      'Habit tracking and quit programs live in this triangle.';
+
+  @override
+  String get appTourWillpowerTabsTitle => 'Growth and purification';
+
+  @override
+  String get appTourWillpowerTabsBody =>
+      'Growth is for habits you want to keep. Purification is for what you want to leave.';
+
+  @override
+  String get appTourWillpowerBreathingTitle => 'Breath';
+
+  @override
+  String get appTourWillpowerBreathingBody =>
+      'In a hard moment, open the breathing exercise from here.';
+
+  @override
+  String get appTourWillpowerAddTitle => 'New program';
+
+  @override
+  String get appTourWillpowerAddBody =>
+      'Use plus to add a growth habit or a purification program.';
+
+  @override
+  String get appTourNavExploreTitle => 'Explore';
+
+  @override
+  String get appTourNavExploreBody =>
+      'Verses, hadith, and quotes — swipe, save, and share.';
+
+  @override
+  String get appTourInspireSearchTitle => 'Search';
+
+  @override
+  String get appTourInspireSearchBody =>
+      'Type a word; unaccented search works too.';
+
+  @override
+  String get appTourInspireFilterTitle => 'Filter';
+
+  @override
+  String get appTourInspireFilterBody =>
+      'Narrow the feed to quotes, verses, or hadith.';
+
+  @override
+  String get appTourNavSettingsTitle => 'Settings';
+
+  @override
+  String get appTourNavSettingsBody =>
+      'Notifications, language, widgets, and your account are here.';
+
+  @override
+  String get appTourSettingsNotificationsTitle => 'Notifications';
+
+  @override
+  String get appTourSettingsNotificationsBody =>
+      'Manage adhan, purification, and dhikr reminders here.';
+
+  @override
+  String get appTourSettingsWidgetsTitle => 'Widget Center';
+
+  @override
+  String get appTourSettingsWidgetsBody =>
+      'Unlock home-screen and lock-screen widgets here.';
+
+  @override
+  String get appTourSettingsLanguageTitle => 'Language';
+
+  @override
+  String get appTourSettingsLanguageBody =>
+      'Choose Turkish, English, or Arabic.';
+
+  @override
+  String get appTourAssistantFabTitle => 'Assistant bubble';
+
+  @override
+  String get appTourAssistantFabBody =>
+      'A draggable shortcut that opens the assistant on any tab.';
+
+  @override
+  String get appTourFinaleTitle => 'You are ready';
+
+  @override
+  String get appTourFinaleBody =>
+      'The tour is over. Continue from any tab — we will remind you and walk with you.';
 }

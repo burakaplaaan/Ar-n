@@ -12,13 +12,19 @@ import '../../core/theme/arin_shell_background.dart';
 import '../../data/services/product_metrics_service.dart';
 import '../shared/providers/auth_providers.dart';
 import '../shared/providers/premium_providers.dart';
+import '../shared/providers/prayer_time_providers.dart';
 import '../shared/providers/user_profile_providers.dart';
 import '../shared/widgets/arin_shell_layout.dart';
+import 'assistant_calendar.dart';
 import 'assistant_context_builder.dart';
+import 'assistant_prayer_countdown.dart';
+import 'assistant_destinations.dart';
 import 'assistant_models.dart';
 import 'assistant_repository.dart';
+import 'assistant_session.dart';
 import 'assistant_tool_executor.dart';
 import 'widgets/assistant_hilal_mark.dart';
+import 'package:arin/presentation/shared/widgets/arin_loader.dart';
 
 final assistantRepositoryProvider = Provider<AssistantRepository>((ref) {
   return AssistantRepository();
@@ -35,13 +41,20 @@ class _AssistantPageState extends ConsumerState<AssistantPage> {
   final _input = TextEditingController();
   final _scroll = ScrollController();
   final _focus = FocusNode();
-  final List<AssistantChatTurn> _turns = [];
-  bool _sending = false;
-  int? _remainingToday;
-  String? _banner;
-  int _seq = 0;
-  int? _streamingId;
-  final Set<int> _revealed = <int>{};
+
+  AssistantSession get _chat => ref.read(assistantSessionProvider);
+  List<AssistantChatTurn> get _turns => _chat.turns;
+  bool get _sending => _chat.sending;
+  set _sending(bool value) => _chat.sending = value;
+  int? get _remainingToday => _chat.remainingToday;
+  set _remainingToday(int? value) => _chat.remainingToday = value;
+  String? get _banner => _chat.banner;
+  set _banner(String? value) => _chat.banner = value;
+  int get _seq => _chat.seq;
+  set _seq(int value) => _chat.seq = value;
+  int? get _streamingId => _chat.streamingId;
+  set _streamingId(int? value) => _chat.streamingId = value;
+  Set<int> get _revealed => _chat.revealed;
 
   static const _maxUserChars = 100;
 
@@ -50,6 +63,7 @@ class _AssistantPageState extends ConsumerState<AssistantPage> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ProductMetricsService.featureOpen(ProductMetricFeatures.assistant);
+      if (_turns.isNotEmpty) _scrollToEnd();
     });
   }
 
@@ -65,10 +79,16 @@ class _AssistantPageState extends ConsumerState<AssistantPage> {
 
   bool get _overLimit => _charCount > _maxUserChars;
 
-  Future<void> _send() async {
+  Future<void> _send() => _sendPrompt(_input.text);
+
+  Future<void> _sendPrompt(String raw) async {
     final l10n = AppLocalizations.of(context)!;
-    final text = _input.text.trim();
-    if (text.isEmpty || _sending || _overLimit) return;
+    final text = raw.trim();
+    if (text.isEmpty || _sending || text.characters.length > _maxUserChars) {
+      return;
+    }
+    _focus.unfocus();
+    final local = resolveAssistantLocalRoute(text);
     setState(() {
       _sending = true;
       _banner = null;
@@ -76,6 +96,61 @@ class _AssistantPageState extends ConsumerState<AssistantPage> {
       _input.clear();
     });
     _scrollToEnd();
+
+    if (isRamadanCountdownAsk(text)) {
+      final locale = Localizations.localeOf(context).languageCode;
+      final reply = formatRamadanAssistantReply(
+        l10n: l10n,
+        locale: locale,
+        now: DateTime.now(),
+      );
+      setState(() {
+        final id = ++_seq;
+        _streamingId = id;
+        _turns.add(AssistantChatTurn(role: 'model', text: reply, id: id));
+        _sending = false;
+      });
+      _scrollToEnd();
+      return;
+    }
+
+    final prayerTarget = matchAssistantPrayerTarget(text);
+    if (prayerTarget != null) {
+      final reply = formatPrayerCountdownReply(
+        l10n: l10n,
+        times: ref.read(prayerTimesProvider).asData?.value,
+        now: DateTime.now(),
+        target: prayerTarget,
+      );
+      setState(() {
+        final id = ++_seq;
+        _streamingId = id;
+        _turns.add(
+          AssistantChatTurn(role: 'model', text: reply ?? l10n.assistantPrayerTimesMissing, id: id),
+        );
+        _sending = false;
+      });
+      _scrollToEnd();
+      return;
+    }
+
+    if (local != null) {
+      final reply = local.kind == AssistantLocalKind.lockVerseGuide
+          ? l10n.assistantLockVerseGuide
+          : l10n.assistantNavigatingThere;
+      setState(() {
+        final id = ++_seq;
+        _streamingId = id;
+        _turns.add(AssistantChatTurn(role: 'model', text: reply, id: id));
+        _sending = false;
+      });
+      _scrollToEnd();
+      if (!mounted) return;
+      await AssistantToolExecutor(ref, context).run(
+        AssistantAction(name: 'open_page', args: {'page': local.page}),
+      );
+      return;
+    }
 
     try {
       final locale = Localizations.localeOf(context).languageCode;
@@ -103,6 +178,16 @@ class _AssistantPageState extends ConsumerState<AssistantPage> {
           }
           if (action.name == 'open_page') break;
         }
+      }
+      final inferred = matchAssistantPage(text);
+      final opened = result.actions.any((a) => a.name == 'open_page');
+      if (!opened &&
+          inferred != null &&
+          isExplicitAssistantNavigation(text) &&
+          mounted) {
+        await AssistantToolExecutor(ref, context).run(
+          AssistantAction(name: 'open_page', args: {'page': inferred}),
+        );
       }
       if (!mounted) return;
       setState(() {
@@ -134,7 +219,8 @@ class _AssistantPageState extends ConsumerState<AssistantPage> {
         _input.text = text;
       });
     } finally {
-      if (mounted) setState(() => _sending = false);
+      _sending = false;
+      if (mounted) setState(() {});
     }
   }
 
@@ -212,7 +298,7 @@ class _AssistantPageState extends ConsumerState<AssistantPage> {
               ),
             ),
             if (resolving)
-              const Expanded(child: Center(child: CircularProgressIndicator()))
+              const Expanded(child: Center(child: ArinLoader()))
             else if (!allowed)
               Expanded(child: _AssistantGate(signedIn: signedIn, onDark: onDark))
             else ...[
@@ -223,7 +309,11 @@ class _AssistantPageState extends ConsumerState<AssistantPage> {
                 ),
               Expanded(
                 child: _turns.isEmpty
-                    ? _EmptyState(hide: _charCount > 0)
+                    ? _EmptyState(
+                        hide: _charCount > 0,
+                        enabled: !_sending,
+                        onAsk: _sendPrompt,
+                      )
                     : ListView.builder(
                         controller: _scroll,
                         padding: const EdgeInsets.fromLTRB(20, 8, 20, 20),
@@ -299,7 +389,7 @@ class _AssistantHeader extends StatelessWidget {
           const SizedBox(width: 10),
           Expanded(
             child: Text(
-              l10n.assistantTitle,
+              l10n.qiblaHubAiTitle,
               style: GoogleFonts.plusJakartaSans(
                 color: title,
                 fontSize: 17,
@@ -380,9 +470,15 @@ class _AssistantGate extends StatelessWidget {
 }
 
 class _EmptyState extends ConsumerWidget {
-  const _EmptyState({required this.hide});
+  const _EmptyState({
+    required this.hide,
+    required this.enabled,
+    required this.onAsk,
+  });
 
   final bool hide;
+  final bool enabled;
+  final ValueChanged<String> onAsk;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -397,11 +493,16 @@ class _EmptyState extends ConsumerWidget {
     );
     final helloStyle = GoogleFonts.plusJakartaSans(
       color: onDark ? Colors.white.withValues(alpha: 0.96) : AppColors.emeraldDark,
-      fontSize: 34,
-      fontWeight: FontWeight.w600,
+      fontSize: 30,
+      fontWeight: FontWeight.w700,
       height: 1.15,
-      letterSpacing: -1.1,
+      letterSpacing: -0.8,
     );
+    final prompts = [
+      l10n.assistantPromptLockVerse,
+      l10n.assistantPromptInshirah,
+      l10n.assistantPromptRamadan,
+    ];
     return AnimatedSlide(
       offset: hide ? const Offset(0, -0.22) : Offset.zero,
       duration: const Duration(milliseconds: 460),
@@ -411,33 +512,105 @@ class _EmptyState extends ConsumerWidget {
         duration: const Duration(milliseconds: 380),
         curve: hide ? Curves.easeIn : Curves.easeOut,
         child: IgnorePointer(
-          ignoring: hide,
+          ignoring: hide || !enabled,
           child: Center(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 28),
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.fromLTRB(24, 8, 24, 16),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   AssistantHilalMark(size: 42, color: bronze.withValues(alpha: 0.9)),
-                  const SizedBox(height: 22),
-                  Text.rich(
-                    TextSpan(
-                      style: helloStyle,
-                      children: [
-                        TextSpan(text: l10n.assistantHello),
-                        if (name != null) ...[
-                          const TextSpan(text: ' '),
-                          TextSpan(
-                            text: name,
-                            style: helloStyle.copyWith(color: bronze),
-                          ),
-                        ],
-                      ],
-                    ),
+                  const SizedBox(height: 18),
+                  Text(
+                    l10n.assistantHello,
                     textAlign: TextAlign.center,
+                    style: helloStyle,
                   ),
+                  if (name != null) ...[
+                    const SizedBox(height: 4),
+                    Text(
+                      name,
+                      textAlign: TextAlign.center,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: helloStyle.copyWith(
+                        color: bronze,
+                        fontSize: 26,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                  const SizedBox(height: 10),
+                  Text(
+                    l10n.assistantEmptyBody,
+                    textAlign: TextAlign.center,
+                    style: GoogleFonts.plusJakartaSans(
+                      color: onDark
+                          ? Colors.white.withValues(alpha: 0.62)
+                          : AppColors.textSecondary,
+                      fontSize: 14.5,
+                      fontWeight: FontWeight.w500,
+                      height: 1.35,
+                    ),
+                  ),
+                  const SizedBox(height: 22),
+                  for (var i = 0; i < prompts.length; i++) ...[
+                    if (i > 0) const SizedBox(height: 10),
+                    _PromptChip(
+                      label: prompts[i],
+                      onDark: onDark,
+                      bronze: bronze,
+                      onTap: () => onAsk(prompts[i]),
+                    ),
+                  ],
                 ],
               ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _PromptChip extends StatelessWidget {
+  const _PromptChip({
+    required this.label,
+    required this.onDark,
+    required this.bronze,
+    required this.onTap,
+  });
+
+  final String label;
+  final bool onDark;
+  final Color bronze;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final border = bronze.withValues(alpha: onDark ? 0.42 : 0.38);
+    final fill = onDark
+        ? const Color(0xFF0C1812).withValues(alpha: 0.72)
+        : AppColors.creamSurface.withValues(alpha: 0.92);
+    return Material(
+      color: fill,
+      shape: StadiumBorder(side: BorderSide(color: border)),
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: onTap,
+        customBorder: const StadiumBorder(),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 13),
+          child: Text(
+            label,
+            textAlign: TextAlign.center,
+            style: GoogleFonts.plusJakartaSans(
+              color: onDark
+                  ? Colors.white.withValues(alpha: 0.92)
+                  : AppColors.emeraldDark,
+              fontSize: 13.5,
+              fontWeight: FontWeight.w600,
+              height: 1.25,
             ),
           ),
         ),
@@ -885,7 +1058,7 @@ class _ComposerState extends State<_Composer> with TickerProviderStateMixin {
                                 child: widget.sending
                                     ? const Padding(
                                         padding: EdgeInsets.all(10),
-                                        child: CircularProgressIndicator(strokeWidth: 2),
+                                        child: ArinLoader(strokeWidth: 2),
                                       )
                                     : Icon(
                                         Icons.arrow_upward_rounded,

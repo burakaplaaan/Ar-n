@@ -5,16 +5,17 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:arin/l10n/app_localizations.dart';
 
 import '../../core/constants/app_colors.dart';
-import '../../core/router/app_router.dart';
 import '../../core/theme/arin_shell_background.dart';
 import '../../data/services/ad_gate_service.dart';
-import '../../data/services/paywall_prompt_service.dart';
 import '../../data/services/session_ad_prompt.dart';
+import '../assistant/assistant_entry.dart';
 import '../shared/providers/premium_providers.dart';
+import '../onboarding/app_tour/app_tour_anchor.dart';
+import '../onboarding/app_tour/app_tour_keys.dart';
+import '../shared/widgets/arin_pressable.dart';
 import '../shared/widgets/arin_shell_layout.dart';
 import '../shared/widgets/zikirmatik_silhouette_icon.dart';
 import 'qibla_hub_page.dart';
@@ -99,122 +100,125 @@ class QiblaToolsDashboardPage extends ConsumerWidget {
                   delegate: SliverChildListDelegate([
                     _SpiritualHeader(onDark: onDark),
                     const SizedBox(height: 16),
-                    _QiblaFeatureCard(
-                      onDark: onDark,
-                      accent: accent,
-                      title: l10n.qiblaHubAssistantTitle,
-                      subtitle: l10n.qiblaHubAssistantSubtitle,
-                      motif: _QiblaActionMotif.assistant,
-                      onTap: () {
-                        HapticFeedback.lightImpact();
-                        context.push(AppRoutes.assistant);
-                      },
-                    ),
-                    const SizedBox(height: 10),
-                    _QiblaFeatureCard(
-                      onDark: onDark,
-                      accent: accent,
-                      title: l10n.qiblaHubAiTitle,
-                      subtitle: l10n.qiblaHubAiSubtitle,
-                      motif: _QiblaActionMotif.ai,
-                      locked: !isPremium,
-                      onTap: () async {
-                        HapticFeedback.lightImpact();
-                        if (!isPremium) {
-                          await PaywallPromptService.showForLockedFeature(
-                            context,
+                    AppTourAnchor(
+                      id: AppTourTargetId.qiblaAi,
+                      child: _QiblaFeatureCard(
+                        onDark: onDark,
+                        accent: accent,
+                        title: l10n.qiblaHubAiTitle,
+                        subtitle: l10n.qiblaHubAiSubtitle,
+                        motif: _QiblaActionMotif.ai,
+                        locked: !isPremium,
+                        onTap: () async {
+                          HapticFeedback.lightImpact();
+                          await openAssistantOrPaywall(
+                            context: context,
+                            ref: ref,
                           );
-                          return;
-                        }
-                        if (!context.mounted) return;
-                        Navigator.of(context).pushNamed(
-                          QiblaHubRoutes.islamicAi,
-                        );
-                      },
-                    ),
-                    const SizedBox(height: 10),
-                    _QiblaFeatureCard(
-                      onDark: onDark,
-                      accent: accent,
-                      title: l10n.qiblaHubCompassTitle,
-                      subtitle: l10n.qiblaHubCompassSubtitle,
-                      motif: _QiblaActionMotif.compass,
-                      onTap: () => _openTool(
-                        context,
-                        ref,
-                        route: QiblaHubRoutes.compass,
-                        adPlacement: AdGatePlacement.qiblaSession,
+                        },
                       ),
                     ),
                     const SizedBox(height: 10),
-                    _QiblaFeatureCard(
-                      onDark: onDark,
-                      accent: accent,
-                      title: l10n.qiblaHubZikirTitle,
-                      subtitle: l10n.qiblaHubZikirFeatureSubtitle,
-                      motif: _QiblaActionMotif.tasbeeh,
-                      onTap: () => _openTool(
-                        context,
-                        ref,
-                        route: QiblaHubRoutes.zikir,
-                        adPlacement: AdGatePlacement.zikirSession,
+                    AppTourAnchor(
+                      id: AppTourTargetId.qiblaCompass,
+                      child: _QiblaFeatureCard(
+                        onDark: onDark,
+                        accent: accent,
+                        title: l10n.qiblaHubCompassTitle,
+                        subtitle: l10n.qiblaHubCompassSubtitle,
+                        motif: _QiblaActionMotif.compass,
+                        onTap: () => _openTool(
+                          context,
+                          ref,
+                          route: QiblaHubRoutes.compass,
+                          adPlacement: AdGatePlacement.qiblaSession,
+                        ),
                       ),
                     ),
                     const SizedBox(height: 10),
-                    _QiblaFeatureCard(
-                      onDark: onDark,
-                      accent: accent,
-                      title: l10n.qiblaHubHilalDuelTitle,
-                      subtitle: l10n.qiblaHubHilalDuelSubtitle,
-                      motif: _QiblaActionMotif.hilal,
-                      onTap: () {
-                        HapticFeedback.lightImpact();
-                        Navigator.of(
+                    AppTourAnchor(
+                      id: AppTourTargetId.qiblaZikir,
+                      child: _QiblaFeatureCard(
+                        onDark: onDark,
+                        accent: accent,
+                        title: l10n.qiblaHubZikirTitle,
+                        subtitle: l10n.qiblaHubZikirFeatureSubtitle,
+                        motif: _QiblaActionMotif.tasbeeh,
+                        onTap: () => _openTool(
                           context,
-                        ).pushNamed(QiblaHubRoutes.hilalDuel);
-                      },
-                    ),
-                    const SizedBox(height: 10),
-                    _QiblaFeatureCard(
-                      onDark: onDark,
-                      accent: accent,
-                      title: l10n.qiblaHubPrayerCircleTitle,
-                      subtitle: l10n.qiblaHubPrayerCircleSubtitle,
-                      motif: _QiblaActionMotif.prayer,
-                      onTap: () {
-                        HapticFeedback.lightImpact();
-                        Navigator.of(
-                          context,
-                        ).pushNamed(QiblaHubRoutes.prayerCircle);
-                      },
-                    ),
-                    const SizedBox(height: 10),
-                    _QiblaFeatureCard(
-                      onDark: onDark,
-                      accent: accent,
-                      title: l10n.qiblaHubHealingTitle,
-                      subtitle: l10n.qiblaHubHealingSubtitle,
-                      motif: _QiblaActionMotif.frequency,
-                      onTap: () => _openTool(
-                        context,
-                        ref,
-                        route: QiblaHubRoutes.healing,
-                        adPlacement: AdGatePlacement.healingSession,
+                          ref,
+                          route: QiblaHubRoutes.zikir,
+                          adPlacement: AdGatePlacement.zikirSession,
+                        ),
                       ),
                     ),
                     const SizedBox(height: 10),
-                    _QiblaFeatureCard(
-                      onDark: onDark,
-                      accent: accent,
-                      title: l10n.qiblaHubBreathingTitle,
-                      subtitle: l10n.qiblaHubBreathingSubtitle,
-                      motif: _QiblaActionMotif.breath,
-                      onTap: () {
-                        HapticFeedback.lightImpact();
-                        Navigator.of(
+                    AppTourAnchor(
+                      id: AppTourTargetId.qiblaHilal,
+                      child: _QiblaFeatureCard(
+                        onDark: onDark,
+                        accent: accent,
+                        title: l10n.qiblaHubHilalDuelTitle,
+                        subtitle: l10n.qiblaHubHilalDuelSubtitle,
+                        motif: _QiblaActionMotif.hilal,
+                        onTap: () {
+                          HapticFeedback.lightImpact();
+                          Navigator.of(
+                            context,
+                          ).pushNamed(QiblaHubRoutes.hilalDuel);
+                        },
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    AppTourAnchor(
+                      id: AppTourTargetId.qiblaPrayerCircle,
+                      child: _QiblaFeatureCard(
+                        onDark: onDark,
+                        accent: accent,
+                        title: l10n.qiblaHubPrayerCircleTitle,
+                        subtitle: l10n.qiblaHubPrayerCircleSubtitle,
+                        motif: _QiblaActionMotif.prayer,
+                        onTap: () {
+                          HapticFeedback.lightImpact();
+                          Navigator.of(
+                            context,
+                          ).pushNamed(QiblaHubRoutes.prayerCircle);
+                        },
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    AppTourAnchor(
+                      id: AppTourTargetId.qiblaHealing,
+                      child: _QiblaFeatureCard(
+                        onDark: onDark,
+                        accent: accent,
+                        title: l10n.qiblaHubHealingTitle,
+                        subtitle: l10n.qiblaHubHealingSubtitle,
+                        motif: _QiblaActionMotif.frequency,
+                        onTap: () => _openTool(
                           context,
-                        ).pushNamed(QiblaHubRoutes.breathing);
-                      },
+                          ref,
+                          route: QiblaHubRoutes.healing,
+                          adPlacement: AdGatePlacement.healingSession,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    AppTourAnchor(
+                      id: AppTourTargetId.qiblaBreathing,
+                      child: _QiblaFeatureCard(
+                        onDark: onDark,
+                        accent: accent,
+                        title: l10n.qiblaHubBreathingTitle,
+                        subtitle: l10n.qiblaHubBreathingSubtitle,
+                        motif: _QiblaActionMotif.breath,
+                        onTap: () {
+                          HapticFeedback.lightImpact();
+                          Navigator.of(
+                            context,
+                          ).pushNamed(QiblaHubRoutes.breathing);
+                        },
+                      ),
                     ),
                   ]),
                 ),
@@ -347,15 +351,11 @@ class _QiblaFeatureCard extends StatelessWidget {
       label: '$title. $subtitle',
       onTap: onTap,
       child: ExcludeSemantics(
-        child: Material(
-          color: Colors.transparent,
-          borderRadius: BorderRadius.circular(_QiblaHubCardStyle.radius),
-          clipBehavior: Clip.antiAlias,
-          child: InkWell(
-            onTap: onTap,
-            splashColor: accent.withValues(alpha: 0.12),
-            highlightColor: bronze.withValues(alpha: 0.06),
-            child: Ink(
+        child: ArinPressable(
+          onTap: onTap,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(_QiblaHubCardStyle.radius),
+            child: DecoratedBox(
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(_QiblaHubCardStyle.radius),
                 gradient: LinearGradient(

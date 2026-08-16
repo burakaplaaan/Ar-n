@@ -19,6 +19,7 @@ import '../../../core/constants/turkey_provinces.dart';
 import '../../../core/providers/shared_preferences_provider.dart';
 import '../../../data/services/location_service.dart';
 import '../providers/prayer_time_providers.dart';
+import 'package:arin/presentation/shared/widgets/arin_loader.dart';
 
 class LocationChangeListener extends ConsumerStatefulWidget {
   const LocationChangeListener({required this.child, super.key});
@@ -296,7 +297,7 @@ class _LocationChangeDialogState extends State<_LocationChangeDialog> {
                 child: SizedBox(
                   width: 24,
                   height: 24,
-                  child: CircularProgressIndicator(strokeWidth: 2),
+                  child: ArinLoader(strokeWidth: 2),
                 ),
               )
             else

@@ -16,6 +16,7 @@ import '../../data/services/location_service.dart';
 import '../../l10n/app_localizations.dart';
 import '../shared/providers/prayer_time_providers.dart';
 import '../shared/providers/quotes_providers.dart';
+import 'package:arin/presentation/shared/widgets/arin_loader.dart';
 
 class LanguageSettingsPage extends ConsumerStatefulWidget {
   const LanguageSettingsPage({super.key});
@@ -280,7 +281,7 @@ class _LanguageOptionTile extends StatelessWidget {
                 SizedBox(
                   width: 20,
                   height: 20,
-                  child: CircularProgressIndicator(
+                  child: ArinLoader(
                     strokeWidth: 2.2,
                     color: titleColor.withValues(alpha: 0.65),
                   ),

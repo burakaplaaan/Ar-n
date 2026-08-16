@@ -13,6 +13,7 @@ import '../../core/router/app_router.dart';
 import '../../data/models/habit_model.dart';
 import '../shared/providers/habit_providers.dart';
 import '../shared/providers/willpower_hub_nav_provider.dart';
+import 'package:arin/presentation/shared/widgets/arin_loader.dart';
 
 const Color _kQuitAccent = Color(0xFFFF5252);
 const Color _kSaveOutline = Color(0xFFFFC107);
@@ -270,7 +271,7 @@ class _QuitTemplatePickerPageState
                             ? SizedBox(
                                 width: 18,
                                 height: 18,
-                                child: CircularProgressIndicator(
+                                child: ArinLoader(
                                   strokeWidth: 2,
                                   color: _kSaveOutline.withValues(alpha: 0.9),
                                 ),

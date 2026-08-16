@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../assistant/assistant_session.dart';
+
 /// Kıble hub içi sayfalarda: **geri kenarından** başlayıp içeri doğru kaydırınca
 /// [Navigator.pop]. Ana shell [PageView] zaten bu rotalarda kilitli.
 class QiblaNestedSwipeBack extends StatefulWidget {
@@ -34,6 +36,7 @@ class _QiblaNestedSwipeBackState extends State<QiblaNestedSwipeBack> {
       canPop: false,
       onPopInvokedWithResult: (didPop, _) {
         if (didPop) return;
+        if (popToAssistantIfNeeded(context)) return;
         final onBack = widget.onBack;
         if (onBack != null) {
           onBack();
@@ -74,6 +77,7 @@ class _QiblaNestedSwipeBackState extends State<QiblaNestedSwipeBack> {
           _startedFromBackEdge = false;
           _accumDx = 0;
           if ((farEnough || flingBack) && context.mounted) {
+            if (popToAssistantIfNeeded(context)) return;
             final onBack = widget.onBack;
             if (onBack != null) {
               onBack();

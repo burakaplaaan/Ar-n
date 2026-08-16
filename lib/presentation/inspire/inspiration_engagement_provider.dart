@@ -7,6 +7,7 @@ import '../../core/analytics/arin_analytics.dart';
 import '../../core/providers/shared_preferences_provider.dart';
 import '../../data/services/inspiration_engagement_sync_service.dart';
 import '../../data/services/product_metrics_service.dart';
+import 'inspiration_like_totals_provider.dart';
 
 const _kSaved = 'inspire_saved_ids';
 const _kLiked = 'inspire_liked_ids';
@@ -57,9 +58,13 @@ final inspirationSavedIdsProvider =
     });
 
 class InspirationLikedNotifier extends StateNotifier<Set<String>> {
-  InspirationLikedNotifier(this._prefs) : super(_read(_prefs));
+  InspirationLikedNotifier(
+    this._prefs, {
+    this.onLikeToggled,
+  }) : super(_read(_prefs));
 
   final SharedPreferences _prefs;
+  final void Function(String id, {required bool liked})? onLikeToggled;
 
   static Set<String> _read(SharedPreferences p) =>
       (p.getStringList(_kLiked) ?? const <String>[]).toSet();
@@ -77,9 +82,9 @@ class InspirationLikedNotifier extends StateNotifier<Set<String>> {
     state = next;
     _prefs.setStringList(_kLiked, next.toList());
     unawaited(InspirationEngagementSyncService.pushFromPrefs(_prefs));
+    onLikeToggled?.call(id, liked: !wasLiked);
     if (!wasLiked) {
       unawaited(ArinAnalytics.kesfetLike());
-      unawaited(ProductMetricsService.contentLike(id));
     }
   }
 }
@@ -87,5 +92,14 @@ class InspirationLikedNotifier extends StateNotifier<Set<String>> {
 final inspirationLikedIdsProvider =
     StateNotifierProvider<InspirationLikedNotifier, Set<String>>((ref) {
       final prefs = ref.watch(sharedPreferencesProvider);
-      return InspirationLikedNotifier(prefs);
+      return InspirationLikedNotifier(
+        prefs,
+        onLikeToggled: (id, {required liked}) {
+          unawaited(
+            ref
+                .read(inspirationLikeTotalsProvider.notifier)
+                .syncUserLike(id, liked: liked),
+          );
+        },
+      );
     });

@@ -25,6 +25,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../firebase_options.dart';
 import '../../core/router/app_router.dart';
+import '../../core/willpower/quit_notification_plan.dart';
 import 'arin_local_notifications_plugin.dart';
 import 'product_metrics_service.dart';
 import 'startup_permission_policy.dart';
@@ -130,6 +131,15 @@ abstract final class FcmTokenService {
     _navigate(AppRoutes.hilalDuel);
   }
 
+  static void _openQuitProgram(String payload) {
+    final parsed = parseQuitNotificationPayload(payload);
+    if (parsed == null) {
+      _navigate(AppRoutes.habitsArinmaTab);
+      return;
+    }
+    _navigate(AppRoutes.willQuitHome(parsed.habitId, tab: parsed.tab));
+  }
+
   static Future<bool> _queueAudienceSync({required bool active}) {
     final completer = Completer<bool>();
     _audienceSyncTail = _audienceSyncTail
@@ -189,6 +199,9 @@ abstract final class FcmTokenService {
         });
         registerLocalNotificationTapHandler('hilal_duel', (_) {
           _openHilalDuel();
+        });
+        registerLocalNotificationTapHandler('quit_program', (payload) {
+          _openQuitProgram(payload);
         });
         _localTapHandlerRegistered = true;
       }

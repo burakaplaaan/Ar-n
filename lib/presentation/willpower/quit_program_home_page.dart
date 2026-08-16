@@ -16,6 +16,7 @@ import '../../core/constants/app_text_styles.dart';
 import '../../core/constants/willpower_templates.dart';
 import '../../core/providers/shared_preferences_provider.dart';
 import '../../core/router/app_router.dart';
+import '../../core/willpower/quit_elapsed_format.dart';
 import '../../core/willpower/quit_program_metrics.dart';
 import '../../data/models/habit_model.dart';
 import '../../data/willpower/willpower_content_loader.dart';
@@ -23,11 +24,19 @@ import '../shared/mixins/review_prompt_on_exit_mixin.dart';
 import '../shared/providers/habit_providers.dart';
 import '../shared/providers/willpower_hub_nav_provider.dart';
 import 'widgets/quit_smoking_shared_widgets.dart';
+import 'package:arin/presentation/shared/widgets/arin_loader.dart';
 
 class QuitProgramHomePage extends ConsumerStatefulWidget {
-  const QuitProgramHomePage({super.key, required this.habitId});
+  const QuitProgramHomePage({
+    super.key,
+    required this.habitId,
+    this.initialTab,
+  });
 
   final String habitId;
+
+  /// `progress` (İlerleme) veya `tips` (İpuçları).
+  final String? initialTab;
 
   @override
   ConsumerState<QuitProgramHomePage> createState() =>
@@ -75,13 +84,25 @@ class _QuitProgramHomePageState extends ConsumerState<QuitProgramHomePage>
   void initState() {
     super.initState();
     startReviewPromptTracking();
-    _tabs = TabController(length: 2, vsync: this);
+    _tabs = TabController(
+      length: 2,
+      vsync: this,
+      initialIndex: widget.initialTab == 'tips' ? 1 : 0,
+    );
     _liveClock = Timer.periodic(const Duration(seconds: 1), (_) {
       if (!mounted) return;
       // Yalnızca ValueNotifier güncellenir; sayfanın tamamı rebuild edilmez.
       final repo = ref.read(habitRepositoryProvider);
       _elapsedLiveNotifier.value = repo.quitElapsedSinceClock(widget.habitId);
     });
+  }
+
+  @override
+  void didUpdateWidget(covariant QuitProgramHomePage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.initialTab != widget.initialTab) {
+      _tabs.index = widget.initialTab == 'tips' ? 1 : 0;
+    }
   }
 
   @override
@@ -171,7 +192,7 @@ class _QuitProgramHomePageState extends ConsumerState<QuitProgramHomePage>
       return const Scaffold(
         backgroundColor: AppColors.anthraciteDark,
         body: Center(
-          child: CircularProgressIndicator(color: AppColors.accentNeonGreen),
+          child: ArinLoader(color: AppColors.accentNeonGreen),
         ),
       );
     }
@@ -342,7 +363,7 @@ class _QuitProgramHomePageState extends ConsumerState<QuitProgramHomePage>
                     ),
                     _loadingTips
                         ? const Center(
-                            child: CircularProgressIndicator(
+                            child: ArinLoader(
                               color: AppColors.accentNeonGreen,
                             ),
                           )
@@ -600,16 +621,7 @@ class _ResetOptionTile extends StatelessWidget {
 }
 
 String _formatQuitHms(Duration d, AppLocalizations l10n) {
-  final h = d.inHours;
-  final m = d.inMinutes.remainder(60);
-  final s = d.inSeconds.remainder(60);
-  if (h > 0) {
-    return l10n.quitProgramElapsedHms(h, m, s);
-  }
-  if (m > 0) {
-    return l10n.quitProgramElapsedMs(m, s);
-  }
-  return l10n.quitProgramElapsedS(s);
+  return formatQuitElapsed(d, l10n);
 }
 
 /// İki sekmeli animasyonlu üst çubuk.
@@ -1137,12 +1149,18 @@ class _TerakkiTab extends StatelessWidget {
                       if (elapsed == null) return const SizedBox.shrink();
                       return Padding(
                         padding: const EdgeInsets.only(top: 10),
-                        child: Text(
-                          _formatQuitHms(elapsed, l10n),
-                          style: AppTextStyles.labelMedium.copyWith(
-                            color: Colors.white.withValues(alpha: 0.85),
-                            fontWeight: FontWeight.w600,
-                            letterSpacing: 0.5,
+                        child: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            _formatQuitHms(elapsed, l10n),
+                            maxLines: 1,
+                            softWrap: false,
+                            style: AppTextStyles.labelMedium.copyWith(
+                              color: Colors.white.withValues(alpha: 0.85),
+                              fontWeight: FontWeight.w600,
+                              letterSpacing: 0.5,
+                            ),
                           ),
                         ),
                       );
@@ -1390,15 +1408,17 @@ class _StatCard extends StatelessWidget {
         children: [
           Icon(icon, color: borderColor, size: 28),
           const SizedBox(height: 8),
-          Text(
-            value,
-            textAlign: TextAlign.center,
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-            style: AppTextStyles.headlineSmall.copyWith(
-              color: AppColors.creamBase,
-              fontWeight: FontWeight.w800,
-              fontSize: smallValue ? 15 : null,
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Text(
+              value,
+              textAlign: TextAlign.center,
+              maxLines: 2,
+              style: AppTextStyles.headlineSmall.copyWith(
+                color: AppColors.creamBase,
+                fontWeight: FontWeight.w800,
+                fontSize: smallValue ? 15 : null,
+              ),
             ),
           ),
           Text(

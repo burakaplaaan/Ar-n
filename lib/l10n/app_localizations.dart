@@ -1444,6 +1444,37 @@ abstract class AppLocalizations {
   /// **'{seconds} sn'**
   String quitProgramElapsedS(int seconds);
 
+  /// No description provided for @quitProgramElapsedDHms.
+  ///
+  /// In tr, this message translates to:
+  /// **'{days} gün {hours} sa {minutes} dk {seconds} sn'**
+  String quitProgramElapsedDHms(int days, int hours, int minutes, int seconds);
+
+  /// No description provided for @quitProgramElapsedMdHms.
+  ///
+  /// In tr, this message translates to:
+  /// **'{months} ay {days} gün {hours} sa {minutes} dk {seconds} sn'**
+  String quitProgramElapsedMdHms(
+    int months,
+    int days,
+    int hours,
+    int minutes,
+    int seconds,
+  );
+
+  /// No description provided for @quitProgramElapsedYmdHms.
+  ///
+  /// In tr, this message translates to:
+  /// **'{years} yıl {months} ay {days} gün {hours} sa {minutes} dk {seconds} sn'**
+  String quitProgramElapsedYmdHms(
+    int years,
+    int months,
+    int days,
+    int hours,
+    int minutes,
+    int seconds,
+  );
+
   /// No description provided for @quitProgramTabProgress.
   ///
   /// In tr, this message translates to:
@@ -2457,26 +2488,44 @@ abstract class AppLocalizations {
   /// No description provided for @assistantEmptyTitle.
   ///
   /// In tr, this message translates to:
-  /// **'Merhaba'**
+  /// **'Selamün Aleyküm!'**
   String get assistantEmptyTitle;
 
   /// No description provided for @assistantEmptyBody.
   ///
   /// In tr, this message translates to:
-  /// **''**
+  /// **'Ben İslami bir yapay zekâyım.'**
   String get assistantEmptyBody;
 
   /// No description provided for @assistantHello.
   ///
   /// In tr, this message translates to:
-  /// **'Merhaba'**
+  /// **'Selamün Aleyküm!'**
   String get assistantHello;
 
   /// No description provided for @assistantHelloName.
   ///
   /// In tr, this message translates to:
-  /// **'Merhaba {name}'**
+  /// **'Selamün Aleyküm! {name}'**
   String assistantHelloName(String name);
+
+  /// No description provided for @assistantPromptLockVerse.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kilit ekranına ayet nasıl koyulur?'**
+  String get assistantPromptLockVerse;
+
+  /// No description provided for @assistantPromptInshirah.
+  ///
+  /// In tr, this message translates to:
+  /// **'İnşirah suresini açıkla.'**
+  String get assistantPromptInshirah;
+
+  /// No description provided for @assistantPromptRamadan.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ramazana kaç gün var?'**
+  String get assistantPromptRamadan;
 
   /// No description provided for @assistantNeedSignIn.
   ///
@@ -2555,6 +2604,130 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'O sayfayı açamadım.'**
   String get assistantActionUnknownPage;
+
+  /// No description provided for @assistantNavigatingThere.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hemen açıyorum.'**
+  String get assistantNavigatingThere;
+
+  /// No description provided for @assistantLockVerseGuide.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bunu Arın’dan yapabilirsin. Ayarlar → Widget Merkezi’nden kilit ekranı ayetini ekle. Başka bir uygulama indirmen gerekmez.'**
+  String get assistantLockVerseGuide;
+
+  /// No description provided for @assistantRamadanDays.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bugün {today}. Ramazana {days} gün var. Takribi başlangıç {date}; hilal bir gün kaydırabilir.'**
+  String assistantRamadanDays(String today, int days, String date);
+
+  /// No description provided for @assistantRamadanTomorrow.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bugün {today}. Ramazan yarın başlıyor (takribi {date}).'**
+  String assistantRamadanTomorrow(String today, String date);
+
+  /// No description provided for @assistantRamadanToday.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bugün {today}. Ramazan bugün başlıyor.'**
+  String assistantRamadanToday(String today);
+
+  /// No description provided for @assistantRamadanOngoing.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bugün {today}. Ramazandayız; {day}. günündeyiz.'**
+  String assistantRamadanOngoing(String today, int day);
+
+  /// No description provided for @assistantPrayerTimesMissing.
+  ///
+  /// In tr, this message translates to:
+  /// **'Namaz vakitleri henüz yok. Konumu açıp biraz bekle.'**
+  String get assistantPrayerTimesMissing;
+
+  /// No description provided for @assistantPrayerCountdown.
+  ///
+  /// In tr, this message translates to:
+  /// **'{label} {remaining} var. Vakit {time}.'**
+  String assistantPrayerCountdown(String label, String remaining, String time);
+
+  /// No description provided for @assistantPrayerCountdownTomorrow.
+  ///
+  /// In tr, this message translates to:
+  /// **'{label} {remaining} var. Yarın {time}.'**
+  String assistantPrayerCountdownTomorrow(
+    String label,
+    String remaining,
+    String time,
+  );
+
+  /// No description provided for @assistantPrayerLabelIftar.
+  ///
+  /// In tr, this message translates to:
+  /// **'İftara'**
+  String get assistantPrayerLabelIftar;
+
+  /// No description provided for @assistantPrayerLabelImsak.
+  ///
+  /// In tr, this message translates to:
+  /// **'İmsake'**
+  String get assistantPrayerLabelImsak;
+
+  /// No description provided for @assistantPrayerLabelDhuhr.
+  ///
+  /// In tr, this message translates to:
+  /// **'Öğleye'**
+  String get assistantPrayerLabelDhuhr;
+
+  /// No description provided for @assistantPrayerLabelAsr.
+  ///
+  /// In tr, this message translates to:
+  /// **'İkindiye'**
+  String get assistantPrayerLabelAsr;
+
+  /// No description provided for @assistantPrayerLabelMaghrib.
+  ///
+  /// In tr, this message translates to:
+  /// **'Akşama'**
+  String get assistantPrayerLabelMaghrib;
+
+  /// No description provided for @assistantPrayerLabelIsha.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yatsıya'**
+  String get assistantPrayerLabelIsha;
+
+  /// No description provided for @assistantPrayerLabelNext.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sıradaki namaza ({name})'**
+  String assistantPrayerLabelNext(String name);
+
+  /// No description provided for @assistantDurationHm.
+  ///
+  /// In tr, this message translates to:
+  /// **'{hours} sa {minutes} dk'**
+  String assistantDurationHm(int hours, int minutes);
+
+  /// No description provided for @assistantDurationH.
+  ///
+  /// In tr, this message translates to:
+  /// **'{hours} sa'**
+  String assistantDurationH(int hours);
+
+  /// No description provided for @assistantDurationM.
+  ///
+  /// In tr, this message translates to:
+  /// **'{minutes} dk'**
+  String assistantDurationM(int minutes);
+
+  /// No description provided for @assistantDurationSoon.
+  ///
+  /// In tr, this message translates to:
+  /// **'bir dakikadan az'**
+  String get assistantDurationSoon;
 
   /// No description provided for @assistantActionCancelled.
   ///
@@ -3537,7 +3710,7 @@ abstract class AppLocalizations {
   /// No description provided for @notificationsMilestoneSubtitle.
   ///
   /// In tr, this message translates to:
-  /// **'Örn. bırakma yolculuğunda 24 saat, 1 hafta gibi seyrek mesajlar.'**
+  /// **'Arınma eşikleri, toparlanma yüzdeleri, aylık motivasyon ve ara sıra ipucu / ilham.'**
   String get notificationsMilestoneSubtitle;
 
   /// No description provided for @notificationsTaskTitle.
@@ -9467,6 +9640,342 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'İşlem tamamlanamadı. Bağlantını kontrol edip tekrar dene.'**
   String get prayerCircleGenericError;
+
+  /// No description provided for @appTourNext.
+  ///
+  /// In tr, this message translates to:
+  /// **'İlerle'**
+  String get appTourNext;
+
+  /// No description provided for @appTourSkip.
+  ///
+  /// In tr, this message translates to:
+  /// **'Atla'**
+  String get appTourSkip;
+
+  /// No description provided for @appTourLetsStart.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hadi başlayalım!'**
+  String get appTourLetsStart;
+
+  /// No description provided for @appTourProgress.
+  ///
+  /// In tr, this message translates to:
+  /// **'{current}/{total}'**
+  String appTourProgress(int current, int total);
+
+  /// No description provided for @appTourHomeHeaderTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ana ekranın'**
+  String get appTourHomeHeaderTitle;
+
+  /// No description provided for @appTourHomeHeaderBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'Selam, ismin ve sıradaki namaz geri sayımı burada. İsme dokunarak hitabı değiştirebilirsin.'**
+  String get appTourHomeHeaderBody;
+
+  /// No description provided for @appTourHomeWisdomTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Günün sözü'**
+  String get appTourHomeWisdomTitle;
+
+  /// No description provided for @appTourHomeWisdomBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'Her gün bir namaz hikmeti. Kartı kaydırarak yenileyebilir, kaydedebilirsin.'**
+  String get appTourHomeWisdomBody;
+
+  /// No description provided for @appTourHomeNamazTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Namaz takibi'**
+  String get appTourHomeNamazTitle;
+
+  /// No description provided for @appTourHomeNamazBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'Vakitleri işaretle, serini koru. Kaza ve hatırlatmalar da burada.'**
+  String get appTourHomeNamazBody;
+
+  /// No description provided for @appTourHomePrayerTimesTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Namaz vakitleri'**
+  String get appTourHomePrayerTimesTitle;
+
+  /// No description provided for @appTourHomePrayerTimesBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'İlçene göre vakitler. Konumu Ayarlar’dan değiştirebilirsin.'**
+  String get appTourHomePrayerTimesBody;
+
+  /// No description provided for @appTourNavToolsTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Araçlar'**
+  String get appTourNavToolsTitle;
+
+  /// No description provided for @appTourNavToolsBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kıble, zikir, dua halkası ve diğer manevi araçlar bu sekmede.'**
+  String get appTourNavToolsBody;
+
+  /// No description provided for @appTourQiblaAssistantTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Arın Asistanı'**
+  String get appTourQiblaAssistantTitle;
+
+  /// No description provided for @appTourQiblaAssistantBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'Namaz, bildirim ve hatırlatıcıları sohbetle yönet.'**
+  String get appTourQiblaAssistantBody;
+
+  /// No description provided for @appTourQiblaAiTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'İslami Yapay Zeka'**
+  String get appTourQiblaAiTitle;
+
+  /// No description provided for @appTourQiblaAiBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sorularına İslami kaynaklarla yanıt. Premium ile açılır.'**
+  String get appTourQiblaAiBody;
+
+  /// No description provided for @appTourQiblaCompassTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kıble pusulası'**
+  String get appTourQiblaCompassTitle;
+
+  /// No description provided for @appTourQiblaCompassBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'Konumunla Kâbe yönünü gösterir.'**
+  String get appTourQiblaCompassBody;
+
+  /// No description provided for @appTourQiblaZikirTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Zikirmatik'**
+  String get appTourQiblaZikirTitle;
+
+  /// No description provided for @appTourQiblaZikirBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'Dijital tesbih; hedef, tur ve zikir bilgisi.'**
+  String get appTourQiblaZikirBody;
+
+  /// No description provided for @appTourQiblaHilalTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bilgi düellosu'**
+  String get appTourQiblaHilalTitle;
+
+  /// No description provided for @appTourQiblaHilalBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'İslami sorularla yarış, bilgilerini pekiştir.'**
+  String get appTourQiblaHilalBody;
+
+  /// No description provided for @appTourQiblaPrayerCircleTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Dua halkası'**
+  String get appTourQiblaPrayerCircleTitle;
+
+  /// No description provided for @appTourQiblaPrayerCircleBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'Niyetini anonim paylaş; başkalarının dualarına amin de.'**
+  String get appTourQiblaPrayerCircleBody;
+
+  /// No description provided for @appTourQiblaHealingTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Şifa frekansları'**
+  String get appTourQiblaHealingTitle;
+
+  /// No description provided for @appTourQiblaHealingBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sakinleştirici seslerle nefesini ve odağını toparla.'**
+  String get appTourQiblaHealingBody;
+
+  /// No description provided for @appTourQiblaBreathingTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Nefes egzersizi'**
+  String get appTourQiblaBreathingTitle;
+
+  /// No description provided for @appTourQiblaBreathingBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'4-7-8 döngüsüyle stres anında sakinleş.'**
+  String get appTourQiblaBreathingBody;
+
+  /// No description provided for @appTourNavWillpowerTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Gelişim ve Arınma'**
+  String get appTourNavWillpowerTitle;
+
+  /// No description provided for @appTourNavWillpowerBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'Alışkanlık takibi ve bırakma programları bu üçgende.'**
+  String get appTourNavWillpowerBody;
+
+  /// No description provided for @appTourWillpowerTabsTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Gelişim ve Arınma'**
+  String get appTourWillpowerTabsTitle;
+
+  /// No description provided for @appTourWillpowerTabsBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'Gelişim’de hayır katan alışkanlıklar; Arınma’da bırakmak istediğin şeyler.'**
+  String get appTourWillpowerTabsBody;
+
+  /// No description provided for @appTourWillpowerBreathingTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Nefes'**
+  String get appTourWillpowerBreathingTitle;
+
+  /// No description provided for @appTourWillpowerBreathingBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kriz anında buradan nefes egzersizine geç.'**
+  String get appTourWillpowerBreathingBody;
+
+  /// No description provided for @appTourWillpowerAddTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yeni program'**
+  String get appTourWillpowerAddTitle;
+
+  /// No description provided for @appTourWillpowerAddBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'Artı ile gelişim alışkanlığı veya arınma programı ekle.'**
+  String get appTourWillpowerAddBody;
+
+  /// No description provided for @appTourNavExploreTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Keşfet'**
+  String get appTourNavExploreTitle;
+
+  /// No description provided for @appTourNavExploreBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ayet, hadis ve sözler — kaydır, kaydet, paylaş.'**
+  String get appTourNavExploreBody;
+
+  /// No description provided for @appTourInspireSearchTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ara'**
+  String get appTourInspireSearchTitle;
+
+  /// No description provided for @appTourInspireSearchBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kelime yaz; şekilsiz arama da çalışır.'**
+  String get appTourInspireSearchBody;
+
+  /// No description provided for @appTourInspireFilterTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Filtre'**
+  String get appTourInspireFilterTitle;
+
+  /// No description provided for @appTourInspireFilterBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'Söz, ayet veya hadis olarak akışı daralt.'**
+  String get appTourInspireFilterBody;
+
+  /// No description provided for @appTourNavSettingsTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ayarlar'**
+  String get appTourNavSettingsTitle;
+
+  /// No description provided for @appTourNavSettingsBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bildirim, dil, widget ve hesabın burada.'**
+  String get appTourNavSettingsBody;
+
+  /// No description provided for @appTourSettingsNotificationsTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bildirimler'**
+  String get appTourSettingsNotificationsTitle;
+
+  /// No description provided for @appTourSettingsNotificationsBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ezan, arınma ve zikir hatırlatmalarını buradan yönet.'**
+  String get appTourSettingsNotificationsBody;
+
+  /// No description provided for @appTourSettingsWidgetsTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Widget Merkezi'**
+  String get appTourSettingsWidgetsTitle;
+
+  /// No description provided for @appTourSettingsWidgetsBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ana ekran ve kilit widget’larını buradan aç.'**
+  String get appTourSettingsWidgetsBody;
+
+  /// No description provided for @appTourSettingsLanguageTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Dil'**
+  String get appTourSettingsLanguageTitle;
+
+  /// No description provided for @appTourSettingsLanguageBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'Türkçe, İngilizce veya Arapça seç.'**
+  String get appTourSettingsLanguageBody;
+
+  /// No description provided for @appTourAssistantFabTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Asistan balonu'**
+  String get appTourAssistantFabTitle;
+
+  /// No description provided for @appTourAssistantFabBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sürüklenebilir kısayol — her sekmede asistanı açar.'**
+  String get appTourAssistantFabBody;
+
+  /// No description provided for @appTourFinaleTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hazırsın'**
+  String get appTourFinaleTitle;
+
+  /// No description provided for @appTourFinaleBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'Tur bitti. İstediğin sekmeden devam et; biz hatırlatır ve eşlik ederiz.'**
+  String get appTourFinaleBody;
 }
 
 class _AppLocalizationsDelegate

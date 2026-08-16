@@ -42,6 +42,7 @@ import '../shared/providers/premium_providers.dart';
 import '../shared/providers/quotes_providers.dart';
 import 'admin_dev_tab.dart';
 import 'widgets/admin_diagnostics_tab.dart';
+import 'package:arin/presentation/shared/widgets/arin_loader.dart';
 
 part 'admin_content_inspire_form_row.dart';
 part 'admin_content_pools_tab.dart';
@@ -2430,7 +2431,7 @@ class _AdminContentPageState extends ConsumerState<AdminContentPage>
     final adminAsync = ref.watch(isCurrentUserAdminProvider);
     if (adminAsync.isLoading) {
       _isAdminVerified = false;
-      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+      return const Scaffold(body: Center(child: ArinLoader()));
     }
     if (adminAsync.hasError) {
       _isAdminVerified = false;
@@ -2622,7 +2623,7 @@ class _AdminContentPageState extends ConsumerState<AdminContentPage>
 
   Widget _buildPoolsTab() {
     if (_poolLoading && _poolDoc == null) {
-      return const Center(child: CircularProgressIndicator());
+      return const Center(child: ArinLoader());
     }
     final bottomInset = _shellBodyBottomInset(context);
     final allItems = _itemsFromDoc();
@@ -2933,7 +2934,7 @@ class _AdminContentPageState extends ConsumerState<AdminContentPage>
                   ? const SizedBox(
                       width: 14,
                       height: 14,
-                      child: CircularProgressIndicator(strokeWidth: 2),
+                      child: ArinLoader(strokeWidth: 2),
                     )
                   : const Icon(Icons.refresh_rounded),
               label: Text(l10n.adminRefreshAction),
@@ -3091,7 +3092,7 @@ class _AdminContentPageState extends ConsumerState<AdminContentPage>
                       ? const SizedBox(
                           width: 16,
                           height: 16,
-                          child: CircularProgressIndicator(strokeWidth: 2),
+                          child: ArinLoader(strokeWidth: 2),
                         )
                       : const Icon(Icons.refresh_rounded),
                 ),
@@ -3143,7 +3144,7 @@ class _AdminContentPageState extends ConsumerState<AdminContentPage>
                   child: SizedBox(
                     width: 20,
                     height: 20,
-                    child: CircularProgressIndicator(strokeWidth: 2),
+                    child: ArinLoader(strokeWidth: 2),
                   ),
                 ),
               )
@@ -3451,7 +3452,7 @@ class _AdminContentPageState extends ConsumerState<AdminContentPage>
                       ? const SizedBox(
                           width: 16,
                           height: 16,
-                          child: CircularProgressIndicator(strokeWidth: 2),
+                          child: ArinLoader(strokeWidth: 2),
                         )
                       : const Icon(Icons.campaign_rounded),
                   label: Text(
@@ -3535,7 +3536,7 @@ class _AdminContentPageState extends ConsumerState<AdminContentPage>
                           ? const SizedBox(
                               width: 16,
                               height: 16,
-                              child: CircularProgressIndicator(strokeWidth: 2),
+                              child: ArinLoader(strokeWidth: 2),
                             )
                           : const Icon(Icons.favorite_rounded),
                       label: Text(
@@ -3650,7 +3651,7 @@ class _AdminContentPageState extends ConsumerState<AdminContentPage>
                   ? const SizedBox(
                       width: 14,
                       height: 14,
-                      child: CircularProgressIndicator(strokeWidth: 2),
+                      child: ArinLoader(strokeWidth: 2),
                     )
                   : const Icon(Icons.refresh_rounded),
               label: const Text('Yenile'),
@@ -3876,7 +3877,7 @@ class _AdminContentPageState extends ConsumerState<AdminContentPage>
                   ? const SizedBox(
                       width: 14,
                       height: 14,
-                      child: CircularProgressIndicator(strokeWidth: 2),
+                      child: ArinLoader(strokeWidth: 2),
                     )
                   : const Icon(Icons.refresh_rounded),
               label: const Text('Yenile'),

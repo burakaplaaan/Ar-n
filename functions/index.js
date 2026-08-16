@@ -23,6 +23,7 @@ const {
 const { getMessaging } = require("firebase-admin/messaging");
 const { getAuth } = require("firebase-admin/auth");
 const premiumWebhookPolicy = require("./premium_webhook_policy");
+const { applyPublicInspirationLike } = require("./inspirationLikes");
 
 initializeApp();
 
@@ -226,6 +227,7 @@ async function assertCallerIsAdmin(req) {
 const _kMetricEvents = new Set([
   "content_view",
   "content_like",
+  "content_unlike",
   "content_save",
   "widget_active",
   "widget_first_use",
@@ -917,7 +919,15 @@ exports.recordProductMetric = onCall(
     const isHomeWidgetEvent = event.startsWith("widget_");
     if (event.startsWith("content_")) {
       cardId = _validatedCardId(req.data?.cardId);
-      await _assertKnownContentCard(db, cardId);
+      if (event === "content_like" || event === "content_unlike") {
+        try {
+          await _assertKnownContentCard(db, cardId);
+        } catch (_) {
+          // Yerel korpus kartları Firestore kataloğunda olmayabilir.
+        }
+      } else {
+        await _assertKnownContentCard(db, cardId);
+      }
       entity = cardId;
     }
     if (event === "widget_first_use" ||
@@ -1004,7 +1014,9 @@ exports.recordProductMetric = onCall(
         shardId: _metricShardId(installHash),
         updatedAt: FieldValue.serverTimestamp(),
       };
-      if (event.startsWith("content_")) {
+      if (event === "content_like" ||
+          event === "content_save" ||
+          event === "content_view") {
         const metric = event.substring("content_".length);
         dailyUpdate.content = {
           [metric + "s"]: FieldValue.increment(1),
@@ -1174,6 +1186,14 @@ exports.recordProductMetric = onCall(
       }
       tx.set(dailyRef, dailyUpdate, { merge: true });
     });
+    if ((event === "content_like" || event === "content_unlike") && cardId) {
+      await applyPublicInspirationLike(db, {
+        cardId,
+        installHash,
+        liked: event === "content_like",
+        FieldValue,
+      });
+    }
     return { ok: true, counted, accepted };
   },
 );

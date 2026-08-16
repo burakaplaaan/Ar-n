@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 import 'package:arin/l10n/app_localizations.dart';
 
 import '../../core/constants/app_colors.dart';
+import '../shared/widgets/arin_pressable.dart';
 import '../../core/constants/product_metric_features.dart';
 import '../../core/providers/shared_preferences_provider.dart';
 import '../../core/router/app_router.dart';
@@ -14,12 +15,15 @@ import '../../data/models/inspiration_card_model.dart';
 import '../../data/models/inspiration_content_kind.dart';
 import '../../data/repositories/inspiration_firestore_repository.dart';
 import '../../data/services/product_metrics_service.dart';
+import '../onboarding/app_tour/app_tour_anchor.dart';
+import '../onboarding/app_tour/app_tour_keys.dart';
 import '../shared/widgets/arin_skeleton.dart';
 import 'explore_content_filter_provider.dart';
 import 'inspiration_catalog_provider.dart';
 import 'inspire_viewer_session_provider.dart';
 import 'inspiration_search.dart';
 import 'widgets/explore_bgm_app_bar_actions.dart';
+import 'widgets/explore_header_veil.dart';
 import 'widgets/inspiration_grid_tile.dart';
 
 /// Instagram Keşfet tarzı ızgara — ara kutusu, Türkçe uyumlu arama, shell + alt bar.
@@ -176,11 +180,21 @@ class _InspireExplorePageState extends ConsumerState<InspireExplorePage> {
                     ? AppColors.creamSurface
                     : AppColors.homeGradientTop,
                 onRefresh: _onRefresh,
-                child: ListView(
+                child: CustomScrollView(
                   physics: const AlwaysScrollableScrollPhysics(),
-                  children: [
-                    SizedBox(height: MediaQuery.sizeOf(context).height * 0.25),
-                    _ExploreEmpty(onClose: canPop ? () => context.pop() : null),
+                  slivers: [
+                    _exploreHeader(
+                      l10n: l10n,
+                      onLight: onLight,
+                      canPop: canPop,
+                      filter: filter,
+                    ),
+                    SliverFillRemaining(
+                      hasScrollBody: false,
+                      child: _ExploreEmpty(
+                        onClose: canPop ? () => context.pop() : null,
+                      ),
+                    ),
                   ],
                 ),
               );
@@ -199,161 +213,11 @@ class _InspireExplorePageState extends ConsumerState<InspireExplorePage> {
                   parent: AlwaysScrollableScrollPhysics(),
                 ),
                 slivers: [
-                  SliverAppBar(
-                    pinned: true,
-                    elevation: 0,
-                    scrolledUnderElevation: 0,
-                    automaticallyImplyLeading: false,
-                    leading: canPop
-                        ? IconButton(
-                            onPressed: () => context.pop(),
-                            icon: const Icon(Icons.arrow_back_ios_new_rounded),
-                            color: onLight
-                                ? AppColors.emeraldDark.withValues(alpha: 0.72)
-                                : Colors.white.withValues(alpha: 0.48),
-                          )
-                        : null,
-                    backgroundColor: Colors.transparent,
-                    surfaceTintColor: Colors.transparent,
-                    flexibleSpace: Container(
-                      decoration: BoxDecoration(
-                        color: onLight
-                            ? Colors.white.withValues(alpha: 0.72)
-                            : Colors.grey.withValues(alpha: 0.42),
-                      ),
-                    ),
-                    title: Text(
-                      l10n.inspireExploreTitle,
-                      style: TextStyle(
-                        color: onLight
-                            ? AppColors.emeraldDark.withValues(alpha: 0.78)
-                            : Colors.white.withValues(alpha: 0.48),
-                        fontWeight: FontWeight.w500,
-                        letterSpacing: 0.2,
-                      ),
-                    ),
-                    centerTitle: true,
-                    actions: const [
-                      Padding(
-                        padding: EdgeInsets.only(right: 4),
-                        child: ExploreBgmAppBarActions(),
-                      ),
-                    ],
-                  ),
-                  SliverToBoxAdapter(
-                    child: Padding(
-                      padding: const EdgeInsets.fromLTRB(12, 6, 12, 10),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Expanded(
-                            child: Material(
-                              color: onLight
-                                  ? Colors.white.withValues(alpha: 0.88)
-                                  : Colors.white.withValues(alpha: 0.08),
-                              borderRadius: BorderRadius.circular(14),
-                              child: TextField(
-                                controller: _searchController,
-                                style: TextStyle(
-                                  color: onLight
-                                      ? AppColors.emeraldDark
-                                      : Colors.white.withValues(alpha: 0.92),
-                                  fontSize: 15,
-                                ),
-                                cursorColor: AppColors.accentNeonGreen,
-                                decoration: InputDecoration(
-                                  hintText: l10n.inspireSearchHint,
-                                  hintStyle: TextStyle(
-                                    color: onLight
-                                        ? AppColors.textSecondary
-                                        : Colors.white.withValues(alpha: 0.38),
-                                    fontSize: 15,
-                                  ),
-                                  prefixIcon: Icon(
-                                    Icons.search_rounded,
-                                    color: onLight
-                                        ? AppColors.textSecondary
-                                        : Colors.white.withValues(alpha: 0.45),
-                                    size: 24,
-                                  ),
-                                  suffixIcon: _query.isNotEmpty
-                                      ? IconButton(
-                                          icon: Icon(
-                                            Icons.close_rounded,
-                                            color: onLight
-                                                ? AppColors.textSecondary
-                                                      .withValues(alpha: 0.8)
-                                                : Colors.white.withValues(
-                                                    alpha: 0.5,
-                                                  ),
-                                          ),
-                                          onPressed: () {
-                                            _searchController.clear();
-                                          },
-                                        )
-                                      : null,
-                                  border: InputBorder.none,
-                                  contentPadding: const EdgeInsets.symmetric(
-                                    horizontal: 4,
-                                    vertical: 12,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 6),
-                          Material(
-                            color: onLight
-                                ? Colors.white.withValues(alpha: 0.88)
-                                : Colors.white.withValues(alpha: 0.08),
-                            borderRadius: BorderRadius.circular(14),
-                            child: PopupMenuButton<ExploreContentFilter>(
-                              tooltip: l10n.inspireFilterTooltip,
-                              initialValue: filter,
-                              padding: EdgeInsets.zero,
-                              icon: Icon(
-                                Icons.more_horiz_rounded,
-                                color: onLight
-                                    ? AppColors.emeraldDark.withValues(
-                                        alpha: 0.7,
-                                      )
-                                    : Colors.white.withValues(alpha: 0.55),
-                              ),
-                              onSelected: (v) {
-                                ref
-                                        .read(
-                                          exploreContentFilterProvider.notifier,
-                                        )
-                                        .state =
-                                    v;
-                              },
-                              itemBuilder: (context) => [
-                                CheckedPopupMenuItem(
-                                  value: ExploreContentFilter.mixed,
-                                  checked: filter == ExploreContentFilter.mixed,
-                                  child: Text(l10n.inspireFilterMainFeed),
-                                ),
-                                CheckedPopupMenuItem(
-                                  value: ExploreContentFilter.soz,
-                                  checked: filter == ExploreContentFilter.soz,
-                                  child: Text(l10n.inspireFilterQuote),
-                                ),
-                                CheckedPopupMenuItem(
-                                  value: ExploreContentFilter.ayet,
-                                  checked: filter == ExploreContentFilter.ayet,
-                                  child: Text(l10n.inspireFilterVerse),
-                                ),
-                                CheckedPopupMenuItem(
-                                  value: ExploreContentFilter.hadis,
-                                  checked: filter == ExploreContentFilter.hadis,
-                                  child: Text(l10n.inspireFilterHadith),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
+                  _exploreHeader(
+                    l10n: l10n,
+                    onLight: onLight,
+                    canPop: canPop,
+                    filter: filter,
                   ),
                   if (filtered.isEmpty)
                     SliverFillRemaining(
@@ -445,17 +309,33 @@ class _InspireExplorePageState extends ConsumerState<InspireExplorePage> {
               ),
             );
           },
-          loading: () => GridView.builder(
-            padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              mainAxisSpacing: 12,
-              crossAxisSpacing: 12,
-              childAspectRatio: 0.78,
-            ),
-            itemCount: 6,
-            itemBuilder: (_, __) =>
-                const ArinSkeleton(height: double.infinity, borderRadius: 16),
+          loading: () => CustomScrollView(
+            slivers: [
+              _exploreHeader(
+                l10n: l10n,
+                onLight: onLight,
+                canPop: canPop,
+                filter: filter,
+              ),
+              SliverPadding(
+                padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
+                sliver: SliverGrid(
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    mainAxisSpacing: 12,
+                    crossAxisSpacing: 12,
+                    childAspectRatio: 0.78,
+                  ),
+                  delegate: SliverChildBuilderDelegate(
+                    (_, __) => const ArinSkeleton(
+                      height: double.infinity,
+                      borderRadius: 16,
+                    ),
+                    childCount: 6,
+                  ),
+                ),
+              ),
+            ],
           ),
           error: (e, _) => RefreshIndicator(
             color: AppColors.accentNeonGreen,
@@ -463,18 +343,238 @@ class _InspireExplorePageState extends ConsumerState<InspireExplorePage> {
                 ? AppColors.creamSurface
                 : AppColors.homeGradientTop,
             onRefresh: _onRefresh,
-            child: ListView(
+            child: CustomScrollView(
               physics: const AlwaysScrollableScrollPhysics(),
-              children: [
-                SizedBox(height: MediaQuery.sizeOf(context).height * 0.2),
-                _ExploreError(
-                  message: '$e',
-                  onClose: canPop ? () => context.pop() : null,
+              slivers: [
+                _exploreHeader(
+                  l10n: l10n,
+                  onLight: onLight,
+                  canPop: canPop,
+                  filter: filter,
+                ),
+                SliverFillRemaining(
+                  hasScrollBody: false,
+                  child: _ExploreError(
+                    message: '$e',
+                    onClose: canPop ? () => context.pop() : null,
+                  ),
                 ),
               ],
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  SliverAppBar _exploreHeader({
+    required AppLocalizations l10n,
+    required bool onLight,
+    required bool canPop,
+    required ExploreContentFilter filter,
+  }) {
+    return SliverAppBar(
+      pinned: true,
+      primary: true,
+      elevation: 0,
+      scrolledUnderElevation: 0,
+      automaticallyImplyLeading: false,
+      toolbarHeight: ExploreHeaderMetrics.toolbarHeight,
+      titleSpacing: 8,
+      leadingWidth: canPop ? 40 : 0,
+      leading: canPop
+          ? ArinPressable(
+              scale: 0.90,
+              onTap: () => context.pop(),
+              child: SizedBox(
+                width: 40,
+                height: 34,
+                child: Icon(
+                  Icons.arrow_back_ios_new_rounded,
+                  size: 18,
+                  color: onLight
+                      ? AppColors.emeraldDark.withValues(alpha: 0.78)
+                      : Colors.white.withValues(alpha: 0.78),
+                ),
+              ),
+            )
+          : null,
+      backgroundColor: Colors.transparent,
+      surfaceTintColor: Colors.transparent,
+      flexibleSpace: const ExploreHeaderVeil(),
+      title: Text(
+        l10n.inspireExploreTitle,
+        style: TextStyle(
+          color: onLight
+              ? AppColors.emeraldDark
+              : Colors.white.withValues(alpha: 0.94),
+          fontWeight: FontWeight.w600,
+          fontSize: 17,
+          letterSpacing: -0.35,
+          height: 1.1,
+        ),
+      ),
+      centerTitle: true,
+      actions: const [
+        Padding(
+          padding: EdgeInsets.only(right: 2),
+          child: ExploreBgmAppBarActions(),
+        ),
+      ],
+      bottom: PreferredSize(
+        preferredSize: const Size.fromHeight(
+          ExploreHeaderMetrics.searchRowHeight,
+        ),
+        child: _ExploreSearchRow(
+          controller: _searchController,
+          query: _query,
+          filter: filter,
+          onLight: onLight,
+          onFilterSelected: (v) {
+            ref.read(exploreContentFilterProvider.notifier).state = v;
+          },
+        ),
+      ),
+    );
+  }
+}
+
+class _ExploreSearchRow extends StatelessWidget {
+  const _ExploreSearchRow({
+    required this.controller,
+    required this.query,
+    required this.filter,
+    required this.onLight,
+    required this.onFilterSelected,
+  });
+
+  final TextEditingController controller;
+  final String query;
+  final ExploreContentFilter filter;
+  final bool onLight;
+  final ValueChanged<ExploreContentFilter> onFilterSelected;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final fieldFill = onLight
+        ? Colors.white.withValues(alpha: 0.78)
+        : Colors.white.withValues(alpha: 0.07);
+    final fieldBorder = onLight
+        ? Colors.black.withValues(alpha: 0.06)
+        : Colors.white.withValues(alpha: 0.08);
+    final iconColor = onLight
+        ? AppColors.textSecondary
+        : Colors.white.withValues(alpha: 0.48);
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(12, 0, 12, 8),
+      child: Row(
+        children: [
+          Expanded(
+            child: AppTourAnchor(
+              id: AppTourTargetId.inspireSearch,
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  color: fieldFill,
+                  borderRadius: BorderRadius.circular(22),
+                  border: Border.all(color: fieldBorder),
+                ),
+                child: TextField(
+                  controller: controller,
+                  style: TextStyle(
+                    color: onLight
+                        ? AppColors.emeraldDark
+                        : Colors.white.withValues(alpha: 0.92),
+                    fontSize: 14.5,
+                    height: 1.2,
+                  ),
+                  cursorColor: AppColors.accentNeonGreen,
+                  decoration: InputDecoration(
+                    hintText: l10n.inspireSearchHint,
+                    hintStyle: TextStyle(
+                      color: onLight
+                          ? AppColors.textSecondary
+                          : Colors.white.withValues(alpha: 0.36),
+                      fontSize: 14.5,
+                    ),
+                    prefixIcon: Icon(
+                      Icons.search_rounded,
+                      color: iconColor,
+                      size: 20,
+                    ),
+                    suffixIcon: query.isNotEmpty
+                        ? ArinPressable(
+                            scale: 0.88,
+                            onTap: controller.clear,
+                            child: Icon(
+                              Icons.close_rounded,
+                              color: iconColor,
+                              size: 18,
+                            ),
+                          )
+                        : null,
+                    border: InputBorder.none,
+                    isDense: true,
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 4,
+                      vertical: 10,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: 8),
+          AppTourAnchor(
+            id: AppTourTargetId.inspireFilter,
+            child: PopupMenuButton<ExploreContentFilter>(
+              tooltip: l10n.inspireFilterTooltip,
+              initialValue: filter,
+              padding: EdgeInsets.zero,
+              onSelected: onFilterSelected,
+              itemBuilder: (context) => [
+                CheckedPopupMenuItem(
+                  value: ExploreContentFilter.mixed,
+                  checked: filter == ExploreContentFilter.mixed,
+                  child: Text(l10n.inspireFilterMainFeed),
+                ),
+                CheckedPopupMenuItem(
+                  value: ExploreContentFilter.soz,
+                  checked: filter == ExploreContentFilter.soz,
+                  child: Text(l10n.inspireFilterQuote),
+                ),
+                CheckedPopupMenuItem(
+                  value: ExploreContentFilter.ayet,
+                  checked: filter == ExploreContentFilter.ayet,
+                  child: Text(l10n.inspireFilterVerse),
+                ),
+                CheckedPopupMenuItem(
+                  value: ExploreContentFilter.hadis,
+                  checked: filter == ExploreContentFilter.hadis,
+                  child: Text(l10n.inspireFilterHadith),
+                ),
+              ],
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  color: fieldFill,
+                  borderRadius: BorderRadius.circular(22),
+                  border: Border.all(color: fieldBorder),
+                ),
+                child: SizedBox(
+                  width: 40,
+                  height: 40,
+                  child: Icon(
+                    Icons.more_horiz_rounded,
+                    color: onLight
+                        ? AppColors.emeraldDark.withValues(alpha: 0.72)
+                        : Colors.white.withValues(alpha: 0.62),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

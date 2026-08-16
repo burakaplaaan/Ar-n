@@ -24,8 +24,12 @@ AssistantContextSnapshot buildAssistantContext({
 
   String? nextPrayer;
   String? prayers;
+  String? imsak;
+  String? maghrib;
   final times = ref.read(prayerTimesProvider).asData?.value;
   if (times != null) {
+    imsak = times.imsak;
+    maghrib = times.maghrib;
     final now = DateTime.now();
     final next = times.nextPrayer(now);
     if (next != null) {
@@ -49,11 +53,20 @@ AssistantContextSnapshot buildAssistantContext({
     }
   }
 
+  final now = DateTime.now();
+  final today =
+      '${now.year.toString().padLeft(4, '0')}-'
+      '${now.month.toString().padLeft(2, '0')}-'
+      '${now.day.toString().padLeft(2, '0')}';
+
   return AssistantContextSnapshot(
     name: name,
     locale: locale,
     nextPrayer: nextPrayer,
     prayers: prayers,
     habits: habits.isEmpty ? null : habits,
+    today: today,
+    imsak: imsak,
+    maghrib: maghrib,
   );
 }

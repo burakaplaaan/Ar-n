@@ -13,6 +13,7 @@ import 'inspiration_engagement_provider.dart';
 import 'inspiration_search.dart';
 import 'inspire_viewer_session_provider.dart';
 import 'widgets/inspiration_grid_tile.dart';
+import 'package:arin/presentation/shared/widgets/arin_loader.dart';
 
 /// Ayarlar → Kaydedilenler: Keşfet’te kaydedilen kartlar (sıra: en yeni üstte).
 class SavedInspirationPage extends ConsumerWidget {
@@ -120,7 +121,7 @@ class SavedInspirationPage extends ConsumerWidget {
             );
           },
           loading: () => const Center(
-            child: CircularProgressIndicator(color: AppColors.accentNeonGreen),
+            child: ArinLoader(color: AppColors.accentNeonGreen),
           ),
           error: (e, _) => Center(
             child: Padding(

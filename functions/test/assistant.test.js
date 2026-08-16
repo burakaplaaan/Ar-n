@@ -88,6 +88,7 @@ test("applyQuotaTick blocks day, minute, and month caps", () => {
 test("sanitizeActions drops unknown tools and clamps alarm", () => {
   const actions = t.sanitizeActions([
     { name: "open_page", args: { page: "qibla" } },
+    { name: "open_page", args: { page: "widgets" } },
     { name: "open_page", args: { page: "bank_transfer" } },
     { name: "create_alarm", args: { hour: 7, minute: 0, title: "Sahur" } },
     { name: "create_alarm", args: { hour: 30, minute: 0 } },
@@ -98,10 +99,10 @@ test("sanitizeActions drops unknown tools and clamps alarm", () => {
   ]);
   assert.deepEqual(
     actions.map((a) => a.name),
-    ["open_page", "create_alarm", "set_notifications"],
+    ["open_page", "open_page", "create_alarm"],
   );
-  assert.equal(actions[1].args.hour, 7);
-  assert.equal(actions[2].args.enabled, false);
+  assert.equal(actions[1].args.page, "widgets");
+  assert.equal(actions[2].args.hour, 7);
   const stringBool = t.sanitizeActions([
     { name: "set_notifications", args: { channel: "zikir", enabled: "true" } },
   ]);
@@ -145,6 +146,17 @@ test("parseGeminiPayload reads text and function calls", () => {
 test("gemini models use current lite endpoints", () => {
   assert.deepEqual(t.MODELS, ["gemini-3.5-flash-lite", "gemini-3.1-flash-lite"]);
   assert.match(t.geminiUrl(t.MODELS[0]), /models\/gemini-3\.5-flash-lite:generateContent$/);
+});
+
+test("sanitizeContext stamps Istanbul clock and ignores client year", () => {
+  const ctx = t.sanitizeContext(
+    { name: "Asadad", locale: "tr", today: "2025-01-01" },
+    Date.parse("2026-08-16T18:00:00+03:00"),
+  );
+  assert.equal(ctx.today, "2026-08-16");
+  assert.equal(ctx.year, 2026);
+  assert.match(ctx.now, /2026-08-16/);
+  assert.match(ctx.now, /Europe\/Istanbul/);
 });
 
 test("sanitizeHistory drops leading model turns and merges same role", () => {

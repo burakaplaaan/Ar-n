@@ -791,6 +791,34 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String quitProgramElapsedDHms(int days, int hours, int minutes, int seconds) {
+    return '$days ي $hours س $minutes د $seconds ث';
+  }
+
+  @override
+  String quitProgramElapsedMdHms(
+    int months,
+    int days,
+    int hours,
+    int minutes,
+    int seconds,
+  ) {
+    return '$months ش $days ي $hours س $minutes د $seconds ث';
+  }
+
+  @override
+  String quitProgramElapsedYmdHms(
+    int years,
+    int months,
+    int days,
+    int hours,
+    int minutes,
+    int seconds,
+  ) {
+    return '$years سنة $months ش $days ي $hours س $minutes د $seconds ث';
+  }
+
+  @override
   String get quitProgramTabProgress => 'التقدم';
 
   @override
@@ -1358,18 +1386,27 @@ class AppLocalizationsAr extends AppLocalizations {
   String get assistantInputHint => 'اكتب باختصار…';
 
   @override
-  String get assistantEmptyTitle => 'مرحبا';
+  String get assistantEmptyTitle => 'السلام عليكم!';
 
   @override
-  String get assistantEmptyBody => '';
+  String get assistantEmptyBody => 'أنا ذكاء اصطناعي إسلامي.';
 
   @override
-  String get assistantHello => 'مرحبا';
+  String get assistantHello => 'السلام عليكم!';
 
   @override
   String assistantHelloName(String name) {
-    return 'مرحبا $name';
+    return 'السلام عليكم! $name';
   }
+
+  @override
+  String get assistantPromptLockVerse => 'كيف أضع آية على شاشة القفل؟';
+
+  @override
+  String get assistantPromptInshirah => 'اشرح سورة الانشراح.';
+
+  @override
+  String get assistantPromptRamadan => 'كم يوماً بقي لرمضان؟';
 
   @override
   String get assistantNeedSignIn => 'سجّل الدخول لاستخدام المساعد.';
@@ -1414,6 +1451,92 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get assistantActionUnknownPage => 'تعذّر فتح تلك الصفحة.';
+
+  @override
+  String get assistantNavigatingThere => 'أفتحها الآن.';
+
+  @override
+  String get assistantLockVerseGuide =>
+      'يمكنك فعل ذلك من أرِن. من الإعدادات → مركز الأدوات أضف آية شاشة القفل. لا تحتاج تطبيقاً آخر.';
+
+  @override
+  String assistantRamadanDays(String today, int days, String date) {
+    return 'اليوم $today. تبقّى $days يوماً لرمضان. البداية التقريبية $date؛ قد يتأخر الهلال يوماً.';
+  }
+
+  @override
+  String assistantRamadanTomorrow(String today, String date) {
+    return 'اليوم $today. رمضان يبدأ غداً (تقريباً $date).';
+  }
+
+  @override
+  String assistantRamadanToday(String today) {
+    return 'اليوم $today. رمضان يبدأ اليوم.';
+  }
+
+  @override
+  String assistantRamadanOngoing(String today, int day) {
+    return 'اليوم $today. نحن في رمضان؛ هذا اليوم $day.';
+  }
+
+  @override
+  String get assistantPrayerTimesMissing =>
+      'مواقيت الصلاة غير جاهزة بعد. فعّل الموقع وانتظر قليلاً.';
+
+  @override
+  String assistantPrayerCountdown(String label, String remaining, String time) {
+    return '$label $remaining. الوقت $time.';
+  }
+
+  @override
+  String assistantPrayerCountdownTomorrow(
+    String label,
+    String remaining,
+    String time,
+  ) {
+    return '$label $remaining. غداً الساعة $time.';
+  }
+
+  @override
+  String get assistantPrayerLabelIftar => 'إلى الإفطار';
+
+  @override
+  String get assistantPrayerLabelImsak => 'إلى الإمساك';
+
+  @override
+  String get assistantPrayerLabelDhuhr => 'إلى الظهر';
+
+  @override
+  String get assistantPrayerLabelAsr => 'إلى العصر';
+
+  @override
+  String get assistantPrayerLabelMaghrib => 'إلى المغرب';
+
+  @override
+  String get assistantPrayerLabelIsha => 'إلى العشاء';
+
+  @override
+  String assistantPrayerLabelNext(String name) {
+    return 'إلى الصلاة التالية ($name)';
+  }
+
+  @override
+  String assistantDurationHm(int hours, int minutes) {
+    return '$hours س $minutes د';
+  }
+
+  @override
+  String assistantDurationH(int hours) {
+    return '$hours س';
+  }
+
+  @override
+  String assistantDurationM(int minutes) {
+    return '$minutes د';
+  }
+
+  @override
+  String get assistantDurationSoon => 'أقل من دقيقة';
 
   @override
   String get assistantActionCancelled => 'تم الإلغاء.';
@@ -1977,7 +2100,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get notificationsMilestoneSubtitle =>
-      'مثل رسائل متباعدة عند 24 ساعة أو أسبوع في رحلة الإقلاع.';
+      'عتبات التزكية ونسب التعافي والتحفيز الشهري ونصائح أو إلهام من حين لآخر.';
 
   @override
   String get notificationsTaskTitle => 'تذكير المهام';
@@ -5381,4 +5504,195 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get prayerCircleGenericError =>
       'تعذر إكمال العملية. تحقق من اتصالك وحاول مجددًا.';
+
+  @override
+  String get appTourNext => 'التالي';
+
+  @override
+  String get appTourSkip => 'تخطي';
+
+  @override
+  String get appTourLetsStart => 'هيا نبدأ!';
+
+  @override
+  String appTourProgress(int current, int total) {
+    return '$current/$total';
+  }
+
+  @override
+  String get appTourHomeHeaderTitle => 'شاشتك الرئيسية';
+
+  @override
+  String get appTourHomeHeaderBody =>
+      'التحية واسمك وعدّاد الصلاة التالية هنا. اضغط على الاسم لتغيير طريقة مخاطبتك.';
+
+  @override
+  String get appTourHomeWisdomTitle => 'حكمة اليوم';
+
+  @override
+  String get appTourHomeWisdomBody =>
+      'حكمة عن الصلاة كل يوم. اسحب البطاقة للتحديث أو الحفظ.';
+
+  @override
+  String get appTourHomeNamazTitle => 'متابعة الصلاة';
+
+  @override
+  String get appTourHomeNamazBody =>
+      'علّم الأوقات واحفظ سلسلتك. القضاء والتذكيرات هنا أيضًا.';
+
+  @override
+  String get appTourHomePrayerTimesTitle => 'مواقيت الصلاة';
+
+  @override
+  String get appTourHomePrayerTimesBody =>
+      'المواقيت حسب منطقتك. يمكنك تغيير الموقع من الإعدادات.';
+
+  @override
+  String get appTourNavToolsTitle => 'الأدوات';
+
+  @override
+  String get appTourNavToolsBody =>
+      'القبلة والذكر وحلقة الدعاء وبقية الأدوات الروحية في هذا التبويب.';
+
+  @override
+  String get appTourQiblaAssistantTitle => 'مساعد أرِن';
+
+  @override
+  String get appTourQiblaAssistantBody =>
+      'أدِر الصلاة والإشعارات والتذكيرات عبر المحادثة.';
+
+  @override
+  String get appTourQiblaAiTitle => 'الذكاء الاصطناعي الإسلامي';
+
+  @override
+  String get appTourQiblaAiBody =>
+      'إجابات مستندة إلى مصادر إسلامية. تُفتح مع Premium.';
+
+  @override
+  String get appTourQiblaCompassTitle => 'بوصلة القبلة';
+
+  @override
+  String get appTourQiblaCompassBody => 'تُظهر اتجاه الكعبة من موقعك.';
+
+  @override
+  String get appTourQiblaZikirTitle => 'عداد الذكر';
+
+  @override
+  String get appTourQiblaZikirBody =>
+      'تسبيح رقمي مع الأهداف والجولات وملاحظات الذكر.';
+
+  @override
+  String get appTourQiblaHilalTitle => 'مبارزة المعرفة';
+
+  @override
+  String get appTourQiblaHilalBody =>
+      'اختبر نفسك بأسئلة إسلامية وثبّت ما تعرفه.';
+
+  @override
+  String get appTourQiblaPrayerCircleTitle => 'حلقة الدعاء';
+
+  @override
+  String get appTourQiblaPrayerCircleBody =>
+      'شارك نيتك دون اسم، وقل آمين لأدعية الآخرين.';
+
+  @override
+  String get appTourQiblaHealingTitle => 'ترددات الشفاء';
+
+  @override
+  String get appTourQiblaHealingBody => 'أصوات مهدئة لجمع نفسك وتركيزك.';
+
+  @override
+  String get appTourQiblaBreathingTitle => 'تمرين التنفس';
+
+  @override
+  String get appTourQiblaBreathingBody =>
+      'استخدم دورة 4-7-8 للهدوء في لحظة توتر.';
+
+  @override
+  String get appTourNavWillpowerTitle => 'النمو والتزكية';
+
+  @override
+  String get appTourNavWillpowerBody =>
+      'متابعة العادات وبرامج الترك في هذا المثلث.';
+
+  @override
+  String get appTourWillpowerTabsTitle => 'النمو والتزكية';
+
+  @override
+  String get appTourWillpowerTabsBody =>
+      'النمو للعادات التي تريد تثبيتها، والتزكية لما تريد تركه.';
+
+  @override
+  String get appTourWillpowerBreathingTitle => 'التنفس';
+
+  @override
+  String get appTourWillpowerBreathingBody =>
+      'في اللحظة الصعبة افتح تمرين التنفس من هنا.';
+
+  @override
+  String get appTourWillpowerAddTitle => 'برنامج جديد';
+
+  @override
+  String get appTourWillpowerAddBody =>
+      'استخدم علامة الزائد لإضافة عادة نمو أو برنامج تزكية.';
+
+  @override
+  String get appTourNavExploreTitle => 'اكتشف';
+
+  @override
+  String get appTourNavExploreBody => 'آيات وأحاديث وكلمات — اسحب واحفظ وشارك.';
+
+  @override
+  String get appTourInspireSearchTitle => 'بحث';
+
+  @override
+  String get appTourInspireSearchBody =>
+      'اكتب كلمة؛ البحث دون تشكيل يعمل أيضًا.';
+
+  @override
+  String get appTourInspireFilterTitle => 'تصفية';
+
+  @override
+  String get appTourInspireFilterBody => 'ضيّق التدفق إلى كلمة أو آية أو حديث.';
+
+  @override
+  String get appTourNavSettingsTitle => 'الإعدادات';
+
+  @override
+  String get appTourNavSettingsBody => 'الإشعارات واللغة والودجات وحسابك هنا.';
+
+  @override
+  String get appTourSettingsNotificationsTitle => 'الإشعارات';
+
+  @override
+  String get appTourSettingsNotificationsBody =>
+      'أدِر تذكيرات الأذان والتزكية والذكر من هنا.';
+
+  @override
+  String get appTourSettingsWidgetsTitle => 'مركز الودجات';
+
+  @override
+  String get appTourSettingsWidgetsBody =>
+      'افتح ودجات الشاشة الرئيسية وشاشة القفل من هنا.';
+
+  @override
+  String get appTourSettingsLanguageTitle => 'اللغة';
+
+  @override
+  String get appTourSettingsLanguageBody =>
+      'اختر التركية أو الإنجليزية أو العربية.';
+
+  @override
+  String get appTourAssistantFabTitle => 'فقاعة المساعد';
+
+  @override
+  String get appTourAssistantFabBody =>
+      'اختصار قابل للسحب يفتح المساعد في أي تبويب.';
+
+  @override
+  String get appTourFinaleTitle => 'أنت جاهز';
+
+  @override
+  String get appTourFinaleBody =>
+      'انتهت الجولة. تابع من أي تبويب — سنذكّرك ونرافقك.';
 }

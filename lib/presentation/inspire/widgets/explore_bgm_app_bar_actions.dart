@@ -24,6 +24,9 @@ class ExploreBgmAppBarActions extends ConsumerWidget {
       children: [
         IconButton(
           tooltip: muted ? 'Müziği aç' : 'Müziği kapat',
+          visualDensity: VisualDensity.compact,
+          constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
+          padding: const EdgeInsets.all(6),
           onPressed: () => notifier.toggle(),
           icon: AnimatedSwitcher(
             duration: const Duration(milliseconds: 220),
@@ -50,6 +53,9 @@ class ExploreBgmAppBarActions extends ConsumerWidget {
         if (on)
           IconButton(
             tooltip: 'Sıradaki parça',
+            visualDensity: VisualDensity.compact,
+            constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
+            padding: const EdgeInsets.all(6),
             onPressed: () => notifier.skip(),
             icon: Icon(
               Icons.skip_next_rounded,

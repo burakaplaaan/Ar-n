@@ -2,6 +2,8 @@
 // Açık görseller: nötr koyu gri/siyah dolgu + çok hafif beyaz kontur (kahve/terracotta yok).
 // Font listesi: reels_typography.dart
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -11,6 +13,8 @@ import '../../../core/utils/explore_occasion_message.dart';
 import '../../../data/models/inspiration_card_model.dart';
 import '../../../data/models/inspiration_content_kind.dart';
 import '../inspiration_engagement_provider.dart';
+import '../inspiration_like_count.dart';
+import '../inspiration_like_totals_provider.dart';
 
 // ── Okunurluk: ince kontur, abartısız ─────────────────────────────────────
 
@@ -319,7 +323,7 @@ class InspirationReelsQuoteBlock extends StatelessWidget {
 }
 
 /// Sağ aksiyon şeridi (paylaşım görüntüsüne dahil edilmez).
-class InspirationReelsActionRail extends ConsumerWidget {
+class InspirationReelsActionRail extends ConsumerStatefulWidget {
   const InspirationReelsActionRail({
     super.key,
     required this.card,
@@ -334,9 +338,46 @@ class InspirationReelsActionRail extends ConsumerWidget {
   final void Function(Rect? shareAnchor)? onShare;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<InspirationReelsActionRail> createState() =>
+      _InspirationReelsActionRailState();
+}
+
+class _InspirationReelsActionRailState
+    extends ConsumerState<InspirationReelsActionRail> {
+  void _prefetchCount(String cardId) {
+    final locallyLiked = ref.read(inspirationLikedIdsProvider).contains(cardId);
+    unawaited(
+      ref.read(inspirationLikeTotalsProvider.notifier).ensureLoaded(
+        cardId,
+        locallyLiked: locallyLiked,
+      ),
+    );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      _prefetchCount(widget.card.id);
+    });
+  }
+
+  @override
+  void didUpdateWidget(covariant InspirationReelsActionRail oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.card.id != widget.card.id) {
+      _prefetchCount(widget.card.id);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final card = widget.card;
+    final lightOnImage = widget.lightOnImage;
     final saved = ref.watch(inspirationSavedIdsProvider);
     final liked = ref.watch(inspirationLikedIdsProvider);
+    final totals = ref.watch(inspirationLikeTotalsProvider);
     final isSaved = saved.contains(card.id);
     final isLiked = liked.contains(card.id);
     final savedNotifier = ref.read(inspirationSavedIdsProvider.notifier);
@@ -358,6 +399,14 @@ class InspirationReelsActionRail extends ConsumerWidget {
     final likeColor = isLiked
         ? const Color(0xFFFF5252)
         : Colors.white.withValues(alpha: 0.92);
+    final likeCount = displayedInspirationLikeCount(
+      card.id,
+      likedByUser: isLiked,
+      remoteExtra: totals.extras[card.id] ?? 0,
+      remoteExtraLoaded: totals.loadedIds.contains(card.id),
+      remoteIncludesUser: totals.remotelyCountedIds.contains(card.id),
+    );
+    final likeCountLabel = formatInspirationLikeCount(likeCount);
 
     return Positioned(
       right: 4,
@@ -391,6 +440,7 @@ class InspirationReelsActionRail extends ConsumerWidget {
                         HapticFeedback.lightImpact();
                       },
                       label: 'Beğen',
+                      caption: likeCountLabel,
                     ),
                     const SizedBox(height: 18),
                     _ReelsActionButton(
@@ -405,7 +455,7 @@ class InspirationReelsActionRail extends ConsumerWidget {
                     const SizedBox(height: 18),
                     _ReelsActionButton(
                       icon: Icons.menu_book_outlined,
-                      onPressed: onRemixBackground ?? () {},
+                      onPressed: widget.onRemixBackground ?? () {},
                       label: 'Arka planı değiştir',
                     ),
                     const SizedBox(height: 18),
@@ -422,7 +472,7 @@ class InspirationReelsActionRail extends ConsumerWidget {
                               anchor =
                                   box.localToGlobal(Offset.zero) & box.size;
                             }
-                            onShare?.call(anchor);
+                            widget.onShare?.call(anchor);
                           },
                           label: 'Paylaş',
                         );
@@ -839,36 +889,71 @@ class _ReelsActionButton extends StatelessWidget {
     required this.onPressed,
     required this.label,
     this.iconColor,
+    this.caption,
   });
 
   final IconData icon;
   final VoidCallback onPressed;
   final String label;
   final Color? iconColor;
+  final String? caption;
 
   @override
   Widget build(BuildContext context) {
     final c = iconColor ?? Colors.white.withValues(alpha: 0.92);
+    final captionText = caption;
     return Semantics(
       button: true,
-      label: label,
+      label: captionText == null ? label : '$label, $captionText',
       child: Material(
         color: Colors.transparent,
         child: InkWell(
           onTap: onPressed,
-          customBorder: const CircleBorder(),
-          child: Padding(
-            padding: const EdgeInsets.all(6),
-            child: Icon(
-              icon,
-              size: 30,
-              color: c,
-              shadows: const [
-                Shadow(
-                  blurRadius: 10,
-                  offset: Offset(0, 1),
-                  color: Color(0x99000000),
+          customBorder: captionText == null
+              ? const CircleBorder()
+              : RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
                 ),
+          child: Padding(
+            padding: captionText == null
+                ? const EdgeInsets.all(6)
+                : const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  icon,
+                  size: 30,
+                  color: c,
+                  shadows: const [
+                    Shadow(
+                      blurRadius: 10,
+                      offset: Offset(0, 1),
+                      color: Color(0x99000000),
+                    ),
+                  ],
+                ),
+                if (captionText != null) ...[
+                  const SizedBox(height: 2),
+                  ExcludeSemantics(
+                    child: Text(
+                      captionText,
+                      style: TextStyle(
+                        color: Colors.white.withValues(alpha: 0.92),
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                        height: 1,
+                        shadows: const [
+                          Shadow(
+                            blurRadius: 8,
+                            offset: Offset(0, 1),
+                            color: Color(0x99000000),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
               ],
             ),
           ),

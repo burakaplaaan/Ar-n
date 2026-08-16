@@ -21,6 +21,7 @@ import '../../core/constants/app_text_styles.dart';
 import '../../core/constants/profile_prefs_keys.dart';
 import '../../core/providers/shared_preferences_provider.dart';
 import '../../core/router/app_router.dart';
+import 'app_tour/app_tour_controller.dart';
 import '../../data/services/arin_local_notifications_plugin.dart';
 import '../../data/services/arin_lock_notification_service.dart';
 import '../../data/services/fcm_token_service.dart';
@@ -28,6 +29,7 @@ import '../../data/services/local_notification_permission_gate.dart';
 import '../../data/services/widget_access_service.dart';
 import '../shared/providers/user_profile_providers.dart';
 import '../shared/widgets/arin_permission_dialog.dart';
+import 'package:arin/presentation/shared/widgets/arin_loader.dart';
 
 class OnboardingSurveyPage extends ConsumerStatefulWidget {
   const OnboardingSurveyPage({super.key});
@@ -229,6 +231,8 @@ class _OnboardingSurveyPageState extends ConsumerState<OnboardingSurveyPage>
       final prefs = ref.read(sharedPreferencesProvider);
       await prefs.setBool(profileNameLockedByUserKey, hasCustomName);
       await prefs.setBool('onboarding_completed', true);
+      await prefs.setBool(kAppTourPendingKey, true);
+      await prefs.setBool(kAppTourCompletedKey, false);
       await FcmTokenService.markBroadcastPermissionPromptHandled();
       // Funnel bitti — tamamlananlar için kritik ölçü.
       unawaited(ArinAnalytics.log('onboarding_complete'));
@@ -313,7 +317,7 @@ class _OnboardingSurveyPageState extends ConsumerState<OnboardingSurveyPage>
             ),
           ),
           child: const Center(
-            child: CircularProgressIndicator(
+            child: ArinLoader(
               color: AppColors.emeraldLight,
               strokeWidth: 2.5,
             ),
@@ -556,7 +560,7 @@ class _OnboardingSurveyPageState extends ConsumerState<OnboardingSurveyPage>
                   ? const SizedBox(
                       height: 20,
                       width: 20,
-                      child: CircularProgressIndicator(
+                      child: ArinLoader(
                         strokeWidth: 2,
                         color: Colors.white,
                       ),
@@ -708,7 +712,7 @@ class _OnboardingSurveyPageState extends ConsumerState<OnboardingSurveyPage>
                   ? const SizedBox(
                       height: 20,
                       width: 20,
-                      child: CircularProgressIndicator(
+                      child: ArinLoader(
                         strokeWidth: 2,
                         color: Colors.white,
                       ),
@@ -1022,7 +1026,7 @@ class _OnboardingSurveyPageState extends ConsumerState<OnboardingSurveyPage>
                   ? const SizedBox(
                       height: 20,
                       width: 20,
-                      child: CircularProgressIndicator(
+                      child: ArinLoader(
                         strokeWidth: 2.2,
                         color: Colors.white,
                       ),

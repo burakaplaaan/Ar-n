@@ -25,6 +25,7 @@ import 'android_local_notification_schedule.dart';
 import 'app_notification_channel_prefs.dart';
 import 'arin_local_notifications_plugin.dart';
 import 'local_notification_permission_gate.dart';
+import 'quit_program_notification_scheduler.dart';
 import 'tz_local_bootstrap.dart';
 
 bool _appInitialized = false;
@@ -66,6 +67,12 @@ abstract final class AppLocalNotificationIds {
   /// Haftalık — 8 tekrar.
   static const int milestoneRollingStart = 5000600;
   static const int rollingWeeklySlotCount = 8;
+
+  /// Arınma programı (başarı / yüzde / süre / ilham / ipucu).
+  /// 5000800–5000823 — iOS’ta ilk 8 slot kullanılır.
+  static const int quitProgramStart = 5000800;
+  static const int quitProgramSlotCount = 24;
+  static const int iosQuitProgramSlotCount = 8;
 
   /// Admin/test bildirimleri için sabit kimlikler.
   static const int testZikirScheduled = 9199981;
@@ -204,6 +211,14 @@ abstract final class AppLocalNotificationScheduler {
       // weekly) ağdan bağımsız ilk turda planlanır.
       if (pools != null) {
         unawaited(_kickoffPoolSync(pools));
+      }
+
+      final activeQuitPrograms =
+          QuitProgramNotificationScheduler.activeQuitProgramsWithClock();
+      if (activeQuitPrograms.isNotEmpty) {
+        await AppNotificationChannelPrefs.enableArinmaNotificationsForQuit(
+          prefs,
+        );
       }
 
       // Resume akışında her seferinde toplu cancel+reschedule yapmak, özellikle
@@ -353,8 +368,12 @@ abstract final class AppLocalNotificationScheduler {
             );
           }
 
-          // Slot 1: motivasyon (eski arınma metinleri) — 3.5 saat sonra
-          if (when1.isAfter(now)) {
+          // Slot 1: eski genel arınma motivasyonu. Aktif arınma varken yeni
+          // yolculuk bildirimleri aynı işi görür — çakışmayı tekilleştir.
+          if (when1.isAfter(now) &&
+              AppNotificationChannelPrefs.shouldScheduleGenericArinmaMotivation(
+                hasActiveQuit: activeQuitPrograms.isNotEmpty,
+              )) {
             final rawBody = pools != null
                 ? arinmaNotificationBodyWithPool(pools, day, localeCode)
                 : arinmaNotificationBodyForDay(day);
@@ -381,7 +400,21 @@ abstract final class AppLocalNotificationScheduler {
         }
       }
 
-      if (AppNotificationChannelPrefs.milestoneEnabled(prefs)) {
+      var quitQueued = 0;
+      if (AppNotificationChannelPrefs.milestoneEnabled(prefs) &&
+          activeQuitPrograms.isNotEmpty) {
+        quitQueued = await QuitProgramNotificationScheduler.scheduleForActivePrograms(
+          prefs: prefs,
+          localeCode: localeCode,
+          now: now,
+          mode: fixedTimeMode,
+        );
+      } else {
+        await QuitProgramNotificationScheduler.cancelAll();
+      }
+
+      if (AppNotificationChannelPrefs.milestoneEnabled(prefs) &&
+          activeQuitPrograms.isEmpty) {
         await _scheduleWeekdayNextOccurrences(
           idBase: AppLocalNotificationIds.milestoneRollingStart,
           maxOccurrences: milestoneRollingWeeks,
@@ -408,7 +441,10 @@ abstract final class AppLocalNotificationScheduler {
         );
       }
 
-      if (AppNotificationChannelPrefs.taskReminderEnabled(prefs)) {
+      if (AppNotificationChannelPrefs.shouldScheduleGenericTaskReminder(
+        prefs,
+        hasActiveQuit: activeQuitPrograms.isNotEmpty,
+      )) {
         await _scheduleFixedTimeNextDays(
           idBase: AppLocalNotificationIds.taskDailyRollingStart,
           maxDays: taskRollingDays,
@@ -491,6 +527,7 @@ abstract final class AppLocalNotificationScheduler {
           'task_on': AppNotificationChannelPrefs.taskReminderEnabled(prefs),
           'zikir_on': AppNotificationChannelPrefs.zikirQuoteEnabled(prefs),
           'zikir_queued': zikirQueued,
+          'quit_queued': quitQueued,
           'ios_caps': Platform.isIOS
               ? <String, int>{
                   'arinma_days': arinmaWindowDays,
@@ -574,14 +611,44 @@ abstract final class AppLocalNotificationScheduler {
   /// deneriz; reddedilirse kademeli olarak daha zayıf moda düşeriz. Böylece
   /// zamanında ÇOK GÜVENLİ çalma (alarmClock) → ZAMANINDA çalma (exact) →
   /// EN AZINDAN çalma (inexact) sırası korunur.
+  static Future<bool> scheduleAppNotification({
+    required int id,
+    required String title,
+    required String body,
+    required tz.TZDateTime when,
+    required NotificationDetails details,
+    required AndroidScheduleMode mode,
+    String? payload,
+  }) => _safeZonedSchedule(
+    id,
+    title,
+    body,
+    when,
+    details,
+    mode,
+    payload: payload,
+  );
+
+  static Future<void> cancelAppNotification(int id) => _cancelSilently(id);
+
+  static NotificationDetails appDetails({
+    required String channelId,
+    required String channelName,
+    String? body,
+  }) => _details(channelId: channelId, channelName: channelName, body: body);
+
+  static String? prepareAppNotificationBody(String s) =>
+      _prepareNotificationBody(s);
+
   static Future<bool> _safeZonedSchedule(
     int id,
     String title,
     String body,
     tz.TZDateTime when,
     NotificationDetails details,
-    AndroidScheduleMode mode,
-  ) async {
+    AndroidScheduleMode mode, {
+    String? payload,
+  }) async {
     final attempts = <AndroidScheduleMode>[mode];
     if (Platform.isAndroid) {
       if (mode == AndroidScheduleMode.alarmClock &&
@@ -602,6 +669,7 @@ abstract final class AppLocalNotificationScheduler {
           when,
           details,
           androidScheduleMode: m,
+          payload: payload,
         );
         if (m != mode) {
           debugPrint(
@@ -679,6 +747,9 @@ abstract final class AppLocalNotificationScheduler {
     }
     for (var i = 0; i < AppLocalNotificationIds.rollingWeeklySlotCount; i++) {
       await _cancelSilently(AppLocalNotificationIds.milestoneRollingStart + i);
+    }
+    for (var i = 0; i < AppLocalNotificationIds.quitProgramSlotCount; i++) {
+      await _cancelSilently(AppLocalNotificationIds.quitProgramStart + i);
     }
   }
 
@@ -763,14 +834,30 @@ abstract final class AppLocalNotificationScheduler {
       return false;
     }
 
-    if (AppNotificationChannelPrefs.taskReminderEnabled(prefs) &&
+    final hasActiveQuit =
+        QuitProgramNotificationScheduler.activeQuitProgramsWithClock()
+            .isNotEmpty;
+    if (AppNotificationChannelPrefs.shouldScheduleGenericTaskReminder(
+          prefs,
+          hasActiveQuit: hasActiveQuit,
+        ) &&
         taskQueued < _minReserveFromTarget(taskTarget)) {
       return false;
     }
 
-    if (AppNotificationChannelPrefs.milestoneEnabled(prefs) &&
-        milestoneQueued < _minReserveFromTarget(milestoneTarget)) {
-      return false;
+    if (AppNotificationChannelPrefs.milestoneEnabled(prefs)) {
+      if (hasActiveQuit) {
+        final quitQueued = _pendingCountInRange(
+          pending,
+          AppLocalNotificationIds.quitProgramStart,
+          AppLocalNotificationIds.quitProgramSlotCount,
+        );
+        if (quitQueued < 1) {
+          return false;
+        }
+      } else if (milestoneQueued < _minReserveFromTarget(milestoneTarget)) {
+        return false;
+      }
     }
 
     if (AppNotificationChannelPrefs.zikirQuoteEnabled(prefs) &&
@@ -785,6 +872,9 @@ abstract final class AppLocalNotificationScheduler {
     SharedPreferences prefs,
     List<PendingNotificationRequest> pending,
   ) {
+    final hasActiveQuit =
+        QuitProgramNotificationScheduler.activeQuitProgramsWithClock()
+            .isNotEmpty;
     final hasArinma = _hasPendingInRange(
       pending,
       AppLocalNotificationIds.arinmaWeekStart,
@@ -800,7 +890,11 @@ abstract final class AppLocalNotificationScheduler {
       AppLocalNotificationIds.taskDailyRollingStart,
       AppLocalNotificationIds.rollingDailySlotCount,
     );
-    if (!AppNotificationChannelPrefs.taskReminderEnabled(prefs) && hasTask) {
+    if (hasTask &&
+        !AppNotificationChannelPrefs.shouldScheduleGenericTaskReminder(
+          prefs,
+          hasActiveQuit: hasActiveQuit,
+        )) {
       return true;
     }
 
@@ -809,7 +903,20 @@ abstract final class AppLocalNotificationScheduler {
       AppLocalNotificationIds.milestoneRollingStart,
       AppLocalNotificationIds.rollingWeeklySlotCount,
     );
-    if (!AppNotificationChannelPrefs.milestoneEnabled(prefs) && hasMilestone) {
+    if ((!AppNotificationChannelPrefs.milestoneEnabled(prefs) ||
+            hasActiveQuit) &&
+        hasMilestone) {
+      return true;
+    }
+
+    final hasQuitProgram = _hasPendingInRange(
+      pending,
+      AppLocalNotificationIds.quitProgramStart,
+      AppLocalNotificationIds.quitProgramSlotCount,
+    );
+    if (hasQuitProgram &&
+        (!AppNotificationChannelPrefs.milestoneEnabled(prefs) ||
+            !hasActiveQuit)) {
       return true;
     }
 

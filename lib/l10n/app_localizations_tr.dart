@@ -794,6 +794,34 @@ class AppLocalizationsTr extends AppLocalizations {
   }
 
   @override
+  String quitProgramElapsedDHms(int days, int hours, int minutes, int seconds) {
+    return '$days gün $hours sa $minutes dk $seconds sn';
+  }
+
+  @override
+  String quitProgramElapsedMdHms(
+    int months,
+    int days,
+    int hours,
+    int minutes,
+    int seconds,
+  ) {
+    return '$months ay $days gün $hours sa $minutes dk $seconds sn';
+  }
+
+  @override
+  String quitProgramElapsedYmdHms(
+    int years,
+    int months,
+    int days,
+    int hours,
+    int minutes,
+    int seconds,
+  ) {
+    return '$years yıl $months ay $days gün $hours sa $minutes dk $seconds sn';
+  }
+
+  @override
   String get quitProgramTabProgress => 'İlerleme';
 
   @override
@@ -1362,18 +1390,27 @@ class AppLocalizationsTr extends AppLocalizations {
   String get assistantInputHint => 'Kısaca yaz…';
 
   @override
-  String get assistantEmptyTitle => 'Merhaba';
+  String get assistantEmptyTitle => 'Selamün Aleyküm!';
 
   @override
-  String get assistantEmptyBody => '';
+  String get assistantEmptyBody => 'Ben İslami bir yapay zekâyım.';
 
   @override
-  String get assistantHello => 'Merhaba';
+  String get assistantHello => 'Selamün Aleyküm!';
 
   @override
   String assistantHelloName(String name) {
-    return 'Merhaba $name';
+    return 'Selamün Aleyküm! $name';
   }
+
+  @override
+  String get assistantPromptLockVerse => 'Kilit ekranına ayet nasıl koyulur?';
+
+  @override
+  String get assistantPromptInshirah => 'İnşirah suresini açıkla.';
+
+  @override
+  String get assistantPromptRamadan => 'Ramazana kaç gün var?';
 
   @override
   String get assistantNeedSignIn => 'Asistan için hesabını bağla.';
@@ -1418,6 +1455,92 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get assistantActionUnknownPage => 'O sayfayı açamadım.';
+
+  @override
+  String get assistantNavigatingThere => 'Hemen açıyorum.';
+
+  @override
+  String get assistantLockVerseGuide =>
+      'Bunu Arın’dan yapabilirsin. Ayarlar → Widget Merkezi’nden kilit ekranı ayetini ekle. Başka bir uygulama indirmen gerekmez.';
+
+  @override
+  String assistantRamadanDays(String today, int days, String date) {
+    return 'Bugün $today. Ramazana $days gün var. Takribi başlangıç $date; hilal bir gün kaydırabilir.';
+  }
+
+  @override
+  String assistantRamadanTomorrow(String today, String date) {
+    return 'Bugün $today. Ramazan yarın başlıyor (takribi $date).';
+  }
+
+  @override
+  String assistantRamadanToday(String today) {
+    return 'Bugün $today. Ramazan bugün başlıyor.';
+  }
+
+  @override
+  String assistantRamadanOngoing(String today, int day) {
+    return 'Bugün $today. Ramazandayız; $day. günündeyiz.';
+  }
+
+  @override
+  String get assistantPrayerTimesMissing =>
+      'Namaz vakitleri henüz yok. Konumu açıp biraz bekle.';
+
+  @override
+  String assistantPrayerCountdown(String label, String remaining, String time) {
+    return '$label $remaining var. Vakit $time.';
+  }
+
+  @override
+  String assistantPrayerCountdownTomorrow(
+    String label,
+    String remaining,
+    String time,
+  ) {
+    return '$label $remaining var. Yarın $time.';
+  }
+
+  @override
+  String get assistantPrayerLabelIftar => 'İftara';
+
+  @override
+  String get assistantPrayerLabelImsak => 'İmsake';
+
+  @override
+  String get assistantPrayerLabelDhuhr => 'Öğleye';
+
+  @override
+  String get assistantPrayerLabelAsr => 'İkindiye';
+
+  @override
+  String get assistantPrayerLabelMaghrib => 'Akşama';
+
+  @override
+  String get assistantPrayerLabelIsha => 'Yatsıya';
+
+  @override
+  String assistantPrayerLabelNext(String name) {
+    return 'Sıradaki namaza ($name)';
+  }
+
+  @override
+  String assistantDurationHm(int hours, int minutes) {
+    return '$hours sa $minutes dk';
+  }
+
+  @override
+  String assistantDurationH(int hours) {
+    return '$hours sa';
+  }
+
+  @override
+  String assistantDurationM(int minutes) {
+    return '$minutes dk';
+  }
+
+  @override
+  String get assistantDurationSoon => 'bir dakikadan az';
 
   @override
   String get assistantActionCancelled => 'İşlem iptal edildi.';
@@ -1982,7 +2105,7 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get notificationsMilestoneSubtitle =>
-      'Örn. bırakma yolculuğunda 24 saat, 1 hafta gibi seyrek mesajlar.';
+      'Arınma eşikleri, toparlanma yüzdeleri, aylık motivasyon ve ara sıra ipucu / ilham.';
 
   @override
   String get notificationsTaskTitle => 'Görev hatırlatıcısı';
@@ -5387,4 +5510,199 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String get prayerCircleGenericError =>
       'İşlem tamamlanamadı. Bağlantını kontrol edip tekrar dene.';
+
+  @override
+  String get appTourNext => 'İlerle';
+
+  @override
+  String get appTourSkip => 'Atla';
+
+  @override
+  String get appTourLetsStart => 'Hadi başlayalım!';
+
+  @override
+  String appTourProgress(int current, int total) {
+    return '$current/$total';
+  }
+
+  @override
+  String get appTourHomeHeaderTitle => 'Ana ekranın';
+
+  @override
+  String get appTourHomeHeaderBody =>
+      'Selam, ismin ve sıradaki namaz geri sayımı burada. İsme dokunarak hitabı değiştirebilirsin.';
+
+  @override
+  String get appTourHomeWisdomTitle => 'Günün sözü';
+
+  @override
+  String get appTourHomeWisdomBody =>
+      'Her gün bir namaz hikmeti. Kartı kaydırarak yenileyebilir, kaydedebilirsin.';
+
+  @override
+  String get appTourHomeNamazTitle => 'Namaz takibi';
+
+  @override
+  String get appTourHomeNamazBody =>
+      'Vakitleri işaretle, serini koru. Kaza ve hatırlatmalar da burada.';
+
+  @override
+  String get appTourHomePrayerTimesTitle => 'Namaz vakitleri';
+
+  @override
+  String get appTourHomePrayerTimesBody =>
+      'İlçene göre vakitler. Konumu Ayarlar’dan değiştirebilirsin.';
+
+  @override
+  String get appTourNavToolsTitle => 'Araçlar';
+
+  @override
+  String get appTourNavToolsBody =>
+      'Kıble, zikir, dua halkası ve diğer manevi araçlar bu sekmede.';
+
+  @override
+  String get appTourQiblaAssistantTitle => 'Arın Asistanı';
+
+  @override
+  String get appTourQiblaAssistantBody =>
+      'Namaz, bildirim ve hatırlatıcıları sohbetle yönet.';
+
+  @override
+  String get appTourQiblaAiTitle => 'İslami Yapay Zeka';
+
+  @override
+  String get appTourQiblaAiBody =>
+      'Sorularına İslami kaynaklarla yanıt. Premium ile açılır.';
+
+  @override
+  String get appTourQiblaCompassTitle => 'Kıble pusulası';
+
+  @override
+  String get appTourQiblaCompassBody => 'Konumunla Kâbe yönünü gösterir.';
+
+  @override
+  String get appTourQiblaZikirTitle => 'Zikirmatik';
+
+  @override
+  String get appTourQiblaZikirBody =>
+      'Dijital tesbih; hedef, tur ve zikir bilgisi.';
+
+  @override
+  String get appTourQiblaHilalTitle => 'Bilgi düellosu';
+
+  @override
+  String get appTourQiblaHilalBody =>
+      'İslami sorularla yarış, bilgilerini pekiştir.';
+
+  @override
+  String get appTourQiblaPrayerCircleTitle => 'Dua halkası';
+
+  @override
+  String get appTourQiblaPrayerCircleBody =>
+      'Niyetini anonim paylaş; başkalarının dualarına amin de.';
+
+  @override
+  String get appTourQiblaHealingTitle => 'Şifa frekansları';
+
+  @override
+  String get appTourQiblaHealingBody =>
+      'Sakinleştirici seslerle nefesini ve odağını toparla.';
+
+  @override
+  String get appTourQiblaBreathingTitle => 'Nefes egzersizi';
+
+  @override
+  String get appTourQiblaBreathingBody =>
+      '4-7-8 döngüsüyle stres anında sakinleş.';
+
+  @override
+  String get appTourNavWillpowerTitle => 'Gelişim ve Arınma';
+
+  @override
+  String get appTourNavWillpowerBody =>
+      'Alışkanlık takibi ve bırakma programları bu üçgende.';
+
+  @override
+  String get appTourWillpowerTabsTitle => 'Gelişim ve Arınma';
+
+  @override
+  String get appTourWillpowerTabsBody =>
+      'Gelişim’de hayır katan alışkanlıklar; Arınma’da bırakmak istediğin şeyler.';
+
+  @override
+  String get appTourWillpowerBreathingTitle => 'Nefes';
+
+  @override
+  String get appTourWillpowerBreathingBody =>
+      'Kriz anında buradan nefes egzersizine geç.';
+
+  @override
+  String get appTourWillpowerAddTitle => 'Yeni program';
+
+  @override
+  String get appTourWillpowerAddBody =>
+      'Artı ile gelişim alışkanlığı veya arınma programı ekle.';
+
+  @override
+  String get appTourNavExploreTitle => 'Keşfet';
+
+  @override
+  String get appTourNavExploreBody =>
+      'Ayet, hadis ve sözler — kaydır, kaydet, paylaş.';
+
+  @override
+  String get appTourInspireSearchTitle => 'Ara';
+
+  @override
+  String get appTourInspireSearchBody =>
+      'Kelime yaz; şekilsiz arama da çalışır.';
+
+  @override
+  String get appTourInspireFilterTitle => 'Filtre';
+
+  @override
+  String get appTourInspireFilterBody =>
+      'Söz, ayet veya hadis olarak akışı daralt.';
+
+  @override
+  String get appTourNavSettingsTitle => 'Ayarlar';
+
+  @override
+  String get appTourNavSettingsBody =>
+      'Bildirim, dil, widget ve hesabın burada.';
+
+  @override
+  String get appTourSettingsNotificationsTitle => 'Bildirimler';
+
+  @override
+  String get appTourSettingsNotificationsBody =>
+      'Ezan, arınma ve zikir hatırlatmalarını buradan yönet.';
+
+  @override
+  String get appTourSettingsWidgetsTitle => 'Widget Merkezi';
+
+  @override
+  String get appTourSettingsWidgetsBody =>
+      'Ana ekran ve kilit widget’larını buradan aç.';
+
+  @override
+  String get appTourSettingsLanguageTitle => 'Dil';
+
+  @override
+  String get appTourSettingsLanguageBody =>
+      'Türkçe, İngilizce veya Arapça seç.';
+
+  @override
+  String get appTourAssistantFabTitle => 'Asistan balonu';
+
+  @override
+  String get appTourAssistantFabBody =>
+      'Sürüklenebilir kısayol — her sekmede asistanı açar.';
+
+  @override
+  String get appTourFinaleTitle => 'Hazırsın';
+
+  @override
+  String get appTourFinaleBody =>
+      'Tur bitti. İstediğin sekmeden devam et; biz hatırlatır ve eşlik ederiz.';
 }
