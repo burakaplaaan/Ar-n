@@ -265,7 +265,7 @@ abstract class AppLocalizations {
   /// No description provided for @settingsContactSubtitle.
   ///
   /// In tr, this message translates to:
-  /// **'Öneri, hata bildirimi veya destek talebini doğrudan bize e-posta ile iletebilirsin.'**
+  /// **'Öneri, hata bildirimi veya destek talebini doğrudan bize e-posta ile iletebilirsin. Lütfen telefonunun markasını ve modelini de yaz.'**
   String get settingsContactSubtitle;
 
   /// No description provided for @settingsContactOpenMailAction.
@@ -307,8 +307,8 @@ abstract class AppLocalizations {
   /// No description provided for @settingsContactMailBody.
   ///
   /// In tr, this message translates to:
-  /// **'Selam Arın ekibi,\n\n'**
-  String get settingsContactMailBody;
+  /// **'Selam Arın ekibi,\n\nCihaz (marka ve model): {device}\n\n'**
+  String settingsContactMailBody(Object device);
 
   /// No description provided for @settingsGuestHint.
   ///

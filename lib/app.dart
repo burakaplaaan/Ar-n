@@ -47,6 +47,7 @@ import 'presentation/inspire/inspiration_engagement_provider.dart';
 import 'presentation/inspire/inspiration_like_totals_provider.dart';
 import 'presentation/shared/providers/auth_providers.dart';
 import 'presentation/shared/providers/habit_providers.dart';
+import 'presentation/willpower/salat_tracking_visibility_provider.dart';
 import 'presentation/shared/providers/quotes_providers.dart';
 import 'presentation/shared/providers/prayer_time_providers.dart';
 import 'presentation/shared/providers/premium_providers.dart';
@@ -497,6 +498,7 @@ class _ArinAppState extends ConsumerState<ArinApp> with WidgetsBindingObserver {
           if (!isStillSignedInAsCurrentUser()) return;
           await UserCloudBackupService.syncAfterSignIn(uid: uid, prefs: prefs);
           if (!isStillSignedInAsCurrentUser()) return;
+          ref.invalidate(salatTrackingVisibleOnHomeProvider);
           ref.read(prayerServiceResolverProvider).invalidateCache();
           ref.invalidate(prayerTimesProvider);
           await InspirationEngagementSyncService.pullMergeLocal(

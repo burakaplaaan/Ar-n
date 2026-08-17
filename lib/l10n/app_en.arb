@@ -27,14 +27,19 @@
   "settingsMenuSupportSubtitle": "One-time support packs",
   "settingsMenuComingSoon": "Write to us by email",
   "settingsContactPageTitle": "Contact us",
-  "settingsContactSubtitle": "You can send suggestions, bug reports, or support requests directly by email.",
+  "settingsContactSubtitle": "You can send suggestions, bug reports, or support requests directly by email. Please also include your phone’s brand and model.",
   "settingsContactOpenMailAction": "Open mail app",
   "settingsContactCopyMailAction": "Copy email address",
   "settingsContactEmailCopied": "Email address copied.",
   "settingsContactOpenFailed": "Could not open the mail app. You can copy the address and send manually.",
   "settingsContactCopyFailed": "Could not copy the email address. Please enter it manually: arinapphelp@gmail.com",
   "settingsContactMailSubject": "Arin app feedback",
-  "settingsContactMailBody": "Hi Arin team,\n\n",
+  "settingsContactMailBody": "Hi Arin team,\n\nDevice (brand and model): {device}\n\n",
+  "@settingsContactMailBody": {
+    "placeholders": {
+      "device": {}
+    }
+  },
   "settingsGuestHint": "Guest mode — your data is stored on this device. Sign in to sync to cloud.",
   "settingsAccountFallback": "Account",
   "settingsSignInGoogle": "Sign in with Google",

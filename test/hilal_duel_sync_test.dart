@@ -132,6 +132,88 @@ void main() {
       );
     });
 
+    test('meydan okumada rakip cevapladı diye self beklemez', () {
+      final match = HilalDuelMatch(
+        id: 'c1',
+        status: 'challenger_playing',
+        version: 1,
+        currentRound: 1,
+        totalRounds: 7,
+        roundStartedAtMs: 1,
+        deadlineMs: 2,
+        selfAnswered: true,
+        opponentAnswered: false,
+        kind: 'challenge',
+        lastResolution: _resolution(0),
+        self: const HilalDuelPlayer(
+          id: 'a',
+          name: 'A',
+          hilals: 0,
+          level: 1,
+          isBot: false,
+        ),
+        opponent: const HilalDuelPlayer(
+          id: 'b',
+          name: 'B',
+          hilals: 0,
+          level: 1,
+          isBot: false,
+        ),
+      );
+      expect(
+        computeAwaitingOpponent(
+          match: match,
+          selectedChoice: 1,
+          revealingResolution: false,
+        ),
+        isFalse,
+      );
+      expect(
+        shouldStartResolutionReveal(
+          match: HilalDuelMatch(
+            id: 'c1',
+            status: 'challenger_playing',
+            version: 1,
+            currentRound: 1,
+            totalRounds: 7,
+            roundStartedAtMs: 1,
+            deadlineMs: 2,
+            selfAnswered: false,
+            opponentAnswered: false,
+            kind: 'challenge',
+            lastResolution: HilalDuelResolution(
+              round: 0,
+              question: const HilalDuelQuestion(
+                id: 'q',
+                category: 'c',
+                text: 'Q?',
+                options: ['a', 'b', 'c', 'd'],
+              ),
+              choices: const {'b': 2},
+              elapsedMs: const {'b': 800},
+              opponentChoice: 2,
+            ),
+            self: const HilalDuelPlayer(
+              id: 'a',
+              name: 'A',
+              hilals: 0,
+              level: 1,
+              isBot: false,
+            ),
+            opponent: const HilalDuelPlayer(
+              id: 'b',
+              name: 'B',
+              hilals: 0,
+              level: 1,
+              isBot: false,
+            ),
+          ),
+          alreadyRevealedRound: null,
+        ),
+        isFalse,
+      );
+    });
+
     test('awaitingOpponent seçim veya selfAnswered ile true kalır', () {
       final match = _match(id: 'm1', version: 1, selfAnswered: true);
       expect(

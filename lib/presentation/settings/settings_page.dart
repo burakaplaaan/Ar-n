@@ -2,7 +2,6 @@
 // Ayarlar: panel arka planı, hesap (Apple/Google), krem tema, menü, Firebase çıkış/sil.
 
 import 'dart:async';
-import 'dart:ui';
 
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -25,6 +24,7 @@ import '../../core/firebase/firebase_bootstrap.dart';
 import '../../core/providers/app_locale_provider.dart';
 import '../../core/router/app_router.dart';
 import '../../core/router/app_router_refresh.dart';
+import '../../core/theme/arin_backdrop_blur.dart';
 import '../../core/theme/arin_shell_background.dart';
 import '../../l10n/app_localizations.dart';
 import '../../core/providers/shared_preferences_provider.dart';
@@ -81,7 +81,10 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
     setState(() => _locationLoading = true);
     try {
       final loc = ref.read(locationServiceProvider);
-      await loc.syncPrayerLocation(forceRefresh: true);
+      await loc.syncPrayerLocation(
+        forceRefresh: true,
+        overwriteManual: true,
+      );
       ref.invalidate(prayerTimesProvider);
       if (!mounted) return;
       final resolved = matchTurkeyProvinceExact(loc.savedCity) ?? loc.savedCity;
@@ -957,11 +960,10 @@ class _AccountCard extends StatelessWidget {
         ? AppColors.cardSurface.withValues(alpha: 0.55)
         : Colors.white.withValues(alpha: 0.72);
 
-    return ClipRRect(
+    return ArinBackdropBlur(
+      sigma: 14,
       borderRadius: BorderRadius.circular(22),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 14, sigmaY: 14),
-        child: Container(
+      child: Container(
           padding: const EdgeInsets.all(18),
           decoration: BoxDecoration(
             color: fill,
@@ -1063,7 +1065,6 @@ class _AccountCard extends StatelessWidget {
             ],
           ),
         ),
-      ),
     );
   }
 }
@@ -1290,11 +1291,10 @@ class _CreamThemeToggle extends StatelessWidget {
         ? AppColors.cardSurface.withValues(alpha: 0.5)
         : Colors.white.withValues(alpha: 0.75);
 
-    return ClipRRect(
+    return ArinBackdropBlur(
+      sigma: 10,
       borderRadius: BorderRadius.circular(22),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-        child: AnimatedContainer(
+      child: AnimatedContainer(
           duration: const Duration(milliseconds: 420),
           curve: Curves.elasticOut,
           padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
@@ -1361,7 +1361,6 @@ class _CreamThemeToggle extends StatelessWidget {
             ],
           ),
         ),
-      ),
     );
   }
 }

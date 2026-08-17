@@ -27,14 +27,19 @@
   "settingsMenuSupportSubtitle": "حزم دعم لمرة واحدة",
   "settingsMenuComingSoon": "راسلنا عبر البريد",
   "settingsContactPageTitle": "تواصل معنا",
-  "settingsContactSubtitle": "يمكنك إرسال الاقتراحات أو بلاغات الأعطال أو طلبات الدعم مباشرة عبر البريد الإلكتروني.",
+  "settingsContactSubtitle": "يمكنك إرسال الاقتراحات أو بلاغات الأعطال أو طلبات الدعم مباشرة عبر البريد الإلكتروني. يرجى أيضًا كتابة ماركة هاتفك وطرازه.",
   "settingsContactOpenMailAction": "فتح تطبيق البريد",
   "settingsContactCopyMailAction": "نسخ عنوان البريد",
   "settingsContactEmailCopied": "تم نسخ عنوان البريد.",
   "settingsContactOpenFailed": "تعذر فتح تطبيق البريد. يمكنك نسخ العنوان والإرسال يدويًا.",
   "settingsContactCopyFailed": "تعذر نسخ عنوان البريد. الرجاء إدخاله يدويًا: arinapphelp@gmail.com",
   "settingsContactMailSubject": "ملاحظات تطبيق Arin",
-  "settingsContactMailBody": "مرحبًا فريق Arin،\n\n",
+  "settingsContactMailBody": "مرحبًا فريق Arin،\n\nالجهاز (الماركة والطراز): {device}\n\n",
+  "@settingsContactMailBody": {
+    "placeholders": {
+      "device": {}
+    }
+  },
   "settingsGuestHint": "وضع الضيف — بياناتك محفوظة على هذا الجهاز. سجّل الدخول للمزامنة السحابية.",
   "settingsAccountFallback": "الحساب",
   "settingsSignInGoogle": "تسجيل الدخول عبر Google",

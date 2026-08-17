@@ -2,7 +2,6 @@
 
 import 'dart:async';
 import 'dart:math' as math;
-import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -13,6 +12,7 @@ import '../../core/analytics/arin_analytics.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_text_styles.dart';
 import '../../core/router/app_router.dart';
+import '../../core/theme/arin_backdrop_blur.dart';
 import 'breathing_bottom_nav_provider.dart';
 import 'breathing_haptics.dart';
 import 'breathing_heartbeat_audio.dart';

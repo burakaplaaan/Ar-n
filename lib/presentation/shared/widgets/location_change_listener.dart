@@ -72,12 +72,14 @@ class _LocationChangeListenerState extends ConsumerState<LocationChangeListener>
     final location = ref.read(locationServiceProvider);
     final pref = location.locationUpdatePref;
     if (pref == LocationUpdatePref.neverUpdate) return;
+    if (location.isManualPrayerLocation) return;
 
     _lastCheck = DateTime.now();
 
     // GPS + reverse geocoding (arka planda — UI'ı bloklamaz).
     final change = await location.detectLocationChange();
     if (change == null || !mounted) return;
+    if (location.isManualPrayerLocation) return;
 
     // İlk açılışta (savedCity boş) veya alwaysUpdate: diyalogsuz sessiz güncelle.
     final isFirstTime = location.savedCity.isEmpty;

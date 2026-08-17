@@ -45,15 +45,16 @@ class _HabitManagementPageState extends ConsumerState<HabitManagementPage> {
             break;
           }
         }
-        final h = salatHabit ??
-            await ref.read(habitSummaryProvider.notifier).createFromTemplate(
-                  templateId: WillpowerTemplates.salatDaily,
-                  title: AppLocalizations.of(context)!.mgmtDailyPrayers,
-                  type: HabitType.good,
-                  emoji: '🕌',
-                  onboardingCompleted: false,
-                );
+        if (salatHabit == null) {
+          await ref.read(habitRepositoryProvider).ensureDefaultSalatHabit();
+          ref.read(habitSummaryProvider.notifier).refresh();
+          salatHabit = ref
+              .read(habitRepositoryProvider)
+              .findActiveByTemplateId(WillpowerTemplates.salatDaily);
+        }
         if (!context.mounted) return;
+        final h = salatHabit;
+        if (h == null) return;
         await context.push(
           AppRoutes.willNamaz(
             h.id,

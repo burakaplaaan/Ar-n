@@ -92,7 +92,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settingsContactSubtitle =>
-      'You can send suggestions, bug reports, or support requests directly by email.';
+      'You can send suggestions, bug reports, or support requests directly by email. Please also include your phone’s brand and model.';
 
   @override
   String get settingsContactOpenMailAction => 'Open mail app';
@@ -115,7 +115,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsContactMailSubject => 'Arin app feedback';
 
   @override
-  String get settingsContactMailBody => 'Hi Arin team,\n\n';
+  String settingsContactMailBody(Object device) {
+    return 'Hi Arin team,\n\nDevice (brand and model): $device\n\n';
+  }
 
   @override
   String get settingsGuestHint =>

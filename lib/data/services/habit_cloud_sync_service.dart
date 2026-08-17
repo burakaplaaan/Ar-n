@@ -259,6 +259,7 @@ abstract final class HabitCloudSyncService {
       if (cloudHabitIds.isNotEmpty) {
         await repo.dedupeActiveSalatPreferringCloudIds(cloudHabitIds);
       }
+      await repo.ensureDefaultSalatHabit();
 
       for (final deletedId in deletedHabitIds) {
         await deleteHabitCloudData(uid: uid, habitId: deletedId, prefs: prefs);

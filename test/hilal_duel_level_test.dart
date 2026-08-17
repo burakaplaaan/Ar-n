@@ -243,15 +243,17 @@ void main() {
   });
 
   group('HilalDuelWeeklyLastWinner', () {
-    test('grantDays 0 ise ödül metni yok sayılır', () {
+    test('sıra ve isim korunur; grantDays 0 da parse edilir', () {
       final skipped = HilalDuelWeeklyLastWinner.fromMap({
-        'rank': 1,
-        'name': 'Ali',
+        'rank': 3,
+        'name': 'Aleyna',
         'grantDays': 0,
-        'champion': true,
+        'champion': false,
       });
+      expect(skipped.rank, 3);
+      expect(skipped.name, 'Aleyna');
       expect(skipped.grantDays, 0);
-      expect(skipped.champion, isTrue);
+      expect(skipped.champion, isFalse);
       final granted = HilalDuelWeeklyLastWinner.fromMap({
         'rank': 2,
         'name': 'Ece',

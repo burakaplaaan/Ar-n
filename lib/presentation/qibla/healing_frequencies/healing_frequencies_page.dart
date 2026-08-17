@@ -1,7 +1,6 @@
 // İyileştirici Frekanslar — tam ekran oturum.
 
 import 'dart:async';
-import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -9,6 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../core/constants/app_colors.dart';
+import '../../../core/theme/arin_backdrop_blur.dart';
 import '../../../core/constants/product_metric_features.dart';
 import '../../../data/services/product_metrics_service.dart';
 import 'healing_audio_notifier.dart';
@@ -136,11 +136,10 @@ class _HealingFrequenciesPageState extends ConsumerState<HealingFrequenciesPage>
       builder: (ctx) => Dialog(
         backgroundColor: Colors.transparent,
         insetPadding: const EdgeInsets.symmetric(horizontal: 24),
-        child: ClipRRect(
+        child: ArinBackdropBlur(
+          sigma: 22,
           borderRadius: BorderRadius.circular(24),
-          child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 22, sigmaY: 22),
-            child: Container(
+          child: Container(
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(24),
                 gradient: LinearGradient(
@@ -234,7 +233,6 @@ class _HealingFrequenciesPageState extends ConsumerState<HealingFrequenciesPage>
             ),
           ),
         ),
-      ),
     );
   }
 

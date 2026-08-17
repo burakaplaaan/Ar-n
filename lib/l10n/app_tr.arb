@@ -27,14 +27,19 @@
   "settingsMenuSupportSubtitle": "Tek seferlik destek paketleri",
   "settingsMenuComingSoon": "E-posta ile direkt yaz",
   "settingsContactPageTitle": "Bize ulaşın",
-  "settingsContactSubtitle": "Öneri, hata bildirimi veya destek talebini doğrudan bize e-posta ile iletebilirsin.",
+  "settingsContactSubtitle": "Öneri, hata bildirimi veya destek talebini doğrudan bize e-posta ile iletebilirsin. Lütfen telefonunun markasını ve modelini de yaz.",
   "settingsContactOpenMailAction": "Mail uygulamasını aç",
   "settingsContactCopyMailAction": "E-posta adresini kopyala",
   "settingsContactEmailCopied": "E-posta adresi kopyalandı.",
   "settingsContactOpenFailed": "Mail uygulaması açılamadı. Adresi kopyalayıp manuel gönderebilirsin.",
   "settingsContactCopyFailed": "E-posta adresi kopyalanamadı. Lütfen manuel olarak yazın: arinapphelp@gmail.com",
   "settingsContactMailSubject": "Arın uygulaması geri bildirimi",
-  "settingsContactMailBody": "Selam Arın ekibi,\n\n",
+  "settingsContactMailBody": "Selam Arın ekibi,\n\nCihaz (marka ve model): {device}\n\n",
+  "@settingsContactMailBody": {
+    "placeholders": {
+      "device": {}
+    }
+  },
   "settingsGuestHint": "Misafir — veriler bu cihazda. Buluta kaydetmek için giriş yapın.",
   "settingsAccountFallback": "Hesap",
   "settingsSignInGoogle": "Google ile giriş",

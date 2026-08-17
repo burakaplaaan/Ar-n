@@ -2,10 +2,10 @@
 // Uygulamanın tam ThemeData tanımları ve Glassmorphism extension'ları.
 // Hem açık (light) hem koyu (dark) mod desteklenir.
 
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import '../constants/app_colors.dart';
 import '../constants/app_text_styles.dart';
+import 'arin_backdrop_blur.dart';
 
 // ─── Glassmorphism Yardımcı Sınıfı ─────────────────────────────────────────
 
@@ -131,18 +131,13 @@ class GlassContainer extends StatelessWidget {
       width: width,
       height: height,
       margin: margin,
-      child: ClipRRect(
+      child: ArinBackdropBlur(
+        sigma: style.blurSigma,
         borderRadius: BorderRadius.circular(style.borderRadius),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(
-            sigmaX: style.blurSigma,
-            sigmaY: style.blurSigma,
-          ),
-          child: Container(
-            padding: padding ?? const EdgeInsets.all(16),
-            decoration: style.toDecoration(),
-            child: child,
-          ),
+        child: Container(
+          padding: padding ?? const EdgeInsets.all(16),
+          decoration: style.toDecoration(),
+          child: child,
         ),
       ),
     );

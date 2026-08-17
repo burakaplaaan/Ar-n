@@ -131,6 +131,12 @@ bool shouldStartResolutionReveal({
   final res = match.lastResolution;
   if (res == null) return false;
   if (alreadyRevealedRound == res.round) return false;
+  if (match.isChallenge) {
+    final selfId = match.self.id;
+    final selfPlayed = res.selfChoice != null ||
+        (selfId.isNotEmpty && res.choices.containsKey(selfId));
+    if (!selfPlayed) return false;
+  }
   if (match.isCompleted) return res.round == match.currentRound;
   return res.round == match.currentRound - 1;
 }
@@ -155,6 +161,8 @@ bool computeAwaitingOpponent({
   if (match.isCompleted || revealingResolution || match.opponentAnswered) {
     return false;
   }
+  // Meydan okuma sırayla: rakip bu turu canlı oynamaz, bekleme HUD'u yok.
+  if (match.isChallenge) return false;
   return selectedChoice != null || match.selfAnswered;
 }
 

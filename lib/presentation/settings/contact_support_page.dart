@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
@@ -9,8 +10,49 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../core/analytics/arin_analytics.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/theme/arin_shell_background.dart';
+import '../../data/services/android_oem_settings_service.dart';
 import '../../l10n/app_localizations.dart';
 import 'package:arin/presentation/shared/widgets/arin_loader.dart';
+
+/// Destek mailine yazılacak marka + model satırı.
+String formatContactDeviceLabel({
+  required String brand,
+  required String model,
+}) {
+  final brandText = brand.trim();
+  final modelText = model.trim();
+  if (brandText.isEmpty) return modelText;
+  if (modelText.isEmpty) return brandText;
+  if (modelText.toLowerCase().startsWith(brandText.toLowerCase())) {
+    return modelText;
+  }
+  return '$brandText $modelText';
+}
+
+/// OEM `displayName` "Android" ise gerçek markayı kullan (Pixel vb.).
+String contactDeviceBrand({
+  required String displayName,
+  required String brand,
+}) {
+  final display = displayName.trim();
+  if (display.isNotEmpty && display.toLowerCase() != 'android') {
+    return display;
+  }
+  return brand.trim();
+}
+
+Future<String> resolveContactDeviceLabel() async {
+  if (kIsWeb || defaultTargetPlatform != TargetPlatform.android) return '';
+  final oem = await AndroidOemSettingsService.getInfo();
+  if (oem == null) return '';
+  return formatContactDeviceLabel(
+    brand: contactDeviceBrand(
+      displayName: oem.displayName,
+      brand: oem.brand,
+    ),
+    model: oem.model,
+  );
+}
 
 class ContactSupportPage extends StatefulWidget {
   const ContactSupportPage({super.key});
@@ -23,9 +65,10 @@ class _ContactSupportPageState extends State<ContactSupportPage> {
   static const String _supportEmail = 'arinapphelp@gmail.com';
   bool _mailOpening = false;
 
-  Uri _buildMailUri(AppLocalizations l10n) {
+  Future<Uri> _buildMailUri(AppLocalizations l10n) async {
+    final device = await resolveContactDeviceLabel();
     final subject = Uri.encodeComponent(l10n.settingsContactMailSubject);
-    final body = Uri.encodeComponent(l10n.settingsContactMailBody);
+    final body = Uri.encodeComponent(l10n.settingsContactMailBody(device));
     return Uri.parse(
       'mailto:$_supportEmail?subject=$subject&body=$body',
     );
@@ -70,7 +113,7 @@ class _ContactSupportPageState extends State<ContactSupportPage> {
     unawaited(ArinAnalytics.log('contact_mail_tap'));
     try {
       final ok = await launchUrl(
-        _buildMailUri(l10n),
+        await _buildMailUri(l10n),
         mode: LaunchMode.externalApplication,
       );
       if (ok) return;

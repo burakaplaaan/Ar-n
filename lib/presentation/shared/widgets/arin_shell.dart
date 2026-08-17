@@ -31,6 +31,7 @@ import '../../willpower/willpower_hub_page.dart';
 import 'arin_pressable.dart';
 import 'offline_banner.dart';
 import 'prayer_schedule_listener.dart';
+import 'shell_tab_tickers.dart';
 
 /// Shell sekme sayfaları — sabit liste; PageView.builder bunu index ile çağırır.
 const List<Widget> _kShellPages = [
@@ -41,11 +42,35 @@ const List<Widget> _kShellPages = [
   SettingsPage(),
 ];
 
+/// Açık sekme index'ini keep-alive sayfalara iletir.
+/// [PageView.builder] uzak sekmeleri yeniden üretmeyebilir; InheritedWidget
+/// hepsini haberdar eder, böylece uzak ticker'lar gerçekten durur.
+class _ShellTabTickerScope extends InheritedWidget {
+  const _ShellTabTickerScope({
+    required this.currentIndex,
+    required super.child,
+  });
+
+  final int currentIndex;
+
+  static int of(BuildContext context) {
+    final scope = context
+        .dependOnInheritedWidgetOfExactType<_ShellTabTickerScope>();
+    assert(scope != null, 'Shell tab ticker scope missing');
+    return scope!.currentIndex;
+  }
+
+  @override
+  bool updateShouldNotify(_ShellTabTickerScope old) =>
+      currentIndex != old.currentIndex;
+}
+
 /// Bir sekme sayfasını lazy build ederken state'ini korur.
 /// PageView.builder ile kullanılır; ziyaret edilmemiş sekmeler hiç build edilmez,
 /// daha önce açılmış sekmeler AutomaticKeepAlive sayesinde ağaçta kalır.
 class _KeepAlivePage extends StatefulWidget {
-  const _KeepAlivePage({required this.child});
+  const _KeepAlivePage({required this.index, required this.child});
+  final int index;
   final Widget child;
   @override
   State<_KeepAlivePage> createState() => _KeepAlivePageState();
@@ -59,7 +84,14 @@ class _KeepAlivePageState extends State<_KeepAlivePage>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    return widget.child;
+    final current = _ShellTabTickerScope.of(context);
+    return TickerMode(
+      enabled: shellTabTickersEnabled(
+        index: widget.index,
+        currentIndex: current,
+      ),
+      child: widget.child,
+    );
   }
 }
 
@@ -365,28 +397,34 @@ class _ArinShellState extends State<ArinShell> {
         // initialPage=0 (Home) ile yeniden kurulup bir kare flaşlar.
         final Widget innerBody;
         if (keepPageView) {
-          innerBody = Stack(
-            fit: StackFit.expand,
-            children: [
-              PageView.builder(
-                controller: _pageController!,
-                physics: pagePhysics,
-                itemCount: 5,
-                onPageChanged: (i) {
-                  if (onInspireView) return;
-                  HapticFeedback.selectionClick();
-                  _navBarSolidity.value = 1.0;
-                  final next = _shellPathForIndex(i);
-                  if (path != next) {
-                    context.go(next);
-                  }
-                },
-                itemBuilder: (context, index) {
-                  return _KeepAlivePage(child: _kShellPages[index]);
-                },
-              ),
-              if (!swipeRoot) widget.child,
-            ],
+          innerBody = _ShellTabTickerScope(
+            currentIndex: currentIndex,
+            child: Stack(
+              fit: StackFit.expand,
+              children: [
+                PageView.builder(
+                  controller: _pageController!,
+                  physics: pagePhysics,
+                  itemCount: 5,
+                  onPageChanged: (i) {
+                    if (onInspireView) return;
+                    HapticFeedback.selectionClick();
+                    _navBarSolidity.value = 1.0;
+                    final next = _shellPathForIndex(i);
+                    if (path != next) {
+                      context.go(next);
+                    }
+                  },
+                  itemBuilder: (context, index) {
+                    return _KeepAlivePage(
+                      index: index,
+                      child: _kShellPages[index],
+                    );
+                  },
+                ),
+                if (!swipeRoot) widget.child,
+              ],
+            ),
           );
         } else {
           innerBody = SizedBox.expand(child: widget.child);

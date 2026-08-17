@@ -91,7 +91,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get settingsContactSubtitle =>
-      'يمكنك إرسال الاقتراحات أو بلاغات الأعطال أو طلبات الدعم مباشرة عبر البريد الإلكتروني.';
+      'يمكنك إرسال الاقتراحات أو بلاغات الأعطال أو طلبات الدعم مباشرة عبر البريد الإلكتروني. يرجى أيضًا كتابة ماركة هاتفك وطرازه.';
 
   @override
   String get settingsContactOpenMailAction => 'فتح تطبيق البريد';
@@ -114,7 +114,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get settingsContactMailSubject => 'ملاحظات تطبيق Arin';
 
   @override
-  String get settingsContactMailBody => 'مرحبًا فريق Arin،\n\n';
+  String settingsContactMailBody(Object device) {
+    return 'مرحبًا فريق Arin،\n\nالجهاز (الماركة والطراز): $device\n\n';
+  }
 
   @override
   String get settingsGuestHint =>

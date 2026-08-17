@@ -131,15 +131,29 @@ class _DistrictPickerBodyState extends State<_DistrictPickerBody> {
         final r = filtered[i];
         return ListTile(
           title: Text(_prettyIlAdi(r.ilAdi)),
-          trailing: const Icon(Icons.chevron_right),
-          onTap: () => setState(() {
-            _selectedIlNormalized = r.normalized;
-            _selectedIlDisplay = _prettyIlAdi(r.ilAdi);
-            _query = '';
-          }),
+          trailing: IconButton(
+            icon: const Icon(Icons.chevron_right),
+            onPressed: () => _openIlceList(r),
+          ),
+          onTap: () {
+            final merkez = DiyanetDistrictMatcher.match(ilAdi: r.ilAdi);
+            if (merkez != null) {
+              Navigator.of(ctx).pop(merkez);
+              return;
+            }
+            _openIlceList(r);
+          },
         );
       },
     );
+  }
+
+  void _openIlceList(_IlRow r) {
+    setState(() {
+      _selectedIlNormalized = r.normalized;
+      _selectedIlDisplay = _prettyIlAdi(r.ilAdi);
+      _query = '';
+    });
   }
 
   Widget _buildIlceList(String ilNormalized) {

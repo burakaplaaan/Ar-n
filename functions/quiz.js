@@ -79,6 +79,10 @@ const CHALLENGE_DOC_TTL_MS = 7 * 24 * 60 * 60_000;
 /** Aynı anda bekleyen giden meydan okuma limiti. */
 const CHALLENGE_MAX_ACTIVE_OUTGOING = 3;
 const QUEUE_WAIT_MS = 15_000;
+/** Canlı kuyruk taraması: stale kayıtlar gerçek rakibi limit dışına itmesin. */
+const QUEUE_CANDIDATE_SCAN_LIMIT = 80;
+/** Transaction içinde denenecek en iyi aday sayısı. */
+const QUEUE_CANDIDATE_PICK_LIMIT = 16;
 /** Mantıksal terk: bu süreden sonra waiting kuyruk iade edilir. */
 const QUEUE_ABANDON_MS = 10 * 60_000;
 /** Waiting doc TTL yedeği — iade job'u önce çalışsın diye uzun tutulur. */
@@ -1244,6 +1248,132 @@ async function _isQueueFundingValidInTransaction(tx, db, queue) {
   );
 }
 
+function queueOwnerId(queue) {
+  return String(
+    queue?.ownerHash || queue?.id || queue?.ref?.id || "",
+  ).trim();
+}
+
+/** activeUntil / queuedAt dolduysa waiting artık eşleşmeye açık değil. */
+function shouldRetireStaleWaitingQueue(queue, nowMs = Date.now()) {
+  if (!queue || queue.status !== "waiting") return false;
+  const abandonAt = queueAbandonAtMs(queue);
+  return abandonAt > 0 && nowMs >= abandonAt;
+}
+
+function isPairableWaitingQueue(queue, { nowMs = Date.now(), excludeOwnerHash = "" } = {}) {
+  if (!queue || queue.status !== "waiting") return false;
+  const owner = queueOwnerId(queue);
+  const excluded = String(excludeOwnerHash || "").trim();
+  if (!owner || (excluded && owner === excluded)) return false;
+  if (!isFundedQueue(queue)) return false;
+  return !shouldRetireStaleWaitingQueue(queue, nowMs);
+}
+
+function rankLiveQueueCandidates(items, {
+  excludeOwnerHash,
+  nowMs = Date.now(),
+  level = 1,
+  limit = QUEUE_CANDIDATE_PICK_LIMIT,
+} = {}) {
+  const safeLevel = Math.max(1, Math.floor(Number(level) || 1));
+  const safeLimit = Math.max(1, Math.floor(Number(limit) || QUEUE_CANDIDATE_PICK_LIMIT));
+  return (Array.isArray(items) ? items : [])
+    .filter((item) => isPairableWaitingQueue(item, { nowMs, excludeOwnerHash }))
+    .sort((a, b) => {
+      const levelA = Math.max(1, Math.floor(Number(a.level) || 1));
+      const levelB = Math.max(1, Math.floor(Number(b.level) || 1));
+      const exactA = levelA === safeLevel ? 0 : 1;
+      const exactB = levelB === safeLevel ? 0 : 1;
+      if (exactA !== exactB) return exactA - exactB;
+      const gapA = Math.abs(levelA - safeLevel);
+      const gapB = Math.abs(levelB - safeLevel);
+      if (gapA !== gapB) return gapA - gapB;
+      return (_timestampMs(a.queuedAt) || Number(a.queuedAtMs) || 0) -
+        (_timestampMs(b.queuedAt) || Number(b.queuedAtMs) || 0);
+    })
+    .slice(0, safeLimit);
+}
+
+function pickPairableCandidate(candidates, chargeRecords, {
+  nowMs = Date.now(),
+  excludeOwnerHash = "",
+} = {}) {
+  const records = chargeRecords instanceof Map ? chargeRecords : new Map();
+  for (const item of Array.isArray(candidates) ? candidates : []) {
+    if (!isPairableWaitingQueue(item, { nowMs, excludeOwnerHash })) continue;
+    const chargeId = String(item.heartChargeId || "").trim();
+    const charge = chargeId ? records.get(chargeId) : null;
+    if (!isValidQueueFunding(item, charge)) continue;
+    return item;
+  }
+  return null;
+}
+
+/**
+ * Poll kararı: insan varsa her zaman insan; bot yalnızca 15sn ve rakip yoksa.
+ * queuedAt yoksa bot'a düş — sonsuz waiting üretmesin.
+ */
+function decideLiveQueuePollAction({
+  selfStatus,
+  hasPairableHuman,
+  queuedAtMs,
+  nowMs = Date.now(),
+  waitMs = QUEUE_WAIT_MS,
+}) {
+  if (selfStatus === "matched") return "already_matched";
+  if (selfStatus !== "waiting") return "idle";
+  if (hasPairableHuman) return "pair_human";
+  const started = Number(queuedAtMs) || 0;
+  if (!(started > 0) || nowMs - started >= waitMs) return "pair_bot";
+  return "keep_waiting";
+}
+
+function _mapWaitingQueueDocs(snap) {
+  return (snap?.docs || []).map((doc) => ({
+    ref: doc.ref,
+    id: doc.id,
+    ...doc.data(),
+    ownerHash: String(doc.data()?.ownerHash || doc.id).trim(),
+  }));
+}
+
+async function _readChargeRecordsInTx(tx, db, chargeIds) {
+  const chargeRecordsPreRead = new Map();
+  const unique = [...new Set(
+    [...chargeIds].map((id) => String(id || "").trim()).filter(Boolean),
+  )];
+  for (const id of unique) {
+    const snap = await tx.get(db.collection("quiz_heart_charges").doc(id));
+    if (snap.exists) chargeRecordsPreRead.set(id, snap.data());
+  }
+  return chargeRecordsPreRead;
+}
+
+async function _readLiveQueueFallback(db, queueRef) {
+  const snap = await queueRef.get();
+  const data = snap.data() || {};
+  if (data.status === "matched" && data.matchId) {
+    const match = await db.collection("quiz_matches")
+      .doc(String(data.matchId))
+      .get();
+    if (match.exists && match.data()?.status === "playing") {
+      return { ok: true, status: "matched", matchId: String(data.matchId) };
+    }
+  }
+  if (
+    data.status === "waiting" &&
+    !shouldRetireStaleWaitingQueue(data, Date.now())
+  ) {
+    return {
+      ok: true,
+      status: "waiting",
+      queuedAtMs: _timestampMs(data.queuedAt) || Date.now(),
+    };
+  }
+  return null;
+}
+
 /** Saf/unit-test dostu iade kararı (FieldValue yok). */
 function describeHeartRefund(heartSource) {
   if (heartSource === "ad") {
@@ -1583,56 +1713,69 @@ function _pickQuestions(excludeIds = []) {
   return selected.slice(0, ROUND_COUNT).map((item) => item.id);
 }
 
+/** Canlı maç botu: genellikle 2, bazen 1, bazen 3 doğru. Tavan 3. */
+function _pickBotCorrectCount(roundCount) {
+  const n = Math.max(0, Math.floor(Number(roundCount) || 0));
+  if (n <= 0) return 0;
+  const maxCorrect = Math.min(3, n);
+  if (maxCorrect === 1) return 1;
+  const roll = crypto.randomInt(100);
+  if (roll < 22) return 1;
+  if (roll < 80) return Math.min(2, maxCorrect);
+  return maxCorrect;
+}
+
 /**
- * İnsan benzeri bot planı:
- * - Kolay (1): çoğu doğru, daha hızlı
- * - Orta (2): karışık
- * - Zor (3): sık yanılır, bilmeyince daha geç cevaplar
- * Seviye doğruluğu hafifçe kaydırır (şişirmez).
+ * İnsan cevapladıktan sonra botun görünür gecikmesi.
+ * Çoğunlukla 2–3 sn, bazen ~5 sn. Anında cevap yok.
  */
-function _botPlan(questionIds, playerLevel) {
-  const level = Math.max(1, Math.floor(Number(playerLevel) || 1));
-  const levelBoost = Math.min(0.08, (level - 1) * 0.01);
-  return questionIds.map((questionId) => {
+function _pickBotAfterHumanDelayMs() {
+  if (crypto.randomInt(100) < 25) {
+    return crypto.randomInt(4_800, 5_201);
+  }
+  return crypto.randomInt(2_000, 3_001);
+}
+
+function _botWrongChoice(correctIndex) {
+  const correct = Number.isInteger(correctIndex) ? correctIndex : 0;
+  const alternatives = [0, 1, 2, 3].filter((index) => index !== correct);
+  if (alternatives.length === 0) return (correct + 1) % 4;
+  return alternatives[crypto.randomInt(alternatives.length)];
+}
+
+/**
+ * Canlı eşleşme bot planı: maç başına 1–3 doğru (genelde 2).
+ * Seviye doğruluğu şişirmez. Cevap süresi insansı; insan öndeyse
+ * afterHumanDelayMs kadar bekler, plan önceyse ondan önce yazar.
+ */
+function _botPlan(questionIds, _playerLevel) {
+  const ids = Array.isArray(questionIds) ? questionIds : [];
+  if (ids.length === 0) return [];
+  const wantCorrect = _pickBotCorrectCount(ids.length);
+  const order = ids.map((_, index) => index);
+  for (let i = order.length - 1; i > 0; i -= 1) {
+    const j = crypto.randomInt(i + 1);
+    const swap = order[i];
+    order[i] = order[j];
+    order[j] = swap;
+  }
+  const correctRounds = new Set(order.slice(0, wantCorrect));
+  return ids.map((questionId, index) => {
     const question = QUESTION_BY_ID.get(questionId);
-    if (!question) {
-      return { choice: 0, elapsedMs: crypto.randomInt(5_000, 12_000) };
-    }
-    const difficulty = [1, 2, 3].includes(question.difficulty)
-      ? question.difficulty
-      : 2;
-    let accuracy;
-    if (difficulty === 1) {
-      accuracy = 0.93 + levelBoost * 0.4; // ~%93–96 kolay bilir
-    } else if (difficulty === 2) {
-      accuracy = 0.55 + levelBoost;
-    } else {
-      accuracy = 0.26 + levelBoost; // zor: çoğu zaman bilmez
-    }
-    accuracy = Math.min(0.97, Math.max(0.18, accuracy));
-    const isCorrect = crypto.randomInt(10_000) < Math.round(accuracy * 10_000);
-    let choice = question.correctIndex;
-    if (!isCorrect) {
-      const alternatives = [0, 1, 2, 3]
-        .filter((index) => index !== question.correctIndex);
-      choice = alternatives[crypto.randomInt(alternatives.length)];
-    }
-    let elapsedMs;
-    if (difficulty === 1) {
-      elapsedMs = isCorrect
-        ? crypto.randomInt(2_800, 6_800)
-        : crypto.randomInt(6_000, 11_500);
-    } else if (difficulty === 2) {
-      elapsedMs = isCorrect
-        ? crypto.randomInt(4_200, 10_500)
-        : crypto.randomInt(7_500, 14_500);
-    } else {
-      elapsedMs = isCorrect
-        ? crypto.randomInt(6_500, 13_500)
-        : crypto.randomInt(9_500, 17_800);
-    }
-    elapsedMs = Math.min(ROUND_DURATION_MS - 500, Math.max(2_200, elapsedMs));
-    return { choice, elapsedMs };
+    const correctIndex = Number.isInteger(question?.correctIndex)
+      ? question.correctIndex
+      : 0;
+    const isCorrect = correctRounds.has(index);
+    const choice = isCorrect ? correctIndex : _botWrongChoice(correctIndex);
+    const elapsedMs = isCorrect
+      ? crypto.randomInt(3_200, 9_500)
+      : crypto.randomInt(5_200, 14_500);
+    return {
+      choice,
+      elapsedMs: Math.min(ROUND_DURATION_MS - 500, Math.max(2_200, elapsedMs)),
+      afterHumanDelayMs: _pickBotAfterHumanDelayMs(),
+      correct: isCorrect,
+    };
   });
 }
 
@@ -1785,9 +1928,9 @@ function _challengeBotWeakPlan(questionIds) {
 
 /**
  * Bot cevabı zamanı.
- * İnsan yokken planlanan süreyi bekler.
- * İnsan cevapladıysa aynı istekte yazılır — yoksa "Cevapladı" görünüp reveal
- * için 1–5 sn poll bekleniyordu.
+ * İnsan yokken planlanan süreyi bekler (bazen insandan önce "Cevapladı").
+ * İnsan öndeyse 2–3 sn (bazen ~5 sn) sonra yazar; anında çözüm yok.
+ * Plan zaten insandan önce dolduysa ekstra beklemez.
  */
 function _botReadyAtMs({
   roundStartedAtMs,
@@ -1796,6 +1939,7 @@ function _botReadyAtMs({
   nowMs,
   humanAnswered,
   humanElapsedMs,
+  afterHumanDelayMs,
 }) {
   const start = Math.max(0, Math.floor(Number(roundStartedAtMs) || 0));
   const planned = start + Math.max(0, Math.floor(Number(plannedElapsedMs) || 8_000));
@@ -1803,29 +1947,46 @@ function _botReadyAtMs({
     start + 1_000,
     Math.floor(Number(deadlineMs) || (start + ROUND_DURATION_MS)),
   );
-  const now = Math.max(0, Math.floor(Number(nowMs) || 0));
+  const cap = deadline - 200;
   if (!humanAnswered) {
-    return Math.min(planned, deadline - 200);
+    return Math.min(planned, cap);
   }
-  // humanElapsedMs API uyumu için kalır; submit anında tur çözülsün.
-  return Math.min(now, deadline - 200);
+  const humanElapsed = Math.max(0, Math.floor(Number(humanElapsedMs) || 0));
+  const humanAt = start + humanElapsed;
+  if (planned <= humanAt) {
+    return Math.min(planned, cap);
+  }
+  const delay = Math.max(0, Math.floor(Number(afterHumanDelayMs) || 2_500));
+  return Math.min(humanAt + delay, cap);
 }
 
-/** Bot elapsedMs: erken resolve'da plan; zamanında cevapta duvar saati tavanı. */
+/** Bot elapsedMs: plan veya insan + gecikme; duvar saati planı aşmasın. */
 function _botAnswerElapsedMs({
   planElapsedMs,
   nowMs,
   roundStartedAtMs,
   humanAnswered,
+  humanElapsedMs,
+  afterHumanDelayMs,
 }) {
   const planned = Math.min(
     ROUND_DURATION_MS,
     Math.max(800, Math.floor(Number(planElapsedMs) || ROUND_DURATION_MS)),
   );
-  if (humanAnswered) return planned;
   const roundStart = Math.max(0, Math.floor(Number(roundStartedAtMs) || 0));
   const wall = Math.max(0, Math.floor(Number(nowMs) || 0) - roundStart);
-  return Math.min(ROUND_DURATION_MS, Math.max(800, Math.min(planned, wall || planned)));
+  if (!humanAnswered) {
+    return Math.min(
+      ROUND_DURATION_MS,
+      Math.max(800, Math.min(planned, wall || planned)),
+    );
+  }
+  const humanElapsed = Math.max(0, Math.floor(Number(humanElapsedMs) || 0));
+  const delay = Math.max(0, Math.floor(Number(afterHumanDelayMs) || 2_500));
+  const intended = planned <= humanElapsed
+    ? planned
+    : humanElapsed + delay;
+  return Math.min(ROUND_DURATION_MS, Math.max(800, intended));
 }
 
 function _questionPayload(questionId, includeAnswer = false, locale = "tr") {
@@ -2327,11 +2488,29 @@ async function _completeMatch(tx, db, matchRef, match, options = {}) {
   }
 }
 
+function _roundAnswersChanged(previous, next) {
+  const prev = previous && typeof previous === "object" ? previous : {};
+  const cur = next && typeof next === "object" ? next : {};
+  const prevKeys = Object.keys(prev);
+  const curKeys = Object.keys(cur);
+  if (prevKeys.length !== curKeys.length) return true;
+  for (const id of curKeys) {
+    const a = prev[id];
+    const b = cur[id];
+    if (!a || !b) return true;
+    if (a.choice !== b.choice || a.elapsedMs !== b.elapsedMs || a.correct !== b.correct) {
+      return true;
+    }
+  }
+  return false;
+}
+
 async function _resolveRoundIfReady(tx, db, matchRef, match, nowMs) {
-  if (match.status !== "playing") return;
+  if (match.status !== "playing") return false;
   const round = Number(match.currentRound) || 0;
   const key = String(round);
-  const answers = { ...(match.answers?.[key] || {}) };
+  const previousAnswers = match.answers?.[key] || {};
+  const answers = { ...previousAnswers };
   const bot = match.players.find((player) => player.isBot);
   const humanAnswered = match.players.some(
     (player) => !player.isBot && Boolean(answers[player.id]),
@@ -2350,21 +2529,25 @@ async function _resolveRoundIfReady(tx, db, matchRef, match, nowMs) {
         nowMs,
         humanAnswered,
         humanElapsedMs,
+        afterHumanDelayMs: plan.afterHumanDelayMs,
       });
       if (nowMs >= dueAt) {
         const question = QUESTION_BY_ID.get(match.questionIds[round]);
-        // İnsan erken bitirdiyse bot hemen yazılır ama skor için planlanan süre kalır
-        // (hiz beraberliğinde insan haksız yere kaybetmesin).
         const elapsedMs = _botAnswerElapsedMs({
           planElapsedMs: plan.elapsedMs,
           nowMs,
           roundStartedAtMs: match.roundStartedAtMs,
           humanAnswered,
+          humanElapsedMs,
+          afterHumanDelayMs: plan.afterHumanDelayMs,
         });
+        const correctIndex = Number.isInteger(question?.correctIndex)
+          ? question.correctIndex
+          : null;
         answers[bot.id] = {
           choice: plan.choice,
           elapsedMs,
-          correct: plan.choice === question.correctIndex,
+          correct: correctIndex != null && plan.choice === correctIndex,
         };
       }
     }
@@ -2402,7 +2585,7 @@ async function _resolveRoundIfReady(tx, db, matchRef, match, nowMs) {
         lastResolution: match.lastResolution,
         version: match.version,
       }, { merge: true });
-      return;
+      return true;
     }
     match.currentRound = round + 1;
     // İstemci ~ROUND_REVEAL_MS reveal gösterir; süre o bitince 20'den başlasın.
@@ -2418,15 +2601,19 @@ async function _resolveRoundIfReady(tx, db, matchRef, match, nowMs) {
       version: match.version,
       updatedAt: FieldValue.serverTimestamp(),
     }, { merge: true });
-  } else if (Object.keys(answers).length > 0) {
-    match.answers = { ...(match.answers || {}), [key]: answers };
-    match.version = _nextVersion(match);
-    tx.set(matchRef, {
-      [`answers.${key}`]: answers,
-      version: match.version,
-      updatedAt: FieldValue.serverTimestamp(),
-    }, { merge: true });
+    return true;
   }
+  if (!_roundAnswersChanged(previousAnswers, answers)) {
+    return false;
+  }
+  match.answers = { ...(match.answers || {}), [key]: answers };
+  match.version = _nextVersion(match);
+  tx.set(matchRef, {
+    [`answers.${key}`]: answers,
+    version: match.version,
+    updatedAt: FieldValue.serverTimestamp(),
+  }, { merge: true });
+  return true;
 }
 
 function _queueStatusPayload(queue) {
@@ -2499,7 +2686,7 @@ const getQuizProfile = onCall(
         ? await _isQueueFundingValidInTransaction(tx, db, queue)
         : true;
       if (
-        shouldRefundAbandonedQueue(queue, Date.now()) ||
+        shouldRetireStaleWaitingQueue(queue, Date.now()) ||
         (queue?.status === "waiting" && !fundingValid)
       ) {
         await _refundQueueHeartInTransaction(tx, db, {
@@ -2741,6 +2928,278 @@ const claimQuizReward = onCall(
   },
 );
 
+async function _startOrPairQuizMatchInTransaction({
+  tx,
+  db,
+  ownerHash,
+  name,
+  premium,
+  profile,
+  playerRef,
+  queueRef,
+  allowPair = true,
+}) {
+  const nowMs = Date.now();
+  const freshPlayer = await tx.get(playerRef);
+  const freshQueue = await tx.get(queueRef);
+  const currentQueue = freshQueue.data() || {};
+
+  if (currentQueue.status === "matched" && currentQueue.matchId) {
+    const activeMatchSnap = await tx.get(
+      db.collection("quiz_matches").doc(String(currentQueue.matchId)),
+    );
+    if (activeMatchSnap.exists && activeMatchSnap.data()?.status === "playing") {
+      return {
+        ok: true,
+        status: "matched",
+        matchId: String(currentQueue.matchId),
+      };
+    }
+  }
+
+  if (
+    currentQueue.status === "waiting" &&
+    (shouldRetireStaleWaitingQueue(currentQueue, nowMs) ||
+      !isFundedQueue(currentQueue))
+  ) {
+    await _refundQueueHeartInTransaction(tx, db, {
+      queueRef,
+      queue: currentQueue,
+      playerRef,
+    });
+    return { ok: true, status: "idle", refunded: true };
+  }
+
+  const waitingSnap = allowPair
+    ? await tx.get(
+      db.collection("quiz_queue")
+        .where("status", "==", "waiting")
+        .limit(QUEUE_CANDIDATE_SCAN_LIMIT),
+    )
+    : null;
+  const ranked = allowPair
+    ? rankLiveQueueCandidates(_mapWaitingQueueDocs(waitingSnap), {
+      excludeOwnerHash: ownerHash,
+      nowMs,
+      level: profile.level,
+      limit: QUEUE_CANDIDATE_PICK_LIMIT,
+    })
+    : [];
+
+  const selfWaiting = currentQueue.status === "waiting" &&
+    isFundedQueue(currentQueue) &&
+    !shouldRetireStaleWaitingQueue(currentQueue, nowMs);
+  const heartChargeId = (!selfWaiting && !premium)
+    ? crypto.randomBytes(16).toString("hex")
+    : null;
+  const chargeRef = heartChargeId
+    ? db.collection("quiz_heart_charges").doc(heartChargeId)
+    : null;
+  if (chargeRef) await tx.get(chargeRef);
+
+  const chargeIds = [];
+  const selfChargeId = String(currentQueue.heartChargeId || "").trim();
+  if (selfChargeId) chargeIds.push(selfChargeId);
+  for (const item of ranked) {
+    const id = String(item.heartChargeId || "").trim();
+    if (id) chargeIds.push(id);
+  }
+  const chargeRecordsPreRead = await _readChargeRecordsInTx(tx, db, chargeIds);
+  if (heartChargeId) {
+    chargeRecordsPreRead.set(heartChargeId, {
+      ownerHash,
+      heartSource: "ad",
+      status: "charged",
+    });
+  }
+
+  const pair = pickPairableCandidate(ranked, chargeRecordsPreRead, {
+    nowMs: Date.now(),
+    excludeOwnerHash: ownerHash,
+  });
+
+  if (selfWaiting) {
+    if (pair) {
+      const created = await _createMatchInTransaction({
+        tx,
+        db,
+        firstQueue: {
+          ...currentQueue,
+          ownerHash: currentQueue.ownerHash || ownerHash,
+        },
+        secondQueue: pair,
+        chargeRecordsPreRead,
+      });
+      return { ok: true, status: "matched", matchId: created.matchId };
+    }
+    return {
+      ok: true,
+      status: "waiting",
+      queuedAtMs: _timestampMs(currentQueue.queuedAt) || nowMs,
+    };
+  }
+
+  const player = freshPlayer.data() || {};
+  if (!premium && adHeartBalance(player) <= 0) {
+    throw new HttpsError(
+      "resource-exhausted",
+      "Oynamak için reklam izleyerek can kazanmalısın.",
+    );
+  }
+
+  const heartSource = premium ? "premium" : "ad";
+  const queuedAt = Timestamp.now();
+  const applyHeartCharge = () => {
+    tx.set(playerRef, {
+      name,
+      ...(premium ? {} : { adHearts: FieldValue.increment(-1) }),
+      updatedAt: FieldValue.serverTimestamp(),
+      ...(player.createdAt ? {} : { createdAt: FieldValue.serverTimestamp() }),
+    }, { merge: true });
+    if (chargeRef) {
+      tx.create(chargeRef, {
+        ownerHash,
+        heartSource,
+        status: "charged",
+        createdAt: FieldValue.serverTimestamp(),
+        expiresAt: Timestamp.fromMillis(Date.now() + 30 * 86400000),
+      });
+    }
+  };
+  const queueData = {
+    ownerHash,
+    name,
+    hilals: profile.hilals,
+    level: profile.level,
+    status: "waiting",
+    heartSource,
+    ...(heartChargeId ? { heartChargeId } : {}),
+    refunded: false,
+    queuedAt,
+    activeUntil: Timestamp.fromMillis(queuedAt.toMillis() + QUEUE_ABANDON_MS),
+    updatedAt: Timestamp.now(),
+    expiresAt: Timestamp.fromMillis(Date.now() + QUEUE_WAITING_TTL_MS),
+  };
+
+  if (pair) {
+    const created = await _createMatchInTransaction({
+      tx,
+      db,
+      firstQueue: queueData,
+      secondQueue: pair,
+      chargeRecordsPreRead,
+      afterReads: applyHeartCharge,
+    });
+    return { ok: true, status: "matched", matchId: created.matchId };
+  }
+
+  applyHeartCharge();
+  tx.set(queueRef, queueData);
+  return {
+    ok: true,
+    status: "waiting",
+    queuedAtMs: queueData.queuedAt.toMillis(),
+  };
+}
+
+async function _resolveQuizMatchPollInTransaction({
+  tx,
+  db,
+  ownerHash,
+  queueRef,
+  playerRef,
+}) {
+  const nowMs = Date.now();
+  const fresh = await tx.get(queueRef);
+  const data = fresh.data() || {};
+
+  if (data.status === "matched" && data.matchId) {
+    return { ok: true, status: "matched", matchId: String(data.matchId) };
+  }
+  if (data.status !== "waiting") {
+    return { ok: true, status: "idle", reason: "not_waiting" };
+  }
+
+  const selfChargeId = String(data.heartChargeId || "").trim();
+  const selfChargeRecords = await _readChargeRecordsInTx(
+    tx,
+    db,
+    selfChargeId ? [selfChargeId] : [],
+  );
+  const selfCharge = selfChargeId ? selfChargeRecords.get(selfChargeId) : null;
+  if (!isValidQueueFunding(data, selfCharge) || shouldRetireStaleWaitingQueue(data, nowMs)) {
+    await _refundQueueHeartInTransaction(tx, db, {
+      queueRef,
+      queue: data,
+      playerRef,
+    });
+    return {
+      ok: true,
+      status: "idle",
+      reason: isValidQueueFunding(data, selfCharge)
+        ? undefined
+        : "invalid_funding_retired",
+      refunded: true,
+    };
+  }
+
+  const waitingSnap = await tx.get(
+    db.collection("quiz_queue")
+      .where("status", "==", "waiting")
+      .limit(QUEUE_CANDIDATE_SCAN_LIMIT),
+  );
+  const ranked = rankLiveQueueCandidates(_mapWaitingQueueDocs(waitingSnap), {
+    excludeOwnerHash: ownerHash,
+    nowMs,
+    level: Math.max(1, Math.floor(Number(data.level) || 1)),
+    limit: QUEUE_CANDIDATE_PICK_LIMIT,
+  });
+
+  const chargeIds = [];
+  if (selfChargeId) chargeIds.push(selfChargeId);
+  for (const item of ranked) {
+    const id = String(item.heartChargeId || "").trim();
+    if (id) chargeIds.push(id);
+  }
+  const chargeRecordsPreRead = await _readChargeRecordsInTx(tx, db, chargeIds);
+
+  const pair = pickPairableCandidate(ranked, chargeRecordsPreRead, {
+    nowMs: Date.now(),
+    excludeOwnerHash: ownerHash,
+  });
+  const queuedAtMs = _timestampMs(data.queuedAt);
+  const action = decideLiveQueuePollAction({
+    selfStatus: data.status,
+    hasPairableHuman: Boolean(pair),
+    queuedAtMs,
+    nowMs: Date.now(),
+  });
+
+  if (action === "pair_human" && pair) {
+    const created = await _createMatchInTransaction({
+      tx,
+      db,
+      firstQueue: { ...data, ownerHash: data.ownerHash || ownerHash },
+      secondQueue: pair,
+      chargeRecordsPreRead,
+    });
+    return { ok: true, status: "matched", matchId: created.matchId };
+  }
+  if (action === "keep_waiting") {
+    return { ok: true, status: "waiting", queuedAtMs: queuedAtMs || nowMs };
+  }
+
+  const created = await _createMatchInTransaction({
+    tx,
+    db,
+    firstQueue: { ...data, ownerHash: data.ownerHash || ownerHash },
+    bot: true,
+    ownerHashOverride: ownerHash,
+    chargeRecordsPreRead,
+  });
+  return { ok: true, status: "matched", matchId: created.matchId };
+}
+
 const startQuizMatch = onCall(
   { region: REGION, memory: "256MiB", enforceAppCheck: ENFORCE_APP_CHECK },
   async (req) => {
@@ -2759,7 +3218,7 @@ const startQuizMatch = onCall(
         ? await _isQueueFundingValidInTransaction(tx, db, queue)
         : true;
       if (
-        shouldRefundAbandonedQueue(queue, Date.now()) ||
+        shouldRetireStaleWaitingQueue(queue, Date.now()) ||
         (queue?.status === "waiting" && !fundingValid)
       ) {
         await _refundQueueHeartInTransaction(tx, db, {
@@ -2780,16 +3239,6 @@ const startQuizMatch = onCall(
         return { ok: true, status: "matched", matchId: existingData.matchId };
       }
     }
-    if (
-      existingData.status === "waiting" &&
-      !shouldRefundAbandonedQueue(existingData, Date.now())
-    ) {
-      return {
-        ok: true,
-        status: "waiting",
-        queuedAtMs: existingData.queuedAt?.toMillis?.() || Date.now(),
-      };
-    }
 
     const playerSnap = await playerRef.get();
     const premium = await _isPremiumCaller(db, req);
@@ -2798,193 +3247,47 @@ const startQuizMatch = onCall(
       name,
       premium,
     });
-    const waitingSnap = await db.collection("quiz_queue")
-      .where("status", "==", "waiting")
-      .limit(20)
-      .get();
-    const nowMs = Date.now();
-    const candidates = waitingSnap.docs
-      .map((doc) => ({ ref: doc.ref, ...doc.data() }))
-      .filter((item) => {
-        if (item.ownerHash === ownerHash) return false;
-        if (!isFundedQueue(item)) return false;
-        if (shouldRefundAbandonedQueue(item, nowMs)) return false;
-        const activeUntil = queueAbandonAtMs(item);
-        return activeUntil === 0 || activeUntil > nowMs;
-      })
-      .sort((a, b) => {
-        const exactA = a.level === profile.level ? 0 : 1;
-        const exactB = b.level === profile.level ? 0 : 1;
-        if (exactA !== exactB) return exactA - exactB;
-        const gapA = Math.abs((a.level || 1) - profile.level);
-        const gapB = Math.abs((b.level || 1) - profile.level);
-        if (gapA !== gapB) return gapA - gapB;
-        return (a.queuedAt?.toMillis?.() || 0) -
-          (b.queuedAt?.toMillis?.() || 0);
-      });
-    const candidate = candidates[0] || null;
+    const startArgs = {
+      db,
+      ownerHash,
+      name,
+      premium,
+      profile,
+      playerRef,
+      queueRef,
+    };
 
     try {
-      return await db.runTransaction(async (tx) => {
-      const freshPlayer = await tx.get(playerRef);
-      const freshQueue = await tx.get(queueRef);
-      const freshCandidate = candidate ? await tx.get(candidate.ref) : null;
-      const player = freshPlayer.data() || {};
-      const currentQueue = freshQueue.data() || {};
-      if (currentQueue.status === "matched" && currentQueue.matchId) {
-        const activeMatch = await tx.get(
-          db.collection("quiz_matches").doc(String(currentQueue.matchId)),
-        );
-        if (activeMatch.exists && activeMatch.data()?.status === "playing") {
-          return {
-            ok: true,
-            status: "matched",
-            matchId: currentQueue.matchId,
-          };
-        }
-      }
-      if (
-        currentQueue.status === "waiting" &&
-        !shouldRefundAbandonedQueue(currentQueue, Date.now())
-      ) {
-        return {
-          ok: true,
-          status: "waiting",
-          queuedAtMs: currentQueue.queuedAt?.toMillis?.() || Date.now(),
-        };
-      }
-      // Aynı tx içinde iade + yeni charge karışmasın; iade sonrası istemci tekrar dener.
-      if (shouldRefundAbandonedQueue(currentQueue, Date.now())) {
-        await _refundQueueHeartInTransaction(tx, db, {
-          queueRef,
-          queue: currentQueue,
-          playerRef,
-        });
-        return { ok: true, status: "idle", refunded: true };
-      }
-      const adHearts = adHeartBalance(player);
-      if (!premium && adHearts <= 0) {
-        throw new HttpsError(
-          "resource-exhausted",
-          "Oynamak için reklam izleyerek can kazanmalısın.",
-        );
-      }
-      const heartSource = premium ? "premium" : "ad";
-      const heartChargeId = premium
-        ? null
-        : crypto.randomBytes(16).toString("hex");
-      const chargeRef = heartChargeId
-        ? db.collection("quiz_heart_charges").doc(heartChargeId)
-        : null;
-      // Tüm okumalar yazmadan önce tamamlanır (Firestore tx kuralı).
-      if (chargeRef) await tx.get(chargeRef);
-      // Adayla anında eşleşme yolunda _createMatchInTransaction çağrısından
-      // önce adayın charge kaydını da oku. Firestore transaction'larında tüm
-      // okumalar, aşağıdaki ilk yazmadan önce tamamlanmalıdır.
-      const candidateChargeId = String(
-        freshCandidate?.data()?.heartChargeId || "",
-      ).trim();
-      const candidateChargeSnap = candidateChargeId
-        ? await tx.get(
-          db.collection("quiz_heart_charges").doc(candidateChargeId),
-        )
-        : null;
-      const chargeRecordsPreRead = new Map();
-      if (heartChargeId) {
-        chargeRecordsPreRead.set(heartChargeId, {
-          ownerHash,
-          heartSource: "ad",
-          status: "charged",
-        });
-      }
-      if (candidateChargeId && candidateChargeSnap?.exists) {
-        chargeRecordsPreRead.set(candidateChargeId, candidateChargeSnap.data());
-      }
-      const candidateData = freshCandidate?.data() || null;
-      const candidateFundingValid = candidateData?.status === "waiting" &&
-        isValidQueueFunding(candidateData, candidateChargeSnap?.data());
-      if (candidateData?.status === "waiting" && !candidateFundingValid) {
-        await _refundQueueHeartInTransaction(tx, db, {
-          queueRef: candidate.ref,
-          queue: candidateData,
-          playerRef: db.collection("quiz_players").doc(
-            String(candidateData.ownerHash || candidate.ref.id),
-          ),
-        });
-      }
-      const queuedAt = Timestamp.now();
-      const activeUntil = Timestamp.fromMillis(
-        queuedAt.toMillis() + QUEUE_ABANDON_MS,
-      );
-      const applyHeartCharge = () => {
-        tx.set(playerRef, {
-          name,
-          ...(premium ? {} : { adHearts: FieldValue.increment(-1) }),
-          updatedAt: FieldValue.serverTimestamp(),
-          ...(player.createdAt ? {} : { createdAt: FieldValue.serverTimestamp() }),
-        }, { merge: true });
-        if (chargeRef) {
-          tx.create(chargeRef, {
-            ownerHash,
-            heartSource,
-            status: "charged",
-            createdAt: FieldValue.serverTimestamp(),
-            expiresAt: Timestamp.fromMillis(Date.now() + 30 * 86400000),
-          });
-        }
-      };
-      const queueData = {
-        ownerHash,
-        name,
-        hilals: profile.hilals,
-        level: profile.level,
-        status: "waiting",
-        heartSource,
-        ...(heartChargeId ? { heartChargeId } : {}),
-        refunded: false,
-        queuedAt,
-        activeUntil,
-        updatedAt: Timestamp.now(),
-        expiresAt: Timestamp.fromMillis(Date.now() + QUEUE_WAITING_TTL_MS),
-      };
-      if (
-        candidate &&
-        freshCandidate?.exists &&
-        freshCandidate.data()?.status === "waiting" &&
-        candidateFundingValid &&
-        !shouldRefundAbandonedQueue(freshCandidate.data(), Date.now())
-      ) {
-        // Can/charge yazısı afterReads ile, oyuncu okumalarından sonra.
-        // Önce yazıp sonra _createMatchInTransaction içinde tx.get yapmak
-        // Firestore kuralını bozar ve INTERNAL döner.
-        const result = await _createMatchInTransaction({
+      return await db.runTransaction(async (tx) =>
+        _startOrPairQuizMatchInTransaction({
           tx,
-          db,
-          firstQueue: queueData,
-          secondQueue: freshCandidate.data(),
-          chargeRecordsPreRead,
-          afterReads: applyHeartCharge,
-        });
-        return { ok: true, status: "matched", matchId: result.matchId };
-      }
-      applyHeartCharge();
-      // Yeni/replaced waiting dokümanında matchId alanına ihtiyaç yok.
-      // FieldValue.delete(), mergesiz set() içinde geçersizdir ve callable'ı
-      // INTERNAL ile düşürür.
-      tx.set(queueRef, queueData);
-      return {
-        ok: true,
-        status: "waiting",
-        queuedAtMs: queueData.queuedAt.toMillis(),
-      };
-    });
+          ...startArgs,
+          allowPair: true,
+        }),
+      );
     } catch (error) {
       if (error instanceof HttpsError) throw error;
       console.error("[HilalDuel] startQuizMatch failed:", error);
-      throw new HttpsError(
-        "internal",
-        "Eşleşme başlatılamadı. Tekrar dene.",
-      );
+      const recovered = await _readLiveQueueFallback(db, queueRef);
+      if (recovered) return recovered;
+      try {
+        return await db.runTransaction(async (tx) =>
+          _startOrPairQuizMatchInTransaction({
+            tx,
+            ...startArgs,
+            allowPair: false,
+          }),
+        );
+      } catch (fallbackError) {
+        if (fallbackError instanceof HttpsError) throw fallbackError;
+        console.error("[HilalDuel] startQuizMatch enqueue fallback failed:", fallbackError);
+        const second = await _readLiveQueueFallback(db, queueRef);
+        if (second) return second;
+        throw new HttpsError(
+          "internal",
+          "Eşleşme başlatılamadı. Tekrar dene.",
+        );
+      }
     }
   },
 );
@@ -3067,11 +3370,11 @@ const pollQuizMatch = onCall(
       });
       return { ok: true, status: "idle", reason: "invalid_funding_retired" };
     }
-    if (shouldRefundAbandonedQueue(queue, Date.now())) {
+    if (shouldRetireStaleWaitingQueue(queue, Date.now())) {
       await db.runTransaction(async (tx) => {
         const fresh = await tx.get(queueRef);
         const data = fresh.data() || {};
-        if (shouldRefundAbandonedQueue(data, Date.now())) {
+        if (shouldRetireStaleWaitingQueue(data, Date.now())) {
           await _refundQueueHeartInTransaction(tx, db, {
             queueRef,
             queue: data,
@@ -3081,54 +3384,30 @@ const pollQuizMatch = onCall(
       });
       return { ok: true, status: "idle", refunded: true };
     }
-    // queuedAt okunamazsa Date.now() fallback sonsuz "waiting" üretir — bot'a geç.
-    const queuedAtMs = _timestampMs(queue.queuedAt);
-    if (queuedAtMs > 0 && Date.now() - queuedAtMs < QUEUE_WAIT_MS) {
-      return { ok: true, status: "waiting", queuedAtMs };
-    }
-    let result;
     try {
-      result = await db.runTransaction(async (tx) => {
-        const fresh = await tx.get(queueRef);
-        const data = fresh.data() || {};
-        if (data.status === "matched" && data.matchId) return String(data.matchId);
-        if (data.status !== "waiting") {
-          throw new HttpsError("failed-precondition", "Eşleşme kapandı.");
-        }
-        const fundingValid = await _isQueueFundingValidInTransaction(
+      return await db.runTransaction(async (tx) =>
+        _resolveQuizMatchPollInTransaction({
           tx,
           db,
-          data,
-        );
-        if (!fundingValid) {
-          await _refundQueueHeartInTransaction(tx, db, {
-            queueRef,
-            queue: data,
-            playerRef,
-          });
-          return null;
-        }
-        const created = await _createMatchInTransaction({
-          tx,
-          db,
-          firstQueue: { ...data, ownerHash: data.ownerHash || ownerHash },
-          bot: true,
-          ownerHashOverride: ownerHash,
-        });
-        return created.matchId;
-      });
-    } catch (error) {
-      if (error instanceof HttpsError) throw error;
-      console.error("[HilalDuel] bot match create failed:", error);
-      throw new HttpsError(
-        "internal",
-        "Rakip atanamadı. Tekrar dene.",
+          ownerHash,
+          queueRef,
+          playerRef,
+        }),
       );
+    } catch (error) {
+      if (
+        error instanceof HttpsError &&
+        (error.code === "unauthenticated" || error.code === "permission-denied")
+      ) {
+        throw error;
+      }
+      console.error("[HilalDuel] pollQuizMatch failed:", error);
+      return {
+        ok: true,
+        status: "waiting",
+        queuedAtMs: _timestampMs(queue.queuedAt) || Date.now(),
+      };
     }
-    if (!result) {
-      return { ok: true, status: "idle", reason: "invalid_funding_retired" };
-    }
-    return { ok: true, status: "matched", matchId: result };
   },
 );
 
@@ -3236,8 +3515,8 @@ const submitQuizAnswer = onCall(
           [ownerHash]: graded,
         },
       };
-      await _resolveRoundIfReady(tx, db, matchRef, data, nowMs);
-      if (!_answerFor(data, round, ownerHash)) {
+      const wroteRound = await _resolveRoundIfReady(tx, db, matchRef, data, nowMs);
+      if (!wroteRound) {
         data.version = _nextVersion(data);
         tx.set(matchRef, {
           [`answers.${round}.${ownerHash}`]: graded,
@@ -3599,7 +3878,8 @@ async function _lastWeekWinnersPromo(db, now = new Date()) {
 }
 
 /**
- * Promo: Premium verilmediyse grantDays=0 (UI 14/7/3 yazmasın).
+ * Promo: sıra ödülü (14/7/3) her zaman yazılır.
+ * Gerçek grant başarısız olsa bile lobide “3. → 3 gün” boş kalmasın.
  * Ledger yok / henüz settle değil → null.
  */
 function lastWeekWinnersFromLedgerData(data) {
@@ -3624,18 +3904,13 @@ function lastWeekWinnersFromLedgerData(data) {
       if (rank < 1 || rank > 3) return null;
       const name = String(row?.name || "Oyuncu").trim().slice(0, 32);
       if (!name) return null;
-      const granted = String(row?.premiumStatus || "") === "granted";
-      const grantDays = granted
-        ? Math.max(
-          0,
-          Math.floor(Number(row?.grantDays) || hilalWeeklyPremiumDaysForRank(rank)),
-        )
-        : 0;
+      const advertised = hilalWeeklyPremiumDaysForRank(rank);
+      const stored = Math.floor(Number(row?.grantDays) || 0);
       return {
         rank,
         name,
         ownerHash: String(row?.ownerHash || "").trim().toLowerCase(),
-        grantDays,
+        grantDays: stored > 0 ? stored : advertised,
         champion: rank === 1 || row?.championIncremented === true,
       };
     })
@@ -3664,19 +3939,23 @@ const cleanupAbandonedQuizQueues = onSchedule(
     let refunded = 0;
     for (const doc of snap.docs) {
       const queue = doc.data() || {};
-      if (!shouldRefundAbandonedQueue(queue, nowMs)) continue;
+      if (!shouldRetireStaleWaitingQueue(queue, nowMs)) continue;
       try {
         await db.runTransaction(async (tx) => {
           const fresh = await tx.get(doc.ref);
           const data = fresh.data() || {};
-          if (!shouldRefundAbandonedQueue(data, nowMs)) return;
+          if (!shouldRetireStaleWaitingQueue(data, nowMs)) return;
           const playerRef = db.collection("quiz_players").doc(doc.id);
-          await _refundQueueHeartInTransaction(tx, db, {
-            queueRef: doc.ref,
-            queue: data,
-            playerRef,
-            nowMs,
-          });
+          if (shouldRefundAbandonedQueue(data, nowMs)) {
+            await _refundQueueHeartInTransaction(tx, db, {
+              queueRef: doc.ref,
+              queue: data,
+              playerRef,
+              nowMs,
+            });
+            return;
+          }
+          tx.set(doc.ref, _idleQueuePatch(nowMs), { merge: true });
         });
         refunded += 1;
       } catch (error) {
@@ -4011,22 +4290,46 @@ function _pendingRoundMarks() {
 /**
  * Meydan okuma tur işaretleri. Bitmemiş maçta cevaplanmamış tur `pending`;
  * tamamlanmış / süresi dolmuşta boş tur `missed` (rakip tahtası için).
+ * Henüz sırası gelmeyen oyuncuya `currentRound` yansıtılmaz — aksi halde
+ * rakip cevapladıkça diğer tarafın tahtası da dolu görünür.
  */
-function _challengeRoundMarks(challenge, playerId) {
+function _challengePlayerSideState(challenge, playerId) {
   const status = String(challenge.status || "");
-  const completed = status === "completed" || status === "expired";
+  const id = String(playerId || "");
   const activeId = String(challenge.activePlayerId || "");
-  const playerFinished = completed ||
-    (status === "opponent_playing" && String(playerId) !== activeId) ||
-    (status === "awaiting_opponent" &&
-      String(playerId) === String(challenge.challengerId || ""));
+  const challengerId = String(challenge.challengerId || "");
+  const challengedId = String(challenge.challengedId || "");
+  if (status === "completed" || status === "expired") return "finished";
+  if (status === "challenger_playing") {
+    if (challengerId && id === challengerId) return "playing";
+    if (challengedId && id === challengedId) return "not_started";
+    if (!challengerId && !challengedId) return "playing";
+    return "not_started";
+  }
+  if (status === "awaiting_opponent") {
+    if (challengerId && id === challengerId) return "finished";
+    return "not_started";
+  }
+  if (status === "opponent_playing") {
+    if (activeId && id === activeId) return "playing";
+    if (challengerId && id === challengerId) return "finished";
+    if (activeId && id && id !== activeId) return "finished";
+    return "not_started";
+  }
+  return "not_started";
+}
+
+function _challengeRoundMarks(challenge, playerId) {
+  const state = _challengePlayerSideState(challenge, playerId);
   const currentRound = Math.min(
     Math.max(0, Number(challenge.currentRound) || 0),
     ROUND_COUNT - 1,
   );
   const marks = [];
   for (let round = 0; round < ROUND_COUNT; round += 1) {
-    const missing = playerFinished || round < currentRound ? "missed" : "pending";
+    let missing = "pending";
+    if (state === "finished") missing = "missed";
+    else if (state === "playing" && round < currentRound) missing = "missed";
     marks.push(_challengeRoundMarkToken(challenge, round, playerId, missing));
   }
   return marks;
@@ -4088,12 +4391,26 @@ function _serializeChallenge(challengeId, challenge, ownerHash, locale = "tr") {
   const selfAnswer = myTurn
     ? _challengeAnswerFor(challenge, currentRound, ownerHash)
     : null;
-  const lastResolution = challenge.lastResolution || null;
+  const rawLastResolution = challenge.lastResolution || null;
   const revealOpponentMarks = _shouldRevealChallengeOpponentMarks(
     challenge,
     ownerHash,
     opponent.id,
   );
+  const resolutionBelongsToSelf = Boolean(
+    rawLastResolution &&
+    Object.prototype.hasOwnProperty.call(
+      rawLastResolution.choices || {},
+      ownerHash,
+    ),
+  );
+  const lastResolution = rawLastResolution &&
+    (resolutionBelongsToSelf ||
+      (revealOpponentMarks && myTurn) ||
+      status === "completed" ||
+      status === "expired")
+    ? rawLastResolution
+    : null;
   const resolutionChoices = { ...(lastResolution?.choices || {}) };
   const resolutionElapsed = { ...(lastResolution?.elapsedMs || {}) };
   if (revealOpponentMarks && lastResolution) {
@@ -4132,9 +4449,10 @@ function _serializeChallenge(challengeId, challenge, ownerHash, locale = "tr") {
     question: playing && myTurn
       ? _questionPayload(challenge.questionIds[currentRound], false, locale)
       : null,
-    // Solo tur: rakip yok; istemci "rakip bekleniyor"a düşmesin.
+    // Solo tur: yalnızca senin bu turdaki cevabın. Rakip cevapladı diye
+    // karşı tarafın HUD'u "Cevapladı" yanmasın.
     selfAnswered: Boolean(selfAnswer),
-    opponentAnswered: myTurn ? Boolean(selfAnswer) : true,
+    opponentAnswered: false,
     lastResolution: lastResolution
       ? {
           round: Number(lastResolution.round) || 0,
@@ -5940,6 +6258,8 @@ module.exports = {
     ENGAGEMENT_NEVER_PLAYED_MIN_AGE_MS,
     ENGAGEMENT_NEVER_PLAYED_MAX_AGE_MS,
     botPlan: _botPlan,
+    pickBotCorrectCount: _pickBotCorrectCount,
+    pickBotAfterHumanDelayMs: _pickBotAfterHumanDelayMs,
     botReadyAtMs: _botReadyAtMs,
     botAnswerElapsedMs: _botAnswerElapsedMs,
     canAcceptAnswer,
@@ -5950,6 +6270,7 @@ module.exports = {
     perspectiveResolutionChoices: _perspectiveResolutionChoices,
     ANSWER_GRACE_MS,
     allPlayersAnswered,
+    roundAnswersChanged: _roundAnswersChanged,
     shouldRefundAbandonedQueue,
     queueAbandonAtMs,
     buildHeartRefundPlayerUpdates,
@@ -5960,8 +6281,16 @@ module.exports = {
     isFundedQueue,
     isValidChargedAdLedger,
     isValidQueueFunding,
+    queueOwnerId,
+    shouldRetireStaleWaitingQueue,
+    isPairableWaitingQueue,
+    rankLiveQueueCandidates,
+    pickPairableCandidate,
+    decideLiveQueuePollAction,
     QUEUE_ABANDON_MS,
     QUEUE_WAIT_MS,
+    QUEUE_CANDIDATE_SCAN_LIMIT,
+    QUEUE_CANDIDATE_PICK_LIMIT,
     ROUND_DURATION_MS,
     ROUND_REVEAL_MS,
     pickQuestions: _pickQuestions,
@@ -5995,6 +6324,7 @@ module.exports = {
     challengePushRecipients,
     claimChallengeNotify,
     challengeRoundMarks: _challengeRoundMarks,
+    challengePlayerSideState: _challengePlayerSideState,
     shouldRevealChallengeOpponentMarks: _shouldRevealChallengeOpponentMarks,
     serializeChallenge: _serializeChallenge,
   },

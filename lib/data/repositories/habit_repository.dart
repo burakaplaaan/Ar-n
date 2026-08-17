@@ -2,6 +2,7 @@
 // Alışkanlık ve günlük log CRUD işlemleri.
 
 import 'package:hive/hive.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
 import '../models/habit_model.dart';
 import '../models/habit_log_model.dart';
@@ -175,9 +176,44 @@ class HabitRepository {
   bool hasActiveTemplate(String templateId) =>
       findActiveByTemplateId(templateId) != null;
 
-  /// Günlük namaz takibi her zaman aktif kalsın: yoksa oluşturur; yalnızca arşivdeyse en yeniyi geri açar.
+  /// Ana sayfa + Gelişim: günlük namaz takibi kurulu ve kullanıma hazır olsun.
+  static Future<void> seedDefaultSalatTracking(
+    SharedPreferences prefs,
+  ) async {
+    final repo = HabitRepository();
+    await repo.ensureDefaultSalatHabit();
+    if (prefs.getBool(WillpowerTemplates.salatPreinstalledPrefKey) == true) {
+      return;
+    }
+    await prefs.setBool(WillpowerTemplates.salatVisibleOnHomePrefKey, true);
+    await prefs.setBool(WillpowerTemplates.salatPreinstalledPrefKey, true);
+  }
+
+  /// Eski yedek (preinstall alanı yok) bu sürümün tek seferlik ana sayfa
+  /// kurulumunu `visible=false` ile geri almasın. Yeni yedek gizlemeyi taşır.
+  static Future<void> applyImportedSalatHomeVisibility(
+    SharedPreferences prefs, {
+    required bool incomingVisible,
+    required bool backupKnowsPreinstall,
+  }) async {
+    final localPreinstalled =
+        prefs.getBool(WillpowerTemplates.salatPreinstalledPrefKey) == true;
+    if (!incomingVisible && localPreinstalled && !backupKnowsPreinstall) {
+      return;
+    }
+    await prefs.setBool(
+      WillpowerTemplates.salatVisibleOnHomePrefKey,
+      incomingVisible,
+    );
+  }
+
+  /// Günlük namaz takibi her zaman aktif ve tamamlanmış olsun.
   Future<void> ensureDefaultSalatHabit() async {
-    if (hasActiveTemplate(WillpowerTemplates.salatDaily)) return;
+    final active = findActiveByTemplateId(WillpowerTemplates.salatDaily);
+    if (active != null) {
+      await _completeSalatIfNeeded(active);
+      return;
+    }
 
     HabitModel? newestArchived;
     for (final h in _habitsBox.values.whereType<HabitModel>()) {
@@ -190,9 +226,7 @@ class HabitRepository {
       }
     }
     if (newestArchived != null) {
-      newestArchived.isArchived = false;
-      await _habitsBox.put(newestArchived.id, newestArchived);
-      await HabitCloudSyncQueue.markHabitDirty(newestArchived.id);
+      await _completeSalatIfNeeded(newestArchived);
       return;
     }
 
@@ -201,8 +235,28 @@ class HabitRepository {
       title: 'Günlük namaz',
       type: HabitType.good,
       emoji: '🕌',
-      onboardingCompleted: false,
+      onboardingCompleted: true,
+      commitmentText: WillpowerTemplates.defaultSalatCommitment,
     );
+  }
+
+  Future<void> _completeSalatIfNeeded(HabitModel habit) async {
+    var changed = false;
+    if (habit.isArchived) {
+      habit.isArchived = false;
+      changed = true;
+    }
+    if (!habit.onboardingCompleted) {
+      habit.onboardingCompleted = true;
+      changed = true;
+    }
+    if (habit.commitmentText.trim().isEmpty) {
+      habit.commitmentText = WillpowerTemplates.defaultSalatCommitment;
+      changed = true;
+    }
+    if (!changed) return;
+    await _habitsBox.put(habit.id, habit);
+    await HabitCloudSyncQueue.markHabitDirty(habit.id);
   }
 
   /// Klasik serbest alışkanlık

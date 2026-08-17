@@ -91,7 +91,7 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get settingsContactSubtitle =>
-      'Öneri, hata bildirimi veya destek talebini doğrudan bize e-posta ile iletebilirsin.';
+      'Öneri, hata bildirimi veya destek talebini doğrudan bize e-posta ile iletebilirsin. Lütfen telefonunun markasını ve modelini de yaz.';
 
   @override
   String get settingsContactOpenMailAction => 'Mail uygulamasını aç';
@@ -114,7 +114,9 @@ class AppLocalizationsTr extends AppLocalizations {
   String get settingsContactMailSubject => 'Arın uygulaması geri bildirimi';
 
   @override
-  String get settingsContactMailBody => 'Selam Arın ekibi,\n\n';
+  String settingsContactMailBody(Object device) {
+    return 'Selam Arın ekibi,\n\nCihaz (marka ve model): $device\n\n';
+  }
 
   @override
   String get settingsGuestHint =>

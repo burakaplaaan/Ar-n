@@ -632,7 +632,7 @@ test("challenge round marks reveal opponent sheet only when finished", () => {
   assert.equal(serialized.result.roundMarks.aaa[0], "correct");
   assert.equal(serialized.result.roundMarks.bbb[0], "wrong");
 
-  const live = t.serializeChallenge("c2", {
+  const liveSource = {
     challengerId: "aaa",
     challengedId: "bbb",
     challengerName: "A",
@@ -644,11 +644,43 @@ test("challenge round marks reveal opponent sheet only when finished", () => {
     answers: {
       0: { aaa: { choice: q.correctIndex, elapsedMs: 1 } },
     },
-  }, "aaa");
+    lastResolution: {
+      round: 0,
+      choices: { aaa: q.correctIndex },
+      elapsedMs: { aaa: 1 },
+    },
+  };
+  const live = t.serializeChallenge("c2", liveSource, "aaa");
   assert.equal(live.selfRoundMarks[0], "correct");
   assert.deepEqual(live.opponentRoundMarks, [
     "pending", "pending", "pending", "pending", "pending", "pending", "pending",
   ]);
+  assert.equal(live.opponentAnswered, false);
+  assert.equal(t.challengePlayerSideState(liveSource, "bbb"), "not_started");
+
+  const asChallenged = t.serializeChallenge("c2", liveSource, "bbb");
+  assert.deepEqual(asChallenged.selfRoundMarks, [
+    "pending", "pending", "pending", "pending", "pending", "pending", "pending",
+  ]);
+  assert.equal(asChallenged.selfAnswered, false);
+  assert.equal(asChallenged.opponentAnswered, false);
+  assert.equal(asChallenged.lastResolution, null);
+
+  const awaiting = {
+    ...liveSource,
+    status: "awaiting_opponent",
+    activePlayerId: null,
+    currentRound: 0,
+    lastResolution: {
+      round: 6,
+      choices: { aaa: q.correctIndex },
+      elapsedMs: { aaa: 1 },
+    },
+  };
+  assert.deepEqual(t.challengeRoundMarks(awaiting, "bbb"), [
+    "pending", "pending", "pending", "pending", "pending", "pending", "pending",
+  ]);
+  assert.equal(t.serializeChallenge("c2b", awaiting, "bbb").lastResolution, null);
 
   const challengedTurn = t.serializeChallenge("c3", {
     challengerId: "aaa",
@@ -812,6 +844,184 @@ test("free-player hearts come only from rewarded-ad balance", () => {
   );
 });
 
+test("rankLiveQueueCandidates prefers same level then oldest live queue", () => {
+  const now = Date.now();
+  const self = "self_owner";
+  const items = [
+    {
+      ownerHash: "lvl5",
+      status: "waiting",
+      heartSource: "premium",
+      level: 5,
+      queuedAtMs: now - 9_000,
+    },
+    {
+      ownerHash: "lvl2-new",
+      status: "waiting",
+      heartSource: "premium",
+      level: 2,
+      queuedAtMs: now - 2_000,
+    },
+    {
+      ownerHash: "lvl2-old",
+      status: "waiting",
+      heartSource: "premium",
+      level: 2,
+      queuedAtMs: now - 8_000,
+    },
+    {
+      ownerHash: self,
+      status: "waiting",
+      heartSource: "premium",
+      level: 2,
+      queuedAtMs: now - 20_000,
+    },
+    {
+      ownerHash: "unfunded",
+      status: "waiting",
+      heartSource: "ad",
+      level: 2,
+      queuedAtMs: now - 12_000,
+    },
+    {
+      ownerHash: "stale",
+      status: "waiting",
+      heartSource: "ad",
+      heartChargeId: "charge_stale",
+      level: 2,
+      queuedAtMs: now - t.QUEUE_ABANDON_MS - 50,
+      activeUntilMs: now - 1,
+    },
+  ];
+  const ranked = t.rankLiveQueueCandidates(items, {
+    excludeOwnerHash: self,
+    nowMs: now,
+    level: 2,
+    limit: 5,
+  });
+  assert.deepEqual(ranked.map((item) => item.ownerHash), [
+    "lvl2-old",
+    "lvl2-new",
+    "lvl5",
+  ]);
+});
+
+test("pickPairableCandidate requires a live funded ledger", () => {
+  const now = Date.now();
+  const adQueue = {
+    ownerHash: "owner_a",
+    status: "waiting",
+    heartSource: "ad",
+    heartChargeId: "charge_a",
+    level: 1,
+    queuedAtMs: now - 1_000,
+  };
+  const premiumQueue = {
+    ownerHash: "owner_b",
+    status: "waiting",
+    heartSource: "premium",
+    level: 1,
+    queuedAtMs: now - 500,
+  };
+  assert.equal(
+    t.pickPairableCandidate([adQueue], new Map(), {
+      nowMs: now,
+      excludeOwnerHash: "self",
+    }),
+    null,
+  );
+  assert.equal(
+    t.pickPairableCandidate([adQueue], new Map([
+      ["charge_a", {
+        ownerHash: "owner_a",
+        heartSource: "ad",
+        status: "charged",
+      }],
+    ]), {
+      nowMs: now,
+      excludeOwnerHash: "self",
+    })?.ownerHash,
+    "owner_a",
+  );
+  assert.equal(
+    t.pickPairableCandidate([premiumQueue], new Map(), {
+      nowMs: now,
+      excludeOwnerHash: "self",
+    })?.ownerHash,
+    "owner_b",
+  );
+});
+
+test("decideLiveQueuePollAction pairs humans before the bot timeout", () => {
+  const now = Date.now();
+  assert.equal(
+    t.decideLiveQueuePollAction({
+      selfStatus: "waiting",
+      hasPairableHuman: true,
+      queuedAtMs: now,
+      nowMs: now + 1_000,
+    }),
+    "pair_human",
+  );
+  assert.equal(
+    t.decideLiveQueuePollAction({
+      selfStatus: "waiting",
+      hasPairableHuman: false,
+      queuedAtMs: now,
+      nowMs: now + 1_000,
+    }),
+    "keep_waiting",
+  );
+  assert.equal(
+    t.decideLiveQueuePollAction({
+      selfStatus: "waiting",
+      hasPairableHuman: true,
+      queuedAtMs: now - t.QUEUE_WAIT_MS - 10,
+      nowMs: now,
+    }),
+    "pair_human",
+  );
+  assert.equal(
+    t.decideLiveQueuePollAction({
+      selfStatus: "waiting",
+      hasPairableHuman: false,
+      queuedAtMs: now - t.QUEUE_WAIT_MS - 10,
+      nowMs: now,
+    }),
+    "pair_bot",
+  );
+  assert.equal(
+    t.decideLiveQueuePollAction({
+      selfStatus: "waiting",
+      hasPairableHuman: false,
+      queuedAtMs: 0,
+      nowMs: now,
+    }),
+    "pair_bot",
+  );
+});
+
+test("stale premium waiting retires without an ad refund", () => {
+  const now = Date.now();
+  const premium = {
+    ownerHash: "premium_owner",
+    status: "waiting",
+    heartSource: "premium",
+    queuedAtMs: now - t.QUEUE_ABANDON_MS - 1,
+  };
+  assert.equal(t.shouldRefundAbandonedQueue(premium, now), false);
+  assert.equal(t.shouldRetireStaleWaitingQueue(premium, now), true);
+  assert.equal(t.isPairableWaitingQueue(premium, { nowMs: now }), false);
+  assert.equal(
+    t.isPairableWaitingQueue({
+      ...premium,
+      queuedAtMs: now - 1_000,
+      activeUntilMs: now + 60_000,
+    }, { nowMs: now }),
+    true,
+  );
+});
+
 test("ad-funded queue requires matching charged ledger", () => {
   const queue = {
     status: "waiting",
@@ -883,44 +1093,80 @@ test("stableBotId is deterministic per display name", () => {
   assert.notEqual(a, c);
 });
 
-test("bot plan knows easy questions and hesitates on hard misses", () => {
-  const easyIds = questions.filter((q) => q.difficulty === 1).slice(0, 40).map((q) => q.id);
-  const hardIds = questions.filter((q) => q.difficulty === 3).slice(0, 40).map((q) => q.id);
-  const easyPlan = t.botPlan(easyIds, 1);
-  const hardPlan = t.botPlan(hardIds, 1);
-  const easyCorrect = easyPlan.filter((row, i) => {
-    const q = questions.find((item) => item.id === easyIds[i]);
-    return row.choice === q.correctIndex;
-  }).length;
-  const hardCorrect = hardPlan.filter((row, i) => {
-    const q = questions.find((item) => item.id === hardIds[i]);
-    return row.choice === q.correctIndex;
-  }).length;
-  assert.ok(easyCorrect >= 30, `easy accuracy too low: ${easyCorrect}/40`);
-  assert.ok(hardCorrect <= 22, `hard accuracy too high: ${hardCorrect}/40`);
-  const hardWrong = hardPlan.filter((row, i) => {
-    const q = questions.find((item) => item.id === hardIds[i]);
-    return row.choice !== q.correctIndex;
-  });
-  assert.ok(hardWrong.length > 0);
-  const avgWrongMs = hardWrong.reduce((sum, row) => sum + row.elapsedMs, 0) /
-    hardWrong.length;
-  assert.ok(avgWrongMs >= 8_000, `hard wrong too fast: ${avgWrongMs}`);
+test("bot plan caps live matches at 1-3 correct and delays after human", () => {
+  const ids = t.pickQuestions();
+  assert.equal(ids.length, 7);
+  const histogram = { 1: 0, 2: 0, 3: 0 };
+  for (let sample = 0; sample < 80; sample += 1) {
+    const plan = t.botPlan(ids, 10);
+    assert.equal(plan.length, 7);
+    const correctCount = plan.filter((step) => step.correct === true).length;
+    assert.ok(correctCount >= 1 && correctCount <= 3, `out of range: ${correctCount}`);
+    histogram[correctCount] += 1;
+    for (let i = 0; i < plan.length; i += 1) {
+      const step = plan[i];
+      assert.ok(Number.isInteger(step.choice));
+      assert.ok(step.choice >= 0 && step.choice <= 3);
+      assert.ok(step.elapsedMs >= 2_200);
+      assert.ok(step.elapsedMs <= 19_500);
+      assert.equal(t.isChoiceCorrect(step.choice, ids[i]), step.correct);
+      assert.ok(step.afterHumanDelayMs >= 2_000);
+      assert.ok(step.afterHumanDelayMs <= 5_200);
+      assert.ok(
+        step.afterHumanDelayMs <= 3_000 || step.afterHumanDelayMs >= 4_800,
+        `delay bucket: ${step.afterHumanDelayMs}`,
+      );
+    }
+  }
+  assert.ok(histogram[2] > histogram[1], `expected 2 most common: ${JSON.stringify(histogram)}`);
+  assert.ok(histogram[2] > histogram[3], `expected 2 most common: ${JSON.stringify(histogram)}`);
+  assert.ok(histogram[1] > 0);
+  assert.ok(histogram[3] > 0);
+  assert.equal(t.pickBotCorrectCount(0), 0);
+  assert.equal(t.pickBotCorrectCount(1), 1);
 });
 
-test("botReadyAtMs resolves with human submit; waits plan if human silent", () => {
+test("botReadyAtMs waits after human unless plan already elapsed", () => {
   const start = 1_000_000;
-  const planned = 12_000;
-  // İnsan cevapladıysa bot aynı nowMs ile hazır — submit'te reveal gelsin.
-  const ready = t.botReadyAtMs({
-    roundStartedAtMs: start,
-    plannedElapsedMs: planned,
-    deadlineMs: start + 20_000,
-    nowMs: start + 3_500,
-    humanAnswered: true,
-    humanElapsedMs: 3_000,
-  });
-  assert.equal(ready, start + 3_500);
+  // İnsan öndeyse 2.5 sn sonra.
+  assert.equal(
+    t.botReadyAtMs({
+      roundStartedAtMs: start,
+      plannedElapsedMs: 12_000,
+      deadlineMs: start + 20_000,
+      nowMs: start + 3_500,
+      humanAnswered: true,
+      humanElapsedMs: 3_000,
+      afterHumanDelayMs: 2_500,
+    }),
+    start + 5_500,
+  );
+  // Bazen ~5 sn sonra.
+  assert.equal(
+    t.botReadyAtMs({
+      roundStartedAtMs: start,
+      plannedElapsedMs: 12_000,
+      deadlineMs: start + 20_000,
+      nowMs: start + 3_500,
+      humanAnswered: true,
+      humanElapsedMs: 3_000,
+      afterHumanDelayMs: 5_000,
+    }),
+    start + 8_000,
+  );
+  // Plan insandan önce dolduysa ekstra bekleme yok.
+  assert.equal(
+    t.botReadyAtMs({
+      roundStartedAtMs: start,
+      plannedElapsedMs: 4_000,
+      deadlineMs: start + 20_000,
+      nowMs: start + 8_000,
+      humanAnswered: true,
+      humanElapsedMs: 7_500,
+      afterHumanDelayMs: 2_500,
+    }),
+    start + 4_000,
+  );
   // İnsan yoksa planlanan süre.
   assert.equal(
     t.botReadyAtMs({
@@ -933,19 +1179,58 @@ test("botReadyAtMs resolves with human submit; waits plan if human silent", () =
     }),
     start + 7_000,
   );
+  // Gecikme deadline'ı ezmesin.
+  assert.equal(
+    t.botReadyAtMs({
+      roundStartedAtMs: start,
+      plannedElapsedMs: 19_500,
+      deadlineMs: start + 20_000,
+      nowMs: start + 18_500,
+      humanAnswered: true,
+      humanElapsedMs: 18_000,
+      afterHumanDelayMs: 5_000,
+    }),
+    start + 19_800,
+  );
 });
 
-test("botAnswerElapsedMs keeps plan when human forces early bot write", () => {
+test("roundAnswersChanged ignores identical poll snapshots", () => {
+  const human = { choice: 1, elapsedMs: 3_000, correct: true };
+  assert.equal(
+    t.roundAnswersChanged({ p1: human }, { p1: { ...human } }),
+    false,
+  );
+  assert.equal(
+    t.roundAnswersChanged({ p1: human }, { p1: human, bot: { choice: 2, elapsedMs: 5_500, correct: false } }),
+    true,
+  );
+  assert.equal(t.roundAnswersChanged({}, { p1: human }), true);
+});
+
+test("botAnswerElapsedMs follows human delay instead of instant write", () => {
   const start = 1_000_000;
   const planElapsed = 12_000;
   assert.equal(
     t.botAnswerElapsedMs({
       planElapsedMs: planElapsed,
-      nowMs: start + 3_500,
+      nowMs: start + 5_500,
       roundStartedAtMs: start,
       humanAnswered: true,
+      humanElapsedMs: 3_000,
+      afterHumanDelayMs: 2_500,
     }),
-    planElapsed,
+    5_500,
+  );
+  assert.equal(
+    t.botAnswerElapsedMs({
+      planElapsedMs: 4_000,
+      nowMs: start + 8_000,
+      roundStartedAtMs: start,
+      humanAnswered: true,
+      humanElapsedMs: 7_500,
+      afterHumanDelayMs: 2_500,
+    }),
+    4_000,
   );
   // İnsan yokken duvar saati planı aşmasın.
   assert.equal(
@@ -1338,19 +1623,19 @@ test("challenge inbox keeps completed 24h and hides expired", () => {
   assert.equal(t.challengeInboxOutcome("awaiting_opponent", "me", "me"), null);
 });
 
-test("last-week promo grantDays is 0 unless premium was granted", () => {
+test("last-week promo always advertises 14/7/3 by rank", () => {
   const skipped = t.lastWeekWinnersFromLedgerData({
     status: "settled",
     placements: [
-      { rank: 1, name: "Ali", ownerHash: "aa", grantDays: 14, premiumStatus: "skipped_already_premium" },
+      { rank: 1, name: "Ali", ownerHash: "aa", grantDays: 0, premiumStatus: "skipped_already_premium" },
       { rank: 2, name: "Ece", ownerHash: "bb", grantDays: 7, premiumStatus: "granted" },
-      { rank: 3, name: "Can", ownerHash: "cc", grantDays: 3, premiumStatus: "skipped_no_auth" },
+      { rank: 3, name: "Can", ownerHash: "cc", grantDays: 0, premiumStatus: "skipped_no_auth" },
     ],
   });
   assert.equal(skipped.length, 3);
-  assert.equal(skipped[0].grantDays, 0);
+  assert.equal(skipped[0].grantDays, 14);
   assert.equal(skipped[1].grantDays, 7);
-  assert.equal(skipped[2].grantDays, 0);
+  assert.equal(skipped[2].grantDays, 3);
   const granted = t.lastWeekWinnersFromLedgerData({
     status: "granted",
     ownerHash: "aa",

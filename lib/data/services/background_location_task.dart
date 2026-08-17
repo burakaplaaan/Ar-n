@@ -131,10 +131,12 @@ Future<void> _runBackgroundLocationSync() async {
   final location = LocationService();
   final pref = location.locationUpdatePref;
   if (pref == LocationUpdatePref.neverUpdate) return;
+  if (location.isManualPrayerLocation) return;
   if (!await location.hasAlwaysLocationPermission()) return;
 
   final change = await location.detectLocationChangeHeadless();
   if (change == null) return;
+  if (location.isManualPrayerLocation) return;
 
   final prefs = await SharedPreferences.getInstance();
   final localeCode = _localeCodeFromPrefs(prefs);

@@ -1260,20 +1260,14 @@ class HilalDuelController extends ChangeNotifier {
         _safeNotify();
         return;
       }
+      // Canlı aramada geçici hatayı ekrana basma; periyodik poll tekrar denesin.
+      if (phase == HilalDuelPhase.matchmaking && !_arms.cancelPending) {
+        errorMessage = null;
+        _safeNotify();
+        return;
+      }
       errorMessage = friendly;
       _safeNotify();
-      // 15sn sonrası geçici hata: kısa aralıkla tekrar dene.
-      if (_botAssignRequested &&
-          phase == HilalDuelPhase.matchmaking &&
-          !_arms.cancelPending) {
-        _queuePollInFlight = false;
-        await Future<void>.delayed(const Duration(milliseconds: 1200));
-        if (!_disposed &&
-            phase == HilalDuelPhase.matchmaking &&
-            _queueConfirmed) {
-          unawaited(_pollQueue());
-        }
-      }
     } finally {
       _queuePollInFlight = false;
     }
@@ -1581,9 +1575,11 @@ class HilalDuelController extends ChangeNotifier {
     final selfTokens = _roundMarkTokensFor(incoming, opponent: false);
     if (selfTokens.isNotEmpty) {
       final nextSelf = parseRoundMarks(selfTokens, total: total);
-      // Oyun içi poll'daki tamamen pending özet, lastResolution ile
-      // yazılmış turları geri silmesin. Sonuçta her zaman uygula.
-      if (incoming.isCompleted ||
+      // Canlı maç poll'u tamamen pending özetle lastResolution işaretlerini
+      // silmesin. Meydan okumada sunucu kaynak: sırası gelmeyen taraf
+      // pending kalmalı, eski "missed" sızıntısı durmalı.
+      if (incoming.isChallenge ||
+          incoming.isCompleted ||
           nextSelf.any((mark) => mark != HilalDuelRoundMark.pending)) {
         selfRoundMarks = nextSelf;
       }
@@ -1644,14 +1640,18 @@ class HilalDuelController extends ChangeNotifier {
     final correct = res.question.correctIndex;
     final nextSelf = List<HilalDuelRoundMark>.from(selfRoundMarks);
     final nextOpp = List<HilalDuelRoundMark>.from(opponentRoundMarks);
-    nextSelf[res.round] = markFromServerChoice(
-      choice: _rawRevealChoice(
-        resolution: res,
-        playerId: m.self.id,
-        preferPerspective: 'self',
-      ),
-      correctIndex: correct,
+    final selfRaw = _rawRevealChoice(
+      resolution: res,
+      playerId: m.self.id,
+      preferPerspective: 'self',
     );
+    // Meydan okuma solo çözümünde rakibin lastResolution'ı self'e missed yazmasın.
+    if (selfRaw != null || !challengeMode) {
+      nextSelf[res.round] = markFromServerChoice(
+        choice: selfRaw,
+        correctIndex: correct,
+      );
+    }
     // Challenge solo: rakip choices'ta yok → pending kalsın (missed yazma).
     final oppRaw = _rawRevealChoice(
       resolution: res,

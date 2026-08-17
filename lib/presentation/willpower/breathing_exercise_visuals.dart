@@ -7,11 +7,10 @@ class _BreathingGlassPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ClipRRect(
+    return ArinBackdropBlur(
+      sigma: 22,
       borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 22, sigmaY: 22),
-        child: DecoratedBox(
+      child: DecoratedBox(
           decoration: BoxDecoration(
             borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
             gradient: LinearGradient(
@@ -40,7 +39,6 @@ class _BreathingGlassPanel extends StatelessWidget {
           ),
           child: child,
         ),
-      ),
     );
   }
 }

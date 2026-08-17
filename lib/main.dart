@@ -30,6 +30,7 @@ import 'data/models/habit_model.dart';
 import 'data/models/habit_model.g.dart';
 import 'data/models/habit_log_model.dart';
 import 'data/models/habit_log_model.g.dart';
+import 'data/repositories/habit_repository.dart';
 import 'data/services/app_notification_channel_prefs.dart';
 import 'data/services/arin_local_notifications_plugin.dart';
 import 'data/services/admob_service.dart';
@@ -288,6 +289,7 @@ Future<_BootstrapPayload> _bootstrapApp() async {
 
     // ── SharedPreferences ──────────────────────────────────────────────
     final prefs = await SharedPreferences.getInstance();
+    await HabitRepository.seedDefaultSalatTracking(prefs);
 
     // intl tarih adları splash kritik yolunda beklemesin. İlk kurulumda
     // onboarding ekranlarının tarih formatına ihtiyacı yok; gerekli ekranlar

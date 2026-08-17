@@ -38,6 +38,20 @@ class LocationChangeResult {
   });
 }
 
+/// Elle seçilen il/ilçe GPS ile sessizce ezilmesin.
+bool shouldHoldManualPrayerLocation({
+  required bool isManual,
+  required bool overwriteManual,
+}) =>
+    isManual && !overwriteManual;
+
+/// Elle seçilen şehirde Aladhan kalan GPS koordinatını kullanmasın.
+bool shouldUseAladhanCityName({
+  required bool isManual,
+  required String city,
+}) =>
+    isManual && city.trim().isNotEmpty;
+
 /// Konum güncelleme tercihi sabitleri (Hive key: `location_auto_update_pref`).
 abstract final class LocationUpdatePref {
   /// Her şehir değişiminde sor (kullanıcı Ayarlar'dan kapatırsa).
@@ -60,6 +74,7 @@ class LocationService {
   /// Diyanet (ezanvakti) ilçe kimliği. TR ve ancak match başarılıysa
   /// dolu olur; değilse `null` kalıp resolver Aladhan'a düşer.
   static const _districtIdKey = 'prayer_district_id';
+  static const _manualPrayerLocationKey = 'prayer_location_manual';
   static const _locationUpdatePrefKey = 'location_auto_update_pref';
 
   /// İlk namaz vakitleri yüklemesinde (oturum başına bir kez) GPS ile güncel şehir.
@@ -72,6 +87,10 @@ class LocationService {
   double? get savedLat => _prefs.get(_latKey) as double?;
   double? get savedLon => _prefs.get(_lonKey) as double?;
   int? get savedDistrictId => _prefs.get(_districtIdKey) as int?;
+
+  /// Kullanıcı il/ilçe seçtiyse GPS `alwaysUpdate` bunu geri almasın.
+  bool get isManualPrayerLocation =>
+      _prefs.get(_manualPrayerLocationKey) == true;
 
   /// İnternet/GPS fix olmadan (ör. kıble pusulası) son bilinen koordinatı
   /// senkron döndürür. Box açık değilse ya da hiç konum kaydı yoksa `null`.
@@ -108,6 +127,7 @@ class LocationService {
     if (savedLat != null) 'lat': savedLat,
     if (savedLon != null) 'lon': savedLon,
     if (savedDistrictId != null) 'districtId': savedDistrictId,
+    if (isManualPrayerLocation) 'manualPrayerLocation': true,
   };
 
   Future<void> importBackupJson(Map<String, dynamic> json) async {
@@ -133,6 +153,11 @@ class LocationService {
 
     final districtId = (json['districtId'] as num?)?.toInt();
     await saveDistrictId(districtId);
+    if (json['manualPrayerLocation'] == true) {
+      await _prefs.put(_manualPrayerLocationKey, true);
+    } else {
+      await _prefs.delete(_manualPrayerLocationKey);
+    }
   }
 
   Future<void> saveCity(String city, String country) async {
@@ -154,19 +179,28 @@ class LocationService {
   Future<void> saveManualCity(String city, String country) async {
     final trimmed = city.trim();
     if (trimmed.isEmpty) return;
+    _syncGeneration++;
+    _sessionAutoGpsPending = false;
     await _prefs.delete(_latKey);
     await _prefs.delete(_lonKey);
     await _prefs.delete(_districtIdKey); // ilçe de sıfırlanır
+    await _prefs.put(_manualPrayerLocationKey, true);
     await saveCity(trimmed, country);
   }
 
-  /// Elle ilçe seçimi (settings > "Konum değiştir" sheet'inden).
-  /// Saved district + il adı + ülke eşzamanlı yazılır; GPS'i silmez
-  /// (kullanıcı "manuel ama GPS'im doğru" diyebilir).
+  /// Elle ilçe seçimi (ana sayfa / ayarlar picker).
+  /// GPS koordinatını siler — aksi halde Diyanet düşünce Aladhan Kocaeli
+  /// vaktini Ankara etiketiyle gösterebilir. Uçuştaki GPS yazısını nesil
+  /// ile iptal eder; `alwaysUpdate` seçimi geri alamaz.
   Future<void> saveManualDistrict(DiyanetDistrict d) async {
+    _syncGeneration++;
+    _sessionAutoGpsPending = false;
     await _prefs.put(_districtIdKey, d.id);
     await _prefs.put(_cityKey, d.il);
     await _prefs.put(_countryKey, 'Turkey');
+    await _prefs.put(_manualPrayerLocationKey, true);
+    await _prefs.delete(_latKey);
+    await _prefs.delete(_lonKey);
   }
 
   String _locationKey() {
@@ -193,15 +227,30 @@ class LocationService {
   Future<void> syncPrayerLocation({
     bool forceRefresh = false,
     bool promptIfNeeded = false,
+    bool overwriteManual = false,
   }) async {
+    if (shouldHoldManualPrayerLocation(
+      isManual: isManualPrayerLocation,
+      overwriteManual: overwriteManual,
+    )) {
+      _sessionAutoGpsPending = false;
+      return;
+    }
     final existing = _syncJob;
     if (existing != null) {
       await existing;
       if (!forceRefresh) return;
+      if (shouldHoldManualPrayerLocation(
+        isManual: isManualPrayerLocation,
+        overwriteManual: overwriteManual,
+      )) {
+        return;
+      }
     }
     final job = _syncPrayerLocationBody(
       forceRefresh: forceRefresh,
       promptIfNeeded: promptIfNeeded,
+      overwriteManual: overwriteManual,
     );
     _syncJob = job;
     try {
@@ -214,7 +263,15 @@ class LocationService {
   Future<void> _syncPrayerLocationBody({
     required bool forceRefresh,
     required bool promptIfNeeded,
+    required bool overwriteManual,
   }) async {
+    if (shouldHoldManualPrayerLocation(
+      isManual: isManualPrayerLocation,
+      overwriteManual: overwriteManual,
+    )) {
+      _sessionAutoGpsPending = false;
+      return;
+    }
     final currentGen = ++_syncGeneration;
     try {
       final oldLocationKey = _locationKey();
@@ -248,8 +305,19 @@ class LocationService {
         }
       }
 
-      final pos = await requestCurrentPosition(promptIfNeeded: promptIfNeeded);
+      final pos = await requestCurrentPosition(
+        promptIfNeeded: promptIfNeeded,
+        persistCoordinates: false,
+      );
       if (pos == null || currentGen != _syncGeneration) return;
+      if (shouldHoldManualPrayerLocation(
+        isManual: isManualPrayerLocation,
+        overwriteManual: overwriteManual,
+      )) {
+        return;
+      }
+      await _prefs.put(_latKey, pos.lat);
+      await _prefs.put(_lonKey, pos.lon);
 
       try {
         final marks = await placemarkFromCoordinates(pos.lat, pos.lon);
@@ -260,6 +328,9 @@ class LocationService {
         if (city == null || city.isEmpty) return;
 
         final country = _countryForAladhan(p);
+        if (overwriteManual) {
+          await _prefs.delete(_manualPrayerLocationKey);
+        }
         await saveCity(city, country);
         if (currentGen != _syncGeneration) return;
 
@@ -410,8 +481,18 @@ class LocationService {
   }
 
   /// [detectLocationChange]'in sonucunu Hive'a kalıcı olarak yazar.
-  Future<void> applyLocationChange(LocationChangeResult result) async {
+  Future<void> applyLocationChange(
+    LocationChangeResult result, {
+    bool overwriteManual = false,
+  }) async {
+    if (shouldHoldManualPrayerLocation(
+      isManual: isManualPrayerLocation,
+      overwriteManual: overwriteManual,
+    )) {
+      return;
+    }
     _syncGeneration++;
+    await _prefs.delete(_manualPrayerLocationKey);
     await saveCity(result.newCity, result.newCountry);
     await saveDistrictId(result.newDistrictId);
     await _prefs.put(_latKey, result.lat);
@@ -587,6 +668,7 @@ class LocationService {
 
   Future<({double lat, double lon})?> requestCurrentPosition({
     bool promptIfNeeded = true,
+    bool persistCoordinates = true,
   }) async {
     final permission = await _requestLocationPermissionWithDisclosure(
       promptIfNeeded: promptIfNeeded,
@@ -598,8 +680,14 @@ class LocationService {
 
     final pos = await _readGpsPosition();
     if (pos == null) return null;
-    await _prefs.put(_latKey, pos.lat);
-    await _prefs.put(_lonKey, pos.lon);
+    if (persistCoordinates &&
+        !shouldHoldManualPrayerLocation(
+          isManual: isManualPrayerLocation,
+          overwriteManual: false,
+        )) {
+      await _prefs.put(_latKey, pos.lat);
+      await _prefs.put(_lonKey, pos.lon);
+    }
     return pos;
   }
 }

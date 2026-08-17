@@ -2098,9 +2098,7 @@ class _LastWeekWinnersPromo extends StatelessWidget {
           ),
           SizedBox(height: compact ? 6 : 8),
           ...winners.map((winner) {
-            final prize = winner.grantDays > 0
-                ? _lastWeekWinnerPrize(l10n, winner.rank)
-                : '';
+            final prize = _lastWeekWinnerPrize(l10n, winner.rank);
             final accent = winner.rank == 1
                 ? gold
                 : winner.rank == 2
@@ -3424,6 +3422,8 @@ class _PlayingBody extends StatelessWidget {
     );
 
     final waiting =
+        !controller.challengeMode &&
+        !match.isChallenge &&
         !showReveal &&
         (controller.awaitingOpponent ||
             ((controller.selectedChoice != null || match.selfAnswered) &&

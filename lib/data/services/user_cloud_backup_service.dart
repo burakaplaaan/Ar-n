@@ -7,8 +7,10 @@ import 'package:flutter/foundation.dart';
 import 'package:hive/hive.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../core/constants/willpower_templates.dart';
 import '../../core/firebase/firebase_bootstrap.dart';
 import '../../core/utils/hive_boxes.dart';
+import '../repositories/habit_repository.dart';
 import '../models/kaza_tracking_state.dart';
 import '../models/zikir_matik_record.dart';
 import '../models/zikir_matik_tur_log.dart';
@@ -344,7 +346,9 @@ abstract final class UserCloudBackupService {
     if (prefs.getString('arin_app_locale') != null)
       'locale': prefs.getString('arin_app_locale'),
     'salatTrackingVisibleOnHome':
-        prefs.getBool('salat_tracking_visible_on_home') ?? false,
+        prefs.getBool(WillpowerTemplates.salatVisibleOnHomePrefKey) ?? false,
+    'salatTrackingPreinstalled':
+        prefs.getBool(WillpowerTemplates.salatPreinstalledPrefKey) ?? false,
   };
 
   static Future<void> _importAppPrefs(
@@ -356,10 +360,14 @@ abstract final class UserCloudBackupService {
       await prefs.setString('arin_app_locale', locale!);
     }
     if (raw['salatTrackingVisibleOnHome'] is bool) {
-      await prefs.setBool(
-        'salat_tracking_visible_on_home',
-        raw['salatTrackingVisibleOnHome'] as bool,
+      await HabitRepository.applyImportedSalatHomeVisibility(
+        prefs,
+        incomingVisible: raw['salatTrackingVisibleOnHome'] as bool,
+        backupKnowsPreinstall: raw['salatTrackingPreinstalled'] == true,
       );
+    }
+    if (raw['salatTrackingPreinstalled'] == true) {
+      await prefs.setBool(WillpowerTemplates.salatPreinstalledPrefKey, true);
     }
   }
 

@@ -97,9 +97,10 @@ class PrayerServiceResolver {
     // aksi halde Aladhan'a boş şehirle gidip sürekli hata döngüsüne girer.
     // Sistem izin diyaloğu burada açılmaz — aksi halde hazırlık ekranı
     // ile ev ekranı aynı anda iki kez soruyordu.
-    if (_location.savedCity.trim().isEmpty ||
-        _location.savedCountry.trim().isEmpty ||
-        (_location.savedLat == null || _location.savedLon == null)) {
+    if (!_location.isManualPrayerLocation &&
+        (_location.savedCity.trim().isEmpty ||
+            _location.savedCountry.trim().isEmpty ||
+            (_location.savedLat == null || _location.savedLon == null))) {
       await _location.syncPrayerLocation(
         forceRefresh: true,
         promptIfNeeded: false,
@@ -157,6 +158,7 @@ class PrayerServiceResolver {
           lon: lon,
           city: city,
           country: country,
+          preferCity: _location.isManualPrayerLocation,
         );
         final result = PrayerFetchResult(m, PrayerSource.aladhan);
         _memCache = result;
@@ -171,6 +173,7 @@ class PrayerServiceResolver {
             lon: lon,
             city: city,
             country: country,
+            preferCity: _location.isManualPrayerLocation,
           );
           final result = PrayerFetchResult(m, PrayerSource.aladhan);
           _memCache = result;
@@ -259,16 +262,21 @@ class PrayerServiceResolver {
     final city = _location.savedCity.trim();
     if ((lat != null && lon != null) || city.isNotEmpty) {
       try {
-        final list = lat != null && lon != null
-            ? await _aladhan.fetchUpcomingByCoordinates(
+        final list = shouldUseAladhanCityName(
+              isManual: _location.isManualPrayerLocation,
+              city: city,
+            ) ||
+                lat == null ||
+                lon == null
+            ? await _aladhan.fetchUpcomingByCity(
+                city: city,
+                country: _location.savedCountry,
+                days: days,
+              )
+            : await _aladhan.fetchUpcomingByCoordinates(
                 latitude: lat,
                 longitude: lon,
                 cityLabel: _location.savedCity,
-                days: days,
-              )
-            : await _aladhan.fetchUpcomingByCity(
-                city: city,
-                country: _location.savedCountry,
                 days: days,
               );
         if (list.isNotEmpty) return list;
@@ -296,15 +304,18 @@ class PrayerServiceResolver {
     required double? lon,
     required String city,
     required String country,
+    required bool preferCity,
   }) {
-    if (lat != null && lon != null) {
-      return _aladhan.fetchByCoordinates(
-        latitude: lat,
-        longitude: lon,
-        cityLabel: city,
-      );
+    if (shouldUseAladhanCityName(isManual: preferCity, city: city) ||
+        lat == null ||
+        lon == null) {
+      return _aladhan.fetchByCity(city: city, country: country);
     }
-    return _aladhan.fetchByCity(city: city, country: country);
+    return _aladhan.fetchByCoordinates(
+      latitude: lat,
+      longitude: lon,
+      cityLabel: city,
+    );
   }
 
   static bool _isTurkey(String country) {
