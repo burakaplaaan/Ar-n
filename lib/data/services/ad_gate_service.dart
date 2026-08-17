@@ -254,7 +254,7 @@ class AdGateService {
 
     final views = (_prefs.getInt(_exploreViewCountKey) ?? 0) + 1;
     await _prefs.setInt(_exploreViewCountKey, views);
-    return views >= exploreSwipeFreeCount;
+    return views > 0 && views % exploreSwipeFreeCount == 0;
   }
 
   Future<void> markPending(AdGatePlacement placement) {

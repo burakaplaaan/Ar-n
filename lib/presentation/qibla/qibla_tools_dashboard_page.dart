@@ -1,7 +1,5 @@
 // lib/presentation/qibla/qibla_tools_dashboard_page.dart
 
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -9,12 +7,10 @@ import 'package:arin/l10n/app_localizations.dart';
 
 import '../../core/constants/app_colors.dart';
 import '../../core/theme/arin_shell_background.dart';
-import '../../data/services/ad_gate_service.dart';
-import '../../data/services/session_ad_prompt.dart';
 import '../assistant/assistant_entry.dart';
-import '../shared/providers/premium_providers.dart';
 import '../onboarding/app_tour/app_tour_anchor.dart';
 import '../onboarding/app_tour/app_tour_keys.dart';
+import '../shared/navigation/once_open.dart';
 import '../shared/widgets/arin_pressable.dart';
 import '../shared/widgets/arin_shell_layout.dart';
 import '../shared/widgets/zikirmatik_silhouette_icon.dart';
@@ -57,29 +53,46 @@ abstract final class _QiblaWarm {
       onDark ? const Color(0xFF8A6545) : const Color(0xFFC9A27A);
 }
 
-class QiblaToolsDashboardPage extends ConsumerWidget {
+class QiblaToolsDashboardPage extends ConsumerStatefulWidget {
   const QiblaToolsDashboardPage({super.key});
 
-  Future<void> _openTool(
-    BuildContext context,
-    WidgetRef ref, {
-    required String route,
-    AdGatePlacement? adPlacement,
-  }) async {
-    HapticFeedback.lightImpact();
-    if (adPlacement != null) {
-      await SessionAdPrompt.maybeShow(ref: ref, placement: adPlacement);
-      if (!context.mounted) return;
-    }
-    Navigator.of(context).pushNamed(route);
+  @override
+  ConsumerState<QiblaToolsDashboardPage> createState() =>
+      _QiblaToolsDashboardPageState();
+}
+
+class _QiblaToolsDashboardPageState
+    extends ConsumerState<QiblaToolsDashboardPage> {
+  late final OnceOpen _openGate = OnceOpen(
+    onBusyChanged: (_) {
+      if (mounted) setState(() {});
+    },
+  );
+
+  bool get _canOpen {
+    if (_openGate.isBusy) return false;
+    final route = ModalRoute.of(context);
+    return route == null || route.isCurrent;
+  }
+
+  Future<void> _openOnce(Future<void> Function() action) async {
+    if (!_canOpen) return;
+    await _openGate.run(action);
+  }
+
+  Future<void> _openTool({required String route}) {
+    return _openOnce(() async {
+      HapticFeedback.lightImpact();
+      if (!mounted) return;
+      await Navigator.of(context).pushNamed(route);
+    });
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final onDark = !ArinShellBackground.isLight(context);
     final l10n = AppLocalizations.of(context)!;
     const accent = AppColors.accentNeonGreen;
-    final isPremium = ref.watch(isPremiumProvider);
 
     // extendBody alt çubuğu gövdenin üstüne bindirdiği için son kart
     // (Bilgi Düellosu) sistem nav + shell bar yüksekliği kadar yukarıda bitmeli.
@@ -88,7 +101,9 @@ class QiblaToolsDashboardPage extends ConsumerWidget {
     return SizedBox.expand(
       child: ArinShellBackground.buildLayered(
         context,
-        child: CustomScrollView(
+        child: AbsorbPointer(
+          absorbing: _openGate.isBusy,
+          child: CustomScrollView(
           key: const PageStorageKey<String>('qiblaToolsScroll'),
           physics: const BouncingScrollPhysics(),
           slivers: [
@@ -104,18 +119,17 @@ class QiblaToolsDashboardPage extends ConsumerWidget {
                       id: AppTourTargetId.qiblaAi,
                       child: _QiblaFeatureCard(
                         onDark: onDark,
-                        accent: accent,
+                        accent: AppColors.goldAccent,
                         title: l10n.qiblaHubAiTitle,
                         subtitle: l10n.qiblaHubAiSubtitle,
                         motif: _QiblaActionMotif.ai,
-                        locked: !isPremium,
-                        onTap: () async {
+                        onTap: () => _openOnce(() async {
                           HapticFeedback.lightImpact();
                           await openAssistantOrPaywall(
                             context: context,
                             ref: ref,
                           );
-                        },
+                        }),
                       ),
                     ),
                     const SizedBox(height: 10),
@@ -127,12 +141,7 @@ class QiblaToolsDashboardPage extends ConsumerWidget {
                         title: l10n.qiblaHubCompassTitle,
                         subtitle: l10n.qiblaHubCompassSubtitle,
                         motif: _QiblaActionMotif.compass,
-                        onTap: () => _openTool(
-                          context,
-                          ref,
-                          route: QiblaHubRoutes.compass,
-                          adPlacement: AdGatePlacement.qiblaSession,
-                        ),
+                        onTap: () => _openTool(route: QiblaHubRoutes.compass),
                       ),
                     ),
                     const SizedBox(height: 10),
@@ -144,12 +153,7 @@ class QiblaToolsDashboardPage extends ConsumerWidget {
                         title: l10n.qiblaHubZikirTitle,
                         subtitle: l10n.qiblaHubZikirFeatureSubtitle,
                         motif: _QiblaActionMotif.tasbeeh,
-                        onTap: () => _openTool(
-                          context,
-                          ref,
-                          route: QiblaHubRoutes.zikir,
-                          adPlacement: AdGatePlacement.zikirSession,
-                        ),
+                        onTap: () => _openTool(route: QiblaHubRoutes.zikir),
                       ),
                     ),
                     const SizedBox(height: 10),
@@ -161,12 +165,7 @@ class QiblaToolsDashboardPage extends ConsumerWidget {
                         title: l10n.qiblaHubHilalDuelTitle,
                         subtitle: l10n.qiblaHubHilalDuelSubtitle,
                         motif: _QiblaActionMotif.hilal,
-                        onTap: () {
-                          HapticFeedback.lightImpact();
-                          Navigator.of(
-                            context,
-                          ).pushNamed(QiblaHubRoutes.hilalDuel);
-                        },
+                        onTap: () => _openTool(route: QiblaHubRoutes.hilalDuel),
                       ),
                     ),
                     const SizedBox(height: 10),
@@ -178,12 +177,8 @@ class QiblaToolsDashboardPage extends ConsumerWidget {
                         title: l10n.qiblaHubPrayerCircleTitle,
                         subtitle: l10n.qiblaHubPrayerCircleSubtitle,
                         motif: _QiblaActionMotif.prayer,
-                        onTap: () {
-                          HapticFeedback.lightImpact();
-                          Navigator.of(
-                            context,
-                          ).pushNamed(QiblaHubRoutes.prayerCircle);
-                        },
+                        onTap: () =>
+                            _openTool(route: QiblaHubRoutes.prayerCircle),
                       ),
                     ),
                     const SizedBox(height: 10),
@@ -195,12 +190,7 @@ class QiblaToolsDashboardPage extends ConsumerWidget {
                         title: l10n.qiblaHubHealingTitle,
                         subtitle: l10n.qiblaHubHealingSubtitle,
                         motif: _QiblaActionMotif.frequency,
-                        onTap: () => _openTool(
-                          context,
-                          ref,
-                          route: QiblaHubRoutes.healing,
-                          adPlacement: AdGatePlacement.healingSession,
-                        ),
+                        onTap: () => _openTool(route: QiblaHubRoutes.healing),
                       ),
                     ),
                     const SizedBox(height: 10),
@@ -212,12 +202,7 @@ class QiblaToolsDashboardPage extends ConsumerWidget {
                         title: l10n.qiblaHubBreathingTitle,
                         subtitle: l10n.qiblaHubBreathingSubtitle,
                         motif: _QiblaActionMotif.breath,
-                        onTap: () {
-                          HapticFeedback.lightImpact();
-                          Navigator.of(
-                            context,
-                          ).pushNamed(QiblaHubRoutes.breathing);
-                        },
+                        onTap: () => _openTool(route: QiblaHubRoutes.breathing),
                       ),
                     ),
                   ]),
@@ -225,6 +210,7 @@ class QiblaToolsDashboardPage extends ConsumerWidget {
               ),
             ),
           ],
+        ),
         ),
       ),
     );
@@ -333,6 +319,7 @@ class _QiblaFeatureCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final bronze = _QiblaWarm.bronze(onDark);
     final bronzeSoft = _QiblaWarm.bronzeSoft(onDark);
+    final goldCard = motif == _QiblaActionMotif.ai;
     final titleC = onDark
         ? Colors.white.withValues(alpha: 0.95)
         : AppColors.emeraldDark;
@@ -377,9 +364,10 @@ class _QiblaFeatureCard extends StatelessWidget {
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: AppColors.accentGlowGreen.withValues(
-                      alpha: onDark ? 0.14 : 0.1,
-                    ),
+                    color: (goldCard
+                            ? AppColors.goldAccent
+                            : AppColors.accentGlowGreen)
+                        .withValues(alpha: onDark ? 0.14 : 0.1),
                     blurRadius: 18,
                     offset: const Offset(0, 6),
                   ),
@@ -434,6 +422,7 @@ class _QiblaFeatureCard extends StatelessWidget {
                           accent: accent,
                           bronze: bronze,
                           bronzeSoft: bronzeSoft,
+                          filled: goldCard,
                           child: _QiblaToolGlyph(
                             motif: motif,
                             onDark: onDark,
@@ -552,7 +541,7 @@ class _QiblaToolGlyph extends StatelessWidget {
       return Icon(
         Icons.auto_awesome_rounded,
         size: 28,
-        color: onDark ? Colors.white : AppColors.emeraldDark,
+        color: onDark ? AppColors.goldAccent : const Color(0xFFB45309),
       );
     }
 
@@ -906,6 +895,7 @@ class _IconRing extends StatelessWidget {
     required this.bronze,
     required this.bronzeSoft,
     required this.child,
+    this.filled = false,
   });
 
   final bool onDark;
@@ -913,6 +903,7 @@ class _IconRing extends StatelessWidget {
   final Color bronze;
   final Color bronzeSoft;
   final Widget child;
+  final bool filled;
 
   @override
   Widget build(BuildContext context) {
@@ -924,13 +915,20 @@ class _IconRing extends StatelessWidget {
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [
-            accent.withValues(alpha: onDark ? 0.12 : 0.14),
-            bronzeSoft.withValues(alpha: onDark ? 0.18 : 0.2),
-          ],
+          colors: filled
+              ? [
+                  accent.withValues(alpha: onDark ? 0.34 : 0.28),
+                  accent.withValues(alpha: onDark ? 0.18 : 0.16),
+                ]
+              : [
+                  accent.withValues(alpha: onDark ? 0.12 : 0.14),
+                  bronzeSoft.withValues(alpha: onDark ? 0.18 : 0.2),
+                ],
         ),
         border: Border.all(
-          color: Color.lerp(accent, bronze, 0.4)!.withValues(alpha: 0.45),
+          color: filled
+              ? accent.withValues(alpha: onDark ? 0.78 : 0.7)
+              : Color.lerp(accent, bronze, 0.4)!.withValues(alpha: 0.45),
         ),
       ),
       alignment: Alignment.center,

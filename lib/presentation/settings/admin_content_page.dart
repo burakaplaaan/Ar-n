@@ -43,6 +43,7 @@ import '../shared/providers/quotes_providers.dart';
 import 'admin_dev_tab.dart';
 import 'widgets/admin_diagnostics_tab.dart';
 import 'package:arin/presentation/shared/widgets/arin_loader.dart';
+import 'package:arin/presentation/shared/widgets/arin_top_toast.dart';
 
 part 'admin_content_inspire_form_row.dart';
 part 'admin_content_pools_tab.dart';
@@ -572,16 +573,10 @@ class _AdminContentPageState extends ConsumerState<AdminContentPage>
     final items = QuotePoolDefaults.itemsForPoolId(_poolId);
     if (items == null) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              _poolId == QuotePoolIds.personalizedQuotes ||
+        showArinTopToast(context, _poolId == QuotePoolIds.personalizedQuotes ||
                       _poolId == QuotePoolIds.widgetQuote
                   ? l10n.adminUseSeedAllForPool
-                  : l10n.adminNoBuiltInSeedForPool,
-            ),
-          ),
-        );
+                  : l10n.adminNoBuiltInSeedForPool);
       }
       return;
     }
@@ -593,9 +588,7 @@ class _AdminContentPageState extends ConsumerState<AdminContentPage>
   /// veya silme kazası olursa, admin bu JSON'u açıp yeniden yazabilir.
   Future<void> _exportCurrentPool() async {
     if (_poolDoc == null) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(l10n.adminPoolNotLoadedYet)));
+      showArinTopToast(context, l10n.adminPoolNotLoadedYet);
       return;
     }
     try {
@@ -625,9 +618,7 @@ class _AdminContentPageState extends ConsumerState<AdminContentPage>
       );
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.adminBackupCreationFailed(e.toString()))),
-      );
+      showArinTopToast(context, l10n.adminBackupCreationFailed(e.toString()));
     }
   }
 
@@ -836,15 +827,9 @@ class _AdminContentPageState extends ConsumerState<AdminContentPage>
         mergeOnly: mergeOnly,
       );
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              mergeOnly
+        showArinTopToast(context, mergeOnly
                   ? l10n.adminMissingItemsAddedToPools
-                  : l10n.adminAllPoolsOverwritten,
-            ),
-          ),
-        );
+                  : l10n.adminAllPoolsOverwritten);
       }
       await _loadPool();
     } catch (e) {
@@ -2374,7 +2359,7 @@ class _AdminContentPageState extends ConsumerState<AdminContentPage>
 
   void _snack(String m) {
     if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(m)));
+      showArinTopToast(context, m);
     }
   }
 

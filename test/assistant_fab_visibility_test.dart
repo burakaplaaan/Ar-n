@@ -25,6 +25,14 @@ void main() {
       isTrue,
     );
     expect(
+      assistantFabHiddenFor(path: AppRoutes.inspire, duelActive: false),
+      isTrue,
+    );
+    expect(
+      assistantFabHiddenFor(path: '${AppRoutes.inspire}/view/0', duelActive: false),
+      isTrue,
+    );
+    expect(
       assistantFabHiddenFor(path: AppRoutes.assistant, duelActive: false),
       isTrue,
     );

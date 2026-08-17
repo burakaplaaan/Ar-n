@@ -450,16 +450,11 @@ class _LoadingView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final light = ArinShellBackground.isLight(context);
-    final gold = light ? _goldOnLight : _goldOnDark;
     return Center(
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          SizedBox(
-            width: 26,
-            height: 26,
-            child: ArinLoader(color: gold, strokeWidth: 2),
-          ),
+          const ArinLoader(),
           const SizedBox(height: 18),
           Text(
             AppLocalizations.of(context)!.qiblaCompassGettingLocation,

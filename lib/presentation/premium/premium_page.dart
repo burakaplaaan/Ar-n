@@ -20,6 +20,7 @@ import '../../l10n/app_localizations.dart';
 import '../shared/providers/auth_providers.dart';
 import '../shared/providers/premium_providers.dart';
 import 'package:arin/presentation/shared/widgets/arin_loader.dart';
+import 'package:arin/presentation/shared/widgets/arin_top_toast.dart';
 
 /// Android/iOS'ta mağazadan gerçek fiyatları çeker.
 final _premiumPricesProvider =
@@ -137,40 +138,34 @@ class _PremiumPageState extends ConsumerState<PremiumPage> {
       final uri = Uri.parse(rawUrl);
       final ok = await launchUrl(uri, mode: LaunchMode.externalApplication);
       if (!ok && mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(l10n.premiumLinkOpenFailed)));
+        showArinTopToast(context, l10n.premiumLinkOpenFailed);
       }
     } catch (_) {
       if (!mounted) return;
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(l10n.premiumLinkOpenFailed)));
+      showArinTopToast(context, l10n.premiumLinkOpenFailed);
     }
   }
 
   Future<void> _startPurchase(String productId) async {
     if (_busyProductId != null) return;
-    final messenger = ScaffoldMessenger.of(context);
     final l10n = AppLocalizations.of(context)!;
     if (RevenueCatIds.isLegacyProductId(productId) ||
         !RevenueCatIds.canPurchaseInApp(productId)) {
-      messenger.showSnackBar(SnackBar(content: Text(l10n.purchaseErrorLegacyPlan)));
+      showArinTopToast(context, l10n.purchaseErrorLegacyPlan);
       return;
     }
     final entitlement = ref.read(premiumEntitlementProvider).asData?.value;
     final activeProductId = entitlement?.productId ?? '';
     if (RevenueCatIds.isLegacyProductId(activeProductId) &&
         _normalizeProductId(productId) != PremiumPage.lifetimeProductId) {
-      messenger.showSnackBar(SnackBar(content: Text(l10n.purchaseErrorLegacyPlan)));
+      showArinTopToast(context, l10n.purchaseErrorLegacyPlan);
       return;
     }
     if (_loadingProducts || !_containsProduct(productId)) {
-      messenger.showSnackBar(
-        SnackBar(
-          content: Text(l10n.premiumProductNotReadyError),
-          backgroundColor: Colors.red.shade700,
-        ),
+      showArinTopToast(
+        context,
+        l10n.premiumProductNotReadyError,
+        tone: ArinTopToastTone.error,
       );
       return;
     }
@@ -180,9 +175,7 @@ class _PremiumPageState extends ConsumerState<PremiumPage> {
         await PurchaseService.loginUser(user.uid);
       } catch (e) {
         if (mounted) {
-          messenger.showSnackBar(
-            SnackBar(content: Text(l10n.premiumAccountLinkError)),
-          );
+          showArinTopToast(context, l10n.premiumAccountLinkError);
         }
         return;
       }
@@ -209,7 +202,7 @@ class _PremiumPageState extends ConsumerState<PremiumPage> {
         final localActive = await ref.read(purchaseServiceProvider).isPremiumLocally();
         final premiumConfirmed = entitlement.isActive || localActive;
         if (!premiumConfirmed && mounted) {
-          messenger.showSnackBar(SnackBar(content: Text(l10n.premiumLoadingWait)));
+          showArinTopToast(context, l10n.premiumLoadingWait);
         }
         if (mounted && ref.read(authUserProvider).asData?.value == null) {
           await _maybePromptAccountLinkAfterPurchase();
@@ -220,9 +213,7 @@ class _PremiumPageState extends ConsumerState<PremiumPage> {
       } else if (!result.isCancelled) {
         final msg = result.userMessage;
         if (msg != null) {
-          messenger.showSnackBar(
-            SnackBar(content: Text(msg)),
-          );
+          showArinTopToast(context, msg);
         }
       }
     } finally {
@@ -259,14 +250,10 @@ class _PremiumPageState extends ConsumerState<PremiumPage> {
       await PurchaseService.loginUser(uid);
       if (!mounted) return;
       ref.invalidate(premiumEntitlementProvider);
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(l10n.premiumPostPurchaseLinkSuccess)));
+      showArinTopToast(context, l10n.premiumPostPurchaseLinkSuccess);
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.premiumAccountLinkError)),
-      );
+      showArinTopToast(context, l10n.premiumAccountLinkError);
     }
   }
 
@@ -313,7 +300,6 @@ class _PremiumPageState extends ConsumerState<PremiumPage> {
 
   Future<void> _restorePurchases() async {
     if (_busyProductId != null) return;
-    final messenger = ScaffoldMessenger.of(context);
     final l10n = AppLocalizations.of(context)!;
 
     final user = ref.read(authUserProvider).asData?.value;
@@ -322,9 +308,7 @@ class _PremiumPageState extends ConsumerState<PremiumPage> {
         await PurchaseService.loginUser(user.uid);
       } catch (e) {
         if (mounted) {
-          messenger.showSnackBar(
-            SnackBar(content: Text(l10n.premiumAccountLinkError)),
-          );
+          showArinTopToast(context, l10n.premiumAccountLinkError);
         }
         return;
       }
@@ -345,19 +329,13 @@ class _PremiumPageState extends ConsumerState<PremiumPage> {
         final localActive = await ref.read(purchaseServiceProvider).isPremiumLocally();
         
         if (entitlement.isActive || localActive) {
-          messenger.showSnackBar(
-            SnackBar(content: Text(l10n.premiumRestoreSuccess)),
-          );
+          showArinTopToast(context, l10n.premiumRestoreSuccess);
         } else {
-          messenger.showSnackBar(
-            SnackBar(content: Text(l10n.premiumNoActiveSubscription)),
-          );
+          showArinTopToast(context, l10n.premiumNoActiveSubscription);
         }
       } else {
         final msg = result.userMessage ?? l10n.premiumNoActiveSubscription;
-        messenger.showSnackBar(
-          SnackBar(content: Text(msg)),
-        );
+        showArinTopToast(context, msg);
       }
     } finally {
       if (mounted) setState(() => _busyProductId = null);
@@ -417,9 +395,7 @@ class _PremiumPageState extends ConsumerState<PremiumPage> {
       return true;
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('${AppLocalizations.of(context)!.premiumSignInErrorPrefix}$e')),
-        );
+        showArinTopToast(context, '${AppLocalizations.of(context)!.premiumSignInErrorPrefix}$e');
       }
       return false;
     }

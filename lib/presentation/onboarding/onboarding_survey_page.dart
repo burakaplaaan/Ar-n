@@ -30,6 +30,7 @@ import '../../data/services/widget_access_service.dart';
 import '../shared/providers/user_profile_providers.dart';
 import '../shared/widgets/arin_permission_dialog.dart';
 import 'package:arin/presentation/shared/widgets/arin_loader.dart';
+import 'package:arin/presentation/shared/widgets/arin_top_toast.dart';
 
 class OnboardingSurveyPage extends ConsumerStatefulWidget {
   const OnboardingSurveyPage({super.key});
@@ -198,11 +199,10 @@ class _OnboardingSurveyPageState extends ConsumerState<OnboardingSurveyPage>
         setState(() => _notificationPermissionEnabled = false);
         // Reddedildi → skip olarak davran ama kullanıcı "Sistem ayarları" ile
         // sonradan açabileceğini bilsin.
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(l10n.onboardingNotificationPermissionDenied),
-            duration: const Duration(seconds: 4),
-          ),
+        showArinTopToast(
+          context,
+          l10n.onboardingNotificationPermissionDenied,
+          duration: const Duration(seconds: 4),
         );
         _nextPage();
       }
@@ -242,11 +242,10 @@ class _OnboardingSurveyPageState extends ConsumerState<OnboardingSurveyPage>
       debugPrint('Onboarding kayit hatasi: $e');
       if (!mounted) return;
       setState(() => _finishing = false);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(l10n.surveySummarySaveError),
-          duration: const Duration(seconds: 3),
-        ),
+      showArinTopToast(
+        context,
+        l10n.surveySummarySaveError,
+        duration: const Duration(seconds: 3),
       );
     }
   }
@@ -282,13 +281,10 @@ class _OnboardingSurveyPageState extends ConsumerState<OnboardingSurveyPage>
           if (_lockPrayerEnabled && !prayerOk) _lockPrayerEnabled = false;
           if (_lockQuoteEnabled && !quoteOk) _lockQuoteEnabled = false;
         });
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text(
-              'Bildirim izni verilmeden kilit ekranı widget\'ı açılamaz.',
-            ),
-            duration: Duration(seconds: 3),
-          ),
+        showArinTopToast(
+          context,
+          'Bildirim izni verilmeden kilit ekranı widget\'ı açılamaz.',
+          duration: const Duration(seconds: 3),
         );
       }
       if (!mounted) return;

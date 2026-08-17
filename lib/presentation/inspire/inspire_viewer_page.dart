@@ -25,6 +25,7 @@ import 'explore_bgm_controller.dart';
 import 'inspiration_catalog_provider.dart';
 import 'inspiration_search.dart';
 import 'inspire_viewer_session_provider.dart';
+import 'widgets/explore_bgm_app_bar_actions.dart';
 import 'widgets/inspiration_slide.dart';
 
 /// Tam ekran dikey akış (Reels); görseller aynı viewport’ta, `BoxFit.cover` + ortala.
@@ -403,12 +404,13 @@ class _ViewerBodyState extends ConsumerState<_ViewerBody>
         }
         if (!adGate.isPending(AdGatePlacement.exploreSwipe)) continue;
         if (!mounted) return;
-        await ref.read(exploreBgmNotifierProvider.notifier).pauseForAdGate();
-        if (!mounted) return;
         final shown = await ref
             .read(adMobServiceProvider)
             .showInterstitial(ArinAdUnit.exploreInterstitial);
         if (!mounted) return;
+        unawaited(
+          ref.read(exploreBgmNotifierProvider.notifier).resumeAfterAdGate(),
+        );
         if (shown) {
           await adGate.recordRewardedUnlock(AdGatePlacement.exploreSwipe);
           unawaited(
@@ -459,6 +461,25 @@ class _ViewerBodyState extends ConsumerState<_ViewerBody>
             },
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildBgmActions(double opacity) {
+    if (opacity <= 0) return const SizedBox.shrink();
+    return Align(
+      alignment: Alignment.topRight,
+      child: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(8, 2, 4, 0),
+          child: Opacity(
+            opacity: opacity,
+            child: IgnorePointer(
+              ignoring: opacity < 0.08,
+              child: const ExploreBgmAppBarActions(),
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -543,6 +564,7 @@ class _ViewerBodyState extends ConsumerState<_ViewerBody>
                     ),
                   ),
                   _buildBackButton(backOpacity),
+                  _buildBgmActions(backOpacity),
                 ],
               ),
             );

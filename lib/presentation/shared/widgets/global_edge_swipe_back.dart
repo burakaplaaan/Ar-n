@@ -1,5 +1,18 @@
 import 'package:flutter/material.dart';
 
+/// Üst rota parmağı takip eden Cupertino geri jestini kabul ediyor mu?
+bool navigatorAllowsInteractivePop(NavigatorState? nav) {
+  if (nav == null || !nav.mounted) return false;
+  ModalRoute<dynamic>? top;
+  nav.popUntil((route) {
+    if (route is ModalRoute<dynamic>) {
+      top = route;
+    }
+    return true;
+  });
+  return top?.popGestureEnabled ?? false;
+}
+
 /// iOS benzeri soldan-sağa "edge swipe back" davranışı.
 ///
 /// - Yalnızca sol kenara yakın başlayan sürüklemelerde aktif olur.

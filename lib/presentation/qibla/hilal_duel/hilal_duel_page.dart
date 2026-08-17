@@ -24,6 +24,7 @@ import 'hilal_duel_level.dart';
 import 'hilal_duel_repository.dart';
 import 'hilal_duel_sync.dart';
 import 'package:arin/presentation/shared/widgets/arin_loader.dart';
+import 'package:arin/presentation/shared/widgets/arin_top_toast.dart';
 
 /// 0 can: eşleşme ekranına girmeden uyarı; isterse reklam izlet.
 Future<void> _promptNeedHeartDialog({
@@ -2410,15 +2411,11 @@ class _WeeklyLeaderSheetState extends ConsumerState<_WeeklyLeaderSheet> {
     try {
       await widget.controller.adminRemoveWeeklyEntry(entry.ownerHash);
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(widget.l10n.hilalDuelAdminRemoved)),
-      );
+      showArinTopToast(context, widget.l10n.hilalDuelAdminRemoved);
       _reloadBoard();
     } catch (error) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(error.toString())),
-      );
+      showArinTopToast(context, error.toString());
     } finally {
       if (mounted) {
         setState(() => _removingHashes.remove(entry.ownerHash));

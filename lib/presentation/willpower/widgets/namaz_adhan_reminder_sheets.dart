@@ -147,18 +147,7 @@ class _PrayerNotificationSoundSheetState
       if (uri == null || uri.isEmpty) {
         if (!mounted) return;
         final l10n = AppLocalizations.of(context)!;
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              l10n.prayerSoundPreviewSystem,
-              style: TextStyle(
-                color: AppColors.creamBase.withValues(alpha: 0.92),
-              ),
-            ),
-            backgroundColor: AppColors.anthraciteMid,
-            behavior: SnackBarBehavior.floating,
-          ),
-        );
+        showArinTopToast(context, l10n.prayerSoundPreviewSystem);
         return;
       }
 
@@ -190,16 +179,7 @@ class _PrayerNotificationSoundSheetState
   void _snackImportFailed() {
     if (!mounted) return;
     final l10n = AppLocalizations.of(context)!;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          l10n.prayerSoundImportFailed,
-          style: TextStyle(color: AppColors.creamBase.withValues(alpha: 0.92)),
-        ),
-        backgroundColor: AppColors.anthraciteMid,
-        behavior: SnackBarBehavior.floating,
-      ),
-    );
+    showArinTopToast(context, l10n.prayerSoundImportFailed);
   }
 
   Future<void> _pickForSlot(int slot) async {
@@ -244,16 +224,7 @@ class _PrayerNotificationSoundSheetState
     _markNeedsReschedule();
     setState(() {});
     final l10n = AppLocalizations.of(context)!;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          l10n.prayerSoundAppliedAllSuccess,
-          style: TextStyle(color: AppColors.creamBase.withValues(alpha: 0.92)),
-        ),
-        backgroundColor: AppColors.anthraciteMid,
-        behavior: SnackBarBehavior.floating,
-      ),
-    );
+    showArinTopToast(context, l10n.prayerSoundAppliedAllSuccess);
   }
 
   Future<void> _clearForAllSlots() async {
@@ -289,16 +260,7 @@ class _PrayerNotificationSoundSheetState
     _markNeedsReschedule();
     if (!showSuccessSnack || !mounted) return;
     final l10n = AppLocalizations.of(context)!;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          l10n.prayerSoundAppliedAllSuccess,
-          style: TextStyle(color: AppColors.creamBase.withValues(alpha: 0.92)),
-        ),
-        backgroundColor: AppColors.anthraciteMid,
-        behavior: SnackBarBehavior.floating,
-      ),
-    );
+    showArinTopToast(context, l10n.prayerSoundAppliedAllSuccess);
   }
 
   Future<void> _applySelectedSoundToAllPrayers() async {
@@ -1071,16 +1033,7 @@ class _PerPrayerReminderListSheetState
     await widget.onReschedule();
     setState(() {});
     if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          l10n.reminderDurationsAppliedAllSuccess,
-          style: TextStyle(color: AppColors.creamBase.withValues(alpha: 0.92)),
-        ),
-        backgroundColor: AppColors.anthraciteMid,
-        behavior: SnackBarBehavior.floating,
-      ),
-    );
+    showArinTopToast(context, l10n.reminderDurationsAppliedAllSuccess);
   }
 
   Future<void> _openEditor(int i) async {

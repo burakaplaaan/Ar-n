@@ -20,6 +20,7 @@ import '../shared/providers/admob_providers.dart';
 import '../shared/providers/premium_providers.dart';
 import '../shared/providers/widget_access_providers.dart';
 import 'package:arin/presentation/shared/widgets/arin_loader.dart';
+import 'package:arin/presentation/shared/widgets/arin_top_toast.dart';
 
 class WidgetUnlockPage extends ConsumerStatefulWidget {
   const WidgetUnlockPage({required this.kind, super.key});
@@ -149,18 +150,15 @@ class _WidgetUnlockPageState extends ConsumerState<WidgetUnlockPage> {
       );
       if (!context.mounted) return;
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            l10n.widgetUnlockSuccessTitle(
+      showArinTopToast(
+        context,
+        l10n.widgetUnlockSuccessTitle(
               kindTitle,
               GlobalWidgetLockService.unlockHours(
                 ref.read(sharedPreferencesProvider),
               ),
             ),
-          ),
-          duration: const Duration(seconds: 4),
-        ),
+        duration: const Duration(seconds: 4),
       );
       context.pop();
     } finally {
@@ -233,11 +231,10 @@ class _WidgetUnlockPageState extends ConsumerState<WidgetUnlockPage> {
           isPremium: true,
         );
         if (!context.mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(l10n.widgetUnlockPremiumSuccess),
-            duration: const Duration(seconds: 4),
-          ),
+        showArinTopToast(
+          context,
+          l10n.widgetUnlockPremiumSuccess,
+          duration: const Duration(seconds: 4),
         );
         context.pop();
       }

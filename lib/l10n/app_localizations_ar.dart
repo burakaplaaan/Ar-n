@@ -1597,8 +1597,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get qiblaHubAiTitle => 'الذكاء الاصطناعي الإسلامي';
 
   @override
-  String get qiblaHubAiSubtitle =>
-      'إجابات مستندة إلى مصادر للأسئلة الدينية — ليست فتوى. Premium.';
+  String get qiblaHubAiSubtitle => 'اسأل ما يدور في ذهنك وابدأ محادثة إسلامية';
 
   @override
   String get islamicAiComingSoonTitle => 'الذكاء الاصطناعي الإسلامي';

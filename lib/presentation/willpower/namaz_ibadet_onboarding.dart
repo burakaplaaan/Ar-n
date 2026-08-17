@@ -16,6 +16,7 @@ import '../shared/widgets/commitment_seal_widget.dart';
 import 'salat_tracking_visibility_provider.dart';
 import 'widgets/commitment_example_chips.dart';
 import 'widgets/commitment_input_tokens.dart';
+import 'package:arin/presentation/shared/widgets/arin_top_toast.dart';
 
 class NamazIbadetOnboarding extends ConsumerStatefulWidget {
   const NamazIbadetOnboarding({
@@ -62,17 +63,7 @@ class _NamazIbadetOnboardingState extends ConsumerState<NamazIbadetOnboarding> {
     if (_pageIndex == 1) {
       final t = _commitment.text.trim();
       if (t.length < 8) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              l10n.namazIbadetCommitmentTooShort,
-              style: TextStyle(
-                color: AppColors.creamBase.withValues(alpha: 0.92),
-              ),
-            ),
-            backgroundColor: AppColors.anthraciteMid,
-          ),
-        );
+        showArinTopToast(context, l10n.namazIbadetCommitmentTooShort);
         return;
       }
     }
@@ -237,11 +228,7 @@ class _NamazIbadetOnboardingState extends ConsumerState<NamazIbadetOnboarding> {
                         } catch (_) {
                           if (!mounted) return;
                           setState(() => _finishing = false);
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(l10n.surveySummarySaveError),
-                            ),
-                          );
+                          showArinTopToast(context, l10n.surveySummarySaveError);
                         }
                       },
                     ),

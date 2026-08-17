@@ -10,6 +10,7 @@ import 'package:flutter/services.dart';
 import 'package:arin/l10n/app_localizations.dart';
 
 import '../../../core/constants/app_colors.dart';
+import 'package:arin/presentation/shared/widgets/arin_top_toast.dart';
 
 class AsyncErrorView extends StatelessWidget {
   const AsyncErrorView({
@@ -141,9 +142,7 @@ class _ErrorDetailsTile extends StatelessWidget {
         InkWell(
           onTap: () {
             Clipboard.setData(ClipboardData(text: raw));
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(l10n.asyncErrorCopiedToClipboard)),
-            );
+            showArinTopToast(context, l10n.asyncErrorCopiedToClipboard);
           },
           child: Container(
             padding: const EdgeInsets.all(10),

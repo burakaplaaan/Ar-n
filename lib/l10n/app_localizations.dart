@@ -2834,7 +2834,7 @@ abstract class AppLocalizations {
   /// No description provided for @qiblaHubAiSubtitle.
   ///
   /// In tr, this message translates to:
-  /// **'Dini sorularına kaynaklı, fetva olmayan yanıtlar — Premium'**
+  /// **'Aklındaki soruyu sor, İslami sohbet başlat'**
   String get qiblaHubAiSubtitle;
 
   /// No description provided for @islamicAiComingSoonTitle.

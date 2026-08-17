@@ -20,6 +20,7 @@ import '../../data/services/prayer_notification_scheduler.dart';
 import '../../l10n/app_localizations.dart';
 import '../shared/providers/prayer_time_providers.dart';
 import 'package:arin/presentation/shared/widgets/arin_loader.dart';
+import 'package:arin/presentation/shared/widgets/arin_top_toast.dart';
 
 /// [ArinShell] alt barı için alt boşluk.
 double _shellBodyBottomInset(BuildContext context) {
@@ -49,7 +50,6 @@ class _AdminDevTabState extends ConsumerState<AdminDevTab> {
 
   Future<void> _saveOffsetAndReschedule() async {
     final l10n = AppLocalizations.of(context)!;
-    final messenger = ScaffoldMessenger.of(context);
     final prefs = ref.read(sharedPreferencesProvider);
     await AdminDevPrefs.setPrayerOffsetMinutes(prefs, _offsetSlider.round());
     ref.invalidate(prayerTimesProvider);
@@ -60,14 +60,11 @@ class _AdminDevTabState extends ConsumerState<AdminDevTab> {
       force: true,
     );
     if (!mounted) return;
-    messenger.showSnackBar(
-      SnackBar(content: Text(l10n.adminDevOffsetSavedAndRescheduled)),
-    );
+    showArinTopToast(context, l10n.adminDevOffsetSavedAndRescheduled);
   }
 
   Future<void> _resetOffset() async {
     final l10n = AppLocalizations.of(context)!;
-    final messenger = ScaffoldMessenger.of(context);
     final prefs = ref.read(sharedPreferencesProvider);
     await AdminDevPrefs.setPrayerOffsetMinutes(prefs, 0);
     setState(() => _offsetSlider = 0);
@@ -79,7 +76,7 @@ class _AdminDevTabState extends ConsumerState<AdminDevTab> {
       force: true,
     );
     if (!mounted) return;
-    messenger.showSnackBar(SnackBar(content: Text(l10n.adminDevOffsetReset)));
+    showArinTopToast(context, l10n.adminDevOffsetReset);
   }
 
   @override
@@ -192,31 +189,23 @@ class _AdminDevTabState extends ConsumerState<AdminDevTab> {
         const SizedBox(height: 12),
         FilledButton.tonal(
           onPressed: () async {
-            final messenger = ScaffoldMessenger.of(context);
             final prefs = ref.read(sharedPreferencesProvider);
             final err =
                 await PrayerNotificationScheduler.showImmediateTestPrayerNotification(
                   prefs,
                 );
             if (!mounted) return;
-            messenger.showSnackBar(
-              SnackBar(
-                content: Text(err ?? l10n.adminDevPrayerNotificationSent),
-              ),
-            );
+            showArinTopToast(context, err ?? l10n.adminDevPrayerNotificationSent);
           },
           child: Text(l10n.adminDevPrayerNotificationNowAction),
         ),
         const SizedBox(height: 10),
         FilledButton.tonal(
           onPressed: () async {
-            final messenger = ScaffoldMessenger.of(context);
             final err =
                 await AppLocalNotificationScheduler.showImmediateTestAppNotification();
             if (!mounted) return;
-            messenger.showSnackBar(
-              SnackBar(content: Text(err ?? l10n.adminDevAppNotificationSent)),
-            );
+            showArinTopToast(context, err ?? l10n.adminDevAppNotificationSent);
           },
           child: Text(l10n.adminDevAppNotificationNowAction),
         ),
@@ -241,14 +230,11 @@ class _AdminDevTabState extends ConsumerState<AdminDevTab> {
         const SizedBox(height: 12),
         FilledButton.tonal(
           onPressed: () async {
-            final messenger = ScaffoldMessenger.of(context);
-            messenger.showSnackBar(
-              const SnackBar(content: Text('Ad Inspector açılıyor…')),
-            );
+            showArinTopToast(context, 'Ad Inspector açılıyor…');
             final err = await AdMobService.openAdInspector();
             if (!mounted) return;
             if (err != null) {
-              messenger.showSnackBar(SnackBar(content: Text(err)));
+              showArinTopToast(context, err);
             }
           },
           child: const Text('Ad Inspector aç'),
@@ -306,11 +292,8 @@ class _AdminDevTabState extends ConsumerState<AdminDevTab> {
         const SizedBox(height: 12),
         FilledButton.tonal(
           onPressed: () async {
-            final messenger = ScaffoldMessenger.of(context);
             if (!isFirebaseReady) {
-              messenger.showSnackBar(
-                SnackBar(content: Text(l10n.adminFirebaseNotReady)),
-              );
+              showArinTopToast(context, l10n.adminFirebaseNotReady);
               return;
             }
             try {
@@ -321,16 +304,10 @@ class _AdminDevTabState extends ConsumerState<AdminDevTab> {
                 fatal: false,
               );
               if (!mounted) return;
-              messenger.showSnackBar(
-                SnackBar(content: Text(l10n.adminDevCrashlyticsNonFatalSent)),
-              );
+              showArinTopToast(context, l10n.adminDevCrashlyticsNonFatalSent);
             } catch (e) {
               if (!mounted) return;
-              messenger.showSnackBar(
-                SnackBar(
-                  content: Text(l10n.adminErrorWithReason(e.toString())),
-                ),
-              );
+              showArinTopToast(context, l10n.adminErrorWithReason(e.toString()));
             }
           },
           child: Text(l10n.adminDevSendNonFatalTestAction),
@@ -341,7 +318,6 @@ class _AdminDevTabState extends ConsumerState<AdminDevTab> {
           icon: const Icon(Icons.warning_amber_rounded),
           label: Text(l10n.adminDevCrashNowFatalAction),
           onPressed: () async {
-            final messenger = ScaffoldMessenger.of(context);
             final proceed = await showDialog<bool>(
               context: context,
               barrierDismissible: false,
@@ -365,9 +341,7 @@ class _AdminDevTabState extends ConsumerState<AdminDevTab> {
             );
             if (proceed != true) return;
             if (!isFirebaseReady) {
-              messenger.showSnackBar(
-                SnackBar(content: Text(l10n.adminFirebaseNotReady)),
-              );
+              showArinTopToast(context, l10n.adminFirebaseNotReady);
               return;
             }
             // crash() native tarafı çağırıp uygulamayı sonlandırır.

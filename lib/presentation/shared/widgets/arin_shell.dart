@@ -32,6 +32,7 @@ import 'arin_pressable.dart';
 import 'offline_banner.dart';
 import 'prayer_schedule_listener.dart';
 import 'shell_tab_tickers.dart';
+import 'package:arin/presentation/shared/widgets/arin_top_toast.dart';
 
 /// Shell sekme sayfaları — sabit liste; PageView.builder bunu index ile çağırır.
 const List<Widget> _kShellPages = [
@@ -108,6 +109,9 @@ class _ArinShellState extends State<ArinShell> {
   PageController? _pageController;
   String? _prevShellPath;
   bool _keepPageViewMounted = false;
+  bool _holdRouterChild = false;
+  String? _pendingOverlayPath;
+  Timer? _routerChildHold;
 
   /// Ana sekmede (`/home`) çıkmayı iki adıma bölmek için son geri zamanı.
   DateTime? _lastExitBackPressAt;
@@ -126,12 +130,34 @@ class _ArinShellState extends State<ArinShell> {
         path == AppRoutes.settings;
   }
 
+  static bool _isShellFamilyPath(String path) {
+    return path == AppRoutes.home ||
+        path.startsWith('${AppRoutes.home}/') ||
+        path == AppRoutes.qibla ||
+        path.startsWith('${AppRoutes.qibla}/') ||
+        path == AppRoutes.habits ||
+        path.startsWith('${AppRoutes.habits}/') ||
+        path == AppRoutes.inspire ||
+        path.startsWith('${AppRoutes.inspire}/') ||
+        path == AppRoutes.settings ||
+        path.startsWith('${AppRoutes.settings}/') ||
+        path == AppRoutes.assistant;
+  }
+
   static int _shellIndexFromPath(String path) {
-    if (path == AppRoutes.home) return 0;
-    if (path == AppRoutes.qibla) return 1;
-    if (path == AppRoutes.habits) return 2;
-    if (path == AppRoutes.inspire) return 3;
-    if (path == AppRoutes.settings) return 4;
+    if (path == AppRoutes.qibla || path.startsWith('${AppRoutes.qibla}/')) {
+      return 1;
+    }
+    if (path == AppRoutes.habits || path.startsWith('${AppRoutes.habits}/')) {
+      return 2;
+    }
+    if (path == AppRoutes.inspire || path.startsWith('${AppRoutes.inspire}/')) {
+      return 3;
+    }
+    if (path == AppRoutes.settings ||
+        path.startsWith('${AppRoutes.settings}/')) {
+      return 4;
+    }
     return 0;
   }
 
@@ -285,12 +311,10 @@ class _ArinShellState extends State<ArinShell> {
       return;
     }
     _lastExitBackPressAt = now;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(l10n.shellExitConfirmBackTwice),
-        duration: const Duration(seconds: 2),
-        behavior: SnackBarBehavior.floating,
-      ),
+    showArinTopToast(
+      context,
+      l10n.shellExitConfirmBackTwice,
+      duration: const Duration(seconds: 2),
     );
   }
 
@@ -319,9 +343,49 @@ class _ArinShellState extends State<ArinShell> {
 
   @override
   void dispose() {
+    _routerChildHold?.cancel();
     _pageController?.dispose();
     _navBarSolidity.dispose();
     super.dispose();
+  }
+
+  void _syncRouterChildHold(String path, bool swipeRoot) {
+    // Kıble/asistan kökünde PageView zaten o sayfayı tutar; hold asla
+    // ikinci QiblaHubPage bağlamasın (GlobalKey).
+    if (path == AppRoutes.qibla || path == AppRoutes.assistant) {
+      _routerChildHold?.cancel();
+      _holdRouterChild = false;
+      _pendingOverlayPath = null;
+      return;
+    }
+    if (!swipeRoot) {
+      _routerChildHold?.cancel();
+      _holdRouterChild = false;
+      _pendingOverlayPath = path;
+      return;
+    }
+    final from = _pendingOverlayPath;
+    _pendingOverlayPath = null;
+    if (from == null) return;
+    final sameFamily =
+        _shellIndexFromPath(from) == _shellIndexFromPath(path);
+    if (!sameFamily) {
+      _holdRouterChild = false;
+      return;
+    }
+    _routerChildHold?.cancel();
+    _holdRouterChild = true;
+    _routerChildHold = Timer(const Duration(milliseconds: 600), () {
+      if (!mounted) return;
+      setState(() => _holdRouterChild = false);
+    });
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final path = GoRouterState.of(context).uri.path;
+    _syncRouterChildHold(path, _isShellSwipeRoot(path));
   }
 
   @override
@@ -329,7 +393,8 @@ class _ArinShellState extends State<ArinShell> {
     final path = GoRouterState.of(context).uri.path;
     final swipeRoot = _isShellSwipeRoot(path);
     final onInspireView = path.contains('/inspire/view');
-    final keepPageView = swipeRoot || onInspireView;
+    final keepPageView =
+        swipeRoot || onInspireView || _isShellFamilyPath(path);
     final currentIndex = _currentIndex(context);
 
     if (keepPageView) {
@@ -341,7 +406,8 @@ class _ArinShellState extends State<ArinShell> {
         _pageController = PageController(initialPage: idx);
       }
       _keepPageViewMounted = true;
-      if (swipeRoot && _prevShellPath != path) {
+      // Asistan overlay'i alttaki sekmeyi sıfırlamasın.
+      if (path != AppRoutes.assistant && _prevShellPath != path) {
         _prevShellPath = path;
         _syncPageToRoute(path);
       }
@@ -389,6 +455,8 @@ class _ArinShellState extends State<ArinShell> {
         final pagePhysics =
             onInspireView ||
                 tourActive ||
+                !swipeRoot ||
+                _holdRouterChild ||
                 (currentIndex == 1 && blockShellSwipeOnQibla)
             ? const NeverScrollableScrollPhysics()
             : const BouncingScrollPhysics();
@@ -422,7 +490,7 @@ class _ArinShellState extends State<ArinShell> {
                     );
                   },
                 ),
-                if (!swipeRoot) widget.child,
+                if (!swipeRoot || _holdRouterChild) widget.child,
               ],
             ),
           );
@@ -450,8 +518,15 @@ class _ArinShellState extends State<ArinShell> {
               : Brightness.light,
         );
 
+        final pendingAssistant = ref.watch(assistantReturnToolProvider);
+        final allowInteractivePop =
+            GoRouter.of(context).canPop() &&
+            !onInspireView &&
+            !tourActive &&
+            (pendingAssistant == null || pendingAssistant.isEmpty);
+
         return PopScope(
-          canPop: false,
+          canPop: allowInteractivePop,
           onPopInvokedWithResult: (didPop, _) {
             if (didPop) return;
             _onSystemBack(context);

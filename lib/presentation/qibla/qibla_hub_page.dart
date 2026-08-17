@@ -3,17 +3,20 @@
 
 import 'dart:async';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../core/router/app_router.dart';
+import '../../data/services/ad_gate_service.dart';
 import '../../data/services/audio_session_coordinator.dart';
 import '../../data/services/paywall_prompt_service.dart';
 import 'islamic_ai/islamic_ai_page.dart';
 import 'qibla_hub_navigator_key.dart';
 import 'qibla_hub_open.dart';
 import 'qibla_page.dart';
+import 'qibla_tool_opening_gate.dart';
 import 'qibla_tools_dashboard_page.dart';
 import 'qibla_nested_swipe_back.dart';
 import 'qibla_shell_swipe_provider.dart';
@@ -181,14 +184,21 @@ class _QiblaHubPageState extends ConsumerState<QiblaHubPage> {
               settings: settings,
               builder: (context) => QiblaNestedSwipeBack(
                 onBack: fromHome ? () => context.go(AppRoutes.home) : null,
-                child: QiblaPage(exitToHomeOnBack: fromHome),
+                child: QiblaToolOpeningGate(
+                  adPlacement: AdGatePlacement.qiblaSession,
+                  child: QiblaPage(exitToHomeOnBack: fromHome),
+                ),
               ),
             );
           case QiblaHubRoutes.zikir:
             return _toolRoute(
               settings: settings,
-              builder: (_) =>
-                  const QiblaNestedSwipeBack(child: ZikirMatikPage()),
+              builder: (_) => const QiblaNestedSwipeBack(
+                child: QiblaToolOpeningGate(
+                  adPlacement: AdGatePlacement.zikirSession,
+                  child: ZikirMatikPage(),
+                ),
+              ),
             );
           case QiblaHubRoutes.breathing:
             return _toolRoute(
@@ -199,8 +209,12 @@ class _QiblaHubPageState extends ConsumerState<QiblaHubPage> {
           case QiblaHubRoutes.healing:
             return _toolRoute(
               settings: settings,
-              builder: (_) =>
-                  const QiblaNestedSwipeBack(child: HealingFrequenciesPage()),
+              builder: (_) => const QiblaNestedSwipeBack(
+                child: QiblaToolOpeningGate(
+                  adPlacement: AdGatePlacement.healingSession,
+                  child: HealingFrequenciesPage(),
+                ),
+              ),
             );
           case QiblaHubRoutes.prayerCircle:
             return _toolRoute(
@@ -235,31 +249,9 @@ class _QiblaHubPageState extends ConsumerState<QiblaHubPage> {
     required RouteSettings settings,
     required WidgetBuilder builder,
   }) {
-    // opaque:false — fade sırasında altındaki dashboard görünsün (siyah flash yok).
-    return PageRouteBuilder<void>(
+    return CupertinoPageRoute<void>(
       settings: settings,
-      opaque: false,
-      barrierDismissible: false,
-      transitionDuration: const Duration(milliseconds: 180),
-      reverseTransitionDuration: const Duration(milliseconds: 160),
-      pageBuilder: (context, animation, secondaryAnimation) => builder(context),
-      transitionsBuilder: (context, animation, secondaryAnimation, child) {
-        final curved = CurvedAnimation(
-          parent: animation,
-          curve: Curves.easeOutCubic,
-          reverseCurve: Curves.easeInCubic,
-        );
-        return FadeTransition(
-          opacity: curved,
-          child: SlideTransition(
-            position: Tween<Offset>(
-              begin: const Offset(0.04, 0),
-              end: Offset.zero,
-            ).animate(curved),
-            child: child,
-          ),
-        );
-      },
+      builder: builder,
     );
   }
 }

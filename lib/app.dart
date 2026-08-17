@@ -55,8 +55,10 @@ import 'presentation/shared/providers/user_profile_providers.dart';
 import 'presentation/shared/widgets/global_edge_swipe_back.dart';
 import 'presentation/shared/widgets/location_change_listener.dart';
 import 'presentation/shared/widgets/widget_launch_gate_listener.dart';
+import 'presentation/assistant/assistant_session.dart';
 import 'presentation/onboarding/app_tour/app_tour_controller.dart';
 import 'presentation/qibla/qibla_hub_back_dispatcher.dart';
+import 'presentation/qibla/qibla_hub_navigator_key.dart';
 import 'main.dart' show runDeferredStartupIfNeeded;
 
 final themeModeProvider = StateProvider<ThemeMode>((ref) => ThemeMode.dark);
@@ -587,14 +589,30 @@ class _ArinAppState extends ConsumerState<ArinApp> with WidgetsBindingObserver {
                 }
                 final currentPath =
                     router.routeInformationProvider.value.uri.path;
+                if (popToAssistantIfNeeded(
+                  context,
+                  router: router,
+                  pathOverride: currentPath,
+                )) {
+                  return true;
+                }
+                // Yalnızca üst rota parmağı takip edebiliyorsa jesti çalma.
+                if (!currentPath.contains('/inspire/view') &&
+                    (navigatorAllowsInteractivePop(
+                          qiblaHubNavigatorKey.currentState,
+                        ) ||
+                        navigatorAllowsInteractivePop(
+                          shellNavigatorKey.currentState,
+                        ) ||
+                        navigatorAllowsInteractivePop(
+                          router.routerDelegate.navigatorKey.currentState,
+                        ))) {
+                  return false;
+                }
                 if (dispatchQiblaHubBack(currentPath: currentPath)) {
                   return true;
                 }
-                final rootNav = router.routerDelegate.navigatorKey.currentState;
-                if (rootNav != null && rootNav.canPop()) {
-                  return rootNav.maybePop();
-                }
-                return false;
+                return router.routerDelegate.popRoute();
               },
               child: WidgetLaunchGateListener(
                 child: LocationChangeListener(child: child),

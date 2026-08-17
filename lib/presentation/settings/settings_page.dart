@@ -48,6 +48,7 @@ import '../shared/providers/user_profile_providers.dart';
 import 'package:arin/presentation/shared/widgets/arin_loader.dart';
 import '../shared/widgets/arin_pressable.dart';
 import '../shared/widgets/arin_premium_mark.dart';
+import 'package:arin/presentation/shared/widgets/arin_top_toast.dart';
 
 class SettingsPage extends ConsumerStatefulWidget {
   const SettingsPage({super.key});
@@ -97,21 +98,13 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
       }
       final ok = loc.savedLat != null;
       final l10n = AppLocalizations.of(context)!;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            ok
+      showArinTopToast(context, ok
                 ? l10n.settingsLocationUpdatedMessage(resolved)
-                : l10n.settingsLocationFailedMessage,
-          ),
-        ),
-      );
+                : l10n.settingsLocationFailedMessage);
     } catch (_) {
       if (!mounted) return;
       final l10n = AppLocalizations.of(context)!;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.settingsLocationFailedMessage)),
-      );
+      showArinTopToast(context, l10n.settingsLocationFailedMessage);
     } finally {
       if (mounted) {
         setState(() => _locationLoading = false);
@@ -125,9 +118,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
     ref.invalidate(prayerTimesProvider);
     if (mounted) {
       final l10n = AppLocalizations.of(context)!;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.settingsProvinceUpdatedMessage(province))),
-      );
+      showArinTopToast(context, l10n.settingsProvinceUpdatedMessage(province));
     }
   }
 
@@ -139,9 +130,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
     if (!mounted) return;
     _cityController.text = picked.displayLabel;
     final l10n = AppLocalizations.of(context)!;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(l10n.settingsProvinceUpdatedMessage(picked.il))),
-    );
+    showArinTopToast(context, l10n.settingsProvinceUpdatedMessage(picked.il));
   }
 
   Future<void> _signOut() async {
@@ -194,9 +183,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
         // kullanıcı önceki kullanıcının habit/zikir/ayar verilerini görür.
         debugPrint('signOut failed (continuing with local wipe): $e');
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(l10n.settingsAuthServiceUnavailable)),
-          );
+          showArinTopToast(context, l10n.settingsAuthServiceUnavailable);
         }
       }
     }
@@ -206,9 +193,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
     } catch (e) {
       debugPrint('LocalDataWipeService.wipeAll failed: $e');
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.settingsAccountDeleteRetryMessage)),
-      );
+      showArinTopToast(context, l10n.settingsAccountDeleteRetryMessage);
       return;
     }
     _invalidateAfterWipe();
@@ -337,11 +322,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
       }
       if (mounted) {
         setState(() => _accountDeleteBusy = false);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(e.message ?? l10n.settingsAccountDeleteFailedMessage),
-          ),
-        );
+        showArinTopToast(context, e.message ?? l10n.settingsAccountDeleteFailedMessage);
       }
       return;
     } on StateError catch (e) {
@@ -351,9 +332,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
       }
       if (mounted) {
         setState(() => _accountDeleteBusy = false);
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(e.message)));
+        showArinTopToast(context, e.message);
       }
       return;
     } catch (e) {
@@ -363,9 +342,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
       }
       if (mounted) {
         setState(() => _accountDeleteBusy = false);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(l10n.settingsAccountDeleteRetryMessage)),
-        );
+        showArinTopToast(context, l10n.settingsAccountDeleteRetryMessage);
       }
       return;
     }
@@ -405,9 +382,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
         }
         if (mounted) {
           setState(() => _accountDeleteBusy = false);
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(l10n.settingsCloudDeleteFailedMessage)),
-          );
+          showArinTopToast(context, l10n.settingsCloudDeleteFailedMessage);
         }
         return;
       }
@@ -425,11 +400,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
       }
       if (mounted) {
         setState(() => _accountDeleteBusy = false);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(e.message ?? l10n.settingsAccountDeleteFailedMessage),
-          ),
-        );
+        showArinTopToast(context, e.message ?? l10n.settingsAccountDeleteFailedMessage);
       }
       return;
     } catch (e) {
@@ -439,9 +410,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
       }
       if (mounted) {
         setState(() => _accountDeleteBusy = false);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(l10n.settingsAccountDeleteRetryMessage)),
-        );
+        showArinTopToast(context, l10n.settingsAccountDeleteRetryMessage);
       }
       return;
     }
@@ -459,9 +428,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
     } catch (e) {
       debugPrint('LocalDataWipeService.wipeAll (delete account) failed: $e');
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(l10n.settingsAccountDeleteRetryMessage)),
-        );
+        showArinTopToast(context, l10n.settingsAccountDeleteRetryMessage);
       }
       return;
     }
@@ -483,9 +450,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
       await _restoreLocalProfileName(localName);
       if (mounted) {
         final l10n = AppLocalizations.of(context)!;
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(l10n.settingsGoogleSignInSuccess)),
-        );
+        showArinTopToast(context, l10n.settingsGoogleSignInSuccess);
       }
     } catch (e) {
       debugPrint('Google sign-in failed: $e');
@@ -497,9 +462,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
         final msg = looksLikeCancel
             ? l10n.settingsGoogleSignInCancelled
             : l10n.settingsGoogleSignInFailed;
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(msg)));
+        showArinTopToast(context, msg);
       }
     } finally {
       if (mounted) setState(() => _oauthBusy = false);
@@ -521,17 +484,13 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
       await _restoreLocalProfileName(localName);
       if (mounted) {
         final l10n = AppLocalizations.of(context)!;
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(l10n.settingsAppleSignInSuccess)),
-        );
+        showArinTopToast(context, l10n.settingsAppleSignInSuccess);
       }
     } catch (e, st) {
       debugPrint('Apple sign-in failed: $e\n$st');
       if (mounted) {
         final l10n = AppLocalizations.of(context)!;
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(_appleSignInFailureMessage(e, l10n))),
-        );
+        showArinTopToast(context, _appleSignInFailureMessage(e, l10n));
       }
     } finally {
       if (mounted) setState(() => _oauthBusy = false);
@@ -592,9 +551,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
 
   void _snackFirebase() {
     final l10n = AppLocalizations.of(context)!;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(l10n.settingsAuthServiceUnavailable)),
-    );
+    showArinTopToast(context, l10n.settingsAuthServiceUnavailable);
   }
 
   String _languageLabelForLocale(BuildContext context, Locale locale) {
@@ -1532,11 +1489,7 @@ class _LocationCardState extends State<_LocationCard> {
                               _pickProvince(exact);
                               return;
                             }
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(l10n.settingsProvinceInvalid),
-                              ),
-                            );
+                            showArinTopToast(context, l10n.settingsProvinceInvalid);
                           },
                         );
                       },

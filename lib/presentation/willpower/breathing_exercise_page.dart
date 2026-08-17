@@ -369,7 +369,7 @@ class _BreathingExercisePageState extends ConsumerState<BreathingExercisePage>
                       },
                     ),
                   if (!_intro && !_sessionComplete)
-                    _buildBottomGlass(context, accent, mint),
+                    _buildBottomGlass(context, mint),
                 ],
               ),
               if (!_intro && !_sessionComplete)
@@ -449,39 +449,28 @@ class _BreathingExercisePageState extends ConsumerState<BreathingExercisePage>
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Row(
-                children: [
-                  Text(
-                    l10n.breathingCycleProgress(_cycleDone + 1, _maxCycles),
-                    style: AppTextStyles.labelSmall.copyWith(
-                      color: AppColors.creamBase.withValues(
-                        alpha: topFade * 0.9,
-                      ),
+              Align(
+                alignment: Alignment.centerRight,
+                child: TextButton(
+                  style: TextButton.styleFrom(
+                    foregroundColor: AppColors.creamBase.withValues(
+                      alpha: topFade,
+                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    minimumSize: Size.zero,
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  ),
+                  onPressed: () {
+                    _exitBreathing(context);
+                  },
+                  child: Text(
+                    l10n.breathingFinishAction,
+                    style: AppTextStyles.labelMedium.copyWith(
+                      color: AppColors.creamBase.withValues(alpha: topFade),
                       fontWeight: FontWeight.w500,
                     ),
                   ),
-                  const Spacer(),
-                  TextButton(
-                    style: TextButton.styleFrom(
-                      foregroundColor: AppColors.creamBase.withValues(
-                        alpha: topFade,
-                      ),
-                      padding: const EdgeInsets.symmetric(horizontal: 10),
-                      minimumSize: Size.zero,
-                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                    ),
-                    onPressed: () {
-                      _exitBreathing(context);
-                    },
-                    child: Text(
-                      l10n.breathingFinishAction,
-                      style: AppTextStyles.labelMedium.copyWith(
-                        color: AppColors.creamBase.withValues(alpha: topFade),
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ),
-                ],
+                ),
               ),
               const SizedBox(height: 8),
               Text(
@@ -800,36 +789,61 @@ class _BreathingExercisePageState extends ConsumerState<BreathingExercisePage>
     );
   }
 
-  Widget _buildBottomGlass(BuildContext context, Color accent, Color mint) {
+  Widget _buildBottomGlass(BuildContext context, Color mint) {
     final l10n = AppLocalizations.of(context)!;
-    return _BreathingGlassPanel(
-      child: SafeArea(
-        top: false,
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(24, 12, 24, 18),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                Icons.favorite_border_rounded,
-                size: 16,
-                color: mint.withValues(alpha: 0.38),
-              ),
-              const SizedBox(width: 8),
-              Flexible(
-                child: Text(
-                  l10n.breathingBottomHint,
-                  textAlign: TextAlign.center,
-                  style: AppTextStyles.labelSmall.copyWith(
-                    color: AppColors.creamBase.withValues(alpha: 0.38),
-                    height: 1.45,
-                  ),
-                ),
-              ),
-            ],
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(24, 0, 24, 10),
+          child: Text(
+            l10n.breathingCycleProgress(_cycleDone + 1, _maxCycles),
+            textAlign: TextAlign.center,
+            style: AppTextStyles.titleSmall.copyWith(
+              color: AppColors.creamBase.withValues(alpha: 0.82),
+              fontWeight: FontWeight.w600,
+              fontSize: 16,
+              letterSpacing: 0.2,
+            ),
           ),
         ),
-      ),
+        _BreathingGlassPanel(
+          child: SafeArea(
+            top: false,
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(20, 16, 20, 20),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(top: 2),
+                    child: Icon(
+                      Icons.favorite_border_rounded,
+                      size: 20,
+                      color: mint.withValues(alpha: 0.72),
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Flexible(
+                    child: Text(
+                      l10n.breathingBottomHint,
+                      textAlign: TextAlign.center,
+                      style: AppTextStyles.bodyLarge.copyWith(
+                        color: AppColors.creamBase.withValues(alpha: 0.82),
+                        fontSize: 15,
+                        fontWeight: FontWeight.w500,
+                        height: 1.4,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

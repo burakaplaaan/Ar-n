@@ -71,6 +71,12 @@ class InspirationLikedNotifier extends StateNotifier<Set<String>> {
 
   bool isLiked(String id) => state.contains(id);
 
+  /// Çift tık yalnızca beğenir; ikinci çift tık geri almaz.
+  void ensureLiked(String id) {
+    if (state.contains(id)) return;
+    toggle(id);
+  }
+
   void toggle(String id) {
     final next = Set<String>.from(state);
     final wasLiked = next.contains(id);

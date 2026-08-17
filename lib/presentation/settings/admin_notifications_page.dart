@@ -28,6 +28,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/firebase/firebase_bootstrap.dart';
 import 'package:arin/presentation/shared/widgets/arin_loader.dart';
+import 'package:arin/presentation/shared/widgets/arin_top_toast.dart';
 
 // ── Sabitler ──────────────────────────────────────────────────────────────────
 
@@ -294,12 +295,11 @@ class _AdminNotificationsPageState
 
   void _snack(String msg, {bool error = false}) {
     if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(msg),
-        backgroundColor: error ? Colors.redAccent : AppColors.emeraldDark,
-        duration: const Duration(seconds: 3),
-      ),
+    showArinTopToast(
+      context,
+      msg,
+      duration: const Duration(seconds: 3),
+      tone: error ? ArinTopToastTone.error : ArinTopToastTone.neutral,
     );
   }
 
@@ -2029,12 +2029,11 @@ class _PoolItemDialogState extends State<_PoolItemDialog> {
 
   void _submit() {
     if (!_validate()) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Ayet metni zorunlu (özel bildirim seçtiysen onu da doldur).'),
-          backgroundColor: Colors.redAccent,
-          duration: Duration(seconds: 3),
-        ),
+      showArinTopToast(
+        context,
+        'Ayet metni zorunlu (özel bildirim seçtiysen onu da doldur).',
+        duration: const Duration(seconds: 3),
+        tone: ArinTopToastTone.error,
       );
       return;
     }

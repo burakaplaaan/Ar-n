@@ -9,9 +9,13 @@ import '../../../core/constants/app_colors.dart';
 import '../../../data/models/inspiration_card_model.dart';
 import '../../../data/services/inspiration_asset_discovery.dart';
 import '../inspiration_catalog_provider.dart';
+import '../inspiration_engagement_provider.dart';
 import '../inspiration_share_service.dart';
 import '../inspiration_text_layouts.dart';
+import 'explore_double_tap.dart';
+import 'explore_like_burst.dart';
 import 'inspiration_reels_layer.dart';
+import 'package:arin/presentation/shared/widgets/arin_top_toast.dart';
 
 /// Viewer kapanış/açılış progress'ine göre söz ve aksiyonları soldurur.
 class InspirationViewerChromeScope extends InheritedWidget {
@@ -61,7 +65,14 @@ class InspirationSlide extends ConsumerStatefulWidget {
 class _InspirationSlideState extends ConsumerState<InspirationSlide> {
   late InspirationCardModel _displayCard;
   final GlobalKey _shareBoundaryKey = GlobalKey();
+  final GlobalKey _overlayKey = GlobalKey();
+  final GlobalKey _likeIconKey = GlobalKey();
+  final GlobalKey<ExploreLikeBurstLayerState> _burstKey =
+      GlobalKey<ExploreLikeBurstLayerState>();
+  final ExploreDoubleTapTracker _doubleTap = ExploreDoubleTapTracker();
+  Offset? _pointerDownPos;
   bool _isRemixingBackground = false;
+  int _likePulseToken = 0;
 
   @override
   void initState() {
@@ -74,7 +85,59 @@ class _InspirationSlideState extends ConsumerState<InspirationSlide> {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.card.id != widget.card.id) {
       _displayCard = widget.card;
+      _doubleTap.reset();
+      _pointerDownPos = null;
+      _likePulseToken = 0;
+      _burstKey.currentState?.clear();
     }
+  }
+
+  void _onSlidePointerDown(PointerDownEvent event) {
+    _pointerDownPos = event.localPosition;
+  }
+
+  void _onSlidePointerMove(PointerMoveEvent event) {
+    final down = _pointerDownPos;
+    if (down != null && (event.localPosition - down).distance > 14) {
+      _pointerDownPos = null;
+      _doubleTap.reset();
+    }
+  }
+
+  void _onSlidePointerUp(PointerUpEvent event) {
+    final down = _pointerDownPos;
+    _pointerDownPos = null;
+    if (down == null) return;
+    if ((event.localPosition - down).distance > 14) return;
+    if (!_doubleTap.registerTap(event.localPosition)) return;
+    _likeFromDoubleTap(event.position);
+  }
+
+  void _onSlidePointerCancel(PointerCancelEvent event) {
+    _pointerDownPos = null;
+    _doubleTap.reset();
+  }
+
+  void _likeFromDoubleTap(Offset globalPosition) {
+    ref.read(inspirationLikedIdsProvider.notifier).ensureLiked(_displayCard.id);
+    HapticFeedback.mediumImpact();
+    final overlayBox = _overlayKey.currentContext?.findRenderObject();
+    if (overlayBox is! RenderBox || !overlayBox.hasSize) return;
+    final start = overlayBox.globalToLocal(globalPosition);
+    final likeBox = _likeIconKey.currentContext?.findRenderObject();
+    final end = likeBox is RenderBox && likeBox.hasSize
+        ? overlayBox.globalToLocal(
+            likeBox.localToGlobal(likeBox.size.center(Offset.zero)),
+          )
+        : Offset(overlayBox.size.width - 28, overlayBox.size.height * 0.42);
+    _burstKey.currentState?.spawn(
+      start: start,
+      end: end,
+      onArrived: () {
+        if (!mounted) return;
+        setState(() => _likePulseToken += 1);
+      },
+    );
   }
 
   Future<void> _remixBackground() async {
@@ -101,12 +164,7 @@ class _InspirationSlideState extends ConsumerState<InspirationSlide> {
             ..shuffle(Random());
       if (!mounted || _displayCard.id != requestedCardId) return;
       if (alternatives.isEmpty) {
-        ScaffoldMessenger.maybeOf(context)?.showSnackBar(
-          const SnackBar(
-            content: Text('Başka bir arka plan bulunamadı.'),
-            behavior: SnackBarBehavior.floating,
-          ),
-        );
+        showArinTopToast(context, 'Başka bir arka plan bulunamadı.');
         return;
       }
 
@@ -124,7 +182,6 @@ class _InspirationSlideState extends ConsumerState<InspirationSlide> {
   Future<void> _onSharePressed(Rect? shareAnchor) async {
     HapticFeedback.lightImpact();
     if (!mounted) return;
-    final messenger = ScaffoldMessenger.maybeOf(context);
     final err = await InspirationShareService.shareCapture(
       _shareBoundaryKey,
       context,
@@ -132,9 +189,7 @@ class _InspirationSlideState extends ConsumerState<InspirationSlide> {
     );
     if (!mounted) return;
     if (err != null) {
-      messenger?.showSnackBar(
-        SnackBar(content: Text(err), behavior: SnackBarBehavior.floating),
-      );
+      showArinTopToast(context, err);
     }
   }
 
@@ -214,31 +269,39 @@ class _InspirationSlideState extends ConsumerState<InspirationSlide> {
       context,
     ).clamp(0.0, 1.0);
     return Stack(
+      key: _overlayKey,
       fit: StackFit.expand,
       children: [
-        RepaintBoundary(
-          key: _shareBoundaryKey,
-          child: Stack(
-            fit: StackFit.expand,
-            children: [
-              _SlideBackground(
-                card: _displayCard,
-                useLightPlaceholder: lightTxt,
-              ),
-              _chromeLayer(
-                opacity: chromeOpacity,
-                children: [
-                  Positioned.fill(child: _gradientOverlay(lightTxt)),
-                  _watermark(lightTxt),
-                  InspirationReelsQuoteBlock(
-                    card: _displayCard,
-                    useLightTextOnImage: lightTxt,
-                    textAnchor: textAnchor,
-                    scrollEnabled: widget.reelsTextScrollEnabled,
-                  ),
-                ],
-              ),
-            ],
+        Listener(
+          behavior: HitTestBehavior.translucent,
+          onPointerDown: _onSlidePointerDown,
+          onPointerMove: _onSlidePointerMove,
+          onPointerUp: _onSlidePointerUp,
+          onPointerCancel: _onSlidePointerCancel,
+          child: RepaintBoundary(
+            key: _shareBoundaryKey,
+            child: Stack(
+              fit: StackFit.expand,
+              children: [
+                _SlideBackground(
+                  card: _displayCard,
+                  useLightPlaceholder: lightTxt,
+                ),
+                _chromeLayer(
+                  opacity: chromeOpacity,
+                  children: [
+                    Positioned.fill(child: _gradientOverlay(lightTxt)),
+                    _watermark(lightTxt),
+                    InspirationReelsQuoteBlock(
+                      card: _displayCard,
+                      useLightTextOnImage: lightTxt,
+                      textAnchor: textAnchor,
+                      scrollEnabled: widget.reelsTextScrollEnabled,
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
         _chromeLayer(
@@ -249,9 +312,12 @@ class _InspirationSlideState extends ConsumerState<InspirationSlide> {
               lightOnImage: lightTxt,
               onRemixBackground: _remixBackground,
               onShare: _onSharePressed,
+              likeIconKey: _likeIconKey,
+              likePulseToken: _likePulseToken,
             ),
           ],
         ),
+        ExploreLikeBurstLayer(key: _burstKey),
       ],
     );
   }
