@@ -118,4 +118,41 @@ void main() {
     ArinTopToastController.hide();
     await tester.pump();
   });
+
+  testWidgets('aksiyonlu toast üstte kalır ve tıklanınca kapanır', (tester) async {
+    var tapped = false;
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: AppTheme.dark,
+        themeMode: ThemeMode.dark,
+        home: Scaffold(
+          body: Builder(
+            builder: (context) {
+              return TextButton(
+                onPressed: () => showArinTopToast(
+                  context,
+                  'Şablon zaten var',
+                  actionLabel: 'Aç',
+                  onAction: () => tapped = true,
+                ),
+                child: const Text('göster'),
+              );
+            },
+          ),
+        ),
+      ),
+    );
+
+    await tester.tap(find.text('göster'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 280));
+
+    expect(find.text('Şablon zaten var'), findsOneWidget);
+    await tester.tap(find.text('Aç'));
+    await tester.pump();
+    expect(tapped, isTrue);
+
+    await tester.pump(const Duration(milliseconds: 280));
+    expect(find.text('Şablon zaten var'), findsNothing);
+  });
 }

@@ -27,6 +27,7 @@ import '../shared/providers/premium_providers.dart';
 import '../shared/providers/widget_theme_providers.dart';
 import '../shared/widgets/arin_shell_layout.dart';
 import 'package:arin/presentation/shared/widgets/arin_loader.dart';
+import 'package:arin/presentation/shared/widgets/arin_top_toast.dart';
 
 class WidgetCenterPage extends ConsumerStatefulWidget {
   const WidgetCenterPage({super.key});
@@ -58,15 +59,9 @@ class _WidgetCenterPageState extends ConsumerState<WidgetCenterPage> {
       );
       if (!mounted) return;
       setState(() {});
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            targetId == null
+      showArinTopToast(context, targetId == null
                 ? 'Takip widgetı kapatıldı.'
-                : 'Takip widgetı güncellendi.',
-          ),
-        ),
-      );
+                : 'Takip widgetı güncellendi.');
     } finally {
       if (mounted) setState(() => _saving = false);
     }
@@ -418,9 +413,7 @@ class _WidgetThemeSection extends ConsumerWidget {
                   );
                   ref.invalidate(effectiveWidgetThemeProvider);
                   if (!context.mounted) return;
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text(l10n.widgetThemeApplied)),
-                  );
+                  showArinTopToast(context, l10n.widgetThemeApplied);
                 },
               ),
           ],
@@ -600,13 +593,7 @@ class _LockNotificationTogglesState extends State<_LockNotificationToggles> {
         // İzin reddedildi (veya yazma başarısız oldu) — anahtarı eski haline al.
         setState(() => _states = {...?_states, kind: !value});
         if (value) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text(
-                'Bildirim izni verilmeden kilit ekranı widget\'ı açılamaz.',
-              ),
-            ),
-          );
+          showArinTopToast(context, 'Bildirim izni verilmeden kilit ekranı widget\'ı açılamaz.');
         }
       }
     } finally {
@@ -764,17 +751,9 @@ class _OemLockScreenHelpCardState extends State<_OemLockScreenHelpCard> {
         case AndroidOemOpenResult.oem:
           break;
         case AndroidOemOpenResult.fallback:
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text(
-                'Özel menü açılamadı; genel ayar sayfası açıldı. Listeden Arın\'ı bul.',
-              ),
-            ),
-          );
+          showArinTopToast(context, 'Özel menü açılamadı; genel ayar sayfası açıldı. Listeden Arın\'ı bul.');
         case AndroidOemOpenResult.failed:
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(failMessage)),
-          );
+          showArinTopToast(context, failMessage);
       }
       await _load();
     } finally {
@@ -793,9 +772,7 @@ class _OemLockScreenHelpCardState extends State<_OemLockScreenHelpCard> {
       final ok = await action();
       if (!mounted) return;
       if (!ok) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(failMessage)),
-        );
+        showArinTopToast(context, failMessage);
       }
       await _load();
     } finally {
@@ -815,17 +792,9 @@ class _OemLockScreenHelpCardState extends State<_OemLockScreenHelpCard> {
           case AndroidOemOpenResult.oem:
             break;
           case AndroidOemOpenResult.fallback:
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text(
-                  'Özel menü açılamadı; genel ayar sayfası açıldı. Listeden Arın\'ı bul.',
-                ),
-              ),
-            );
+            showArinTopToast(context, 'Özel menü açılamadı; genel ayar sayfası açıldı. Listeden Arın\'ı bul.');
           case AndroidOemOpenResult.failed:
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Pil menüsü açılamadı.')),
-            );
+            showArinTopToast(context, 'Pil menüsü açılamadı.');
         }
       } else {
         final granted = await requestIgnoreBatteryOptimizations();
@@ -833,17 +802,9 @@ class _OemLockScreenHelpCardState extends State<_OemLockScreenHelpCard> {
           final r = await AndroidOemSettingsService.openOemBattery();
           if (!mounted) return;
           if (r == AndroidOemOpenResult.failed) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Pil menüsü açılamadı.')),
-            );
+            showArinTopToast(context, 'Pil menüsü açılamadı.');
           } else if (r == AndroidOemOpenResult.fallback) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text(
-                  'Özel menü açılamadı; genel ayar sayfası açıldı. Listeden Arın\'ı bul.',
-                ),
-              ),
-            );
+            showArinTopToast(context, 'Özel menü açılamadı; genel ayar sayfası açıldı. Listeden Arın\'ı bul.');
           }
         }
       }

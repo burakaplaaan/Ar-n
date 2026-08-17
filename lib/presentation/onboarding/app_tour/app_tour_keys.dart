@@ -1,5 +1,6 @@
 // lib/presentation/onboarding/app_tour/app_tour_keys.dart
-// Spotlight turunun hedef widget anahtarları.
+// Spotlight turunun hedef widget bağlamları.
+// GlobalKey kullanılmaz: aynı hedef iki host'ta olunca layout donması olmasın.
 
 import 'package:flutter/widgets.dart';
 
@@ -31,16 +32,37 @@ enum AppTourTargetId {
 }
 
 abstract final class AppTourKeys {
-  static final Map<AppTourTargetId, GlobalKey> _keys = {
-    for (final id in AppTourTargetId.values)
-      id: GlobalKey(debugLabel: 'app_tour_${id.name}'),
-  };
+  static final Map<AppTourTargetId, List<BuildContext>> _contexts = {};
 
-  static GlobalKey of(AppTourTargetId id) => _keys[id]!;
+  static void register(AppTourTargetId id, BuildContext context) {
+    final stack = _contexts.putIfAbsent(id, () => <BuildContext>[]);
+    if (!stack.contains(context)) {
+      stack.add(context);
+    }
+  }
+
+  static void unregister(AppTourTargetId id, BuildContext context) {
+    final stack = _contexts[id];
+    if (stack == null) return;
+    stack.remove(context);
+    if (stack.isEmpty) {
+      _contexts.remove(id);
+    }
+  }
+
+  static BuildContext? contextOf(AppTourTargetId id) {
+    final stack = _contexts[id];
+    if (stack == null || stack.isEmpty) return null;
+    for (var i = stack.length - 1; i >= 0; i--) {
+      final ctx = stack[i];
+      if (ctx.mounted) return ctx;
+    }
+    return null;
+  }
 
   static Rect? measure(AppTourTargetId id) {
-    final ctx = _keys[id]?.currentContext;
-    if (ctx == null || !ctx.mounted) return null;
+    final ctx = contextOf(id);
+    if (ctx == null) return null;
     final box = ctx.findRenderObject();
     if (box is! RenderBox || !box.hasSize) return null;
     final offset = box.localToGlobal(Offset.zero);

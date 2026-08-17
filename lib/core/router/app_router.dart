@@ -1,5 +1,6 @@
 // lib/core/router/app_router.dart
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -52,6 +53,7 @@ import '../../presentation/inspire/inspire_viewer_page.dart';
 import '../../presentation/inspire/inspire_viewer_session_provider.dart';
 import '../../presentation/moment_verse/moment_verse_page.dart';
 import '../../presentation/assistant/assistant_page.dart';
+import '../../presentation/assistant/assistant_return_pop_guard.dart';
 import '../../presentation/premium/premium_page.dart';
 import '../../presentation/shared/providers/auth_providers.dart';
 import '../../presentation/shared/providers/willpower_hub_nav_provider.dart';
@@ -59,6 +61,7 @@ import '../../presentation/assistant/widgets/assistant_fab_host.dart';
 import '../../presentation/shared/widgets/arin_shell.dart';
 
 final GlobalKey<NavigatorState> rootNavigatorKey = GlobalKey<NavigatorState>();
+final GlobalKey<NavigatorState> shellNavigatorKey = GlobalKey<NavigatorState>();
 
 abstract final class AppRoutes {
   static const String onboarding = '/onboarding';
@@ -324,6 +327,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             _page(state, const AssistantFabHost(child: MomentVersePage())),
       ),
       ShellRoute(
+        navigatorKey: shellNavigatorKey,
         builder: (context, state, child) => ArinShell(child: child),
         routes: [
           GoRoute(
@@ -591,8 +595,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
   );
 });
 
-MaterialPage<void> _page(GoRouterState state, Widget child) =>
-    MaterialPage<void>(key: state.pageKey, child: child);
+Page<void> _page(GoRouterState state, Widget child) => CupertinoPage<void>(
+  key: state.pageKey,
+  child: AssistantReturnPopGuard(child: child),
+);
 
 CustomTransitionPage<void> _inspireViewerPage(
   GoRouterState state,

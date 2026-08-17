@@ -31,6 +31,7 @@ import '../../shared/providers/ad_gate_providers.dart';
 import '../../shared/providers/admob_providers.dart';
 import '../../shared/providers/premium_providers.dart';
 import '../../shared/providers/prayer_time_providers.dart';
+import 'package:arin/presentation/shared/widgets/arin_top_toast.dart';
 
 part 'namaz_adhan_reminder_sheets.dart';
 
@@ -228,18 +229,7 @@ class _NamazAdhanReminderCardState
       await PrayerReminderPrefs.setEnabled(prefs, false);
       if (mounted) {
         setState(() => _enabledOverride = false);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              l10n.reminderPermissionRequiredMessage,
-              style: TextStyle(
-                color: AppColors.creamBase.withValues(alpha: 0.92),
-              ),
-            ),
-            backgroundColor: AppColors.anthraciteMid,
-            behavior: SnackBarBehavior.floating,
-          ),
-        );
+        showArinTopToast(context, l10n.reminderPermissionRequiredMessage);
       }
       return;
     }
@@ -349,11 +339,7 @@ class _NamazAdhanReminderCardState
     final entitlementAsync = ref.read(premiumEntitlementProvider);
     if (entitlementAsync.isLoading || entitlementAsync.hasError) {
       if (!mounted) return false;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(AppLocalizations.of(context)!.premiumLoadingWait),
-        ),
-      );
+      showArinTopToast(context, AppLocalizations.of(context)!.premiumLoadingWait);
       return false;
     }
     final entitlement = await ref.read(premiumEntitlementProvider.future);

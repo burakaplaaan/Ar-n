@@ -16,6 +16,7 @@ import '../shared/widgets/arin_back_button.dart';
 
 import 'package:arin/l10n/app_localizations.dart';
 import 'package:arin/presentation/shared/widgets/arin_loader.dart';
+import 'package:arin/presentation/shared/widgets/arin_top_toast.dart';
 
 abstract final class _Zc {
   static const pageBg = Color(0xFF1A2B34);
@@ -321,9 +322,7 @@ class _ZikirBilgisiPageState extends ConsumerState<ZikirBilgisiPage>
           final msg = isMethodChannelLateInitResultError(e)
           ? platformShareTransientErrorMessage()
           : l10n.zikirmatikShareError;
-      ScaffoldMessenger.maybeOf(context)?.showSnackBar(
-        SnackBar(content: Text(msg), behavior: SnackBarBehavior.floating),
-      );
+      showArinTopToast(context, msg);
     }
   }
 

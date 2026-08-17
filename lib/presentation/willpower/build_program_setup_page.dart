@@ -11,6 +11,7 @@ import '../../core/constants/willpower_templates.dart';
 import '../../core/router/app_router.dart';
 import '../../data/models/habit_model.dart';
 import '../shared/providers/habit_providers.dart';
+import 'package:arin/presentation/shared/widgets/arin_top_toast.dart';
 
 /// Şablon kurulumu — şu an yalnızca quran_daily tam akışlı.
 /// Tasarım: gradient arkaplan + kitap kaligrafi, hero ikon halkası,
@@ -247,14 +248,7 @@ class BuildProgramSetupPage extends ConsumerWidget {
                             );
                             if (existing != null) {
                               if (context.mounted) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text(
-                                      l10n.buildProgramSetupAlreadyActive,
-                                    ),
-                                    behavior: SnackBarBehavior.floating,
-                                  ),
-                                );
+                                showArinTopToast(context, l10n.buildProgramSetupAlreadyActive);
                                 context.go(
                                   AppRoutes.willBuildDetail(existing.id),
                                 );

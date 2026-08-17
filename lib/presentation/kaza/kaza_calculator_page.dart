@@ -15,6 +15,7 @@ import '../../data/models/kaza_tracking_state.dart';
 import '../../data/services/kaza_calculator.dart';
 import 'kaza_tracking_provider.dart';
 import 'kaza_widgets.dart';
+import 'package:arin/presentation/shared/widgets/arin_top_toast.dart';
 
 class KazaCalculatorPage extends ConsumerStatefulWidget {
   const KazaCalculatorPage({super.key});
@@ -258,15 +259,7 @@ class _KazaCalculatorPageState extends ConsumerState<KazaCalculatorPage> {
     // Hesapla’ya basmasın diye erken çık.
     if (r.inclusiveCalendarDays == 0) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            AppLocalizations.of(context)!.kazaCalcErrorPubertyFuture,
-            style: AppTextStyles.bodySmall.copyWith(color: AppColors.creamBase),
-          ),
-          backgroundColor: AppColors.anthraciteMid,
-        ),
-      );
+      showArinTopToast(context, AppLocalizations.of(context)!.kazaCalcErrorPubertyFuture);
       return;
     }
 
@@ -288,15 +281,7 @@ class _KazaCalculatorPageState extends ConsumerState<KazaCalculatorPage> {
 
     if (!mounted) return;
     if (r.remainingPrayers == 0) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            AppLocalizations.of(context)!.kazaCalcErrorZeroRemaining,
-            style: AppTextStyles.bodySmall.copyWith(color: AppColors.creamBase),
-          ),
-          backgroundColor: AppColors.anthraciteMid,
-        ),
-      );
+      showArinTopToast(context, AppLocalizations.of(context)!.kazaCalcErrorZeroRemaining);
     }
     if (mounted) context.push(AppRoutes.kazaTracker);
   }

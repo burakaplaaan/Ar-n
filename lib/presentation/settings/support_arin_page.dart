@@ -12,6 +12,7 @@ import '../../data/models/purchase_result.dart';
 import '../../data/services/purchase_service.dart';
 import '../../l10n/app_localizations.dart';
 import 'package:arin/presentation/shared/widgets/arin_loader.dart';
+import 'package:arin/presentation/shared/widgets/arin_top_toast.dart';
 
 class SupportArinPage extends ConsumerStatefulWidget {
   const SupportArinPage({super.key});
@@ -102,15 +103,11 @@ class _SupportArinPageState extends ConsumerState<SupportArinPage> {
       final uri = Uri.parse(rawUrl);
       final ok = await launchUrl(uri, mode: LaunchMode.externalApplication);
       if (!ok && mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(l10n.premiumLinkOpenFailed)));
+        showArinTopToast(context, l10n.premiumLinkOpenFailed);
       }
     } catch (_) {
       if (!mounted) return;
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(l10n.premiumLinkOpenFailed)));
+      showArinTopToast(context, l10n.premiumLinkOpenFailed);
     }
   }
 
@@ -118,11 +115,10 @@ class _SupportArinPageState extends ConsumerState<SupportArinPage> {
     if (_busyProductId != null) return;
     if (_loadingProducts || !_availableProductIds.contains(_normalizeProductId(productId))) {
       final l10n = AppLocalizations.of(context)!;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(l10n.supportProductNotReady),
-          backgroundColor: Colors.red.shade700,
-        ),
+      showArinTopToast(
+        context,
+        l10n.supportProductNotReady,
+        tone: ArinTopToastTone.error,
       );
       return;
     }
@@ -139,19 +135,17 @@ class _SupportArinPageState extends ConsumerState<SupportArinPage> {
 
     switch (outcome) {
       case PurchaseOutcome _ when outcome.isSuccess:
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(AppLocalizations.of(context)!.premiumLoadingWait),
-          ),
-        );
+        showArinTopToast(context, AppLocalizations.of(context)!.premiumLoadingWait);
         _showSuccessDialog();
       case PurchaseOutcome _ when outcome.isCancelled:
         break;
       default:
         final msg = outcome.userMessage;
         if (msg != null) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(msg), backgroundColor: Colors.red.shade700),
+          showArinTopToast(
+            context,
+            msg,
+            tone: ArinTopToastTone.error,
           );
         }
     }

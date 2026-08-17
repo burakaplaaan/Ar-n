@@ -1608,7 +1608,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get qiblaHubAiSubtitle =>
-      'Source-based answers to religious questions — not a fatwa. Premium.';
+      'Ask what\'s on your mind and start an Islamic chat';
 
   @override
   String get islamicAiComingSoonTitle => 'Islamic AI';

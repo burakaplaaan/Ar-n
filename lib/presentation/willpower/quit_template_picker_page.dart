@@ -14,6 +14,7 @@ import '../../data/models/habit_model.dart';
 import '../shared/providers/habit_providers.dart';
 import '../shared/providers/willpower_hub_nav_provider.dart';
 import 'package:arin/presentation/shared/widgets/arin_loader.dart';
+import 'package:arin/presentation/shared/widgets/arin_top_toast.dart';
 
 const Color _kQuitAccent = Color(0xFFFF5252);
 const Color _kSaveOutline = Color(0xFFFFC107);
@@ -55,32 +56,29 @@ class _QuitTemplatePickerPageState
     final l10n = AppLocalizations.of(context)!;
     final repo = ref.read(habitRepositoryProvider);
     final existing = repo.findActiveByTemplateId(templateId);
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(l10n.quitPickerTemplateAlreadyExists),
-        behavior: SnackBarBehavior.floating,
-        action: existing != null
-            ? SnackBarAction(
-                label: WillpowerTemplates.isFullQuitProgram(templateId)
-                    ? l10n.quitPickerOpenAction
-                    : l10n.quitPickerGoToListAction,
-                onPressed: () {
-                  if (!context.mounted) return;
-                  ScaffoldMessenger.of(context).hideCurrentSnackBar();
-                  context.pop();
-                  if (WillpowerTemplates.isFullQuitProgram(templateId)) {
-                    if (existing.onboardingCompleted) {
-                      context.push(AppRoutes.willQuitHome(existing.id));
-                    } else {
-                      context.push(AppRoutes.willQuitOnboarding(existing.id));
-                    }
-                  } else {
-                    context.go(AppRoutes.habitsArinmaTab);
-                  }
-                },
-              )
-            : null,
-      ),
+    showArinTopToast(
+      context,
+      l10n.quitPickerTemplateAlreadyExists,
+      actionLabel: existing != null
+          ? (WillpowerTemplates.isFullQuitProgram(templateId)
+                ? l10n.quitPickerOpenAction
+                : l10n.quitPickerGoToListAction)
+          : null,
+      onAction: existing == null
+          ? null
+          : () {
+              if (!context.mounted) return;
+              context.pop();
+              if (WillpowerTemplates.isFullQuitProgram(templateId)) {
+                if (existing.onboardingCompleted) {
+                  context.push(AppRoutes.willQuitHome(existing.id));
+                } else {
+                  context.push(AppRoutes.willQuitOnboarding(existing.id));
+                }
+              } else {
+                context.go(AppRoutes.habitsArinmaTab);
+              }
+            },
     );
   }
 

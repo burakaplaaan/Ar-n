@@ -21,6 +21,7 @@ import 'salat_providers.dart';
 import 'widgets/namaz_adhan_reminder_card.dart';
 import 'widgets/namaz_insight_card.dart';
 import 'widgets/salat_prayer_row.dart';
+import 'package:arin/presentation/shared/widgets/arin_top_toast.dart';
 
 class NamazProgramPage extends ConsumerStatefulWidget {
   const NamazProgramPage({
@@ -58,13 +59,7 @@ class _NamazProgramPageState extends ConsumerState<NamazProgramPage> {
     _didShowHomeVisibilityHint = true;
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            AppLocalizations.of(context)!.namazProgramHomeHintActive,
-          ),
-        ),
-      );
+      showArinTopToast(context, AppLocalizations.of(context)!.namazProgramHomeHintActive);
     });
   }
 

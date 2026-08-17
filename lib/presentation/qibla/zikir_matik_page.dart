@@ -4,6 +4,7 @@
 import 'dart:async';
 import 'dart:math' as math;
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -25,6 +26,7 @@ import '../shared/mixins/review_prompt_on_exit_mixin.dart';
 import '../shared/widgets/tasbeeh_zikirmatik_device_frame.dart';
 import '../shared/widgets/arin_back_button.dart';
 import 'package:arin/presentation/shared/widgets/arin_loader.dart';
+import 'package:arin/presentation/shared/widgets/arin_top_toast.dart';
 
 part 'zikir_matik_phrase_widgets.dart';
 part 'zikir_matik_target_sheet.dart';
@@ -466,12 +468,10 @@ class _ZikirMatikPageState extends ConsumerState<ZikirMatikPage>
       }
     }
     if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(l10n.zikirmatikRoundCompleted),
-        behavior: SnackBarBehavior.floating,
-        duration: const Duration(seconds: 2),
-      ),
+    showArinTopToast(
+      context,
+      l10n.zikirmatikRoundCompleted,
+      duration: const Duration(seconds: 2),
     );
   }
 
@@ -596,13 +596,8 @@ class _ZikirMatikPageState extends ConsumerState<ZikirMatikPage>
 
   Future<void> _openList() async {
     await Navigator.of(context).push<void>(
-      PageRouteBuilder<void>(
-        pageBuilder: (_, _, _) => const ZikirBilgisiPage(),
-        transitionDuration: const Duration(milliseconds: 180),
-        reverseTransitionDuration: const Duration(milliseconds: 160),
-        transitionsBuilder: (_, animation, _, child) {
-          return FadeTransition(opacity: animation, child: child);
-        },
+      CupertinoPageRoute<void>(
+        builder: (_) => const ZikirBilgisiPage(),
       ),
     );
   }

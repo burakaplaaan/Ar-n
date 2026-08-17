@@ -1,6 +1,7 @@
 import 'package:arin/core/providers/shared_preferences_provider.dart';
 import 'package:arin/core/router/app_router.dart';
 import 'package:arin/l10n/app_localizations_tr.dart';
+import 'package:arin/presentation/onboarding/app_tour/app_tour_anchor.dart';
 import 'package:arin/presentation/onboarding/app_tour/app_tour_controller.dart';
 import 'package:arin/presentation/onboarding/app_tour/app_tour_keys.dart';
 import 'package:arin/presentation/onboarding/app_tour/app_tour_layout.dart';
@@ -134,6 +135,33 @@ void main() {
     });
     container.read(appTourControllerProvider.notifier).maybeStart();
     expect(container.read(appTourControllerProvider).active, isFalse);
+  });
+
+  testWidgets('aynı hedef iki kez ağaçta olsa da donmaz', (tester) async {
+    await tester.pumpWidget(
+      const Directionality(
+        textDirection: TextDirection.ltr,
+        child: SizedBox(
+          width: 390,
+          height: 844,
+          child: Stack(
+            children: [
+              AppTourAnchor(
+                id: AppTourTargetId.assistantFab,
+                child: SizedBox(width: 40, height: 20),
+              ),
+              AppTourAnchor(
+                id: AppTourTargetId.assistantFab,
+                child: SizedBox(width: 48, height: 24),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+    expect(tester.takeException(), isNull);
+    expect(AppTourKeys.contextOf(AppTourTargetId.assistantFab), isNotNull);
+    expect(AppTourKeys.measure(AppTourTargetId.assistantFab), isNotNull);
   });
 
   test('onboarding bitmeden tur başlamaz', () async {

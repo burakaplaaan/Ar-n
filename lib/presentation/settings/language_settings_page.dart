@@ -17,6 +17,7 @@ import '../../l10n/app_localizations.dart';
 import '../shared/providers/prayer_time_providers.dart';
 import '../shared/providers/quotes_providers.dart';
 import 'package:arin/presentation/shared/widgets/arin_loader.dart';
+import 'package:arin/presentation/shared/widgets/arin_top_toast.dart';
 
 class LanguageSettingsPage extends ConsumerStatefulWidget {
   const LanguageSettingsPage({super.key});
@@ -80,16 +81,12 @@ class _LanguageSettingsPageState extends ConsumerState<LanguageSettingsPage> {
       if (!mounted) return;
       final l10n = AppLocalizations.of(context)!;
       final selectedLabel = _languageLabelForLocale(context, locale);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.languageChangedMessage(selectedLabel))),
-      );
+      showArinTopToast(context, l10n.languageChangedMessage(selectedLabel));
     } catch (e) {
       debugPrint('Language switch failed: $e');
       if (!mounted) return;
       final l10n = AppLocalizations.of(context)!;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.languageChangeFailed)),
-      );
+      showArinTopToast(context, l10n.languageChangeFailed);
     } finally {
       if (mounted) setState(() => _switchingCode = null);
     }

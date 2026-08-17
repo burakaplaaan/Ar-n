@@ -74,17 +74,23 @@ class ExploreBgmNotifier extends StateNotifier<ExploreBgmUiState> {
     );
   }
 
-  /// Koordinatör çağrısıyla tetiklenen pause — kullanıcı toggle'ı off
-  /// konumuna çekmiş gibi davranır: son track index'i kaydedip sessizliğe geçer.
+  /// Koordinatör çağrısıyla tetiklenen pause — konumu korur, Keşfet'te
+  /// kalındıysa kısa süre sonra aynı yerden devam eder.
   Future<void> _pauseByCoordinator() async {
     if (_disposed) return;
-    if (!state.userEnabled && !state.isPlaying) return;
-    _playbackEpoch++;
-    _persistTrackIndex(state.trackIndex);
-    _cancelAllTimers();
-    _crossfadeInProgress = false;
-    state = state.copyWith(userEnabled: false, isPlaying: false);
-    await _silenceBoth();
+    if (!state.isPlaying && !_holdPosition) return;
+    await _pauseHoldingPosition();
+    _scheduleResumeIfStillInExplore();
+  }
+
+  void _scheduleResumeIfStillInExplore() {
+    _resumeAfterPause?.cancel();
+    _resumeAfterPause = Timer(const Duration(milliseconds: 700), () {
+      if (_disposed || !_inExplore || !state.userEnabled || state.isPlaying) {
+        return;
+      }
+      unawaited(_startPlayback());
+    });
   }
 
   final SharedPreferences _prefs;
@@ -116,6 +122,7 @@ class ExploreBgmNotifier extends StateNotifier<ExploreBgmUiState> {
   Future<void> _stopAndRequireManualRestart() async {
     if (_disposed) return;
     _playbackEpoch++;
+    _holdPosition = false;
     if (state.userEnabled) {
       _persistTrackIndex(state.trackIndex);
     }
@@ -153,13 +160,24 @@ class ExploreBgmNotifier extends StateNotifier<ExploreBgmUiState> {
   /// toplantıda ani patlamasın) — aynı oturumda çıkıp tekrar girerse ise
   /// tercih hatırlanır ve otomatik devam edebilir.
   bool _enteredExploreThisSession = false;
+  bool _inExplore = false;
+  bool _holdPosition = false;
+  Timer? _leaveExploreDebounce;
+  Timer? _resumeAfterPause;
+
+  static bool isExplorePath(String path) {
+    return path == AppRoutes.inspire ||
+        path.startsWith('${AppRoutes.inspire}/');
+  }
 
   void onRoutePath(String path) {
     if (_disposed) return;
-    final inExplore = path == AppRoutes.inspire ||
-        path.startsWith('${AppRoutes.inspire}/');
+    final inExplore = isExplorePath(path);
 
     if (inExplore) {
+      _leaveExploreDebounce?.cancel();
+      _leaveExploreDebounce = null;
+      _inExplore = true;
       // Cold-start güvenliği: uygulama yeni açıldıysa ve bu, oturumun ilk
       // Keşfet ziyaretiyse → kullanıcı tercihi "açık" olsa bile OTOMATİK
       // başlatma. Kullanıcı üst sağdaki BGM butonuna bassın. Aynı oturum
@@ -167,6 +185,13 @@ class ExploreBgmNotifier extends StateNotifier<ExploreBgmUiState> {
       // açıksa otomatik sürsün.
       if (!_enteredExploreThisSession) {
         _enteredExploreThisSession = true;
+        return;
+      }
+      if (state.userEnabled && state.isPlaying) {
+        return;
+      }
+      if (state.userEnabled && !state.isPlaying) {
+        unawaited(_startPlayback());
         return;
       }
       if (!state.userEnabled && _readSavedUserEnabled()) {
@@ -177,29 +202,34 @@ class ExploreBgmNotifier extends StateNotifier<ExploreBgmUiState> {
       return;
     }
 
+    // GoRouter geçişinde path kısa süre `/` veya boş olabiliyor; müziği kesme.
+    if (path.isEmpty || path == '/') return;
+
     // Route exit'te kullanıcı tercihini de kapat: Keşfet'e geri dönünce
     // müzik otomatik başlamasın, kullanıcı tekrar elle açsın.
-    unawaited(_stopAndRequireManualRestart());
+    _leaveExploreDebounce?.cancel();
+    _leaveExploreDebounce = Timer(const Duration(milliseconds: 160), () {
+      if (_disposed) return;
+      _inExplore = false;
+      unawaited(_stopAndRequireManualRestart());
+    });
   }
 
   Future<void> pauseForVisibilityLoss() async {
     await _stopAndRequireManualRestart();
   }
 
-  /// Reklam / premium paneli gibi Keşfet içinde geçici overlay açıldığında
-  /// sesi hemen kes. Kullanıcı tercihini prefs'te kapatmaz; panel kapanınca
-  /// müziğin otomatik patlamasını da istemediğimiz için state kapalı kalır.
-  /// Kullanıcı isterse üst bardan tekrar açabilir.
+  /// Reklam gerçekten açıldığında konumu koruyarak duraklat. Kart kaydırınca
+  /// çağrılmaz; aksi halde müzik her sayfada baştan başlar.
   Future<void> pauseForAdGate() async {
     if (_disposed) return;
-    if (!state.userEnabled && !state.isPlaying) return;
-    _playbackEpoch++;
-    _persistTrackIndex(state.trackIndex);
-    _cancelAllTimers();
-    _crossfadeInProgress = false;
-    state = state.copyWith(userEnabled: false, isPlaying: false);
-    await _silenceBoth();
-    AudioSessionCoordinator.release(AudioSessionOwner.exploreBgm);
+    if (!state.isPlaying) return;
+    await _pauseHoldingPosition();
+  }
+
+  Future<void> resumeAfterAdGate() async {
+    if (_disposed || !state.userEnabled || state.isPlaying) return;
+    await _startPlayback();
   }
 
   Future<void> toggle() async {
@@ -207,6 +237,7 @@ class ExploreBgmNotifier extends StateNotifier<ExploreBgmUiState> {
     if (state.userEnabled) {
       _persistTrackIndex(state.trackIndex);
       _playbackEpoch++;
+      _holdPosition = false;
       await _persistUserEnabled(false);
       _cancelAllTimers();
       _crossfadeInProgress = false;
@@ -228,6 +259,7 @@ class ExploreBgmNotifier extends StateNotifier<ExploreBgmUiState> {
     final startEpoch = _playbackEpoch;
     _cancelAllTimers();
     _crossfadeInProgress = false;
+    _holdPosition = false;
 
     final next = (state.trackIndex + 1) % kExploreBgmAssetPaths.length;
     await _silenceBoth();
@@ -262,8 +294,60 @@ class ExploreBgmNotifier extends StateNotifier<ExploreBgmUiState> {
     }
   }
 
+  Future<void> _pauseHoldingPosition() async {
+    if (_disposed) return;
+    if (!state.isPlaying && !_holdPosition) return;
+    _persistTrackIndex(state.trackIndex);
+    _cancelAllTimers();
+    _crossfadeInProgress = false;
+    try {
+      await _primary.pause();
+      await _secondary.stop();
+      await _secondary.setVolume(1.0);
+      await _primary.setVolume(1.0);
+    } catch (_) {}
+    _holdPosition = true;
+    if (!_disposed) {
+      state = state.copyWith(isPlaying: false);
+    }
+  }
+
+  Future<bool> _resumeHeldPosition() async {
+    if (_disposed || !state.userEnabled || !_holdPosition) return false;
+    final startEpoch = ++_playbackEpoch;
+    await AudioSessionCoordinator.claim(AudioSessionOwner.exploreBgm);
+    if (!_isPlaybackStartCurrent(startEpoch)) {
+      AudioSessionCoordinator.release(AudioSessionOwner.exploreBgm);
+      return false;
+    }
+    try {
+      await _primary.setVolume(1.0);
+      await _primary.resume();
+      if (!_isPlaybackStartCurrent(startEpoch)) {
+        await _primary.pause();
+        AudioSessionCoordinator.release(AudioSessionOwner.exploreBgm);
+        return false;
+      }
+      _holdPosition = false;
+      state = state.copyWith(isPlaying: true);
+      _startPositionPoll();
+      return true;
+    } catch (_) {
+      _holdPosition = false;
+      AudioSessionCoordinator.release(AudioSessionOwner.exploreBgm);
+      return false;
+    }
+  }
+
   Future<void> _startPlayback() async {
     if (_disposed || !state.userEnabled) return;
+    if (state.isPlaying) return;
+    if (_holdPosition) {
+      final resumed = await _resumeHeldPosition();
+      if (resumed || _disposed || !state.userEnabled || state.isPlaying) {
+        return;
+      }
+    }
     final startEpoch = ++_playbackEpoch;
     // Sahneyi al — varsa Healing Frequencies otomatik pause olur.
     await AudioSessionCoordinator.claim(AudioSessionOwner.exploreBgm);
@@ -273,6 +357,7 @@ class ExploreBgmNotifier extends StateNotifier<ExploreBgmUiState> {
     }
     _cancelAllTimers();
     _crossfadeInProgress = false;
+    _holdPosition = false;
     _primaryIsA = true;
     await _silenceBoth();
     await _prepareSession();
@@ -452,10 +537,14 @@ class ExploreBgmNotifier extends StateNotifier<ExploreBgmUiState> {
     _positionPoll = null;
     _crossfadeRamp?.cancel();
     _crossfadeRamp = null;
+    _resumeAfterPause?.cancel();
+    _resumeAfterPause = null;
   }
 
   void disposePlayers() {
     if (_disposed) return;
+    _leaveExploreDebounce?.cancel();
+    _leaveExploreDebounce = null;
     _cancelAllTimers();
     _crossfadeInProgress = false;
     AudioSessionCoordinator.unregister(AudioSessionOwner.exploreBgm);

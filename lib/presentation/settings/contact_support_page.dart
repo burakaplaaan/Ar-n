@@ -11,6 +11,7 @@ import '../../core/constants/app_colors.dart';
 import '../../core/theme/arin_shell_background.dart';
 import '../../l10n/app_localizations.dart';
 import 'package:arin/presentation/shared/widgets/arin_loader.dart';
+import 'package:arin/presentation/shared/widgets/arin_top_toast.dart';
 
 class ContactSupportPage extends StatefulWidget {
   const ContactSupportPage({super.key});
@@ -38,14 +39,10 @@ class _ContactSupportPageState extends State<ContactSupportPage> {
     try {
       await Clipboard.setData(const ClipboardData(text: _supportEmail));
       if (!mounted || !showSnack) return;
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(l10n.settingsContactEmailCopied)));
+      showArinTopToast(context, l10n.settingsContactEmailCopied);
     } catch (_) {
       if (!mounted || !showSnack) return;
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(l10n.settingsContactCopyFailed)));
+      showArinTopToast(context, l10n.settingsContactCopyFailed);
     }
   }
 
@@ -53,14 +50,10 @@ class _ContactSupportPageState extends State<ContactSupportPage> {
     try {
       await _copyEmail(l10n, showSnack: false);
       if (!mounted) return;
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(l10n.settingsContactOpenFailed)));
+      showArinTopToast(context, l10n.settingsContactOpenFailed);
     } catch (_) {
       if (!mounted) return;
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(l10n.settingsContactCopyFailed)));
+      showArinTopToast(context, l10n.settingsContactCopyFailed);
     }
   }
 

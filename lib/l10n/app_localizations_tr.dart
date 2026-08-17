@@ -1600,8 +1600,7 @@ class AppLocalizationsTr extends AppLocalizations {
   String get qiblaHubAiTitle => 'İslami Yapay Zeka';
 
   @override
-  String get qiblaHubAiSubtitle =>
-      'Dini sorularına kaynaklı, fetva olmayan yanıtlar — Premium';
+  String get qiblaHubAiSubtitle => 'Aklındaki soruyu sor, İslami sohbet başlat';
 
   @override
   String get islamicAiComingSoonTitle => 'İslami Yapay Zeka';

@@ -330,12 +330,16 @@ class InspirationReelsActionRail extends ConsumerStatefulWidget {
     required this.lightOnImage,
     this.onRemixBackground,
     this.onShare,
+    this.likeIconKey,
+    this.likePulseToken = 0,
   });
 
   final InspirationCardModel card;
   final bool lightOnImage;
   final VoidCallback? onRemixBackground;
   final void Function(Rect? shareAnchor)? onShare;
+  final Key? likeIconKey;
+  final int likePulseToken;
 
   @override
   ConsumerState<InspirationReelsActionRail> createState() =>
@@ -435,6 +439,8 @@ class _InspirationReelsActionRailState
                     _ReelsActionButton(
                       icon: likeIcon,
                       iconColor: likeColor,
+                      iconKey: widget.likeIconKey,
+                      pulseToken: widget.likePulseToken,
                       onPressed: () {
                         likedNotifier.toggle(card.id);
                         HapticFeedback.lightImpact();
@@ -883,6 +889,50 @@ Widget _lineText(
   );
 }
 
+class _LikeIconPulse extends StatefulWidget {
+  const _LikeIconPulse({
+    required this.pulseToken,
+    required this.child,
+  });
+
+  final int pulseToken;
+  final Widget child;
+
+  @override
+  State<_LikeIconPulse> createState() => _LikeIconPulseState();
+}
+
+class _LikeIconPulseState extends State<_LikeIconPulse>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 280),
+  );
+  late final Animation<double> _scale = TweenSequence<double>([
+    TweenSequenceItem(tween: Tween(begin: 1, end: 1.28), weight: 40),
+    TweenSequenceItem(tween: Tween(begin: 1.28, end: 1), weight: 60),
+  ]).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOut));
+
+  @override
+  void didUpdateWidget(covariant _LikeIconPulse oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.pulseToken != oldWidget.pulseToken && widget.pulseToken > 0) {
+      _controller.forward(from: 0);
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ScaleTransition(scale: _scale, child: widget.child);
+  }
+}
+
 class _ReelsActionButton extends StatelessWidget {
   const _ReelsActionButton({
     required this.icon,
@@ -890,6 +940,8 @@ class _ReelsActionButton extends StatelessWidget {
     required this.label,
     this.iconColor,
     this.caption,
+    this.iconKey,
+    this.pulseToken = 0,
   });
 
   final IconData icon;
@@ -897,6 +949,8 @@ class _ReelsActionButton extends StatelessWidget {
   final String label;
   final Color? iconColor;
   final String? caption;
+  final Key? iconKey;
+  final int pulseToken;
 
   @override
   Widget build(BuildContext context) {
@@ -921,17 +975,21 @@ class _ReelsActionButton extends StatelessWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(
-                  icon,
-                  size: 30,
-                  color: c,
-                  shadows: const [
-                    Shadow(
-                      blurRadius: 10,
-                      offset: Offset(0, 1),
-                      color: Color(0x99000000),
-                    ),
-                  ],
+                _LikeIconPulse(
+                  pulseToken: pulseToken,
+                  child: Icon(
+                    icon,
+                    key: iconKey,
+                    size: 30,
+                    color: c,
+                    shadows: const [
+                      Shadow(
+                        blurRadius: 10,
+                        offset: Offset(0, 1),
+                        color: Color(0x99000000),
+                      ),
+                    ],
+                  ),
                 ),
                 if (captionText != null) ...[
                   const SizedBox(height: 2),

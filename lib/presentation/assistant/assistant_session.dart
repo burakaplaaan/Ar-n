@@ -85,28 +85,41 @@ bool assistantReturnStillOnTool({
 }
 
 /// Açık araç hâlâ asistanın gönderdiği yerse sohbete döner.
-bool popToAssistantIfNeeded(BuildContext context) {
+bool popToAssistantIfNeeded(
+  BuildContext context, {
+  GoRouter? router,
+  String? pathOverride,
+}) {
   final container = ProviderScope.containerOf(context, listen: false);
   final tool = container.read(assistantReturnToolProvider);
   if (tool == null || tool.isEmpty) return false;
 
-  var path = '';
-  try {
-    path = GoRouterState.of(context).uri.path;
-  } catch (_) {}
+  String? path = pathOverride;
+  if (path == null || path.isEmpty) {
+    try {
+      path = GoRouterState.of(context).uri.path;
+    } catch (_) {
+      path = null;
+    }
+  }
+  if (path == null || path.isEmpty) {
+    return false;
+  }
+
   final top = _qiblaHubTopName();
   if (!assistantReturnStillOnTool(tool: tool, path: path, qiblaTop: top)) {
     container.read(assistantReturnToolProvider.notifier).state = null;
     return false;
   }
 
+  final go = router ?? GoRouter.maybeOf(context);
+  if (go == null) return false;
+
   container.read(assistantReturnToolProvider.notifier).state = null;
   final hub = qiblaHubNavigatorKey.currentState;
   if (hub != null) {
     hub.popUntil((route) => route.isFirst);
   }
-  final router = GoRouter.maybeOf(context);
-  if (router == null) return false;
-  router.go(AppRoutes.assistant);
+  go.go(AppRoutes.assistant);
   return true;
 }

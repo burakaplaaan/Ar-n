@@ -804,7 +804,6 @@ class _PrayerCirclePageState extends ConsumerState<PrayerCirclePage> {
   }
 
   void _showMessage(String text) {
-    ScaffoldMessenger.of(context).hideCurrentSnackBar();
     showArinTopToast(context, text);
   }
 }

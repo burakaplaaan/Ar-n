@@ -30,6 +30,7 @@ import '../shared/widgets/arin_clock_time_sheet.dart';
 import '../shared/widgets/arin_permission_dialog.dart';
 import 'widgets/permission_gate_card.dart';
 import 'package:arin/presentation/shared/widgets/arin_loader.dart';
+import 'package:arin/presentation/shared/widgets/arin_top_toast.dart';
 
 class NotificationsSettingsPage extends ConsumerStatefulWidget {
   const NotificationsSettingsPage({super.key});
@@ -176,32 +177,20 @@ class _NotificationsSettingsPageState
         if (!status.isGranted) {
           if (!mounted) return;
           setState(() => _backgroundLocationEnabled = false);
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(l10n.settingsBackgroundLocationPermissionDenied),
-            ),
-          );
+          showArinTopToast(context, l10n.settingsBackgroundLocationPermissionDenied);
           return;
         }
         await loc.setLocationUpdatePref(LocationUpdatePref.alwaysUpdate);
         await BackgroundLocationTask.syncSchedule(loc);
         if (!mounted) return;
         setState(() => _backgroundLocationEnabled = true);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(l10n.settingsBackgroundLocationEnabledMessage),
-          ),
-        );
+        showArinTopToast(context, l10n.settingsBackgroundLocationEnabledMessage);
       } else {
         await loc.setLocationUpdatePref(LocationUpdatePref.ask);
         await BackgroundLocationTask.syncSchedule(loc);
         if (!mounted) return;
         setState(() => _backgroundLocationEnabled = false);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(l10n.settingsBackgroundLocationDisabledMessage),
-          ),
-        );
+        showArinTopToast(context, l10n.settingsBackgroundLocationDisabledMessage);
       }
     } finally {
       if (mounted) setState(() => _backgroundLocationBusy = false);

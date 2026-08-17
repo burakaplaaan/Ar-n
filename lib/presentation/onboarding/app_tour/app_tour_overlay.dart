@@ -160,8 +160,7 @@ class _AppTourOverlayState extends ConsumerState<AppTourOverlay> {
         } catch (_) {}
       }
 
-      final key = AppTourKeys.of(step.id!);
-      final ctx = key.currentContext;
+      final ctx = AppTourKeys.contextOf(step.id!);
       if (ctx != null && ctx.mounted && step.scroll) {
         try {
           await Scrollable.ensureVisible(

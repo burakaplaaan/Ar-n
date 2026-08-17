@@ -22,6 +22,7 @@ import '../shared/widgets/commitment_seal_widget.dart';
 import 'widgets/commitment_example_chips.dart';
 import 'widgets/commitment_input_tokens.dart';
 import 'package:arin/presentation/shared/widgets/arin_loader.dart';
+import 'package:arin/presentation/shared/widgets/arin_top_toast.dart';
 
 class QuitOnboardingFlowPage extends ConsumerStatefulWidget {
   const QuitOnboardingFlowPage({super.key, required this.habitId});
@@ -129,11 +130,7 @@ class _QuitOnboardingFlowPageState
     if (_pageIndex == 3) {
       final t = _commitment.text.trim();
       if (t.length < 8) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(l10n.quitOnboardingCommitmentMinLengthError),
-          ),
-        );
+        showArinTopToast(context, l10n.quitOnboardingCommitmentMinLengthError);
         return;
       }
     }
