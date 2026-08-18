@@ -11,13 +11,31 @@ bool shouldShowLocationDisclosure({
   return promptIfNeeded && permissionDenied && !sessionDeclined;
 }
 
-/// FCM sistem diyaloğu onboarding bitmeden açılmamalı; aksi halde
-/// anket adımıyla üst üste biner.
+/// İlk-kurulum tanıtımı bitene kadar sistem izin kutuları spotlight ile
+/// çakışmasın. Mevcut kurulumlarda pending yoksa erteleme yok.
+const String kAppTourPendingKey = 'app_tour_pending';
+const String kAppTourCompletedKey = 'app_tour_completed';
+
+bool shouldDeferSystemPromptsForAppTour({
+  required bool tourPending,
+  required bool tourCompleted,
+}) {
+  return tourPending && !tourCompleted;
+}
+
+/// FCM sistem diyaloğu açılışta veya tanıtım sonrası otomatik açılmamalı.
+/// İzin ritim ekranında veya ayet bildirimi açılırken istenir.
 bool shouldAutoRequestBroadcastPermission({
   required bool onboardingCompleted,
   required bool promptAlreadyHandled,
+  bool appTourBlockingPrompts = false,
 }) {
-  return onboardingCompleted && !promptAlreadyHandled;
+  if (!onboardingCompleted ||
+      promptAlreadyHandled ||
+      appTourBlockingPrompts) {
+    return false;
+  }
+  return false;
 }
 
 String calendarDateIso(DateTime now) {

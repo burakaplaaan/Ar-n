@@ -21,7 +21,8 @@ abstract final class AppTourLayout {
   static const double holeInflate = 8;
   static const double holeRadius = 16;
   static const double minTooltipSpace = 120;
-  static const double ctaBlockHeight = 88;
+  static const double ctaBlockHeight = 62;
+  static const double skipTopClearance = 48;
 
   static AppTourTooltipSide tooltipSide({
     required Rect hole,

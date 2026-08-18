@@ -110,6 +110,7 @@
   "homeRetryAction": "Retry",
   "homeChangeDistrictAction": "Change district",
   "homeOpenSettingsAction": "Open settings",
+  "homeRequestLocationAction": "Allow location",
   "homeRemainingPassed": "passed",
   "homeRemainingFewSeconds": "a few seconds",
   "homeRemainingHoursMinutes": "{hours} h {minutes} min",
@@ -1710,6 +1711,248 @@
   "onboardingSlide4Title": "Arin: together in one app",
   "onboardingSlide4Subtitle": "From inspiration to daily habits, from prayer alerts to purification counters, your journey is here. If you are ready, let's begin together — you walk, we remind and accompany.",
   "onboardingGetStarted": "Let's start",
+  "onboardingStart": "Start",
+  "onboardingWelcomeTitle": "Welcome.",
+  "onboardingWelcomeBody": "Let verses, prayers, and prayer reminders stay with you through the day.",
+  "onboardingLandingVerseArabic": "قَدْ أَفْلَحَ مَن زَكَّاهَا",
+  "onboardingLandingVerseTranslation": "Successful is the one who purifies it.",
+  "onboardingLandingVerseSource": "Ash-Shams 9",
+  "onboardingWelcomeWidgetVerseArabic": "أَلَا بِذِكْرِ اللَّهِ تَطْمَئِنُّ الْقُلُوبُ",
+  "onboardingWelcomeWidgetVerseTranslation": "Surely in the remembrance of Allah do hearts find rest.",
+  "onboardingWelcomeWidgetVerseSource": "Ar-Ra'd 13:28",
+  "onboardingLanguagePickerTitle": "Language",
+  "onboardingContinue": "Continue",
+  "onboardingStoryBody": "Just take a calm breath.\n\nArın will stay with you through the day with short reminders from the Qur'an.\n\nA small verse pause will greet you every time you open your phone.\n\nIf you are ready, let's begin.",
+  "onboardingNameSubtitle": "So verse and reminder texts feel more personal.",
+  "onboardingNameHint": "Your name",
+  "onboardingGreetingTitle": "Glad to meet you, {name}.",
+  "@onboardingGreetingTitle": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "onboardingGreetingBody": "Downloading this app today is not a coincidence.\n\nArın will stay with you from here: a verse, a prayer time, a reminder.\n\nLet us get to know you a little. Answer as it comes from within.",
+  "onboardingIntentTitle": "{name}, what brought you here?",
+  "@onboardingIntentTitle": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "onboardingIntentSubtitle": "We will bring reminders closer to this intention.",
+  "onboardingIntentLock": "See a verse on the lock screen",
+  "onboardingIntentFaith": "Keep my faith fresh",
+  "onboardingIntentCalm": "Quiet my heart",
+  "onboardingIntentDaily": "Begin the day with a verse",
+  "onboardingIntentPrayer": "Not miss prayer times",
+  "onboardingHeartTitle": "{name}, how close to Allah do you feel today?",
+  "@onboardingHeartTitle": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "onboardingHeartHint": "Touch or drag the heart.",
+  "onboardingHeartLabelFar": "I feel distant",
+  "onboardingHeartLabelSeeking": "I am seeking the way",
+  "onboardingHeartLabelHolding": "I am keeping the bond",
+  "onboardingHeartLabelNear": "I am standing close",
+  "onboardingHeartLabelFull": "My heart is full",
+  "onboardingHoldVerseArabic": "وَإِذَا سَأَلَكَ عِبَادِي عَنِّي فَإِنِّي قَرِيبٌ",
+  "onboardingHoldVerseTranslation": "When My servants ask you about Me, I am near.",
+  "onboardingHoldVerseSource": "Al-Baqarah 186",
+  "onboardingHoldFooter": "{name}, this is only a beginning...",
+  "@onboardingHoldFooter": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "onboardingStruggleTitle": "{name}, what is weighing on your heart most lately?",
+  "@onboardingStruggleTitle": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "onboardingStruggleSubtitle": "We will soften reminders around this weight.",
+  "onboardingStruggleAnxiety": "Anxiety",
+  "onboardingStruggleDelay": "Procrastination",
+  "onboardingStruggleLonely": "Loneliness",
+  "onboardingStruggleImpatience": "Impatience",
+  "onboardingStruggleRegret": "Regret",
+  "onboardingNoteSubtitle": "A short sentence is enough. Only you can see this answer.",
+  "onboardingNoteTitleAnxiety": "{name}, is there something you want to put into words about your anxiety?",
+  "@onboardingNoteTitleAnxiety": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "onboardingNoteTitleDelay": "{name}, is there something you keep putting off?",
+  "@onboardingNoteTitleDelay": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "onboardingNoteTitleLonely": "{name}, is there something you want to put into words about your loneliness?",
+  "@onboardingNoteTitleLonely": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "onboardingNoteTitleImpatience": "{name}, is there something you want to put into words about your impatience?",
+  "@onboardingNoteTitleImpatience": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "onboardingNoteTitleRegret": "{name}, is there something you want to put into words about your regret?",
+  "@onboardingNoteTitleRegret": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "onboardingNoteHintAnxiety": "E.g. Worry about the future keeps me awake at night.",
+  "onboardingNoteHintDelay": "E.g. I keep leaving the work I meant to do until tomorrow.",
+  "onboardingNoteHintLonely": "E.g. Even in a crowd I feel empty inside.",
+  "onboardingNoteHintImpatience": "E.g. When things move slowly, my chest tightens.",
+  "onboardingNoteHintRegret": "E.g. A word from the past still sits in my heart.",
+  "onboardingNoteSuggestionAnxiety": "I want to leave my anxiety with Allah and settle my heart.",
+  "onboardingNoteSuggestionDelay": "I want to do what I intended without putting it off.",
+  "onboardingNoteSuggestionLonely": "I want to remember that my Lord is with me even when I am alone.",
+  "onboardingNoteSuggestionImpatience": "I want to walk with patience, without rushing.",
+  "onboardingNoteSuggestionRegret": "I want to set my regret down through repentance.",
+  "onboardingHeardTitle": "We heard you.",
+  "onboardingHeardVerse": "Indeed, with hardship comes ease.",
+  "onboardingHeardSource": "— Ash-Sharh, 94:6",
+  "onboardingToneTitle": "{name}, how weary has your heart felt lately?",
+  "@onboardingToneTitle": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "onboardingToneSubtitle": "Pour your heart out.",
+  "onboardingToneCalm": "Calm",
+  "onboardingToneLight": "Light",
+  "onboardingToneMid": "Medium",
+  "onboardingToneHeavy": "Heavy",
+  "onboardingToneVeryHeavy": "Very heavy",
+  "onboardingToneValue": "{value} / 5",
+  "@onboardingToneValue": {
+    "placeholders": {
+      "value": { "type": "int" }
+    }
+  },
+  "onboardingTurnTitle": "{name}, when hard days come...",
+  "@onboardingTurnTitle": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "onboardingTurnSubtitle": "Do you turn to Allah?",
+  "onboardingTurnAlways": "In every tightness I return to Him",
+  "onboardingTurnSometimes": "I turn sometimes",
+  "onboardingTurnRarely": "Rarely, but I want more",
+  "onboardingTurnStarting": "I am new on this path",
+  "onboardingShapeTitle": "We are weaving this to your heart",
+  "onboardingShapeSubtitle": "Not more screens; a short pause at the right moment.",
+  "onboardingShapeCard1Title": "Verses close to you",
+  "onboardingShapeCard1Body": "Content rises according to the weight you chose.",
+  "onboardingShapeCard2Title": "Soft reminders",
+  "onboardingShapeCard2Body": "The language stays calm, short, and aimed at the heart.",
+  "onboardingShapeCard3Title": "Around the Quran",
+  "onboardingShapeCard3Body": "The day walks the same line as verse and remembrance.",
+  "onboardingPrayerTitle": "{name}, how would you describe your prayer rhythm?",
+  "@onboardingPrayerTitle": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "onboardingPrayerSubtitle": "Let us pick a starting tempo that fits you.",
+  "onboardingPrayerRegular": "I keep my rhythm",
+  "onboardingPrayerOccasional": "I catch it now and then",
+  "onboardingPrayerStruggling": "I struggle when I slip",
+  "onboardingPrayerStarting": "I am only just settling in",
+  "onboardingPrayerBeginHere": "I want to start from this screen",
+  "onboardingWaswasaTitle": "{name}, what do you do when doubt or whispers come?",
+  "@onboardingWaswasaTitle": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "onboardingWaswasaSubtitle": "This answer shapes how we stand beside you.",
+  "onboardingWaswasaPray": "I meet it with prayer",
+  "onboardingWaswasaRead": "I read and try to understand",
+  "onboardingWaswasaAsk": "I open it to someone I trust",
+  "onboardingWaswasaCarry": "I carry it quietly inside",
+  "onboardingPathVerseArabic": "وَمَن يَتَوَكَّلْ عَلَى اللَّهِ فَهُوَ حَسْبُهُ",
+  "onboardingPathVerseTranslation": "Whoever puts their trust in Allah, He is sufficient for them.",
+  "onboardingPathVerseSource": "At-Talaq 65:3",
+  "onboardingPathVerseFooter": "{name}, let the Quran rest in your heart.",
+  "@onboardingPathVerseFooter": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "onboardingPathTitle": "Your daily line is beginning to appear",
+  "onboardingPathSubtitle": "We will join your rhythm, heart-state, and intention in one simple day.",
+  "onboardingPathCard1Title": "Your need first",
+  "onboardingPathCard1Body": "Verses that fit you stay at the top of the list.",
+  "onboardingPathCard2Title": "Your own tempo",
+  "onboardingPathCard2Body": "The flow breathes with how you actually read.",
+  "onboardingPathCard3Title": "In front of your eyes",
+  "onboardingPathCard3Body": "The lock screen becomes a short pause scattered through the day.",
+  "onboardingRhythmTitle": "Arın settles quietly into the day",
+  "onboardingRhythmSubtitle": "The aim is not more time on screen; a short reminder at the right moment. We will ask for notification permission for this.",
+  "onboardingRhythmFeaturedTitle": "The day's verse reminder",
+  "onboardingRhythmFeaturedBody": "When you continue, we will ask for notification permission. You can change the hours and rhythm from settings whenever you want.",
+  "onboardingRhythmCard1Title": "A short pause",
+  "onboardingRhythmCard1Body": "Verses appear calmly and briefly through the day.",
+  "onboardingRhythmCard2Title": "A breath on the lock screen",
+  "onboardingRhythmCard2Body": "Each glance at the phone holds a small reminder.",
+  "onboardingRhythmCard3Title": "Staying on the same line",
+  "onboardingRhythmCard3Body": "Prayer, remembrance, and reflection follow one another.",
+  "onboardingLocationTitle": "Location for prayer times",
+  "onboardingLocationSubtitle": "We kindly ask for your location so we can show imsak, noon, and evening for your city. Location is used only for prayer times and qibla.",
+  "onboardingLocationFeaturedTitle": "Times for where you are",
+  "onboardingLocationFeaturedBody": "When you continue, we will ask for location permission. You can change this later from settings.",
+  "onboardingLocationCard1Title": "Prayer times",
+  "onboardingLocationCard1Body": "Daily times stay fresh for your city.",
+  "onboardingLocationCard2Title": "Qibla direction",
+  "onboardingLocationCard2Body": "The same permission is enough to calculate the direction.",
+  "onboardingLocationCard3Title": "It stays with you",
+  "onboardingLocationCard3Body": "Your location is not shared for any other purpose.",
+  "onboardingPrepareTitle": "Final settings are being made",
+  "onboardingPrepareSubtitle": "Each part is being prepared one by one.",
+  "onboardingPrepareReadyTitle": "Your experience is ready",
+  "onboardingPrepareReadySubtitle": "In the last step you will say Amen to a short prayer.",
+  "onboardingPrepareStatus": "Preparing",
+  "onboardingPrepareYes": "Yes",
+  "onboardingPrepareNo": "No",
+  "onboardingPrepareBar1Title": "{name}, your verse flow is being woven",
+  "@onboardingPrepareBar1Title": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "onboardingPrepareBar1Body": "Language and emphasis are chosen from your answers.",
+  "onboardingPrepareBar2Title": "Lock screen view is being prepared",
+  "onboardingPrepareBar2Body": "The clock and verse stay simple.",
+  "onboardingPrepareBar3Title": "Adjusting so we can reach more people",
+  "onboardingPrepareBar3Body": "Discovery sources are measured privately.",
+  "onboardingPrepareBar4Title": "Shortcuts are being placed",
+  "onboardingPrepareBar4Body": "Tasbih, qibla, prayer, and conversation are being readied.",
+  "onboardingPrepareAskLock": "Shall we use a simple verse view on the lock screen?",
+  "onboardingPrepareAskVerses": "Shall we put verses first according to your answers?",
+  "onboardingPrepareAskShortcuts": "Shall we lift worship shortcuts in the main flow?",
+  "onboardingDuaTitle": "A short prayer",
+  "onboardingDuaBody": "O Allah, grant Your servant {name} goodness, blessing, health, peace, wisdom, and steadfastness. Keep their heart alive with the Quran, and their steps firm in what is good. Let Your word stay close to them in every season.",
+  "@onboardingDuaBody": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "onboardingDuaVerseArabic": "رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً",
+  "onboardingDuaVerseTranslation": "Our Lord, give us good in this world and good in the Hereafter.",
+  "onboardingDuaVerseSource": "Al-Baqarah 2:201",
+  "onboardingDuaAmin": "Amen.",
+  "onboardingDuaHoldHint": "Hold down",
   "onboardingSkip": "Skip",
   "onboardingNext": "Next",
   "surveyNameTitle": "How should we address you?",

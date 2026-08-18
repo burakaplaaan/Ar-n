@@ -1,5 +1,7 @@
+import 'package:arin/data/services/feature_permission_gate.dart';
 import 'package:arin/data/services/startup_permission_policy.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:geolocator/geolocator.dart';
 
 void main() {
   test('location disclosure is shown only once per session', () {
@@ -37,7 +39,31 @@ void main() {
     );
   });
 
-  test('FCM auto-prompt waits for onboarding and respects skip', () {
+  test('app tour pending defers colliding system prompts', () {
+    expect(
+      shouldDeferSystemPromptsForAppTour(
+        tourPending: true,
+        tourCompleted: false,
+      ),
+      isTrue,
+    );
+    expect(
+      shouldDeferSystemPromptsForAppTour(
+        tourPending: false,
+        tourCompleted: false,
+      ),
+      isFalse,
+    );
+    expect(
+      shouldDeferSystemPromptsForAppTour(
+        tourPending: true,
+        tourCompleted: true,
+      ),
+      isFalse,
+    );
+  });
+
+  test('FCM auto-prompt stays off so spotlight and feature screens own the ask', () {
     expect(
       shouldAutoRequestBroadcastPermission(
         onboardingCompleted: false,
@@ -50,7 +76,7 @@ void main() {
         onboardingCompleted: true,
         promptAlreadyHandled: false,
       ),
-      isTrue,
+      isFalse,
     );
     expect(
       shouldAutoRequestBroadcastPermission(
@@ -59,6 +85,21 @@ void main() {
       ),
       isFalse,
     );
+    expect(
+      shouldAutoRequestBroadcastPermission(
+        onboardingCompleted: true,
+        promptAlreadyHandled: false,
+        appTourBlockingPrompts: true,
+      ),
+      isFalse,
+    );
+  });
+
+  test('granted location is not asked again', () {
+    expect(locationPermissionGranted(LocationPermission.always), isTrue);
+    expect(locationPermissionGranted(LocationPermission.whileInUse), isTrue);
+    expect(locationPermissionGranted(LocationPermission.denied), isFalse);
+    expect(locationPermissionGranted(LocationPermission.deniedForever), isFalse);
   });
 
   test('resume does not wipe healthy same-day prayer times', () {

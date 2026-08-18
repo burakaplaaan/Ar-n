@@ -290,6 +290,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get homeOpenSettingsAction => 'Open settings';
 
   @override
+  String get homeRequestLocationAction => 'Allow location';
+
+  @override
   String get homeRemainingPassed => 'passed';
 
   @override
@@ -3315,6 +3318,553 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get onboardingGetStarted => 'Let\'s start';
+
+  @override
+  String get onboardingStart => 'Start';
+
+  @override
+  String get onboardingWelcomeTitle => 'Welcome.';
+
+  @override
+  String get onboardingWelcomeBody =>
+      'Let verses, prayers, and prayer reminders stay with you through the day.';
+
+  @override
+  String get onboardingLandingVerseArabic => 'قَدْ أَفْلَحَ مَن زَكَّاهَا';
+
+  @override
+  String get onboardingLandingVerseTranslation =>
+      'Successful is the one who purifies it.';
+
+  @override
+  String get onboardingLandingVerseSource => 'Ash-Shams 9';
+
+  @override
+  String get onboardingWelcomeWidgetVerseArabic =>
+      'أَلَا بِذِكْرِ اللَّهِ تَطْمَئِنُّ الْقُلُوبُ';
+
+  @override
+  String get onboardingWelcomeWidgetVerseTranslation =>
+      'Surely in the remembrance of Allah do hearts find rest.';
+
+  @override
+  String get onboardingWelcomeWidgetVerseSource => 'Ar-Ra\'d 13:28';
+
+  @override
+  String get onboardingLanguagePickerTitle => 'Language';
+
+  @override
+  String get onboardingContinue => 'Continue';
+
+  @override
+  String get onboardingStoryBody =>
+      'Just take a calm breath.\n\nArın will stay with you through the day with short reminders from the Qur\'an.\n\nA small verse pause will greet you every time you open your phone.\n\nIf you are ready, let\'s begin.';
+
+  @override
+  String get onboardingNameSubtitle =>
+      'So verse and reminder texts feel more personal.';
+
+  @override
+  String get onboardingNameHint => 'Your name';
+
+  @override
+  String onboardingGreetingTitle(String name) {
+    return 'Glad to meet you, $name.';
+  }
+
+  @override
+  String get onboardingGreetingBody =>
+      'Downloading this app today is not a coincidence.\n\nArın will stay with you from here: a verse, a prayer time, a reminder.\n\nLet us get to know you a little. Answer as it comes from within.';
+
+  @override
+  String onboardingIntentTitle(String name) {
+    return '$name, what brought you here?';
+  }
+
+  @override
+  String get onboardingIntentSubtitle =>
+      'We will bring reminders closer to this intention.';
+
+  @override
+  String get onboardingIntentLock => 'See a verse on the lock screen';
+
+  @override
+  String get onboardingIntentFaith => 'Keep my faith fresh';
+
+  @override
+  String get onboardingIntentCalm => 'Quiet my heart';
+
+  @override
+  String get onboardingIntentDaily => 'Begin the day with a verse';
+
+  @override
+  String get onboardingIntentPrayer => 'Not miss prayer times';
+
+  @override
+  String onboardingHeartTitle(String name) {
+    return '$name, how close to Allah do you feel today?';
+  }
+
+  @override
+  String get onboardingHeartHint => 'Touch or drag the heart.';
+
+  @override
+  String get onboardingHeartLabelFar => 'I feel distant';
+
+  @override
+  String get onboardingHeartLabelSeeking => 'I am seeking the way';
+
+  @override
+  String get onboardingHeartLabelHolding => 'I am keeping the bond';
+
+  @override
+  String get onboardingHeartLabelNear => 'I am standing close';
+
+  @override
+  String get onboardingHeartLabelFull => 'My heart is full';
+
+  @override
+  String get onboardingHoldVerseArabic =>
+      'وَإِذَا سَأَلَكَ عِبَادِي عَنِّي فَإِنِّي قَرِيبٌ';
+
+  @override
+  String get onboardingHoldVerseTranslation =>
+      'When My servants ask you about Me, I am near.';
+
+  @override
+  String get onboardingHoldVerseSource => 'Al-Baqarah 186';
+
+  @override
+  String onboardingHoldFooter(String name) {
+    return '$name, this is only a beginning...';
+  }
+
+  @override
+  String onboardingStruggleTitle(String name) {
+    return '$name, what is weighing on your heart most lately?';
+  }
+
+  @override
+  String get onboardingStruggleSubtitle =>
+      'We will soften reminders around this weight.';
+
+  @override
+  String get onboardingStruggleAnxiety => 'Anxiety';
+
+  @override
+  String get onboardingStruggleDelay => 'Procrastination';
+
+  @override
+  String get onboardingStruggleLonely => 'Loneliness';
+
+  @override
+  String get onboardingStruggleImpatience => 'Impatience';
+
+  @override
+  String get onboardingStruggleRegret => 'Regret';
+
+  @override
+  String get onboardingNoteSubtitle =>
+      'A short sentence is enough. Only you can see this answer.';
+
+  @override
+  String onboardingNoteTitleAnxiety(String name) {
+    return '$name, is there something you want to put into words about your anxiety?';
+  }
+
+  @override
+  String onboardingNoteTitleDelay(String name) {
+    return '$name, is there something you keep putting off?';
+  }
+
+  @override
+  String onboardingNoteTitleLonely(String name) {
+    return '$name, is there something you want to put into words about your loneliness?';
+  }
+
+  @override
+  String onboardingNoteTitleImpatience(String name) {
+    return '$name, is there something you want to put into words about your impatience?';
+  }
+
+  @override
+  String onboardingNoteTitleRegret(String name) {
+    return '$name, is there something you want to put into words about your regret?';
+  }
+
+  @override
+  String get onboardingNoteHintAnxiety =>
+      'E.g. Worry about the future keeps me awake at night.';
+
+  @override
+  String get onboardingNoteHintDelay =>
+      'E.g. I keep leaving the work I meant to do until tomorrow.';
+
+  @override
+  String get onboardingNoteHintLonely =>
+      'E.g. Even in a crowd I feel empty inside.';
+
+  @override
+  String get onboardingNoteHintImpatience =>
+      'E.g. When things move slowly, my chest tightens.';
+
+  @override
+  String get onboardingNoteHintRegret =>
+      'E.g. A word from the past still sits in my heart.';
+
+  @override
+  String get onboardingNoteSuggestionAnxiety =>
+      'I want to leave my anxiety with Allah and settle my heart.';
+
+  @override
+  String get onboardingNoteSuggestionDelay =>
+      'I want to do what I intended without putting it off.';
+
+  @override
+  String get onboardingNoteSuggestionLonely =>
+      'I want to remember that my Lord is with me even when I am alone.';
+
+  @override
+  String get onboardingNoteSuggestionImpatience =>
+      'I want to walk with patience, without rushing.';
+
+  @override
+  String get onboardingNoteSuggestionRegret =>
+      'I want to set my regret down through repentance.';
+
+  @override
+  String get onboardingHeardTitle => 'We heard you.';
+
+  @override
+  String get onboardingHeardVerse => 'Indeed, with hardship comes ease.';
+
+  @override
+  String get onboardingHeardSource => '— Ash-Sharh, 94:6';
+
+  @override
+  String onboardingToneTitle(String name) {
+    return '$name, how weary has your heart felt lately?';
+  }
+
+  @override
+  String get onboardingToneSubtitle => 'Pour your heart out.';
+
+  @override
+  String get onboardingToneCalm => 'Calm';
+
+  @override
+  String get onboardingToneLight => 'Light';
+
+  @override
+  String get onboardingToneMid => 'Medium';
+
+  @override
+  String get onboardingToneHeavy => 'Heavy';
+
+  @override
+  String get onboardingToneVeryHeavy => 'Very heavy';
+
+  @override
+  String onboardingToneValue(int value) {
+    return '$value / 5';
+  }
+
+  @override
+  String onboardingTurnTitle(String name) {
+    return '$name, when hard days come...';
+  }
+
+  @override
+  String get onboardingTurnSubtitle => 'Do you turn to Allah?';
+
+  @override
+  String get onboardingTurnAlways => 'In every tightness I return to Him';
+
+  @override
+  String get onboardingTurnSometimes => 'I turn sometimes';
+
+  @override
+  String get onboardingTurnRarely => 'Rarely, but I want more';
+
+  @override
+  String get onboardingTurnStarting => 'I am new on this path';
+
+  @override
+  String get onboardingShapeTitle => 'We are weaving this to your heart';
+
+  @override
+  String get onboardingShapeSubtitle =>
+      'Not more screens; a short pause at the right moment.';
+
+  @override
+  String get onboardingShapeCard1Title => 'Verses close to you';
+
+  @override
+  String get onboardingShapeCard1Body =>
+      'Content rises according to the weight you chose.';
+
+  @override
+  String get onboardingShapeCard2Title => 'Soft reminders';
+
+  @override
+  String get onboardingShapeCard2Body =>
+      'The language stays calm, short, and aimed at the heart.';
+
+  @override
+  String get onboardingShapeCard3Title => 'Around the Quran';
+
+  @override
+  String get onboardingShapeCard3Body =>
+      'The day walks the same line as verse and remembrance.';
+
+  @override
+  String onboardingPrayerTitle(String name) {
+    return '$name, how would you describe your prayer rhythm?';
+  }
+
+  @override
+  String get onboardingPrayerSubtitle =>
+      'Let us pick a starting tempo that fits you.';
+
+  @override
+  String get onboardingPrayerRegular => 'I keep my rhythm';
+
+  @override
+  String get onboardingPrayerOccasional => 'I catch it now and then';
+
+  @override
+  String get onboardingPrayerStruggling => 'I struggle when I slip';
+
+  @override
+  String get onboardingPrayerStarting => 'I am only just settling in';
+
+  @override
+  String get onboardingPrayerBeginHere => 'I want to start from this screen';
+
+  @override
+  String onboardingWaswasaTitle(String name) {
+    return '$name, what do you do when doubt or whispers come?';
+  }
+
+  @override
+  String get onboardingWaswasaSubtitle =>
+      'This answer shapes how we stand beside you.';
+
+  @override
+  String get onboardingWaswasaPray => 'I meet it with prayer';
+
+  @override
+  String get onboardingWaswasaRead => 'I read and try to understand';
+
+  @override
+  String get onboardingWaswasaAsk => 'I open it to someone I trust';
+
+  @override
+  String get onboardingWaswasaCarry => 'I carry it quietly inside';
+
+  @override
+  String get onboardingPathVerseArabic =>
+      'وَمَن يَتَوَكَّلْ عَلَى اللَّهِ فَهُوَ حَسْبُهُ';
+
+  @override
+  String get onboardingPathVerseTranslation =>
+      'Whoever puts their trust in Allah, He is sufficient for them.';
+
+  @override
+  String get onboardingPathVerseSource => 'At-Talaq 65:3';
+
+  @override
+  String onboardingPathVerseFooter(String name) {
+    return '$name, let the Quran rest in your heart.';
+  }
+
+  @override
+  String get onboardingPathTitle => 'Your daily line is beginning to appear';
+
+  @override
+  String get onboardingPathSubtitle =>
+      'We will join your rhythm, heart-state, and intention in one simple day.';
+
+  @override
+  String get onboardingPathCard1Title => 'Your need first';
+
+  @override
+  String get onboardingPathCard1Body =>
+      'Verses that fit you stay at the top of the list.';
+
+  @override
+  String get onboardingPathCard2Title => 'Your own tempo';
+
+  @override
+  String get onboardingPathCard2Body =>
+      'The flow breathes with how you actually read.';
+
+  @override
+  String get onboardingPathCard3Title => 'In front of your eyes';
+
+  @override
+  String get onboardingPathCard3Body =>
+      'The lock screen becomes a short pause scattered through the day.';
+
+  @override
+  String get onboardingRhythmTitle => 'Arın settles quietly into the day';
+
+  @override
+  String get onboardingRhythmSubtitle =>
+      'The aim is not more time on screen; a short reminder at the right moment. We will ask for notification permission for this.';
+
+  @override
+  String get onboardingRhythmFeaturedTitle => 'The day\'s verse reminder';
+
+  @override
+  String get onboardingRhythmFeaturedBody =>
+      'When you continue, we will ask for notification permission. You can change the hours and rhythm from settings whenever you want.';
+
+  @override
+  String get onboardingRhythmCard1Title => 'A short pause';
+
+  @override
+  String get onboardingRhythmCard1Body =>
+      'Verses appear calmly and briefly through the day.';
+
+  @override
+  String get onboardingRhythmCard2Title => 'A breath on the lock screen';
+
+  @override
+  String get onboardingRhythmCard2Body =>
+      'Each glance at the phone holds a small reminder.';
+
+  @override
+  String get onboardingRhythmCard3Title => 'Staying on the same line';
+
+  @override
+  String get onboardingRhythmCard3Body =>
+      'Prayer, remembrance, and reflection follow one another.';
+
+  @override
+  String get onboardingLocationTitle => 'Location for prayer times';
+
+  @override
+  String get onboardingLocationSubtitle =>
+      'We kindly ask for your location so we can show imsak, noon, and evening for your city. Location is used only for prayer times and qibla.';
+
+  @override
+  String get onboardingLocationFeaturedTitle => 'Times for where you are';
+
+  @override
+  String get onboardingLocationFeaturedBody =>
+      'When you continue, we will ask for location permission. You can change this later from settings.';
+
+  @override
+  String get onboardingLocationCard1Title => 'Prayer times';
+
+  @override
+  String get onboardingLocationCard1Body =>
+      'Daily times stay fresh for your city.';
+
+  @override
+  String get onboardingLocationCard2Title => 'Qibla direction';
+
+  @override
+  String get onboardingLocationCard2Body =>
+      'The same permission is enough to calculate the direction.';
+
+  @override
+  String get onboardingLocationCard3Title => 'It stays with you';
+
+  @override
+  String get onboardingLocationCard3Body =>
+      'Your location is not shared for any other purpose.';
+
+  @override
+  String get onboardingPrepareTitle => 'Final settings are being made';
+
+  @override
+  String get onboardingPrepareSubtitle =>
+      'Each part is being prepared one by one.';
+
+  @override
+  String get onboardingPrepareReadyTitle => 'Your experience is ready';
+
+  @override
+  String get onboardingPrepareReadySubtitle =>
+      'In the last step you will say Amen to a short prayer.';
+
+  @override
+  String get onboardingPrepareStatus => 'Preparing';
+
+  @override
+  String get onboardingPrepareYes => 'Yes';
+
+  @override
+  String get onboardingPrepareNo => 'No';
+
+  @override
+  String onboardingPrepareBar1Title(String name) {
+    return '$name, your verse flow is being woven';
+  }
+
+  @override
+  String get onboardingPrepareBar1Body =>
+      'Language and emphasis are chosen from your answers.';
+
+  @override
+  String get onboardingPrepareBar2Title => 'Lock screen view is being prepared';
+
+  @override
+  String get onboardingPrepareBar2Body => 'The clock and verse stay simple.';
+
+  @override
+  String get onboardingPrepareBar3Title =>
+      'Adjusting so we can reach more people';
+
+  @override
+  String get onboardingPrepareBar3Body =>
+      'Discovery sources are measured privately.';
+
+  @override
+  String get onboardingPrepareBar4Title => 'Shortcuts are being placed';
+
+  @override
+  String get onboardingPrepareBar4Body =>
+      'Tasbih, qibla, prayer, and conversation are being readied.';
+
+  @override
+  String get onboardingPrepareAskLock =>
+      'Shall we use a simple verse view on the lock screen?';
+
+  @override
+  String get onboardingPrepareAskVerses =>
+      'Shall we put verses first according to your answers?';
+
+  @override
+  String get onboardingPrepareAskShortcuts =>
+      'Shall we lift worship shortcuts in the main flow?';
+
+  @override
+  String get onboardingDuaTitle => 'A short prayer';
+
+  @override
+  String onboardingDuaBody(String name) {
+    return 'O Allah, grant Your servant $name goodness, blessing, health, peace, wisdom, and steadfastness. Keep their heart alive with the Quran, and their steps firm in what is good. Let Your word stay close to them in every season.';
+  }
+
+  @override
+  String get onboardingDuaVerseArabic =>
+      'رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً';
+
+  @override
+  String get onboardingDuaVerseTranslation =>
+      'Our Lord, give us good in this world and good in the Hereafter.';
+
+  @override
+  String get onboardingDuaVerseSource => 'Al-Baqarah 2:201';
+
+  @override
+  String get onboardingDuaAmin => 'Amen.';
+
+  @override
+  String get onboardingDuaHoldHint => 'Hold down';
 
   @override
   String get onboardingSkip => 'Skip';

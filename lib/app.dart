@@ -371,6 +371,13 @@ class _ArinAppState extends ConsumerState<ArinApp> with WidgetsBindingObserver {
     unawaited(_runForegroundMaintenance(initial: false));
   }
 
+  Future<void> _runDeferredPromptsAfterAppTour() async {
+    unawaited(MetaAppEvents.retryPendingTrackingAuthorizationIfNeeded());
+    if (isFirebaseReady) {
+      unawaited(FcmTokenService.requestBroadcastPermissionIfNeeded());
+    }
+  }
+
   bool _isOnboardingCompletedForMaintenance() {
     final prefs = ref.read(sharedPreferencesProvider);
     final flag = prefs.getBool('onboarding_completed');
@@ -436,6 +443,12 @@ class _ArinAppState extends ConsumerState<ArinApp> with WidgetsBindingObserver {
       final wasDone = previous?.onboardingCompleted == true;
       if (!wasDone && next.onboardingCompleted) {
         unawaited(_runPostOnboardingStartup());
+      }
+    });
+
+    ref.listen(appTourControllerProvider, (previous, next) {
+      if (previous?.active == true && !next.active) {
+        unawaited(_runDeferredPromptsAfterAppTour());
       }
     });
 

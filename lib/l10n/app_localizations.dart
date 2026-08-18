@@ -604,6 +604,12 @@ abstract class AppLocalizations {
   /// **'Ayarları aç'**
   String get homeOpenSettingsAction;
 
+  /// No description provided for @homeRequestLocationAction.
+  ///
+  /// In tr, this message translates to:
+  /// **'Konum izni ver'**
+  String get homeRequestLocationAction;
+
   /// No description provided for @homeRemainingPassed.
   ///
   /// In tr, this message translates to:
@@ -5742,6 +5748,918 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'Başlayalım'**
   String get onboardingGetStarted;
+
+  /// No description provided for @onboardingStart.
+  ///
+  /// In tr, this message translates to:
+  /// **'Başla'**
+  String get onboardingStart;
+
+  /// No description provided for @onboardingWelcomeTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hoş geldin.'**
+  String get onboardingWelcomeTitle;
+
+  /// No description provided for @onboardingWelcomeBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ayetler, dualar ve namaz hatırlatmaları gün içinde yanında olsun.'**
+  String get onboardingWelcomeBody;
+
+  /// No description provided for @onboardingLandingVerseArabic.
+  ///
+  /// In tr, this message translates to:
+  /// **'قَدْ أَفْلَحَ مَن زَكَّاهَا'**
+  String get onboardingLandingVerseArabic;
+
+  /// No description provided for @onboardingLandingVerseTranslation.
+  ///
+  /// In tr, this message translates to:
+  /// **'Nefsini arındıran kurtuluşa ermiştir.'**
+  String get onboardingLandingVerseTranslation;
+
+  /// No description provided for @onboardingLandingVerseSource.
+  ///
+  /// In tr, this message translates to:
+  /// **'Şems 9'**
+  String get onboardingLandingVerseSource;
+
+  /// No description provided for @onboardingWelcomeWidgetVerseArabic.
+  ///
+  /// In tr, this message translates to:
+  /// **'أَلَا بِذِكْرِ اللَّهِ تَطْمَئِنُّ الْقُلُوبُ'**
+  String get onboardingWelcomeWidgetVerseArabic;
+
+  /// No description provided for @onboardingWelcomeWidgetVerseTranslation.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kalpler ancak Allah\'ı zikretmekle huzur bulur.'**
+  String get onboardingWelcomeWidgetVerseTranslation;
+
+  /// No description provided for @onboardingWelcomeWidgetVerseSource.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ra\'d 13:28'**
+  String get onboardingWelcomeWidgetVerseSource;
+
+  /// No description provided for @onboardingLanguagePickerTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Dil'**
+  String get onboardingLanguagePickerTitle;
+
+  /// No description provided for @onboardingContinue.
+  ///
+  /// In tr, this message translates to:
+  /// **'Devam'**
+  String get onboardingContinue;
+
+  /// No description provided for @onboardingStoryBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sadece sakin bir nefes al.\n\nArın, gün içinde Kur\'an\'dan kısa hatırlatmalarla yanında olacak.\n\nTelefonunu her açtığında küçük bir ayet molası seni karşılayacak.\n\nHazırsan başlayalım.'**
+  String get onboardingStoryBody;
+
+  /// No description provided for @onboardingNameSubtitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ayet ve hatırlatma metinleri daha kişisel hissetsin.'**
+  String get onboardingNameSubtitle;
+
+  /// No description provided for @onboardingNameHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Adın'**
+  String get onboardingNameHint;
+
+  /// No description provided for @onboardingGreetingTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Tanıştığımıza memnunum, {name}.'**
+  String onboardingGreetingTitle(String name);
+
+  /// No description provided for @onboardingGreetingBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bugün bu uygulamayı indirmen tesadüf değil.\n\nArın bundan sonra yanında olacak: bir ayet, bir vakit, bir hatırlatma.\n\nŞimdi seni biraz tanıyalım. İçinden geldiği gibi cevap vermen yeterli.'**
+  String get onboardingGreetingBody;
+
+  /// No description provided for @onboardingIntentTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'{name}, buraya gelmene ne vesile oldu?'**
+  String onboardingIntentTitle(String name);
+
+  /// No description provided for @onboardingIntentSubtitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hatırlatmaları bu niyete göre yaklaştıralım.'**
+  String get onboardingIntentSubtitle;
+
+  /// No description provided for @onboardingIntentLock.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kilit ekranında ayet görmek'**
+  String get onboardingIntentLock;
+
+  /// No description provided for @onboardingIntentFaith.
+  ///
+  /// In tr, this message translates to:
+  /// **'İmanımı taze tutmak'**
+  String get onboardingIntentFaith;
+
+  /// No description provided for @onboardingIntentCalm.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kalbimi sakinleştirmek'**
+  String get onboardingIntentCalm;
+
+  /// No description provided for @onboardingIntentDaily.
+  ///
+  /// In tr, this message translates to:
+  /// **'Güne bir ayetle başlamak'**
+  String get onboardingIntentDaily;
+
+  /// No description provided for @onboardingIntentPrayer.
+  ///
+  /// In tr, this message translates to:
+  /// **'Namaz vakitlerini kaçırmamak'**
+  String get onboardingIntentPrayer;
+
+  /// No description provided for @onboardingHeartTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'{name}, Allah\'a yakınlığını bugün nasıl hissediyorsun?'**
+  String onboardingHeartTitle(String name);
+
+  /// No description provided for @onboardingHeartHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kalbe dokun veya sürükle.'**
+  String get onboardingHeartHint;
+
+  /// No description provided for @onboardingHeartLabelFar.
+  ///
+  /// In tr, this message translates to:
+  /// **'Uzak hissediyorum'**
+  String get onboardingHeartLabelFar;
+
+  /// No description provided for @onboardingHeartLabelSeeking.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yolunu arıyorum'**
+  String get onboardingHeartLabelSeeking;
+
+  /// No description provided for @onboardingHeartLabelHolding.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bağımı koruyorum'**
+  String get onboardingHeartLabelHolding;
+
+  /// No description provided for @onboardingHeartLabelNear.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yakın duruyorum'**
+  String get onboardingHeartLabelNear;
+
+  /// No description provided for @onboardingHeartLabelFull.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kalbim dolu'**
+  String get onboardingHeartLabelFull;
+
+  /// No description provided for @onboardingHoldVerseArabic.
+  ///
+  /// In tr, this message translates to:
+  /// **'وَإِذَا سَأَلَكَ عِبَادِي عَنِّي فَإِنِّي قَرِيبٌ'**
+  String get onboardingHoldVerseArabic;
+
+  /// No description provided for @onboardingHoldVerseTranslation.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kullarım beni sorarsa, bilesin ki ben onlara yakınım.'**
+  String get onboardingHoldVerseTranslation;
+
+  /// No description provided for @onboardingHoldVerseSource.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bakara 186'**
+  String get onboardingHoldVerseSource;
+
+  /// No description provided for @onboardingHoldFooter.
+  ///
+  /// In tr, this message translates to:
+  /// **'{name}, bu sadece bir başlangıç...'**
+  String onboardingHoldFooter(String name);
+
+  /// No description provided for @onboardingStruggleTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'{name}, şu ara kalbini en çok ne yoruyor?'**
+  String onboardingStruggleTitle(String name);
+
+  /// No description provided for @onboardingStruggleSubtitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hatırlatmaları bu yüke göre yumuşatalım.'**
+  String get onboardingStruggleSubtitle;
+
+  /// No description provided for @onboardingStruggleAnxiety.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kaygı'**
+  String get onboardingStruggleAnxiety;
+
+  /// No description provided for @onboardingStruggleDelay.
+  ///
+  /// In tr, this message translates to:
+  /// **'Erteleme'**
+  String get onboardingStruggleDelay;
+
+  /// No description provided for @onboardingStruggleLonely.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yalnızlık'**
+  String get onboardingStruggleLonely;
+
+  /// No description provided for @onboardingStruggleImpatience.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sabırsızlık'**
+  String get onboardingStruggleImpatience;
+
+  /// No description provided for @onboardingStruggleRegret.
+  ///
+  /// In tr, this message translates to:
+  /// **'Pişmanlık'**
+  String get onboardingStruggleRegret;
+
+  /// No description provided for @onboardingNoteSubtitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kısa bir cümle yeter. Bu cevabı sadece sen görebilirsin.'**
+  String get onboardingNoteSubtitle;
+
+  /// No description provided for @onboardingNoteTitleAnxiety.
+  ///
+  /// In tr, this message translates to:
+  /// **'{name}, kaygını dile getirmek istediğin bir şey var mı?'**
+  String onboardingNoteTitleAnxiety(String name);
+
+  /// No description provided for @onboardingNoteTitleDelay.
+  ///
+  /// In tr, this message translates to:
+  /// **'{name}, ertelemede takıldığın bir şey var mı?'**
+  String onboardingNoteTitleDelay(String name);
+
+  /// No description provided for @onboardingNoteTitleLonely.
+  ///
+  /// In tr, this message translates to:
+  /// **'{name}, yalnızlığını dile getirmek istediğin bir şey var mı?'**
+  String onboardingNoteTitleLonely(String name);
+
+  /// No description provided for @onboardingNoteTitleImpatience.
+  ///
+  /// In tr, this message translates to:
+  /// **'{name}, sabırsızlığını dile getirmek istediğin bir şey var mı?'**
+  String onboardingNoteTitleImpatience(String name);
+
+  /// No description provided for @onboardingNoteTitleRegret.
+  ///
+  /// In tr, this message translates to:
+  /// **'{name}, pişmanlığını dile getirmek istediğin bir şey var mı?'**
+  String onboardingNoteTitleRegret(String name);
+
+  /// No description provided for @onboardingNoteHintAnxiety.
+  ///
+  /// In tr, this message translates to:
+  /// **'Örn. Geleceğe dair kaygım gece uykumu kaçırıyor.'**
+  String get onboardingNoteHintAnxiety;
+
+  /// No description provided for @onboardingNoteHintDelay.
+  ///
+  /// In tr, this message translates to:
+  /// **'Örn. Yapacağım işi yine yarına bırakıyorum.'**
+  String get onboardingNoteHintDelay;
+
+  /// No description provided for @onboardingNoteHintLonely.
+  ///
+  /// In tr, this message translates to:
+  /// **'Örn. Kalabalıkta bile içim tenhalaşıyor.'**
+  String get onboardingNoteHintLonely;
+
+  /// No description provided for @onboardingNoteHintImpatience.
+  ///
+  /// In tr, this message translates to:
+  /// **'Örn. İşler yavaş ilerleyince içim daralıyor.'**
+  String get onboardingNoteHintImpatience;
+
+  /// No description provided for @onboardingNoteHintRegret.
+  ///
+  /// In tr, this message translates to:
+  /// **'Örn. Geçmişteki bir sözüm hâlâ içimde duruyor.'**
+  String get onboardingNoteHintRegret;
+
+  /// No description provided for @onboardingNoteSuggestionAnxiety.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kaygımı Allah\'a bırakıp kalbimi rahatlatmak istiyorum.'**
+  String get onboardingNoteSuggestionAnxiety;
+
+  /// No description provided for @onboardingNoteSuggestionDelay.
+  ///
+  /// In tr, this message translates to:
+  /// **'Niyet ettiğim işi ertelemeden yerine getirmek istiyorum.'**
+  String get onboardingNoteSuggestionDelay;
+
+  /// No description provided for @onboardingNoteSuggestionLonely.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yalnızken bile Rabbimin yanımda olduğunu hatırlamak istiyorum.'**
+  String get onboardingNoteSuggestionLonely;
+
+  /// No description provided for @onboardingNoteSuggestionImpatience.
+  ///
+  /// In tr, this message translates to:
+  /// **'Acele etmeden, sabırla yürümek istiyorum.'**
+  String get onboardingNoteSuggestionImpatience;
+
+  /// No description provided for @onboardingNoteSuggestionRegret.
+  ///
+  /// In tr, this message translates to:
+  /// **'Pişmanlığımı tövbe ile bırakmak istiyorum.'**
+  String get onboardingNoteSuggestionRegret;
+
+  /// No description provided for @onboardingHeardTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Seni duyduk.'**
+  String get onboardingHeardTitle;
+
+  /// No description provided for @onboardingHeardVerse.
+  ///
+  /// In tr, this message translates to:
+  /// **'Muhakkak ki zorlukla beraber bir kolaylık vardır.'**
+  String get onboardingHeardVerse;
+
+  /// No description provided for @onboardingHeardSource.
+  ///
+  /// In tr, this message translates to:
+  /// **'— İnşirah, 94:6'**
+  String get onboardingHeardSource;
+
+  /// No description provided for @onboardingToneTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'{name}, son günlerde kalbin ne kadar yorgun?'**
+  String onboardingToneTitle(String name);
+
+  /// No description provided for @onboardingToneSubtitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Dök içini.'**
+  String get onboardingToneSubtitle;
+
+  /// No description provided for @onboardingToneCalm.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sakin'**
+  String get onboardingToneCalm;
+
+  /// No description provided for @onboardingToneLight.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hafif'**
+  String get onboardingToneLight;
+
+  /// No description provided for @onboardingToneMid.
+  ///
+  /// In tr, this message translates to:
+  /// **'Orta'**
+  String get onboardingToneMid;
+
+  /// No description provided for @onboardingToneHeavy.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ağır'**
+  String get onboardingToneHeavy;
+
+  /// No description provided for @onboardingToneVeryHeavy.
+  ///
+  /// In tr, this message translates to:
+  /// **'Çok ağır'**
+  String get onboardingToneVeryHeavy;
+
+  /// No description provided for @onboardingToneValue.
+  ///
+  /// In tr, this message translates to:
+  /// **'{value} / 5'**
+  String onboardingToneValue(int value);
+
+  /// No description provided for @onboardingTurnTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'{name}, zor zamanlardan geçerken...'**
+  String onboardingTurnTitle(String name);
+
+  /// No description provided for @onboardingTurnSubtitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Allah\'a yönelir misin?'**
+  String get onboardingTurnSubtitle;
+
+  /// No description provided for @onboardingTurnAlways.
+  ///
+  /// In tr, this message translates to:
+  /// **'Her daralmada O\'na dönerim'**
+  String get onboardingTurnAlways;
+
+  /// No description provided for @onboardingTurnSometimes.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bazen yönelirim'**
+  String get onboardingTurnSometimes;
+
+  /// No description provided for @onboardingTurnRarely.
+  ///
+  /// In tr, this message translates to:
+  /// **'Seyrek, ama artırmak istiyorum'**
+  String get onboardingTurnRarely;
+
+  /// No description provided for @onboardingTurnStarting.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu yola yeni giriyorum'**
+  String get onboardingTurnStarting;
+
+  /// No description provided for @onboardingShapeTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bunu kalbine göre örüyoruz'**
+  String get onboardingShapeTitle;
+
+  /// No description provided for @onboardingShapeSubtitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Daha çok ekran değil; doğru anda kısa bir duruş.'**
+  String get onboardingShapeSubtitle;
+
+  /// No description provided for @onboardingShapeCard1Title.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sana yakın ayetler'**
+  String get onboardingShapeCard1Title;
+
+  /// No description provided for @onboardingShapeCard1Body.
+  ///
+  /// In tr, this message translates to:
+  /// **'Seçtiğin yüke göre içerikler öne çıkar.'**
+  String get onboardingShapeCard1Body;
+
+  /// No description provided for @onboardingShapeCard2Title.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yumuşak hatırlatma'**
+  String get onboardingShapeCard2Title;
+
+  /// No description provided for @onboardingShapeCard2Body.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bildirim dili sakin, kısa ve kalbe yönelik kalır.'**
+  String get onboardingShapeCard2Body;
+
+  /// No description provided for @onboardingShapeCard3Title.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kur\'an etrafında'**
+  String get onboardingShapeCard3Title;
+
+  /// No description provided for @onboardingShapeCard3Body.
+  ///
+  /// In tr, this message translates to:
+  /// **'Gün, ayet ve zikirle aynı hatta yürür.'**
+  String get onboardingShapeCard3Body;
+
+  /// No description provided for @onboardingPrayerTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'{name}, namaz ve dua ritmini nasıl tarif edersin?'**
+  String onboardingPrayerTitle(String name);
+
+  /// No description provided for @onboardingPrayerSubtitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sana uyan bir başlangıç temposu seçelim.'**
+  String get onboardingPrayerSubtitle;
+
+  /// No description provided for @onboardingPrayerRegular.
+  ///
+  /// In tr, this message translates to:
+  /// **'Düzenimi koruyorum'**
+  String get onboardingPrayerRegular;
+
+  /// No description provided for @onboardingPrayerOccasional.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ara sıra tutturuyorum'**
+  String get onboardingPrayerOccasional;
+
+  /// No description provided for @onboardingPrayerStruggling.
+  ///
+  /// In tr, this message translates to:
+  /// **'Aksatınca zorlanıyorum'**
+  String get onboardingPrayerStruggling;
+
+  /// No description provided for @onboardingPrayerStarting.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yeni yeni alışıyorum'**
+  String get onboardingPrayerStarting;
+
+  /// No description provided for @onboardingPrayerBeginHere.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu ekrandan başlamak istiyorum'**
+  String get onboardingPrayerBeginHere;
+
+  /// No description provided for @onboardingWaswasaTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'{name}, vesvese veya şüphe geldiğinde ne yapıyorsun?'**
+  String onboardingWaswasaTitle(String name);
+
+  /// No description provided for @onboardingWaswasaSubtitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu cevap, yanında duruşumuzu belirler.'**
+  String get onboardingWaswasaSubtitle;
+
+  /// No description provided for @onboardingWaswasaPray.
+  ///
+  /// In tr, this message translates to:
+  /// **'Dua ile karşılarım'**
+  String get onboardingWaswasaPray;
+
+  /// No description provided for @onboardingWaswasaRead.
+  ///
+  /// In tr, this message translates to:
+  /// **'Okuyup anlamaya çalışırım'**
+  String get onboardingWaswasaRead;
+
+  /// No description provided for @onboardingWaswasaAsk.
+  ///
+  /// In tr, this message translates to:
+  /// **'Güvendiğim birine açarım'**
+  String get onboardingWaswasaAsk;
+
+  /// No description provided for @onboardingWaswasaCarry.
+  ///
+  /// In tr, this message translates to:
+  /// **'İçimde sessizce taşırım'**
+  String get onboardingWaswasaCarry;
+
+  /// No description provided for @onboardingPathVerseArabic.
+  ///
+  /// In tr, this message translates to:
+  /// **'وَمَن يَتَوَكَّلْ عَلَى اللَّهِ فَهُوَ حَسْبُهُ'**
+  String get onboardingPathVerseArabic;
+
+  /// No description provided for @onboardingPathVerseTranslation.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kim Allah\'a tevekkül ederse, O ona yeter.'**
+  String get onboardingPathVerseTranslation;
+
+  /// No description provided for @onboardingPathVerseSource.
+  ///
+  /// In tr, this message translates to:
+  /// **'Talâk 65:3'**
+  String get onboardingPathVerseSource;
+
+  /// No description provided for @onboardingPathVerseFooter.
+  ///
+  /// In tr, this message translates to:
+  /// **'{name}, Kur\'an kalbine dursun.'**
+  String onboardingPathVerseFooter(String name);
+
+  /// No description provided for @onboardingPathTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Günlük hattın belirmeye başladı'**
+  String get onboardingPathTitle;
+
+  /// No description provided for @onboardingPathSubtitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ritmini, kalp hâlini ve niyetini tek sade bir günde birleştireceğiz.'**
+  String get onboardingPathSubtitle;
+
+  /// No description provided for @onboardingPathCard1Title.
+  ///
+  /// In tr, this message translates to:
+  /// **'Önce ihtiyacın'**
+  String get onboardingPathCard1Title;
+
+  /// No description provided for @onboardingPathCard1Body.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sana uyan ayetler listenin başında durur.'**
+  String get onboardingPathCard1Body;
+
+  /// No description provided for @onboardingPathCard2Title.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kendi tempon'**
+  String get onboardingPathCard2Title;
+
+  /// No description provided for @onboardingPathCard2Body.
+  ///
+  /// In tr, this message translates to:
+  /// **'Akış, gerçek okuma düzenine göre nefes alır.'**
+  String get onboardingPathCard2Body;
+
+  /// No description provided for @onboardingPathCard3Title.
+  ///
+  /// In tr, this message translates to:
+  /// **'Gözünün önünde'**
+  String get onboardingPathCard3Title;
+
+  /// No description provided for @onboardingPathCard3Body.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kilit ekranı, güne dağılmış kısa bir durak olur.'**
+  String get onboardingPathCard3Body;
+
+  /// No description provided for @onboardingRhythmTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Arın, günün içine sessizce yerleşir'**
+  String get onboardingRhythmTitle;
+
+  /// No description provided for @onboardingRhythmSubtitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Amaç ekranda daha uzun kalmak değil; doğru anda kısa bir hatırlatma. Bunun için bildirim iznini isteyeceğiz.'**
+  String get onboardingRhythmSubtitle;
+
+  /// No description provided for @onboardingRhythmFeaturedTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Günün ayet hatırlatması'**
+  String get onboardingRhythmFeaturedTitle;
+
+  /// No description provided for @onboardingRhythmFeaturedBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'Devam deyince bildirim iznini soracağız. Saatleri ve ritmi istediğin zaman ayarlardan değiştirirsin.'**
+  String get onboardingRhythmFeaturedBody;
+
+  /// No description provided for @onboardingRhythmCard1Title.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kısa duruş'**
+  String get onboardingRhythmCard1Title;
+
+  /// No description provided for @onboardingRhythmCard1Body.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ayetler gün içinde sakin ve kısa görünür.'**
+  String get onboardingRhythmCard1Body;
+
+  /// No description provided for @onboardingRhythmCard2Title.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kilitte bir nefes'**
+  String get onboardingRhythmCard2Title;
+
+  /// No description provided for @onboardingRhythmCard2Body.
+  ///
+  /// In tr, this message translates to:
+  /// **'Telefona her bakışta küçük bir hatırlatma durur.'**
+  String get onboardingRhythmCard2Body;
+
+  /// No description provided for @onboardingRhythmCard3Title.
+  ///
+  /// In tr, this message translates to:
+  /// **'Aynı hatta kalmak'**
+  String get onboardingRhythmCard3Title;
+
+  /// No description provided for @onboardingRhythmCard3Body.
+  ///
+  /// In tr, this message translates to:
+  /// **'Namaz, zikir ve tefekkür birbirini kovalar.'**
+  String get onboardingRhythmCard3Body;
+
+  /// No description provided for @onboardingLocationTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Namaz vakitleri için konum'**
+  String get onboardingLocationTitle;
+
+  /// No description provided for @onboardingLocationSubtitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'İmsak, öğle ve akşamı şehrine göre gösterebilmemiz için konumunu kibarca istiyoruz. Konumun yalnızca namaz vakitleri ve kıble için kullanılır.'**
+  String get onboardingLocationSubtitle;
+
+  /// No description provided for @onboardingLocationFeaturedTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Vakitler, bulunduğun yere göre'**
+  String get onboardingLocationFeaturedTitle;
+
+  /// No description provided for @onboardingLocationFeaturedBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'Devam deyince konum iznini soracağız. İzni sonra da ayarlardan değiştirebilirsin.'**
+  String get onboardingLocationFeaturedBody;
+
+  /// No description provided for @onboardingLocationCard1Title.
+  ///
+  /// In tr, this message translates to:
+  /// **'Namaz vakitleri'**
+  String get onboardingLocationCard1Title;
+
+  /// No description provided for @onboardingLocationCard1Body.
+  ///
+  /// In tr, this message translates to:
+  /// **'Şehrine göre günlük vakitler taze kalır.'**
+  String get onboardingLocationCard1Body;
+
+  /// No description provided for @onboardingLocationCard2Title.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kıble yönü'**
+  String get onboardingLocationCard2Title;
+
+  /// No description provided for @onboardingLocationCard2Body.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yönünü doğru hesaplayabilmek için aynı izin yeter.'**
+  String get onboardingLocationCard2Body;
+
+  /// No description provided for @onboardingLocationCard3Title.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sende kalır'**
+  String get onboardingLocationCard3Title;
+
+  /// No description provided for @onboardingLocationCard3Body.
+  ///
+  /// In tr, this message translates to:
+  /// **'Konumun başka bir amaçla paylaşılmaz.'**
+  String get onboardingLocationCard3Body;
+
+  /// No description provided for @onboardingPrepareTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Son ayarlar yapılıyor'**
+  String get onboardingPrepareTitle;
+
+  /// No description provided for @onboardingPrepareSubtitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Her bölüm tek tek hazırlanıyor.'**
+  String get onboardingPrepareSubtitle;
+
+  /// No description provided for @onboardingPrepareReadyTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Deneyimin hazır'**
+  String get onboardingPrepareReadyTitle;
+
+  /// No description provided for @onboardingPrepareReadySubtitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Son adımda kısa bir duaya Amin diyeceksin.'**
+  String get onboardingPrepareReadySubtitle;
+
+  /// No description provided for @onboardingPrepareStatus.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hazırlanıyor'**
+  String get onboardingPrepareStatus;
+
+  /// No description provided for @onboardingPrepareYes.
+  ///
+  /// In tr, this message translates to:
+  /// **'Evet'**
+  String get onboardingPrepareYes;
+
+  /// No description provided for @onboardingPrepareNo.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hayır'**
+  String get onboardingPrepareNo;
+
+  /// No description provided for @onboardingPrepareBar1Title.
+  ///
+  /// In tr, this message translates to:
+  /// **'{name}, ayet akışın örülüyor'**
+  String onboardingPrepareBar1Title(String name);
+
+  /// No description provided for @onboardingPrepareBar1Body.
+  ///
+  /// In tr, this message translates to:
+  /// **'Cevaplarına göre dil ve vurgu seçiliyor.'**
+  String get onboardingPrepareBar1Body;
+
+  /// No description provided for @onboardingPrepareBar2Title.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kilit ekranı görünümü hazırlanıyor'**
+  String get onboardingPrepareBar2Title;
+
+  /// No description provided for @onboardingPrepareBar2Body.
+  ///
+  /// In tr, this message translates to:
+  /// **'Saat ve ayet düzeni sade tutuluyor.'**
+  String get onboardingPrepareBar2Body;
+
+  /// No description provided for @onboardingPrepareBar3Title.
+  ///
+  /// In tr, this message translates to:
+  /// **'Daha çok kişiye ulaşmak için ayarlanıyor'**
+  String get onboardingPrepareBar3Title;
+
+  /// No description provided for @onboardingPrepareBar3Body.
+  ///
+  /// In tr, this message translates to:
+  /// **'Keşif kaynakları gizlilikle ölçülüyor.'**
+  String get onboardingPrepareBar3Body;
+
+  /// No description provided for @onboardingPrepareBar4Title.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kısa yollar yerleştiriliyor'**
+  String get onboardingPrepareBar4Title;
+
+  /// No description provided for @onboardingPrepareBar4Body.
+  ///
+  /// In tr, this message translates to:
+  /// **'Tesbihat, kıble, namaz ve sohbet hazırlanıyor.'**
+  String get onboardingPrepareBar4Body;
+
+  /// No description provided for @onboardingPrepareAskLock.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kilit ekranında sade ayet görünümünü kullanalım mı?'**
+  String get onboardingPrepareAskLock;
+
+  /// No description provided for @onboardingPrepareAskVerses.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ayetleri cevaplarına göre öne alalım mı?'**
+  String get onboardingPrepareAskVerses;
+
+  /// No description provided for @onboardingPrepareAskShortcuts.
+  ///
+  /// In tr, this message translates to:
+  /// **'İbadet kısa yollarını ana akışta öne alalım mı?'**
+  String get onboardingPrepareAskShortcuts;
+
+  /// No description provided for @onboardingDuaTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kısa bir dua'**
+  String get onboardingDuaTitle;
+
+  /// No description provided for @onboardingDuaBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'Allah\'ım, kulun {name} için hayır, bereket, sağlık, huzur, hikmet ve istikamet nasip et. Kalbini Kur\'an\'la diri, adımlarını hayırla sabit kıl. Sözün her mevsimde ona yakın olsun.'**
+  String onboardingDuaBody(String name);
+
+  /// No description provided for @onboardingDuaVerseArabic.
+  ///
+  /// In tr, this message translates to:
+  /// **'رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً'**
+  String get onboardingDuaVerseArabic;
+
+  /// No description provided for @onboardingDuaVerseTranslation.
+  ///
+  /// In tr, this message translates to:
+  /// **'Rabbimiz! Bize dünyada da iyilik, ahirette de iyilik ver.'**
+  String get onboardingDuaVerseTranslation;
+
+  /// No description provided for @onboardingDuaVerseSource.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bakara 2:201'**
+  String get onboardingDuaVerseSource;
+
+  /// No description provided for @onboardingDuaAmin.
+  ///
+  /// In tr, this message translates to:
+  /// **'Amin.'**
+  String get onboardingDuaAmin;
+
+  /// No description provided for @onboardingDuaHoldHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Basılı tut'**
+  String get onboardingDuaHoldHint;
 
   /// No description provided for @onboardingSkip.
   ///

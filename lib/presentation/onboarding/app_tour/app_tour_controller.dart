@@ -6,10 +6,11 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/providers/shared_preferences_provider.dart';
 import '../../../core/router/app_router.dart';
+import '../../../data/services/startup_permission_policy.dart';
 import 'app_tour_step.dart';
 
-const String kAppTourCompletedKey = 'app_tour_completed';
-const String kAppTourPendingKey = 'app_tour_pending';
+export '../../../data/services/startup_permission_policy.dart'
+    show kAppTourCompletedKey, kAppTourPendingKey;
 
 class AppTourState {
   const AppTourState({this.active = false, this.stepIndex = 0});

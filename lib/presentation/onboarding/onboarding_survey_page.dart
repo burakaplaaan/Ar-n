@@ -1,5 +1,5 @@
 // lib/presentation/onboarding/onboarding_survey_page.dart
-// İsim → bildirim → (Android: kilit widget) → başlangıç özeti.
+// Bildirim → (Android: kilit widget) → başlangıç özeti.
 // Zümrüt tema, koşullu bildirim / widget adımı, animasyonlar.
 
 import 'dart:async';
@@ -46,7 +46,7 @@ class _OnboardingSurveyPageState extends ConsumerState<OnboardingSurveyPage>
   int _currentIndex = 0;
 
   bool _surveyReady = false;
-  bool _includeNotificationStep = true;
+  bool _includeNotificationStep = false;
   bool _finishing = false;
   bool _notificationPermissionEnabled = false;
   bool _refreshPermissionAfterSettingsReturn = false;
@@ -55,8 +55,6 @@ class _OnboardingSurveyPageState extends ConsumerState<OnboardingSurveyPage>
   bool _lockPrayerEnabled = false;
   bool _lockQuoteEnabled = false;
 
-  final TextEditingController _nameController = TextEditingController();
-  final FocusNode _nameFocus = FocusNode();
 
   static const _surveyAccent = AppColors.emeraldMid;
 
@@ -64,7 +62,7 @@ class _OnboardingSurveyPageState extends ConsumerState<OnboardingSurveyPage>
   bool get _includeLockWidgetsStep => !kIsWeb && Platform.isAndroid;
 
   int get _pageCount {
-    var n = 2; // isim + özet
+    var n = 1; // özet
     if (_includeNotificationStep) n++;
     if (_includeLockWidgetsStep) n++;
     return n;
@@ -88,18 +86,13 @@ class _OnboardingSurveyPageState extends ConsumerState<OnboardingSurveyPage>
     if (!mounted) return;
     setState(() {
       _notificationPermissionEnabled = status.isGranted || status.isLimited;
-      // Bildirim adımını onboarding'de her zaman göster:
-      // - Apple review ekranına karşı tutarlı görünüm
-      // - Kullanıcı izin zaten açıksa bile neyin kontrol edildiğini görür.
-      _includeNotificationStep = true;
+      _includeNotificationStep = false;
     });
   }
 
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
-    _nameFocus.dispose();
-    _nameController.dispose();
     _pageController.dispose();
     super.dispose();
   }
@@ -216,8 +209,15 @@ class _OnboardingSurveyPageState extends ConsumerState<OnboardingSurveyPage>
     if (_finishing) return;
     setState(() => _finishing = true);
     try {
-      final normalizedName = _nameController.text.trim();
+      final prefs = ref.read(sharedPreferencesProvider);
+      final normalizedName =
+          prefs.getString(kOnboardingDisplayNameKey)?.trim() ?? '';
       final hasCustomName = normalizedName.isNotEmpty;
+      await prefs.setBool(profileNameLockedByUserKey, hasCustomName);
+      // ATT/FCM, profil kaydı onboarding'i bitirmeden önce pending görsün.
+      await prefs.setBool(kAppTourPendingKey, true);
+      await prefs.setBool(kAppTourCompletedKey, false);
+
       await ref
           .read(userProfileProvider.notifier)
           .saveProfile(
@@ -228,11 +228,7 @@ class _OnboardingSurveyPageState extends ConsumerState<OnboardingSurveyPage>
             needTags: const [],
           );
 
-      final prefs = ref.read(sharedPreferencesProvider);
-      await prefs.setBool(profileNameLockedByUserKey, hasCustomName);
       await prefs.setBool('onboarding_completed', true);
-      await prefs.setBool(kAppTourPendingKey, true);
-      await prefs.setBool(kAppTourCompletedKey, false);
       await FcmTokenService.markBroadcastPermissionPromptHandled();
       // Funnel bitti — tamamlananlar için kritik ölçü.
       unawaited(ArinAnalytics.log('onboarding_complete'));
@@ -251,10 +247,9 @@ class _OnboardingSurveyPageState extends ConsumerState<OnboardingSurveyPage>
   }
 
   /// PageView.builder için: index → sayfa. Sırasıyla:
-  /// isim → bildirim → (Android kilit widget) → özet.
+  /// bildirim → (Android kilit widget) → özet.
   Widget _buildPageAt(int index) {
     final pages = <Widget Function()>[
-      _buildNameStep,
       if (_includeNotificationStep) _buildNotificationStep,
       if (_includeLockWidgetsStep) _buildLockWidgetsStep,
       _buildSummaryStep,
@@ -406,92 +401,6 @@ class _OnboardingSurveyPageState extends ConsumerState<OnboardingSurveyPage>
               }),
             ),
           ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildNameStep() {
-    final l10n = AppLocalizations.of(context)!;
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
-      child: Column(
-        children: [
-          Expanded(
-            child: Center(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Text(
-                    l10n.surveyNameTitle,
-                    style: AppTextStyles.headlineMedium.copyWith(
-                      color: Colors.white,
-                    ),
-                  ).animate().fadeIn(duration: 280.ms),
-                  ValueListenableBuilder<TextEditingValue>(
-                    valueListenable: _nameController,
-                    builder: (context, value, _) {
-                      final name = value.text.trim();
-                      if (name.isEmpty) return const SizedBox.shrink();
-                      return Padding(
-                        padding: const EdgeInsets.only(top: 12),
-                        child: Text(
-                          '${l10n.surveyNameGreetingPrefix}, $name',
-                          style: AppTextStyles.titleMedium.copyWith(
-                            color: AppColors.emeraldLight,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                  const SizedBox(height: 28),
-                  TextField(
-                    controller: _nameController,
-                    focusNode: _nameFocus,
-                    textInputAction: TextInputAction.next,
-                    autocorrect: false,
-                    enableSuggestions: false,
-                    smartDashesType: SmartDashesType.disabled,
-                    smartQuotesType: SmartQuotesType.disabled,
-                    textCapitalization: TextCapitalization.words,
-                    style: const TextStyle(
-                      fontFamily: AppTextStyles.primaryFontFamily,
-                      color: Colors.white,
-                      fontSize: 18,
-                    ),
-                    decoration: InputDecoration(
-                      hintText: l10n.surveyNameHint,
-                      hintStyle: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.4),
-                      ),
-                      filled: true,
-                      fillColor: Colors.white.withValues(alpha: 0.07),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(20),
-                        borderSide: BorderSide.none,
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(20),
-                        borderSide: BorderSide(
-                          color: Colors.white.withValues(alpha: 0.1),
-                        ),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(20),
-                        borderSide: const BorderSide(
-                          color: AppColors.emeraldLight,
-                          width: 2,
-                        ),
-                      ),
-                    ),
-                  ).animate().fadeIn(delay: 80.ms),
-                ],
-              ),
-            ),
-          ),
-          _buildNextButton(),
         ],
       ),
     );
@@ -880,7 +789,11 @@ class _OnboardingSurveyPageState extends ConsumerState<OnboardingSurveyPage>
 
   Widget _buildSummaryStep() {
     final l10n = AppLocalizations.of(context)!;
-    final name = _nameController.text.trim();
+    final name = ref
+            .read(sharedPreferencesProvider)
+            .getString(kOnboardingDisplayNameKey)
+            ?.trim() ??
+        '';
     final displayName = name.isEmpty ? l10n.surveySummaryNotProvided : name;
 
     return Padding(
@@ -1042,29 +955,4 @@ class _OnboardingSurveyPageState extends ConsumerState<OnboardingSurveyPage>
     );
   }
 
-  Widget _buildNextButton({String? text}) {
-    final l10n = AppLocalizations.of(context)!;
-    return SizedBox(
-      width: double.infinity,
-      child: FilledButton(
-        onPressed: _nextPage,
-        style: FilledButton.styleFrom(
-          backgroundColor: _surveyAccent,
-          foregroundColor: Colors.white,
-          padding: const EdgeInsets.symmetric(vertical: 18),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-        ),
-        child: Text(
-          text ?? l10n.surveyNext,
-          style: AppTextStyles.labelLarge.copyWith(
-            color: Colors.white,
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-      ),
-    ).animate().fadeIn(delay: 40.ms);
-  }
 }

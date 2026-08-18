@@ -569,6 +569,7 @@ class LocationService {
 
   Future<LocationPermission> _requestLocationPermissionWithDisclosure({
     bool promptIfNeeded = true,
+    bool showDisclosure = true,
   }) async {
     final inFlight = _permissionPromptInFlight;
     if (inFlight != null) return inFlight.future;
@@ -576,11 +577,14 @@ class LocationService {
     var permission = await Geolocator.checkPermission();
     if (permission != LocationPermission.denied) return permission;
 
-    if (!shouldShowLocationDisclosure(
-      permissionDenied: true,
-      promptIfNeeded: promptIfNeeded,
-      sessionDeclined: _sessionDeclinedDisclosure,
-    )) {
+    if (!promptIfNeeded) return LocationPermission.denied;
+
+    if (showDisclosure &&
+        !shouldShowLocationDisclosure(
+          permissionDenied: true,
+          promptIfNeeded: true,
+          sessionDeclined: _sessionDeclinedDisclosure,
+        )) {
       return LocationPermission.denied;
     }
 
@@ -593,28 +597,30 @@ class LocationService {
         return permission;
       }
 
-      final ctx = rootNavigatorKey.currentContext;
-      if (ctx == null || !ctx.mounted) {
-        completer.complete(LocationPermission.denied);
-        return LocationPermission.denied;
-      }
-      final l10n = AppLocalizations.of(ctx);
-      final confirmed = await showArinPermissionDialog(
-        context: ctx,
-        icon: Icons.location_on_rounded,
-        title: l10n?.locationPermissionRequiredTitle ?? 'Konum İzni Gerekli',
-        body:
-            l10n?.locationPermissionRequiredBody ??
-            'Arın, namaz vakitlerini ve kıble yönünü doğru hesaplayabilmek için '
-                'konumunuza erişim izni gerektirir. Konum verileriniz yalnızca '
-                'bu amaçlar için kullanılır ve cihazınızda işlenir.',
-        cancelLabel: l10n?.locationPermissionNotNow ?? 'Şimdi Değil',
-        confirmLabel: l10n?.locationPermissionContinue ?? 'Devam Et',
-      );
-      if (!confirmed) {
-        _sessionDeclinedDisclosure = true;
-        completer.complete(LocationPermission.denied);
-        return LocationPermission.denied;
+      if (showDisclosure) {
+        final ctx = rootNavigatorKey.currentContext;
+        if (ctx == null || !ctx.mounted) {
+          completer.complete(LocationPermission.denied);
+          return LocationPermission.denied;
+        }
+        final l10n = AppLocalizations.of(ctx);
+        final confirmed = await showArinPermissionDialog(
+          context: ctx,
+          icon: Icons.location_on_rounded,
+          title: l10n?.locationPermissionRequiredTitle ?? 'Konum İzni Gerekli',
+          body:
+              l10n?.locationPermissionRequiredBody ??
+              'Arın, namaz vakitlerini ve kıble yönünü doğru hesaplayabilmek için '
+                  'konumunuza erişim izni gerektirir. Konum verileriniz yalnızca '
+                  'bu amaçlar için kullanılır ve cihazınızda işlenir.',
+          cancelLabel: l10n?.locationPermissionNotNow ?? 'Şimdi Değil',
+          confirmLabel: l10n?.locationPermissionContinue ?? 'Devam Et',
+        );
+        if (!confirmed) {
+          _sessionDeclinedDisclosure = true;
+          completer.complete(LocationPermission.denied);
+          return LocationPermission.denied;
+        }
       }
 
       permission = await Geolocator.requestPermission();
@@ -666,12 +672,21 @@ class LocationService {
     return _readGpsPosition();
   }
 
+  Future<LocationPermission> requestSystemLocationPermission() {
+    return _requestLocationPermissionWithDisclosure(
+      promptIfNeeded: true,
+      showDisclosure: false,
+    );
+  }
+
   Future<({double lat, double lon})?> requestCurrentPosition({
     bool promptIfNeeded = true,
     bool persistCoordinates = true,
+    bool showDisclosure = true,
   }) async {
     final permission = await _requestLocationPermissionWithDisclosure(
       promptIfNeeded: promptIfNeeded,
+      showDisclosure: showDisclosure,
     );
     if (permission == LocationPermission.denied ||
         permission == LocationPermission.deniedForever) {

@@ -70,47 +70,52 @@ class _AppTourOverlayState extends ConsumerState<AppTourOverlay> {
               body: step.body(l10n),
             ),
             Positioned(
+              top: media.padding.top + 4,
+              right: 8,
+              child: TextButton(
+                onPressed: _advancing ? null : () => unawaited(_onSkip()),
+                style: TextButton.styleFrom(
+                  foregroundColor: Colors.white.withValues(alpha: 0.78),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 8,
+                  ),
+                ),
+                child: Text(
+                  l10n.appTourSkip,
+                  style: AppTextStyles.labelMedium.copyWith(
+                    color: Colors.white.withValues(alpha: 0.78),
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ),
+            Positioned(
               left: 20,
               right: 20,
               bottom: slots.ctaBottom,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  TextButton(
-                    onPressed: _advancing
-                        ? null
-                        : () => unawaited(_onSkip()),
-                    child: Text(
-                      l10n.appTourSkip,
-                      style: AppTextStyles.labelMedium.copyWith(
-                        color: Colors.white.withValues(alpha: 0.72),
-                      ),
+              child: SizedBox(
+                width: double.infinity,
+                height: 50,
+                child: FilledButton(
+                  onPressed: _advancing ? null : () => unawaited(_onNext()),
+                  style: FilledButton.styleFrom(
+                    backgroundColor: AppColors.emeraldLight,
+                    foregroundColor: Colors.white,
+                    disabledBackgroundColor: AppColors.emeraldLight
+                        .withValues(alpha: 0.55),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
                     ),
                   ),
-                  SizedBox(
-                    width: double.infinity,
-                    height: 50,
-                    child: FilledButton(
-                      onPressed: _advancing ? null : () => unawaited(_onNext()),
-                      style: FilledButton.styleFrom(
-                        backgroundColor: AppColors.emeraldLight,
-                        foregroundColor: Colors.white,
-                        disabledBackgroundColor: AppColors.emeraldLight
-                            .withValues(alpha: 0.55),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                      ),
-                      child: Text(
-                        step.finale ? l10n.appTourLetsStart : l10n.appTourNext,
-                        style: AppTextStyles.labelLarge.copyWith(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
+                  child: Text(
+                    step.finale ? l10n.appTourLetsStart : l10n.appTourNext,
+                    style: AppTextStyles.labelLarge.copyWith(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w700,
                     ),
                   ),
-                ],
+                ),
               ),
             ),
           ],
@@ -227,7 +232,7 @@ class _TooltipCard extends StatelessWidget {
       return Positioned(
         left: 24,
         right: 24,
-        top: media.padding.top + 72,
+        top: media.padding.top + AppTourLayout.skipTopClearance + 24,
         bottom: reservedBottom + 8,
         child: Align(alignment: Alignment.center, child: card),
       );
@@ -250,7 +255,7 @@ class _TooltipCard extends StatelessWidget {
     return Positioned(
       left: 24,
       right: 24,
-      top: media.padding.top + 12,
+      top: media.padding.top + AppTourLayout.skipTopClearance,
       bottom: aboveBottom,
       child: Align(alignment: Alignment.bottomCenter, child: card),
     );

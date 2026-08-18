@@ -110,6 +110,7 @@
   "homeRetryAction": "إعادة المحاولة",
   "homeChangeDistrictAction": "تغيير الحي",
   "homeOpenSettingsAction": "فتح الإعدادات",
+  "homeRequestLocationAction": "السماح بالموقع",
   "homeRemainingPassed": "انتهى",
   "homeRemainingFewSeconds": "ثوانٍ قليلة",
   "homeRemainingHoursMinutes": "{hours} س {minutes} د",
@@ -1710,6 +1711,248 @@
   "onboardingSlide4Title": "Arin: كل شيء في تطبيق واحد",
   "onboardingSlide4Subtitle": "من الإلهام إلى العادات اليومية، ومن تنبيهات الأوقات إلى عدّاد التزكية، رحلتك هنا. إن كنت جاهزًا فلنبدأ معًا — أنت تمضي ونحن نذكّرك ونرافقك.",
   "onboardingGetStarted": "لنبدأ",
+  "onboardingStart": "ابدأ",
+  "onboardingWelcomeTitle": "مرحباً.",
+  "onboardingWelcomeBody": "لتكن الآيات والأدعية وتذكيرات الصلاة معك طوال اليوم.",
+  "onboardingLandingVerseArabic": "قَدْ أَفْلَحَ مَن زَكَّاهَا",
+  "onboardingLandingVerseTranslation": "قد أفلح من زكّاها.",
+  "onboardingLandingVerseSource": "الشمس ٩",
+  "onboardingWelcomeWidgetVerseArabic": "أَلَا بِذِكْرِ اللَّهِ تَطْمَئِنُّ الْقُلُوبُ",
+  "onboardingWelcomeWidgetVerseTranslation": "ألا بذكر الله تطمئن القلوب.",
+  "onboardingWelcomeWidgetVerseSource": "الرعد ١٣:٢٨",
+  "onboardingLanguagePickerTitle": "اللغة",
+  "onboardingContinue": "متابعة",
+  "onboardingStoryBody": "خذ نفساً هادئاً فقط.\n\nستكون أرن معك خلال اليوم بتذكيرات قصيرة من القرآن.\n\nوسيستقبلك توقفٌ قصير مع آية في كل مرة تفتح فيها هاتفك.\n\nإن كنت جاهزاً فلنبدأ.",
+  "onboardingNameSubtitle": "لتشعر نصوص الآيات والتذكيرات بمزيد من القرب.",
+  "onboardingNameHint": "اسمك",
+  "onboardingGreetingTitle": "سعدت بلقائك، {name}.",
+  "@onboardingGreetingTitle": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "onboardingGreetingBody": "تنزيلك هذا التطبيق اليوم ليس صدفة.\n\nستكون أرن بعد اليوم إلى جانبك: آية، ووقت صلاة، وتذكير.\n\nدعنا نتعرف عليك قليلاً. أجب بما يأتي من داخلك.",
+  "onboardingIntentTitle": "{name}، ما الذي جاء بك إلى هنا؟",
+  "@onboardingIntentTitle": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "onboardingIntentSubtitle": "سنقرّب التذكيرات وفق هذه النية.",
+  "onboardingIntentLock": "رؤية آية على شاشة القفل",
+  "onboardingIntentFaith": "تجديد إيماني",
+  "onboardingIntentCalm": "تسكين قلبي",
+  "onboardingIntentDaily": "بدء اليوم بآية",
+  "onboardingIntentPrayer": "ألا تفوتني أوقات الصلاة",
+  "onboardingHeartTitle": "{name}، كيف تشعر بقربك من الله اليوم؟",
+  "@onboardingHeartTitle": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "onboardingHeartHint": "المس القلب أو اسحبه.",
+  "onboardingHeartLabelFar": "أشعر بالبعد",
+  "onboardingHeartLabelSeeking": "أبحث عن الطريق",
+  "onboardingHeartLabelHolding": "أحفظ الصلة",
+  "onboardingHeartLabelNear": "أقف قريباً",
+  "onboardingHeartLabelFull": "قلبي ممتلئ",
+  "onboardingHoldVerseArabic": "وَإِذَا سَأَلَكَ عِبَادِي عَنِّي فَإِنِّي قَرِيبٌ",
+  "onboardingHoldVerseTranslation": "وإذا سألك عبادي عني فإني قريب.",
+  "onboardingHoldVerseSource": "البقرة ١٨٦",
+  "onboardingHoldFooter": "{name}، هذا مجرد بداية...",
+  "@onboardingHoldFooter": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "onboardingStruggleTitle": "{name}، ما أثقل ما يرهق قلبك الآن؟",
+  "@onboardingStruggleTitle": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "onboardingStruggleSubtitle": "سنلطّف التذكيرات وفق هذا الثقل.",
+  "onboardingStruggleAnxiety": "القلق",
+  "onboardingStruggleDelay": "التسويف",
+  "onboardingStruggleLonely": "الوحدة",
+  "onboardingStruggleImpatience": "قلة الصبر",
+  "onboardingStruggleRegret": "الندم",
+  "onboardingNoteSubtitle": "جملة قصيرة تكفي. هذا الجواب تراه أنت فقط.",
+  "onboardingNoteTitleAnxiety": "{name}، هل تريد أن تضع شيئاً عن قلقك في كلمات؟",
+  "@onboardingNoteTitleAnxiety": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "onboardingNoteTitleDelay": "{name}، هل هناك أمر تؤجّله مراراً؟",
+  "@onboardingNoteTitleDelay": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "onboardingNoteTitleLonely": "{name}، هل تريد أن تضع شيئاً عن وحدتك في كلمات؟",
+  "@onboardingNoteTitleLonely": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "onboardingNoteTitleImpatience": "{name}، هل تريد أن تضع شيئاً عن قلة صبرك في كلمات؟",
+  "@onboardingNoteTitleImpatience": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "onboardingNoteTitleRegret": "{name}، هل تريد أن تضع شيئاً عن ندمك في كلمات؟",
+  "@onboardingNoteTitleRegret": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "onboardingNoteHintAnxiety": "مثال: قلق المستقبل يمنع نومي في الليل.",
+  "onboardingNoteHintDelay": "مثال: أؤجّل العمل الذي نويتُه إلى الغد مرة أخرى.",
+  "onboardingNoteHintLonely": "مثال: حتى في الزحام أشعر بفراغ في داخلي.",
+  "onboardingNoteHintImpatience": "مثال: حين تبطئ الأمور يضيق صدري.",
+  "onboardingNoteHintRegret": "مثال: كلمة من الماضي ما زالت في قلبي.",
+  "onboardingNoteSuggestionAnxiety": "أريد أن أترك قلقي عند الله وأُسكن قلبي.",
+  "onboardingNoteSuggestionDelay": "أريد أن أؤدي ما نويتُه دون تأجيل.",
+  "onboardingNoteSuggestionLonely": "أريد أن أذكر أن ربي معي حتى حين أكون وحدي.",
+  "onboardingNoteSuggestionImpatience": "أريد أن أمشي بصبر من غير عجلة.",
+  "onboardingNoteSuggestionRegret": "أريد أن أضع ندمي بالتوبة.",
+  "onboardingHeardTitle": "سمعناك.",
+  "onboardingHeardVerse": "إن مع العسر يسراً.",
+  "onboardingHeardSource": "— الشرح، ٩٤:٦",
+  "onboardingToneTitle": "{name}، كم يبدو قلبك متعباً في هذه الأيام؟",
+  "@onboardingToneTitle": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "onboardingToneSubtitle": "أفرغ ما في قلبك.",
+  "onboardingToneCalm": "هادئ",
+  "onboardingToneLight": "خفيف",
+  "onboardingToneMid": "متوسط",
+  "onboardingToneHeavy": "ثقيل",
+  "onboardingToneVeryHeavy": "ثقيل جداً",
+  "onboardingToneValue": "{value} / 5",
+  "@onboardingToneValue": {
+    "placeholders": {
+      "value": { "type": "int" }
+    }
+  },
+  "onboardingTurnTitle": "{name}، حين تمرّ أيام عسيرة...",
+  "@onboardingTurnTitle": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "onboardingTurnSubtitle": "هل تتوجه إلى الله؟",
+  "onboardingTurnAlways": "في كل ضيق أعود إليه",
+  "onboardingTurnSometimes": "أتوجه أحياناً",
+  "onboardingTurnRarely": "نادراً، لكنّي أريد المزيد",
+  "onboardingTurnStarting": "أنا جديد على هذا الطريق",
+  "onboardingShapeTitle": "ننسج هذا وفق قلبك",
+  "onboardingShapeSubtitle": "ليس مزيداً من الشاشات؛ بل وقفة قصيرة في الوقت المناسب.",
+  "onboardingShapeCard1Title": "آيات قريبة منك",
+  "onboardingShapeCard1Body": "يظهر المحتوى وفق الثقل الذي اخترته.",
+  "onboardingShapeCard2Title": "تذكير لطيف",
+  "onboardingShapeCard2Body": "يبقى اللسان هادئاً وقصيراً ومتجهاً إلى القلب.",
+  "onboardingShapeCard3Title": "حول القرآن",
+  "onboardingShapeCard3Body": "يسير اليوم مع الآية والذكر على خط واحد.",
+  "onboardingPrayerTitle": "{name}، كيف تصف إيقاع صلاتك ودعائك؟",
+  "@onboardingPrayerTitle": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "onboardingPrayerSubtitle": "لنختر إيقاعاً يناسبك في البداية.",
+  "onboardingPrayerRegular": "أحفظ نظمي",
+  "onboardingPrayerOccasional": "أوفّق أحياناً",
+  "onboardingPrayerStruggling": "أتعثر حين أنقطع",
+  "onboardingPrayerStarting": "ما زلت أتدرّب",
+  "onboardingPrayerBeginHere": "أريد أن أبدأ من هذه الشاشة",
+  "onboardingWaswasaTitle": "{name}، ماذا تفعل حين يأتيك الشك أو الوسوسة؟",
+  "@onboardingWaswasaTitle": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "onboardingWaswasaSubtitle": "هذا الجواب يحدّد كيف نقف إلى جانبك.",
+  "onboardingWaswasaPray": "أقابلها بالدعاء",
+  "onboardingWaswasaRead": "أقرأ وأحاول أن أفهم",
+  "onboardingWaswasaAsk": "أفتحها لمن أثق به",
+  "onboardingWaswasaCarry": "أحملها بهدوء في داخلي",
+  "onboardingPathVerseArabic": "وَمَن يَتَوَكَّلْ عَلَى اللَّهِ فَهُوَ حَسْبُهُ",
+  "onboardingPathVerseTranslation": "ومن يتوكل على الله فهو حسبه.",
+  "onboardingPathVerseSource": "الطلاق ٦٥:٣",
+  "onboardingPathVerseFooter": "{name}، ليقرّ القرآن في قلبك.",
+  "@onboardingPathVerseFooter": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "onboardingPathTitle": "خطّ يومك بدأ يظهر",
+  "onboardingPathSubtitle": "سنجمع إيقاعك وحال قلبك ونيّتك في يوم واحد بسيط.",
+  "onboardingPathCard1Title": "حاجتك أولاً",
+  "onboardingPathCard1Body": "الآيات التي تناسبك تبقى في رأس القائمة.",
+  "onboardingPathCard2Title": "إيقاعك أنت",
+  "onboardingPathCard2Body": "يتنفّس التدفق وفق قراءتك الحقيقية.",
+  "onboardingPathCard3Title": "أمام عينيك",
+  "onboardingPathCard3Body": "تصبح شاشة القفل وقفة قصيرة في أثناء اليوم.",
+  "onboardingRhythmTitle": "أرِن يستقر بهدوء في يومك",
+  "onboardingRhythmSubtitle": "ليس الهدف وقتاً أطول على الشاشة؛ بل تذكيراً قصيراً في الوقت المناسب. وسنطلب إذن الإشعارات لهذا.",
+  "onboardingRhythmFeaturedTitle": "تذكير آية اليوم",
+  "onboardingRhythmFeaturedBody": "عند المتابعة سنطلب إذن الإشعارات. يمكنك تغيير الساعات والإيقاع من الإعدادات متى شئت.",
+  "onboardingRhythmCard1Title": "وقفة قصيرة",
+  "onboardingRhythmCard1Body": "تظهر الآيات بهدوء واختصار في أثناء اليوم.",
+  "onboardingRhythmCard2Title": "نفس على شاشة القفل",
+  "onboardingRhythmCard2Body": "كل نظرة إلى الهاتف تُبقي تذكيراً صغيراً.",
+  "onboardingRhythmCard3Title": "البقاء على الخط نفسه",
+  "onboardingRhythmCard3Body": "الصلاة والذكر والتفكّر يتبع بعضها بعضاً.",
+  "onboardingLocationTitle": "الموقع لأوقات الصلاة",
+  "onboardingLocationSubtitle": "نطلب موقعك بلطف حتى نعرض الإمساك والظهر والمغرب وفق مدينتك. يُستخدم الموقع فقط لأوقات الصلاة والقبلة.",
+  "onboardingLocationFeaturedTitle": "الأوقات بحسب مكانك",
+  "onboardingLocationFeaturedBody": "عند المتابعة سنطلب إذن الموقع. يمكنك تغييره لاحقاً من الإعدادات.",
+  "onboardingLocationCard1Title": "أوقات الصلاة",
+  "onboardingLocationCard1Body": "تبقى الأوقات اليومية متجددة لمدينتك.",
+  "onboardingLocationCard2Title": "اتجاه القبلة",
+  "onboardingLocationCard2Body": "الإذن نفسه يكفي لحساب الاتجاه.",
+  "onboardingLocationCard3Title": "يبقى عندك",
+  "onboardingLocationCard3Body": "لا يُشارك موقعك لأي غرض آخر.",
+  "onboardingPrepareTitle": "يتم إعداد الإعدادات الأخيرة",
+  "onboardingPrepareSubtitle": "كل قسم يُجهَّز واحداً تلو الآخر.",
+  "onboardingPrepareReadyTitle": "تجربتك جاهزة",
+  "onboardingPrepareReadySubtitle": "في الخطوة الأخيرة ستقول آمين على دعاء قصير.",
+  "onboardingPrepareStatus": "جارٍ التحضير",
+  "onboardingPrepareYes": "نعم",
+  "onboardingPrepareNo": "لا",
+  "onboardingPrepareBar1Title": "{name}، يُنسج مسار آياتك",
+  "@onboardingPrepareBar1Title": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "onboardingPrepareBar1Body": "يُختار اللسان والتأكيد وفق إجاباتك.",
+  "onboardingPrepareBar2Title": "يتم إعداد مظهر شاشة القفل",
+  "onboardingPrepareBar2Body": "يبقى الوقت والآية بسيطين.",
+  "onboardingPrepareBar3Title": "يُضبط للوصول إلى المزيد من الناس",
+  "onboardingPrepareBar3Body": "تُقاس مصادر الاكتشاف بخصوصية.",
+  "onboardingPrepareBar4Title": "تُوضع الاختصارات",
+  "onboardingPrepareBar4Body": "يُجهَّز التسبيح والقبلة والصلاة والمحادثة.",
+  "onboardingPrepareAskLock": "هل نستخدم عرضاً بسيطاً للآية على شاشة القفل؟",
+  "onboardingPrepareAskVerses": "هل نقدّم الآيات وفق إجاباتك؟",
+  "onboardingPrepareAskShortcuts": "هل نبرز اختصارات العبادة في المسار الرئيسي؟",
+  "onboardingDuaTitle": "دعاء قصير",
+  "onboardingDuaBody": "اللهم ارزق عبدك {name} خيراً وبركة وصحة وسكينة وحكمة واستقامة. أحيِ قلبه بالقرآن وثبّت خطاه في الخير. ولتكن كلمتك قريبة منه في كل حين.",
+  "@onboardingDuaBody": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "onboardingDuaVerseArabic": "رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً",
+  "onboardingDuaVerseTranslation": "ربنا آتنا في الدنيا حسنة وفي الآخرة حسنة.",
+  "onboardingDuaVerseSource": "البقرة ٢:٢٠١",
+  "onboardingDuaAmin": "آمين.",
+  "onboardingDuaHoldHint": "اضغط مع الاستمرار",
   "onboardingSkip": "تخطي",
   "onboardingNext": "التالي",
   "surveyNameTitle": "كيف تحب أن نخاطبك؟",

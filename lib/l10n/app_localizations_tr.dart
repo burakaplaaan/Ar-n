@@ -289,6 +289,9 @@ class AppLocalizationsTr extends AppLocalizations {
   String get homeOpenSettingsAction => 'Ayarları aç';
 
   @override
+  String get homeRequestLocationAction => 'Konum izni ver';
+
+  @override
   String get homeRemainingPassed => 'geçti';
 
   @override
@@ -3304,6 +3307,554 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get onboardingGetStarted => 'Başlayalım';
+
+  @override
+  String get onboardingStart => 'Başla';
+
+  @override
+  String get onboardingWelcomeTitle => 'Hoş geldin.';
+
+  @override
+  String get onboardingWelcomeBody =>
+      'Ayetler, dualar ve namaz hatırlatmaları gün içinde yanında olsun.';
+
+  @override
+  String get onboardingLandingVerseArabic => 'قَدْ أَفْلَحَ مَن زَكَّاهَا';
+
+  @override
+  String get onboardingLandingVerseTranslation =>
+      'Nefsini arındıran kurtuluşa ermiştir.';
+
+  @override
+  String get onboardingLandingVerseSource => 'Şems 9';
+
+  @override
+  String get onboardingWelcomeWidgetVerseArabic =>
+      'أَلَا بِذِكْرِ اللَّهِ تَطْمَئِنُّ الْقُلُوبُ';
+
+  @override
+  String get onboardingWelcomeWidgetVerseTranslation =>
+      'Kalpler ancak Allah\'ı zikretmekle huzur bulur.';
+
+  @override
+  String get onboardingWelcomeWidgetVerseSource => 'Ra\'d 13:28';
+
+  @override
+  String get onboardingLanguagePickerTitle => 'Dil';
+
+  @override
+  String get onboardingContinue => 'Devam';
+
+  @override
+  String get onboardingStoryBody =>
+      'Sadece sakin bir nefes al.\n\nArın, gün içinde Kur\'an\'dan kısa hatırlatmalarla yanında olacak.\n\nTelefonunu her açtığında küçük bir ayet molası seni karşılayacak.\n\nHazırsan başlayalım.';
+
+  @override
+  String get onboardingNameSubtitle =>
+      'Ayet ve hatırlatma metinleri daha kişisel hissetsin.';
+
+  @override
+  String get onboardingNameHint => 'Adın';
+
+  @override
+  String onboardingGreetingTitle(String name) {
+    return 'Tanıştığımıza memnunum, $name.';
+  }
+
+  @override
+  String get onboardingGreetingBody =>
+      'Bugün bu uygulamayı indirmen tesadüf değil.\n\nArın bundan sonra yanında olacak: bir ayet, bir vakit, bir hatırlatma.\n\nŞimdi seni biraz tanıyalım. İçinden geldiği gibi cevap vermen yeterli.';
+
+  @override
+  String onboardingIntentTitle(String name) {
+    return '$name, buraya gelmene ne vesile oldu?';
+  }
+
+  @override
+  String get onboardingIntentSubtitle =>
+      'Hatırlatmaları bu niyete göre yaklaştıralım.';
+
+  @override
+  String get onboardingIntentLock => 'Kilit ekranında ayet görmek';
+
+  @override
+  String get onboardingIntentFaith => 'İmanımı taze tutmak';
+
+  @override
+  String get onboardingIntentCalm => 'Kalbimi sakinleştirmek';
+
+  @override
+  String get onboardingIntentDaily => 'Güne bir ayetle başlamak';
+
+  @override
+  String get onboardingIntentPrayer => 'Namaz vakitlerini kaçırmamak';
+
+  @override
+  String onboardingHeartTitle(String name) {
+    return '$name, Allah\'a yakınlığını bugün nasıl hissediyorsun?';
+  }
+
+  @override
+  String get onboardingHeartHint => 'Kalbe dokun veya sürükle.';
+
+  @override
+  String get onboardingHeartLabelFar => 'Uzak hissediyorum';
+
+  @override
+  String get onboardingHeartLabelSeeking => 'Yolunu arıyorum';
+
+  @override
+  String get onboardingHeartLabelHolding => 'Bağımı koruyorum';
+
+  @override
+  String get onboardingHeartLabelNear => 'Yakın duruyorum';
+
+  @override
+  String get onboardingHeartLabelFull => 'Kalbim dolu';
+
+  @override
+  String get onboardingHoldVerseArabic =>
+      'وَإِذَا سَأَلَكَ عِبَادِي عَنِّي فَإِنِّي قَرِيبٌ';
+
+  @override
+  String get onboardingHoldVerseTranslation =>
+      'Kullarım beni sorarsa, bilesin ki ben onlara yakınım.';
+
+  @override
+  String get onboardingHoldVerseSource => 'Bakara 186';
+
+  @override
+  String onboardingHoldFooter(String name) {
+    return '$name, bu sadece bir başlangıç...';
+  }
+
+  @override
+  String onboardingStruggleTitle(String name) {
+    return '$name, şu ara kalbini en çok ne yoruyor?';
+  }
+
+  @override
+  String get onboardingStruggleSubtitle =>
+      'Hatırlatmaları bu yüke göre yumuşatalım.';
+
+  @override
+  String get onboardingStruggleAnxiety => 'Kaygı';
+
+  @override
+  String get onboardingStruggleDelay => 'Erteleme';
+
+  @override
+  String get onboardingStruggleLonely => 'Yalnızlık';
+
+  @override
+  String get onboardingStruggleImpatience => 'Sabırsızlık';
+
+  @override
+  String get onboardingStruggleRegret => 'Pişmanlık';
+
+  @override
+  String get onboardingNoteSubtitle =>
+      'Kısa bir cümle yeter. Bu cevabı sadece sen görebilirsin.';
+
+  @override
+  String onboardingNoteTitleAnxiety(String name) {
+    return '$name, kaygını dile getirmek istediğin bir şey var mı?';
+  }
+
+  @override
+  String onboardingNoteTitleDelay(String name) {
+    return '$name, ertelemede takıldığın bir şey var mı?';
+  }
+
+  @override
+  String onboardingNoteTitleLonely(String name) {
+    return '$name, yalnızlığını dile getirmek istediğin bir şey var mı?';
+  }
+
+  @override
+  String onboardingNoteTitleImpatience(String name) {
+    return '$name, sabırsızlığını dile getirmek istediğin bir şey var mı?';
+  }
+
+  @override
+  String onboardingNoteTitleRegret(String name) {
+    return '$name, pişmanlığını dile getirmek istediğin bir şey var mı?';
+  }
+
+  @override
+  String get onboardingNoteHintAnxiety =>
+      'Örn. Geleceğe dair kaygım gece uykumu kaçırıyor.';
+
+  @override
+  String get onboardingNoteHintDelay =>
+      'Örn. Yapacağım işi yine yarına bırakıyorum.';
+
+  @override
+  String get onboardingNoteHintLonely =>
+      'Örn. Kalabalıkta bile içim tenhalaşıyor.';
+
+  @override
+  String get onboardingNoteHintImpatience =>
+      'Örn. İşler yavaş ilerleyince içim daralıyor.';
+
+  @override
+  String get onboardingNoteHintRegret =>
+      'Örn. Geçmişteki bir sözüm hâlâ içimde duruyor.';
+
+  @override
+  String get onboardingNoteSuggestionAnxiety =>
+      'Kaygımı Allah\'a bırakıp kalbimi rahatlatmak istiyorum.';
+
+  @override
+  String get onboardingNoteSuggestionDelay =>
+      'Niyet ettiğim işi ertelemeden yerine getirmek istiyorum.';
+
+  @override
+  String get onboardingNoteSuggestionLonely =>
+      'Yalnızken bile Rabbimin yanımda olduğunu hatırlamak istiyorum.';
+
+  @override
+  String get onboardingNoteSuggestionImpatience =>
+      'Acele etmeden, sabırla yürümek istiyorum.';
+
+  @override
+  String get onboardingNoteSuggestionRegret =>
+      'Pişmanlığımı tövbe ile bırakmak istiyorum.';
+
+  @override
+  String get onboardingHeardTitle => 'Seni duyduk.';
+
+  @override
+  String get onboardingHeardVerse =>
+      'Muhakkak ki zorlukla beraber bir kolaylık vardır.';
+
+  @override
+  String get onboardingHeardSource => '— İnşirah, 94:6';
+
+  @override
+  String onboardingToneTitle(String name) {
+    return '$name, son günlerde kalbin ne kadar yorgun?';
+  }
+
+  @override
+  String get onboardingToneSubtitle => 'Dök içini.';
+
+  @override
+  String get onboardingToneCalm => 'Sakin';
+
+  @override
+  String get onboardingToneLight => 'Hafif';
+
+  @override
+  String get onboardingToneMid => 'Orta';
+
+  @override
+  String get onboardingToneHeavy => 'Ağır';
+
+  @override
+  String get onboardingToneVeryHeavy => 'Çok ağır';
+
+  @override
+  String onboardingToneValue(int value) {
+    return '$value / 5';
+  }
+
+  @override
+  String onboardingTurnTitle(String name) {
+    return '$name, zor zamanlardan geçerken...';
+  }
+
+  @override
+  String get onboardingTurnSubtitle => 'Allah\'a yönelir misin?';
+
+  @override
+  String get onboardingTurnAlways => 'Her daralmada O\'na dönerim';
+
+  @override
+  String get onboardingTurnSometimes => 'Bazen yönelirim';
+
+  @override
+  String get onboardingTurnRarely => 'Seyrek, ama artırmak istiyorum';
+
+  @override
+  String get onboardingTurnStarting => 'Bu yola yeni giriyorum';
+
+  @override
+  String get onboardingShapeTitle => 'Bunu kalbine göre örüyoruz';
+
+  @override
+  String get onboardingShapeSubtitle =>
+      'Daha çok ekran değil; doğru anda kısa bir duruş.';
+
+  @override
+  String get onboardingShapeCard1Title => 'Sana yakın ayetler';
+
+  @override
+  String get onboardingShapeCard1Body =>
+      'Seçtiğin yüke göre içerikler öne çıkar.';
+
+  @override
+  String get onboardingShapeCard2Title => 'Yumuşak hatırlatma';
+
+  @override
+  String get onboardingShapeCard2Body =>
+      'Bildirim dili sakin, kısa ve kalbe yönelik kalır.';
+
+  @override
+  String get onboardingShapeCard3Title => 'Kur\'an etrafında';
+
+  @override
+  String get onboardingShapeCard3Body =>
+      'Gün, ayet ve zikirle aynı hatta yürür.';
+
+  @override
+  String onboardingPrayerTitle(String name) {
+    return '$name, namaz ve dua ritmini nasıl tarif edersin?';
+  }
+
+  @override
+  String get onboardingPrayerSubtitle =>
+      'Sana uyan bir başlangıç temposu seçelim.';
+
+  @override
+  String get onboardingPrayerRegular => 'Düzenimi koruyorum';
+
+  @override
+  String get onboardingPrayerOccasional => 'Ara sıra tutturuyorum';
+
+  @override
+  String get onboardingPrayerStruggling => 'Aksatınca zorlanıyorum';
+
+  @override
+  String get onboardingPrayerStarting => 'Yeni yeni alışıyorum';
+
+  @override
+  String get onboardingPrayerBeginHere => 'Bu ekrandan başlamak istiyorum';
+
+  @override
+  String onboardingWaswasaTitle(String name) {
+    return '$name, vesvese veya şüphe geldiğinde ne yapıyorsun?';
+  }
+
+  @override
+  String get onboardingWaswasaSubtitle =>
+      'Bu cevap, yanında duruşumuzu belirler.';
+
+  @override
+  String get onboardingWaswasaPray => 'Dua ile karşılarım';
+
+  @override
+  String get onboardingWaswasaRead => 'Okuyup anlamaya çalışırım';
+
+  @override
+  String get onboardingWaswasaAsk => 'Güvendiğim birine açarım';
+
+  @override
+  String get onboardingWaswasaCarry => 'İçimde sessizce taşırım';
+
+  @override
+  String get onboardingPathVerseArabic =>
+      'وَمَن يَتَوَكَّلْ عَلَى اللَّهِ فَهُوَ حَسْبُهُ';
+
+  @override
+  String get onboardingPathVerseTranslation =>
+      'Kim Allah\'a tevekkül ederse, O ona yeter.';
+
+  @override
+  String get onboardingPathVerseSource => 'Talâk 65:3';
+
+  @override
+  String onboardingPathVerseFooter(String name) {
+    return '$name, Kur\'an kalbine dursun.';
+  }
+
+  @override
+  String get onboardingPathTitle => 'Günlük hattın belirmeye başladı';
+
+  @override
+  String get onboardingPathSubtitle =>
+      'Ritmini, kalp hâlini ve niyetini tek sade bir günde birleştireceğiz.';
+
+  @override
+  String get onboardingPathCard1Title => 'Önce ihtiyacın';
+
+  @override
+  String get onboardingPathCard1Body =>
+      'Sana uyan ayetler listenin başında durur.';
+
+  @override
+  String get onboardingPathCard2Title => 'Kendi tempon';
+
+  @override
+  String get onboardingPathCard2Body =>
+      'Akış, gerçek okuma düzenine göre nefes alır.';
+
+  @override
+  String get onboardingPathCard3Title => 'Gözünün önünde';
+
+  @override
+  String get onboardingPathCard3Body =>
+      'Kilit ekranı, güne dağılmış kısa bir durak olur.';
+
+  @override
+  String get onboardingRhythmTitle => 'Arın, günün içine sessizce yerleşir';
+
+  @override
+  String get onboardingRhythmSubtitle =>
+      'Amaç ekranda daha uzun kalmak değil; doğru anda kısa bir hatırlatma. Bunun için bildirim iznini isteyeceğiz.';
+
+  @override
+  String get onboardingRhythmFeaturedTitle => 'Günün ayet hatırlatması';
+
+  @override
+  String get onboardingRhythmFeaturedBody =>
+      'Devam deyince bildirim iznini soracağız. Saatleri ve ritmi istediğin zaman ayarlardan değiştirirsin.';
+
+  @override
+  String get onboardingRhythmCard1Title => 'Kısa duruş';
+
+  @override
+  String get onboardingRhythmCard1Body =>
+      'Ayetler gün içinde sakin ve kısa görünür.';
+
+  @override
+  String get onboardingRhythmCard2Title => 'Kilitte bir nefes';
+
+  @override
+  String get onboardingRhythmCard2Body =>
+      'Telefona her bakışta küçük bir hatırlatma durur.';
+
+  @override
+  String get onboardingRhythmCard3Title => 'Aynı hatta kalmak';
+
+  @override
+  String get onboardingRhythmCard3Body =>
+      'Namaz, zikir ve tefekkür birbirini kovalar.';
+
+  @override
+  String get onboardingLocationTitle => 'Namaz vakitleri için konum';
+
+  @override
+  String get onboardingLocationSubtitle =>
+      'İmsak, öğle ve akşamı şehrine göre gösterebilmemiz için konumunu kibarca istiyoruz. Konumun yalnızca namaz vakitleri ve kıble için kullanılır.';
+
+  @override
+  String get onboardingLocationFeaturedTitle =>
+      'Vakitler, bulunduğun yere göre';
+
+  @override
+  String get onboardingLocationFeaturedBody =>
+      'Devam deyince konum iznini soracağız. İzni sonra da ayarlardan değiştirebilirsin.';
+
+  @override
+  String get onboardingLocationCard1Title => 'Namaz vakitleri';
+
+  @override
+  String get onboardingLocationCard1Body =>
+      'Şehrine göre günlük vakitler taze kalır.';
+
+  @override
+  String get onboardingLocationCard2Title => 'Kıble yönü';
+
+  @override
+  String get onboardingLocationCard2Body =>
+      'Yönünü doğru hesaplayabilmek için aynı izin yeter.';
+
+  @override
+  String get onboardingLocationCard3Title => 'Sende kalır';
+
+  @override
+  String get onboardingLocationCard3Body =>
+      'Konumun başka bir amaçla paylaşılmaz.';
+
+  @override
+  String get onboardingPrepareTitle => 'Son ayarlar yapılıyor';
+
+  @override
+  String get onboardingPrepareSubtitle => 'Her bölüm tek tek hazırlanıyor.';
+
+  @override
+  String get onboardingPrepareReadyTitle => 'Deneyimin hazır';
+
+  @override
+  String get onboardingPrepareReadySubtitle =>
+      'Son adımda kısa bir duaya Amin diyeceksin.';
+
+  @override
+  String get onboardingPrepareStatus => 'Hazırlanıyor';
+
+  @override
+  String get onboardingPrepareYes => 'Evet';
+
+  @override
+  String get onboardingPrepareNo => 'Hayır';
+
+  @override
+  String onboardingPrepareBar1Title(String name) {
+    return '$name, ayet akışın örülüyor';
+  }
+
+  @override
+  String get onboardingPrepareBar1Body =>
+      'Cevaplarına göre dil ve vurgu seçiliyor.';
+
+  @override
+  String get onboardingPrepareBar2Title => 'Kilit ekranı görünümü hazırlanıyor';
+
+  @override
+  String get onboardingPrepareBar2Body => 'Saat ve ayet düzeni sade tutuluyor.';
+
+  @override
+  String get onboardingPrepareBar3Title =>
+      'Daha çok kişiye ulaşmak için ayarlanıyor';
+
+  @override
+  String get onboardingPrepareBar3Body =>
+      'Keşif kaynakları gizlilikle ölçülüyor.';
+
+  @override
+  String get onboardingPrepareBar4Title => 'Kısa yollar yerleştiriliyor';
+
+  @override
+  String get onboardingPrepareBar4Body =>
+      'Tesbihat, kıble, namaz ve sohbet hazırlanıyor.';
+
+  @override
+  String get onboardingPrepareAskLock =>
+      'Kilit ekranında sade ayet görünümünü kullanalım mı?';
+
+  @override
+  String get onboardingPrepareAskVerses =>
+      'Ayetleri cevaplarına göre öne alalım mı?';
+
+  @override
+  String get onboardingPrepareAskShortcuts =>
+      'İbadet kısa yollarını ana akışta öne alalım mı?';
+
+  @override
+  String get onboardingDuaTitle => 'Kısa bir dua';
+
+  @override
+  String onboardingDuaBody(String name) {
+    return 'Allah\'ım, kulun $name için hayır, bereket, sağlık, huzur, hikmet ve istikamet nasip et. Kalbini Kur\'an\'la diri, adımlarını hayırla sabit kıl. Sözün her mevsimde ona yakın olsun.';
+  }
+
+  @override
+  String get onboardingDuaVerseArabic =>
+      'رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً';
+
+  @override
+  String get onboardingDuaVerseTranslation =>
+      'Rabbimiz! Bize dünyada da iyilik, ahirette de iyilik ver.';
+
+  @override
+  String get onboardingDuaVerseSource => 'Bakara 2:201';
+
+  @override
+  String get onboardingDuaAmin => 'Amin.';
+
+  @override
+  String get onboardingDuaHoldHint => 'Basılı tut';
 
   @override
   String get onboardingSkip => 'Geç';

@@ -485,6 +485,10 @@ abstract final class FcmTokenService {
       if (!shouldAutoRequestBroadcastPermission(
         onboardingCompleted: onboardingCompleted,
         promptAlreadyHandled: promptHandled,
+        appTourBlockingPrompts: shouldDeferSystemPromptsForAppTour(
+          tourPending: prefs.getBool(kAppTourPendingKey) == true,
+          tourCompleted: prefs.getBool(kAppTourCompletedKey) == true,
+        ),
       )) {
         return syncBroadcastSubscriptionIfAuthorized();
       }

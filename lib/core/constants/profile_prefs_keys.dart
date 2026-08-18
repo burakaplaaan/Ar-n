@@ -1,1 +1,13 @@
 const String profileNameLockedByUserKey = 'profile_name_locked_by_user';
+const String kOnboardingDisplayNameKey = 'arin_onboarding_display_name';
+const String kOnboardingIntentKey = 'arin_onboarding_intent';
+const String kOnboardingHeartPercentKey = 'arin_onboarding_heart_percent';
+const String kOnboardingStruggleKey = 'arin_onboarding_struggle';
+const String kOnboardingStruggleNoteKey = 'arin_onboarding_struggle_note';
+const String kOnboardingToneLevelKey = 'arin_onboarding_tone_level';
+const String kOnboardingTurnKey = 'arin_onboarding_turn';
+const String kOnboardingPrayerKey = 'arin_onboarding_prayer';
+const String kOnboardingWaswasaKey = 'arin_onboarding_waswasa';
+const String kOnboardingLockVerseSimpleKey = 'arin_onboarding_lock_verse_simple';
+const String kOnboardingPrioritizeVersesKey = 'arin_onboarding_prioritize_verses';
+const String kOnboardingShortcutsPromoteKey = 'arin_onboarding_shortcuts_promote';

@@ -11,6 +11,7 @@ import 'package:flutter/widgets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../constants/meta_ads_ids.dart';
+import '../../data/services/startup_permission_policy.dart';
 
 /// Meta reklam ölçümü. Firebase Analytics'ten bağımsızdır.
 abstract final class MetaAppEvents {
@@ -141,6 +142,14 @@ abstract final class MetaAppEvents {
   static Future<void> _requestTrackingAuthorizationOnce() async {
     try {
       await _setAttPromptPending(true);
+      final prefs = await SharedPreferences.getInstance();
+      if (shouldDeferSystemPromptsForAppTour(
+        tourPending: prefs.getBool(kAppTourPendingKey) == true,
+        tourCompleted: prefs.getBool(kAppTourCompletedKey) == true,
+      )) {
+        debugPrint('══ ARIN ══ ATT tanıtım bitene kadar ertelendi');
+        return;
+      }
       if (!_ready) await initialize();
       if (!_ready) return;
 

@@ -18,6 +18,7 @@ import '../../core/theme/arin_shell_background.dart';
 import '../../core/extensions/date_extensions.dart';
 import '../../data/models/prayer_times_model.dart';
 import '../../data/services/diyanet_district_matcher.dart';
+import '../../data/services/feature_permission_gate.dart';
 import '../../data/services/location_service.dart';
 import '../settings/widgets/district_picker_sheet.dart';
 import '../shared/providers/auth_providers.dart';
@@ -1067,6 +1068,15 @@ class _PrayerTimesError extends ConsumerWidget {
       ref.invalidate(prayerTimesProvider);
     }
 
+    Future<void> requestLocation() async {
+      final ok = await ensureLocationPermissionForFeature(
+        ref.read(locationServiceProvider),
+      );
+      if (!ok || !context.mounted) return;
+      await ref.read(locationServiceProvider).clearPrayerLocationThrottle();
+      ref.invalidate(prayerTimesProvider);
+    }
+
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -1105,6 +1115,19 @@ class _PrayerTimesError extends ConsumerWidget {
             runSpacing: 8,
             alignment: WrapAlignment.center,
             children: [
+              FilledButton.icon(
+                onPressed: requestLocation,
+                icon: const Icon(Icons.my_location_rounded, size: 18),
+                label: Text(l10n.homeRequestLocationAction),
+                style: FilledButton.styleFrom(
+                  backgroundColor: AppColors.emeraldMid,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 10,
+                  ),
+                ),
+              ),
               FilledButton.icon(
                 onPressed: () async {
                   await ref

@@ -20,6 +20,7 @@ import '../../data/services/app_notification_channel_prefs.dart';
 import '../../data/services/arin_local_notifications_plugin.dart';
 import '../../data/services/background_location_task.dart';
 import '../../data/services/fcm_token_service.dart';
+import '../../data/services/feature_permission_gate.dart';
 import '../../data/services/local_notification_permission_gate.dart';
 import '../../data/services/location_service.dart';
 import '../../data/services/prayer_reminder_prefs.dart';
@@ -248,6 +249,10 @@ class _NotificationsSettingsPageState
 
   /// Önce prefs diske yazılır ve UI hemen güncellenir; ardından bildirim yeniden
   /// planlanır. Sync ağ/Firestore gecikmesinde anahtarın takılı kalmasını önler.
+  Future<bool> _ensureCanEnableNotifications() {
+    return ensureNotificationPermissionForFeature();
+  }
+
   Future<void> _applyPrefsAndSync(
     SharedPreferences prefs,
     Future<void> Function() savePrefs,
@@ -495,6 +500,9 @@ class _NotificationsSettingsPageState
                                 value: dailyOn,
                                 onChanged: (v) async {
                                   HapticFeedback.selectionClick();
+                                  if (v && !await _ensureCanEnableNotifications()) {
+                                    return;
+                                  }
                                   await _applyPrefsAndSync(
                                     prefs,
                                     () =>
@@ -516,6 +524,9 @@ class _NotificationsSettingsPageState
                                     ),
                                 onChanged: (v) async {
                                   HapticFeedback.selectionClick();
+                                  if (v && !await _ensureCanEnableNotifications()) {
+                                    return;
+                                  }
                                   await _applyPrefsAndSync(
                                     prefs,
                                     () =>
@@ -537,6 +548,9 @@ class _NotificationsSettingsPageState
                                     ),
                                 onChanged: (v) async {
                                   HapticFeedback.selectionClick();
+                                  if (v && !await _ensureCanEnableNotifications()) {
+                                    return;
+                                  }
                                   await _applyPrefsAndSync(
                                     prefs,
                                     () =>
@@ -555,6 +569,9 @@ class _NotificationsSettingsPageState
                                 value: zikirOn,
                                 onChanged: (v) async {
                                   HapticFeedback.selectionClick();
+                                  if (v && !await _ensureCanEnableNotifications()) {
+                                    return;
+                                  }
                                   await _applyPrefsAndSync(
                                     prefs,
                                     () =>

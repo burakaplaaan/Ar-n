@@ -18,6 +18,8 @@ import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/turkey_provinces.dart';
 import '../../../core/providers/shared_preferences_provider.dart';
 import '../../../data/services/location_service.dart';
+import '../../../data/services/startup_permission_policy.dart';
+import '../../onboarding/app_tour/app_tour_controller.dart';
 import '../providers/prayer_time_providers.dart';
 import 'package:arin/presentation/shared/widgets/arin_loader.dart';
 
@@ -68,6 +70,12 @@ class _LocationChangeListenerState extends ConsumerState<LocationChangeListener>
     final prefs = ref.read(sharedPreferencesProvider);
     final onboardingDone = prefs.getBool('onboarding_completed') ?? false;
     if (!onboardingDone) return;
+    if (shouldDeferSystemPromptsForAppTour(
+      tourPending: prefs.getBool(kAppTourPendingKey) == true,
+      tourCompleted: prefs.getBool(kAppTourCompletedKey) == true,
+    )) {
+      return;
+    }
 
     final location = ref.read(locationServiceProvider);
     final pref = location.locationUpdatePref;
@@ -119,7 +127,14 @@ class _LocationChangeListenerState extends ConsumerState<LocationChangeListener>
   }
 
   @override
-  Widget build(BuildContext context) => widget.child;
+  Widget build(BuildContext context) {
+    ref.listen(appTourControllerProvider, (previous, next) {
+      if (previous?.active == true && !next.active) {
+        unawaited(_checkLocation());
+      }
+    });
+    return widget.child;
+  }
 }
 
 // ── Dialog ────────────────────────────────────────────────────────────────────

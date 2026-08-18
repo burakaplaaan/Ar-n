@@ -10,7 +10,6 @@ import 'package:arin/l10n/app_localizations.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_text_styles.dart';
 import '../../core/router/app_router.dart';
-import '../../data/services/location_service.dart';
 import '../shared/providers/prayer_time_providers.dart';
 import '../shared/providers/quotes_providers.dart';
 
@@ -53,38 +52,8 @@ class _AppPreparePageState extends ConsumerState<AppPreparePage> {
     });
   }
 
-  /// İlk kurulumda konum hiç kaydedilmemişse, vakitleri ısıtmadan ÖNCE
-  /// (Play Store gereği belirgin açıklama dialog'u ile) konum iznini iste.
-  ///
-  /// Aksi halde izin isteği, vakit ısıtmasının kısa `_warmupTimeout` (1.8 sn)
-  /// süresiyle yarışıyor; kullanıcı sistem dialog'una cevap veremeden istek
-  /// zaman aşımına uğruyor ve ana ekranda "Vakitler yüklenemedi" görünüyordu.
-  /// Bu adım kasıtlı olarak warmup yarışından ayrı ve bloklayan biçimde,
-  /// yalnızca gerçekten konum yokken çalışır.
-  Future<void> _ensureLocationPermission() async {
-    try {
-      final location = ref.read(locationServiceProvider);
-      final hasCoordinates =
-          location.savedLat != null && location.savedLon != null;
-      final hasCity = location.savedCity.trim().isNotEmpty;
-      if (hasCoordinates || hasCity) return;
-
-      // requestCurrentPosition: izin yoksa belirgin açıklama + sistem izni
-      // ister, izin verilirse koordinatı kaydeder. Kullanıcı reddederse null
-      // döner; bu durumda ana ekran manuel "İlçe değiştir" akışına yönlendirir.
-      await location
-          .requestCurrentPosition()
-          .timeout(const Duration(seconds: 30));
-    } catch (_) {
-      // İzin/GPS başarısız olsa bile hazırlık ekranı navigasyonu bloke etmez;
-      // ana ekranda kullanıcı manuel konum seçebilir.
-    }
-  }
-
   Future<void> _runPrepare() async {
     try {
-      await _ensureLocationPermission();
-      if (!mounted) return;
       await Future.wait<void>([
         Future<void>.delayed(_minimumVisibleDuration),
         _warmPrayerTimes(),
