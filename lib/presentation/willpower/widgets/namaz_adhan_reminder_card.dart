@@ -14,6 +14,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../core/ads/admob_ids.dart';
 import '../../../core/constants/app_colors.dart';
+import '../../shared/widgets/arin_popup.dart';
 import '../../../core/constants/app_text_styles.dart';
 import '../../../core/constants/product_metric_features.dart';
 import '../../../core/providers/shared_preferences_provider.dart';
@@ -355,22 +356,14 @@ class _NamazAdhanReminderCardState
     // ödüllü reklam arka planda yüklensin ki "izle"ye basınca anında açılsın.
     // (2. alarm geçiş reklamı göstermez → yalnızca ödüllü ısıtılır.)
     AdMobService.preloadRewarded();
-    final accepted = await showDialog<bool>(
+    final l10n = AppLocalizations.of(context)!;
+    final accepted = await showArinConfirm(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text(AppLocalizations.of(ctx)!.secondAlarmPremiumFeature),
-        content: Text(AppLocalizations.of(ctx)!.secondAlarmAdWatchText),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, false),
-            child: Text(AppLocalizations.of(ctx)!.giveUp),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.pop(ctx, true),
-            child: Text(AppLocalizations.of(ctx)!.openAfterAd),
-          ),
-        ],
-      ),
+      title: l10n.secondAlarmPremiumFeature,
+      message: l10n.secondAlarmAdWatchText,
+      cancelLabel: l10n.giveUp,
+      confirmLabel: l10n.openAfterAd,
+      icon: Icons.alarm_rounded,
     );
     if (accepted != true) return false;
     final rewarded = await ref

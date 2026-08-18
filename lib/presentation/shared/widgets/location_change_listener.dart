@@ -22,6 +22,7 @@ import '../../../data/services/startup_permission_policy.dart';
 import '../../onboarding/app_tour/app_tour_controller.dart';
 import '../providers/prayer_time_providers.dart';
 import 'package:arin/presentation/shared/widgets/arin_loader.dart';
+import 'package:arin/presentation/shared/widgets/arin_popup.dart';
 
 class LocationChangeListener extends ConsumerStatefulWidget {
   const LocationChangeListener({required this.child, super.key});
@@ -104,7 +105,7 @@ class _LocationChangeListenerState extends ConsumerState<LocationChangeListener>
     final newCity =
         matchTurkeyProvinceExact(change.newCity) ?? change.newCity;
 
-    await showDialog<void>(
+    await showArinPopup<void>(
       context: context,
       barrierDismissible: false,
       builder: (_) => _LocationChangeDialog(
@@ -190,10 +191,11 @@ class _LocationChangeDialogState extends State<_LocationChangeDialog> {
     final checkboxFill =
         isDark ? AppColors.emeraldMid : AppColors.emeraldLight;
 
-    return Dialog(
-      backgroundColor: Colors.transparent,
-      insetPadding: const EdgeInsets.symmetric(horizontal: 28, vertical: 48),
-      child: Container(
+    return Material(
+      type: MaterialType.transparency,
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 420),
+        child: Container(
         decoration: BoxDecoration(
           color: surfaceColor,
           borderRadius: BorderRadius.circular(20),
@@ -340,6 +342,7 @@ class _LocationChangeDialogState extends State<_LocationChangeDialog> {
                 ],
               ),
           ],
+        ),
         ),
       ),
     );

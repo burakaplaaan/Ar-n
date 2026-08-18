@@ -27,6 +27,7 @@ import '../shared/providers/prayer_time_providers.dart';
 import '../onboarding/app_tour/app_tour_anchor.dart';
 import '../onboarding/app_tour/app_tour_keys.dart';
 import '../shared/providers/willpower_hub_nav_provider.dart';
+import '../shared/widgets/arin_popup.dart';
 import '../shared/widgets/arin_pressable.dart';
 import '../shared/widgets/arin_shell_layout.dart';
 import '../kaza/kaza_tracking_provider.dart';
@@ -374,41 +375,14 @@ Future<void> _confirmDeleteHabitHub(
   String habitId,
 ) async {
   final l10n = AppLocalizations.of(context)!;
-  final confirmed = await showDialog<bool>(
+  final confirmed = await showArinConfirm(
     context: context,
-    builder: (ctx) => AlertDialog(
-      backgroundColor: AppColors.anthraciteMid,
-      title: Text(
-        l10n.willpowerHubArchiveHabitDialogTitle,
-        style: AppTextStyles.headlineSmall.copyWith(color: AppColors.creamBase),
-      ),
-      content: Text(
-        l10n.willpowerHubArchiveHabitDialogBody,
-        style: AppTextStyles.bodyMedium.copyWith(
-          color: AppColors.textOnDarkMuted,
-          height: 1.4,
-        ),
-      ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(ctx, false),
-          child: Text(
-            l10n.commonCancel,
-            style: AppTextStyles.labelLarge.copyWith(
-              color: AppColors.creamBase,
-            ),
-          ),
-        ),
-        FilledButton(
-          onPressed: () => Navigator.pop(ctx, true),
-          style: FilledButton.styleFrom(backgroundColor: _kQuitAccent),
-          child: Text(
-            l10n.willpowerHubArchiveAction,
-            style: AppTextStyles.labelLarge.copyWith(color: Colors.white),
-          ),
-        ),
-      ],
-    ),
+    title: l10n.willpowerHubArchiveHabitDialogTitle,
+    message: l10n.willpowerHubArchiveHabitDialogBody,
+    cancelLabel: l10n.commonCancel,
+    confirmLabel: l10n.willpowerHubArchiveAction,
+    tone: ArinPopupTone.destructive,
+    icon: Icons.delete_outline_rounded,
   );
   if (confirmed == true) {
     await HabitCloudSyncService.rememberDeletedHabitId(habitId: habitId);
@@ -2150,54 +2124,14 @@ Future<void> _confirmHideKazaHubCard(
   WidgetRef ref,
 ) async {
   final l10n = AppLocalizations.of(context)!;
-  final onLight = ArinShellBackground.isLight(context);
-  final ok = await showDialog<bool>(
+  final ok = await showArinConfirm(
     context: context,
-    builder: (ctx) => AlertDialog(
-      backgroundColor: onLight
-          ? const Color(0xFFF2F4F3)
-          : AppColors.anthraciteMid,
-      title: Text(
-        l10n.willpowerHubHideKazaDialogTitle,
-        style: AppTextStyles.titleSmall.copyWith(
-          color: onLight ? AppColors.emeraldDark : AppColors.creamBase,
-        ),
-      ),
-      content: Text(
-        l10n.willpowerHubHideKazaDialogBody,
-        style: AppTextStyles.bodySmall.copyWith(
-          color: onLight
-              ? AppColors.emeraldDark.withValues(alpha: 0.75)
-              : AppColors.textOnDarkMuted,
-          height: 1.45,
-        ),
-      ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(ctx, false),
-          child: Text(
-            l10n.commonCancel,
-            style: TextStyle(
-              color: onLight
-                  ? AppColors.emeraldDark.withValues(alpha: 0.65)
-                  : AppColors.textOnDarkMuted,
-            ),
-          ),
-        ),
-        TextButton(
-          onPressed: () => Navigator.pop(ctx, true),
-          child: Text(
-            l10n.willpowerHubRemoveAction,
-            style: TextStyle(
-              color: onLight
-                  ? const Color(0xFFB85C5C)
-                  : const Color(0xFFFF8A80),
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-        ),
-      ],
-    ),
+    title: l10n.willpowerHubHideKazaDialogTitle,
+    message: l10n.willpowerHubHideKazaDialogBody,
+    cancelLabel: l10n.commonCancel,
+    confirmLabel: l10n.willpowerHubRemoveAction,
+    tone: ArinPopupTone.destructive,
+    icon: Icons.visibility_off_outlined,
   );
   if (ok == true && context.mounted) {
     await ref.read(kazaTrackingProvider.notifier).hideGelisimHubCard();
@@ -2784,27 +2718,20 @@ class _WillHabitTile extends ConsumerWidget {
                         child: OutlinedButton.icon(
                           onPressed: () async {
                             HapticFeedback.mediumImpact();
-                            final choice = await showDialog<_HubResetChoice>(
+                            final choice = await showArinPopup<_HubResetChoice>(
                               context: context,
-                              builder: (ctx) => AlertDialog(
-                                backgroundColor: AppColors.anthraciteMid,
-                                title: Text(
-                                  l10n.quitProgramRestartTitle,
-                                  style: AppTextStyles.titleSmall.copyWith(
-                                    color: AppColors.creamBase,
-                                  ),
+                              builder: (ctx) => ArinPopupCard(
+                                title: l10n.quitProgramRestartTitle,
+                                message: l10n.quitProgramRestartPrompt,
+                                icon: Icons.restart_alt_rounded,
+                                tone: ArinPopupTone.warning,
+                                cancelLabel: l10n.commonCancel,
+                                onCancel: () => Navigator.pop(
+                                  ctx,
+                                  _HubResetChoice.cancel,
                                 ),
-                                content: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                extra: Column(
                                   children: [
-                                    Text(
-                                      l10n.quitProgramRestartPrompt,
-                                      style: AppTextStyles.bodyMedium.copyWith(
-                                        color: AppColors.textOnDarkMuted,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 14),
                                     _HubResetOptionTile(
                                       icon: Icons.history_rounded,
                                       title: l10n
@@ -2831,20 +2758,6 @@ class _WillHabitTile extends ConsumerWidget {
                                     ),
                                   ],
                                 ),
-                                actions: [
-                                  TextButton(
-                                    onPressed: () => Navigator.pop(
-                                      ctx,
-                                      _HubResetChoice.cancel,
-                                    ),
-                                    child: Text(
-                                      l10n.commonCancel,
-                                      style: const TextStyle(
-                                        color: AppColors.creamBase,
-                                      ),
-                                    ),
-                                  ),
-                                ],
                               ),
                             );
                             if (choice != null &&

@@ -25,6 +25,7 @@ import '../shared/providers/auth_providers.dart';
 import '../shared/providers/premium_providers.dart';
 import '../shared/providers/prayer_time_providers.dart';
 import '../shared/providers/user_profile_providers.dart';
+import '../shared/widgets/arin_popup.dart';
 import '../shared/widgets/arin_skeleton.dart';
 import '../shared/widgets/arin_shell_layout.dart';
 import '../shared/widgets/arin_pressable.dart';
@@ -178,12 +179,13 @@ Future<void> _editHomeDisplayName({
   );
   String? result;
   try {
-    result = await showDialog<String>(
+    result = await showArinPopup<String>(
       context: context,
       builder: (ctx) {
-        return AlertDialog(
-          title: Text(l10n.surveyNameTitle),
-          content: TextField(
+        return ArinPopupCard(
+          title: l10n.surveyNameTitle,
+          icon: Icons.badge_outlined,
+          extra: TextField(
             controller: controller,
             autofocus: true,
             textCapitalization: TextCapitalization.words,
@@ -203,20 +205,14 @@ Future<void> _editHomeDisplayName({
               Navigator.of(ctx).pop(normalized);
             },
           ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(ctx).pop(),
-              child: Text(l10n.commonCancel),
-            ),
-            TextButton(
-              onPressed: () {
-                final normalized = _normalizeHomeDisplayName(controller.text);
-                if (normalized == null) return;
-                Navigator.of(ctx).pop(normalized);
-              },
-              child: Text(l10n.saveAction),
-            ),
-          ],
+          cancelLabel: l10n.commonCancel,
+          confirmLabel: l10n.saveAction,
+          onCancel: () => Navigator.of(ctx).pop(),
+          onConfirm: () {
+            final normalized = _normalizeHomeDisplayName(controller.text);
+            if (normalized == null) return;
+            Navigator.of(ctx).pop(normalized);
+          },
         );
       },
     );

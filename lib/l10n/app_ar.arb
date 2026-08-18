@@ -848,6 +848,11 @@
   "widgetThemeSectionSubtitle": "السمة الكلاسيكية مجانية. السمات الأخرى خاصة بـ Premium وتظهر بنفس الشكل على iPhone وAndroid.",
   "widgetThemeApplied": "تم تحديث سمة الأداة.",
   "widgetThemePremiumRequired": "هذه السمة خاصة بـ Premium.",
+  "widgetLockTextSectionTitle": "نص شاشة القفل",
+  "widgetLockTextSectionSubtitle": "لا يمكن تغيير اللون على شاشة القفل. يمكنك جعل النص واضحًا أو ناعمًا. خاص بـ Premium.",
+  "widgetLockTextClear": "واضح",
+  "widgetLockTextSoft": "ناعم",
+  "widgetLockTextApplied": "تم تحديث نص شاشة القفل.",
   "qiblaHubHilalDuelTitle": "مبارزة المعرفة",
   "qiblaHubHilalDuelSubtitle": "تنافس في 7 أسئلة إسلامية، واجمع الأهلة وتقدّم بالمستوى",
   "hilalDuelTitle": "مبارزة المعرفة",
@@ -2337,7 +2342,7 @@
   "premiumCompareThemesPremium": "6 سمات",
   "premiumCompareAi": "الذكاء الاصطناعي الإسلامي",
   "premiumCompareAiFree": "مقفل",
-  "premiumCompareAiPremium": "قريبًا",
+  "premiumCompareAiPremium": "مفتوح",
   "premiumCompareExplore": "استكشف",
   "premiumCompareExploreFree": "مع إعلانات",
   "premiumCompareExplorePremium": "بدون انقطاع",
@@ -2714,5 +2719,9 @@
   "appTourAssistantFabTitle": "فقاعة المساعد",
   "appTourAssistantFabBody": "اختصار قابل للسحب يفتح المساعد في أي تبويب.",
   "appTourFinaleTitle": "أنت جاهز",
-  "appTourFinaleBody": "انتهت الجولة. تابع من أي تبويب — سنذكّرك ونرافقك."
+  "appTourFinaleBody": "انتهت الجولة. تابع من أي تبويب — سنذكّرك ونرافقك.",
+  "appTourWidgetPromptTitle": "هل تريد إضافة ودجة؟",
+  "appTourWidgetPromptBody": "لتبق آية قصيرة أو وقت صلاة على الشاشة الرئيسية وشاشة القفل. يمكننا إضافتها الآن من مركز الودجات.",
+  "appTourWidgetPromptYes": "نعم",
+  "appTourWidgetPromptLater": "لاحقاً"
 }

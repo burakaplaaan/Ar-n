@@ -11,6 +11,7 @@ import 'package:arin/l10n/app_localizations.dart';
 
 import '../../../app.dart';
 import '../../../core/constants/app_colors.dart';
+import '../../../core/providers/shared_preferences_provider.dart';
 import '../../../core/router/app_router.dart';
 import '../../../data/services/audio_session_coordinator.dart';
 import '../../home/home_page.dart';
@@ -26,6 +27,7 @@ import '../../onboarding/app_tour/app_tour_anchor.dart';
 import '../../onboarding/app_tour/app_tour_controller.dart';
 import '../../onboarding/app_tour/app_tour_keys.dart';
 import '../../onboarding/app_tour/app_tour_overlay.dart';
+import '../../onboarding/app_tour/post_tour_widget_prompt.dart';
 import '../../willpower/breathing_bottom_nav_provider.dart';
 import '../../willpower/willpower_hub_page.dart';
 import 'arin_pressable.dart';
@@ -121,6 +123,7 @@ class _ArinShellState extends State<ArinShell> {
   final ValueNotifier<double> _navBarSolidity = ValueNotifier(1.0);
   String? _lastPathForNavSolidity;
   String? _lastPathForAudioVisibility;
+  bool _widgetPromptResumeChecked = false;
 
   static bool _isShellSwipeRoot(String path) {
     return path == AppRoutes.home ||
@@ -443,6 +446,16 @@ class _ArinShellState extends State<ArinShell> {
         if (tourActive) {
           _navBarSolidity.value = 1.0;
         }
+        ref.listen(appTourControllerProvider, (previous, next) {
+          if (previous?.active == true && !next.active) {
+            unawaited(
+              maybeShowPostTourWidgetPrompt(
+                context: context,
+                prefs: ref.read(sharedPreferencesProvider),
+              ),
+            );
+          }
+        });
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (!context.mounted) return;
           final controller = ref.read(appTourControllerProvider.notifier);
@@ -450,6 +463,17 @@ class _ArinShellState extends State<ArinShell> {
           final started = ref.read(appTourControllerProvider);
           if (started.active && started.step != null && path != started.step!.route) {
             context.go(started.step!.route);
+          }
+          if (!_widgetPromptResumeChecked) {
+            _widgetPromptResumeChecked = true;
+            if (!started.active) {
+              unawaited(
+                maybeShowPostTourWidgetPrompt(
+                  context: context,
+                  prefs: ref.read(sharedPreferencesProvider),
+                ),
+              );
+            }
           }
         });
         final pagePhysics =

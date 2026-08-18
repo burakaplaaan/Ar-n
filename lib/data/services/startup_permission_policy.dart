@@ -15,6 +15,7 @@ bool shouldShowLocationDisclosure({
 /// çakışmasın. Mevcut kurulumlarda pending yoksa erteleme yok.
 const String kAppTourPendingKey = 'app_tour_pending';
 const String kAppTourCompletedKey = 'app_tour_completed';
+const String kAppTourWidgetPromptPendingKey = 'app_tour_widget_prompt_pending';
 
 bool shouldDeferSystemPromptsForAppTour({
   required bool tourPending,

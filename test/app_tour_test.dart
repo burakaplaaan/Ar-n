@@ -6,6 +6,7 @@ import 'package:arin/presentation/onboarding/app_tour/app_tour_controller.dart';
 import 'package:arin/presentation/onboarding/app_tour/app_tour_keys.dart';
 import 'package:arin/presentation/onboarding/app_tour/app_tour_layout.dart';
 import 'package:arin/presentation/onboarding/app_tour/app_tour_step.dart';
+import 'package:arin/presentation/onboarding/app_tour/post_tour_widget_prompt.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -162,6 +163,24 @@ void main() {
     expect(tester.takeException(), isNull);
     expect(AppTourKeys.contextOf(AppTourTargetId.assistantFab), isNotNull);
     expect(AppTourKeys.measure(AppTourTargetId.assistantFab), isNotNull);
+  });
+
+  test('tur bitince widget daveti bir kez bekler', () async {
+    SharedPreferences.setMockInitialValues({});
+    TestWidgetsFlutterBinding.ensureInitialized();
+    final prefs = await SharedPreferences.getInstance();
+    await persistAppTourFinished(prefs);
+    expect(prefs.getBool(kAppTourCompletedKey), isTrue);
+    expect(prefs.getBool(kAppTourPendingKey), isFalse);
+    expect(prefs.getBool(kAppTourWidgetPromptPendingKey), isTrue);
+    expect(
+      shouldOfferPostTourWidgetPrompt(promptPending: true),
+      isTrue,
+    );
+    expect(
+      shouldOfferPostTourWidgetPrompt(promptPending: false),
+      isFalse,
+    );
   });
 
   test('onboarding bitmeden tur başlamaz', () async {

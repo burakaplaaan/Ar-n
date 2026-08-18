@@ -1623,6 +1623,22 @@ class AppLocalizationsAr extends AppLocalizations {
   String get widgetThemePremiumRequired => 'هذه السمة خاصة بـ Premium.';
 
   @override
+  String get widgetLockTextSectionTitle => 'نص شاشة القفل';
+
+  @override
+  String get widgetLockTextSectionSubtitle =>
+      'لا يمكن تغيير اللون على شاشة القفل. يمكنك جعل النص واضحًا أو ناعمًا. خاص بـ Premium.';
+
+  @override
+  String get widgetLockTextClear => 'واضح';
+
+  @override
+  String get widgetLockTextSoft => 'ناعم';
+
+  @override
+  String get widgetLockTextApplied => 'تم تحديث نص شاشة القفل.';
+
+  @override
   String get qiblaHubHilalDuelTitle => 'مبارزة المعرفة';
 
   @override
@@ -5032,7 +5048,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get premiumCompareAiFree => 'مقفل';
 
   @override
-  String get premiumCompareAiPremium => 'قريبًا';
+  String get premiumCompareAiPremium => 'مفتوح';
 
   @override
   String get premiumCompareExplore => 'استكشف';
@@ -6228,4 +6244,17 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get appTourFinaleBody =>
       'انتهت الجولة. تابع من أي تبويب — سنذكّرك ونرافقك.';
+
+  @override
+  String get appTourWidgetPromptTitle => 'هل تريد إضافة ودجة؟';
+
+  @override
+  String get appTourWidgetPromptBody =>
+      'لتبق آية قصيرة أو وقت صلاة على الشاشة الرئيسية وشاشة القفل. يمكننا إضافتها الآن من مركز الودجات.';
+
+  @override
+  String get appTourWidgetPromptYes => 'نعم';
+
+  @override
+  String get appTourWidgetPromptLater => 'لاحقاً';
 }

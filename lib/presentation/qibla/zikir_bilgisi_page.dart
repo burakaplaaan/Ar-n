@@ -13,6 +13,7 @@ import '../../data/models/zikir_matik_record.dart';
 import '../../data/models/zikir_matik_tur_log.dart';
 import '../../data/repositories/zikir_matik_repository.dart';
 import '../shared/widgets/arin_back_button.dart';
+import '../shared/widgets/arin_popup.dart';
 
 import 'package:arin/l10n/app_localizations.dart';
 import 'package:arin/presentation/shared/widgets/arin_loader.dart';
@@ -23,7 +24,6 @@ abstract final class _Zc {
   static const outer = Color(0xFF708A96);
   static const lcdBg = Color(0xFFB2C9AB);
   static const labelMuted = Color(0xFFC5D4DC);
-  static const dialogSurface = Color(0xFF0C1419);
 }
 
 const List<String> _kZikirDailyReflections = <String>[
@@ -242,63 +242,13 @@ class _ZikirBilgisiPageState extends ConsumerState<ZikirBilgisiPage>
 
   Future<void> _deleteTur(ZikirMatikTurLog log) async {
     final l10n = AppLocalizations.of(context)!;
-    final ok = await showDialog<bool>(
+    final ok = await showArinConfirm(
       context: context,
-      barrierColor: Colors.black.withValues(alpha: 0.72),
-      builder: (ctx) => Dialog(
-        backgroundColor: Colors.transparent,
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 320),
-          child: DecoratedBox(
-            decoration: BoxDecoration(
-              color: _Zc.dialogSurface,
-              borderRadius: BorderRadius.circular(22),
-              border: Border.all(
-                color: _Zc.outer.withValues(alpha: 0.3),
-              ),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(20, 20, 16, 12),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Text(
-                    l10n.zikirmatikDeleteRoundRecord,
-                    style: TextStyle(
-                      color: _Zc.labelMuted,
-                      fontWeight: FontWeight.w800,
-                      fontSize: 17,
-                    ),
-                  ),
-                  const SizedBox(height: 18),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      TextButton(
-                        onPressed: () => Navigator.pop(ctx, false),
-                        child: Text(
-                          l10n.zikirmatikCancel,
-                          style: TextStyle(color: _Zc.outer),
-                        ),
-                      ),
-                      FilledButton(
-                        onPressed: () => Navigator.pop(ctx, true),
-                        style: FilledButton.styleFrom(
-                          backgroundColor: _Zc.outer,
-                          foregroundColor: Colors.white,
-                          shape: const StadiumBorder(),
-                        ),
-                        child: Text(l10n.zikirmatikDelete),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ),
+      title: l10n.zikirmatikDeleteRoundRecord,
+      cancelLabel: l10n.zikirmatikCancel,
+      confirmLabel: l10n.zikirmatikDelete,
+      tone: ArinPopupTone.destructive,
+      icon: Icons.delete_outline_rounded,
     );
     if (ok == true) {
       await _repo?.deleteTurLog(log.id);
@@ -328,28 +278,13 @@ class _ZikirBilgisiPageState extends ConsumerState<ZikirBilgisiPage>
 
   Future<void> _deleteArchive(ZikirMatikRecord r) async {
     final l10n = AppLocalizations.of(context)!;
-    final ok = await showDialog<bool>(
+    final ok = await showArinConfirm(
       context: context,
-      barrierColor: Colors.black.withValues(alpha: 0.72),
-      builder: (ctx) => AlertDialog(
-        backgroundColor: _Zc.dialogSurface,
-        title: Text(
-          l10n.zikirmatikDeleteRecord,
-          style: TextStyle(color: _Zc.labelMuted),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, false),
-            child: Text(l10n.zikirmatikCancel,
-                style: TextStyle(color: _Zc.outer)),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.pop(ctx, true),
-            style: FilledButton.styleFrom(backgroundColor: _Zc.outer),
-            child: Text(l10n.zikirmatikDelete),
-          ),
-        ],
-      ),
+      title: l10n.zikirmatikDeleteRecord,
+      cancelLabel: l10n.zikirmatikCancel,
+      confirmLabel: l10n.zikirmatikDelete,
+      tone: ArinPopupTone.destructive,
+      icon: Icons.delete_outline_rounded,
     );
     if (ok == true) {
       await _repo?.deleteRecord(r.id);

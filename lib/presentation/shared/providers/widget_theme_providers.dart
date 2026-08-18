@@ -13,3 +13,8 @@ final effectiveWidgetThemeProvider = Provider<ArinWidgetTheme>((ref) {
   final service = ref.watch(widgetThemeServiceProvider);
   return service.effectiveTheme(isPremium: ref.watch(isPremiumProvider));
 });
+
+final effectiveWidgetLockTextProvider = Provider<WidgetLockTextStyle>((ref) {
+  final service = ref.watch(widgetThemeServiceProvider);
+  return service.effectiveLockText(isPremium: ref.watch(isPremiumProvider));
+});

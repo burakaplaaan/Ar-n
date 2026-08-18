@@ -4,7 +4,7 @@
     <string name="app_name">آرين</string>
     <string name="widget_description">اقتباس يومي والمصدر — آرين</string>
     <string name="widget_quote_description">آرين — اقتباس يومي</string>
-    <string name="widget_prayer_description">آرين — مواقيت الصلاة</string>
+    <string name="widget_prayer_description">آرين — الوقت المتبقي للصلاة التالية وصلوات اليوم</string>
     <string name="widget_quote_title">آرين · اقتباس</string>
     <string name="widget_prayer_title">آرين · الصلاة</string>
     <string name="widget_brand_label">آرين</string>
@@ -20,4 +20,7 @@
     <string name="widget_zikir_phrase_fallback">ذِكر</string>
     <string name="widget_zikir_select_prompt">اضغط لاختيار الذِكر</string>
     <string name="widget_lock_tap_to_unlock">اضغط لإلغاء القفل</string>
+    <string name="widget_esma_title">آرين · أسماء الحسنى</string>
+    <string name="widget_esma_description">آرين — اسم اليوم</string>
+    <string name="widget_esma_label">أسماء الحسنى</string>
 </resources>

@@ -46,6 +46,7 @@ import '../shared/providers/prayer_time_providers.dart';
 import '../shared/providers/premium_providers.dart';
 import '../shared/providers/user_profile_providers.dart';
 import 'package:arin/presentation/shared/widgets/arin_loader.dart';
+import '../shared/widgets/arin_popup.dart';
 import '../shared/widgets/arin_pressable.dart';
 import '../shared/widgets/arin_premium_mark.dart';
 import 'package:arin/presentation/shared/widgets/arin_top_toast.dart';
@@ -135,22 +136,13 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
 
   Future<void> _signOut() async {
     final l10n = AppLocalizations.of(context)!;
-    final ok = await showDialog<bool>(
+    final ok = await showArinConfirm(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text(l10n.settingsSignOutDialogTitle),
-        content: Text(l10n.settingsSignOutDialogBody),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, false),
-            child: Text(l10n.settingsDialogCancel),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.pop(ctx, true),
-            child: Text(l10n.settingsSignOutAction),
-          ),
-        ],
-      ),
+      title: l10n.settingsSignOutDialogTitle,
+      message: l10n.settingsSignOutDialogBody,
+      cancelLabel: l10n.settingsDialogCancel,
+      confirmLabel: l10n.settingsSignOutAction,
+      icon: Icons.logout_rounded,
     );
     if (ok != true || !mounted) return;
 
@@ -220,23 +212,14 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
     final l10n = AppLocalizations.of(context)!;
 
     if (firebaseUser == null) {
-      final ok = await showDialog<bool>(
+      final ok = await showArinConfirm(
         context: context,
-        builder: (ctx) => AlertDialog(
-          title: Text(l10n.settingsDeleteAllDataDialogTitle),
-          content: Text(l10n.settingsDeleteAllDataDialogBody),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(ctx, false),
-              child: Text(l10n.settingsDialogCancel),
-            ),
-            FilledButton(
-              style: FilledButton.styleFrom(backgroundColor: AppColors.error),
-              onPressed: () => Navigator.pop(ctx, true),
-              child: Text(l10n.settingsDeleteAction),
-            ),
-          ],
-        ),
+        title: l10n.settingsDeleteAllDataDialogTitle,
+        message: l10n.settingsDeleteAllDataDialogBody,
+        cancelLabel: l10n.settingsDialogCancel,
+        confirmLabel: l10n.settingsDeleteAction,
+        tone: ArinPopupTone.destructive,
+        icon: Icons.delete_forever_rounded,
       );
       if (ok != true || !mounted) return;
       final prefs = ref.read(sharedPreferencesProvider);
@@ -252,23 +235,14 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
       return;
     }
 
-    final ok = await showDialog<bool>(
+    final ok = await showArinConfirm(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text(l10n.settingsDeleteAccountDialogTitle),
-        content: Text(l10n.settingsDeleteAccountDialogBody),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, false),
-            child: Text(l10n.settingsDialogCancel),
-          ),
-          FilledButton(
-            style: FilledButton.styleFrom(backgroundColor: AppColors.error),
-            onPressed: () => Navigator.pop(ctx, true),
-            child: Text(l10n.settingsDeleteAction),
-          ),
-        ],
-      ),
+      title: l10n.settingsDeleteAccountDialogTitle,
+      message: l10n.settingsDeleteAccountDialogBody,
+      cancelLabel: l10n.settingsDialogCancel,
+      confirmLabel: l10n.settingsDeleteAction,
+      tone: ArinPopupTone.destructive,
+      icon: Icons.delete_forever_rounded,
     );
     if (ok != true || !mounted) return;
 
@@ -283,32 +257,15 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
     var loaderPushed = false;
     if (mounted) {
       loaderPushed = true;
-      showDialog<void>(
+      showArinPopup<void>(
         context: context,
         barrierDismissible: false,
         builder: (ctx) => PopScope(
           canPop: false,
-          child: AlertDialog(
-            backgroundColor: Theme.of(ctx).colorScheme.surface,
-            content: Row(
-              children: [
-                const SizedBox(
-                  width: 28,
-                  height: 28,
-                  child: ArinLoader(strokeWidth: 2.4),
-                ),
-                const SizedBox(width: 18),
-                Expanded(
-                  child: Text(
-                    l10n.settingsDeleteProgressMessage,
-                    style: GoogleFonts.plusJakartaSans(
-                      fontSize: 14,
-                      height: 1.35,
-                    ),
-                  ),
-                ),
-              ],
-            ),
+          child: ArinPopupCard(
+            title: l10n.settingsDeleteProgressMessage,
+            showActions: false,
+            extra: const Center(child: ArinLoader()),
           ),
         ),
       );

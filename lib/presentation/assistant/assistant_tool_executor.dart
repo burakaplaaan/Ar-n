@@ -1,19 +1,21 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:arin/l10n/app_localizations.dart';
 
-import '../../core/constants/app_colors.dart';
 import '../../core/constants/willpower_templates.dart';
-import '../../core/theme/arin_shell_background.dart';
 import '../../core/providers/shared_preferences_provider.dart';
 import '../../core/router/app_router.dart';
 import '../../data/services/app_local_notification_scheduler.dart';
 import '../../data/services/app_notification_channel_prefs.dart';
+import '../../data/services/arin_widget_sync.dart';
 import '../../data/services/assistant_alarm_service.dart';
 import '../../data/services/location_service.dart';
 import '../../data/services/prayer_notification_scheduler.dart';
 import '../../data/services/prayer_reminder_prefs.dart';
+import '../shared/widgets/arin_popup.dart';
 import '../shared/providers/habit_providers.dart';
 import '../shared/providers/prayer_time_providers.dart';
 import '../shared/providers/quotes_providers.dart';
@@ -156,6 +158,7 @@ class AssistantToolExecutor {
       ref.read(habitRepositoryProvider),
     );
     ref.read(habitSummaryProvider.notifier).refresh();
+    unawaited(ArinWidgetSync.refreshPrayerTodayMarks());
     return done ? l10n.assistantPrayerMarked : l10n.assistantPrayerUnmarked;
   }
 
@@ -187,34 +190,14 @@ class AssistantToolExecutor {
     final prefs = ref.read(sharedPreferencesProvider);
 
     if (channel == 'prayer' && !enabled) {
-      final onDark = !ArinShellBackground.isLight(context);
-      final confirmed = await showDialog<bool>(
+      final confirmed = await showArinConfirm(
         context: context,
-        builder: (ctx) => AlertDialog(
-          backgroundColor: onDark ? AppColors.homeCardSurface : AppColors.creamSurface,
-          title: Text(
-            l10n.assistantConfirmDisablePrayerTitle,
-            style: TextStyle(
-              color: onDark ? Colors.white : AppColors.emeraldDark,
-            ),
-          ),
-          content: Text(
-            l10n.assistantConfirmDisablePrayerBody,
-            style: TextStyle(
-              color: onDark ? Colors.white70 : AppColors.textSecondary,
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(ctx, false),
-              child: Text(l10n.assistantCancel),
-            ),
-            TextButton(
-              onPressed: () => Navigator.pop(ctx, true),
-              child: Text(l10n.assistantConfirm),
-            ),
-          ],
-        ),
+        title: l10n.assistantConfirmDisablePrayerTitle,
+        message: l10n.assistantConfirmDisablePrayerBody,
+        cancelLabel: l10n.assistantCancel,
+        confirmLabel: l10n.assistantConfirm,
+        tone: ArinPopupTone.warning,
+        icon: Icons.notifications_off_outlined,
       );
       if (confirmed != true) return l10n.assistantActionCancelled;
     }

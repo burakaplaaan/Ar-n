@@ -3,6 +3,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../core/providers/shared_preferences_provider.dart';
 import '../../../core/router/app_router.dart';
@@ -10,7 +11,10 @@ import '../../../data/services/startup_permission_policy.dart';
 import 'app_tour_step.dart';
 
 export '../../../data/services/startup_permission_policy.dart'
-    show kAppTourCompletedKey, kAppTourPendingKey;
+    show
+        kAppTourCompletedKey,
+        kAppTourPendingKey,
+        kAppTourWidgetPromptPendingKey;
 
 class AppTourState {
   const AppTourState({this.active = false, this.stepIndex = 0});
@@ -69,13 +73,18 @@ class AppTourController extends Notifier<AppTourState> {
 
   Future<void> finish(BuildContext context) async {
     final prefs = ref.read(sharedPreferencesProvider);
-    await prefs.setBool(kAppTourCompletedKey, true);
-    await prefs.setBool(kAppTourPendingKey, false);
+    await persistAppTourFinished(prefs);
     state = const AppTourState();
     if (context.mounted) {
       context.go(AppRoutes.home);
     }
   }
+}
+
+Future<void> persistAppTourFinished(SharedPreferences prefs) async {
+  await prefs.setBool(kAppTourCompletedKey, true);
+  await prefs.setBool(kAppTourPendingKey, false);
+  await prefs.setBool(kAppTourWidgetPromptPendingKey, true);
 }
 
 final appTourControllerProvider =

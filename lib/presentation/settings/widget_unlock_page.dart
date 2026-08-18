@@ -20,6 +20,7 @@ import '../shared/providers/admob_providers.dart';
 import '../shared/providers/premium_providers.dart';
 import '../shared/providers/widget_access_providers.dart';
 import 'package:arin/presentation/shared/widgets/arin_loader.dart';
+import 'package:arin/presentation/shared/widgets/arin_popup.dart';
 import 'package:arin/presentation/shared/widgets/arin_top_toast.dart';
 
 class WidgetUnlockPage extends ConsumerStatefulWidget {
@@ -169,9 +170,8 @@ class _WidgetUnlockPageState extends ConsumerState<WidgetUnlockPage> {
   Future<bool> _prepareRewardedWithFeedback(BuildContext context) async {
     final adMob = ref.read(adMobServiceProvider);
     if (adMob.isRewardedReady) return true;
-    return await showDialog<bool>(
+    return await showArinPopup<bool>(
           context: context,
-          useRootNavigator: true,
           barrierDismissible: false,
           builder: (_) => _RewardedPreparingDialog(
             prepare: adMob.prepareRewarded,
@@ -198,19 +198,15 @@ class _WidgetUnlockPageState extends ConsumerState<WidgetUnlockPage> {
     final l10n = AppLocalizations.of(context)!;
     await _awaitDialogRouteSettle();
     if (!context.mounted) return false;
-    return await showDialog<bool>(
+    return await showArinConfirm(
           context: context,
-          useRootNavigator: true,
           barrierDismissible: true,
-          barrierColor: Colors.black.withValues(alpha: 0.55),
-          builder: (dialogContext) => _WidgetUnlockAdUnavailableDialog(
-            title: title,
-            message: l10n.widgetUnlockAdLoadFailed,
-            laterLabel: l10n.widgetUnlockAdLaterButton,
-            retryLabel: l10n.widgetUnlockAdRetryButton,
-          ),
-        ) ??
-        false;
+          title: title,
+          message: l10n.widgetUnlockAdLoadFailed,
+          cancelLabel: l10n.widgetUnlockAdLaterButton,
+          confirmLabel: l10n.widgetUnlockAdRetryButton,
+          icon: Icons.wifi_off_rounded,
+        );
   }
 
   Future<void> _goPremium(BuildContext context) async {
@@ -394,77 +390,6 @@ class _WidgetUnlockPageState extends ConsumerState<WidgetUnlockPage> {
   }
 }
 
-class _WidgetUnlockAdUnavailableDialog extends StatelessWidget {
-  const _WidgetUnlockAdUnavailableDialog({
-    required this.title,
-    required this.message,
-    required this.laterLabel,
-    required this.retryLabel,
-  });
-
-  final String title;
-  final String message;
-  final String laterLabel;
-  final String retryLabel;
-
-  @override
-  Widget build(BuildContext context) {
-    // Unlock sayfası koyu yeşil; sistem teması açık olsa bile diyalog her
-    // platformda (özellikle iOS) aynı, okunaklı Material popup olarak kalsın.
-    const surface = Color(0xFF1C2E28);
-    const onSurface = Colors.white;
-    const accent = AppColors.emeraldLight;
-
-    return AlertDialog(
-      backgroundColor: surface,
-      surfaceTintColor: Colors.transparent,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
-      title: Text(
-        title,
-        style: const TextStyle(
-          color: onSurface,
-          fontSize: 18,
-          fontWeight: FontWeight.w700,
-          letterSpacing: -0.2,
-        ),
-      ),
-      content: Text(
-        message,
-        style: TextStyle(
-          color: onSurface.withValues(alpha: 0.88),
-          fontSize: 14.5,
-          height: 1.45,
-          fontWeight: FontWeight.w500,
-        ),
-      ),
-      actionsAlignment: MainAxisAlignment.end,
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.of(context, rootNavigator: true).pop(false),
-          child: Text(
-            laterLabel,
-            style: const TextStyle(
-              color: accent,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-        ),
-        FilledButton(
-          onPressed: () => Navigator.of(context, rootNavigator: true).pop(true),
-          style: FilledButton.styleFrom(
-            backgroundColor: accent,
-            foregroundColor: const Color(0xFF071815),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(999),
-            ),
-          ),
-          child: Text(retryLabel),
-        ),
-      ],
-    );
-  }
-}
-
 class _RewardedPreparingDialog extends StatefulWidget {
   const _RewardedPreparingDialog({
     required this.prepare,
@@ -495,37 +420,12 @@ class _RewardedPreparingDialogState extends State<_RewardedPreparingDialog> {
 
   @override
   Widget build(BuildContext context) {
-    const surface = Color(0xFF1C2E28);
-    const onSurface = Colors.white;
     return PopScope(
       canPop: false,
-      child: AlertDialog(
-        backgroundColor: surface,
-        surfaceTintColor: Colors.transparent,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
-        content: Row(
-          children: [
-            const SizedBox(
-              width: 24,
-              height: 24,
-              child: ArinLoader(
-                strokeWidth: 2.5,
-                color: AppColors.emeraldLight,
-              ),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Text(
-                widget.message,
-                style: TextStyle(
-                  color: onSurface.withValues(alpha: 0.9),
-                  fontSize: 14.5,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ),
-          ],
-        ),
+      child: ArinPopupCard(
+        title: widget.message,
+        showActions: false,
+        extra: const Center(child: ArinLoader()),
       ),
     );
   }

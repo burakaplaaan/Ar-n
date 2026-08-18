@@ -28,4 +28,22 @@ void main() {
   test('bilinmeyen tema klasike düşer', () {
     expect(ArinWidgetTheme.byId('missing').id, ArinWidgetTheme.classicId);
   });
+
+  test('kilit yazısı premium değilse nete düşer', () {
+    expect(
+      WidgetLockTextStyle.resolveEffectiveId(
+        requestedId: WidgetLockTextStyle.softId,
+        isPremium: false,
+      ),
+      WidgetLockTextStyle.clearId,
+    );
+    expect(
+      WidgetLockTextStyle.resolveEffectiveId(
+        requestedId: WidgetLockTextStyle.softId,
+        isPremium: true,
+      ),
+      WidgetLockTextStyle.softId,
+    );
+    expect(WidgetLockTextStyle.byId('missing').id, WidgetLockTextStyle.clearId);
+  });
 }

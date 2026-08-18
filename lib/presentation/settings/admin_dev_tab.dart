@@ -20,6 +20,7 @@ import '../../data/services/prayer_notification_scheduler.dart';
 import '../../l10n/app_localizations.dart';
 import '../shared/providers/prayer_time_providers.dart';
 import 'package:arin/presentation/shared/widgets/arin_loader.dart';
+import 'package:arin/presentation/shared/widgets/arin_popup.dart';
 import 'package:arin/presentation/shared/widgets/arin_top_toast.dart';
 
 /// [ArinShell] alt barı için alt boşluk.
@@ -318,26 +319,15 @@ class _AdminDevTabState extends ConsumerState<AdminDevTab> {
           icon: const Icon(Icons.warning_amber_rounded),
           label: Text(l10n.adminDevCrashNowFatalAction),
           onPressed: () async {
-            final proceed = await showDialog<bool>(
+            final proceed = await showArinConfirm(
               context: context,
               barrierDismissible: false,
-              builder: (ctx) => AlertDialog(
-                title: Text(l10n.adminDevCrashDialogTitle),
-                content: Text(l10n.adminDevCrashDialogBody),
-                actions: [
-                  TextButton(
-                    onPressed: () => Navigator.pop(ctx, false),
-                    child: Text(l10n.commonCancel),
-                  ),
-                  FilledButton(
-                    style: FilledButton.styleFrom(
-                      backgroundColor: Colors.redAccent,
-                    ),
-                    onPressed: () => Navigator.pop(ctx, true),
-                    child: Text(l10n.adminDevCrashAction),
-                  ),
-                ],
-              ),
+              title: l10n.adminDevCrashDialogTitle,
+              message: l10n.adminDevCrashDialogBody,
+              cancelLabel: l10n.commonCancel,
+              confirmLabel: l10n.adminDevCrashAction,
+              tone: ArinPopupTone.destructive,
+              icon: Icons.warning_amber_rounded,
             );
             if (proceed != true) return;
             if (!isFirebaseReady) {

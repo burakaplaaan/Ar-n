@@ -9,6 +9,7 @@ import 'package:arin/l10n/app_localizations.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_text_styles.dart';
 import '../../core/router/app_router.dart';
+import '../shared/widgets/arin_popup.dart';
 import '../shared/providers/willpower_hub_nav_provider.dart';
 import 'kaza_tracking_provider.dart';
 import 'kaza_widgets.dart';
@@ -31,41 +32,15 @@ class KazaTrackerPage extends ConsumerWidget {
   const KazaTrackerPage({super.key});
 
   Future<void> _confirmReset(BuildContext context, WidgetRef ref) async {
-    final ok = await showDialog<bool>(
+    final l10n = AppLocalizations.of(context)!;
+    final ok = await showArinConfirm(
       context: context,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: AppColors.anthraciteMid,
-        title: Text(
-          AppLocalizations.of(context)!.kazaReset,
-          style: AppTextStyles.titleSmall.copyWith(color: AppColors.creamBase),
-        ),
-        content: Text(
-          AppLocalizations.of(context)!.kazaResetConfirmDesc,
-          style: AppTextStyles.bodySmall.copyWith(
-            color: AppColors.textOnDarkMuted,
-            height: 1.45,
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, false),
-            child: Text(
-              AppLocalizations.of(context)!.kazaCancel,
-              style: const TextStyle(color: AppColors.textOnDarkMuted),
-            ),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, true),
-            child: Text(
-              AppLocalizations.of(context)!.kazaReset,
-              style: const TextStyle(
-                color: _kDebtPlusColor,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-          ),
-        ],
-      ),
+      title: l10n.kazaReset,
+      message: l10n.kazaResetConfirmDesc,
+      cancelLabel: l10n.kazaCancel,
+      confirmLabel: l10n.kazaReset,
+      tone: ArinPopupTone.destructive,
+      icon: Icons.restart_alt_rounded,
     );
     if (ok == true) {
       await ref.read(kazaTrackingProvider.notifier).resetAllCounts();

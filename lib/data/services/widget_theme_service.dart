@@ -1,8 +1,11 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:home_widget/home_widget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/widget_theme.dart';
+import 'arin_lock_notification_service.dart';
 import 'arin_widget_sync.dart';
 
 class WidgetThemeService {
@@ -12,6 +15,8 @@ class WidgetThemeService {
 
   static const prefsKey = 'arin_widget_theme_id';
   static const widgetKey = ArinWidgetKeys.themeId;
+  static const lockTextPrefsKey = 'arin_widget_lock_text';
+  static const lockTextWidgetKey = ArinWidgetKeys.lockTextStyle;
 
   String requestedId() => _prefs.getString(prefsKey) ?? ArinWidgetTheme.defaultId;
 
@@ -38,12 +43,41 @@ class WidgetThemeService {
     await syncToWidgets(isPremium: isPremium);
   }
 
+  String requestedLockTextId() =>
+      _prefs.getString(lockTextPrefsKey) ?? WidgetLockTextStyle.defaultId;
+
+  WidgetLockTextStyle requestedLockText() =>
+      WidgetLockTextStyle.byId(requestedLockTextId());
+
+  WidgetLockTextStyle effectiveLockText({required bool isPremium}) {
+    return WidgetLockTextStyle.byId(
+      WidgetLockTextStyle.resolveEffectiveId(
+        requestedId: requestedLockTextId(),
+        isPremium: isPremium,
+      ),
+    );
+  }
+
+  Future<void> selectLockText({
+    required String styleId,
+    required bool isPremium,
+  }) async {
+    if (!isPremium) {
+      throw StateError('premium_required');
+    }
+    await _prefs.setString(lockTextPrefsKey, WidgetLockTextStyle.byId(styleId).id);
+    await syncToWidgets(isPremium: isPremium);
+  }
+
   Future<void> syncToWidgets({required bool isPremium}) async {
     if (kIsWeb) return;
     final effective = effectiveTheme(isPremium: isPremium);
+    final lockText = effectiveLockText(isPremium: isPremium);
     try {
       await HomeWidget.saveWidgetData<String>(widgetKey, effective.id);
+      await HomeWidget.saveWidgetData<String>(lockTextWidgetKey, lockText.id);
       await ArinWidgetSync.refreshAllWidgets();
+      unawaited(ArinLockNotificationService.syncAll());
     } catch (e) {
       debugPrint('[WidgetThemeService] sync error: $e');
     }

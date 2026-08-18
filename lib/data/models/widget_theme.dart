@@ -115,3 +115,64 @@ class ArinWidgetTheme {
     return theme.id;
   }
 }
+
+/// Kilit ekranı yazı netliği. Apple rengi siler; yalnızca açıklık kalır.
+class WidgetLockTextStyle {
+  const WidgetLockTextStyle({
+    required this.id,
+    required this.nameTr,
+    required this.nameEn,
+    required this.nameAr,
+  });
+
+  final String id;
+  final String nameTr;
+  final String nameEn;
+  final String nameAr;
+
+  String localizedName(String languageCode) {
+    switch (languageCode) {
+      case 'ar':
+        return nameAr;
+      case 'en':
+        return nameEn;
+      default:
+        return nameTr;
+    }
+  }
+
+  static const String clearId = 'clear';
+  static const String softId = 'soft';
+  static const String defaultId = clearId;
+
+  static const WidgetLockTextStyle clear = WidgetLockTextStyle(
+    id: clearId,
+    nameTr: 'Net',
+    nameEn: 'Clear',
+    nameAr: 'واضح',
+  );
+
+  static const WidgetLockTextStyle soft = WidgetLockTextStyle(
+    id: softId,
+    nameTr: 'Yumuşak',
+    nameEn: 'Soft',
+    nameAr: 'ناعم',
+  );
+
+  static const List<WidgetLockTextStyle> all = [clear, soft];
+
+  static WidgetLockTextStyle byId(String? id) {
+    for (final style in all) {
+      if (style.id == id) return style;
+    }
+    return clear;
+  }
+
+  static String resolveEffectiveId({
+    required String requestedId,
+    required bool isPremium,
+  }) {
+    if (!isPremium) return defaultId;
+    return byId(requestedId).id;
+  }
+}

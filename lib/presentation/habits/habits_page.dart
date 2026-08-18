@@ -15,6 +15,7 @@ import '../../data/models/habit_model.dart';
 import '../../data/services/habit_cloud_sync_service.dart';
 import '../shared/providers/auth_providers.dart';
 import '../shared/providers/habit_providers.dart';
+import '../shared/widgets/arin_popup.dart';
 
 class HabitsPage extends ConsumerWidget {
   const HabitsPage({super.key});
@@ -157,30 +158,14 @@ class HabitsPage extends ConsumerWidget {
     WidgetRef ref,
     String habitId,
   ) async {
-    final confirmed = await showDialog<bool>(
+    final l10n = AppLocalizations.of(context)!;
+    final confirmed = await showArinConfirm(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text(
-            AppLocalizations.of(context)!.habitsDeleteConfirmTitle,
-            style: AppTextStyles.headlineSmall),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, false),
-            child: Text(
-                AppLocalizations.of(context)!.habitsCancel,
-                style:
-                    AppTextStyles.labelLarge.copyWith(color: AppColors.textMuted)),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.pop(ctx, true),
-            style: FilledButton.styleFrom(
-                backgroundColor: AppColors.error),
-            child: Text(
-                AppLocalizations.of(context)!.habitsYesDelete,
-                style: AppTextStyles.labelLarge.copyWith(color: Colors.white)),
-          ),
-        ],
-      ),
+      title: l10n.habitsDeleteConfirmTitle,
+      cancelLabel: l10n.habitsCancel,
+      confirmLabel: l10n.habitsYesDelete,
+      tone: ArinPopupTone.destructive,
+      icon: Icons.delete_outline_rounded,
     );
     if (confirmed == true) {
       await HabitCloudSyncService.rememberDeletedHabitId(habitId: habitId);

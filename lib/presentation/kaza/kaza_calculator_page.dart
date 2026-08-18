@@ -15,6 +15,7 @@ import '../../data/models/kaza_tracking_state.dart';
 import '../../data/services/kaza_calculator.dart';
 import 'kaza_tracking_provider.dart';
 import 'kaza_widgets.dart';
+import 'package:arin/presentation/shared/widgets/arin_popup.dart';
 import 'package:arin/presentation/shared/widgets/arin_top_toast.dart';
 
 class KazaCalculatorPage extends ConsumerStatefulWidget {
@@ -205,43 +206,16 @@ class _KazaCalculatorPageState extends ConsumerState<KazaCalculatorPage> {
   }
 
   Future<bool> _confirmOverwrite() async {
-    final r = await showDialog<bool>(
+    final l10n = AppLocalizations.of(context)!;
+    final r = await showArinConfirm(
       context: context,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: AppColors.anthraciteMid,
-        title: Text(
-          AppLocalizations.of(context)!.kazaCalcUpdateCounters,
-          style: AppTextStyles.titleSmall.copyWith(color: AppColors.creamBase),
-        ),
-        content: Text(
-          AppLocalizations.of(context)!.kazaCalcUpdateDesc,
-          style: AppTextStyles.bodySmall.copyWith(
-            color: AppColors.textOnDarkMuted,
-            height: 1.45,
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, false),
-            child: Text(
-              AppLocalizations.of(context)!.kazaCalcCancel,
-              style: const TextStyle(color: AppColors.textOnDarkMuted),
-            ),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, true),
-            child: Text(
-              AppLocalizations.of(context)!.kazaCalcContinue,
-              style: const TextStyle(
-                color: AppColors.accentNeonGreen,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-          ),
-        ],
-      ),
+      title: l10n.kazaCalcUpdateCounters,
+      message: l10n.kazaCalcUpdateDesc,
+      cancelLabel: l10n.kazaCalcCancel,
+      confirmLabel: l10n.kazaCalcContinue,
+      icon: Icons.sync_rounded,
     );
-    return r ?? false;
+    return r;
   }
 
   Future<void> _onCalculate() async {

@@ -12,7 +12,7 @@
     <string name="fb_login_protocol_scheme">fb4451380661797719</string>
     <string name="widget_description">Günlük söz ve kaynak — Arın</string>
     <string name="widget_quote_description">Arın — günlük söz</string>
-    <string name="widget_prayer_description">Arın — namaz vakitleri</string>
+    <string name="widget_prayer_description">Arın — sıradaki vakte kalan süre ve bugünün namazları</string>
     <string name="widget_combo_description">Arın — namaz vakti ve günlük söz</string>
     <string name="widget_tracking_description">Arın — seçili takip ve motivasyon</string>
     <string name="widget_zikir_description">Arın — zikirmatik sayacı</string>
@@ -21,6 +21,9 @@
     <string name="widget_combo_title">Arın · Karma</string>
     <string name="widget_tracking_title">Arın · Takip</string>
     <string name="widget_zikir_title">Arın · Zikirmatik</string>
+    <string name="widget_esma_title">Arın · Esma-ül Hüsna</string>
+    <string name="widget_esma_description">Arın — günün ism-i şerifi</string>
+    <string name="widget_esma_label">Esma-ül Hüsna</string>
     <string name="widget_zikir_phrase_fallback">Zikir</string>
     <string name="widget_zikir_select_prompt">Zikir seçmek için dokunun</string>
     <string name="widget_lock_tap_to_unlock">Açmak için dokunun</string>

@@ -1636,6 +1636,22 @@ class AppLocalizationsEn extends AppLocalizations {
   String get widgetThemePremiumRequired => 'This theme is Premium-only.';
 
   @override
+  String get widgetLockTextSectionTitle => 'Lock screen text';
+
+  @override
+  String get widgetLockTextSectionSubtitle =>
+      'Lock screen color cannot change. You can make the text clear or soft. Premium only.';
+
+  @override
+  String get widgetLockTextClear => 'Clear';
+
+  @override
+  String get widgetLockTextSoft => 'Soft';
+
+  @override
+  String get widgetLockTextApplied => 'Lock screen text updated.';
+
+  @override
   String get qiblaHubHilalDuelTitle => 'Knowledge Duel';
 
   @override
@@ -5070,7 +5086,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get premiumCompareAiFree => 'Locked';
 
   @override
-  String get premiumCompareAiPremium => 'Coming soon';
+  String get premiumCompareAiPremium => 'Unlocked';
 
   @override
   String get premiumCompareExplore => 'Explore';
@@ -6275,4 +6291,17 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get appTourFinaleBody =>
       'The tour is over. Continue from any tab — we will remind you and walk with you.';
+
+  @override
+  String get appTourWidgetPromptTitle => 'Would you like to add a widget?';
+
+  @override
+  String get appTourWidgetPromptBody =>
+      'Keep a short verse or prayer time on your home and lock screens. We can add it now from Widget Center.';
+
+  @override
+  String get appTourWidgetPromptYes => 'Yes';
+
+  @override
+  String get appTourWidgetPromptLater => 'Later';
 }

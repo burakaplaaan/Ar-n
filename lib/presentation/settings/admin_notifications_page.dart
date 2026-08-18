@@ -28,6 +28,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/firebase/firebase_bootstrap.dart';
 import 'package:arin/presentation/shared/widgets/arin_loader.dart';
+import 'package:arin/presentation/shared/widgets/arin_popup.dart';
 import 'package:arin/presentation/shared/widgets/arin_top_toast.dart';
 
 // ── Sabitler ──────────────────────────────────────────────────────────────────
@@ -410,24 +411,14 @@ class _AdminNotificationsPageState
   }
 
   Future<void> _deletePoolItem(String docId, String label) async {
-    final ok = await showDialog<bool>(
+    final ok = await showArinConfirm(
       context: context,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: _kBgCard,
-        title: const Text('Sil'),
-        content: Text('"$label" silinsin mi?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('Vazgeç'),
-          ),
-          FilledButton(
-            style: FilledButton.styleFrom(backgroundColor: Colors.redAccent),
-            onPressed: () => Navigator.pop(ctx, true),
-            child: const Text('Sil'),
-          ),
-        ],
-      ),
+      title: 'Sil',
+      message: '"$label" silinsin mi?',
+      cancelLabel: 'Vazgeç',
+      confirmLabel: 'Sil',
+      tone: ArinPopupTone.destructive,
+      icon: Icons.delete_outline_rounded,
     );
     if (ok != true) return;
     try {
@@ -482,33 +473,18 @@ class _AdminNotificationsPageState
   /// günün normal otomatik planını etkilemez, ayrı devam eder.
   Future<void> _forceSendToday() async {
     if (_forceSendingToday) return;
-    final ok = await showDialog<bool>(
+    final ok = await showArinConfirm(
       context: context,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: _kBgCard,
-        title: const Text('Bugün gönder'),
-        content: const Text(
+      title: 'Bugün gönder',
+      message:
           'Havuzdaki etkin ayetler arasından bugün için saati henüz '
           'geçmemiş en yakın ayet seçilip, o saat gelince TÜM '
           'kullanıcılara otomatik gönderilecek.\n\n'
           '7 günlük ana döngü bundan etkilenmez, kendi takviminde ayrı '
           'devam eder.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('Vazgeç'),
-          ),
-          FilledButton(
-            style: FilledButton.styleFrom(
-              backgroundColor: AppColors.accentNeonGreen,
-              foregroundColor: Colors.black,
-            ),
-            onPressed: () => Navigator.pop(ctx, true),
-            child: const Text('Planla'),
-          ),
-        ],
-      ),
+      cancelLabel: 'Vazgeç',
+      confirmLabel: 'Planla',
+      icon: Icons.schedule_send_rounded,
     );
     if (ok != true) return;
 
@@ -535,29 +511,14 @@ class _AdminNotificationsPageState
   }
 
   Future<void> _sendNow(String docId, String preview) async {
-    final ok = await showDialog<bool>(
+    final ok = await showArinConfirm(
       context: context,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: _kBgCard,
-        title: const Text('Şimdi gönder'),
-        content: Text(
+      title: 'Şimdi gönder',
+      message:
           'Bu ayet TÜM kullanıcılara hemen bildirim olarak gönderilsin mi?\n\n"$preview"',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('Vazgeç'),
-          ),
-          FilledButton(
-            style: FilledButton.styleFrom(
-              backgroundColor: AppColors.accentNeonGreen,
-              foregroundColor: Colors.black,
-            ),
-            onPressed: () => Navigator.pop(ctx, true),
-            child: const Text('Gönder'),
-          ),
-        ],
-      ),
+      cancelLabel: 'Vazgeç',
+      confirmLabel: 'Gönder',
+      icon: Icons.send_rounded,
     );
     if (ok != true) return;
 

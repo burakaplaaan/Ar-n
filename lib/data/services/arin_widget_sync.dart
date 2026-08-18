@@ -8,10 +8,15 @@ import 'package:flutter/foundation.dart';
 import 'package:home_widget/home_widget.dart';
 import 'package:path_provider/path_provider.dart';
 
+import '../../core/constants/willpower_templates.dart';
+import '../models/esma_ul_husna.dart';
 import '../models/prayer_times_model.dart';
+import '../repositories/habit_repository.dart';
+import '../repositories/salat_log_repository.dart';
 import 'arin_lock_notification_service.dart';
 import 'global_widget_lock_service.dart';
 import 'location_service.dart';
+import 'prayer_today_board.dart';
 import 'prayer_widget_snapshot.dart';
 
 abstract final class ArinWidgetKeys {
@@ -25,6 +30,12 @@ abstract final class ArinWidgetKeys {
   static const prayerCountdown = 'arin_prayer_countdown';
   static const prayerNextEpochMs = 'arin_prayer_next_epoch_ms';
   static const prayerScheduleJson = 'arin_prayer_schedule_json';
+  static const prayerTodayJson = 'arin_prayer_today_json';
+  static const prayerNextClock = 'arin_prayer_next_clock';
+  static const esmaArabic = 'arin_esma_arabic';
+  static const esmaTurkish = 'arin_esma_turkish';
+  static const esmaIndex = 'arin_esma_index';
+  static const esmaScheduleJson = 'arin_esma_schedule_json';
 
   static const trackingEnabled = 'arin_tracking_enabled';
   static const trackingTitle = 'arin_tracking_title';
@@ -56,6 +67,7 @@ abstract final class ArinWidgetKeys {
   static const widgetGateGlobalRevision = 'arin_widget_gate_global_revision';
   static const widgetGateUnlockHours = 'arin_widget_gate_unlock_hours';
   static const themeId = 'arin_widget_theme_id';
+  static const lockTextStyle = 'arin_widget_lock_text';
 }
 
 abstract final class ArinWidgetSync {
@@ -84,17 +96,21 @@ abstract final class ArinWidgetSync {
       'com.arin.arin.ArinTrackingWidgetProvider';
   static const androidZikirProviderClass =
       'com.arin.arin.ArinZikirWidgetProvider';
+  static const androidEsmaProviderClass =
+      'com.arin.arin.ArinEsmaWidgetProvider';
   static const iOSQuoteWidgetName = 'ArinQuoteWidget';
   static const iOSPrayerWidgetName = 'ArinPrayerWidget';
   static const iOSComboWidgetName = 'ArinComboWidget';
   static const iOSTrackingWidgetName = 'ArinTrackingWidget';
   static const iOSZikirWidgetName = 'ArinZikirWidget';
+  static const iOSEsmaWidgetName = 'ArinEsmaWidget';
 
   static const _androidQuote = androidQuoteProviderClass;
   static const _androidPrayer = androidPrayerProviderClass;
   static const _androidCombo = androidComboProviderClass;
   static const _androidTracking = androidTrackingProviderClass;
   static const _androidZikir = androidZikirProviderClass;
+  static const _androidEsma = androidEsmaProviderClass;
 
   static String _widgetQuotePreferredLineBreaks(String t) => t;
 
@@ -115,10 +131,12 @@ abstract final class ArinWidgetSync {
         ArinWidgetKeys.localeCode,
         _forcedWidgetLocale,
       );
+      await _writeEsma(DateTime.now());
       await HomeWidget.updateWidget(
         qualifiedAndroidName: _androidQuote,
         iOSName: 'ArinQuoteWidget',
       );
+      await _updateEsmaWidget();
       await HomeWidget.updateWidget(
         qualifiedAndroidName: _androidCombo,
         iOSName: iOSComboWidgetName,
@@ -746,11 +764,17 @@ abstract final class ArinWidgetSync {
         ArinWidgetKeys.prayerNextEpochMs,
         '$nextEpoch',
       );
+      await _writeTodayAndEsma(
+        models: [model],
+        now: now,
+        nextAt: now.add(snap.remaining),
+      );
 
       await HomeWidget.updateWidget(
         qualifiedAndroidName: _androidPrayer,
         iOSName: 'ArinPrayerWidget',
       );
+      await _updateEsmaWidget();
       await HomeWidget.updateWidget(
         qualifiedAndroidName: _androidCombo,
         iOSName: iOSComboWidgetName,
@@ -836,10 +860,16 @@ abstract final class ArinWidgetSync {
         ArinWidgetKeys.prayerNextEpochMs,
         '${next.at.millisecondsSinceEpoch}',
       );
+      await _writeTodayAndEsma(
+        models: models,
+        now: now,
+        nextAt: next.at,
+      );
       await HomeWidget.updateWidget(
         qualifiedAndroidName: _androidPrayer,
         iOSName: iOSPrayerWidgetName,
       );
+      await _updateEsmaWidget();
       await HomeWidget.updateWidget(
         qualifiedAndroidName: _androidCombo,
         iOSName: iOSComboWidgetName,
@@ -907,6 +937,145 @@ abstract final class ArinWidgetSync {
     return '$h:${m.toString().padLeft(2, '0')}:${s.toString().padLeft(2, '0')}';
   }
 
+  static List<bool> _todaySalatDone(DateTime day) {
+    try {
+      final habit = HabitRepository().findActiveByTemplateId(
+        WillpowerTemplates.salatDaily,
+      );
+      if (habit == null) {
+        return List<bool>.filled(5, false);
+      }
+      return SalatLogRepository().getPrayers(habit.id, day);
+    } catch (_) {
+      return List<bool>.filled(5, false);
+    }
+  }
+
+  static Map<String, Object?> _todayBoard({
+    required List<PrayerTimesModel> models,
+    required DateTime now,
+    required DateTime nextAt,
+  }) {
+    final tickDay = PrayerTodayBoard.salatBoardDay(models: models, now: now);
+    return PrayerTodayBoard.build(
+      models: models,
+      now: now,
+      nextAt: nextAt,
+      done: _todaySalatDone(tickDay),
+      tickDay: tickDay,
+    );
+  }
+
+  static Future<void> _writeTodayAndEsma({
+    required List<PrayerTimesModel> models,
+    required DateTime now,
+    required DateTime nextAt,
+  }) async {
+    final board = _todayBoard(models: models, now: now, nextAt: nextAt);
+    await HomeWidget.saveWidgetData<String>(
+      ArinWidgetKeys.prayerTodayJson,
+      jsonEncode(board),
+    );
+    await HomeWidget.saveWidgetData<String>(
+      ArinWidgetKeys.prayerNextClock,
+      board['nextClock'] as String? ?? '',
+    );
+    await _writeEsma(now);
+  }
+
+  static Future<void> _writeEsma(DateTime now) async {
+    final today = EsmaUlHusna.forDay(now);
+    await HomeWidget.saveWidgetData<String>(
+      ArinWidgetKeys.esmaArabic,
+      today.arabic,
+    );
+    await HomeWidget.saveWidgetData<String>(
+      ArinWidgetKeys.esmaTurkish,
+      today.turkish,
+    );
+    await HomeWidget.saveWidgetData<String>(
+      ArinWidgetKeys.esmaIndex,
+      '${today.index}',
+    );
+    final start = DateTime(now.year, now.month, now.day);
+    final entries = List<Map<String, Object?>>.generate(16, (i) {
+      final day = start.add(Duration(days: i));
+      final name = EsmaUlHusna.forDay(day);
+      return {
+        'day': PrayerTodayBoard.ymd(day),
+        'arabic': name.arabic,
+        'turkish': name.turkish,
+        'index': name.index,
+      };
+    });
+    await HomeWidget.saveWidgetData<String>(
+      ArinWidgetKeys.esmaScheduleJson,
+      jsonEncode({'entries': entries}),
+    );
+  }
+
+  static Future<void> _updateEsmaWidget() async {
+    await HomeWidget.updateWidget(
+      qualifiedAndroidName: _androidEsma,
+      iOSName: iOSEsmaWidgetName,
+    );
+  }
+
+  /// Namaz tiklenince sadece günlük tahta güncellenir.
+  static Future<void> refreshPrayerTodayMarks() async {
+    if (kIsWeb) return;
+    try {
+      if (!await _ensureAppGroupReady()) return;
+      final raw = await HomeWidget.getWidgetData<String>(
+        ArinWidgetKeys.prayerTodayJson,
+      );
+      if (raw == null || raw.trim().isEmpty) return;
+      final decoded = jsonDecode(raw);
+      if (decoded is! Map) return;
+      final map = Map<String, Object?>.from(decoded);
+      final now = DateTime.now();
+      var imsakClock = '';
+      final slotsProbe = map['slots'];
+      if (slotsProbe is List && slotsProbe.isNotEmpty) {
+        final first = slotsProbe.first;
+        if (first is Map) {
+          imsakClock = '${first['time'] ?? ''}';
+        }
+      }
+      final tickDay = imsakClock.isEmpty
+          ? DateTime(now.year, now.month, now.day)
+          : PrayerTodayBoard.salatBoardDayFromClock(
+              now: now,
+              imsakClock: imsakClock,
+            );
+      final done = _todaySalatDone(tickDay);
+      map['day'] = PrayerTodayBoard.ymd(tickDay);
+      final slotsRaw = map['slots'];
+      if (slotsRaw is List) {
+        final slots = <Map<String, Object?>>[];
+        for (var i = 0; i < slotsRaw.length && i < 5; i++) {
+          final slot = slotsRaw[i];
+          if (slot is! Map) continue;
+          final next = Map<String, Object?>.from(slot);
+          next['done'] = done[i];
+          slots.add(next);
+        }
+        map['slots'] = slots;
+      }
+      map['doneCount'] = done.where((e) => e).length;
+      await HomeWidget.saveWidgetData<String>(
+        ArinWidgetKeys.prayerTodayJson,
+        jsonEncode(map),
+      );
+      await HomeWidget.updateWidget(
+        qualifiedAndroidName: _androidPrayer,
+        iOSName: iOSPrayerWidgetName,
+      );
+    } catch (e, st) {
+      debugPrint('ArinWidgetSync.refreshPrayerTodayMarks: $e\n$st');
+    }
+  }
+
   static String _widgetSafeLocationLine({
     required String primary,
     required String fallback,
@@ -944,6 +1113,12 @@ abstract final class ArinWidgetSync {
         ArinWidgetKeys.prayerCountdown,
         ArinWidgetKeys.prayerNextEpochMs,
         ArinWidgetKeys.prayerScheduleJson,
+        ArinWidgetKeys.prayerTodayJson,
+        ArinWidgetKeys.prayerNextClock,
+        ArinWidgetKeys.esmaArabic,
+        ArinWidgetKeys.esmaTurkish,
+        ArinWidgetKeys.esmaIndex,
+        ArinWidgetKeys.esmaScheduleJson,
         ArinWidgetKeys.trackingEnabled,
         ArinWidgetKeys.trackingTitle,
         ArinWidgetKeys.trackingValue,
@@ -1024,6 +1199,7 @@ abstract final class ArinWidgetSync {
         qualifiedAndroidName: _androidZikir,
         iOSName: iOSZikirWidgetName,
       );
+      await _updateEsmaWidget();
       unawaited(ArinLockNotificationService.syncAll());
     } catch (e, st) {
       debugPrint('ArinWidgetSync.clearAll: $e\n$st');

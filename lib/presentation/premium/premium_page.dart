@@ -20,6 +20,7 @@ import '../../l10n/app_localizations.dart';
 import '../shared/providers/auth_providers.dart';
 import '../shared/providers/premium_providers.dart';
 import 'package:arin/presentation/shared/widgets/arin_loader.dart';
+import 'package:arin/presentation/shared/widgets/arin_popup.dart';
 import 'package:arin/presentation/shared/widgets/arin_top_toast.dart';
 
 /// Android/iOS'ta mağazadan gerçek fiyatları çeker.
@@ -223,23 +224,13 @@ class _PremiumPageState extends ConsumerState<PremiumPage> {
 
   Future<void> _maybePromptAccountLinkAfterPurchase() async {
     final l10n = AppLocalizations.of(context)!;
-    final shouldLink = await showDialog<bool>(
+    final shouldLink = await showArinConfirm(
       context: context,
-      builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: Text(l10n.premiumPostPurchaseLinkTitle),
-        content: Text(l10n.premiumPostPurchaseLinkBody),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, false),
-            child: Text(l10n.premiumPostPurchaseLinkLater),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.pop(ctx, true),
-            child: Text(l10n.premiumPostPurchaseLinkNow),
-          ),
-        ],
-      ),
+      title: l10n.premiumPostPurchaseLinkTitle,
+      message: l10n.premiumPostPurchaseLinkBody,
+      cancelLabel: l10n.premiumPostPurchaseLinkLater,
+      confirmLabel: l10n.premiumPostPurchaseLinkNow,
+      icon: Icons.link_rounded,
     );
     if (shouldLink != true || !mounted) return;
     final signedIn = await _showSignInSheet();
@@ -275,25 +266,18 @@ class _PremiumPageState extends ConsumerState<PremiumPage> {
   Future<void> _showSuccessDialog() async {
     if (!mounted) return;
     final l10n = AppLocalizations.of(context)!;
-    await showDialog<void>(
+    await showArinPopup<void>(
       context: context,
       barrierDismissible: false,
-      builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: Text(
-          l10n.premiumWelcomeTitle,
-          style: const TextStyle(fontWeight: FontWeight.w800),
-        ),
-        content: Text(l10n.premiumWelcomeMessage),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.pop(ctx);
-              if (mounted && context.canPop()) context.pop();
-            },
-            child: Text(l10n.premiumWelcomeButton),
-          ),
-        ],
+      builder: (ctx) => ArinPopupCard(
+        title: l10n.premiumWelcomeTitle,
+        message: l10n.premiumWelcomeMessage,
+        confirmLabel: l10n.premiumWelcomeButton,
+        icon: Icons.workspace_premium_rounded,
+        onConfirm: () {
+          Navigator.pop(ctx);
+          if (mounted && context.canPop()) context.pop();
+        },
       ),
     );
   }

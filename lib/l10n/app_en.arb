@@ -848,6 +848,11 @@
   "widgetThemeSectionSubtitle": "The classic theme is free. Other themes are Premium-only and look the same on iPhone and Android.",
   "widgetThemeApplied": "Widget theme updated.",
   "widgetThemePremiumRequired": "This theme is Premium-only.",
+  "widgetLockTextSectionTitle": "Lock screen text",
+  "widgetLockTextSectionSubtitle": "Lock screen color cannot change. You can make the text clear or soft. Premium only.",
+  "widgetLockTextClear": "Clear",
+  "widgetLockTextSoft": "Soft",
+  "widgetLockTextApplied": "Lock screen text updated.",
   "qiblaHubHilalDuelTitle": "Knowledge Duel",
   "qiblaHubHilalDuelSubtitle": "Compete across 7 Islamic knowledge questions, earn crescents, and level up",
   "hilalDuelTitle": "Knowledge Duel",
@@ -2337,7 +2342,7 @@
   "premiumCompareThemesPremium": "6 themes",
   "premiumCompareAi": "Islamic AI",
   "premiumCompareAiFree": "Locked",
-  "premiumCompareAiPremium": "Coming soon",
+  "premiumCompareAiPremium": "Unlocked",
   "premiumCompareExplore": "Explore",
   "premiumCompareExploreFree": "With ads",
   "premiumCompareExplorePremium": "Uninterrupted",
@@ -2714,5 +2719,9 @@
   "appTourAssistantFabTitle": "Assistant bubble",
   "appTourAssistantFabBody": "A draggable shortcut that opens the assistant on any tab.",
   "appTourFinaleTitle": "You are ready",
-  "appTourFinaleBody": "The tour is over. Continue from any tab — we will remind you and walk with you."
+  "appTourFinaleBody": "The tour is over. Continue from any tab — we will remind you and walk with you.",
+  "appTourWidgetPromptTitle": "Would you like to add a widget?",
+  "appTourWidgetPromptBody": "Keep a short verse or prayer time on your home and lock screens. We can add it now from Widget Center.",
+  "appTourWidgetPromptYes": "Yes",
+  "appTourWidgetPromptLater": "Later"
 }

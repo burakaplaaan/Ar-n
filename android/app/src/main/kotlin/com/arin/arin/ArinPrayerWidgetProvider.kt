@@ -149,6 +149,12 @@ class ArinPrayerWidgetProvider : HomeWidgetProvider() {
                 )
             }
             views.setTextViewText(R.id.widget_prayer_location, safeLocation)
+            bindTodayBoard(
+                views,
+                widgetData,
+                epochMs,
+                showBoard = shouldShowTodayBoard(appWidgetManager, widgetId),
+            )
             views.setOnClickPendingIntent(R.id.widget_prayer_root, contentPi)
             ArinWidgetTheme.apply(
                 views,
@@ -157,6 +163,14 @@ class ArinPrayerWidgetProvider : HomeWidgetProvider() {
                 intArrayOf(
                     R.id.widget_prayer_next_name,
                     R.id.widget_prayer_countdown,
+                    R.id.widget_prayer_clock,
+                    R.id.widget_prayer_done,
+                    R.id.widget_prayer_slot_0,
+                    R.id.widget_prayer_slot_1,
+                    R.id.widget_prayer_slot_2,
+                    R.id.widget_prayer_slot_3,
+                    R.id.widget_prayer_slot_4,
+                    R.id.widget_prayer_hijri,
                     R.id.widget_prayer_location,
                     R.id.widget_lock_note,
                 ),
@@ -189,6 +203,16 @@ class ArinPrayerWidgetProvider : HomeWidgetProvider() {
             cancelDeadlineRefresh(context)
             cancelTickAlarm(context)
         }
+    }
+
+    override fun onAppWidgetOptionsChanged(
+        context: Context,
+        appWidgetManager: AppWidgetManager,
+        appWidgetId: Int,
+        newOptions: android.os.Bundle,
+    ) {
+        super.onAppWidgetOptionsChanged(context, appWidgetManager, appWidgetId, newOptions)
+        requestUpdate(context)
     }
 
     override fun onEnabled(context: Context) {
@@ -447,6 +471,89 @@ class ArinPrayerWidgetProvider : HomeWidgetProvider() {
         }
     }
 
+    private fun shouldShowTodayBoard(
+        appWidgetManager: AppWidgetManager,
+        widgetId: Int,
+    ): Boolean {
+        val opts = appWidgetManager.getAppWidgetOptions(widgetId)
+        val minW = opts.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_WIDTH, 250)
+        val minH = opts.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_HEIGHT, 250)
+        return minW >= 180 && minH >= 110
+    }
+
+    private fun bindTodayBoard(
+        views: RemoteViews,
+        widgetData: SharedPreferences,
+        epochMs: Long?,
+        showBoard: Boolean,
+    ) {
+        val clock = widgetData.getString(KEY_NEXT_CLOCK, null)?.trim().orEmpty().ifEmpty {
+            formatClock(epochMs)
+        }
+        views.setTextViewText(
+            R.id.widget_prayer_clock,
+            if (clock.isEmpty) "" else "Vakit: $clock",
+        )
+        if (!showBoard) {
+            views.setViewVisibility(R.id.widget_prayer_done, View.GONE)
+            views.setViewVisibility(R.id.widget_prayer_slots, View.GONE)
+            views.setViewVisibility(R.id.widget_prayer_hijri, View.GONE)
+            return
+        }
+        val raw = widgetData.getString(KEY_TODAY_JSON, null)?.trim().orEmpty()
+        if (raw.isEmpty()) {
+            views.setViewVisibility(R.id.widget_prayer_done, View.GONE)
+            views.setViewVisibility(R.id.widget_prayer_slots, View.GONE)
+            views.setViewVisibility(R.id.widget_prayer_hijri, View.GONE)
+            return
+        }
+        try {
+            val root = JSONObject(raw)
+            val doneCount = root.optInt("doneCount", 0)
+            views.setTextViewText(R.id.widget_prayer_done, "$doneCount/5 tamamlandı")
+            views.setViewVisibility(R.id.widget_prayer_done, View.VISIBLE)
+            val hijri = root.optString("hijri").orEmpty()
+            if (hijri.isNotBlank()) {
+                views.setTextViewText(R.id.widget_prayer_hijri, hijri)
+                views.setViewVisibility(R.id.widget_prayer_hijri, View.VISIBLE)
+            } else {
+                views.setViewVisibility(R.id.widget_prayer_hijri, View.GONE)
+            }
+            val slots = root.optJSONArray("slots")
+            val slotIds = intArrayOf(
+                R.id.widget_prayer_slot_0,
+                R.id.widget_prayer_slot_1,
+                R.id.widget_prayer_slot_2,
+                R.id.widget_prayer_slot_3,
+                R.id.widget_prayer_slot_4,
+            )
+            if (slots != null && slots.length() > 0) {
+                views.setViewVisibility(R.id.widget_prayer_slots, View.VISIBLE)
+                for (i in slotIds.indices) {
+                    val obj = slots.optJSONObject(i)
+                    val name = obj?.optString("name").orEmpty()
+                    val done = obj?.optBoolean("done") == true
+                    val mark = if (done) "✓" else "·"
+                    views.setTextViewText(slotIds[i], "$mark\n$name")
+                }
+            } else {
+                views.setViewVisibility(R.id.widget_prayer_slots, View.GONE)
+            }
+        } catch (_: Exception) {
+            views.setViewVisibility(R.id.widget_prayer_done, View.GONE)
+            views.setViewVisibility(R.id.widget_prayer_slots, View.GONE)
+            views.setViewVisibility(R.id.widget_prayer_hijri, View.GONE)
+        }
+    }
+
+    private fun formatClock(epochMs: Long?): String {
+        if (epochMs == null || epochMs <= 0L) return ""
+        val cal = java.util.Calendar.getInstance().apply { timeInMillis = epochMs }
+        val h = cal.get(java.util.Calendar.HOUR_OF_DAY)
+        val m = cal.get(java.util.Calendar.MINUTE)
+        return "${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}"
+    }
+
     private data class ScheduledPrayer(
         val name: String,
         val epochMs: Long?,
@@ -460,6 +567,8 @@ class ArinPrayerWidgetProvider : HomeWidgetProvider() {
         private const val KEY_COUNTDOWN = "arin_prayer_countdown"
         private const val KEY_NEXT_EPOCH = "arin_prayer_next_epoch_ms"
         private const val KEY_PRAYER_SCHEDULE = "arin_prayer_schedule_json"
+        private const val KEY_TODAY_JSON = "arin_prayer_today_json"
+        private const val KEY_NEXT_CLOCK = "arin_prayer_next_clock"
         private const val KEY_LOCALE = "arin_widget_locale"
         private const val KEY_GATE_LOCKED = "arin_widget_gate_prayer_locked"
         private const val KEY_GATE_PREMIUM = "arin_widget_gate_premium"
@@ -507,6 +616,7 @@ class ArinWidgetRestoreReceiver : BroadcastReceiver() {
             ArinComboWidgetProvider.requestUpdate(appContext)
             ArinTrackingWidgetProvider.requestUpdate(appContext)
             ArinZikirWidgetProvider.requestUpdate(appContext)
+            ArinEsmaWidgetProvider.requestUpdate(appContext)
             // Kilit ekranı bildirimleri AppWidgetProvider'a bağlı değil; boot/saat/
             // dil değişiminde kendi alarm'larını da burada yeniden kurmamız gerekir.
             ArinLockNotifications.syncAll(appContext)

@@ -97,6 +97,32 @@ private struct PrayerSchedulePayload: Decodable {
   let entries: [PrayerScheduleItem]
 }
 
+private struct PrayerTodayPayload: Decodable {
+  let nextClock: String?
+  let hijri: String?
+  let doneCount: Int?
+  let slots: [PrayerTodaySlot]?
+}
+
+private struct PrayerTodaySlot: Decodable {
+  let name: String
+  let time: String
+  let done: Bool
+}
+
+private func loadPrayerTodayBoard() -> PrayerTodayPayload? {
+  decodeWidgetJson("arin_prayer_today_json", as: PrayerTodayPayload.self)
+}
+
+private func clockLabel(from date: Date?) -> String {
+  guard let date else {
+    return loadPrayerTodayBoard()?.nextClock ?? ""
+  }
+  let f = DateFormatter()
+  f.dateFormat = "HH:mm"
+  return f.string(from: date)
+}
+
 private struct PrayerScheduleItem: Decodable {
   let epochMs: Double
   let name: String
@@ -238,6 +264,10 @@ private func currentWidgetPalette() -> ArinWidgetPalette {
 
 private func widgetPrimaryText(colorScheme: ColorScheme, family: WidgetFamily) -> Color {
   if family == .accessoryRectangular {
+    let soft = suite()?.string(forKey: "arin_widget_lock_text") == "soft"
+    if soft {
+      return Color.white.opacity(0.52)
+    }
     return colorScheme == .dark ? Color(red: 0.88, green: 0.90, blue: 0.93) : .white
   }
   let theme = currentWidgetPalette()
@@ -824,7 +854,9 @@ struct PrayerWidgetView: View {
       LockedWidgetView(family: family, kindId: "prayer")
     } else {
       switch family {
-      case .accessoryRectangular, .systemSmall:
+      case .accessoryRectangular:
+        prayerLockCompact
+      case .systemSmall:
         prayerCompact
       default:
         prayerExpanded
@@ -832,37 +864,36 @@ struct PrayerWidgetView: View {
     }
   }
 
-  /// Sade düzen: başlık + geri sayım + küçük konum.
+  /// Kilit ekranı: tema yok, sıkı dikdörtgen — sadece vakit + kalan süre.
+  private var prayerLockCompact: some View {
+    VStack(alignment: .leading, spacing: 2) {
+      Text(headerTitle)
+        .font(.system(size: 12, weight: .semibold))
+        .foregroundStyle(primaryTextColor)
+        .lineLimit(1)
+      countdownText(size: 16, minScale: 0.7)
+    }
+    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
+  }
+
+  /// Küçük ana ekran: sıradaki vakit + büyük kalan süre + saat.
   private var prayerCompact: some View {
-    VStack(alignment: .leading, spacing: 6) {
-      HStack(alignment: .center) {
-        HStack(spacing: 5) {
-          Image(systemName: "moon.stars.fill")
-            .font(.system(size: 11, weight: .semibold))
-            .foregroundStyle(secondaryTextColor)
-          Text(headerTitle)
-            .font(.system(size: 12, weight: .bold, design: .default))
-            .foregroundStyle(primaryTextColor)
-            .lineLimit(1)
-        }
-        Spacer(minLength: 4)
-      }
-      HStack(alignment: .firstTextBaseline, spacing: 7) {
-        Image(systemName: "clock.fill")
-          .font(.system(size: 15, weight: .semibold))
-          .foregroundStyle(secondaryTextColor)
-          .symbolRenderingMode(.hierarchical)
-        countdownText(size: 21, minScale: 0.78)
-      }
-      if !entry.location.isEmpty {
-        Text(entry.location)
-          .font(.system(size: 10, weight: .medium, design: .rounded))
+    let clock = clockLabel(from: entry.nextDate)
+    return VStack(alignment: .leading, spacing: 4) {
+      Text(headerTitle)
+        .font(.system(size: 13, weight: .bold))
+        .foregroundStyle(primaryTextColor)
+        .lineLimit(1)
+      countdownText(size: 28, minScale: 0.62)
+      if !clock.isEmpty {
+        Text("Vakit: \(clock)")
+          .font(.system(size: 11, weight: .medium, design: .rounded))
           .foregroundStyle(secondaryTextColor)
           .lineLimit(1)
-          .minimumScaleFactor(0.8)
       }
     }
-    .padding(.horizontal, 11)
+    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
+    .padding(.horizontal, 12)
     .padding(.vertical, 10)
     .shadow(color: .black.opacity(textShadowOpacity), radius: 2.6, x: 0, y: 1)
   }
@@ -875,29 +906,73 @@ struct PrayerWidgetView: View {
   }
 
   private var prayerExpanded: some View {
-    VStack(alignment: .leading, spacing: 7) {
-      HStack(spacing: 5) {
-        Image(systemName: "moon.stars.fill")
-          .font(.system(size: 12))
-          .foregroundStyle(secondaryTextColor)
-        Text(headerTitle)
-          .font(.system(size: 13, weight: .bold, design: .default))
-          .foregroundStyle(primaryTextColor)
-          .lineLimit(1)
-        Spacer()
+    let board = loadPrayerTodayBoard()
+    let slots = board?.slots ?? []
+    let doneCount = board?.doneCount ?? slots.filter(\.done).count
+    let clock = clockLabel(from: entry.nextDate)
+    return VStack(alignment: .leading, spacing: 8) {
+      HStack(alignment: .top) {
+        VStack(alignment: .leading, spacing: 2) {
+          Text(localizedWidgetText(tr: "Bugünün namazları"))
+            .font(.system(size: 13, weight: .bold))
+            .foregroundStyle(primaryTextColor)
+          Text("\(doneCount)/5 tamamlandı")
+            .font(.system(size: 11, weight: .medium))
+            .foregroundStyle(secondaryTextColor)
+        }
+        Spacer(minLength: 8)
+        VStack(alignment: .trailing, spacing: 2) {
+          countdownText(size: 18, minScale: 0.7)
+          Text(headerTitle)
+            .font(.system(size: 11, weight: .semibold))
+            .foregroundStyle(secondaryTextColor)
+          if !clock.isEmpty {
+            Text(clock)
+              .font(.system(size: 10, weight: .medium))
+              .foregroundStyle(secondaryTextColor)
+          }
+        }
       }
-      HStack(spacing: 8) {
-        Image(systemName: "clock.fill")
-          .font(.system(size: 18, weight: .semibold))
-          .foregroundStyle(secondaryTextColor)
-        countdownText(size: 26, minScale: 0.78)
+      if !slots.isEmpty {
+        HStack(spacing: 0) {
+          ForEach(Array(slots.enumerated()), id: \.offset) { _, slot in
+            VStack(spacing: 4) {
+              ZStack {
+                Circle()
+                  .stroke(primaryTextColor.opacity(slot.done ? 0.95 : 0.28), lineWidth: 1.4)
+                  .frame(width: 26, height: 26)
+                if slot.done {
+                  Image(systemName: "checkmark")
+                    .font(.system(size: 11, weight: .bold))
+                    .foregroundStyle(primaryTextColor)
+                }
+              }
+              Text(slot.name)
+                .font(.system(size: 9, weight: .semibold))
+                .foregroundStyle(secondaryTextColor)
+                .lineLimit(1)
+                .minimumScaleFactor(0.7)
+            }
+            .frame(maxWidth: .infinity)
+          }
+        }
+        GeometryReader { geo in
+          ZStack(alignment: .leading) {
+            Capsule()
+              .fill(primaryTextColor.opacity(0.18))
+              .frame(height: 4)
+            Capsule()
+              .fill(primaryTextColor.opacity(0.88))
+              .frame(width: geo.size.width * CGFloat(min(5, max(0, doneCount))) / 5, height: 4)
+          }
+        }
+        .frame(height: 4)
       }
-      if !entry.location.isEmpty {
-        Text(entry.location)
-          .font(.system(size: 11, weight: .medium, design: .rounded))
+      if let hijri = board?.hijri, !hijri.isEmpty {
+        Text(hijri)
+          .font(.system(size: 10, weight: .medium))
           .foregroundStyle(secondaryTextColor)
           .lineLimit(1)
-          .minimumScaleFactor(0.82)
       }
     }
     .padding(14)
@@ -934,7 +1009,7 @@ struct ArinPrayerWidget: Widget {
           : "arin://widget/prayer?homeWidget=true"))
     }
     .configurationDisplayName(localizedWidgetText(tr: "ARIN — Namaz"))
-    .description(localizedWidgetText(tr: "Sıradaki vakit ve geri sayım."))
+    .description(localizedWidgetText(tr: "Sıradaki vakte kalan süre ve bugünün namazları."))
     .supportedFamilies([.systemSmall, .systemMedium, .accessoryRectangular])
   }
 }
@@ -1868,8 +1943,133 @@ struct ArinZikirWidget: Widget {
   }
 }
 
+struct EsmaEntry: TimelineEntry {
+  let date: Date
+  let arabic: String
+  let turkish: String
+  let locked: Bool
+}
+
+struct EsmaProvider: TimelineProvider {
+  func placeholder(in context: Context) -> EsmaEntry {
+    EsmaEntry(date: Date(), arabic: "الرحمن", turkish: "Er-Rahmân", locked: false)
+  }
+
+  func getSnapshot(in context: Context, completion: @escaping (EsmaEntry) -> Void) {
+    if context.isPreview {
+      completion(EsmaEntry(date: Date(), arabic: "الرحمن", turkish: "Er-Rahmân", locked: false))
+      return
+    }
+    completion(loadEntry())
+  }
+
+  func getTimeline(in context: Context, completion: @escaping (Timeline<EsmaEntry>) -> Void) {
+    recordWidgetFirstUse("quote", family: context.family)
+    let entry = loadEntry()
+    let midnight = Calendar.current.nextDate(
+      after: Date(),
+      matching: DateComponents(hour: 0, minute: 1),
+      matchingPolicy: .nextTime
+    ) ?? Date().addingTimeInterval(3600)
+    completion(Timeline(entries: [entry], policy: .after(midnight)))
+  }
+
+  private func loadEntry() -> EsmaEntry {
+    let locked = widgetLocked("quote")
+    let scheduled = todaysEsma()
+    let u = suite()
+    return EsmaEntry(
+      date: Date(),
+      arabic: scheduled?.arabic ?? u?.string(forKey: "arin_esma_arabic") ?? "الرحمن",
+      turkish: scheduled?.turkish ?? u?.string(forKey: "arin_esma_turkish") ?? "Er-Rahmân",
+      locked: locked
+    )
+  }
+}
+
+private struct EsmaSchedulePayload: Decodable {
+  let entries: [EsmaScheduleItem]
+}
+
+private struct EsmaScheduleItem: Decodable {
+  let day: String
+  let arabic: String
+  let turkish: String
+}
+
+private func todaysEsma() -> EsmaScheduleItem? {
+  guard let payload = decodeWidgetJson("arin_esma_schedule_json", as: EsmaSchedulePayload.self) else {
+    return nil
+  }
+  let f = DateFormatter()
+  f.calendar = Calendar.current
+  f.locale = Locale(identifier: "en_US_POSIX")
+  f.dateFormat = "yyyy-MM-dd"
+  let today = f.string(from: Date())
+  return payload.entries.first(where: { $0.day == today })
+}
+
+struct EsmaWidgetView: View {
+  var entry: EsmaProvider.Entry
+  @Environment(\.widgetFamily) private var family
+  @Environment(\.colorScheme) private var colorScheme
+
+  private var primaryTextColor: Color {
+    widgetPrimaryText(colorScheme: colorScheme, family: family)
+  }
+
+  var body: some View {
+    if entry.locked {
+      LockedWidgetView(family: family, kindId: "quote")
+    } else {
+      VStack(spacing: 6) {
+        Text(entry.arabic)
+          .font(.system(size: family == .systemSmall ? 28 : 34, weight: .regular))
+          .foregroundStyle(primaryTextColor)
+          .lineLimit(1)
+          .minimumScaleFactor(0.5)
+          .environment(\.layoutDirection, .rightToLeft)
+        Text(entry.turkish)
+          .font(.system(size: 13, weight: .semibold))
+          .foregroundStyle(primaryTextColor.opacity(0.82))
+          .lineLimit(2)
+          .minimumScaleFactor(0.7)
+        Text(localizedWidgetText(tr: "Esma-ül Hüsna"))
+          .font(.system(size: 10, weight: .medium))
+          .foregroundStyle(primaryTextColor.opacity(0.62))
+      }
+      .frame(maxWidth: .infinity, maxHeight: .infinity)
+      .padding(10)
+    }
+  }
+}
+
+struct ArinEsmaWidget: Widget {
+  let kind: String = "ArinEsmaWidget"
+
+  var body: some WidgetConfiguration {
+    StaticConfiguration(kind: kind, provider: EsmaProvider()) { entry in
+      EsmaWidgetView(entry: entry)
+        .arinTransparentWidgetSurface()
+        .widgetURL(URL(string: entry.locked
+          ? "arin://widget/quote?homeWidget=true&lock=1"
+          : "arin://widget/quote?homeWidget=true"))
+    }
+    .configurationDisplayName(localizedWidgetText(tr: "ARIN — Esma-ül Hüsna"))
+    .description(localizedWidgetText(tr: "Günün ism-i şerifi."))
+    .supportedFamilies([.systemSmall, .systemMedium])
+  }
+}
+
 @main
 struct ArinWidgetsBundle: WidgetBundle {
+  var body: some Widget {
+    ArinWidgetsCoreBundle()
+    ArinEsmaWidget()
+  }
+}
+
+struct ArinWidgetsCoreBundle: WidgetBundle {
   var body: some Widget {
     ArinQuoteWidget()
     ArinPrayerWidget()

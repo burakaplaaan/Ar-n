@@ -142,6 +142,8 @@ class _WidgetCenterPageState extends ConsumerState<WidgetCenterPage> {
                     const SizedBox(height: 22),
                     _WidgetThemeSection(onDark: onDark, muted: muted),
                     const SizedBox(height: 22),
+                    _WidgetLockTextSection(onDark: onDark, muted: muted),
+                    const SizedBox(height: 22),
                     if (Platform.isIOS) ...[
                       _SectionTitle('Mevcut widgetlar', muted: muted),
                       const SizedBox(height: 10),
@@ -158,7 +160,7 @@ class _WidgetCenterPageState extends ConsumerState<WidgetCenterPage> {
                         icon: Icons.access_time_rounded,
                         title: 'Namaz Vakti Widgetı',
                         subtitle:
-                            'Konumuna göre sıradaki vakti gösterir. Konum değişirse uygulamayı açman yeterli.',
+                            'Küçükte sıradaki vakte kalan süreyi, genişte bugünün 5 vaktini ve kıldıklarını gösterir.',
                       ),
                       const SizedBox(height: 10),
                       _InfoTile(
@@ -175,6 +177,14 @@ class _WidgetCenterPageState extends ConsumerState<WidgetCenterPage> {
                         title: 'Zikirmatik Widgetı',
                         subtitle:
                             'Ana ekrandan "+" ile zikir çekersin; sayaç uygulamayla eş zamanlı. Tek dokunuş zikirmatik sayfasını açar.',
+                      ),
+                      const SizedBox(height: 10),
+                      _InfoTile(
+                        onDark: onDark,
+                        icon: Icons.auto_awesome_outlined,
+                        title: 'Esma-ül Hüsna Widgetı',
+                        subtitle:
+                            'Her gün bir ism-i şerif. Ana ekrana küçük kare olarak eklenir.',
                       ),
                     ] else ...[
                       _SectionTitle(
@@ -195,6 +205,39 @@ class _WidgetCenterPageState extends ConsumerState<WidgetCenterPage> {
                       const _LockNotificationToggles(),
                       const SizedBox(height: 12),
                       const _OemLockScreenHelpCard(),
+                    ],
+                    if (!Platform.isIOS) ...[
+                      const SizedBox(height: 22),
+                      _SectionTitle('Ana ekran widgetları', muted: muted),
+                      const SizedBox(height: 10),
+                      _InfoTile(
+                        onDark: onDark,
+                        icon: Icons.access_time_rounded,
+                        title: 'Namaz Vakti Widgetı',
+                        subtitle:
+                            'Küçükte sıradaki vakte kalan süre, genişte bugünün 5 namazı ve hicri tarih.',
+                      ),
+                      const SizedBox(height: 10),
+                      _InfoTile(
+                        onDark: onDark,
+                        icon: Icons.auto_awesome_outlined,
+                        title: 'Esma-ül Hüsna Widgetı',
+                        subtitle: 'Her gün bir ism-i şerif.',
+                      ),
+                      const SizedBox(height: 10),
+                      _InfoTile(
+                        onDark: onDark,
+                        icon: Icons.format_quote_rounded,
+                        title: 'Günlük Söz Widgetı',
+                        subtitle: 'Ayet ve hadisler otomatik yenilenir.',
+                      ),
+                      const SizedBox(height: 10),
+                      _InfoTile(
+                        onDark: onDark,
+                        icon: Icons.fingerprint_rounded,
+                        title: 'Zikirmatik Widgetı',
+                        subtitle: 'Ana ekrandan zikir çek; sayaç uygulamayla eşleşir.',
+                      ),
                     ],
                     const SizedBox(height: 24),
                     _SectionTitle('Takip widgetı', muted: muted),
@@ -419,6 +462,181 @@ class _WidgetThemeSection extends ConsumerWidget {
           ],
         ),
       ],
+    );
+  }
+}
+
+class _WidgetLockTextSection extends ConsumerWidget {
+  const _WidgetLockTextSection({required this.onDark, required this.muted});
+
+  final bool onDark;
+  final Color muted;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
+    final isPremium = ref.watch(isPremiumProvider);
+    final selected = ref.watch(effectiveWidgetLockTextProvider);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _SectionTitle(l10n.widgetLockTextSectionTitle, muted: muted),
+        const SizedBox(height: 8),
+        Text(
+          l10n.widgetLockTextSectionSubtitle,
+          style: GoogleFonts.plusJakartaSans(
+            fontSize: 13,
+            height: 1.42,
+            color: muted,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+        const SizedBox(height: 12),
+        Row(
+          children: [
+            Expanded(
+              child: _LockTextChip(
+                title: l10n.widgetLockTextClear,
+                preview: 'İmsak  1:24:10',
+                textOpacity: 1,
+                selected: selected.id == WidgetLockTextStyle.clearId,
+                locked: !isPremium,
+                onDark: onDark,
+                onTap: () => _select(
+                  context,
+                  ref,
+                  isPremium: isPremium,
+                  styleId: WidgetLockTextStyle.clearId,
+                  toast: l10n.widgetLockTextApplied,
+                ),
+              ),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: _LockTextChip(
+                title: l10n.widgetLockTextSoft,
+                preview: 'İmsak  1:24:10',
+                textOpacity: 0.52,
+                selected: selected.id == WidgetLockTextStyle.softId,
+                locked: !isPremium,
+                onDark: onDark,
+                onTap: () => _select(
+                  context,
+                  ref,
+                  isPremium: isPremium,
+                  styleId: WidgetLockTextStyle.softId,
+                  toast: l10n.widgetLockTextApplied,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Future<void> _select(
+    BuildContext context,
+    WidgetRef ref, {
+    required bool isPremium,
+    required String styleId,
+    required String toast,
+  }) async {
+    if (!isPremium) {
+      await PaywallPromptService.showForLockedFeature(context);
+      return;
+    }
+    await ref.read(widgetThemeServiceProvider).selectLockText(
+      styleId: styleId,
+      isPremium: isPremium,
+    );
+    ref.invalidate(effectiveWidgetLockTextProvider);
+    if (!context.mounted) return;
+    showArinTopToast(context, toast);
+  }
+}
+
+class _LockTextChip extends StatelessWidget {
+  const _LockTextChip({
+    required this.title,
+    required this.preview,
+    required this.textOpacity,
+    required this.selected,
+    required this.locked,
+    required this.onDark,
+    required this.onTap,
+  });
+
+  final String title;
+  final String preview;
+  final double textOpacity;
+  final bool selected;
+  final bool locked;
+  final bool onDark;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final fg = Colors.white.withValues(alpha: textOpacity);
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(16),
+        child: Ink(
+          padding: const EdgeInsets.fromLTRB(12, 12, 12, 12),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16),
+            color: onDark ? const Color(0xFF1A1F1C) : const Color(0xFF2F3A33),
+            border: Border.all(
+              color: selected
+                  ? AppColors.goldAccent
+                  : Colors.white.withValues(alpha: 0.12),
+              width: selected ? 2 : 1,
+            ),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      title,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: GoogleFonts.plusJakartaSans(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w800,
+                        fontSize: 13,
+                      ),
+                    ),
+                  ),
+                  if (locked)
+                    Icon(
+                      Icons.lock_rounded,
+                      size: 13,
+                      color: Colors.white.withValues(alpha: 0.85),
+                    ),
+                ],
+              ),
+              const SizedBox(height: 10),
+              Text(
+                preview,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  color: fg,
+                  fontSize: 15,
+                  fontWeight: FontWeight.w600,
+                  fontFamily: 'serif',
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

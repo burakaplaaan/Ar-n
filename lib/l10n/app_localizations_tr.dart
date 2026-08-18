@@ -1628,6 +1628,22 @@ class AppLocalizationsTr extends AppLocalizations {
   String get widgetThemePremiumRequired => 'Bu tema Premium’a özel.';
 
   @override
+  String get widgetLockTextSectionTitle => 'Kilit ekranı yazısı';
+
+  @override
+  String get widgetLockTextSectionSubtitle =>
+      'Kilitte renk seçilemez. Yazıyı net veya yumuşak yapabilirsin. Premium’a özel.';
+
+  @override
+  String get widgetLockTextClear => 'Net';
+
+  @override
+  String get widgetLockTextSoft => 'Yumuşak';
+
+  @override
+  String get widgetLockTextApplied => 'Kilit yazısı güncellendi.';
+
+  @override
   String get qiblaHubHilalDuelTitle => 'Bilgi Düellosu';
 
   @override
@@ -5058,7 +5074,7 @@ class AppLocalizationsTr extends AppLocalizations {
   String get premiumCompareAiFree => 'Kilitli';
 
   @override
-  String get premiumCompareAiPremium => 'Yakında';
+  String get premiumCompareAiPremium => 'Açık';
 
   @override
   String get premiumCompareExplore => 'Keşfet';
@@ -6257,4 +6273,17 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String get appTourFinaleBody =>
       'Tur bitti. İstediğin sekmeden devam et; biz hatırlatır ve eşlik ederiz.';
+
+  @override
+  String get appTourWidgetPromptTitle => 'Widget eklemek ister misin?';
+
+  @override
+  String get appTourWidgetPromptBody =>
+      'Ana ekranda ve kilitte kısa bir ayet veya vakit dursun. İstersen şimdi Widget Merkezi\'nden ekleriz.';
+
+  @override
+  String get appTourWidgetPromptYes => 'Evet';
+
+  @override
+  String get appTourWidgetPromptLater => 'Sonra';
 }

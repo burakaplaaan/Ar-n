@@ -17,6 +17,7 @@ import '../../core/willpower/quit_commitment_chips.dart';
 import '../../data/willpower/willpower_content_loader.dart';
 import '../shared/providers/habit_providers.dart';
 import '../shared/providers/willpower_hub_nav_provider.dart';
+import '../shared/widgets/arin_popup.dart';
 import '../shared/widgets/arin_shell_layout.dart';
 import '../shared/widgets/commitment_seal_widget.dart';
 import 'widgets/commitment_example_chips.dart';
@@ -158,37 +159,14 @@ class _QuitOnboardingFlowPageState
   /// geri dönüp onboarding'i tamamlayabilir.
   Future<void> _onQuickStart() async {
     final l10n = AppLocalizations.of(context)!;
-    final ok = await showDialog<bool>(
+    final ok = await showArinConfirm(
       context: context,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: AppColors.anthraciteMid,
-        title: Text(
-          l10n.quitOnboardingQuickStartTitle,
-          style: AppTextStyles.titleSmall.copyWith(color: AppColors.creamBase),
-        ),
-        content: Text(
-          l10n.quitOnboardingQuickStartBody,
-          style: AppTextStyles.bodyMedium.copyWith(
-            color: AppColors.textOnDarkMuted,
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, false),
-            child: Text(
-              l10n.quitOnboardingAbortAction,
-              style: const TextStyle(color: AppColors.creamBase),
-            ),
-          ),
-          FilledButton(
-            style: FilledButton.styleFrom(
-              backgroundColor: Colors.orange.shade700,
-            ),
-            onPressed: () => Navigator.pop(ctx, true),
-            child: Text(l10n.commonStart),
-          ),
-        ],
-      ),
+      title: l10n.quitOnboardingQuickStartTitle,
+      message: l10n.quitOnboardingQuickStartBody,
+      cancelLabel: l10n.quitOnboardingAbortAction,
+      confirmLabel: l10n.commonStart,
+      tone: ArinPopupTone.warning,
+      icon: Icons.flash_on_rounded,
     );
     if (ok != true || !mounted) return;
     await ref
@@ -221,39 +199,14 @@ class _QuitOnboardingFlowPageState
   Future<void> _exitFlowToArinma() async {
     final l10n = AppLocalizations.of(context)!;
     if (_hasDraftProgress) {
-      final leave = await showDialog<bool>(
+      final leave = await showArinConfirm(
         context: context,
-        builder: (ctx) => AlertDialog(
-          backgroundColor: AppColors.anthraciteMid,
-          title: Text(
-            l10n.quitOnboardingExitDraftTitle,
-            style: AppTextStyles.titleSmall.copyWith(
-              color: AppColors.creamBase,
-            ),
-          ),
-          content: Text(
-            l10n.quitOnboardingExitDraftBody,
-            style: AppTextStyles.bodyMedium.copyWith(
-              color: AppColors.textOnDarkMuted,
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(ctx, false),
-              child: Text(
-                l10n.quitOnboardingStayAction,
-                style: const TextStyle(color: AppColors.creamBase),
-              ),
-            ),
-            FilledButton(
-              style: FilledButton.styleFrom(
-                backgroundColor: Colors.orange.shade700,
-              ),
-              onPressed: () => Navigator.pop(ctx, true),
-              child: Text(l10n.quitOnboardingExitAction),
-            ),
-          ],
-        ),
+        title: l10n.quitOnboardingExitDraftTitle,
+        message: l10n.quitOnboardingExitDraftBody,
+        cancelLabel: l10n.quitOnboardingStayAction,
+        confirmLabel: l10n.quitOnboardingExitAction,
+        tone: ArinPopupTone.warning,
+        icon: Icons.exit_to_app_rounded,
       );
       if (leave != true || !mounted) return;
     }

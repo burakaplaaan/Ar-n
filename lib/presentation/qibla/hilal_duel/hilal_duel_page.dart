@@ -16,6 +16,7 @@ import '../../shared/providers/auth_providers.dart';
 import '../../shared/providers/user_profile_providers.dart';
 import '../../assistant/assistant_session.dart';
 import '../../shared/widgets/arin_permission_dialog.dart';
+import '../../shared/widgets/arin_popup.dart';
 import '../../shared/widgets/arin_shell_layout.dart';
 import '../qibla_hub_navigator_key.dart';
 import '../qibla_hub_page.dart';
@@ -50,25 +51,32 @@ Future<bool?> _promptAdminChallengeMode({
   required BuildContext context,
   required AppLocalizations l10n,
 }) {
-  return showDialog<bool>(
+  return showArinPopup<bool>(
     context: context,
-    builder: (ctx) => AlertDialog(
-      title: Text(l10n.hilalDuelAdminChallengeTitle),
-      content: Text(l10n.hilalDuelAdminChallengeBody),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(ctx),
-          child: Text(l10n.commonCancel),
-        ),
-        TextButton(
-          onPressed: () => Navigator.pop(ctx, false),
-          child: Text(l10n.hilalDuelAdminChallengePlay),
-        ),
-        FilledButton(
-          onPressed: () => Navigator.pop(ctx, true),
-          child: Text(l10n.hilalDuelAdminChallengeAuto),
-        ),
-      ],
+    builder: (ctx) => ArinPopupCard(
+      title: l10n.hilalDuelAdminChallengeTitle,
+      message: l10n.hilalDuelAdminChallengeBody,
+      icon: Icons.sports_kabaddi_rounded,
+      extra: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          FilledButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: Text(l10n.hilalDuelAdminChallengeAuto),
+          ),
+          const SizedBox(height: 8),
+          OutlinedButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: Text(l10n.hilalDuelAdminChallengePlay),
+          ),
+          const SizedBox(height: 8),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: Text(l10n.commonCancel),
+          ),
+        ],
+      ),
+      showActions: false,
     ),
   );
 }
@@ -610,49 +618,12 @@ class _LobbyBodyState extends ConsumerState<_LobbyBody>
       final name = widget.controller.consumeChallengeSentNotice();
       _challengeSentDialogQueued = false;
       if (name == null || !mounted) return;
-      final onDark = widget.onDark;
-      final bronze = _HilalPalette.bronze(onDark);
-      await showDialog<void>(
+      await showArinNotice(
         context: context,
-        builder: (ctx) => AlertDialog(
-          backgroundColor: onDark ? const Color(0xFF101814) : Colors.white,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(18),
-            side: BorderSide(color: bronze.withValues(alpha: 0.45)),
-          ),
-          icon: Icon(Icons.hourglass_top_rounded, color: bronze, size: 32),
-          title: Text(
-            widget.l10n.hilalDuelChallengeSentTitle,
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: _HilalPalette.ink(onDark),
-              fontWeight: FontWeight.w900,
-              fontSize: 18,
-            ),
-          ),
-          content: Text(
-            widget.l10n.hilalDuelChallengeSentBody(name),
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: _HilalPalette.muted(onDark),
-              fontSize: 14,
-              height: 1.4,
-            ),
-          ),
-          actionsAlignment: MainAxisAlignment.center,
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(ctx).pop(),
-              child: Text(
-                widget.l10n.hilalDuelChallengeSentOk,
-                style: TextStyle(
-                  color: bronze,
-                  fontWeight: FontWeight.w800,
-                ),
-              ),
-            ),
-          ],
-        ),
+        title: widget.l10n.hilalDuelChallengeSentTitle,
+        message: widget.l10n.hilalDuelChallengeSentBody(name),
+        actionLabel: widget.l10n.hilalDuelChallengeSentOk,
+        icon: Icons.hourglass_top_rounded,
       );
     });
   }
@@ -685,57 +656,27 @@ class _LobbyBodyState extends ConsumerState<_LobbyBody>
   }
 
   Future<void> _promptAdminGrantHilals() async {
-    final onDark = widget.onDark;
-    final bronze = _HilalPalette.bronze(onDark);
-    final amount = await showDialog<int>(
+    final amount = await showArinPopup<int>(
       context: context,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: onDark ? const Color(0xFF101814) : Colors.white,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(18),
-          side: BorderSide(color: bronze.withValues(alpha: 0.45)),
-        ),
-        title: Text(
-          'Admin · Hilal ekle',
-          style: TextStyle(
-            color: _HilalPalette.ink(onDark),
-            fontWeight: FontWeight.w900,
-            fontSize: 18,
-          ),
-        ),
-        content: Text(
-          'Kendi toplam ve haftalık puanına eklenir.',
-          style: TextStyle(
-            color: _HilalPalette.muted(onDark),
-            fontSize: 13.5,
-            height: 1.35,
-          ),
-        ),
-        actionsAlignment: MainAxisAlignment.center,
-        actions: [
-          for (final n in const [10, 50, 100])
-            TextButton(
-              onPressed: () => Navigator.of(ctx).pop(n),
-              child: Text(
-                '+$n',
-                style: TextStyle(
-                  color: bronze,
-                  fontWeight: FontWeight.w900,
-                  fontSize: 15,
+      builder: (ctx) => ArinPopupCard(
+        title: 'Admin · Hilal ekle',
+        message: 'Kendi toplam ve haftalık puanına eklenir.',
+        icon: Icons.add_circle_outline_rounded,
+        cancelLabel: widget.l10n.commonCancel,
+        onCancel: () => Navigator.of(ctx).pop(),
+        extra: Row(
+          children: [
+            for (final n in const [10, 50, 100]) ...[
+              if (n != 10) const SizedBox(width: 8),
+              Expanded(
+                child: FilledButton(
+                  onPressed: () => Navigator.of(ctx).pop(n),
+                  child: Text('+$n'),
                 ),
               ),
-            ),
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(),
-            child: Text(
-              widget.l10n.commonCancel,
-              style: TextStyle(
-                color: _HilalPalette.muted(onDark),
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-          ),
-        ],
+            ],
+          ],
+        ),
       ),
     );
     if (amount == null || !mounted) return;
@@ -747,75 +688,33 @@ class _LobbyBodyState extends ConsumerState<_LobbyBody>
     final onDark = widget.onDark;
     final bronze = _HilalPalette.bronze(onDark);
     final current = widget.controller.profile?.level ?? 1;
-    final level = await showDialog<int>(
+    final level = await showArinPopup<int>(
       context: context,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: onDark ? const Color(0xFF101814) : Colors.white,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(18),
-          side: BorderSide(color: bronze.withValues(alpha: 0.45)),
-        ),
-        title: Text(
-          'Admin · Seviye ayarla',
-          style: TextStyle(
-            color: _HilalPalette.ink(onDark),
-            fontWeight: FontWeight.w900,
-            fontSize: 18,
-          ),
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
+      builder: (ctx) => ArinPopupCard(
+        title: 'Admin · Seviye ayarla',
+        message:
+            'Toplam hilal seviye tabanına çekilir. Haftalık skor değişmez.',
+        icon: Icons.military_tech_outlined,
+        cancelLabel: widget.l10n.commonCancel,
+        onCancel: () => Navigator.of(ctx).pop(),
+        extra: Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          alignment: WrapAlignment.center,
           children: [
-            Text(
-              'Toplam hilal seviye tabanına çekilir. Haftalık skor değişmez.',
-              style: TextStyle(
-                color: _HilalPalette.muted(onDark),
-                fontSize: 13.5,
-                height: 1.35,
+            for (var n = 1; n <= kHilalDuelMaxLevel; n += 1)
+              FilledButton(
+                style: FilledButton.styleFrom(
+                  backgroundColor: n == current
+                      ? bronze.withValues(alpha: 0.85)
+                      : null,
+                  minimumSize: const Size(44, 40),
+                ),
+                onPressed: () => Navigator.of(ctx).pop(n),
+                child: Text('LV$n'),
               ),
-            ),
-            const SizedBox(height: 14),
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              alignment: WrapAlignment.center,
-              children: [
-                for (var n = 1; n <= kHilalDuelMaxLevel; n += 1)
-                  TextButton(
-                    style: TextButton.styleFrom(
-                      backgroundColor: n == current
-                          ? bronze.withValues(alpha: 0.22)
-                          : null,
-                      foregroundColor: bronze,
-                      minimumSize: const Size(44, 40),
-                    ),
-                    onPressed: () => Navigator.of(ctx).pop(n),
-                    child: Text(
-                      'LV$n',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w900,
-                        fontSize: 14,
-                        color: bronze,
-                      ),
-                    ),
-                  ),
-              ],
-            ),
           ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(),
-            child: Text(
-              widget.l10n.commonCancel,
-              style: TextStyle(
-                color: _HilalPalette.muted(onDark),
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-          ),
-        ],
       ),
     );
     if (level == null || !mounted) return;
@@ -2386,25 +2285,14 @@ class _WeeklyLeaderSheetState extends ConsumerState<_WeeklyLeaderSheet> {
 
   Future<void> _adminRemoveEntry(HilalDuelWeeklyEntry entry) async {
     final name = _leaderboardEntryName(entry);
-    final confirmed = await showDialog<bool>(
+    final confirmed = await showArinConfirm(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text(widget.l10n.hilalDuelAdminRemoveTitle),
-        content: Text(widget.l10n.hilalDuelAdminRemoveBody(name)),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, false),
-            child: Text(widget.l10n.commonCancel),
-          ),
-          FilledButton(
-            style: FilledButton.styleFrom(
-              backgroundColor: Theme.of(ctx).colorScheme.error,
-            ),
-            onPressed: () => Navigator.pop(ctx, true),
-            child: Text(widget.l10n.hilalDuelAdminRemoveAction),
-          ),
-        ],
-      ),
+      title: widget.l10n.hilalDuelAdminRemoveTitle,
+      message: widget.l10n.hilalDuelAdminRemoveBody(name),
+      cancelLabel: widget.l10n.commonCancel,
+      confirmLabel: widget.l10n.hilalDuelAdminRemoveAction,
+      tone: ArinPopupTone.destructive,
+      icon: Icons.person_remove_rounded,
     );
     if (confirmed != true || !mounted) return;
     setState(() => _removingHashes.add(entry.ownerHash));

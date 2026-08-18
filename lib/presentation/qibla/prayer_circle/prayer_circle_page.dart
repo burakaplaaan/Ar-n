@@ -19,6 +19,7 @@ import '../../shared/providers/admob_providers.dart';
 import '../../shared/providers/auth_providers.dart';
 import '../../shared/providers/premium_providers.dart';
 import '../../shared/widgets/arin_back_button.dart';
+import '../../shared/widgets/arin_popup.dart';
 import '../../shared/widgets/arin_shell_layout.dart';
 import '../../shared/widgets/arin_top_toast.dart';
 import 'prayer_circle_repository.dart';
@@ -687,22 +688,14 @@ class _PrayerCirclePageState extends ConsumerState<PrayerCirclePage> {
 
   Future<void> _deleteRequest(PrayerCircleRequest request) async {
     final l10n = AppLocalizations.of(context)!;
-    final confirmed = await showDialog<bool>(
+    final confirmed = await showArinConfirm(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text(l10n.prayerCircleDeleteTitle),
-        content: Text(l10n.prayerCircleDeleteBody),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: Text(l10n.prayerCircleCancel),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.pop(context, true),
-            child: Text(l10n.prayerCircleDeleteAction),
-          ),
-        ],
-      ),
+      title: l10n.prayerCircleDeleteTitle,
+      message: l10n.prayerCircleDeleteBody,
+      cancelLabel: l10n.prayerCircleCancel,
+      confirmLabel: l10n.prayerCircleDeleteAction,
+      tone: ArinPopupTone.destructive,
+      icon: Icons.delete_outline_rounded,
     );
     if (confirmed != true || !mounted) return;
     setState(() => _pendingPrayerIds.add(request.id));
@@ -718,25 +711,14 @@ class _PrayerCirclePageState extends ConsumerState<PrayerCirclePage> {
 
   Future<void> _adminDeleteRequest(PrayerCircleRequest request) async {
     final l10n = AppLocalizations.of(context)!;
-    final confirmed = await showDialog<bool>(
+    final confirmed = await showArinConfirm(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text(l10n.prayerCircleAdminDeleteTitle),
-        content: Text(l10n.prayerCircleAdminDeleteBody),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: Text(l10n.prayerCircleCancel),
-          ),
-          FilledButton(
-            style: FilledButton.styleFrom(
-              backgroundColor: Theme.of(context).colorScheme.error,
-            ),
-            onPressed: () => Navigator.pop(context, true),
-            child: Text(l10n.prayerCircleAdminDeleteAction),
-          ),
-        ],
-      ),
+      title: l10n.prayerCircleAdminDeleteTitle,
+      message: l10n.prayerCircleAdminDeleteBody,
+      cancelLabel: l10n.prayerCircleCancel,
+      confirmLabel: l10n.prayerCircleAdminDeleteAction,
+      tone: ArinPopupTone.destructive,
+      icon: Icons.admin_panel_settings_rounded,
     );
     if (confirmed != true || !mounted) return;
     setState(() => _pendingPrayerIds.add(request.id));
@@ -756,22 +738,14 @@ class _PrayerCirclePageState extends ConsumerState<PrayerCirclePage> {
 
   Future<void> _reportRequest(PrayerCircleRequest request) async {
     final l10n = AppLocalizations.of(context)!;
-    final confirmed = await showDialog<bool>(
+    final confirmed = await showArinConfirm(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text(l10n.prayerCircleReportTitle),
-        content: Text(l10n.prayerCircleReportBody),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: Text(l10n.prayerCircleCancel),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.pop(context, true),
-            child: Text(l10n.prayerCircleReportAction),
-          ),
-        ],
-      ),
+      title: l10n.prayerCircleReportTitle,
+      message: l10n.prayerCircleReportBody,
+      cancelLabel: l10n.prayerCircleCancel,
+      confirmLabel: l10n.prayerCircleReportAction,
+      tone: ArinPopupTone.warning,
+      icon: Icons.flag_outlined,
     );
     if (confirmed != true || !mounted) return;
     setState(() => _pendingPrayerIds.add(request.id));

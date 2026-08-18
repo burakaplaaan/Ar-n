@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'arin_popup.dart';
+
 /// Üst rota parmağı takip eden Cupertino geri jestini kabul ediyor mu?
 bool navigatorAllowsInteractivePop(NavigatorState? nav) {
   if (nav == null || !nav.mounted) return false;
@@ -50,6 +52,7 @@ class _GlobalEdgeSwipeBackState extends State<GlobalEdgeSwipeBack> {
   }
 
   void _onPointerDown(PointerDownEvent e) {
+    ArinDialogOrigin.remember(e.position);
     if (_activePointer != null) return;
     _activePointer = e.pointer;
     _startGlobalPos = e.position;

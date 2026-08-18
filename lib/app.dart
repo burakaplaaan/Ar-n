@@ -372,6 +372,14 @@ class _ArinAppState extends ConsumerState<ArinApp> with WidgetsBindingObserver {
   }
 
   Future<void> _runDeferredPromptsAfterAppTour() async {
+    final prefs = ref.read(sharedPreferencesProvider);
+    final waitStarted = DateTime.now();
+    while (mounted &&
+        prefs.getBool(kAppTourWidgetPromptPendingKey) == true &&
+        DateTime.now().difference(waitStarted) < const Duration(seconds: 45)) {
+      await Future<void>.delayed(const Duration(milliseconds: 300));
+    }
+    if (!mounted) return;
     unawaited(MetaAppEvents.retryPendingTrackingAuthorizationIfNeeded());
     if (isFirebaseReady) {
       unawaited(FcmTokenService.requestBroadcastPermissionIfNeeded());

@@ -4,6 +4,7 @@
 
 import 'package:flutter/material.dart';
 import '../constants/app_colors.dart';
+import '../constants/app_radii.dart';
 import '../constants/app_text_styles.dart';
 import 'arin_backdrop_blur.dart';
 
@@ -298,6 +299,19 @@ abstract final class AppTheme {
         ),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),
+      dialogTheme: DialogThemeData(
+        backgroundColor: AppColors.creamSurface,
+        surfaceTintColor: Colors.transparent,
+        shape: AppRadii.lgShape,
+        titleTextStyle: AppTextStyles.headlineMedium.copyWith(
+          color: AppColors.textPrimary,
+          fontWeight: FontWeight.w700,
+        ),
+        contentTextStyle: AppTextStyles.bodyMedium.copyWith(
+          color: AppColors.textSecondary,
+          height: 1.5,
+        ),
+      ),
       pageTransitionsTheme: const PageTransitionsTheme(
         builders: {
           TargetPlatform.android: CupertinoPageTransitionsBuilder(),
@@ -394,6 +408,19 @@ abstract final class AppTheme {
         unselectedItemColor: AppColors.textOnDarkMuted,
         elevation: 0,
         type: BottomNavigationBarType.fixed,
+      ),
+      dialogTheme: DialogThemeData(
+        backgroundColor: AppColors.homeCardSurface,
+        surfaceTintColor: Colors.transparent,
+        shape: AppRadii.lgShape,
+        titleTextStyle: AppTextStyles.headlineMedium.copyWith(
+          color: AppColors.textOnDark,
+          fontWeight: FontWeight.w700,
+        ),
+        contentTextStyle: AppTextStyles.bodyMedium.copyWith(
+          color: AppColors.textOnDarkMuted,
+          height: 1.5,
+        ),
       ),
       pageTransitionsTheme: const PageTransitionsTheme(
         builders: {

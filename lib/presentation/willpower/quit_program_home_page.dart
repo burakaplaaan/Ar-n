@@ -25,6 +25,7 @@ import '../shared/providers/habit_providers.dart';
 import '../shared/providers/willpower_hub_nav_provider.dart';
 import 'widgets/quit_smoking_shared_widgets.dart';
 import 'package:arin/presentation/shared/widgets/arin_loader.dart';
+import 'package:arin/presentation/shared/widgets/arin_popup.dart';
 
 class QuitProgramHomePage extends ConsumerStatefulWidget {
   const QuitProgramHomePage({
@@ -387,26 +388,17 @@ class _QuitProgramHomePageState extends ConsumerState<QuitProgramHomePage>
     // 2 seçenekli reset dialog: "Geçmişi sakla" (önerilen, güvenli) ve
     // "Sıfırdan başla" (kırmızı, geri alınmaz). Kullanıcı 87 gün sonra kazara
     // "sıfırla" basıp tüm istatistiklerini kaybetmesin diye yumuşak default.
-    final choice = await showDialog<_ResetChoice>(
+    final choice = await showArinPopup<_ResetChoice>(
       context: context,
-      barrierDismissible: true,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: AppColors.anthraciteMid,
-        title: Text(
-          l10n.quitProgramRestartTitle,
-          style: AppTextStyles.titleSmall.copyWith(color: AppColors.creamBase),
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
+      builder: (ctx) => ArinPopupCard(
+        title: l10n.quitProgramRestartTitle,
+        message: l10n.quitProgramRestartPrompt,
+        icon: Icons.restart_alt_rounded,
+        tone: ArinPopupTone.warning,
+        cancelLabel: l10n.quitOnboardingAbortAction,
+        onCancel: () => Navigator.pop(ctx, _ResetChoice.cancel),
+        extra: Column(
           children: [
-            Text(
-              l10n.quitProgramRestartPrompt,
-              style: AppTextStyles.bodyMedium.copyWith(
-                color: AppColors.textOnDarkMuted,
-              ),
-            ),
-            const SizedBox(height: 14),
             _ResetOptionTile(
               icon: Icons.history_rounded,
               title: l10n.quitProgramRestartKeepHistoryTitle,
@@ -424,15 +416,6 @@ class _QuitProgramHomePageState extends ConsumerState<QuitProgramHomePage>
             ),
           ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, _ResetChoice.cancel),
-            child: Text(
-              l10n.quitOnboardingAbortAction,
-              style: const TextStyle(color: AppColors.creamBase),
-            ),
-          ),
-        ],
       ),
     );
     if (choice == null || choice == _ResetChoice.cancel) return;

@@ -4,7 +4,7 @@
     <string name="app_name">Arin</string>
     <string name="widget_description">Daily quote and source — Arin</string>
     <string name="widget_quote_description">Arin — daily quote</string>
-    <string name="widget_prayer_description">Arin — prayer times</string>
+    <string name="widget_prayer_description">Arin — time to the next prayer and today\'s prayers</string>
     <string name="widget_quote_title">Arin · Quote</string>
     <string name="widget_prayer_title">Arin · Prayer</string>
     <string name="widget_brand_label">Arin</string>
@@ -20,4 +20,7 @@
     <string name="widget_zikir_phrase_fallback">Dhikr</string>
     <string name="widget_zikir_select_prompt">Tap to choose a dhikr</string>
     <string name="widget_lock_tap_to_unlock">Tap to unlock</string>
+    <string name="widget_esma_title">Arin · Asma al-Husna</string>
+    <string name="widget_esma_description">Arin — the name of the day</string>
+    <string name="widget_esma_label">Asma al-Husna</string>
 </resources>

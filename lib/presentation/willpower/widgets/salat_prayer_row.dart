@@ -1,5 +1,7 @@
 // Günlük beş vakit — üçgen tikler; hub ve namaz ekranında ortak.
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:arin/l10n/app_localizations.dart';
@@ -7,6 +9,7 @@ import 'package:arin/l10n/app_localizations.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_text_styles.dart';
 import '../../../core/theme/arin_shell_background.dart';
+import '../../../data/services/arin_widget_sync.dart';
 import '../../shared/providers/habit_providers.dart';
 import '../../shared/providers/prayer_time_providers.dart';
 import '../salat_providers.dart';
@@ -122,6 +125,7 @@ class SalatPrayerRow extends ConsumerWidget {
                   habitRepo,
                 );
                 ref.read(habitSummaryProvider.notifier).refresh();
+                unawaited(ArinWidgetSync.refreshPrayerTodayMarks());
               },
               borderRadius: BorderRadius.circular(10),
               child: ConstrainedBox(

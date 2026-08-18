@@ -177,6 +177,18 @@
                 android:name="android.appwidget.provider"
                 android:resource="@xml/arin_zikir_widget_info" />
         </receiver>
+        <receiver
+            android:name=".ArinEsmaWidgetProvider"
+            android:exported="true"
+            android:label="@string/widget_esma_title">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="com.arin.arin.action.ESMA_WIDGET_MIDNIGHT" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/arin_esma_widget_info" />
+        </receiver>
 
         <!-- Namaz bildirimleri: gecikmiş alarm teslimlerini native tarafta
              filtreler. İnternet/Doze/OEM sonrası bayat "1 dk/5 dk kaldı"

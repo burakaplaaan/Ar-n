@@ -19,6 +19,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../../core/constants/app_colors.dart';
+import '../shared/widgets/arin_popup.dart';
 import '../../core/constants/admin_allowlist.dart';
 import '../../core/constants/quote_pool_ids.dart';
 import '../../core/router/app_router.dart';
@@ -669,33 +670,20 @@ class _AdminContentPageState extends ConsumerState<AdminContentPage>
           : backupPoolId;
       final samePool = backupPoolId == null || backupPoolId == _poolId;
       if (!mounted) return;
-      final ok = await showDialog<bool>(
+      final ok = await showArinConfirm(
         context: context,
         barrierDismissible: false,
-        builder: (ctx) => AlertDialog(
-          title: Text(l10n.adminRestoreBackupTitle),
-          content: Text(
-            l10n.adminRestoreBackupDialogBody(
-              file.name,
-              sourceText,
-              _poolId,
-              items.length,
-              samePool
-                  ? ''
-                  : '${l10n.adminRestoreBackupDifferentPoolWarning}\n\n',
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(ctx, false),
-              child: Text(l10n.commonCancel),
-            ),
-            FilledButton(
-              onPressed: () => Navigator.pop(ctx, true),
-              child: Text(l10n.quitOnboardingContinueAction),
-            ),
-          ],
+        title: l10n.adminRestoreBackupTitle,
+        message: l10n.adminRestoreBackupDialogBody(
+          file.name,
+          sourceText,
+          _poolId,
+          items.length,
+          samePool ? '' : '${l10n.adminRestoreBackupDifferentPoolWarning}\n\n',
         ),
+        cancelLabel: l10n.commonCancel,
+        confirmLabel: l10n.quitOnboardingContinueAction,
+        icon: Icons.restore_rounded,
       );
       if (ok != true) return;
 
@@ -759,44 +747,29 @@ class _AdminContentPageState extends ConsumerState<AdminContentPage>
     }
     if (!mounted) return;
 
-    final ok = await showDialog<bool>(
+    final ok = await showArinConfirm(
       context: context,
       barrierDismissible: false,
-      builder: (ctx) => AlertDialog(
-        title: Text(
-          mergeOnly ? l10n.adminAddMissingRecords : l10n.adminSeedAllPoolsTitle,
-        ),
-        content: Text(
-          mergeOnly
-              ? l10n.adminMergeSeedPreview(
-                  preview.poolCount,
-                  preview.changedPoolCount,
-                  preview.addedItemCount,
-                  preview.targetItemCount,
-                )
-              : l10n.adminResetSeedPreview(
-                  preview.poolCount,
-                  preview.changedPoolCount,
-                  preview.currentItemCount,
-                  preview.targetItemCount,
-                ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, false),
-            child: Text(l10n.commonCancel),
-          ),
-          FilledButton(
-            style: mergeOnly
-                ? null
-                : FilledButton.styleFrom(backgroundColor: Colors.redAccent),
-            onPressed: () => Navigator.pop(ctx, true),
-            child: Text(
-              mergeOnly ? l10n.adminAddAction : l10n.adminOverwriteAction,
+      title: mergeOnly
+          ? l10n.adminAddMissingRecords
+          : l10n.adminSeedAllPoolsTitle,
+      message: mergeOnly
+          ? l10n.adminMergeSeedPreview(
+              preview.poolCount,
+              preview.changedPoolCount,
+              preview.addedItemCount,
+              preview.targetItemCount,
+            )
+          : l10n.adminResetSeedPreview(
+              preview.poolCount,
+              preview.changedPoolCount,
+              preview.currentItemCount,
+              preview.targetItemCount,
             ),
-          ),
-        ],
-      ),
+      cancelLabel: l10n.commonCancel,
+      confirmLabel: mergeOnly ? l10n.adminAddAction : l10n.adminOverwriteAction,
+      tone: mergeOnly ? ArinPopupTone.accent : ArinPopupTone.destructive,
+      icon: mergeOnly ? Icons.add_circle_outline_rounded : Icons.warning_amber_rounded,
     );
     if (ok != true || !mounted) return;
 
@@ -1242,52 +1215,34 @@ class _AdminContentPageState extends ConsumerState<AdminContentPage>
     String? preview,
     String? confirmLabel,
   }) async {
-    final result = await showDialog<bool>(
+    final previewText = preview?.trim();
+    final result = await showArinPopup<bool>(
       context: context,
       barrierDismissible: false,
-      builder: (ctx) => AlertDialog(
-        title: Text(title),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(message),
-            if (preview != null && preview.trim().isNotEmpty) ...[
-              const SizedBox(height: 12),
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.05),
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(
-                    color: Colors.white.withValues(alpha: 0.12),
-                  ),
-                ),
-                child: Text(
-                  preview.length > 180
-                      ? '${preview.substring(0, 180)}…'
-                      : preview,
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontStyle: FontStyle.italic,
-                    color: Colors.white.withValues(alpha: 0.78),
+      builder: (ctx) => ArinPopupCard(
+        title: title,
+        message: message,
+        tone: ArinPopupTone.destructive,
+        icon: Icons.delete_outline_rounded,
+        cancelLabel: l10n.commonCancel,
+        confirmLabel: confirmLabel ?? l10n.settingsDeleteAction,
+        extra: previewText == null || previewText.isEmpty
+            ? null
+            : Text(
+                previewText.length > 180
+                    ? '${previewText.substring(0, 180)}…'
+                    : previewText,
+                style: TextStyle(
+                  fontSize: 13,
+                  fontStyle: FontStyle.italic,
+                  height: 1.4,
+                  color: Theme.of(ctx).textTheme.bodyMedium?.color?.withValues(
+                    alpha: 0.78,
                   ),
                 ),
               ),
-            ],
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, false),
-            child: Text(l10n.commonCancel),
-          ),
-          FilledButton(
-            style: FilledButton.styleFrom(backgroundColor: Colors.redAccent),
-            onPressed: () => Navigator.pop(ctx, true),
-            child: Text(confirmLabel ?? l10n.settingsDeleteAction),
-          ),
-        ],
+        onCancel: () => Navigator.pop(ctx, false),
+        onConfirm: () => Navigator.pop(ctx, true),
       ),
     );
     return result == true;
@@ -1383,43 +1338,22 @@ class _AdminContentPageState extends ConsumerState<AdminContentPage>
     required int newCount,
     required int changedCount,
   }) async {
-    final result = await showDialog<bool>(
+    final result = await showArinConfirm(
       context: context,
       barrierDismissible: false,
-      builder: (ctx) => AlertDialog(
-        title: Text(title),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(actionLabel),
-            const SizedBox(height: 12),
-            Text(l10n.adminCurrentRecordCount(oldCount)),
-            Text(l10n.adminRecordCountToSave(newCount)),
-            Text(l10n.adminChangedRowCount(changedCount)),
-            const SizedBox(height: 12),
-            Text(
-              l10n.adminConcurrentEditWarning,
-              style: TextStyle(
-                fontSize: 12,
-                color: Colors.white.withValues(alpha: 0.68),
-              ),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, false),
-            child: Text(l10n.quitOnboardingAbortAction),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.pop(ctx, true),
-            child: Text(l10n.adminSaveAction),
-          ),
-        ],
-      ),
+      title: title,
+      message: [
+        actionLabel,
+        l10n.adminCurrentRecordCount(oldCount),
+        l10n.adminRecordCountToSave(newCount),
+        l10n.adminChangedRowCount(changedCount),
+        l10n.adminConcurrentEditWarning,
+      ].join('\n'),
+      cancelLabel: l10n.quitOnboardingAbortAction,
+      confirmLabel: l10n.adminSaveAction,
+      icon: Icons.save_outlined,
     );
-    return result == true;
+    return result;
   }
 
   Future<void> _writeAdminAudit({
@@ -3192,27 +3126,18 @@ class _AdminContentPageState extends ConsumerState<AdminContentPage>
 
   Future<void> _grantQuizHeartsAll() async {
     if (_quizHeartsGrantAllBusy) return;
-    final confirmed = await showDialog<bool>(
+    final confirmed = await showArinConfirm(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Herkese +1 can'),
-        content: const Text(
+      title: 'Herkese +1 can',
+      message:
           'Mevcut düello oyuncularına +1 can yazılır; ayrıca global hediye '
           'kaydı oluşur (hiç oynamayan ilk açılışta canı alır).\n\n'
           'Bildirim broadcast_all ile herkese gider — teşvik metni özellikle '
           'yeni oyuncuya göre. Tıklanınca düello açılır. Emin misin?',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, false),
-            child: Text(l10n.commonCancel),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.pop(ctx, true),
-            child: const Text('Gönder'),
-          ),
-        ],
-      ),
+      cancelLabel: l10n.commonCancel,
+      confirmLabel: 'Gönder',
+      tone: ArinPopupTone.warning,
+      icon: Icons.favorite_outline_rounded,
     );
     if (confirmed != true || !mounted) return;
 

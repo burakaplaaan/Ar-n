@@ -18,6 +18,7 @@ import '../../shared/providers/quote_pool_content_providers.dart';
 import 'healing_freq_catalog.dart';
 import 'healing_frequencies_sheets.dart';
 import '../../shared/widgets/arin_back_button.dart';
+import '../../shared/widgets/arin_popup.dart';
 
 import 'package:arin/l10n/app_localizations.dart';
 
@@ -130,12 +131,10 @@ class _HealingFrequenciesPageState extends ConsumerState<HealingFrequenciesPage>
 
   Future<void> _showInfo() async {
     final l10n = AppLocalizations.of(context)!;
-    await showDialog<void>(
+    await showArinPopup<void>(
       context: context,
-      barrierColor: Colors.black.withValues(alpha: 0.62),
-      builder: (ctx) => Dialog(
-        backgroundColor: Colors.transparent,
-        insetPadding: const EdgeInsets.symmetric(horizontal: 24),
+      builder: (ctx) => Material(
+        type: MaterialType.transparency,
         child: ArinBackdropBlur(
           sigma: 22,
           borderRadius: BorderRadius.circular(24),

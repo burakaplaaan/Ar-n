@@ -8,6 +8,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import android.graphics.Color
 import android.graphics.Typeface
 import android.os.Build
 import android.os.SystemClock
@@ -71,6 +72,7 @@ object ArinLockNotifications {
     private const val TICK_INTERVAL_MS = 60_000L
     private const val DEADLINE_GUARD_MS = 1500L
 
+    private const val KEY_LOCK_TEXT = "arin_widget_lock_text"
     private const val KEY_QUOTE_TEXT = "arin_quote_text"
     private const val KEY_QUOTE_SOURCE = "arin_quote_source"
     private const val KEY_QUOTE_SCHEDULE = "arin_quote_schedule_json"
@@ -548,11 +550,24 @@ object ArinLockNotifications {
      * Theme attribute (?android:attr/textColor*) OEM SystemUI'da koyu modda
      * sık sık koyu-kart / koyu-metin üretiyor; setTextColor bu hatayı keser.
      */
-    private fun applyLockNotifTextColors(context: Context, views: RemoteViews) {
-        val primary = ContextCompat.getColor(context, R.color.lock_notif_text_primary)
-        val secondary = ContextCompat.getColor(context, R.color.lock_notif_text_secondary)
+    private fun applyLockNotifTextColors(
+        context: Context,
+        views: RemoteViews,
+        prefs: SharedPreferences,
+    ) {
+        var primary = ContextCompat.getColor(context, R.color.lock_notif_text_primary)
+        var secondary = ContextCompat.getColor(context, R.color.lock_notif_text_secondary)
+        if (prefs.getString(KEY_LOCK_TEXT, "clear") == "soft") {
+            primary = withAlpha(primary, 0.55f)
+            secondary = withAlpha(secondary, 0.42f)
+        }
         views.setTextColor(R.id.notif_primary, primary)
         views.setTextColor(R.id.notif_title, secondary)
+    }
+
+    private fun withAlpha(color: Int, factor: Float): Int {
+        val alpha = (Color.alpha(color) * factor).toInt().coerceIn(0, 255)
+        return Color.argb(alpha, Color.red(color), Color.green(color), Color.blue(color))
     }
 
     private fun postNotification(
@@ -572,7 +587,7 @@ object ArinLockNotifications {
         // Absolute ARGB: OEM SystemUI ?attr/textColor* çözümünü koyu kartta
         // koyu metne çevirip sözü görünmez yapabiliyor; burada uiMode'a göre
         // çözülen renk RemoteViews action olarak gömülür.
-        applyLockNotifTextColors(context, views)
+        applyLockNotifTextColors(context, views, prefs)
         views.setTextViewTextSize(
             R.id.notif_primary,
             TypedValue.COMPLEX_UNIT_SP,

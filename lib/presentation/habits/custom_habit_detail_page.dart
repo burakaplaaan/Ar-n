@@ -12,6 +12,7 @@ import '../../data/models/habit_model.dart';
 import '../../data/services/habit_cloud_sync_service.dart';
 import '../shared/providers/auth_providers.dart';
 import '../shared/providers/habit_providers.dart';
+import '../shared/widgets/arin_popup.dart';
 
 const Color _kArinmaAccent = Color(0xFFFF5252);
 
@@ -59,32 +60,14 @@ class _CustomHabitDetailPageState extends ConsumerState<CustomHabitDetailPage> {
   }
 
   Future<void> _confirmArchive(BuildContext context, String habitId) async {
-    final ok = await showDialog<bool>(
+    final l10n = AppLocalizations.of(context)!;
+    final ok = await showArinConfirm(
       context: context,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: AppColors.anthraciteMid,
-        title: Text(
-          AppLocalizations.of(context)!.habitsDeleteConfirmTitle,
-          style: AppTextStyles.headlineSmall.copyWith(color: AppColors.creamBase),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, false),
-            child: Text(
-              AppLocalizations.of(context)!.habitsCancel,
-              style: AppTextStyles.labelLarge.copyWith(color: AppColors.textMuted),
-            ),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.pop(ctx, true),
-            style: FilledButton.styleFrom(backgroundColor: AppColors.error),
-            child: Text(
-              AppLocalizations.of(context)!.habitsYesDelete,
-              style: AppTextStyles.labelLarge.copyWith(color: Colors.white),
-            ),
-          ),
-        ],
-      ),
+      title: l10n.habitsDeleteConfirmTitle,
+      cancelLabel: l10n.habitsCancel,
+      confirmLabel: l10n.habitsYesDelete,
+      tone: ArinPopupTone.destructive,
+      icon: Icons.delete_outline_rounded,
     );
     if (ok == true && context.mounted) {
       await HabitCloudSyncService.rememberDeletedHabitId(habitId: habitId);

@@ -86,7 +86,7 @@ void main() {
     );
 
     expect(tester.takeException(), isNull);
-    expect(find.byType(SingleChildScrollView), findsOneWidget);
+    expect(find.byType(Scrollable), findsWidgets);
 
     await tester.tap(find.text('Devam Et'));
     await tester.pumpAndSettle();

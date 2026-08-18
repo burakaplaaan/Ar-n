@@ -848,6 +848,11 @@
   "widgetThemeSectionSubtitle": "Klasik tema herkese açık. Diğer temalar Premium’a özeldir ve iPhone ile Android’de aynı görünür.",
   "widgetThemeApplied": "Widget teması güncellendi.",
   "widgetThemePremiumRequired": "Bu tema Premium’a özel.",
+  "widgetLockTextSectionTitle": "Kilit ekranı yazısı",
+  "widgetLockTextSectionSubtitle": "Kilitte renk seçilemez. Yazıyı net veya yumuşak yapabilirsin. Premium’a özel.",
+  "widgetLockTextClear": "Net",
+  "widgetLockTextSoft": "Yumuşak",
+  "widgetLockTextApplied": "Kilit yazısı güncellendi.",
   "qiblaHubHilalDuelTitle": "Bilgi Düellosu",
   "qiblaHubHilalDuelSubtitle": "7 İslami bilgi sorusunda yarış; hilal kazan, seviye atla",
   "hilalDuelTitle": "Bilgi Düellosu",
@@ -2337,7 +2342,7 @@
   "premiumCompareThemesPremium": "6 tema",
   "premiumCompareAi": "İslami yapay zeka",
   "premiumCompareAiFree": "Kilitli",
-  "premiumCompareAiPremium": "Yakında",
+  "premiumCompareAiPremium": "Açık",
   "premiumCompareExplore": "Keşfet",
   "premiumCompareExploreFree": "Reklamlı",
   "premiumCompareExplorePremium": "Kesintisiz",
@@ -2714,5 +2719,9 @@
   "appTourAssistantFabTitle": "Asistan balonu",
   "appTourAssistantFabBody": "Sürüklenebilir kısayol — her sekmede asistanı açar.",
   "appTourFinaleTitle": "Hazırsın",
-  "appTourFinaleBody": "Tur bitti. İstediğin sekmeden devam et; biz hatırlatır ve eşlik ederiz."
+  "appTourFinaleBody": "Tur bitti. İstediğin sekmeden devam et; biz hatırlatır ve eşlik ederiz.",
+  "appTourWidgetPromptTitle": "Widget eklemek ister misin?",
+  "appTourWidgetPromptBody": "Ana ekranda ve kilitte kısa bir ayet veya vakit dursun. İstersen şimdi Widget Merkezi'nden ekleriz.",
+  "appTourWidgetPromptYes": "Evet",
+  "appTourWidgetPromptLater": "Sonra"
 }

@@ -12,6 +12,7 @@ import '../../data/models/purchase_result.dart';
 import '../../data/services/purchase_service.dart';
 import '../../l10n/app_localizations.dart';
 import 'package:arin/presentation/shared/widgets/arin_loader.dart';
+import 'package:arin/presentation/shared/widgets/arin_popup.dart';
 import 'package:arin/presentation/shared/widgets/arin_top_toast.dart';
 
 class SupportArinPage extends ConsumerStatefulWidget {
@@ -153,21 +154,12 @@ class _SupportArinPageState extends ConsumerState<SupportArinPage> {
 
   void _showSuccessDialog() {
     final l10n = AppLocalizations.of(context)!;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    showDialog<void>(
+    showArinNotice(
       context: context,
-      builder: (dialogContext) => AlertDialog(
-        backgroundColor: isDark ? AppColors.cardSurface : Colors.white,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-        title: Text(l10n.supportThanksTitle),
-        content: Text(l10n.supportThanksBody),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(dialogContext).pop(),
-            child: Text(l10n.commonOk),
-          ),
-        ],
-      ),
+      title: l10n.supportThanksTitle,
+      message: l10n.supportThanksBody,
+      actionLabel: l10n.commonOk,
+      icon: Icons.favorite_rounded,
     );
   }
 

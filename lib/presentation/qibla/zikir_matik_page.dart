@@ -26,6 +26,7 @@ import '../shared/mixins/review_prompt_on_exit_mixin.dart';
 import '../shared/widgets/tasbeeh_zikirmatik_device_frame.dart';
 import '../shared/widgets/arin_back_button.dart';
 import 'package:arin/presentation/shared/widgets/arin_loader.dart';
+import 'package:arin/presentation/shared/widgets/arin_popup.dart';
 import 'package:arin/presentation/shared/widgets/arin_top_toast.dart';
 
 part 'zikir_matik_phrase_widgets.dart';
@@ -57,10 +58,7 @@ abstract final class _ZikirmatikColors {
   static const Color lcdBg = Color(0xFFB1D7B4);
   static const Color lcdDim = Color(0xFF8FA394);
   static const Color lcdActive = Color(0xFF1A1A1A);
-  static const Color labelMuted = Color(0xFFEEF6F6);
-
-  /// Diyalog yüzeyi (açık arka planda okunaklı koyu panel).
-  static const Color dialogSurface = Color(0xFF3D5050);
+  static const Color labelMuted = Color(0xFFC5D4DC);
 }
 
 List<String> _zikirPresetPhrases(BuildContext context) {
@@ -477,111 +475,14 @@ class _ZikirMatikPageState extends ConsumerState<ZikirMatikPage>
 
   Future<void> _reset() async {
     final l10n = AppLocalizations.of(context)!;
-    final ok = await showDialog<bool>(
+    final ok = await showArinConfirm(
       context: context,
-      barrierColor: Colors.black.withValues(alpha: 0.72),
-      builder: (ctx) {
-        return Dialog(
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-          insetPadding: const EdgeInsets.symmetric(horizontal: 28),
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 340),
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                color: _ZikirmatikColors.dialogSurface,
-                borderRadius: BorderRadius.circular(26),
-                border: Border.all(
-                  color: _ZikirmatikColors.outer.withValues(alpha: 0.28),
-                  width: 1,
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.55),
-                    blurRadius: 28,
-                    offset: const Offset(0, 14),
-                  ),
-                ],
-              ),
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(22, 22, 14, 14),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Text(
-                      l10n.zikirmatikResetCounter,
-                      style: const TextStyle(
-                        color: _ZikirmatikColors.labelMuted,
-                        fontSize: 19,
-                        fontWeight: FontWeight.w800,
-                        height: 1.25,
-                        letterSpacing: 0.2,
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    Text(
-                      l10n.zikirmatikResetCounterDesc,
-                      style: TextStyle(
-                        color: _ZikirmatikColors.labelMuted.withValues(
-                          alpha: 0.72,
-                        ),
-                        fontSize: 14,
-                        height: 1.45,
-                      ),
-                    ),
-                    const SizedBox(height: 22),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        TextButton(
-                          onPressed: () => Navigator.pop(ctx, false),
-                          style: TextButton.styleFrom(
-                            foregroundColor: _ZikirmatikColors.outer,
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 14,
-                              vertical: 10,
-                            ),
-                          ),
-                          child: Text(
-                            l10n.zikirmatikCancel,
-                            style: const TextStyle(
-                              fontWeight: FontWeight.w600,
-                              fontSize: 14,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 4),
-                        FilledButton(
-                          onPressed: () => Navigator.pop(ctx, true),
-                          style: FilledButton.styleFrom(
-                            backgroundColor: _ZikirmatikColors.outer,
-                            foregroundColor: Colors.white,
-                            elevation: 0,
-                            shadowColor: Colors.transparent,
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 22,
-                              vertical: 12,
-                            ),
-                            shape: const StadiumBorder(),
-                          ),
-                          child: Text(
-                            l10n.zikirmatikReset,
-                            style: const TextStyle(
-                              fontWeight: FontWeight.w700,
-                              fontSize: 14,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        );
-      },
+      title: l10n.zikirmatikResetCounter,
+      message: l10n.zikirmatikResetCounterDesc,
+      cancelLabel: l10n.zikirmatikCancel,
+      confirmLabel: l10n.zikirmatikReset,
+      tone: ArinPopupTone.warning,
+      icon: Icons.refresh_rounded,
     );
     if (ok == true) {
       setState(() {

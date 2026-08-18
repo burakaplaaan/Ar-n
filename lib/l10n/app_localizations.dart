@@ -2879,6 +2879,36 @@ abstract class AppLocalizations {
   /// **'Bu tema Premium’a özel.'**
   String get widgetThemePremiumRequired;
 
+  /// No description provided for @widgetLockTextSectionTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kilit ekranı yazısı'**
+  String get widgetLockTextSectionTitle;
+
+  /// No description provided for @widgetLockTextSectionSubtitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kilitte renk seçilemez. Yazıyı net veya yumuşak yapabilirsin. Premium’a özel.'**
+  String get widgetLockTextSectionSubtitle;
+
+  /// No description provided for @widgetLockTextClear.
+  ///
+  /// In tr, this message translates to:
+  /// **'Net'**
+  String get widgetLockTextClear;
+
+  /// No description provided for @widgetLockTextSoft.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yumuşak'**
+  String get widgetLockTextSoft;
+
+  /// No description provided for @widgetLockTextApplied.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kilit yazısı güncellendi.'**
+  String get widgetLockTextApplied;
+
   /// No description provided for @qiblaHubHilalDuelTitle.
   ///
   /// In tr, this message translates to:
@@ -8812,7 +8842,7 @@ abstract class AppLocalizations {
   /// No description provided for @premiumCompareAiPremium.
   ///
   /// In tr, this message translates to:
-  /// **'Yakında'**
+  /// **'Açık'**
   String get premiumCompareAiPremium;
 
   /// No description provided for @premiumCompareExplore.
@@ -10894,6 +10924,30 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'Tur bitti. İstediğin sekmeden devam et; biz hatırlatır ve eşlik ederiz.'**
   String get appTourFinaleBody;
+
+  /// No description provided for @appTourWidgetPromptTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Widget eklemek ister misin?'**
+  String get appTourWidgetPromptTitle;
+
+  /// No description provided for @appTourWidgetPromptBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ana ekranda ve kilitte kısa bir ayet veya vakit dursun. İstersen şimdi Widget Merkezi\'nden ekleriz.'**
+  String get appTourWidgetPromptBody;
+
+  /// No description provided for @appTourWidgetPromptYes.
+  ///
+  /// In tr, this message translates to:
+  /// **'Evet'**
+  String get appTourWidgetPromptYes;
+
+  /// No description provided for @appTourWidgetPromptLater.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sonra'**
+  String get appTourWidgetPromptLater;
 }
 
 class _AppLocalizationsDelegate
