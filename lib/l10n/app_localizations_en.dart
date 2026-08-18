@@ -3723,6 +3723,31 @@ class AppLocalizationsEn extends AppLocalizations {
       'The lock screen becomes a short pause scattered through the day.';
 
   @override
+  String get onboardingFirstStepTitle =>
+      'Would you like to take the first step now?';
+
+  @override
+  String get onboardingFirstStepSubtitle =>
+      'The path has appeared. If you wish, we will bind an intention today — to leave something, or to build something. If not, it can be set up later; the path does not close.';
+
+  @override
+  String get onboardingFirstStepArinmaTitle => 'Purification';
+
+  @override
+  String get onboardingFirstStepArinmaBody =>
+      'Set a tracker to leave a habit that weighs on the heart.';
+
+  @override
+  String get onboardingFirstStepGelisimTitle => 'Growth';
+
+  @override
+  String get onboardingFirstStepGelisimBody =>
+      'Set prayer, qada, or a daily routine on the path from today.';
+
+  @override
+  String get onboardingFirstStepLater => 'Set up later';
+
+  @override
   String get onboardingRhythmTitle => 'Arın settles quietly into the day';
 
   @override

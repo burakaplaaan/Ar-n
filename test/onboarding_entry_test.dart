@@ -9,6 +9,8 @@ import 'package:arin/presentation/onboarding/onboarding_dua_screen.dart';
 import 'package:arin/presentation/onboarding/onboarding_info_screen.dart';
 import 'package:arin/presentation/onboarding/onboarding_prepare_screen.dart';
 import 'package:arin/presentation/onboarding/onboarding_struggle_note_screen.dart';
+import 'package:arin/presentation/onboarding/onboarding_willpower_invite_screen.dart';
+import 'package:arin/core/constants/profile_prefs_keys.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -265,5 +267,56 @@ void main() {
     expect(l10n.onboardingToneSubtitle, 'Dök içini.');
     expect(l10n.onboardingRhythmSubtitle, contains('bildirim iznini'));
     expect(l10n.onboardingLocationTitle, contains('konum'));
+    expect(l10n.onboardingFirstStepTitle, contains('atmak'));
+    expect(l10n.onboardingFirstStepArinmaTitle, 'Arınma');
+    expect(l10n.onboardingFirstStepGelisimTitle, 'Gelişim');
+    expect(l10n.onboardingFirstStepLater, contains('Daha sonra'));
+  });
+
+  testWidgets('ilk adım davetinde arınma, gelişim ve sonra kur var', (
+    tester,
+  ) async {
+    var later = false;
+    var arinma = false;
+    var gelisim = false;
+    await tester.pumpWidget(
+      MaterialApp(
+        locale: const Locale('tr'),
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        home: Scaffold(
+          body: OnboardingWillpowerInviteScreen(
+            onBack: () {},
+            onChooseArinma: () => arinma = true,
+            onChooseGelisim: () => gelisim = true,
+            onLater: () => later = true,
+          ),
+        ),
+      ),
+    );
+    await tester.pump();
+    expect(
+      find.text('İlk adımı şimdi atmak ister misin?'),
+      findsOneWidget,
+    );
+    expect(find.text('Arınma'), findsOneWidget);
+    expect(find.text('Gelişim'), findsOneWidget);
+    expect(find.text('Daha sonra kur'), findsOneWidget);
+
+    await tester.tap(find.text('Daha sonra kur'));
+    await tester.pump();
+    expect(later, isTrue);
+
+    await tester.tap(find.text('Arınma'));
+    await tester.pump();
+    expect(arinma, isTrue);
+
+    await tester.tap(find.text('Gelişim'));
+    await tester.pump();
+    expect(gelisim, isTrue);
+  });
+
+  test('willpower choice prefs anahtarı kurulumda ayrı durur', () {
+    expect(kOnboardingWillpowerChoiceKey, 'arin_onboarding_willpower_choice');
   });
 }

@@ -26,9 +26,14 @@ import 'package:arin/presentation/shared/widgets/arin_loader.dart';
 import 'package:arin/presentation/shared/widgets/arin_top_toast.dart';
 
 class QuitOnboardingFlowPage extends ConsumerStatefulWidget {
-  const QuitOnboardingFlowPage({super.key, required this.habitId});
+  const QuitOnboardingFlowPage({
+    super.key,
+    required this.habitId,
+    this.embeddedInAppOnboarding = false,
+  });
 
   final String habitId;
+  final bool embeddedInAppOnboarding;
 
   @override
   ConsumerState<QuitOnboardingFlowPage> createState() =>
@@ -179,7 +184,7 @@ class _QuitOnboardingFlowPageState
       ),
     );
     if (mounted) {
-      context.go(AppRoutes.willQuitHome(widget.habitId));
+      _leaveAfterSetup(completed: true);
     }
   }
 
@@ -210,8 +215,20 @@ class _QuitOnboardingFlowPageState
       );
       if (leave != true || !mounted) return;
     }
+    if (widget.embeddedInAppOnboarding) {
+      Navigator.of(context).pop(false);
+      return;
+    }
     ref.read(willpowerHubReturnToArinmaProvider.notifier).state = true;
     popOrGoWillpowerHub(context);
+  }
+
+  void _leaveAfterSetup({required bool completed}) {
+    if (widget.embeddedInAppOnboarding) {
+      Navigator.of(context).pop(completed);
+      return;
+    }
+    context.go(AppRoutes.willQuitHome(widget.habitId));
   }
 
   @override
@@ -379,7 +396,7 @@ class _QuitOnboardingFlowPageState
                           ),
                         );
                         if (context.mounted) {
-                          context.go(AppRoutes.willQuitHome(widget.habitId));
+                          _leaveAfterSetup(completed: true);
                         }
                       },
                     ),

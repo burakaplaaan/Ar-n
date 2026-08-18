@@ -2064,17 +2064,11 @@ struct ArinEsmaWidget: Widget {
 @main
 struct ArinWidgetsBundle: WidgetBundle {
   var body: some Widget {
-    ArinWidgetsCoreBundle()
-    ArinEsmaWidget()
-  }
-}
-
-struct ArinWidgetsCoreBundle: WidgetBundle {
-  var body: some Widget {
     ArinQuoteWidget()
     ArinPrayerWidget()
     ArinComboWidget()
     ArinTrackingWidget()
     ArinZikirWidget()
+    ArinEsmaWidget()
   }
 }

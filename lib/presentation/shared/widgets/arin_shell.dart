@@ -98,6 +98,20 @@ class _KeepAlivePageState extends State<_KeepAlivePage>
   }
 }
 
+/// Kaydırınca sekme köküne `go` etmek, `/settings/widgets` gibi
+/// alt yolları Ayarlar'a ezmesin.
+@visibleForTesting
+bool shouldCommitShellSwipe({
+  required String currentPath,
+  required String tabRoot,
+}) {
+  if (currentPath == tabRoot) return false;
+  if (tabRoot.length > 1 && currentPath.startsWith('$tabRoot/')) {
+    return false;
+  }
+  return true;
+}
+
 class ArinShell extends StatefulWidget {
   const ArinShell({super.key, required this.child});
 
@@ -503,9 +517,13 @@ class _ArinShellState extends State<ArinShell> {
                     HapticFeedback.selectionClick();
                     _navBarSolidity.value = 1.0;
                     final next = _shellPathForIndex(i);
-                    if (path != next) {
-                      context.go(next);
+                    if (!shouldCommitShellSwipe(
+                      currentPath: path,
+                      tabRoot: next,
+                    )) {
+                      return;
                     }
+                    context.go(next);
                   },
                   itemBuilder: (context, index) {
                     return _KeepAlivePage(

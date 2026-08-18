@@ -13,6 +13,8 @@ import '../../core/router/app_router.dart';
 import '../../data/models/habit_model.dart';
 import '../shared/providers/habit_providers.dart';
 import '../shared/providers/willpower_hub_nav_provider.dart';
+import 'quit_onboarding_flow_page.dart';
+import '../habits/add_habit_page.dart';
 import 'package:arin/presentation/shared/widgets/arin_loader.dart';
 import 'package:arin/presentation/shared/widgets/arin_top_toast.dart';
 
@@ -20,7 +22,12 @@ const Color _kQuitAccent = Color(0xFFFF5252);
 const Color _kSaveOutline = Color(0xFFFFC107);
 
 class QuitTemplatePickerPage extends ConsumerStatefulWidget {
-  const QuitTemplatePickerPage({super.key});
+  const QuitTemplatePickerPage({
+    super.key,
+    this.embeddedInAppOnboarding = false,
+  });
+
+  final bool embeddedInAppOnboarding;
 
   @override
   ConsumerState<QuitTemplatePickerPage> createState() =>
@@ -64,7 +71,7 @@ class _QuitTemplatePickerPageState
                 ? l10n.quitPickerOpenAction
                 : l10n.quitPickerGoToListAction)
           : null,
-      onAction: existing == null
+      onAction: existing == null || widget.embeddedInAppOnboarding
           ? null
           : () {
               if (!context.mounted) return;
@@ -108,9 +115,7 @@ class _QuitTemplatePickerPageState
             onboardingCompleted: false,
           );
           if (mounted) {
-            ref.read(willpowerHubReturnToArinmaProvider.notifier).state = true;
-            context.pop();
-            context.push(AppRoutes.willQuitOnboarding(h0.id));
+            await _openCreatedProgram(h0.id);
           }
           break;
         case 1:
@@ -122,9 +127,7 @@ class _QuitTemplatePickerPageState
             onboardingCompleted: false,
           );
           if (mounted) {
-            ref.read(willpowerHubReturnToArinmaProvider.notifier).state = true;
-            context.pop();
-            context.push(AppRoutes.willQuitOnboarding(h.id));
+            await _openCreatedProgram(h.id);
           }
           break;
         case 2:
@@ -136,9 +139,7 @@ class _QuitTemplatePickerPageState
             onboardingCompleted: false,
           );
           if (mounted) {
-            ref.read(willpowerHubReturnToArinmaProvider.notifier).state = true;
-            context.pop();
-            context.push(AppRoutes.willQuitOnboarding(h2.id));
+            await _openCreatedProgram(h2.id);
           }
           break;
         case 3:
@@ -150,9 +151,7 @@ class _QuitTemplatePickerPageState
             onboardingCompleted: false,
           );
           if (mounted) {
-            ref.read(willpowerHubReturnToArinmaProvider.notifier).state = true;
-            context.pop();
-            context.push(AppRoutes.willQuitOnboarding(h3.id));
+            await _openCreatedProgram(h3.id);
           }
           break;
         case 4:
@@ -164,22 +163,67 @@ class _QuitTemplatePickerPageState
             onboardingCompleted: false,
           );
           if (mounted) {
-            ref.read(willpowerHubReturnToArinmaProvider.notifier).state = true;
-            context.pop();
-            context.push(AppRoutes.willQuitOnboarding(h4.id));
+            await _openCreatedProgram(h4.id);
           }
           break;
         case 5:
           if (mounted) {
-            ref.read(willpowerHubReturnToArinmaProvider.notifier).state = true;
-            context.pop();
-            context.push(AppRoutes.addHabit, extra: HabitType.bad);
+            await _openCustomBadHabit();
           }
           break;
       }
     } finally {
       if (mounted) setState(() => _saving = false);
     }
+  }
+
+  Future<void> _openCreatedProgram(String habitId) async {
+    if (widget.embeddedInAppOnboarding) {
+      final done = await Navigator.of(context).push<bool>(
+        MaterialPageRoute(
+          builder: (_) => QuitOnboardingFlowPage(
+            habitId: habitId,
+            embeddedInAppOnboarding: true,
+          ),
+        ),
+      );
+      if (done == true && mounted) {
+        Navigator.of(context).pop(true);
+      }
+      return;
+    }
+    ref.read(willpowerHubReturnToArinmaProvider.notifier).state = true;
+    context.pop();
+    context.push(AppRoutes.willQuitOnboarding(habitId));
+  }
+
+  Future<void> _openCustomBadHabit() async {
+    if (widget.embeddedInAppOnboarding) {
+      final done = await Navigator.of(context).push<bool>(
+        MaterialPageRoute(
+          builder: (_) => const AddHabitPage(
+            initialType: HabitType.bad,
+            embeddedInAppOnboarding: true,
+          ),
+        ),
+      );
+      if (done == true && mounted) {
+        Navigator.of(context).pop(true);
+      }
+      return;
+    }
+    ref.read(willpowerHubReturnToArinmaProvider.notifier).state = true;
+    context.pop();
+    context.push(AppRoutes.addHabit, extra: HabitType.bad);
+  }
+
+  void _leavePicker() {
+    if (widget.embeddedInAppOnboarding) {
+      Navigator.of(context).pop(false);
+      return;
+    }
+    ref.read(willpowerHubReturnToArinmaProvider.notifier).state = true;
+    popOrGoWillpowerHub(context);
   }
 
   @override
@@ -213,16 +257,7 @@ class _QuitTemplatePickerPageState
                       TextButton.icon(
                         onPressed: _saving
                             ? null
-                            : () {
-                                ref
-                                        .read(
-                                          willpowerHubReturnToArinmaProvider
-                                              .notifier,
-                                        )
-                                        .state =
-                                    true;
-                                popOrGoWillpowerHub(context);
-                              },
+                            : _leavePicker,
                         icon: Icon(
                           Icons.arrow_back_ios_new_rounded,
                           color: AppColors.shellOnCanvasPrimary(context),

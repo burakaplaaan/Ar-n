@@ -33,7 +33,7 @@ Future<void> maybeShowPostTourWidgetPrompt({
     );
     await prefs.setBool(kAppTourWidgetPromptPendingKey, false);
     if (goToWidgets == true && context.mounted) {
-      context.push(AppRoutes.settingsWidgets);
+      context.go(AppRoutes.settingsWidgets);
     }
   } finally {
     _promptInFlight = false;

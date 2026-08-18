@@ -6421,6 +6421,48 @@ abstract class AppLocalizations {
   /// **'Kilit ekranı, güne dağılmış kısa bir durak olur.'**
   String get onboardingPathCard3Body;
 
+  /// No description provided for @onboardingFirstStepTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'İlk adımı şimdi atmak ister misin?'**
+  String get onboardingFirstStepTitle;
+
+  /// No description provided for @onboardingFirstStepSubtitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yol belirdi. İstersen bugün bir bırakışa veya bir inşaya niyet bağlarız. İstemezsen sonra da kurulur; yol kapanmaz.'**
+  String get onboardingFirstStepSubtitle;
+
+  /// No description provided for @onboardingFirstStepArinmaTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Arınma'**
+  String get onboardingFirstStepArinmaTitle;
+
+  /// No description provided for @onboardingFirstStepArinmaBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kalbe ağır gelen bir alışkanlığı bırakmak için bir takip kur.'**
+  String get onboardingFirstStepArinmaBody;
+
+  /// No description provided for @onboardingFirstStepGelisimTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Gelişim'**
+  String get onboardingFirstStepGelisimTitle;
+
+  /// No description provided for @onboardingFirstStepGelisimBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'Namaz, kaza veya günlük bir rutini bugünden yola koy.'**
+  String get onboardingFirstStepGelisimBody;
+
+  /// No description provided for @onboardingFirstStepLater.
+  ///
+  /// In tr, this message translates to:
+  /// **'Daha sonra kur'**
+  String get onboardingFirstStepLater;
+
   /// No description provided for @onboardingRhythmTitle.
   ///
   /// In tr, this message translates to:

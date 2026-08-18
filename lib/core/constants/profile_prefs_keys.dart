@@ -11,3 +11,4 @@ const String kOnboardingWaswasaKey = 'arin_onboarding_waswasa';
 const String kOnboardingLockVerseSimpleKey = 'arin_onboarding_lock_verse_simple';
 const String kOnboardingPrioritizeVersesKey = 'arin_onboarding_prioritize_verses';
 const String kOnboardingShortcutsPromoteKey = 'arin_onboarding_shortcuts_promote';
+const String kOnboardingWillpowerChoiceKey = 'arin_onboarding_willpower_choice';

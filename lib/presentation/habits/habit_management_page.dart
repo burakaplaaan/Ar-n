@@ -13,9 +13,16 @@ import '../../core/router/app_router.dart';
 import '../../data/models/habit_model.dart';
 import '../kaza/kaza_tracking_provider.dart';
 import '../shared/providers/habit_providers.dart';
+import '../willpower/namaz_ibadet_onboarding.dart';
+import 'add_habit_page.dart';
 
 class HabitManagementPage extends ConsumerStatefulWidget {
-  const HabitManagementPage({super.key});
+  const HabitManagementPage({
+    super.key,
+    this.embeddedInAppOnboarding = false,
+  });
+
+  final bool embeddedInAppOnboarding;
 
   @override
   ConsumerState<HabitManagementPage> createState() =>
@@ -55,6 +62,25 @@ class _HabitManagementPageState extends ConsumerState<HabitManagementPage> {
         if (!context.mounted) return;
         final h = salatHabit;
         if (h == null) return;
+        if (widget.embeddedInAppOnboarding) {
+          final done = await Navigator.of(context).push<bool>(
+            MaterialPageRoute(
+              builder: (routeContext) => NamazIbadetOnboarding(
+                habitId: h.id,
+                onClose: () => Navigator.of(routeContext).pop(false),
+                onCompleted: () async {
+                  if (routeContext.mounted) {
+                    Navigator.of(routeContext).pop(true);
+                  }
+                },
+              ),
+            ),
+          );
+          if (done == true && context.mounted) {
+            Navigator.of(context).pop(true);
+          }
+          return;
+        }
         await context.push(
           AppRoutes.willNamaz(
             h.id,
@@ -67,8 +93,25 @@ class _HabitManagementPageState extends ConsumerState<HabitManagementPage> {
 
       if (sel == 1) {
         await ref.read(kazaTrackingProvider.notifier).enableGelisimHubCard();
-        if (context.mounted) {
-          await context.push(AppRoutes.kazaCalculator);
+        if (!context.mounted) return;
+        if (widget.embeddedInAppOnboarding) {
+          Navigator.of(context).pop(true);
+          return;
+        }
+        await context.push(AppRoutes.kazaCalculator);
+        return;
+      }
+      if (widget.embeddedInAppOnboarding) {
+        final done = await Navigator.of(context).push<bool>(
+          MaterialPageRoute(
+            builder: (_) => const AddHabitPage(
+              initialType: HabitType.good,
+              embeddedInAppOnboarding: true,
+            ),
+          ),
+        );
+        if (done == true && context.mounted) {
+          Navigator.of(context).pop(true);
         }
         return;
       }

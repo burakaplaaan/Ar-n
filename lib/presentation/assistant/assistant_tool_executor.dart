@@ -124,7 +124,7 @@ class AssistantToolExecutor {
         _push(AppRoutes.settingsNotifications, returnTool: 'notifications');
         return null;
       case 'widgets':
-        _push(AppRoutes.settingsWidgets, returnTool: 'widgets');
+        _go(AppRoutes.settingsWidgets, returnTool: 'widgets');
         return null;
       case 'inspire':
         _go(AppRoutes.inspire);

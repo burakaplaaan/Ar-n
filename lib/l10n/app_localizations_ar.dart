@@ -3691,6 +3691,30 @@ class AppLocalizationsAr extends AppLocalizations {
       'تصبح شاشة القفل وقفة قصيرة في أثناء اليوم.';
 
   @override
+  String get onboardingFirstStepTitle => 'هل تريد أن تخطو الخطوة الأولى الآن؟';
+
+  @override
+  String get onboardingFirstStepSubtitle =>
+      'ظهر الطريق. إن شئت عقدنا اليوم نيّة لترك شيء أو لبناء شيء. وإن لم ترد فيُقام لاحقاً؛ والطريق لا يُغلق.';
+
+  @override
+  String get onboardingFirstStepArinmaTitle => 'التطهر';
+
+  @override
+  String get onboardingFirstStepArinmaBody =>
+      'أقِم متابعة لترك عادة تثقل القلب.';
+
+  @override
+  String get onboardingFirstStepGelisimTitle => 'النمو';
+
+  @override
+  String get onboardingFirstStepGelisimBody =>
+      'ضع الصلاة أو القضاء أو روتيناً يومياً على الطريق من اليوم.';
+
+  @override
+  String get onboardingFirstStepLater => 'الإعداد لاحقاً';
+
+  @override
   String get onboardingRhythmTitle => 'أرِن يستقر بهدوء في يومك';
 
   @override

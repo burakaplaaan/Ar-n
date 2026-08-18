@@ -17,7 +17,14 @@ import 'package:arin/presentation/shared/widgets/arin_loader.dart';
 const Color _kArinmaAccent = Color(0xFFFF5252);
 
 class AddHabitPage extends ConsumerStatefulWidget {
-  const AddHabitPage({super.key});
+  const AddHabitPage({
+    super.key,
+    this.initialType,
+    this.embeddedInAppOnboarding = false,
+  });
+
+  final HabitType? initialType;
+  final bool embeddedInAppOnboarding;
 
   @override
   ConsumerState<AddHabitPage> createState() => _AddHabitPageState();
@@ -34,7 +41,7 @@ class _AddHabitPageState extends ConsumerState<AddHabitPage>
   int _repeatCycle = 0;
   bool _saving = false;
 
-  HabitType _type = HabitType.good;
+  late HabitType _type;
 
   List<String> _getWheelUnits(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
@@ -58,6 +65,7 @@ class _AddHabitPageState extends ConsumerState<AddHabitPage>
   @override
   void initState() {
     super.initState();
+    _type = widget.initialType ?? HabitType.good;
     _amountController = FixedExtentScrollController(initialItem: 4);
     _unitController = FixedExtentScrollController(initialItem: 0);
     _staggerController = AnimationController(
@@ -69,6 +77,7 @@ class _AddHabitPageState extends ConsumerState<AddHabitPage>
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+    if (widget.initialType != null) return;
     final extra = GoRouterState.of(context).extra;
     if (extra is HabitType) {
       if (_type != extra) {
@@ -258,6 +267,10 @@ class _AddHabitPageState extends ConsumerState<AddHabitPage>
             customRepeatCycle: _repeatCycle.clamp(0, 2),
           );
       if (mounted) {
+        if (widget.embeddedInAppOnboarding) {
+          Navigator.of(context).pop(true);
+          return;
+        }
         // Atölye ekranını stack'te bırakma: kayıt sonrası doğrudan detay
         // ekranına geçip geri akışını sadeleştir.
         context.go(AppRoutes.customHabitDetail(h.id));

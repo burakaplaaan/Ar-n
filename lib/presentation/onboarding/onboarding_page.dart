@@ -38,6 +38,8 @@ import 'onboarding_struggle_copy.dart';
 import 'onboarding_struggle_note_screen.dart';
 import 'onboarding_tone_screen.dart';
 import 'onboarding_verse_hold_screen.dart';
+import 'onboarding_embedded_willpower.dart';
+import 'onboarding_willpower_invite_screen.dart';
 
 enum _OnboardingPhase {
   landing,
@@ -57,6 +59,7 @@ enum _OnboardingPhase {
   waswasa,
   pathVerse,
   path,
+  firstStep,
   rhythm,
   location,
   prepare,
@@ -183,8 +186,11 @@ class _OnboardingPageState extends State<OnboardingPage> {
       case _OnboardingPhase.path:
         _goTo(_OnboardingPhase.pathVerse, forward: false);
         return true;
-      case _OnboardingPhase.rhythm:
+      case _OnboardingPhase.firstStep:
         _goTo(_OnboardingPhase.path, forward: false);
+        return true;
+      case _OnboardingPhase.rhythm:
+        _goTo(_OnboardingPhase.firstStep, forward: false);
         return true;
       case _OnboardingPhase.location:
         _goTo(_OnboardingPhase.rhythm, forward: false);
@@ -224,6 +230,22 @@ class _OnboardingPageState extends State<OnboardingPage> {
   Future<void> _persistFlag(String key, bool value) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(key, value);
+  }
+
+  Future<void> _openFirstStepSetup({required bool arinma}) async {
+    unawaited(
+      _persistChoice(
+        kOnboardingWillpowerChoiceKey,
+        arinma ? 'arinma' : 'gelisim',
+      ),
+    );
+    final completed = arinma
+        ? await openEmbeddedQuitSetup(context)
+        : await openEmbeddedBuildSetup(context);
+    if (!mounted) return;
+    if (completed) {
+      _goTo(_OnboardingPhase.rhythm, forward: true);
+    }
   }
 
   Future<void> _requestNotificationsThenContinue() async {
@@ -755,7 +777,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
           verseArabic: l10n.onboardingPathVerseArabic,
           verseTranslation: l10n.onboardingPathVerseTranslation,
           verseSource: l10n.onboardingPathVerseSource,
-          footer: l10n.onboardingPathVerseFooter(_displayName),
+          showFooter: false,
           onBack: () {
             _handleBack();
           },
@@ -791,7 +813,20 @@ class _OnboardingPageState extends State<OnboardingPage> {
           onBack: () {
             _handleBack();
           },
-          onContinue: () => _goTo(_OnboardingPhase.rhythm, forward: true),
+          onContinue: () => _goTo(_OnboardingPhase.firstStep, forward: true),
+        ),
+      ),
+      _OnboardingPhase.firstStep => Scaffold(
+        body: OnboardingWillpowerInviteScreen(
+          onBack: () {
+            _handleBack();
+          },
+          onChooseArinma: () => unawaited(_openFirstStepSetup(arinma: true)),
+          onChooseGelisim: () => unawaited(_openFirstStepSetup(arinma: false)),
+          onLater: () {
+            unawaited(_persistChoice(kOnboardingWillpowerChoiceKey, 'later'));
+            _goTo(_OnboardingPhase.rhythm, forward: true);
+          },
         ),
       ),
       _OnboardingPhase.rhythm => Scaffold(

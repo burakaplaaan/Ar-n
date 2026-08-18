@@ -3713,6 +3713,30 @@ class AppLocalizationsTr extends AppLocalizations {
       'Kilit ekranı, güne dağılmış kısa bir durak olur.';
 
   @override
+  String get onboardingFirstStepTitle => 'İlk adımı şimdi atmak ister misin?';
+
+  @override
+  String get onboardingFirstStepSubtitle =>
+      'Yol belirdi. İstersen bugün bir bırakışa veya bir inşaya niyet bağlarız. İstemezsen sonra da kurulur; yol kapanmaz.';
+
+  @override
+  String get onboardingFirstStepArinmaTitle => 'Arınma';
+
+  @override
+  String get onboardingFirstStepArinmaBody =>
+      'Kalbe ağır gelen bir alışkanlığı bırakmak için bir takip kur.';
+
+  @override
+  String get onboardingFirstStepGelisimTitle => 'Gelişim';
+
+  @override
+  String get onboardingFirstStepGelisimBody =>
+      'Namaz, kaza veya günlük bir rutini bugünden yola koy.';
+
+  @override
+  String get onboardingFirstStepLater => 'Daha sonra kur';
+
+  @override
   String get onboardingRhythmTitle => 'Arın, günün içine sessizce yerleşir';
 
   @override

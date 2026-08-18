@@ -17,6 +17,7 @@ class OnboardingVerseHoldScreen extends StatefulWidget {
     this.verseTranslation,
     this.verseSource,
     this.footer,
+    this.showFooter = true,
     super.key,
   });
 
@@ -29,6 +30,7 @@ class OnboardingVerseHoldScreen extends StatefulWidget {
   final String? verseTranslation;
   final String? verseSource;
   final String? footer;
+  final bool showFooter;
 
   @override
   State<OnboardingVerseHoldScreen> createState() =>
@@ -127,14 +129,16 @@ class _OnboardingVerseHoldScreenState extends State<OnboardingVerseHoldScreen>
                     ],
                   ),
                 ),
-                Text(
-                  widget.footer ?? l10n.onboardingHoldFooter(widget.name),
-                  textAlign: TextAlign.center,
-                  style: AppTextStyles.bodyMedium.copyWith(
-                    color: Colors.white.withValues(alpha: 0.5),
+                if (widget.showFooter) ...[
+                  Text(
+                    widget.footer ?? l10n.onboardingHoldFooter(widget.name),
+                    textAlign: TextAlign.center,
+                    style: AppTextStyles.bodyMedium.copyWith(
+                      color: Colors.white.withValues(alpha: 0.5),
+                    ),
                   ),
-                ),
-                const SizedBox(height: 14),
+                  const SizedBox(height: 14),
+                ],
                 AnimatedBuilder(
                   animation: _bar,
                   builder: (context, _) {
