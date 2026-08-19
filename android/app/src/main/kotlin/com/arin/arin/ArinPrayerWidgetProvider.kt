@@ -492,7 +492,7 @@ class ArinPrayerWidgetProvider : HomeWidgetProvider() {
         }
         views.setTextViewText(
             R.id.widget_prayer_clock,
-            if (clock.isEmpty) "" else "Vakit: $clock",
+            if (clock.isEmpty()) "" else "Vakit: $clock",
         )
         if (!showBoard) {
             views.setViewVisibility(R.id.widget_prayer_done, View.GONE)
