@@ -6868,7 +6868,7 @@ abstract class AppLocalizations {
   /// No description provided for @surveyLockWidgetsSubtitle.
   ///
   /// In tr, this message translates to:
-  /// **'Android’de kilit ekranına gerçek widget eklenemez; seçtiklerin kalıcı bildirim olarak görünür. İstediğin zaman Widget Merkezi’nden değiştirebilirsin.'**
+  /// **'Önce ana ekrana normal widget ekleyebilirsin. Eklenemiyorsa veya kilitte de görmek istersen, seçtiklerin sistem bildirimi olarak kilitte durur. İstediğin zaman Widget Merkezi’nden değiştirebilirsin.'**
   String get surveyLockWidgetsSubtitle;
 
   /// No description provided for @surveyLockWidgetsPrayerTitle.

@@ -3941,7 +3941,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get surveyLockWidgetsSubtitle =>
-      'لا يمكن إضافة ودجات حقيقية على شاشة القفل في أندرويد؛ تظهر اختياراتك كإشعارات دائمة. يمكنك تغييرها لاحقًا من مركز الودجات.';
+      'أضف أولاً ودجة عادية إلى الشاشة الرئيسية. إن تعذّر ذلك أو أردتها أيضًا على شاشة القفل، تبقى اختياراتك كإشعار نظام. يمكنك تغييرها لاحقًا من مركز الودجات.';
 
   @override
   String get surveyLockWidgetsPrayerTitle => 'وقت الصلاة';

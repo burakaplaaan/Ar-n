@@ -1987,7 +1987,7 @@
   "surveyNotificationOpenSettings": "Open settings",
   "surveyLockWidgetsTitle": "Lock screen",
   "surveyLockWidgetsLead": "Would you like prayer times and the daily quote on your lock screen?",
-  "surveyLockWidgetsSubtitle": "Android can’t place real widgets on the lock screen; your choices appear as persistent notifications. You can change this anytime in Widget Center.",
+  "surveyLockWidgetsSubtitle": "First add a normal home-screen widget. If that is not possible or you also want them on the lock screen, your choices stay as a system notification. You can change this anytime in Widget Center.",
   "surveyLockWidgetsPrayerTitle": "Prayer Time",
   "surveyLockWidgetsPrayerSubtitle": "Shows the next prayer and countdown on the lock screen.",
   "surveyLockWidgetsQuoteTitle": "Daily Quote",

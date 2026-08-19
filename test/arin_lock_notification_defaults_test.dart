@@ -12,4 +12,11 @@ void main() {
       );
     }
   });
+
+  test('android namaz ve soz kilit bildirimi opt-in migration anahtari vardir', () {
+    expect(
+      ArinLockNotificationService.prayerQuoteOptInMigratedKey,
+      'lock_notif_prayer_quote_opt_in_v2_migrated',
+    );
+  });
 }

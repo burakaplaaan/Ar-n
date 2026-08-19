@@ -1987,7 +1987,7 @@
   "surveyNotificationOpenSettings": "Ayarlardan aç",
   "surveyLockWidgetsTitle": "Kilit ekranı",
   "surveyLockWidgetsLead": "Namaz vakti ve günün sözünü kilit ekranında göstermek ister misin?",
-  "surveyLockWidgetsSubtitle": "Android’de kilit ekranına gerçek widget eklenemez; seçtiklerin kalıcı bildirim olarak görünür. İstediğin zaman Widget Merkezi’nden değiştirebilirsin.",
+  "surveyLockWidgetsSubtitle": "Önce ana ekrana normal widget ekleyebilirsin. Eklenemiyorsa veya kilitte de görmek istersen, seçtiklerin sistem bildirimi olarak kilitte durur. İstediğin zaman Widget Merkezi’nden değiştirebilirsin.",
   "surveyLockWidgetsPrayerTitle": "Namaz Vakti",
   "surveyLockWidgetsPrayerSubtitle": "Sıradaki vakti ve geri sayımı kilit ekranında gösterir.",
   "surveyLockWidgetsQuoteTitle": "Günlük Söz",

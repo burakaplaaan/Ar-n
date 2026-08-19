@@ -3972,7 +3972,7 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get surveyLockWidgetsSubtitle =>
-      'Android’de kilit ekranına gerçek widget eklenemez; seçtiklerin kalıcı bildirim olarak görünür. İstediğin zaman Widget Merkezi’nden değiştirebilirsin.';
+      'Önce ana ekrana normal widget ekleyebilirsin. Eklenemiyorsa veya kilitte de görmek istersen, seçtiklerin sistem bildirimi olarak kilitte durur. İstediğin zaman Widget Merkezi’nden değiştirebilirsin.';
 
   @override
   String get surveyLockWidgetsPrayerTitle => 'Namaz Vakti';

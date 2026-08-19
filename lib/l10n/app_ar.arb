@@ -1987,7 +1987,7 @@
   "surveyNotificationOpenSettings": "فتح الإعدادات",
   "surveyLockWidgetsTitle": "شاشة القفل",
   "surveyLockWidgetsLead": "هل تريد أوقات الصلاة وكلمة اليوم على شاشة القفل؟",
-  "surveyLockWidgetsSubtitle": "لا يمكن إضافة ودجات حقيقية على شاشة القفل في أندرويد؛ تظهر اختياراتك كإشعارات دائمة. يمكنك تغييرها لاحقًا من مركز الودجات.",
+  "surveyLockWidgetsSubtitle": "أضف أولاً ودجة عادية إلى الشاشة الرئيسية. إن تعذّر ذلك أو أردتها أيضًا على شاشة القفل، تبقى اختياراتك كإشعار نظام. يمكنك تغييرها لاحقًا من مركز الودجات.",
   "surveyLockWidgetsPrayerTitle": "وقت الصلاة",
   "surveyLockWidgetsPrayerSubtitle": "يعرض الوقت التالي والعد التنازلي على شاشة القفل.",
   "surveyLockWidgetsQuoteTitle": "كلمة اليوم",

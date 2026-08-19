@@ -3983,7 +3983,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get surveyLockWidgetsSubtitle =>
-      'Android can’t place real widgets on the lock screen; your choices appear as persistent notifications. You can change this anytime in Widget Center.';
+      'First add a normal home-screen widget. If that is not possible or you also want them on the lock screen, your choices stay as a system notification. You can change this anytime in Widget Center.';
 
   @override
   String get surveyLockWidgetsPrayerTitle => 'Prayer Time';

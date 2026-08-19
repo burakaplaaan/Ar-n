@@ -24,40 +24,42 @@ import 'widget_access_service.dart';
 abstract final class ArinLockNotificationService {
   static const _channel = MethodChannel('com.arin.arin/lock_notifications');
 
-  /// Eski sürümde namaz/söz varsayılanı açıktı; yeni kurulumda kapalı.
-  /// Onboarding'i bitirmiş kullanıcıların anahtarsız tercihi bir kez korunur.
+  /// Eski sürümde namaz/söz varsayılanı açıktı. v1 bu bayrağı yazar;
+  /// artık kimseyi otomatik açmaz.
   static const legacyDefaultsMigratedKey =
       'lock_notif_defaults_off_v1_migrated';
+
+  /// v1'in otomatik açtığı namaz/söz kilit bildirimlerini bir kez kapatır.
+  /// Kullanıcı Widget Merkezi'nden yeniden işaretler.
+  static const prayerQuoteOptInMigratedKey =
+      'lock_notif_prayer_quote_opt_in_v2_migrated';
 
   /// Varsayılan: hepsi kapalı. Kullanıcı Widget Merkezi veya onboarding'de
   /// açar. Native `defaultEnabled` ile birebir aynı kalmalıdır.
   static bool defaultEnabled(ArinWidgetAccessKind kind) => false;
 
-  /// Onboarding'i bitirmiş eski kullanıcılar: anahtar yoksa eski varsayılan
-  /// (namaz + söz açık) bir kez yazılır. Yeni kurulumda dokunulmaz.
+  /// Android: namaz ve söz kilit bildirimi işaretli gelmez. v1 artık
+  /// onları açmaz; v2 daha önce otomatik açılmış olanları bir kez kapatır.
   static Future<void> migrateLegacyDefaultsIfNeeded(
     SharedPreferences prefs,
   ) async {
     if (kIsWeb || !Platform.isAndroid) return;
-    if (prefs.getBool(legacyDefaultsMigratedKey) == true) return;
+    if (prefs.getBool(legacyDefaultsMigratedKey) != true) {
+      await prefs.setBool(legacyDefaultsMigratedKey, true);
+    }
+    if (prefs.getBool(prayerQuoteOptInMigratedKey) == true) return;
     try {
-      final onboarded = prefs.getBool('onboarding_completed') == true;
-      if (onboarded) {
-        for (final kind in const [
-          ArinWidgetAccessKind.prayer,
-          ArinWidgetAccessKind.quote,
-        ]) {
-          final raw = await HomeWidget.getWidgetData<String>(_key(kind));
-          if (raw == null) {
-            await HomeWidget.saveWidgetData<String>(_key(kind), '1');
-          }
-        }
-        await syncAll();
+      for (final kind in const [
+        ArinWidgetAccessKind.prayer,
+        ArinWidgetAccessKind.quote,
+      ]) {
+        await HomeWidget.saveWidgetData<String>(_key(kind), '0');
       }
+      await syncAll();
     } catch (e) {
       debugPrint('ArinLockNotificationService.migrateLegacyDefaults: $e');
     } finally {
-      await prefs.setBool(legacyDefaultsMigratedKey, true);
+      await prefs.setBool(prayerQuoteOptInMigratedKey, true);
     }
   }
 

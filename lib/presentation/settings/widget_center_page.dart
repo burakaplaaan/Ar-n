@@ -187,13 +187,10 @@ class _WidgetCenterPageState extends ConsumerState<WidgetCenterPage> {
                             'Her gün bir ism-i şerif. Ana ekrana küçük kare olarak eklenir.',
                       ),
                     ] else ...[
-                      _SectionTitle(
-                        'Kilit ekranı bildirimleri',
-                        muted: muted,
-                      ),
+                      _SectionTitle('Ana ekran widgetları', muted: muted),
                       const SizedBox(height: 10),
                       Text(
-                        'Android\'de kilit ekranına gerçek widget eklenemiyor; bunun yerine seçtiğin bilgiler kalıcı bir bildirim olarak kilit ekranında görünür. Xiaomi, Huawei ve benzeri cihazlarda ek otomatik başlat / pil ayarı gerekebilir.',
+                        'Önce ana ekrana normal bir widget ekle. Uzun bas → Widgetlar → Arın. Cihazın eklemeye izin vermiyorsa aşağıdan kilit bildirimi aç.',
                         style: GoogleFonts.plusJakartaSans(
                           fontSize: 13,
                           height: 1.45,
@@ -202,14 +199,6 @@ class _WidgetCenterPageState extends ConsumerState<WidgetCenterPage> {
                         ),
                       ),
                       const SizedBox(height: 12),
-                      const _LockNotificationToggles(),
-                      const SizedBox(height: 12),
-                      const _OemLockScreenHelpCard(),
-                    ],
-                    if (!Platform.isIOS) ...[
-                      const SizedBox(height: 22),
-                      _SectionTitle('Ana ekran widgetları', muted: muted),
-                      const SizedBox(height: 10),
                       _InfoTile(
                         onDark: onDark,
                         icon: Icons.access_time_rounded,
@@ -238,6 +227,25 @@ class _WidgetCenterPageState extends ConsumerState<WidgetCenterPage> {
                         title: 'Zikirmatik Widgetı',
                         subtitle: 'Ana ekrandan zikir çek; sayaç uygulamayla eşleşir.',
                       ),
+                      const SizedBox(height: 22),
+                      _SectionTitle(
+                        'Kilit ekranı bildirimleri',
+                        muted: muted,
+                      ),
+                      const SizedBox(height: 10),
+                      Text(
+                        'Ana ekran widget’ı eklenemiyorsa veya kilitte de görmek istiyorsan buradan aç. Seçtiklerin sistem bildirimi olarak kilit ekranında durur. Xiaomi, Huawei ve benzeri cihazlarda ek otomatik başlat / pil ayarı gerekebilir.',
+                        style: GoogleFonts.plusJakartaSans(
+                          fontSize: 13,
+                          height: 1.45,
+                          color: muted,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      const _LockNotificationToggles(),
+                      const SizedBox(height: 12),
+                      const _OemLockScreenHelpCard(),
                     ],
                     const SizedBox(height: 24),
                     _SectionTitle('Takip widgetı', muted: muted),
@@ -389,7 +397,9 @@ class _HeroCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 6),
                 Text(
-                  'Söz ve vakit widgetları otomatik çalışır. Burada sadece gelişim veya arınma takibinin kilit ekranında görünüp görünmeyeceğini seçersin.',
+                  Platform.isIOS
+                      ? 'Söz ve vakit widgetları otomatik çalışır. Burada sadece gelişim veya arınma takibinin kilit ekranında görünüp görünmeyeceğini seçersin.'
+                      : 'Önce ana ekrana widget ekle. Kilitte görmek istersen bildirimleri sen açarsın. Takip için hangi içeriğin kilitte duracağını burada seçersin.',
                   style: GoogleFonts.plusJakartaSans(
                     fontSize: 13,
                     height: 1.42,
@@ -1997,41 +2007,41 @@ const _iosLockScreenSteps = [
 
 const _androidLockScreenSteps = [
   _StepSection(
-    label: 'Android — kilit ekranı',
+    label: 'Android — ana ekran, sonra kilit',
     steps: [
       _Step(
-        icon: Icons.info_outline_rounded,
-        title: 'Önce cihaz desteğini kontrol et',
+        icon: Icons.widgets_outlined,
+        title: 'Önce ana ekrana normal widget ekle',
         subtitle:
-            'Android\'de üçüncü taraf kilit ekranı widgetları her sürüm ve markada desteklenmez. Ayarlarda "Kilit ekranı widgetları" seçeneği yoksa Arın\'ı ana ekrana ekleyebilirsin.',
+            'Boş alana uzun bas → Widgetlar → Arın. Namaz, söz veya Esma kartını ana ekrana yerleştir.',
         imagePath: 'assets/images/widget_guide/android_lock_1.png',
       ),
       _Step(
-        icon: Icons.lock_outline_rounded,
-        title: 'Destekleniyorsa kilit ekranı ayarlarını aç',
+        icon: Icons.home_outlined,
+        title: 'Widget ana ekranda görünsün',
         subtitle:
-            'Ayarlar > Kilit ekranı bölümündeki Widgetlar veya Araçlar seçeneğini kullan. Menü adı Samsung, Xiaomi, Pixel ve diğer cihazlarda değişebilir.',
+            'Eklenen kart vakit ve sözü ana ekranda gösterir. Bu adım çoğu cihazda yeterlidir.',
         imagePath: 'assets/images/widget_guide/android_lock_2.png',
       ),
       _Step(
-        icon: Icons.widgets_outlined,
-        title: "Listede görünüyorsa Arın'ı seç",
+        icon: Icons.notifications_active_outlined,
+        title: 'Eklenemiyorsa kilit bildirimi aç',
         subtitle:
-            "Cihazın üçüncü taraf widgetları destekliyorsa Arın'ı bul; söz, namaz veya takip widgetını seçip konumunu ayarla.",
+            'Cihaz widget eklemiyorsa veya kilitte de görmek istiyorsan Widget Merkezi’nden kilit bildirimi aç. Seçtiklerin sistem bildirimi olarak kilitte durur.',
         imagePath: 'assets/images/widget_guide/android_lock_3.png',
       ),
       _Step(
-        icon: Icons.touch_app_rounded,
-        title: 'Widget önizlemesine dokun veya Ekle',
+        icon: Icons.lock_outline_rounded,
+        title: 'Kilitte görünümü doğrula',
         subtitle:
-            "Widget kartını seç, önizlemeyi kaydırarak boyutu değiştir, ardından Ekle butonuna bas.",
+            'Bildirim gölgesinde ve kilitte Arın kartını gör. Xiaomi, Huawei ve benzerinde otomatik başlat / pil izni gerekebilir.',
         imagePath: 'assets/images/widget_guide/android_lock_3b.png',
       ),
       _Step(
         icon: Icons.center_focus_strong_outlined,
-        title: 'Widget kilit ekranında görünür',
+        title: 'Takip içeriğini buradan seç',
         subtitle:
-            "Kilitte hangi takibin çıkacağını bu sayfadaki 'Takip widgetı' bölümünden seç.",
+            'Kilitte hangi takibin çıkacağını bu sayfadaki Takip bölümünden sen işaretlersin.',
         imagePath: 'assets/images/widget_guide/android_lock_4.png',
       ),
     ],
