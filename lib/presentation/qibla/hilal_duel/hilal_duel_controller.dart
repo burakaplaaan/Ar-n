@@ -41,6 +41,7 @@ class HilalDuelController extends ChangeNotifier {
       'arin_hilal_duel_pending_heart_proof_expiry_v1';
   static const _queueWait = Duration(seconds: 15);
   static const _pollInterval = Duration(milliseconds: 900);
+  static const _queuePollInterval = Duration(milliseconds: 350);
   /// Rakip/bot cevabı beklerken daha sık yokla — sonuç geç düşmesin.
   static const _awaitingPollInterval = Duration(milliseconds: 350);
 
@@ -1185,7 +1186,7 @@ class HilalDuelController extends ChangeNotifier {
     _stopTimers();
     _queuePollInFlight = false;
     _botAssignRequested = false;
-    _queueTimer = Timer.periodic(_pollInterval, (_) => _pollQueue());
+    _queueTimer = Timer.periodic(_queuePollInterval, (_) => _pollQueue());
     // İlk tick'i beklemeden bir kez sor — 15sn dolmuş kuyruk hemen botsuz kalmasın.
     unawaited(_pollQueue());
   }

@@ -844,7 +844,7 @@ test("free-player hearts come only from rewarded-ad balance", () => {
   );
 });
 
-test("rankLiveQueueCandidates prefers same level then oldest live queue", () => {
+test("rankLiveQueueCandidates prefers recent joiners over older waiters", () => {
   const now = Date.now();
   const self = "self_owner";
   const items = [
@@ -892,6 +892,13 @@ test("rankLiveQueueCandidates prefers same level then oldest live queue", () => 
       queuedAtMs: now - t.QUEUE_ABANDON_MS - 50,
       activeUntilMs: now - 1,
     },
+    {
+      ownerHash: "ancient",
+      status: "waiting",
+      heartSource: "premium",
+      level: 2,
+      queuedAtMs: now - t.QUEUE_RECENT_MS - 5_000,
+    },
   ];
   const ranked = t.rankLiveQueueCandidates(items, {
     excludeOwnerHash: self,
@@ -900,9 +907,10 @@ test("rankLiveQueueCandidates prefers same level then oldest live queue", () => 
     limit: 5,
   });
   assert.deepEqual(ranked.map((item) => item.ownerHash), [
-    "lvl2-old",
     "lvl2-new",
+    "lvl2-old",
     "lvl5",
+    "ancient",
   ]);
 });
 
@@ -1110,10 +1118,10 @@ test("bot plan caps live matches at 1-3 correct and delays after human", () => {
       assert.ok(step.elapsedMs >= 2_200);
       assert.ok(step.elapsedMs <= 19_500);
       assert.equal(t.isChoiceCorrect(step.choice, ids[i]), step.correct);
-      assert.ok(step.afterHumanDelayMs >= 2_000);
+      assert.ok(step.afterHumanDelayMs >= 2_500);
       assert.ok(step.afterHumanDelayMs <= 5_200);
       assert.ok(
-        step.afterHumanDelayMs <= 3_000 || step.afterHumanDelayMs >= 4_800,
+        step.afterHumanDelayMs <= 3_500 || step.afterHumanDelayMs >= 4_800,
         `delay bucket: ${step.afterHumanDelayMs}`,
       );
     }
@@ -1126,9 +1134,9 @@ test("bot plan caps live matches at 1-3 correct and delays after human", () => {
   assert.equal(t.pickBotCorrectCount(1), 1);
 });
 
-test("botReadyAtMs waits after human unless plan already elapsed", () => {
+test("botReadyAtMs waits after human and does not write before them", () => {
   const start = 1_000_000;
-  // İnsan öndeyse 2.5 sn sonra.
+  // İnsan 3 sn'de cevapladıysa 2.5 sn daha bekle.
   assert.equal(
     t.botReadyAtMs({
       roundStartedAtMs: start,
@@ -1141,33 +1149,20 @@ test("botReadyAtMs waits after human unless plan already elapsed", () => {
     }),
     start + 5_500,
   );
-  // Bazen ~5 sn sonra.
-  assert.equal(
-    t.botReadyAtMs({
-      roundStartedAtMs: start,
-      plannedElapsedMs: 12_000,
-      deadlineMs: start + 20_000,
-      nowMs: start + 3_500,
-      humanAnswered: true,
-      humanElapsedMs: 3_000,
-      afterHumanDelayMs: 5_000,
-    }),
-    start + 8_000,
-  );
-  // Plan insandan önce dolduysa ekstra bekleme yok.
+  // Plan insandan önce dolmuş olsa bile submit anında yazma.
   assert.equal(
     t.botReadyAtMs({
       roundStartedAtMs: start,
       plannedElapsedMs: 4_000,
       deadlineMs: start + 20_000,
-      nowMs: start + 8_000,
+      nowMs: start + 15_000,
       humanAnswered: true,
-      humanElapsedMs: 7_500,
+      humanElapsedMs: 15_000,
       afterHumanDelayMs: 2_500,
     }),
-    start + 4_000,
+    start + 17_500,
   );
-  // İnsan yoksa planlanan süre.
+  // İnsan yokken deadline'a kadar bekle — erken "Cevapladı" yok.
   assert.equal(
     t.botReadyAtMs({
       roundStartedAtMs: start,
@@ -1177,7 +1172,7 @@ test("botReadyAtMs waits after human unless plan already elapsed", () => {
       humanAnswered: false,
       humanElapsedMs: 0,
     }),
-    start + 7_000,
+    start + 19_800,
   );
   // Gecikme deadline'ı ezmesin.
   assert.equal(
@@ -1210,28 +1205,34 @@ test("roundAnswersChanged ignores identical poll snapshots", () => {
 test("botAnswerElapsedMs follows human delay instead of instant write", () => {
   const start = 1_000_000;
   const planElapsed = 12_000;
+  // 15 sn insan → bot ~10 sn (2/3 bandı).
+  const fifteen = t.botAnswerElapsedMs({
+    planElapsedMs: planElapsed,
+    nowMs: start + 17_500,
+    roundStartedAtMs: start,
+    humanAnswered: true,
+    humanElapsedMs: 15_000,
+    afterHumanDelayMs: 2_500,
+  });
+  assert.ok(fifteen >= 8_500 && fifteen <= 11_000, `15s human → ${fifteen}`);
   assert.equal(
-    t.botAnswerElapsedMs({
+    t.botElapsedAfterHuman({
+      humanElapsedMs: 15_000,
       planElapsedMs: planElapsed,
-      nowMs: start + 5_500,
-      roundStartedAtMs: start,
-      humanAnswered: true,
-      humanElapsedMs: 3_000,
       afterHumanDelayMs: 2_500,
     }),
-    5_500,
+    fifteen,
   );
-  assert.equal(
-    t.botAnswerElapsedMs({
-      planElapsedMs: 4_000,
-      nowMs: start + 8_000,
-      roundStartedAtMs: start,
-      humanAnswered: true,
-      humanElapsedMs: 7_500,
-      afterHumanDelayMs: 2_500,
-    }),
-    4_000,
-  );
+  const lateHuman = t.botAnswerElapsedMs({
+    planElapsedMs: 4_000,
+    nowMs: start + 17_500,
+    roundStartedAtMs: start,
+    humanAnswered: true,
+    humanElapsedMs: 15_000,
+    afterHumanDelayMs: 2_500,
+  });
+  assert.ok(lateHuman < 15_000, `bot must look faster than 15s: ${lateHuman}`);
+  assert.ok(lateHuman >= 2_200);
   // İnsan yokken duvar saati planı aşmasın.
   assert.equal(
     t.botAnswerElapsedMs({
@@ -1563,6 +1564,7 @@ test("createQuizChallenge skips expired-unfinalized as still open", () => {
     },
   ], me, other, now);
   assert.equal(tally.outgoingOpen, 2);
+  assert.equal(tally.outgoingPlaying, 1);
   assert.equal(tally.hasOpenPair, false);
   assert.deepEqual(tally.openOutgoingIds, ["c1", "c3"]);
   assert.equal(
@@ -1570,6 +1572,57 @@ test("createQuizChallenge skips expired-unfinalized as still open", () => {
     "c9",
   );
   assert.equal(t.openPeerChallengeId({}, "bb"), "");
+});
+
+test("open outgoing challenges are counted without an active cap", () => {
+  const now = 2_000_000;
+  const me = "aa";
+  const awaiting = (id, other) => ({
+    id,
+    data: {
+      status: "awaiting_opponent",
+      challengerId: me,
+      challengedId: other,
+      challengeDeadlineMs: now + 1,
+    },
+  });
+  const tally = t.tallyCountableChallenges(
+    [awaiting("c1", "b1"), awaiting("c2", "b2"), awaiting("c3", "b3")],
+    me,
+    "zz",
+    now,
+  );
+  assert.equal(tally.outgoingOpen, 3);
+  assert.equal(tally.outgoingPlaying, 0);
+  assert.equal(t.CHALLENGE_MAX_ACTIVE_PLAYING, undefined);
+  assert.equal(t.CHALLENGE_MAX_ACTIVE_OUTGOING, undefined);
+});
+
+test("quizClientIp skips unknown and loopback so they do not share a bucket", () => {
+  assert.equal(t.quizClientIp({ rawRequest: {} }), "");
+  assert.equal(
+    t.quizClientIp({ rawRequest: { ip: "unknown" } }),
+    "",
+  );
+  assert.equal(
+    t.quizClientIp({ rawRequest: { ip: "127.0.0.1" } }),
+    "",
+  );
+  assert.equal(
+    t.quizClientIp({
+      rawRequest: { headers: { "x-forwarded-for": "203.0.113.9, 10.0.0.1" } },
+    }),
+    "203.0.113.9",
+  );
+  assert.equal(
+    t.quizClientIp({
+      rawRequest: {
+        ip: "198.51.100.4",
+        headers: { "x-forwarded-for": "unknown" },
+      },
+    }),
+    "198.51.100.4",
+  );
 });
 
 test("challenge inbox keeps completed 24h and hides expired", () => {

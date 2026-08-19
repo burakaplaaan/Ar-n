@@ -76,13 +76,13 @@ const CHALLENGE_BOT_DELAY_MS = 12 * 60 * 60_000;
 const CHALLENGE_REMINDER_BEFORE_MS = 2 * 60 * 60_000;
 /** Challenge dokümanı geçmişte görünsün; TTL silmesi 7 gün sonra. */
 const CHALLENGE_DOC_TTL_MS = 7 * 24 * 60 * 60_000;
-/** Aynı anda bekleyen giden meydan okuma limiti. */
-const CHALLENGE_MAX_ACTIVE_OUTGOING = 3;
 const QUEUE_WAIT_MS = 15_000;
 /** Canlı kuyruk taraması: stale kayıtlar gerçek rakibi limit dışına itmesin. */
-const QUEUE_CANDIDATE_SCAN_LIMIT = 80;
+const QUEUE_CANDIDATE_SCAN_LIMIT = 200;
 /** Transaction içinde denenecek en iyi aday sayısı. */
-const QUEUE_CANDIDATE_PICK_LIMIT = 16;
+const QUEUE_CANDIDATE_PICK_LIMIT = 32;
+/** Az önce basanları eski/hayalet kuyruğun önüne al. */
+const QUEUE_RECENT_MS = 20_000;
 /** Mantıksal terk: bu süreden sonra waiting kuyruk iade edilir. */
 const QUEUE_ABANDON_MS = 10 * 60_000;
 /** Waiting doc TTL yedeği — iade job'u önce çalışsın diye uzun tutulur. */
@@ -980,6 +980,7 @@ function isCountableOpenChallenge(data, nowMs = Date.now()) {
 /** Kota / çift davet: tx içi taze snap'lerden say. */
 function tallyCountableChallenges(rows, ownerHash, opponentId, nowMs = Date.now()) {
   let outgoingOpen = 0;
+  let outgoingPlaying = 0;
   let hasOpenPair = false;
   const openOutgoingIds = [];
   const self = String(ownerHash || "");
@@ -990,6 +991,9 @@ function tallyCountableChallenges(rows, ownerHash, opponentId, nowMs = Date.now(
     if (!isCountableOpenChallenge(data, nowMs)) continue;
     if (String(data.challengerId || "") === self) {
       outgoingOpen += 1;
+      if (String(data.status || "") === "challenger_playing") {
+        outgoingPlaying += 1;
+      }
       if (id) openOutgoingIds.push(id);
     }
     if (self && other) {
@@ -1002,7 +1006,7 @@ function tallyCountableChallenges(rows, ownerHash, opponentId, nowMs = Date.now(
       }
     }
   }
-  return { outgoingOpen, hasOpenPair, openOutgoingIds };
+  return { outgoingOpen, outgoingPlaying, hasOpenPair, openOutgoingIds };
 }
 
 function openPeerChallengeId(playerData, peerId) {
@@ -1270,6 +1274,10 @@ function isPairableWaitingQueue(queue, { nowMs = Date.now(), excludeOwnerHash = 
   return !shouldRetireStaleWaitingQueue(queue, nowMs);
 }
 
+function _queueQueuedAtMs(queue) {
+  return _timestampMs(queue?.queuedAt) || Number(queue?.queuedAtMs) || 0;
+}
+
 function rankLiveQueueCandidates(items, {
   excludeOwnerHash,
   nowMs = Date.now(),
@@ -1281,6 +1289,12 @@ function rankLiveQueueCandidates(items, {
   return (Array.isArray(items) ? items : [])
     .filter((item) => isPairableWaitingQueue(item, { nowMs, excludeOwnerHash }))
     .sort((a, b) => {
+      const queuedA = _queueQueuedAtMs(a);
+      const queuedB = _queueQueuedAtMs(b);
+      const recentA = queuedA > 0 && (nowMs - queuedA) <= QUEUE_RECENT_MS ? 0 : 1;
+      const recentB = queuedB > 0 && (nowMs - queuedB) <= QUEUE_RECENT_MS ? 0 : 1;
+      if (recentA !== recentB) return recentA - recentB;
+      if (recentA === 0 && queuedA !== queuedB) return queuedB - queuedA;
       const levelA = Math.max(1, Math.floor(Number(a.level) || 1));
       const levelB = Math.max(1, Math.floor(Number(b.level) || 1));
       const exactA = levelA === safeLevel ? 0 : 1;
@@ -1289,8 +1303,7 @@ function rankLiveQueueCandidates(items, {
       const gapA = Math.abs(levelA - safeLevel);
       const gapB = Math.abs(levelB - safeLevel);
       if (gapA !== gapB) return gapA - gapB;
-      return (_timestampMs(a.queuedAt) || Number(a.queuedAtMs) || 0) -
-        (_timestampMs(b.queuedAt) || Number(b.queuedAtMs) || 0);
+      return queuedA - queuedB;
     })
     .slice(0, safeLimit);
 }
@@ -1336,6 +1349,70 @@ function _mapWaitingQueueDocs(snap) {
     ...doc.data(),
     ownerHash: String(doc.data()?.ownerHash || doc.id).trim(),
   }));
+}
+
+/** Kuyruk taraması transaction dışında — query-in-tx iki eşzamanlı start'ı öldürür. */
+async function _findPairableWaitingCandidates(
+  db,
+  excludeOwnerHash,
+  level,
+  nowMs = Date.now(),
+) {
+  const snap = await db.collection("quiz_queue")
+    .where("status", "==", "waiting")
+    .limit(QUEUE_CANDIDATE_SCAN_LIMIT)
+    .get();
+  return rankLiveQueueCandidates(_mapWaitingQueueDocs(snap), {
+    excludeOwnerHash,
+    nowMs,
+    level,
+    limit: QUEUE_CANDIDATE_PICK_LIMIT,
+  });
+}
+
+async function _lockQueueCandidatesInTx(tx, db, candidates, excludeOwnerHash) {
+  const fresh = [];
+  const seen = new Set();
+  for (const item of Array.isArray(candidates) ? candidates : []) {
+    const id = queueOwnerId(item);
+    if (!id || id === excludeOwnerHash || seen.has(id)) continue;
+    seen.add(id);
+    const snap = await tx.get(db.collection("quiz_queue").doc(id));
+    if (!snap.exists) continue;
+    fresh.push({
+      ref: snap.ref,
+      id: snap.id,
+      ...snap.data(),
+      ownerHash: String(snap.data()?.ownerHash || snap.id).trim(),
+    });
+  }
+  return fresh;
+}
+
+async function _pairWaitingAfterEnqueue(db, startArgs, started) {
+  if (!started || started.status !== "waiting") return started;
+  const again = await _findPairableWaitingCandidates(
+    db,
+    startArgs.ownerHash,
+    startArgs.profile.level,
+  );
+  if (again.length === 0) return started;
+  try {
+    const paired = await db.runTransaction(async (tx) =>
+      _startOrPairQuizMatchInTransaction({
+        tx,
+        ...startArgs,
+        allowPair: true,
+        preselectedCandidates: again,
+      }),
+    );
+    return paired || started;
+  } catch (error) {
+    if (error instanceof HttpsError) throw error;
+    console.error("[HilalDuel] pair after enqueue failed:", error);
+    const recovered = await _readLiveQueueFallback(db, startArgs.queueRef);
+    return recovered || started;
+  }
 }
 
 async function _readChargeRecordsInTx(tx, db, chargeIds) {
@@ -1524,10 +1601,28 @@ function adHeartBalance(data = {}) {
   return Math.max(0, Math.floor(Number(data.adHearts) || 0));
 }
 
-function _quizIpHash(req) {
+function _isUnusableClientIp(ip) {
+  return (
+    !ip ||
+    ip === "unknown" ||
+    ip === "::1" ||
+    ip === "127.0.0.1" ||
+    ip === "::ffff:127.0.0.1"
+  );
+}
+
+function _quizClientIp(req) {
   const forwarded = String(req.rawRequest?.headers?.["x-forwarded-for"] || "");
-  const ip = forwarded.split(",")[0].trim() ||
-    String(req.rawRequest?.ip || "unknown");
+  const headerIp = forwarded.split(",")[0].trim();
+  const rawIp = String(req.rawRequest?.ip || "").trim();
+  if (!_isUnusableClientIp(headerIp)) return headerIp;
+  if (!_isUnusableClientIp(rawIp)) return rawIp;
+  return "";
+}
+
+function _quizIpHash(req) {
+  const ip = _quizClientIp(req);
+  if (!ip) return "";
   return _sha256(`quiz_ip:${ip}`);
 }
 
@@ -1559,11 +1654,17 @@ async function _assertQuizWriteRate(db, key, scope, limit) {
 async function _assertQuizCallerRates(db, req, ownerHash, scope, limit) {
   const authKey = _sha256(`quiz_auth:${req.auth?.uid || "anon"}`);
   const ipHash = _quizIpHash(req);
-  await Promise.all([
+  const checks = [
     _assertQuizWriteRate(db, authKey, `${scope}_auth`, limit),
     _assertQuizWriteRate(db, ownerHash, `${scope}_install`, limit),
-    _assertQuizWriteRate(db, ipHash, `${scope}_ip`, limit * 3),
-  ]);
+  ];
+  // IP yoksa / localhost ise ortak kovayı doldurma — tüm kullanıcılar kilitlenir.
+  if (ipHash) {
+    checks.push(
+      _assertQuizWriteRate(db, ipHash, `${scope}_ip`, limit * 3),
+    );
+  }
+  await Promise.all(checks);
 }
 
 async function _assertInstallation(db, req) {
@@ -1727,13 +1828,13 @@ function _pickBotCorrectCount(roundCount) {
 
 /**
  * İnsan cevapladıktan sonra botun görünür gecikmesi.
- * Çoğunlukla 2–3 sn, bazen ~5 sn. Anında cevap yok.
+ * Çoğunlukla 2.5–3.5 sn, bazen ~5 sn. Anında cevap yok.
  */
 function _pickBotAfterHumanDelayMs() {
   if (crypto.randomInt(100) < 25) {
     return crypto.randomInt(4_800, 5_201);
   }
-  return crypto.randomInt(2_000, 3_001);
+  return crypto.randomInt(2_500, 3_501);
 }
 
 function _botWrongChoice(correctIndex) {
@@ -1745,8 +1846,8 @@ function _botWrongChoice(correctIndex) {
 
 /**
  * Canlı eşleşme bot planı: maç başına 1–3 doğru (genelde 2).
- * Seviye doğruluğu şişirmez. Cevap süresi insansı; insan öndeyse
- * afterHumanDelayMs kadar bekler, plan önceyse ondan önce yazar.
+ * Seviye doğruluğu şişirmez. Bot insan cevaplayana kadar yazılmaz;
+ * sonra afterHumanDelayMs bekler. Görünen süre insanın ~2/3'ü.
  */
 function _botPlan(questionIds, _playerLevel) {
   const ids = Array.isArray(questionIds) ? questionIds : [];
@@ -1928,39 +2029,61 @@ function _challengeBotWeakPlan(questionIds) {
 
 /**
  * Bot cevabı zamanı.
- * İnsan yokken planlanan süreyi bekler (bazen insandan önce "Cevapladı").
- * İnsan öndeyse 2–3 sn (bazen ~5 sn) sonra yazar; anında çözüm yok.
- * Plan zaten insandan önce dolduysa ekstra beklemez.
+ * İnsan bitirmeden yazılmaz (submit ile aynı anda "anında cevap" olmasın).
+ * İnsan cevaplayınca 2.5–3.5 sn (bazen ~5 sn) sonra yazar.
  */
 function _botReadyAtMs({
   roundStartedAtMs,
-  plannedElapsedMs,
+  plannedElapsedMs: _plannedElapsedMs,
   deadlineMs,
-  nowMs,
+  nowMs: _nowMs,
   humanAnswered,
   humanElapsedMs,
   afterHumanDelayMs,
 }) {
   const start = Math.max(0, Math.floor(Number(roundStartedAtMs) || 0));
-  const planned = start + Math.max(0, Math.floor(Number(plannedElapsedMs) || 8_000));
   const deadline = Math.max(
     start + 1_000,
     Math.floor(Number(deadlineMs) || (start + ROUND_DURATION_MS)),
   );
   const cap = deadline - 200;
   if (!humanAnswered) {
-    return Math.min(planned, cap);
+    return cap;
   }
   const humanElapsed = Math.max(0, Math.floor(Number(humanElapsedMs) || 0));
-  const humanAt = start + humanElapsed;
-  if (planned <= humanAt) {
-    return Math.min(planned, cap);
-  }
-  const delay = Math.max(0, Math.floor(Number(afterHumanDelayMs) || 2_500));
-  return Math.min(humanAt + delay, cap);
+  const delay = Math.max(1_600, Math.floor(Number(afterHumanDelayMs) || 2_500));
+  return Math.min(start + humanElapsed + delay, cap);
 }
 
-/** Bot elapsedMs: plan veya insan + gecikme; duvar saati planı aşmasın. */
+/** İnsan 15sn ise bot ~10sn görünsün (≈2/3, küçük sapma). */
+function _botElapsedAfterHuman({
+  humanElapsedMs,
+  planElapsedMs,
+  afterHumanDelayMs,
+}) {
+  const human = Math.max(0, Math.floor(Number(humanElapsedMs) || 0));
+  const planned = Math.min(
+    ROUND_DURATION_MS,
+    Math.max(800, Math.floor(Number(planElapsedMs) || 8_000)),
+  );
+  const minThink = 2_200;
+  if (human <= minThink + 500) {
+    return Math.min(
+      ROUND_DURATION_MS,
+      Math.max(minThink, Math.min(planned, Math.max(human, minThink))),
+    );
+  }
+  const delay = Math.max(0, Math.floor(Number(afterHumanDelayMs) || 2_500));
+  const jitter = ((delay % 900) - 450) / 450;
+  const ratio = 0.62 + jitter * 0.08;
+  const scaled = Math.floor(human * ratio);
+  return Math.min(
+    ROUND_DURATION_MS,
+    Math.max(minThink, Math.min(human - 500, scaled)),
+  );
+}
+
+/** Bot elapsedMs: insandan sonra orantılı süre; erken yazılırsa duvar saati. */
 function _botAnswerElapsedMs({
   planElapsedMs,
   nowMs,
@@ -1969,24 +2092,23 @@ function _botAnswerElapsedMs({
   humanElapsedMs,
   afterHumanDelayMs,
 }) {
+  if (humanAnswered) {
+    return _botElapsedAfterHuman({
+      humanElapsedMs,
+      planElapsedMs,
+      afterHumanDelayMs,
+    });
+  }
   const planned = Math.min(
     ROUND_DURATION_MS,
     Math.max(800, Math.floor(Number(planElapsedMs) || ROUND_DURATION_MS)),
   );
   const roundStart = Math.max(0, Math.floor(Number(roundStartedAtMs) || 0));
   const wall = Math.max(0, Math.floor(Number(nowMs) || 0) - roundStart);
-  if (!humanAnswered) {
-    return Math.min(
-      ROUND_DURATION_MS,
-      Math.max(800, Math.min(planned, wall || planned)),
-    );
-  }
-  const humanElapsed = Math.max(0, Math.floor(Number(humanElapsedMs) || 0));
-  const delay = Math.max(0, Math.floor(Number(afterHumanDelayMs) || 2_500));
-  const intended = planned <= humanElapsed
-    ? planned
-    : humanElapsed + delay;
-  return Math.min(ROUND_DURATION_MS, Math.max(800, intended));
+  return Math.min(
+    ROUND_DURATION_MS,
+    Math.max(800, Math.min(planned, wall || planned)),
+  );
 }
 
 function _questionPayload(questionId, includeAnswer = false, locale = "tr") {
@@ -2638,7 +2760,10 @@ const createQuizSession = onCall(
     const bindingSecretHash = _validatedBindingSecretHash(req.data?.bindingSecret);
     const db = getFirestore();
     await _assertQuizWriteRate(db, ownerHash, "session_install", 10);
-    await _assertQuizWriteRate(db, _quizIpHash(req), "session_ip", 40);
+    const sessionIpHash = _quizIpHash(req);
+    if (sessionIpHash) {
+      await _assertQuizWriteRate(db, sessionIpHash, "session_ip", 40);
+    }
     const ref = db.collection("quiz_installations").doc(ownerHash);
     await db.runTransaction(async (tx) => {
       const snap = await tx.get(ref);
@@ -2938,6 +3063,7 @@ async function _startOrPairQuizMatchInTransaction({
   playerRef,
   queueRef,
   allowPair = true,
+  preselectedCandidates = [],
 }) {
   const nowMs = Date.now();
   const freshPlayer = await tx.get(playerRef);
@@ -2970,15 +3096,16 @@ async function _startOrPairQuizMatchInTransaction({
     return { ok: true, status: "idle", refunded: true };
   }
 
-  const waitingSnap = allowPair
-    ? await tx.get(
-      db.collection("quiz_queue")
-        .where("status", "==", "waiting")
-        .limit(QUEUE_CANDIDATE_SCAN_LIMIT),
+  const locked = allowPair
+    ? await _lockQueueCandidatesInTx(
+      tx,
+      db,
+      preselectedCandidates,
+      ownerHash,
     )
-    : null;
+    : [];
   const ranked = allowPair
-    ? rankLiveQueueCandidates(_mapWaitingQueueDocs(waitingSnap), {
+    ? rankLiveQueueCandidates(locked, {
       excludeOwnerHash: ownerHash,
       nowMs,
       level: profile.level,
@@ -3108,6 +3235,7 @@ async function _resolveQuizMatchPollInTransaction({
   ownerHash,
   queueRef,
   playerRef,
+  preselectedCandidates = [],
 }) {
   const nowMs = Date.now();
   const fresh = await tx.get(queueRef);
@@ -3143,12 +3271,13 @@ async function _resolveQuizMatchPollInTransaction({
     };
   }
 
-  const waitingSnap = await tx.get(
-    db.collection("quiz_queue")
-      .where("status", "==", "waiting")
-      .limit(QUEUE_CANDIDATE_SCAN_LIMIT),
+  const locked = await _lockQueueCandidatesInTx(
+    tx,
+    db,
+    preselectedCandidates,
+    ownerHash,
   );
-  const ranked = rankLiveQueueCandidates(_mapWaitingQueueDocs(waitingSnap), {
+  const ranked = rankLiveQueueCandidates(locked, {
     excludeOwnerHash: ownerHash,
     nowMs,
     level: Math.max(1, Math.floor(Number(data.level) || 1)),
@@ -3257,27 +3386,35 @@ const startQuizMatch = onCall(
       queueRef,
     };
 
+    const preselected = await _findPairableWaitingCandidates(
+      db,
+      ownerHash,
+      profile.level,
+    );
     try {
-      return await db.runTransaction(async (tx) =>
+      const started = await db.runTransaction(async (tx) =>
         _startOrPairQuizMatchInTransaction({
           tx,
           ...startArgs,
           allowPair: true,
+          preselectedCandidates: preselected,
         }),
       );
+      return await _pairWaitingAfterEnqueue(db, startArgs, started);
     } catch (error) {
       if (error instanceof HttpsError) throw error;
       console.error("[HilalDuel] startQuizMatch failed:", error);
       const recovered = await _readLiveQueueFallback(db, queueRef);
       if (recovered) return recovered;
       try {
-        return await db.runTransaction(async (tx) =>
+        const queued = await db.runTransaction(async (tx) =>
           _startOrPairQuizMatchInTransaction({
             tx,
             ...startArgs,
             allowPair: false,
           }),
         );
+        return await _pairWaitingAfterEnqueue(db, startArgs, queued);
       } catch (fallbackError) {
         if (fallbackError instanceof HttpsError) throw fallbackError;
         console.error("[HilalDuel] startQuizMatch enqueue fallback failed:", fallbackError);
@@ -3384,6 +3521,11 @@ const pollQuizMatch = onCall(
       });
       return { ok: true, status: "idle", refunded: true };
     }
+    const preselected = await _findPairableWaitingCandidates(
+      db,
+      ownerHash,
+      Math.max(1, Math.floor(Number(queue.level) || 1)),
+    );
     try {
       return await db.runTransaction(async (tx) =>
         _resolveQuizMatchPollInTransaction({
@@ -3392,6 +3534,7 @@ const pollQuizMatch = onCall(
           ownerHash,
           queueRef,
           playerRef,
+          preselectedCandidates: preselected,
         }),
       );
     } catch (error) {
@@ -3402,6 +3545,8 @@ const pollQuizMatch = onCall(
         throw error;
       }
       console.error("[HilalDuel] pollQuizMatch failed:", error);
+      const recovered = await _readLiveQueueFallback(db, queueRef);
+      if (recovered) return recovered;
       return {
         ok: true,
         status: "waiting",
@@ -4966,7 +5111,7 @@ const createQuizChallenge = onCall(
         "Otomatik gönderim yalnız admin için.",
       );
     }
-    await _assertQuizCallerRates(db, req, ownerHash, "challenge_create", 15);
+    await _assertQuizCallerRates(db, req, ownerHash, "challenge_create", 250);
     const name = _validatedName(req.data?.name);
     const opponentId = _validatedOpponentId(req.data?.opponentOwnerHash);
     if (opponentId === ownerHash) {
@@ -5094,12 +5239,6 @@ const createQuizChallenge = onCall(
         opponentId,
         nowMs,
       );
-      if (tally.outgoingOpen >= CHALLENGE_MAX_ACTIVE_OUTGOING) {
-        throw new HttpsError(
-          "resource-exhausted",
-          "Aynı anda en fazla 3 açık meydan okuman olabilir.",
-        );
-      }
       if (tally.hasOpenPair) {
         throw new HttpsError(
           "already-exists",
@@ -6262,6 +6401,7 @@ module.exports = {
     pickBotAfterHumanDelayMs: _pickBotAfterHumanDelayMs,
     botReadyAtMs: _botReadyAtMs,
     botAnswerElapsedMs: _botAnswerElapsedMs,
+    botElapsedAfterHuman: _botElapsedAfterHuman,
     canAcceptAnswer,
     shouldAutoTimeoutAnswers,
     isTimeoutAnswer,
@@ -6289,6 +6429,7 @@ module.exports = {
     decideLiveQueuePollAction,
     QUEUE_ABANDON_MS,
     QUEUE_WAIT_MS,
+    QUEUE_RECENT_MS,
     QUEUE_CANDIDATE_SCAN_LIMIT,
     QUEUE_CANDIDATE_PICK_LIMIT,
     ROUND_DURATION_MS,
@@ -6304,6 +6445,7 @@ module.exports = {
     challengeDeadlineMsOf,
     isCountableOpenChallenge,
     tallyCountableChallenges,
+    quizClientIp: _quizClientIp,
     shouldListChallengeInInbox,
     challengeInboxOutcome,
     lastWeekWinnersFromLedgerData,

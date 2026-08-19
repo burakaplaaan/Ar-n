@@ -621,5 +621,36 @@ void main() {
         'Bir hata oluştu. Tekrar dene.',
       );
     });
+
+    test('keeps challenge quota text instead of a fake rate-limit', () {
+      expect(
+        hilalDuelFriendlyFunctionsMessage(
+          code: 'resource-exhausted',
+          message: 'Aynı anda en fazla 3 açık meydan okuman olabilir.',
+        ),
+        'Aynı anda en fazla 3 açık meydan okuman olabilir.',
+      );
+      expect(
+        hilalDuelFriendlyFunctionsMessage(
+          code: 'failed-precondition',
+          message: 'Bitmemiş 3 meydan okuman var. Önce onları tamamla.',
+        ),
+        'Bitmemiş 3 meydan okuman var. Önce onları tamamla.',
+      );
+      expect(
+        hilalDuelFriendlyFunctionsMessage(
+          code: 'resource-exhausted',
+          message: 'Çok hızlı işlem yapıldı. Kısa süre sonra tekrar deneyin.',
+        ),
+        'Çok hızlı işlem yapıldı. Kısa süre sonra tekrar dene.',
+      );
+      expect(
+        hilalDuelFriendlyFunctionsMessage(
+          code: 'resource-exhausted',
+          message: 'Oynamak için reklam izleyerek can kazanmalısın.',
+        ),
+        'NEED_HEART',
+      );
+    });
   });
 }

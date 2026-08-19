@@ -331,11 +331,18 @@ String hilalDuelFriendlyFunctionsMessage({
   }
   switch (normalizedCode) {
     case 'resource-exhausted':
-      return trimmed.contains('can') ||
-              trimmed.contains('Oynamak') ||
-              lowerMessage.contains('heart')
-          ? needHeartToken
-          : 'Çok hızlı işlem yapıldı. Kısa süre sonra tekrar dene.';
+      if (_isHeartExhaustedMessage(trimmed, lowerMessage)) {
+        return needHeartToken;
+      }
+      // Kota / iş kuralı da bu koda düşebiliyordu; ham metni ezme.
+      if (_isSpecificFunctionsMessage(trimmed, lowerMessage)) {
+        return trimmed;
+      }
+      return 'Çok hızlı işlem yapıldı. Kısa süre sonra tekrar dene.';
+    case 'failed-precondition':
+      return _isSpecificFunctionsMessage(trimmed, lowerMessage)
+          ? trimmed
+          : 'İşlem şu anda yapılamıyor. Tekrar dene.';
     case 'unavailable':
       return 'Bağlantı kurulamadı. Tekrar dene.';
     case 'permission-denied':
@@ -351,6 +358,21 @@ String hilalDuelFriendlyFunctionsMessage({
           ? 'Bir hata oluştu. Tekrar dene.'
           : trimmed;
   }
+}
+
+bool _isHeartExhaustedMessage(String trimmed, String lowerMessage) {
+  return trimmed.contains('can') ||
+      trimmed.contains('Oynamak') ||
+      lowerMessage.contains('heart');
+}
+
+bool _isSpecificFunctionsMessage(String trimmed, String lowerMessage) {
+  if (trimmed.isEmpty || _isRawFunctionsCode(lowerMessage)) return false;
+  if (lowerMessage.contains('çok hızlı')) return false;
+  if (lowerMessage.contains('too many') || lowerMessage.contains('rate limit')) {
+    return false;
+  }
+  return true;
 }
 
 bool _isRawFunctionsCode(String lowerMessage) {
