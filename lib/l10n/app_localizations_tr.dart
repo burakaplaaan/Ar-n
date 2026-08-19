@@ -5077,10 +5077,10 @@ class AppLocalizationsTr extends AppLocalizations {
   String get premiumCompareWidgets => 'Widget\'lar';
 
   @override
-  String get premiumCompareWidgetsFree => 'Kilitli';
+  String get premiumCompareWidgetsFree => 'Sınırlı';
 
   @override
-  String get premiumCompareWidgetsPremium => 'Açık';
+  String get premiumCompareWidgetsPremium => 'Sınırsız';
 
   @override
   String get premiumCompareThemes => 'Widget temaları';

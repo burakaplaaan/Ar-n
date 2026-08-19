@@ -5090,10 +5090,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get premiumCompareWidgets => 'Widgets';
 
   @override
-  String get premiumCompareWidgetsFree => 'Locked';
+  String get premiumCompareWidgetsFree => 'Limited';
 
   @override
-  String get premiumCompareWidgetsPremium => 'Unlocked';
+  String get premiumCompareWidgetsPremium => 'Unlimited';
 
   @override
   String get premiumCompareThemes => 'Widget themes';

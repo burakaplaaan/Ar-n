@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -10,6 +12,7 @@ import '../../qibla/qibla_hub_navigator_key.dart';
 import '../../qibla/qibla_hub_page.dart';
 import '../../qibla/qibla_shell_swipe_provider.dart';
 import '../../onboarding/app_tour/app_tour_anchor.dart';
+import '../../onboarding/app_tour/app_tour_controller.dart';
 import '../../onboarding/app_tour/app_tour_keys.dart';
 import '../assistant_entry.dart';
 import 'assistant_fab_physics.dart';
@@ -67,19 +70,24 @@ class AssistantFabHost extends ConsumerStatefulWidget {
 }
 
 class _AssistantFabHostState extends ConsumerState<AssistantFabHost>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   Offset? _offset;
   bool _dragging = false;
+  bool _hidden = false;
   Size? _lastScreen;
   Size _bubbleSize = _kBubbleFallback;
   final GlobalKey _bubbleKey = GlobalKey();
   late final AnimationController _move;
+  late final AnimationController _dock;
   Offset _animFrom = Offset.zero;
   Offset _animTo = Offset.zero;
+  Timer? _idleDock;
 
   SharedPreferences get _prefs => ref.read(sharedPreferencesProvider);
 
   Size get _size => _bubbleSize;
+
+  bool get _isPeeked => _dock.value > 0.5;
 
   @override
   void initState() {
@@ -87,15 +95,51 @@ class _AssistantFabHostState extends ConsumerState<AssistantFabHost>
     _move = AnimationController(vsync: this)
       ..addListener(_onMoveTick)
       ..addStatusListener(_onMoveStatus);
+    _dock = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 340),
+    )..addListener(() {
+        if (mounted) setState(() {});
+      });
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _scheduleDock();
+    });
   }
 
   @override
   void dispose() {
+    _idleDock?.cancel();
+    _dock.dispose();
     _move
       ..removeListener(_onMoveTick)
       ..removeStatusListener(_onMoveStatus)
       ..dispose();
     super.dispose();
+  }
+
+  void _scheduleDock() {
+    _idleDock?.cancel();
+    if (!mounted || _hidden || _dragging) return;
+    _idleDock = Timer(kAssistantFabIdleDockDelay, _beginDock);
+  }
+
+  void _beginDock() {
+    if (!mounted || _hidden || _dragging) return;
+    if (ref.read(appTourControllerProvider).active) return;
+    if (_dock.value >= 1) return;
+    if (_move.isAnimating) {
+      _idleDock = Timer(const Duration(milliseconds: 220), _beginDock);
+      return;
+    }
+    _dock.forward();
+  }
+
+  void _expandDock({bool restartIdle = true}) {
+    _idleDock?.cancel();
+    if (_dock.value > 0 || _dock.status == AnimationStatus.forward) {
+      _dock.reverse();
+    }
+    if (restartIdle) _scheduleDock();
   }
 
   void _onMoveTick() {
@@ -170,6 +214,7 @@ class _AssistantFabHostState extends ConsumerState<AssistantFabHost>
     setState(() => _dragging = false);
     HapticFeedback.selectionClick();
     _animateTo(settled, screen, velocity: velocity);
+    _scheduleDock();
   }
 
   void _measureBubble() {
@@ -179,7 +224,53 @@ class _AssistantFabHostState extends ConsumerState<AssistantFabHost>
         (box.size.height - _bubbleSize.height).abs() < 0.5) {
       return;
     }
-    setState(() => _bubbleSize = box.size);
+    final oldSize = _bubbleSize;
+    final nextSize = box.size;
+    final screen = _lastScreen;
+    var nextOffset = _offset;
+    if (nextOffset != null && screen != null && !_move.isAnimating) {
+      nextOffset = _reanchorOnResize(
+        position: nextOffset,
+        oldSize: oldSize,
+        nextSize: nextSize,
+        screen: screen,
+      );
+    }
+    setState(() {
+      _bubbleSize = nextSize;
+      if (nextOffset != null && screen != null) {
+        _offset = _clampTo(nextOffset, screen);
+      }
+    });
+  }
+
+  Offset _reanchorOnResize({
+    required Offset position,
+    required Size oldSize,
+    required Size nextSize,
+    required Size screen,
+  }) {
+    final raw = MediaQueryData.fromView(View.of(context));
+    final oldBounds = assistantFabBoundsFor(
+      stack: screen,
+      bubble: oldSize,
+      viewLeft: raw.viewPadding.left,
+      viewTop: raw.viewPadding.top,
+      viewRight: raw.viewPadding.right,
+      viewBottom: raw.viewPadding.bottom,
+      fullScreenHeight: raw.size.height,
+    );
+    final onRight = (position.dx - oldBounds.maxX).abs() < 1.5;
+    final onBottom = (position.dy - oldBounds.maxY).abs() < 1.5;
+    var dx = position.dx;
+    var dy = position.dy;
+    if (onRight) {
+      dx += oldSize.width - nextSize.width;
+    }
+    if (onBottom) {
+      dy += oldSize.height - nextSize.height;
+    }
+    return Offset(dx, dy);
   }
 
   Offset _restoreOrDefault(Size screen) {
@@ -245,6 +336,27 @@ class _AssistantFabHostState extends ConsumerState<AssistantFabHost>
       path: path,
       duelActive: duelActive || nestedDuel,
     );
+    final tourActive = ref.watch(appTourControllerProvider).active;
+    if (_hidden != hidden) {
+      _hidden = hidden;
+      if (hidden) {
+        _idleDock?.cancel();
+        if (_dock.value > 0) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (mounted) _dock.value = 0;
+          });
+        }
+      } else {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) _scheduleDock();
+        });
+      }
+    }
+    if (tourActive && _dock.value > 0) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _expandDock(restartIdle: false);
+      });
+    }
 
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -256,6 +368,13 @@ class _AssistantFabHostState extends ConsumerState<AssistantFabHost>
             if (mounted) _measureBubble();
           });
         }
+        final edge = assistantFabEdgeFor(offset, _bounds(screen));
+        final peek = assistantFabPeekTranslation(
+          edge: edge,
+          bubble: _size,
+        );
+        final dockT = Curves.easeInOutCubic.transform(_dock.value);
+        final compact = _dock.value > 0.12 && !_dragging;
 
         return NotificationListener<ScrollNotification>(
           onNotification: (notification) {
@@ -268,6 +387,7 @@ class _AssistantFabHostState extends ConsumerState<AssistantFabHost>
           },
           child: Stack(
             fit: StackFit.expand,
+            clipBehavior: Clip.hardEdge,
             children: [
               widget.child,
               Positioned(
@@ -277,42 +397,57 @@ class _AssistantFabHostState extends ConsumerState<AssistantFabHost>
                   offstage: hidden,
                   child: IgnorePointer(
                     ignoring: hidden,
-                    child: AnimatedOpacity(
-                      duration: const Duration(milliseconds: 180),
-                      curve: Curves.easeOutCubic,
-                      opacity: _dragging ? _kDragOpacity : _kIdleOpacity,
-                      child: GestureDetector(
-                        behavior: HitTestBehavior.opaque,
-                        onTap: () async {
-                          HapticFeedback.lightImpact();
-                          await openAssistantOrPaywall(
-                            context: context,
-                            ref: ref,
-                          );
-                        },
-                        onPanStart: (_) {
-                          _move.stop();
-                          setState(() => _dragging = true);
-                        },
-                        onPanUpdate: (details) {
-                          final next = _clampTo(
-                            (_offset ?? offset) + details.delta,
-                            screen,
-                          );
-                          setState(() => _offset = next);
-                        },
-                        onPanEnd: (details) {
-                          _finishDrag(
-                            details.velocity.pixelsPerSecond,
-                            screen,
-                          );
-                        },
-                        onPanCancel: () {
-                          _finishDrag(Offset.zero, screen);
-                        },
-                        child: AppTourAnchor(
-                          id: AppTourTargetId.assistantFab,
-                          child: AssistantHomeBubble(key: _bubbleKey),
+                    child: Transform.translate(
+                      offset: peek * dockT,
+                      child: AnimatedOpacity(
+                        duration: const Duration(milliseconds: 180),
+                        curve: Curves.easeOutCubic,
+                        opacity: _dragging
+                            ? _kDragOpacity
+                            : (_dock.value > 0.4 ? 0.82 : _kIdleOpacity),
+                        child: GestureDetector(
+                          behavior: HitTestBehavior.opaque,
+                          onTap: () async {
+                            if (_isPeeked || _dock.status == AnimationStatus.forward) {
+                              HapticFeedback.selectionClick();
+                              _expandDock();
+                              return;
+                            }
+                            HapticFeedback.lightImpact();
+                            _scheduleDock();
+                            await openAssistantOrPaywall(
+                              context: context,
+                              ref: ref,
+                            );
+                          },
+                          onPanStart: (_) {
+                            _move.stop();
+                            _expandDock(restartIdle: false);
+                            setState(() => _dragging = true);
+                          },
+                          onPanUpdate: (details) {
+                            final next = _clampTo(
+                              (_offset ?? offset) + details.delta,
+                              screen,
+                            );
+                            setState(() => _offset = next);
+                          },
+                          onPanEnd: (details) {
+                            _finishDrag(
+                              details.velocity.pixelsPerSecond,
+                              screen,
+                            );
+                          },
+                          onPanCancel: () {
+                            _finishDrag(Offset.zero, screen);
+                          },
+                          child: AppTourAnchor(
+                            id: AppTourTargetId.assistantFab,
+                            child: AssistantHomeBubble(
+                              key: _bubbleKey,
+                              compact: compact,
+                            ),
+                          ),
                         ),
                       ),
                     ),

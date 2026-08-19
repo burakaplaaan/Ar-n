@@ -109,4 +109,46 @@ void main() {
     );
     expect(settled, const Offset(8, 300));
   });
+
+  test('yapıştığı kenara göre peek yönü ve görünür pay', () {
+    expect(
+      assistantFabEdgeFor(const Offset(254, 300), bounds),
+      AssistantFabEdge.right,
+    );
+    expect(
+      assistantFabEdgeFor(const Offset(8, 300), bounds),
+      AssistantFabEdge.left,
+    );
+    expect(
+      assistantFabEdgeFor(const Offset(131, 55), bounds),
+      AssistantFabEdge.top,
+    );
+    expect(
+      assistantFabEdgeFor(const Offset(131, 682), bounds),
+      AssistantFabEdge.bottom,
+    );
+
+    const bubble = Size(42, 42);
+    expect(
+      assistantFabPeekTranslation(
+        edge: AssistantFabEdge.right,
+        bubble: bubble,
+      ).dx,
+      closeTo(20, 0.01),
+    );
+    expect(
+      assistantFabPeekTranslation(
+        edge: AssistantFabEdge.left,
+        bubble: bubble,
+      ).dx,
+      closeTo(-20, 0.01),
+    );
+    expect(
+      assistantFabPeekTranslation(
+        edge: AssistantFabEdge.top,
+        bubble: bubble,
+      ).dy,
+      closeTo(-20, 0.01),
+    );
+  });
 }

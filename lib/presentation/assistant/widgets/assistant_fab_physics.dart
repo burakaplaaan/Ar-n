@@ -63,6 +63,43 @@ AssistantFabBounds assistantFabBoundsFor({
 
 const double kAssistantFabFlingThreshold = 650;
 
+const Duration kAssistantFabIdleDockDelay = Duration(seconds: 6);
+
+/// Kenara çekilmiş balonda ekranda kalan hilal payı.
+const double kAssistantFabPeekVisible = 22;
+
+enum AssistantFabEdge { left, right, top, bottom }
+
+/// Yapıştığı kenar — köşede yatay kenar tercih edilir.
+AssistantFabEdge assistantFabEdgeFor(Offset position, AssistantFabBounds bounds) {
+  final left = position.dx - bounds.minX;
+  final right = bounds.maxX - position.dx;
+  final top = position.dy - bounds.minY;
+  final bottom = bounds.maxY - position.dy;
+  final horizontal = left < right ? left : right;
+  final vertical = top < bottom ? top : bottom;
+  if (horizontal <= vertical) {
+    return left <= right ? AssistantFabEdge.left : AssistantFabEdge.right;
+  }
+  return top <= bottom ? AssistantFabEdge.top : AssistantFabEdge.bottom;
+}
+
+/// Balonu kenarın içine kaydırır; yalnızca hilal payı görünür kalır.
+Offset assistantFabPeekTranslation({
+  required AssistantFabEdge edge,
+  required Size bubble,
+  double visiblePx = kAssistantFabPeekVisible,
+}) {
+  final hiddenX = (bubble.width - visiblePx).clamp(0.0, bubble.width);
+  final hiddenY = (bubble.height - visiblePx).clamp(0.0, bubble.height);
+  return switch (edge) {
+    AssistantFabEdge.left => Offset(-hiddenX, 0),
+    AssistantFabEdge.right => Offset(hiddenX, 0),
+    AssistantFabEdge.top => Offset(0, -hiddenY),
+    AssistantFabEdge.bottom => Offset(0, hiddenY),
+  };
+}
+
 /// Fırlatma sonrası duracağı tahmini nokta, sonra en yakın kenara yapışır.
 Offset settleAssistantFab({
   required Offset position,

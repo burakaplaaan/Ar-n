@@ -112,4 +112,17 @@ void main() {
       expect(tester.takeException(), isNull);
     },
   );
+
+  testWidgets('namaz vakitleri ızgarası kartın içine güvenli alan eklemez', (
+    tester,
+  ) async {
+    await tester.binding.setSurfaceSize(const Size(390, 900));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+
+    await tester.pumpWidget(appFor(const AsyncValue.data(_prayerTimes)));
+    await tester.pump(const Duration(milliseconds: 400));
+
+    final grid = tester.widget<GridView>(find.byType(GridView));
+    expect(grid.padding, EdgeInsets.zero);
+  });
 }

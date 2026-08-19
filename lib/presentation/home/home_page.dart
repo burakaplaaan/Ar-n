@@ -662,6 +662,7 @@ class _PrayerTimesList extends StatelessWidget {
           ],
         ),
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Row(
@@ -699,6 +700,8 @@ class _PrayerTimesList extends StatelessWidget {
             // ölçeği seçiliyse hücre içeriği (ikon + ad + "Sıradaki vakit" +
             // saat) kutuya sığmayıp üst üste biniyordu. Bu gridi sabit ölçekle
             // render ederek her cihazda aynı, taşmasız görünmesini sağlıyoruz.
+            // padding: zero — GridView aksi halde MediaQuery alt güvenli
+            // alanını kartın içine ekleyip altta boşluk bırakır.
             MediaQuery(
               data: MediaQuery.of(
                 context,
@@ -706,6 +709,7 @@ class _PrayerTimesList extends StatelessWidget {
               child: GridView.builder(
                 itemCount: model.orderedPrayers.length,
                 shrinkWrap: true,
+                padding: EdgeInsets.zero,
                 physics: const NeverScrollableScrollPhysics(),
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 3,
@@ -981,6 +985,7 @@ class _PrayerTimesSkeleton extends StatelessWidget {
           ],
         ),
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Row(
@@ -1012,6 +1017,7 @@ class _PrayerTimesSkeleton extends StatelessWidget {
             GridView.builder(
               itemCount: 6,
               shrinkWrap: true,
+              padding: EdgeInsets.zero,
               physics: const NeverScrollableScrollPhysics(),
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 3,

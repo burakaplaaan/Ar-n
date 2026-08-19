@@ -46,8 +46,6 @@ class _AssistantPageState extends ConsumerState<AssistantPage> {
   List<AssistantChatTurn> get _turns => _chat.turns;
   bool get _sending => _chat.sending;
   set _sending(bool value) => _chat.sending = value;
-  int? get _remainingToday => _chat.remainingToday;
-  set _remainingToday(int? value) => _chat.remainingToday = value;
   String? get _banner => _chat.banner;
   set _banner(String? value) => _chat.banner = value;
   int get _seq => _chat.seq;
@@ -191,7 +189,6 @@ class _AssistantPageState extends ConsumerState<AssistantPage> {
       }
       if (!mounted) return;
       setState(() {
-        _remainingToday = result.remainingToday;
         if (reply.isNotEmpty) {
           final id = ++_seq;
           _streamingId = id;
@@ -287,7 +284,6 @@ class _AssistantPageState extends ConsumerState<AssistantPage> {
               bottom: false,
               child: _AssistantHeader(
                 onDark: onDark,
-                remainingToday: _remainingToday,
                 onBack: () {
                   if (context.canPop()) {
                     context.pop();
@@ -361,12 +357,10 @@ class _AssistantHeader extends StatelessWidget {
   const _AssistantHeader({
     required this.onDark,
     required this.onBack,
-    this.remainingToday,
   });
 
   final bool onDark;
   final VoidCallback onBack;
-  final int? remainingToday;
 
   @override
   Widget build(BuildContext context) {
@@ -398,15 +392,6 @@ class _AssistantHeader extends StatelessWidget {
               ),
             ),
           ),
-          if (remainingToday != null)
-            Text(
-              l10n.assistantRemainingToday(remainingToday!),
-              style: TextStyle(
-                color: title.withValues(alpha: 0.48),
-                fontSize: 11,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
         ],
       ),
     );

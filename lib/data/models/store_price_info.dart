@@ -34,12 +34,32 @@ class StorePriceInfo {
 
   String get monthlyEquivalentString {
     if (price <= 0) return '';
-    final monthly = price / 12;
+    return formatAmount(price / 12);
+  }
+
+  /// 12 ay aylık alınca oluşacak tutar. Yıllık fiyattan yüksekse biçimlenmiş
+  /// metin, değilse null (üstü çizili sahte indirim yok).
+  static String? annualizedMonthlyCompare({
+    required StorePriceInfo? monthly,
+    required StorePriceInfo? yearly,
+  }) {
+    if (monthly == null || yearly == null) return null;
+    if (monthly.price <= 0 || yearly.price <= 0) return null;
+    final annualized = monthly.price * 12;
+    if (annualized <= yearly.price + 0.009) return null;
+    return monthly.formatAmount(annualized);
+  }
+
+  String formatAmount(double value) {
     final code = currencyCode.toUpperCase();
     if (code == 'TRY' || code == 'TL') {
-      return '${formatTry(monthly)} ₺';
+      return '${formatTry(value)} ₺';
     }
-    return '${monthly.toStringAsFixed(2)} $code';
+    final sample = priceString.trim();
+    if (sample.startsWith(r'$')) {
+      return '\$${value.toStringAsFixed(2)}';
+    }
+    return '${value.toStringAsFixed(2)} $code';
   }
 
   static String formatTry(double value) {

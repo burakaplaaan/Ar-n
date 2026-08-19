@@ -5051,10 +5051,10 @@ class AppLocalizationsAr extends AppLocalizations {
   String get premiumCompareWidgets => 'الأدوات';
 
   @override
-  String get premiumCompareWidgetsFree => 'مقفل';
+  String get premiumCompareWidgetsFree => 'محدود';
 
   @override
-  String get premiumCompareWidgetsPremium => 'مفتوح';
+  String get premiumCompareWidgetsPremium => 'غير محدود';
 
   @override
   String get premiumCompareThemes => 'سمات الأدوات';

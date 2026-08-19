@@ -7,7 +7,10 @@ import '../../../core/theme/arin_shell_background.dart';
 import 'assistant_hilal_mark.dart';
 
 class AssistantHomeBubble extends StatelessWidget {
-  const AssistantHomeBubble({super.key});
+  const AssistantHomeBubble({super.key, this.compact = false});
+
+  /// Kenara çekilince yalnızca hilal kalsın.
+  final bool compact;
 
   @override
   Widget build(BuildContext context) {
@@ -41,23 +44,32 @@ class AssistantHomeBubble extends StatelessWidget {
             ),
           ],
         ),
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(12, 9, 14, 9),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              AssistantHilalMark(size: 20, color: mark),
-              const SizedBox(width: 8),
-              Text(
-                l10n.assistantAskChip,
-                style: GoogleFonts.plusJakartaSans(
-                  color: text,
-                  fontSize: 13.5,
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: -0.2,
-                ),
-              ),
-            ],
+        child: AnimatedSize(
+          duration: const Duration(milliseconds: 280),
+          curve: Curves.easeInOutCubic,
+          alignment: Alignment.center,
+          child: Padding(
+            padding: compact
+                ? const EdgeInsets.all(10)
+                : const EdgeInsets.fromLTRB(12, 9, 14, 9),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                AssistantHilalMark(size: 20, color: mark),
+                if (!compact) ...[
+                  const SizedBox(width: 8),
+                  Text(
+                    l10n.assistantAskChip,
+                    style: GoogleFonts.plusJakartaSans(
+                      color: text,
+                      fontSize: 13.5,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: -0.2,
+                    ),
+                  ),
+                ],
+              ],
+            ),
           ),
         ),
       ),

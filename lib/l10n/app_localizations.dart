@@ -8842,13 +8842,13 @@ abstract class AppLocalizations {
   /// No description provided for @premiumCompareWidgetsFree.
   ///
   /// In tr, this message translates to:
-  /// **'Kilitli'**
+  /// **'Sınırlı'**
   String get premiumCompareWidgetsFree;
 
   /// No description provided for @premiumCompareWidgetsPremium.
   ///
   /// In tr, this message translates to:
-  /// **'Açık'**
+  /// **'Sınırsız'**
   String get premiumCompareWidgetsPremium;
 
   /// No description provided for @premiumCompareThemes.

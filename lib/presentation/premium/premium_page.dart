@@ -435,6 +435,13 @@ class _PremiumPageState extends ConsumerState<PremiumPage> {
     final monthlyPrice = monthlyInfo?.priceString;
     final lifetimePrice = lifetimeInfo?.priceString;
     final yearlyPerMonth = yearlyInfo?.monthlyEquivalentString ?? '';
+    final yearlyVsMonthlyOldPrice =
+        !hasYearly && !hasLegacyPlan
+            ? StorePriceInfo.annualizedMonthlyCompare(
+                monthly: monthlyInfo,
+                yearly: yearlyInfo,
+              )
+            : null;
     final yearlyReady =
         yearlyPrice != null && _containsProduct(PremiumPage.yearlyProductId);
     final monthlyReady =
@@ -545,7 +552,7 @@ class _PremiumPageState extends ConsumerState<PremiumPage> {
                           _PlanCard(
                             title: l10n.premiumYearlyPlanTitle,
                             badge: hasYearly ? null : l10n.premiumMostAdvantageousBadge,
-                            oldPrice: null,
+                            oldPrice: yearlyVsMonthlyOldPrice,
                             price: hasYearly && hasLegacyPlan
                                 ? l10n.premiumLegacyOwnedPrice
                                 : yearlyPrice ?? '—',
@@ -838,7 +845,7 @@ class _FreePremiumCompare extends StatelessWidget {
       (l10n.premiumCompareWidgets, l10n.premiumCompareWidgetsFree, l10n.premiumCompareWidgetsPremium),
       (l10n.premiumCompareThemes, l10n.premiumCompareThemesFree, l10n.premiumCompareThemesPremium),
       (l10n.premiumCompareAi, l10n.premiumCompareAiFree, l10n.premiumCompareAiPremium),
-      (l10n.qiblaHubAssistantTitle, l10n.premiumCompareWidgetsFree, l10n.premiumCompareWidgetsPremium),
+      (l10n.qiblaHubAssistantTitle, l10n.premiumCompareAiFree, l10n.premiumCompareAiPremium),
       (l10n.premiumCompareExplore, l10n.premiumCompareExploreFree, l10n.premiumCompareExplorePremium),
       (l10n.premiumCompareAdhan, l10n.premiumCompareAdhanFree, l10n.premiumCompareAdhanPremium),
       (l10n.premiumComparePrayer, l10n.premiumComparePrayerFree, l10n.premiumComparePrayerPremium),
