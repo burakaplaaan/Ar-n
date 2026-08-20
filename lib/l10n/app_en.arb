@@ -44,7 +44,7 @@
   "settingsAccountFallback": "Account",
   "settingsSignInGoogle": "Sign in with Google",
   "settingsSignInApple": "Sign in with Apple",
-  "settingsSessionHint": "To reset the app or remove your account:",
+  "settingsSessionHint": "To sign out or delete your account:",
   "settingsSignOutAction": "Sign out",
   "settingsDeleteAccountAction": "Delete account and all data",
   "settingsLightThemeTitle": "Light theme",
@@ -66,7 +66,8 @@
     }
   },
   "settingsSignOutDialogTitle": "Sign out",
-  "settingsSignOutDialogBody": "The app will reset starting from onboarding slides. All local data on this device will be deleted and your Firebase session will be closed.",
+  "settingsSignOutDialogBody": "Your Google or Apple session will close. Your name, habits, and settings stay on this device. Onboarding will not start again.",
+  "settingsSignOutSuccess": "Signed out.",
   "settingsDialogCancel": "Cancel",
   "settingsDeleteAllDataDialogTitle": "Delete all data",
   "settingsDeleteAllDataDialogBody": "You are in guest mode. All app data on this device will be permanently deleted and you will return to onboarding screens.",

@@ -218,7 +218,8 @@ void popOrGoWillpowerHub(BuildContext context) {
   context.go(AppRoutes.habits);
 }
 
-/// [onboarding_completed] açıkça false ise Hive'a bakılmaz (çıkış sonrası).
+/// [onboarding_completed] açıkça false ise Hive'a bakılmaz
+/// (hesap / yerel veri silme sonrası). Çıkış kurulumu sıfırlamaz.
 bool _onboardingDone(SharedPreferences prefs, Ref ref) {
   final flag = prefs.getBool('onboarding_completed');
   if (flag == false) return false;

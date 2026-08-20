@@ -337,7 +337,7 @@ abstract class AppLocalizations {
   /// No description provided for @settingsSessionHint.
   ///
   /// In tr, this message translates to:
-  /// **'Uygulamayı sıfırlamak veya hesabı kaldırmak için:'**
+  /// **'Oturumu kapatmak veya hesabı silmek için:'**
   String get settingsSessionHint;
 
   /// No description provided for @settingsSignOutAction.
@@ -409,8 +409,14 @@ abstract class AppLocalizations {
   /// No description provided for @settingsSignOutDialogBody.
   ///
   /// In tr, this message translates to:
-  /// **'Bilgilendirme slaytlarından başlayarak uygulama sıfırlanır. Bu cihazdaki tüm yerel veriler silinir; Firebase oturumunuz kapanır.'**
+  /// **'Google veya Apple oturumunuz kapanır. İsmin, alışkanlıkların ve ayarların bu cihazda kalır. Kurulum baştan başlamaz.'**
   String get settingsSignOutDialogBody;
+
+  /// No description provided for @settingsSignOutSuccess.
+  ///
+  /// In tr, this message translates to:
+  /// **'Oturum kapatıldı.'**
+  String get settingsSignOutSuccess;
 
   /// No description provided for @settingsDialogCancel.
   ///

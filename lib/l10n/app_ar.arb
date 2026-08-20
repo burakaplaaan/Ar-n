@@ -44,7 +44,7 @@
   "settingsAccountFallback": "الحساب",
   "settingsSignInGoogle": "تسجيل الدخول عبر Google",
   "settingsSignInApple": "تسجيل الدخول عبر Apple",
-  "settingsSessionHint": "لإعادة ضبط التطبيق أو إزالة الحساب:",
+  "settingsSessionHint": "لإغلاق الجلسة أو حذف الحساب:",
   "settingsSignOutAction": "تسجيل الخروج",
   "settingsDeleteAccountAction": "حذف الحساب وجميع البيانات",
   "settingsLightThemeTitle": "الثيم الفاتح",
@@ -66,7 +66,8 @@
     }
   },
   "settingsSignOutDialogTitle": "تسجيل الخروج",
-  "settingsSignOutDialogBody": "سيتم إعادة ضبط التطبيق بدءاً من شرائح التعريف. ستُحذف جميع البيانات المحلية على هذا الجهاز وسيتم إنهاء جلسة Firebase.",
+  "settingsSignOutDialogBody": "سيتم إغلاق جلسة Google أو Apple. يبقى اسمك وعاداتك وإعداداتك على هذا الجهاز. لن تبدأ خطوات الإعداد من جديد.",
+  "settingsSignOutSuccess": "تم إغلاق الجلسة.",
   "settingsDialogCancel": "إلغاء",
   "settingsDeleteAllDataDialogTitle": "حذف جميع البيانات",
   "settingsDeleteAllDataDialogBody": "أنت في وضع الضيف. سيتم حذف جميع بيانات التطبيق على هذا الجهاز نهائياً وستعود إلى شاشات التعريف.",

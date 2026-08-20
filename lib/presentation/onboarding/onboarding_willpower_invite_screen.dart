@@ -80,20 +80,10 @@ class OnboardingWillpowerInviteScreen extends StatelessWidget {
                     ],
                   ),
                 ),
-                const SizedBox(height: 8),
-                TextButton(
+                const SizedBox(height: 12),
+                OnboardingCtaButton(
+                  label: l10n.onboardingFirstStepLater,
                   onPressed: onLater,
-                  style: TextButton.styleFrom(
-                    foregroundColor: Colors.white.withValues(alpha: 0.72),
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                  ),
-                  child: Text(
-                    l10n.onboardingFirstStepLater,
-                    style: AppTextStyles.labelLarge.copyWith(
-                      color: Colors.white.withValues(alpha: 0.72),
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
                 ),
               ],
             ),

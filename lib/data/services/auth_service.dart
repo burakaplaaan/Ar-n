@@ -13,6 +13,51 @@ import '../../core/firebase/firebase_bootstrap.dart';
 import '../../firebase_options.dart';
 import 'purchase_service.dart';
 
+const _federatedAuthProviders = {'google.com', 'apple.com'};
+
+@visibleForTesting
+bool isAuthProviderLinked(Iterable<String> providerIds, String providerId) {
+  return providerIds.contains(providerId);
+}
+
+@visibleForTesting
+bool hasFederatedAuthProvider(Iterable<String> providerIds) {
+  return providerIds.any(_federatedAuthProviders.contains);
+}
+
+/// Mevcut oturuma sağlayıcı ekleme kararı.
+/// [linkCollision] `linkWithCredential` e-posta/kimlik çakışması attıktan sonra.
+enum AuthConnectResolution { signIn, link, failClosed }
+
+@visibleForTesting
+AuthConnectResolution resolveAuthConnect({
+  required bool hasCurrentUser,
+  required Iterable<String> currentProviderIds,
+  required String incomingProviderId,
+  bool linkCollision = false,
+}) {
+  if (!hasCurrentUser) return AuthConnectResolution.signIn;
+  if (linkCollision) {
+    // Leftover custom-token / anonymous: replace is safe enough.
+    // Apple/Google already present: never switch UID silently.
+    return hasFederatedAuthProvider(currentProviderIds)
+        ? AuthConnectResolution.failClosed
+        : AuthConnectResolution.signIn;
+  }
+  if (isAuthProviderLinked(currentProviderIds, incomingProviderId)) {
+    return AuthConnectResolution.signIn;
+  }
+  return AuthConnectResolution.link;
+}
+
+bool hasAuthProvider(User? user, String providerId) {
+  if (user == null) return false;
+  return isAuthProviderLinked(
+    user.providerData.map((p) => p.providerId),
+    providerId,
+  );
+}
+
 class AuthService {
   AuthService({FirebaseAuth? firebaseAuth})
     : _auth = firebaseAuth ?? FirebaseAuth.instance;
@@ -71,27 +116,17 @@ class AuthService {
   }
 
   Future<UserCredential> signInWithGoogle() async {
+    return connectGoogle();
+  }
+
+  /// Oturum yoksa giriş; varsa Google'ı mevcut hesaba bağlar.
+  /// Kurulumdaki isim bir hesap değildir — sonradan sağlayıcı eklenir.
+  Future<UserCredential> connectGoogle() async {
     if (!canUseFirebase) {
       throw StateError('Firebase yapılandırılmadı.');
     }
-    await _ensureGoogleSignIn();
-    try {
-      final account = await GoogleSignIn.instance.authenticate(
-        scopeHint: const <String>['email', 'profile'],
-      );
-      final auth = account.authentication;
-      final idToken = auth.idToken;
-      if (idToken == null) {
-        throw StateError('Google kimlik jetonu alınamadı.');
-      }
-      final credential = GoogleAuthProvider.credential(idToken: idToken);
-      return _auth.signInWithCredential(credential);
-    } on GoogleSignInException catch (e) {
-      if (e.code == GoogleSignInExceptionCode.canceled) {
-        throw StateError('Google girişi iptal edildi.');
-      }
-      rethrow;
-    }
+    final credential = await _googleCredential();
+    return _signInOrLink(credential, 'google.com');
   }
 
   Future<UserCredential> signInWithApple() async {
@@ -124,7 +159,7 @@ class AuthService {
       familyName: appleCredential.familyName,
     );
 
-    final userCredential = await _auth.signInWithCredential(oauthCredential);
+    final userCredential = await _signInOrLink(oauthCredential, 'apple.com');
 
     // Apple ad/soyad bilgisini YALNIZCA ilk girişte döner; Firebase
     // Apple credential bu alanları otomatik `user.displayName`'e yazmaz.
@@ -137,6 +172,61 @@ class AuthService {
     );
 
     return userCredential;
+  }
+
+  Future<OAuthCredential> _googleCredential() async {
+    await _ensureGoogleSignIn();
+    try {
+      final account = await GoogleSignIn.instance.authenticate(
+        scopeHint: const <String>['email', 'profile'],
+      );
+      final auth = account.authentication;
+      final idToken = auth.idToken;
+      if (idToken == null) {
+        throw StateError('Google kimlik jetonu alınamadı.');
+      }
+      return GoogleAuthProvider.credential(idToken: idToken);
+    } on GoogleSignInException catch (e) {
+      if (e.code == GoogleSignInExceptionCode.canceled) {
+        throw StateError('Google girişi iptal edildi.');
+      }
+      rethrow;
+    }
+  }
+
+  Future<UserCredential> _signInOrLink(
+    AuthCredential credential,
+    String providerId,
+  ) async {
+    final current = _auth.currentUser;
+    final providerIds = current?.providerData.map((p) => p.providerId) ??
+        const <String>[];
+    final first = resolveAuthConnect(
+      hasCurrentUser: current != null,
+      currentProviderIds: providerIds,
+      incomingProviderId: providerId,
+    );
+    if (first == AuthConnectResolution.signIn) {
+      return _auth.signInWithCredential(credential);
+    }
+    try {
+      return await current!.linkWithCredential(credential);
+    } on FirebaseAuthException catch (e) {
+      final collision = e.code == 'credential-already-in-use' ||
+          e.code == 'email-already-in-use' ||
+          e.code == 'provider-already-linked';
+      if (!collision) rethrow;
+      final afterCollision = resolveAuthConnect(
+        hasCurrentUser: true,
+        currentProviderIds: providerIds,
+        incomingProviderId: providerId,
+        linkCollision: true,
+      );
+      if (afterCollision == AuthConnectResolution.signIn) {
+        return _auth.signInWithCredential(credential);
+      }
+      rethrow;
+    }
   }
 
   Future<void> _maybeAttachAppleDisplayName(

@@ -28,6 +28,7 @@ import '../../core/theme/arin_backdrop_blur.dart';
 import '../../core/theme/arin_shell_background.dart';
 import '../../l10n/app_localizations.dart';
 import '../../core/providers/shared_preferences_provider.dart';
+import '../../data/services/auth_service.dart';
 import '../../data/services/habit_cloud_sync_service.dart';
 import '../../data/services/inspiration_engagement_sync_service.dart';
 import '../../data/services/local_data_wipe_service.dart';
@@ -62,6 +63,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
   late final TextEditingController _cityController;
   bool _locationLoading = false;
   bool _oauthBusy = false;
+  bool _signOutBusy = false;
   bool _accountDeleteBusy = false;
 
   @override
@@ -147,50 +149,46 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
     if (ok != true || !mounted) return;
 
     final prefs = ref.read(sharedPreferencesProvider);
-    if (isFirebaseReady) {
-      final user = FirebaseAuth.instance.currentUser;
-      if (user != null) {
-        try {
-          await HabitCloudSyncService.pushFromLocal(
-            uid: user.uid,
-            repo: ref.read(habitRepositoryProvider),
-            prefs: prefs,
-            force: true,
-            bypassForceCooldown: true,
-          );
-          await UserCloudBackupService.pushFromLocal(
-            uid: user.uid,
-            prefs: prefs,
-            force: true,
-          );
-        } catch (e) {
-          debugPrint('signOut pre-push failed: $e');
-        }
-      }
-      try {
-        await ref.read(authServiceProvider).signOut();
-      } catch (e) {
-        // signOut (RC logout / Firebase signOut / Google signOut) hata atsa
-        // bile yerel veri silme her durumda çalışmalı — aksi halde bir sonraki
-        // kullanıcı önceki kullanıcının habit/zikir/ayar verilerini görür.
-        debugPrint('signOut failed (continuing with local wipe): $e');
-        if (mounted) {
-          showArinTopToast(context, l10n.settingsAuthServiceUnavailable);
-        }
-      }
-    }
-
+    setState(() => _signOutBusy = true);
     try {
-      await LocalDataWipeService.wipeAll(prefs);
+      if (isFirebaseReady) {
+        final user = FirebaseAuth.instance.currentUser;
+        if (user != null) {
+          try {
+            await HabitCloudSyncService.pushFromLocal(
+              uid: user.uid,
+              repo: ref.read(habitRepositoryProvider),
+              prefs: prefs,
+              force: true,
+              bypassForceCooldown: true,
+            );
+            await UserCloudBackupService.pushFromLocal(
+              uid: user.uid,
+              prefs: prefs,
+              force: true,
+            );
+          } catch (e) {
+            debugPrint('signOut pre-push failed: $e');
+          }
+        }
+        await ref.read(authServiceProvider).signOut();
+      }
+      ref.invalidate(authUserProvider);
+      ref.invalidate(premiumEntitlementProvider);
+      ref.invalidate(currentAdminRoleProvider);
+      ref.invalidate(isCurrentUserAdminProvider);
+      ref.read(appRouterRefreshProvider).notifyAuthOrOnboarding();
+      if (mounted) {
+        showArinTopToast(context, l10n.settingsSignOutSuccess);
+      }
     } catch (e) {
-      debugPrint('LocalDataWipeService.wipeAll failed: $e');
-      if (!mounted) return;
-      showArinTopToast(context, l10n.settingsAccountDeleteRetryMessage);
-      return;
+      debugPrint('signOut failed: $e');
+      if (mounted) {
+        showArinTopToast(context, l10n.settingsAuthServiceUnavailable);
+      }
+    } finally {
+      if (mounted) setState(() => _signOutBusy = false);
     }
-    _invalidateAfterWipe();
-    ref.read(appRouterRefreshProvider).notifyAuthOrOnboarding();
-    if (mounted) context.go(AppRoutes.onboarding);
   }
 
   void _invalidateAfterWipe() {
@@ -601,7 +599,11 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                       _AccountCard(
                             onDark: onDark,
                             authAsync: authAsync,
-                            oauthBusy: _oauthBusy,
+                            profileName: ref
+                                .watch(userProfileProvider)
+                                .name
+                                ?.trim(),
+                            oauthBusy: _oauthBusy || _signOutBusy,
                             onGoogle: _signInGoogle,
                             onApple: _signInApple,
                           )
@@ -783,7 +785,8 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                         const SizedBox(height: 12),
                         _SessionActionsPanel(
                           onDark: onDark,
-                          sessionBusy: _oauthBusy || _accountDeleteBusy,
+                          sessionBusy:
+                              _oauthBusy || _signOutBusy || _accountDeleteBusy,
                           onSignOut: _signOut,
                           onDeleteAccount: _deleteAccount,
                         ).animate().fadeIn(delay: 400.ms),
@@ -853,6 +856,7 @@ class _AccountCard extends StatelessWidget {
   const _AccountCard({
     required this.onDark,
     required this.authAsync,
+    required this.profileName,
     required this.oauthBusy,
     required this.onGoogle,
     required this.onApple,
@@ -860,6 +864,7 @@ class _AccountCard extends StatelessWidget {
 
   final bool onDark;
   final AsyncValue<User?> authAsync;
+  final String? profileName;
   final bool oauthBusy;
   final VoidCallback onGoogle;
   final VoidCallback onApple;
@@ -896,9 +901,19 @@ class _AccountCard extends StatelessWidget {
             children: [
               authAsync.when(
                 data: (user) {
-                  final email = user?.email;
-                  final name = user?.displayName;
-                  if (user == null) {
+                  final email = user?.email?.trim().isNotEmpty == true
+                      ? user!.email!.trim()
+                      : user?.providerData
+                            .map((p) => p.email?.trim())
+                            .firstWhere(
+                              (e) => e != null && e.isNotEmpty,
+                              orElse: () => null,
+                            );
+                  final localName = profileName?.trim();
+                  final name = (localName != null && localName.isNotEmpty)
+                      ? localName
+                      : user?.displayName;
+                  if (user == null && (name == null || name.isEmpty)) {
                     return Text(
                       l10n.settingsGuestHint,
                       style: GoogleFonts.plusJakartaSans(
@@ -922,7 +937,7 @@ class _AccountCard extends StatelessWidget {
                           color: onDark ? Colors.white : AppColors.emeraldDark,
                         ),
                       ),
-                      if (email != null) ...[
+                      if (email != null && email.isNotEmpty) ...[
                         const SizedBox(height: 4),
                         Text(
                           email,
@@ -942,21 +957,28 @@ class _AccountCard extends StatelessWidget {
               ),
               authAsync.maybeWhen(
                 data: (user) {
-                  if (user != null) return const SizedBox.shrink();
+                  final showGoogle = !hasAuthProvider(user, 'google.com');
+                  final showApple =
+                      (defaultTargetPlatform == TargetPlatform.iOS ||
+                          defaultTargetPlatform == TargetPlatform.macOS) &&
+                      !hasAuthProvider(user, 'apple.com');
+                  if (!showGoogle && !showApple) {
+                    return const SizedBox.shrink();
+                  }
                   return Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       const SizedBox(height: 16),
-                      _OAuthSignInTile(
-                        onDark: onDark,
-                        busy: oauthBusy,
-                        icon: const _GoogleGMark(size: 20),
-                        title: l10n.settingsSignInGoogle,
-                        onTap: onGoogle,
-                      ),
-                      if (defaultTargetPlatform == TargetPlatform.iOS ||
-                          defaultTargetPlatform == TargetPlatform.macOS) ...[
-                        const SizedBox(height: 10),
+                      if (showGoogle)
+                        _OAuthSignInTile(
+                          onDark: onDark,
+                          busy: oauthBusy,
+                          icon: const _GoogleGMark(size: 20),
+                          title: l10n.settingsSignInGoogle,
+                          onTap: onGoogle,
+                        ),
+                      if (showGoogle && showApple) const SizedBox(height: 10),
+                      if (showApple)
                         _OAuthSignInTile(
                           onDark: onDark,
                           busy: oauthBusy,
@@ -970,7 +992,6 @@ class _AccountCard extends StatelessWidget {
                           title: l10n.settingsSignInApple,
                           onTap: onApple,
                         ),
-                      ],
                     ],
                   );
                 },

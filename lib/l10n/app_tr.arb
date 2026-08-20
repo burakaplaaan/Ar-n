@@ -44,7 +44,7 @@
   "settingsAccountFallback": "Hesap",
   "settingsSignInGoogle": "Google ile giriş",
   "settingsSignInApple": "Apple ile giriş",
-  "settingsSessionHint": "Uygulamayı sıfırlamak veya hesabı kaldırmak için:",
+  "settingsSessionHint": "Oturumu kapatmak veya hesabı silmek için:",
   "settingsSignOutAction": "Çıkış yap",
   "settingsDeleteAccountAction": "Hesabı ve verileri tamamen sil",
   "settingsLightThemeTitle": "Açık tema",
@@ -66,7 +66,8 @@
     }
   },
   "settingsSignOutDialogTitle": "Çıkış yap",
-  "settingsSignOutDialogBody": "Bilgilendirme slaytlarından başlayarak uygulama sıfırlanır. Bu cihazdaki tüm yerel veriler silinir; Firebase oturumunuz kapanır.",
+  "settingsSignOutDialogBody": "Google veya Apple oturumunuz kapanır. İsmin, alışkanlıkların ve ayarların bu cihazda kalır. Kurulum baştan başlamaz.",
+  "settingsSignOutSuccess": "Oturum kapatıldı.",
   "settingsDialogCancel": "İptal",
   "settingsDeleteAllDataDialogTitle": "Tüm verileri sil",
   "settingsDeleteAllDataDialogBody": "Misafir modundasınız. Bu cihazdaki tüm uygulama verileri kalıcı olarak silinir ve bilgilendirme ekranlarına dönersiniz.",

@@ -132,8 +132,7 @@ class AppLocalizationsTr extends AppLocalizations {
   String get settingsSignInApple => 'Apple ile giriş';
 
   @override
-  String get settingsSessionHint =>
-      'Uygulamayı sıfırlamak veya hesabı kaldırmak için:';
+  String get settingsSessionHint => 'Oturumu kapatmak veya hesabı silmek için:';
 
   @override
   String get settingsSignOutAction => 'Çıkış yap';
@@ -177,7 +176,10 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get settingsSignOutDialogBody =>
-      'Bilgilendirme slaytlarından başlayarak uygulama sıfırlanır. Bu cihazdaki tüm yerel veriler silinir; Firebase oturumunuz kapanır.';
+      'Google veya Apple oturumunuz kapanır. İsmin, alışkanlıkların ve ayarların bu cihazda kalır. Kurulum baştan başlamaz.';
+
+  @override
+  String get settingsSignOutSuccess => 'Oturum kapatıldı.';
 
   @override
   String get settingsDialogCancel => 'İptal';

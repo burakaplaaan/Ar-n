@@ -1,5 +1,5 @@
 // lib/data/services/local_data_wipe_service.dart
-// Çıkış / hesap sil: Hive + SharedPreferences + yerel bildirimler + widget
+// Hesap sil / tüm verileri sil: Hive + SharedPreferences + yerel bildirimler + widget
 // temizliği. Apple App Store 5.1.1(v) ve Google Play Data Safety gereklilikleri
 // için kullanıcıya ait tüm lokal yan etkilerin sıfırlanmasını garanti ediyoruz.
 

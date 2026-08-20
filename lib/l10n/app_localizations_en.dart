@@ -133,7 +133,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsSignInApple => 'Sign in with Apple';
 
   @override
-  String get settingsSessionHint => 'To reset the app or remove your account:';
+  String get settingsSessionHint => 'To sign out or delete your account:';
 
   @override
   String get settingsSignOutAction => 'Sign out';
@@ -177,7 +177,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settingsSignOutDialogBody =>
-      'The app will reset starting from onboarding slides. All local data on this device will be deleted and your Firebase session will be closed.';
+      'Your Google or Apple session will close. Your name, habits, and settings stay on this device. Onboarding will not start again.';
+
+  @override
+  String get settingsSignOutSuccess => 'Signed out.';
 
   @override
   String get settingsDialogCancel => 'Cancel';

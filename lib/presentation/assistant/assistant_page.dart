@@ -270,10 +270,7 @@ class _AssistantPageState extends ConsumerState<AssistantPage> {
         premiumState == PremiumAccessState.loading ||
         adminAsync.isLoading;
     final allowed = signedIn && (premium || admin);
-    final keyboardOpen = MediaQuery.viewInsetsOf(context).bottom > 0;
-    final bottomPad = keyboardOpen
-        ? 12.0
-        : ArinShellLayout.bottomContentPadding(context);
+    final bottomPad = ArinShellLayout.assistantComposerBottomPadding(context);
 
     return SizedBox.expand(
       child: ArinShellBackground.buildLayered(

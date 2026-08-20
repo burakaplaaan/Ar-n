@@ -132,7 +132,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get settingsSignInApple => 'تسجيل الدخول عبر Apple';
 
   @override
-  String get settingsSessionHint => 'لإعادة ضبط التطبيق أو إزالة الحساب:';
+  String get settingsSessionHint => 'لإغلاق الجلسة أو حذف الحساب:';
 
   @override
   String get settingsSignOutAction => 'تسجيل الخروج';
@@ -175,7 +175,10 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get settingsSignOutDialogBody =>
-      'سيتم إعادة ضبط التطبيق بدءاً من شرائح التعريف. ستُحذف جميع البيانات المحلية على هذا الجهاز وسيتم إنهاء جلسة Firebase.';
+      'سيتم إغلاق جلسة Google أو Apple. يبقى اسمك وعاداتك وإعداداتك على هذا الجهاز. لن تبدأ خطوات الإعداد من جديد.';
+
+  @override
+  String get settingsSignOutSuccess => 'تم إغلاق الجلسة.';
 
   @override
   String get settingsDialogCancel => 'إلغاء';
