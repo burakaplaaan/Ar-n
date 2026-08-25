@@ -139,25 +139,30 @@ QuitNotificationCopy _inspiration(
   List<QuitNotificationWisdomSnippet> items,
 ) {
   final wanted = (event.wisdomKind ?? 'not').toLowerCase();
-  QuitNotificationWisdomSnippet? match;
-  for (final item in items) {
-    if (item.kind.toLowerCase() == wanted && item.body.trim().isNotEmpty) {
-      match = item;
-      break;
-    }
+  final rotation = (event.wisdomIndex ?? 0).abs();
+  var pool = [
+    for (final item in items)
+      if (item.kind.toLowerCase() == wanted && item.body.trim().isNotEmpty)
+        item,
+  ];
+  // İstenen türde içerik yoksa tüm havuzdan seç; başlık her durumda
+  // seçilen içeriğin gerçek türünü taşır (Tıp başlıklı ayet gösterilmez).
+  if (pool.isEmpty) {
+    pool = [
+      for (final item in items)
+        if (item.body.trim().isNotEmpty) item,
+    ];
   }
-  match ??= items.cast<QuitNotificationWisdomSnippet?>().firstWhere(
-    (e) => (e?.body.trim().isNotEmpty ?? false),
-    orElse: () => null,
-  );
-  final kindLabel = _wisdomKindLabel(wanted, localeCode);
-  if (match != null) {
+  if (pool.isNotEmpty) {
+    final match = pool[rotation % pool.length];
+    final kindLabel = _wisdomKindLabel(match.kind.toLowerCase(), localeCode);
     final source = match.source.trim();
-    final body = source.isEmpty ? match.body.trim() : '${match.body.trim()}\n$source';
+    final body =
+        source.isEmpty ? match.body.trim() : '${match.body.trim()}\n$source';
     return QuitNotificationCopy(title: kindLabel, body: body);
   }
   return QuitNotificationCopy(
-    title: kindLabel,
+    title: _wisdomKindLabel(wanted, localeCode),
     body: _fallbackWisdom(event.templateId, wanted, localeCode),
   );
 }

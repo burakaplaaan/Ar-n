@@ -1012,7 +1012,11 @@ class _PerPrayerReminderListSheetState
   Future<void> _applyDurationsToAllPrayers() async {
     await PrayerReminderPrefs.ensurePerPrayerPrefsReady(widget.prefs);
     if (!mounted || !context.mounted) return;
-    final l10n = AppLocalizations.of(context)!;
+    // Release'de element deactivate edilmişken (sheet kapanma anı) mounted
+    // hâlâ true olabilir ama inherited lookup null döner; `!` yerine null
+    // kontrolü kullan — Crashlytics "Null check operator" çökmesi buydu.
+    final l10n = AppLocalizations.of(context);
+    if (l10n == null) return;
     final chosen = await _openDualReminderSheet(
       context,
       prayerTitle: l10n.reminderAllPrayersDurationTarget,
@@ -1031,15 +1035,16 @@ class _PerPrayerReminderListSheetState
       chosen.second,
     );
     await widget.onReschedule();
-    setState(() {});
     if (!mounted) return;
+    setState(() {});
     showArinTopToast(context, l10n.reminderDurationsAppliedAllSuccess);
   }
 
   Future<void> _openEditor(int i) async {
     await PrayerReminderPrefs.ensurePerPrayerPrefsReady(widget.prefs);
     if (!mounted || !context.mounted) return;
-    final l10n = AppLocalizations.of(context)!;
+    final l10n = AppLocalizations.of(context);
+    if (l10n == null) return;
     final chosen = await _openDualReminderSheet(
       context,
       prayerTitle: _prayerSlotLabel(l10n, i),
@@ -1063,6 +1068,7 @@ class _PerPrayerReminderListSheetState
       chosen.second,
     );
     await widget.onReschedule();
+    if (!mounted) return;
     setState(() {});
   }
 

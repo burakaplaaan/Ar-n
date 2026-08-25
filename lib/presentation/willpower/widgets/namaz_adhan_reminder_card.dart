@@ -18,6 +18,7 @@ import '../../shared/widgets/arin_popup.dart';
 import '../../../core/constants/app_text_styles.dart';
 import '../../../core/constants/product_metric_features.dart';
 import '../../../core/providers/shared_preferences_provider.dart';
+import '../../../data/services/aladhan_service.dart';
 import '../../../data/services/arin_local_notifications_plugin.dart';
 import '../../../data/services/ad_gate_service.dart';
 import '../../../data/services/admob_service.dart';
@@ -55,15 +56,31 @@ String _prayerSlotLabel(AppLocalizations l10n, int i) {
   }
 }
 
+/// Zamanlayıcı bağımlılıkları. `ref` GEÇERLİYKEN (build / metot girişi)
+/// yakalanır; sheet callback'leri kart dispose olduktan sonra tetiklenebilir
+/// ve o anda `ref.read` "Cannot use 'ref' after the widget was disposed"
+/// fırlatır (Crashlytics'teki _rescheduleNotifications çökmesi). Servisler
+/// singleton olduğundan erken yakalamak davranışı değiştirmez.
+typedef _SchedulerDeps = ({
+  SharedPreferences prefs,
+  AladhanService aladhan,
+  LocationService location,
+});
+
+_SchedulerDeps _captureSchedulerDeps(WidgetRef ref) => (
+  prefs: ref.read(sharedPreferencesProvider),
+  aladhan: ref.read(aladhanServiceProvider),
+  location: ref.read(locationServiceProvider),
+);
+
 Future<void> _rescheduleNotifications(
-  WidgetRef ref, {
+  _SchedulerDeps deps, {
   bool force = false,
 }) async {
-  final prefs = ref.read(sharedPreferencesProvider);
   await PrayerNotificationScheduler.ensurePrayerNotificationsIfEnabled(
-    prefs: prefs,
-    aladhan: ref.read(aladhanServiceProvider),
-    location: ref.read(locationServiceProvider),
+    prefs: deps.prefs,
+    aladhan: deps.aladhan,
+    location: deps.location,
     force: force,
   );
 }
@@ -153,6 +170,9 @@ Future<bool?> _openPerPrayerReminderList(
   required Future<void> Function() onBildirimSesi,
   required Future<bool> Function(int secondValue) onSecondReminderGate,
 }) {
+  // ref burada (çağıran mounted iken) okunur; callback sheet ömrü boyunca
+  // ref'e dokunmadan çalışır.
+  final deps = _captureSchedulerDeps(ref);
   return showModalBottomSheet<bool>(
     context: context,
     isScrollControlled: true,
@@ -164,7 +184,7 @@ Future<bool?> _openPerPrayerReminderList(
     builder: (ctx) => _PerPrayerReminderListSheet(
       prefs: prefs,
       isEnablingFlow: isEnablingFlow,
-      onReschedule: () => _rescheduleNotifications(ref, force: true),
+      onReschedule: () => _rescheduleNotifications(deps, force: true),
       onBildirimSesi: onBildirimSesi,
       onSecondReminderGate: onSecondReminderGate,
     ),
@@ -224,6 +244,8 @@ class _NamazAdhanReminderCardState
     HapticFeedback.selectionClick();
     if (!_supported) return;
     final l10n = AppLocalizations.of(context)!;
+    // await'lerden sonra widget dispose olabilir → deps'i şimdi yakala.
+    final schedulerDeps = _captureSchedulerDeps(ref);
 
     final ok = await PrayerNotificationScheduler.requestPermissions();
     if (!ok) {
@@ -265,12 +287,13 @@ class _NamazAdhanReminderCardState
     unawaited(
       ProductMetricsService.featureOpen(ProductMetricFeatures.prayerAlarm),
     );
-    await _rescheduleNotifications(ref, force: true);
+    await _rescheduleNotifications(schedulerDeps, force: true);
     if (mounted) setState(() => _enabledOverride = null);
   }
 
   Future<void> _openPrayerSoundPicker(SharedPreferences prefs) async {
     if (!_supported) return;
+    final schedulerDeps = _captureSchedulerDeps(ref);
     await PrayerReminderPrefs.ensurePerPrayerPrefsReady(prefs);
     if (!mounted) return;
     final applied = await showModalBottomSheet<bool>(
@@ -284,7 +307,8 @@ class _NamazAdhanReminderCardState
       ),
       builder: (ctx) => _PrayerNotificationSoundSheet(
         prefs: prefs,
-        onAfterSoundChange: () => _rescheduleNotifications(ref, force: true),
+        onAfterSoundChange: () =>
+            _rescheduleNotifications(schedulerDeps, force: true),
       ),
     );
     if (applied != true || !mounted) return;
@@ -310,6 +334,7 @@ class _NamazAdhanReminderCardState
     SharedPreferences prefs,
     int i,
   ) async {
+    final schedulerDeps = _captureSchedulerDeps(ref);
     await PrayerReminderPrefs.ensurePerPrayerPrefsReady(prefs);
     if (!mounted || !context.mounted) return;
     final l10n = AppLocalizations.of(context)!;
@@ -331,16 +356,22 @@ class _NamazAdhanReminderCardState
       i,
       chosen.second,
     );
-    await _rescheduleNotifications(ref, force: true);
+    await _rescheduleNotifications(schedulerDeps, force: true);
     if (mounted) setState(() {});
   }
 
   Future<bool> _ensureSecondReminderAccess(int secondValue) async {
     if (secondValue < 0) return true;
+    // Sheet callback'i kart dispose edildikten sonra tetiklenebilir; o anda
+    // ref kullanmak "Cannot use 'ref' after the widget was disposed" fırlatır.
+    if (!mounted) return false;
     final entitlementAsync = ref.read(premiumEntitlementProvider);
     if (entitlementAsync.isLoading || entitlementAsync.hasError) {
       if (!mounted) return false;
-      showArinTopToast(context, AppLocalizations.of(context)!.premiumLoadingWait);
+      final l10n = AppLocalizations.of(context);
+      if (l10n != null) {
+        showArinTopToast(context, l10n.premiumLoadingWait);
+      }
       return false;
     }
     final entitlement = await ref.read(premiumEntitlementProvider.future);
@@ -356,7 +387,8 @@ class _NamazAdhanReminderCardState
     // ödüllü reklam arka planda yüklensin ki "izle"ye basınca anında açılsın.
     // (2. alarm geçiş reklamı göstermez → yalnızca ödüllü ısıtılır.)
     AdMobService.preloadRewarded();
-    final l10n = AppLocalizations.of(context)!;
+    final l10n = AppLocalizations.of(context);
+    if (l10n == null) return false;
     final accepted = await showArinConfirm(
       context: context,
       title: l10n.secondAlarmPremiumFeature,
@@ -365,7 +397,7 @@ class _NamazAdhanReminderCardState
       confirmLabel: l10n.openAfterAd,
       icon: Icons.alarm_rounded,
     );
-    if (accepted != true) return false;
+    if (accepted != true || !mounted) return false;
     final rewarded = await ref
         .read(adMobServiceProvider)
         .showRewarded(ArinAdUnit.rewardedUnlock);

@@ -11,6 +11,26 @@ import '../../../core/firebase/firebase_bootstrap.dart';
 import '../../../data/services/product_metrics_service.dart';
 import '../../../data/services/purchase_service.dart';
 
+/// Cihazdan çıkamayan / sunucuya ulaşamayan çağrı: ham `INTERNAL`,
+/// `unavailable` veya `deadline-exceeded`. Bu hatalar sunucu tarafında iz
+/// bırakmaz ve kısa bir gecikmeyle tek seferlik yeniden denemeye uygundur.
+bool hilalDuelIsTransientTransportError({
+  required String code,
+  required String message,
+}) {
+  final normalizedCode = code.toLowerCase().trim();
+  if (normalizedCode == 'unavailable' ||
+      normalizedCode == 'deadline-exceeded') {
+    return true;
+  }
+  if (normalizedCode != 'internal') return false;
+  final lowerMessage = message.trim().toLowerCase();
+  return lowerMessage.isEmpty ||
+      lowerMessage == 'internal' ||
+      lowerMessage == 'unknown' ||
+      lowerMessage == 'internal error';
+}
+
 /// Cached quiz credentials are invalid once Firebase [currentUser] is gone
 /// (sign-out / account transition). Recreate session; never implies overwriting
 /// an existing Google/Apple user (caller only custom-token signs in when null).
@@ -773,11 +793,33 @@ class HilalDuelRepository implements HilalDuelRepositoryApi {
 
   @override
   Future<HilalDuelMatchStart> startMatch(String name) async {
-    final result = await _call('startQuizMatch', {
-      ...await _credentials(),
-      'name': _safeName(name),
-    });
-    return _startFromMap(result);
+    try {
+      final result = await _call('startQuizMatch', {
+        ...await _credentials(),
+        'name': _safeName(name),
+      });
+      return _startFromMap(result);
+    } on FirebaseFunctionsException catch (error) {
+      // Transport hatası (App Check / ağ): istek sunucuya hiç ulaşmamıştır.
+      // startQuizMatch reentry-güvenli olduğundan tek yeniden deneme zararsız;
+      // gerçek sunucu hataları (özel mesajlı) olduğu gibi fırlatılır.
+      if (!hilalDuelIsTransientTransportError(
+        code: error.code,
+        message: error.message ?? '',
+      )) {
+        rethrow;
+      }
+      debugPrint(
+        'HilalDuel startMatch transport hatası, yeniden deneniyor: '
+        '${error.code} ${error.message}',
+      );
+      await Future<void>.delayed(const Duration(milliseconds: 1200));
+      final retried = await _call('startQuizMatch', {
+        ...await _credentials(),
+        'name': _safeName(name),
+      });
+      return _startFromMap(retried);
+    }
   }
 
   @override

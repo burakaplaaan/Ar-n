@@ -368,6 +368,16 @@ class HilalDuelController extends ChangeNotifier {
       errorMessage = 'Eşleşme başlatılamadı. Tekrar dene.';
     } catch (error) {
       if (_disposed) return;
+      // Teşhis: ham kod/mesaj `flutter run` çıktısında görünsün (App Check /
+      // ağ hatası mı, sunucu hatası mı ayırt edilebilsin).
+      if (error is FirebaseFunctionsException) {
+        debugPrint(
+          'HilalDuel startMatchmaking hatası: '
+          '${error.code} | ${error.message} | ${error.details}',
+        );
+      } else {
+        debugPrint('HilalDuel startMatchmaking hatası: $error');
+      }
       try {
         final bundle = await _repository.loadProfile(_displayName());
         if (_disposed) return;

@@ -2,8 +2,33 @@
   "wisdom": [
     {
       "kind": "ayet",
-      "body": "“Mümin erkeklere söyle, gözlerini harama çevirsinler…” (Nur 24:30-31 — mahremiyet ve iffet, meal özeti)",
+      "body": "“Mü’min erkeklere söyle, gözlerini haramdan sakınsınlar, ırzlarını korusunlar. Bu davranış onlar için daha nezihtir.” (Nûr 24:30 — meal)",
       "source": "Kur’an-ı Kerim"
+    },
+    {
+      "kind": "ayet",
+      "body": "“Zinaya yaklaşmayın. Çünkü o, son derece çirkin bir iştir ve çok kötü bir yoldur.” (İsrâ 17:32 — meal)",
+      "source": "Kur’an-ı Kerim"
+    },
+    {
+      "kind": "ayet",
+      "body": "“Mü’minler gerçekten kurtuluşa ermişlerdir… Onlar iffetlerini korurlar.” (Mü’minûn 23:1 ve 5 — meal)",
+      "source": "Kur’an-ı Kerim"
+    },
+    {
+      "kind": "ayet",
+      "body": "“…Şüphesiz namaz, hayâsızlıktan ve kötülükten alıkoyar.” (Ankebût 29:45 — meal)",
+      "source": "Kur’an-ı Kerim"
+    },
+    {
+      "kind": "ayet",
+      "body": "“Ben nefsimi temize çıkarmam. Çünkü nefis, Rabbimin merhamet ettiği hariç, olanca şiddetiyle kötülüğü emreder.” (Yûsuf 12:53 — meal)",
+      "source": "Kur’an-ı Kerim"
+    },
+    {
+      "kind": "sünnet",
+      "body": "“Ey gençler topluluğu! Evlenmeye gücü yeten evlensin… Gücü yetmeyen ise oruç tutsun; çünkü oruç onun için bir kalkandır.”",
+      "source": "Buhârî, Nikâh 2; Müslim, Nikâh 1"
     },
     {
       "kind": "sünnet",
@@ -11,14 +36,29 @@
       "source": "Hadis külliyatı"
     },
     {
+      "kind": "tıp",
+      "body": "Dürtü bir dalga gibidir: çoğu istek 10–20 dakika içinde zirve yapıp söner. O süreyi yürüyüş, abdest veya bir meşguliyetle geçirmek döngüyü kırar.",
+      "source": "Davranış bilimi"
+    },
+    {
+      "kind": "tıp",
+      "body": "Tetikleyiciden uzak geçen her gün, beynin ödül sistemindeki alışkanlık izini zayıflatır; düzenli uyku ve egzersiz bu toparlanmayı hızlandırır.",
+      "source": "Davranış bilimi"
+    },
+    {
       "kind": "not",
-      "body": "Anlık arzu dalgası geçicidir; o anda durup Allah’a sığınmak ve ortamı değiştirmek güçlü bir sündür.",
+      "body": "Anlık arzu dalgası geçicidir; o anda durup Allah’a sığınmak ve ortamı değiştirmek güçlü bir sünnettir.",
       "source": "Pratik maneviyat"
     },
     {
       "kind": "not",
       "body": "Mahrem sohbetleri ve gereksiz yalnızlıkları azaltmak sınır ihlalini önlemeye yardım eder.",
       "source": "Sınır"
+    },
+    {
+      "kind": "not",
+      "body": "Düşüş anı son değildir; istiğfar et, niyeti tazele ve kaldığın yerden devam et. Tövbe kapısı daima açıktır.",
+      "source": "Pratik maneviyat"
     }
   ],
   "tips": [

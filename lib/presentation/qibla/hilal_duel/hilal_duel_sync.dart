@@ -350,8 +350,11 @@ String hilalDuelFriendlyFunctionsMessage({
           ? trimmed
           : 'Bu işlem için yetki doğrulanamadı. Tekrar dene.';
     case 'internal':
+      // Ham INTERNAL: istek çoğu zaman cihazdan çıkamıyor (App Check /
+      // Play Integrity / ağ) — sunucu hatası gibi gösterme.
       return _isRawFunctionsCode(lowerMessage)
-          ? 'Eşleşme başlatılamadı. Tekrar dene.'
+          ? 'Sunucuya ulaşılamadı. İnternet bağlantını ve '
+              'Google Play Hizmetleri\'ni kontrol edip tekrar dene.'
           : trimmed;
     default:
       return trimmed.isEmpty || _isRawFunctionsCode(lowerMessage)

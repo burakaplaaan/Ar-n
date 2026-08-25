@@ -597,14 +597,66 @@ void main() {
     });
   });
 
+  group('hilalDuelIsTransientTransportError', () {
+    test('raw INTERNAL / unavailable / deadline-exceeded retryable', () {
+      expect(
+        hilalDuelIsTransientTransportError(code: 'internal', message: 'INTERNAL'),
+        isTrue,
+      );
+      expect(
+        hilalDuelIsTransientTransportError(code: 'internal', message: ''),
+        isTrue,
+      );
+      expect(
+        hilalDuelIsTransientTransportError(code: 'unavailable', message: 'x'),
+        isTrue,
+      );
+      expect(
+        hilalDuelIsTransientTransportError(
+          code: 'deadline-exceeded',
+          message: '',
+        ),
+        isTrue,
+      );
+    });
+
+    test('gerçek sunucu hataları yeniden denenmez', () {
+      // Sunucunun bilinçli internal mesajı (özel metin) transport sayılmaz.
+      expect(
+        hilalDuelIsTransientTransportError(
+          code: 'internal',
+          message: 'Eşleşme başlatılamadı. Tekrar dene.',
+        ),
+        isFalse,
+      );
+      expect(
+        hilalDuelIsTransientTransportError(
+          code: 'resource-exhausted',
+          message: 'Oynamak için reklam izleyerek can kazanmalısın.',
+        ),
+        isFalse,
+      );
+      expect(
+        hilalDuelIsTransientTransportError(
+          code: 'failed-precondition',
+          message: 'INTERNAL',
+        ),
+        isFalse,
+      );
+    });
+  });
+
   group('hilalDuelFriendlyFunctionsMessage', () {
     test('hides raw INTERNAL from the lobby', () {
+      // Ham INTERNAL = istek cihazdan çıkamadı (App Check / ağ); kullanıcıya
+      // bağlantı odaklı yönlendirme gösterilir, sahte eşleşme hatası değil.
       expect(
         hilalDuelFriendlyFunctionsMessage(
           code: 'internal',
           message: 'INTERNAL',
         ),
-        'Eşleşme başlatılamadı. Tekrar dene.',
+        'Sunucuya ulaşılamadı. İnternet bağlantını ve '
+        'Google Play Hizmetleri\'ni kontrol edip tekrar dene.',
       );
       expect(
         hilalDuelFriendlyFunctionsMessage(

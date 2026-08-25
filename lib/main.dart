@@ -79,7 +79,10 @@ Future<void> main() async {
           msg.contains('ClientException') ||
           msg.contains('SocketException') ||
           msg.contains('TimeoutException') ||
-          msg.contains('Connection closed');
+          msg.contains('Connection closed') ||
+          // Offline'da prayerTimesProvider'ın beklenen hatası — kullanıcıya
+          // UI'da retry gösteriliyor, gerçek crash değil.
+          msg.contains('Namaz vakitleri alınamadı');
       try {
         FirebaseCrashlytics.instance.recordError(
           error,

@@ -20,6 +20,7 @@ class QuitPlannedNotification {
     this.metricId,
     this.percent,
     this.wisdomKind,
+    this.wisdomIndex,
     this.tipIndex,
   });
 
@@ -34,6 +35,9 @@ class QuitPlannedNotification {
   final String? metricId;
   final int? percent;
   final String? wisdomKind;
+
+  /// Aynı türdeki içerikler arasında dönmek için döngü sayacı.
+  final int? wisdomIndex;
   final int? tipIndex;
 
   String get payload => 'quit_program|$habitId|$tab';
@@ -130,6 +134,7 @@ List<QuitPlannedNotification> buildQuitNotificationPlan({
   final content = _contentEvents(
     habitId: habitId,
     templateId: templateId,
+    clockStartedAt: start,
     now: now,
     horizonEnd: horizonEnd,
   )..sort((a, b) => a.fireAt.compareTo(b.fireAt));
@@ -222,29 +227,38 @@ List<QuitPlannedNotification> _recoveryEvents({
 }
 
 const _wisdomKinds = ['ayet', 'sünnet', 'tıp', 'not'];
+const _inspirationEveryDays = 7;
+const _tipsEveryDays = 9;
 
+/// İçerik bildirimleri arınma başlangıcına çapalıdır: plan her uygulama
+/// açılışında yeniden kurulsa bile ateşleme günleri kaymaz. Böylece ilham
+/// gerçekten 7 günde bir gelir ve döngü sayacı zamanla ilerlediği için
+/// içerik her seferinde bir sonrakine döner.
 List<QuitPlannedNotification> _contentEvents({
   required String habitId,
   required String templateId,
+  required DateTime clockStartedAt,
   required DateTime now,
   required DateTime horizonEnd,
 }) {
   final salt = _stableSalt(habitId);
-  final inspirationOffsetDays = 1 + (salt % 2);
-  final tipsOffsetDays = 2 + ((salt >> 3) % 3);
+  final anchor = DateTime(
+    clockStartedAt.year,
+    clockStartedAt.month,
+    clockStartedAt.day,
+  );
   final out = <QuitPlannedNotification>[];
 
-  var inspirationDay = DateTime(now.year, now.month, now.day)
-      .add(Duration(days: inspirationOffsetDays));
-  var kindIndex = salt % _wisdomKinds.length;
+  final daysSinceStart = now.difference(anchor).inDays;
+
+  // Bir önceki döngüden başla; geçmişte kalanlar isAfter(now) ile elenir.
+  // Böylece ateşleme gününün sabahında kurulan plan o günü atlamaz.
+  var cycle = daysSinceStart <= 0
+      ? 1
+      : (daysSinceStart ~/ _inspirationEveryDays).clamp(1, 1 << 30);
   while (true) {
-    final fireAt = DateTime(
-      inspirationDay.year,
-      inspirationDay.month,
-      inspirationDay.day,
-      16,
-      0,
-    );
+    final fireDay = anchor.add(Duration(days: cycle * _inspirationEveryDays));
+    final fireAt = DateTime(fireDay.year, fireDay.month, fireDay.day, 16, 0);
     if (fireAt.isAfter(horizonEnd)) break;
     if (fireAt.isAfter(now)) {
       out.add(
@@ -254,25 +268,20 @@ List<QuitPlannedNotification> _contentEvents({
           habitId: habitId,
           templateId: templateId,
           tab: 'progress',
-          wisdomKind: _wisdomKinds[kindIndex % _wisdomKinds.length],
+          wisdomKind: _wisdomKinds[(salt + cycle) % _wisdomKinds.length],
+          wisdomIndex: salt + cycle,
         ),
       );
     }
-    inspirationDay = inspirationDay.add(const Duration(days: 5));
-    kindIndex++;
+    cycle++;
   }
 
-  var tipsDay = DateTime(now.year, now.month, now.day)
-      .add(Duration(days: tipsOffsetDays));
-  var tipIndex = salt % 12;
+  var tipCycle = daysSinceStart <= 0
+      ? 1
+      : (daysSinceStart ~/ _tipsEveryDays).clamp(1, 1 << 30);
   while (true) {
-    final fireAt = DateTime(
-      tipsDay.year,
-      tipsDay.month,
-      tipsDay.day,
-      18,
-      30,
-    );
+    final fireDay = anchor.add(Duration(days: tipCycle * _tipsEveryDays));
+    final fireAt = DateTime(fireDay.year, fireDay.month, fireDay.day, 18, 30);
     if (fireAt.isAfter(horizonEnd)) break;
     if (fireAt.isAfter(now)) {
       out.add(
@@ -282,12 +291,11 @@ List<QuitPlannedNotification> _contentEvents({
           habitId: habitId,
           templateId: templateId,
           tab: 'tips',
-          tipIndex: tipIndex,
+          tipIndex: salt + tipCycle,
         ),
       );
     }
-    tipsDay = tipsDay.add(const Duration(days: 8));
-    tipIndex++;
+    tipCycle++;
   }
   return out;
 }

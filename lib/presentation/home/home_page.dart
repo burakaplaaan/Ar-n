@@ -95,7 +95,13 @@ class _HomePageState extends ConsumerState<HomePage> {
                 .read(locationServiceProvider)
                 .clearPrayerLocationThrottle();
             ref.invalidate(prayerTimesProvider);
-            await ref.read(prayerTimesProvider.future);
+            // Offline'da provider "Namaz vakitleri alınamadı" fırlatır; burada
+            // yakalanmazsa RefreshIndicator future'ı zone'a taşır ve Crashlytics
+            // fatal crash sayar. UI hata durumunu zaten `ref.watch` ile
+            // gösteriyor — burada yutmak güvenli.
+            try {
+              await ref.read(prayerTimesProvider.future);
+            } catch (_) {}
           },
           child: CustomScrollView(
             physics: const BouncingScrollPhysics(

@@ -54,6 +54,14 @@ class _BreathingExercisePageState extends ConsumerState<BreathingExercisePage>
   DateTime? _phaseEndsAt;
   bool _isDisposing = false;
 
+  /// `dispose()` içinde `ref.read` KULLANILAMAZ: sayfa normal pop ile
+  /// kapanırken çalışır gibi görünse de, widget ağacı toplu söküldüğünde
+  /// (route ağacı yeniden kurulurken / uygulama kapanırken) `ref` geçersizdir
+  /// ve "Cannot use ref after the widget was disposed" fırlatır — Crashlytics
+  /// #1 çökmesi buydu. Notifier `initState`'te yakalanır, dispose'da ref'siz
+  /// kullanılır.
+  late final StateController<bool> _bottomNavHiddenController;
+
   int get _phaseIndex => _phase.index;
 
   @override
@@ -65,6 +73,9 @@ class _BreathingExercisePageState extends ConsumerState<BreathingExercisePage>
     // (kullanıcı geri bildirimi). Seans boyunca ekranı uyanık tut; sayfadan
     // çıkışta [dispose] içinde mutlaka serbest bırakılır.
     _enableWakelock();
+    _bottomNavHiddenController = ref.read(
+      breathingBottomNavHiddenProvider.notifier,
+    );
     _heartbeatAudio = BreathingHeartbeatAudio();
     unawaited(_heartbeatAudio.prepare());
     unawaited(BreathingHaptics.init());
@@ -104,7 +115,7 @@ class _BreathingExercisePageState extends ConsumerState<BreathingExercisePage>
   }
 
   void _beginSession() {
-    ref.read(breathingBottomNavHiddenProvider.notifier).state = true;
+    _bottomNavHiddenController.state = true;
     _introExitController.reset();
     unawaited(_heartbeatAudio.prepare());
     _idleMotionController.stop();
@@ -119,7 +130,7 @@ class _BreathingExercisePageState extends ConsumerState<BreathingExercisePage>
   }
 
   void _resetToIntro() {
-    ref.read(breathingBottomNavHiddenProvider.notifier).state = false;
+    _bottomNavHiddenController.state = false;
     _cancelPhaseTimers();
     _scaleController.stop();
     _pulseController.stop();
@@ -260,7 +271,12 @@ class _BreathingExercisePageState extends ConsumerState<BreathingExercisePage>
     _isDisposing = true;
     _cancelPhaseTimers();
     _disableWakelock();
-    ref.read(breathingBottomNavHiddenProvider.notifier).state = false;
+    // ProviderContainer'ın kendisi de yıkılıyor olabilir (uygulama kapanışı);
+    // bu durumda state setter StateError fırlatır — cleanup zaten anlamsız,
+    // sessizce yut.
+    try {
+      _bottomNavHiddenController.state = false;
+    } catch (_) {}
     _heartbeatAudio.dispose();
     _scaleController.dispose();
     _pulseController.dispose();
@@ -411,7 +427,7 @@ class _BreathingExercisePageState extends ConsumerState<BreathingExercisePage>
     _isDisposing = true;
     _cancelPhaseTimers();
     BreathingHaptics.lightTap();
-    ref.read(breathingBottomNavHiddenProvider.notifier).state = false;
+    _bottomNavHiddenController.state = false;
     _heartbeatAudio.stop();
     _scaleController.stop();
     _pulseController.stop();

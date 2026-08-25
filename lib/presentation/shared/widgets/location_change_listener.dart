@@ -68,6 +68,9 @@ class _LocationChangeListenerState extends ConsumerState<LocationChangeListener>
   }
 
   Future<void> _checkLocation() async {
+    // postFrameCallback aynı frame içinde dispose sonrası da tetiklenebilir;
+    // o durumda ref kullanmak "ref after dispose" fırlatır.
+    if (!mounted) return;
     final prefs = ref.read(sharedPreferencesProvider);
     final onboardingDone = prefs.getBool('onboarding_completed') ?? false;
     if (!onboardingDone) return;

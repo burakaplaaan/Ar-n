@@ -141,6 +141,100 @@ void main() {
     expect(kinds, containsAll(['ayet', 'sünnet', 'tıp', 'not']));
   });
 
+  test('ilham bildirimi 7 günde bir gelir ve başlangıca çapalıdır', () {
+    final now = start.add(const Duration(hours: 1));
+    final fireAts = planAt(now: now)
+        .where((e) => e.kind == QuitNotificationKind.inspiration)
+        .map((e) => e.fireAt)
+        .toList();
+    expect(fireAts, isNotEmpty);
+    for (var i = 1; i < fireAts.length; i++) {
+      expect(fireAts[i].difference(fireAts[i - 1]).inDays, 7);
+    }
+  });
+
+  test('plan her gün yeniden kurulsa da ilham günleri kaymaz', () {
+    DateTime? firstUpcoming(DateTime now) {
+      final events = planAt(now: now)
+          .where((e) => e.kind == QuitNotificationKind.inspiration)
+          .toList();
+      return events.isEmpty ? null : events.first.fireAt;
+    }
+
+    final day2 = firstUpcoming(start.add(const Duration(days: 2, hours: 1)));
+    final day3 = firstUpcoming(start.add(const Duration(days: 3, hours: 1)));
+    final day4 = firstUpcoming(start.add(const Duration(days: 4, hours: 1)));
+    expect(day2, isNotNull);
+    // Uygulama her gün açılsa bile aynı 7. gün hedeflenir; her açılışta
+    // "yarın yeni bildirim" üretilmez.
+    expect(day3, day2);
+    expect(day4, day2);
+  });
+
+  test('ilham döngü sayacı zamanla ilerler — içerik hep aynı kalmaz', () {
+    final now = start.add(const Duration(hours: 1));
+    final indexes = planAt(now: now)
+        .where((e) => e.kind == QuitNotificationKind.inspiration)
+        .map((e) => e.wisdomIndex)
+        .toList();
+    expect(indexes.toSet().length, indexes.length);
+  });
+
+  test('istenen türde içerik yoksa başlık seçilen içeriğin türünü taşır', () {
+    const wisdom = [
+      QuitNotificationWisdomSnippet(
+        kind: 'ayet',
+        body: 'Örnek ayet meali',
+        source: 'Kur’an-ı Kerim',
+      ),
+    ];
+    final event = QuitPlannedNotification(
+      fireAt: DateTime(2026, 2, 1, 16),
+      kind: QuitNotificationKind.inspiration,
+      habitId: 'h1',
+      templateId: WillpowerTemplates.quitZina,
+      tab: 'progress',
+      wisdomKind: 'tıp',
+      wisdomIndex: 3,
+    );
+    final copy = resolveQuitNotificationCopy(
+      event: event,
+      localeCode: 'tr',
+      wisdom: wisdom,
+    );
+    expect(copy.title, 'Ayet');
+    expect(copy.body, contains('Örnek ayet meali'));
+  });
+
+  test('aynı türde birden çok içerik varsa döngü sayacıyla döner', () {
+    const wisdom = [
+      QuitNotificationWisdomSnippet(kind: 'ayet', body: 'Ayet 1', source: ''),
+      QuitNotificationWisdomSnippet(kind: 'ayet', body: 'Ayet 2', source: ''),
+      QuitNotificationWisdomSnippet(kind: 'ayet', body: 'Ayet 3', source: ''),
+    ];
+    QuitNotificationCopy copyAt(int index) {
+      return resolveQuitNotificationCopy(
+        event: QuitPlannedNotification(
+          fireAt: DateTime(2026, 2, 1, 16),
+          kind: QuitNotificationKind.inspiration,
+          habitId: 'h1',
+          templateId: WillpowerTemplates.quitZina,
+          tab: 'progress',
+          wisdomKind: 'ayet',
+          wisdomIndex: index,
+        ),
+        localeCode: 'tr',
+        wisdom: wisdom,
+      );
+    }
+
+    expect(
+      {copyAt(0).body, copyAt(1).body, copyAt(2).body}.length,
+      3,
+    );
+    expect(copyAt(3).body, copyAt(0).body);
+  });
+
   test('tüm tam arınma şablonları plan üretir', () {
     final now = start.add(const Duration(hours: 1));
     for (final templateId in WillpowerTemplates.fullQuitProgramTemplateIds) {
