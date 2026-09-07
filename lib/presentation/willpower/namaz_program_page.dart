@@ -13,6 +13,7 @@ import '../../core/constants/app_text_styles.dart';
 import '../../core/constants/willpower_templates.dart';
 import '../../core/router/app_router.dart';
 import '../../data/models/habit_model.dart';
+import '../shared/mixins/review_prompt_on_exit_mixin.dart';
 import '../shared/providers/habit_providers.dart';
 import 'namaz_ibadet_onboarding.dart';
 import 'salat_celebration.dart';
@@ -39,13 +40,15 @@ class NamazProgramPage extends ConsumerStatefulWidget {
   ConsumerState<NamazProgramPage> createState() => _NamazProgramPageState();
 }
 
-class _NamazProgramPageState extends ConsumerState<NamazProgramPage> {
+class _NamazProgramPageState extends ConsumerState<NamazProgramPage>
+    with ReviewPromptOnExitMixin {
   bool _didShowHomeVisibilityHint = false;
   bool _routeTransitioning = false;
 
   @override
   void initState() {
     super.initState();
+    startReviewPromptTracking();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       ref.read(habitSummaryProvider.notifier).refresh();
       if (mounted) await _celebrateIfNeeded();
@@ -77,6 +80,12 @@ class _NamazProgramPageState extends ConsumerState<NamazProgramPage> {
       return;
     }
     context.go(AppRoutes.habitsGelisimTab);
+  }
+
+  @override
+  void dispose() {
+    maybeRequestReviewOnExit();
+    super.dispose();
   }
 
   Future<void> _cancelIncompleteSetup(HabitModel habit) async {

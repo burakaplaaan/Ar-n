@@ -26,6 +26,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../firebase_options.dart';
 import '../../core/router/app_router.dart';
 import '../../core/willpower/quit_notification_plan.dart';
+import 'app_local_notification_payloads.dart';
 import 'arin_local_notifications_plugin.dart';
 import 'product_metrics_service.dart';
 import 'startup_permission_policy.dart';
@@ -203,6 +204,12 @@ abstract final class FcmTokenService {
         registerLocalNotificationTapHandler('quit_program', (payload) {
           _openQuitProgram(payload);
         });
+        registerLocalNotificationTapHandler(
+          AppLocalNotificationPayloads.fridayExploreShare,
+          (_) {
+            _navigate(AppRoutes.inspire);
+          },
+        );
         _localTapHandlerRegistered = true;
       }
       if (!_initialLocalNotificationChecked) {

@@ -2,11 +2,10 @@
 // Belirli bir özellik ekranında anlamlı süre geçirip çıkan kullanıcıya
 // mağaza değerlendirme sheet'i önermek için ortak `dispose` kancası.
 //
-// Zikirmatik, frekans, keşfet, kıble bulucu, gelişim gibi "kullanıcının
-// keyif aldığı" ekranlarda kullanılır: sayfaya girişte zaman damgası
-// alınır, çıkışta (`dispose`) geçen süre yeterliyse
+// Zikirmatik, frekans, keşfet, kıble, namaz programı gibi ekranlarda
+// kullanılır: girişte zaman damgası alınır, çıkışta süre yeterliyse
 // `ArinReviewPrompter.maybeAskAfterFeatureUse` tetiklenir. Native review
-// çağrısı context gerektirmediğinden dispose sırasında tetiklemek güvenlidir.
+// çağrısı context istemez; dispose sırasında güvenlidir.
 
 import 'dart:async';
 

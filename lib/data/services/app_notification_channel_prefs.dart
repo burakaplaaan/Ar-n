@@ -9,6 +9,8 @@ abstract final class AppNotificationChannelPrefs {
   static const _kTask = 'ntf_arinma_task_enabled';
   static const _kZikirQuote = 'ntf_zikir_quote_enabled';
   static const _kZikirQuoteMin = 'ntf_zikir_quote_minutes_from_midnight';
+  static const _kFridayShare = 'ntf_friday_share_enabled';
+  static const _kFridayShareSeeded = 'ntf_friday_share_seeded_v1';
   static const _kArinmaAutoEnabledOnQuit = 'ntf_arinma_auto_enabled_on_quit_v1';
 
   /// Kaldırılan kanallar (v1.2.0 öncesi kurulumlarda set edilmiş olabilir).
@@ -82,4 +84,17 @@ abstract final class AppNotificationChannelPrefs {
     SharedPreferences p,
     int minutes,
   ) => p.setInt(_kZikirQuoteMin, minutes.clamp(0, 24 * 60 - 1));
+
+  /// Cuma sabahı Keşfet paylaş hatırlatması. Varsayılan açık.
+  static bool fridayShareEnabled(SharedPreferences p) =>
+      p.getBool(_kFridayShare) ?? true;
+
+  static Future<void> setFridayShareEnabled(SharedPreferences p, bool v) =>
+      p.setBool(_kFridayShare, v);
+
+  static bool fridayShareSeeded(SharedPreferences p) =>
+      p.getBool(_kFridayShareSeeded) ?? false;
+
+  static Future<void> markFridayShareSeeded(SharedPreferences p) =>
+      p.setBool(_kFridayShareSeeded, true);
 }

@@ -2164,6 +2164,19 @@ class AppLocalizationsEn extends AppLocalizations {
       'A daily reminder at this time with your latest zikr text.';
 
   @override
+  String get notificationsFridayShareTitle => 'Friday share';
+
+  @override
+  String get notificationsFridayShareSubtitle =>
+      'A Friday morning reminder to share the Explore quote.';
+
+  @override
+  String get inspireShareAction => 'Share';
+
+  @override
+  String get inspireFridayShareAction => 'Send the Friday quote';
+
+  @override
   String get notificationsHealthDisclaimer =>
       'Texts about health and purification are for general information and do not replace treatment. If you have a condition, consult your doctor.';
 

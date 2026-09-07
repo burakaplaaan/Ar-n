@@ -8,7 +8,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:arin/l10n/app_localizations.dart';
 
+import '../../../core/constants/app_colors.dart';
 import '../../../core/utils/explore_occasion_message.dart';
 import '../../../data/models/inspiration_card_model.dart';
 import '../../../data/models/inspiration_content_kind.dart';
@@ -411,6 +413,8 @@ class _InspirationReelsActionRailState
       remoteIncludesUser: totals.remotelyCountedIds.contains(card.id),
     );
     final likeCountLabel = formatInspirationLikeCount(likeCount);
+    final l10n = AppLocalizations.of(context)!;
+    final fridayShare = isFridaySharePromptDay();
 
     return Positioned(
       right: 4,
@@ -468,7 +472,11 @@ class _InspirationReelsActionRailState
                     Builder(
                       builder: (shareBtnContext) {
                         return _ReelsActionButton(
-                          icon: Icons.share_outlined,
+                          icon: fridayShare
+                              ? Icons.share_rounded
+                              : Icons.share_outlined,
+                          highlighted: fridayShare,
+                          caption: fridayShare ? l10n.inspireShareAction : null,
                           onPressed: () {
                             Rect? anchor;
                             final box =
@@ -480,7 +488,9 @@ class _InspirationReelsActionRailState
                             }
                             widget.onShare?.call(anchor);
                           },
-                          label: 'Paylaş',
+                          label: fridayShare
+                              ? l10n.inspireFridayShareAction
+                              : l10n.inspireShareAction,
                         );
                       },
                     ),
@@ -942,6 +952,7 @@ class _ReelsActionButton extends StatelessWidget {
     this.caption,
     this.iconKey,
     this.pulseToken = 0,
+    this.highlighted = false,
   });
 
   final IconData icon;
@@ -951,11 +962,29 @@ class _ReelsActionButton extends StatelessWidget {
   final String? caption;
   final Key? iconKey;
   final int pulseToken;
+  final bool highlighted;
 
   @override
   Widget build(BuildContext context) {
-    final c = iconColor ?? Colors.white.withValues(alpha: 0.92);
+    final c = highlighted
+        ? const Color(0xFF1B4D3E)
+        : (iconColor ?? Colors.white.withValues(alpha: 0.92));
     final captionText = caption;
+    final iconWidget = Icon(
+      icon,
+      key: iconKey,
+      size: highlighted ? 26 : 30,
+      color: c,
+      shadows: highlighted
+          ? const []
+          : const [
+              Shadow(
+                blurRadius: 10,
+                offset: Offset(0, 1),
+                color: Color(0x99000000),
+              ),
+            ],
+    );
     return Semantics(
       button: true,
       label: captionText == null ? label : '$label, $captionText',
@@ -963,13 +992,13 @@ class _ReelsActionButton extends StatelessWidget {
         color: Colors.transparent,
         child: InkWell(
           onTap: onPressed,
-          customBorder: captionText == null
+          customBorder: captionText == null && !highlighted
               ? const CircleBorder()
               : RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
                 ),
           child: Padding(
-            padding: captionText == null
+            padding: captionText == null && !highlighted
                 ? const EdgeInsets.all(6)
                 : const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
             child: Column(
@@ -977,29 +1006,38 @@ class _ReelsActionButton extends StatelessWidget {
               children: [
                 _LikeIconPulse(
                   pulseToken: pulseToken,
-                  child: Icon(
-                    icon,
-                    key: iconKey,
-                    size: 30,
-                    color: c,
-                    shadows: const [
-                      Shadow(
-                        blurRadius: 10,
-                        offset: Offset(0, 1),
-                        color: Color(0x99000000),
-                      ),
-                    ],
-                  ),
+                  child: highlighted
+                      ? Container(
+                          width: 48,
+                          height: 48,
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: AppColors.goldAccent.withValues(alpha: 0.94),
+                            boxShadow: [
+                              BoxShadow(
+                                color: AppColors.goldAccent.withValues(
+                                  alpha: 0.42,
+                                ),
+                                blurRadius: 14,
+                              ),
+                            ],
+                          ),
+                          child: iconWidget,
+                        )
+                      : iconWidget,
                 ),
                 if (captionText != null) ...[
-                  const SizedBox(height: 2),
+                  const SizedBox(height: 4),
                   ExcludeSemantics(
                     child: Text(
                       captionText,
                       style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.92),
-                        fontSize: 11,
-                        fontWeight: FontWeight.w600,
+                        color: highlighted
+                            ? AppColors.goldAccent
+                            : Colors.white.withValues(alpha: 0.92),
+                        fontSize: highlighted ? 12 : 11,
+                        fontWeight: FontWeight.w700,
                         height: 1,
                         shadows: const [
                           Shadow(

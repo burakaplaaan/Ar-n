@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
@@ -6,6 +7,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../core/constants/app_colors.dart';
+import '../../../core/providers/shared_preferences_provider.dart';
+import '../../../core/services/arin_review_prompter.dart';
 import '../../../data/models/inspiration_card_model.dart';
 import '../../../data/services/inspiration_asset_discovery.dart';
 import '../inspiration_catalog_provider.dart';
@@ -190,7 +193,13 @@ class _InspirationSlideState extends ConsumerState<InspirationSlide> {
     if (!mounted) return;
     if (err != null) {
       showArinTopToast(context, err);
+      return;
     }
+    final prefs = ref.read(sharedPreferencesProvider);
+    Future<void>.delayed(const Duration(milliseconds: 1600), () {
+      if (!mounted) return;
+      unawaited(ArinReviewPrompter.maybeAskAfterPositiveMoment(prefs));
+    });
   }
 
   Widget _gradientOverlay(bool lightTxt) {

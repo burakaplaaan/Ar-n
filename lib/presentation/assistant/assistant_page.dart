@@ -270,80 +270,88 @@ class _AssistantPageState extends ConsumerState<AssistantPage> {
         premiumState == PremiumAccessState.loading ||
         adminAsync.isLoading;
     final allowed = signedIn && (premium || admin);
-    final bottomPad = ArinShellLayout.assistantComposerBottomPadding(context);
-
     return SizedBox.expand(
       child: ArinShellBackground.buildLayered(
         context,
-        child: Column(
-          children: [
-            SafeArea(
-              bottom: false,
-              child: _AssistantHeader(
-                onDark: onDark,
-                onBack: () {
-                  if (context.canPop()) {
-                    context.pop();
-                  } else {
-                    context.go(AppRoutes.home);
-                  }
-                },
-              ),
-            ),
-            if (resolving)
-              const Expanded(child: Center(child: ArinLoader()))
-            else if (!allowed)
-              Expanded(child: _AssistantGate(signedIn: signedIn, onDark: onDark))
-            else ...[
-              if (_banner != null)
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 0, 20, 8),
-                  child: _BannerNote(text: _banner!, onDark: onDark),
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final bottomPad = ArinShellLayout.assistantComposerBottomPadding(
+              context,
+              bodyHeight: constraints.maxHeight,
+            );
+            return Column(
+              children: [
+                SafeArea(
+                  bottom: false,
+                  child: _AssistantHeader(
+                    onDark: onDark,
+                    onBack: () {
+                      if (context.canPop()) {
+                        context.pop();
+                      } else {
+                        context.go(AppRoutes.home);
+                      }
+                    },
+                  ),
                 ),
-              Expanded(
-                child: _turns.isEmpty
-                    ? _EmptyState(
-                        hide: _charCount > 0,
-                        enabled: !_sending,
-                        onAsk: _sendPrompt,
-                      )
-                    : ListView.builder(
-                        controller: _scroll,
-                        padding: const EdgeInsets.fromLTRB(20, 8, 20, 20),
-                        itemCount: _turns.length + (_sending ? 1 : 0),
-                        itemBuilder: (context, index) {
-                          if (index >= _turns.length) {
-                            return _TypingDots(onDark: onDark);
-                          }
-                          final turn = _turns[index];
-                          return _ChatLine(
-                            key: ValueKey(turn.id),
-                            turn: turn,
-                            onDark: onDark,
-                            animate: !turn.isUser &&
-                                turn.id == _streamingId &&
-                                !_revealed.contains(turn.id),
-                            onTick: _scrollToEnd,
-                            onComplete: () => _onRevealDone(turn.id),
-                          );
-                        },
-                      ),
-              ),
-              Padding(
-                padding: EdgeInsets.fromLTRB(16, 0, 16, bottomPad),
-                child: _Composer(
-                  controller: _input,
-                  focusNode: _focus,
-                  onDark: onDark,
-                  sending: _sending,
-                  charCount: _charCount,
-                  overLimit: _overLimit,
-                  onChanged: () => setState(() {}),
-                  onSend: _send,
-                ),
-              ),
-            ],
-          ],
+                if (resolving)
+                  const Expanded(child: Center(child: ArinLoader()))
+                else if (!allowed)
+                  Expanded(
+                    child: _AssistantGate(signedIn: signedIn, onDark: onDark),
+                  )
+                else ...[
+                  if (_banner != null)
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(20, 0, 20, 8),
+                      child: _BannerNote(text: _banner!, onDark: onDark),
+                    ),
+                  Expanded(
+                    child: _turns.isEmpty
+                        ? _EmptyState(
+                            hide: _charCount > 0,
+                            enabled: !_sending,
+                            onAsk: _sendPrompt,
+                          )
+                        : ListView.builder(
+                            controller: _scroll,
+                            padding: const EdgeInsets.fromLTRB(20, 8, 20, 20),
+                            itemCount: _turns.length + (_sending ? 1 : 0),
+                            itemBuilder: (context, index) {
+                              if (index >= _turns.length) {
+                                return _TypingDots(onDark: onDark);
+                              }
+                              final turn = _turns[index];
+                              return _ChatLine(
+                                key: ValueKey(turn.id),
+                                turn: turn,
+                                onDark: onDark,
+                                animate: !turn.isUser &&
+                                    turn.id == _streamingId &&
+                                    !_revealed.contains(turn.id),
+                                onTick: _scrollToEnd,
+                                onComplete: () => _onRevealDone(turn.id),
+                              );
+                            },
+                          ),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.fromLTRB(16, 0, 16, bottomPad),
+                    child: _Composer(
+                      controller: _input,
+                      focusNode: _focus,
+                      onDark: onDark,
+                      sending: _sending,
+                      charCount: _charCount,
+                      overLimit: _overLimit,
+                      onChanged: () => setState(() {}),
+                      onSend: _send,
+                    ),
+                  ),
+                ],
+              ],
+            );
+          },
         ),
       ),
     );

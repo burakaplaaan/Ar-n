@@ -2150,6 +2150,19 @@ class AppLocalizationsAr extends AppLocalizations {
       'تذكير يومي في هذا الوقت بآخر نص ذكر لديك.';
 
   @override
+  String get notificationsFridayShareTitle => 'مشاركة الجمعة';
+
+  @override
+  String get notificationsFridayShareSubtitle =>
+      'تذكير صباح الجمعة لمشاركة كلمة الاستكشاف.';
+
+  @override
+  String get inspireShareAction => 'مشاركة';
+
+  @override
+  String get inspireFridayShareAction => 'أرسل كلمة الجمعة';
+
+  @override
   String get notificationsHealthDisclaimer =>
       'النصوص المتعلقة بالصحة والتزكية هي للتوعية العامة ولا تغني عن العلاج. إذا كان لديك حالة صحية فاستشر طبيبك.';
 

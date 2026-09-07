@@ -3797,6 +3797,30 @@ abstract class AppLocalizations {
   /// **'Her gün bu saatte son zikir metninle hatırlatma.'**
   String get notificationsZikirTimePickerSubtitle;
 
+  /// No description provided for @notificationsFridayShareTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Cuma paylaşımı'**
+  String get notificationsFridayShareTitle;
+
+  /// No description provided for @notificationsFridayShareSubtitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Cuma sabahı Keşfet sözünü paylaşman için bir hatırlatma.'**
+  String get notificationsFridayShareSubtitle;
+
+  /// No description provided for @inspireShareAction.
+  ///
+  /// In tr, this message translates to:
+  /// **'Paylaş'**
+  String get inspireShareAction;
+
+  /// No description provided for @inspireFridayShareAction.
+  ///
+  /// In tr, this message translates to:
+  /// **'Cuma sözünü gönder'**
+  String get inspireFridayShareAction;
+
   /// No description provided for @notificationsHealthDisclaimer.
   ///
   /// In tr, this message translates to:

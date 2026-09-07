@@ -2154,6 +2154,19 @@ class AppLocalizationsTr extends AppLocalizations {
       'Her gün bu saatte son zikir metninle hatırlatma.';
 
   @override
+  String get notificationsFridayShareTitle => 'Cuma paylaşımı';
+
+  @override
+  String get notificationsFridayShareSubtitle =>
+      'Cuma sabahı Keşfet sözünü paylaşman için bir hatırlatma.';
+
+  @override
+  String get inspireShareAction => 'Paylaş';
+
+  @override
+  String get inspireFridayShareAction => 'Cuma sözünü gönder';
+
+  @override
   String get notificationsHealthDisclaimer =>
       'Sağlık ve arınma ile ilgili metinler genel bilgilendirme amaçlıdır; tedavi yerine geçmez. Rahatsızlığınız varsa doktorunuza danışın.';
 

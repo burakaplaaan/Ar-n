@@ -28,4 +28,36 @@ void main() {
       isFalse,
     );
   });
+
+  test('asistan yazma çubuğu alt menü insetini iki kez eklemez', () {
+    expect(
+      ArinShellLayout.assistantComposerBottomPaddingFromMedia(
+        viewPaddingBottom: 34,
+        paddingBottom: 96,
+      ),
+      8,
+    );
+  });
+
+  test('asistan yazma çubuğu yalnızca sistem inseti varken menünün üstünde durur', () {
+    expect(
+      ArinShellLayout.assistantComposerBottomPaddingFromMedia(
+        viewPaddingBottom: 34,
+        paddingBottom: 34,
+      ),
+      68,
+    );
+  });
+
+  test('gövde alt menünün üstünde bitiyorsa yazma çubuğu tekrar pay eklemez', () {
+    expect(
+      ArinShellLayout.assistantComposerBottomPaddingFromMedia(
+        viewPaddingBottom: 34,
+        paddingBottom: 34,
+        screenHeight: 800,
+        bodyHeight: 690,
+      ),
+      8,
+    );
+  });
 }

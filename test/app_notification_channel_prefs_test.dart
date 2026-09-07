@@ -63,6 +63,18 @@ void main() {
     );
   });
 
+  test('cuma paylaş bildirimi varsayılan açık, kapatılınca kapalı kalır', () async {
+    final prefs = await SharedPreferences.getInstance();
+    expect(AppNotificationChannelPrefs.fridayShareEnabled(prefs), isTrue);
+    expect(AppNotificationChannelPrefs.fridayShareSeeded(prefs), isFalse);
+
+    await AppNotificationChannelPrefs.setFridayShareEnabled(prefs, false);
+    expect(AppNotificationChannelPrefs.fridayShareEnabled(prefs), isFalse);
+
+    await AppNotificationChannelPrefs.markFridayShareSeeded(prefs);
+    expect(AppNotificationChannelPrefs.fridayShareSeeded(prefs), isTrue);
+  });
+
   test('aktif arınmada genel görev hatırlatıcısı planlanmaz', () async {
     final prefs = await SharedPreferences.getInstance();
     await AppNotificationChannelPrefs.setTaskReminderEnabled(prefs, true);

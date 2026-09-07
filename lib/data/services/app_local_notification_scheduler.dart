@@ -22,6 +22,7 @@ import '../repositories/quote_pools_repository.dart';
 import '../repositories/zikir_matik_repository.dart';
 import 'admin_notification_diagnostics_log.dart';
 import 'android_local_notification_schedule.dart';
+import 'app_local_notification_payloads.dart';
 import 'app_notification_channel_prefs.dart';
 import 'arin_local_notifications_plugin.dart';
 import 'local_notification_permission_gate.dart';
@@ -76,12 +77,18 @@ abstract final class AppLocalNotificationIds {
 
   /// Admin/test bildirimleri için sabit kimlikler.
   static const int testZikirScheduled = 9199981;
+
+  /// Cuma Keşfet paylaşımı — 8 haftalık tek seferlik (5000900–5000907).
+  static const int fridayShareRollingStart = 5000900;
 }
 
 abstract final class AppLocalNotificationDefaults {
   static const int taskMinutesFromMidnight = 21 * 60;
   static const int milestoneWeekday = DateTime.sunday;
   static const int milestoneMinutesFromMidnight = 10 * 60;
+  static const int fridayShareWeekday = DateTime.friday;
+  static const int fridayShareMinutesFromMidnight = 9 * 60;
+  static const int iosFridayShareRollingWeeks = 2;
 
   /// Günlük hatırlatıcı: slot 0 (söz) rastgele penceresi.
   /// 09:00–18:00 arasında — slot 1 (motivasyon) +3.5 saat sonra
@@ -134,6 +141,7 @@ abstract final class AppLocalNotificationScheduler {
       ['arin_ntf_app_milestone', 'Milestone'],
       ['arin_ntf_app_task', 'Görev hatırlatıcısı'],
       ['arin_ntf_app_zikir', 'Zikir'],
+      ['arin_ntf_app_friday_share', 'Cuma paylaşımı'],
     ];
     for (final c in channels) {
       await android?.createNotificationChannel(
@@ -276,6 +284,9 @@ abstract final class AppLocalNotificationScheduler {
           : AppLocalNotificationIds.rollingDailySlotCount;
       final milestoneRollingWeeks = Platform.isIOS
           ? AppLocalNotificationDefaults.iosMilestoneRollingWeeks
+          : AppLocalNotificationIds.rollingWeeklySlotCount;
+      final fridayShareRollingWeeks = Platform.isIOS
+          ? AppLocalNotificationDefaults.iosFridayShareRollingWeeks
           : AppLocalNotificationIds.rollingWeeklySlotCount;
 
       // Günlük hatırlatıcı — gün başına 2 slot:
@@ -515,6 +526,35 @@ abstract final class AppLocalNotificationScheduler {
         );
         zikirQueued = queued;
       }
+
+      if (AppNotificationChannelPrefs.fridayShareEnabled(prefs)) {
+        await _scheduleWeekdayNextOccurrences(
+          idBase: AppLocalNotificationIds.fridayShareRollingStart,
+          maxOccurrences: fridayShareRollingWeeks,
+          weekday: AppLocalNotificationDefaults.fridayShareWeekday,
+          minutesFromMidnight:
+              AppLocalNotificationDefaults.fridayShareMinutesFromMidnight,
+          title: _lt(
+            localeCode,
+            tr: 'Hayırlı Cumalar',
+            en: 'Happy Friday',
+            ar: 'جمعة مباركة',
+          ),
+          body: _lt(
+            localeCode,
+            tr: 'Bu sözü gönder.',
+            en: 'Send this quote.',
+            ar: 'أرسل هذه الكلمة.',
+          ),
+          details: _details(
+            channelId: 'arin_ntf_app_friday_share',
+            channelName: 'Cuma paylaşımı',
+          ),
+          mode: fixedTimeMode,
+          payload: AppLocalNotificationPayloads.fridayExploreShare,
+        );
+        await AppNotificationChannelPrefs.markFridayShareSeeded(prefs);
+      }
       await AdminNotificationDiagnosticsLog.append(
         prefs,
         source: 'app',
@@ -527,6 +567,9 @@ abstract final class AppLocalNotificationScheduler {
           'task_on': AppNotificationChannelPrefs.taskReminderEnabled(prefs),
           'zikir_on': AppNotificationChannelPrefs.zikirQuoteEnabled(prefs),
           'zikir_queued': zikirQueued,
+          'friday_share_on': AppNotificationChannelPrefs.fridayShareEnabled(
+            prefs,
+          ),
           'quit_queued': quitQueued,
           'ios_caps': Platform.isIOS
               ? <String, int>{
@@ -534,6 +577,7 @@ abstract final class AppLocalNotificationScheduler {
                   'task_days': taskRollingDays,
                   'zikir_days': zikirRollingDays,
                   'milestone_weeks': milestoneRollingWeeks,
+                  'friday_share_weeks': fridayShareRollingWeeks,
                 }
               : const <String, int>{},
         },
@@ -747,6 +791,7 @@ abstract final class AppLocalNotificationScheduler {
     }
     for (var i = 0; i < AppLocalNotificationIds.rollingWeeklySlotCount; i++) {
       await _cancelSilently(AppLocalNotificationIds.milestoneRollingStart + i);
+      await _cancelSilently(AppLocalNotificationIds.fridayShareRollingStart + i);
     }
     for (var i = 0; i < AppLocalNotificationIds.quitProgramSlotCount; i++) {
       await _cancelSilently(AppLocalNotificationIds.quitProgramStart + i);
@@ -865,6 +910,11 @@ abstract final class AppLocalNotificationScheduler {
       return false;
     }
 
+    if (AppNotificationChannelPrefs.fridayShareEnabled(prefs) &&
+        !AppNotificationChannelPrefs.fridayShareSeeded(prefs)) {
+      return false;
+    }
+
     return true;
   }
 
@@ -926,6 +976,16 @@ abstract final class AppLocalNotificationScheduler {
       AppLocalNotificationIds.rollingDailySlotCount,
     );
     if (!AppNotificationChannelPrefs.zikirQuoteEnabled(prefs) && hasZikir) {
+      return true;
+    }
+
+    final hasFridayShare = _hasPendingInRange(
+      pending,
+      AppLocalNotificationIds.fridayShareRollingStart,
+      AppLocalNotificationIds.rollingWeeklySlotCount,
+    );
+    if (!AppNotificationChannelPrefs.fridayShareEnabled(prefs) &&
+        hasFridayShare) {
       return true;
     }
 
@@ -1048,6 +1108,7 @@ abstract final class AppLocalNotificationScheduler {
     required String body,
     required NotificationDetails details,
     required AndroidScheduleMode mode,
+    String? payload,
   }) async {
     final now = tz.TZDateTime.now(tz.local);
     final h = minutesFromMidnight ~/ 60;
@@ -1062,7 +1123,15 @@ abstract final class AppLocalNotificationScheduler {
       final when = tz.TZDateTime(tz.local, cal.year, cal.month, cal.day, h, mi);
       if (when.weekday != weekday) continue;
       if (!when.isAfter(now)) continue;
-      await _safeZonedSchedule(idBase + slot, title, body, when, details, mode);
+      await _safeZonedSchedule(
+        idBase + slot,
+        title,
+        body,
+        when,
+        details,
+        mode,
+        payload: payload,
+      );
       slot++;
     }
   }

@@ -582,6 +582,30 @@ class _NotificationsSettingsPageState
                                   );
                                 },
                               ),
+                              const Divider(height: 22),
+                              _NtfSwitchRow(
+                                onDark: onDark,
+                                title: l10n.notificationsFridayShareTitle,
+                                subtitle: l10n.notificationsFridayShareSubtitle,
+                                value:
+                                    AppNotificationChannelPrefs.fridayShareEnabled(
+                                      prefs,
+                                    ),
+                                onChanged: (v) async {
+                                  HapticFeedback.selectionClick();
+                                  if (v && !await _ensureCanEnableNotifications()) {
+                                    return;
+                                  }
+                                  await _applyPrefsAndSync(
+                                    prefs,
+                                    () =>
+                                        AppNotificationChannelPrefs.setFridayShareEnabled(
+                                          prefs,
+                                          v,
+                                        ),
+                                  );
+                                },
+                              ),
                               if (zikirOn) ...[
                                 const Divider(height: 22),
                                 InkWell(

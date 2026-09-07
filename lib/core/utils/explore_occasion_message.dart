@@ -1,5 +1,10 @@
 import 'package:hijri/hijri_calendar.dart';
 
+/// Cuma günü Keşfet paylaşım vurgusu ve Cuma bildirimi için tek kontrol.
+bool isFridaySharePromptDay([DateTime? localNow]) {
+  return (localNow ?? DateTime.now()).weekday == DateTime.friday;
+}
+
 /// Paylaşım teşviki: Cuma / kandil geceleri / bayram — öncelik: bayram > kandil > cuma.
 String? exploreOccasionMessage(DateTime localNow) {
   final h = HijriCalendar.fromDate(localNow);

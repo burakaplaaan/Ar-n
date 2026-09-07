@@ -7,16 +7,14 @@
 // SKStoreReviewController — sistem 365 günde 3 kez limitliyor; kod sorun
 // değil, OS cap'i.
 //
-// İki tetikleyici yolu var:
-//  1) Açılış-tabanlı: kullanıcıyı ilk gününde bölmemek için en az 2 gün ve
-//     3 ayrı kullanım oturumu beklenir (bkz. `markAppLaunched`).
-//  2) Özellik-kullanımı-tabanlı: bir özellikte (zikirmatik, frekans, keşfet,
-//     kıble bulucu, gelişim) anlamlı süre (10sn+) geçirip çıkınca sorulur
-//     (bkz. `maybeAskAfterFeatureUse`) — kullanıcı olumlu bir anın hemen
-//     ardından yakalanır.
+// Tetikleyiciler:
+//  1) Açılış: en az 1 gün ve 2 ayrı oturum (bkz. `markAppLaunched`).
+//  2) Özellik çıkışı: zikir / frekans / keşfet / kıble / namaz ekranında
+//     6 sn+ kalınca (bkz. `maybeAskAfterFeatureUse`).
+//  3) Olumlu an: namaz işareti veya Keşfet paylaşımı
+//     (bkz. `maybeAskAfterPositiveMoment`).
 //
-// Her iki yol da aynı ortak sınırları paylaşır: günde en fazla 1 kez sorulur
-// ve toplamda `_maxTotalAsks` kez sorulduktan sonra kalıcı olarak susulur.
+// Ortak sınır: günde en fazla 1 kez; toplam `_maxTotalAsks` sonrası susulur.
 // Store API'si kullanıcının gerçekten puan verip vermediğini gizlilik
 // nedeniyle bildirmez; bu yüzden "sonuçtan bağımsız say" güvenli sınırdır.
 
@@ -35,17 +33,26 @@ abstract final class ArinReviewPrompter {
   static const _prefsTotalAskCount = 'review_total_ask_count';
   static const _prefsLastAskDayEpoch = 'review_last_ask_day_epoch';
 
-  static const _minSinceFirstLaunch = Duration(days: 2);
-  static const _minBetweenLaunchCounts = Duration(hours: 6);
-  static const _launchCountThreshold = 3;
+  static const _minSinceFirstLaunch = Duration(days: 1);
+  static const _minBetweenLaunchCounts = Duration(hours: 3);
+  static const _launchCountThreshold = 2;
 
   /// Toplamda kaç kez sorulabileceğinin üst sınırı. Aşıldığında kalıcı
   /// olarak susulur — mağaza politikalarıyla uyumlu, spam olmaz.
-  static const _maxTotalAsks = 6;
+  static const _maxTotalAsks = 8;
 
   /// Bir özellik ekranında bu süre kadar kalınmadıysa (ör. yanlışlıkla
   /// girip hemen çıkma) o çıkış review isteği tetiklemez.
-  static const minFeatureUseDuration = Duration(seconds: 10);
+  static const minFeatureUseDuration = Duration(seconds: 6);
+
+  @visibleForTesting
+  static Duration get minSinceFirstLaunch => _minSinceFirstLaunch;
+
+  @visibleForTesting
+  static int get launchCountThreshold => _launchCountThreshold;
+
+  @visibleForTesting
+  static int get maxTotalAsks => _maxTotalAsks;
 
   static bool _askInFlight = false;
 
@@ -54,10 +61,8 @@ abstract final class ArinReviewPrompter {
   /// için 2 gün kural kapısı uygular. Ayrıca toplam açılış sayacını artırır —
   /// 3. sayılan açılışta değerlendirme sheet'ini tetikler.
   ///
-  /// 6-saat throttle: Aynı kullanıcının uygulamayı art arda açması sayacı
-  /// dakikalar içinde 3'e çıkarırdı. Sayaç yalnız önceki artırmadan 6 saat
-  /// sonra yeniden artar — böylece 3 artış ≈ 3 farklı
-  /// kullanım oturumu (gerçekten "aktif kullanıcı" sinyali).
+  /// 3-saat throttle: art arda açılışlar sayacı şişirmesin. 2. sayılan
+  /// oturumda sheet açılabilir; ilk gün açılış yolu sessiz kalır.
   static Future<void> markAppLaunched(SharedPreferences prefs) async {
     await _migrateLegacyAskFlag(prefs);
     if (prefs.getBool(_prefsAskDisabled) == true) return;
@@ -81,8 +86,7 @@ abstract final class ArinReviewPrompter {
       await prefs.setInt(_prefsLastCountedLaunchMs, nowMs);
     }
 
-    // 3. sayılan açılıştan itibaren yeterli. Sonraki kontroller
-    // `_canAsk` tarafından yapılır: ilk 2 gün sessiz.
+    // 2. sayılan açılıştan itibaren yeterli. `_canAsk` ilk günü bekler.
     if (count >= _launchCountThreshold) {
       // Pencereyi _hemen_ açmak yerine kısa bir gecikme: uygulama
       // tamamen açılıp ana ekran render edildikten sonra sheet belirsin,
@@ -105,6 +109,14 @@ abstract final class ArinReviewPrompter {
     required Duration usedFor,
   }) async {
     if (usedFor < minFeatureUseDuration) return;
+    await _maybeAsk(prefs, requireMinDaysSinceFirstLaunch: false);
+  }
+
+  /// Namaz işareti veya paylaşım gibi kısa olumlu andan sonra sorar.
+  /// İlk gün beklenmez; günlük / toplam kota aynıdır.
+  static Future<void> maybeAskAfterPositiveMoment(
+    SharedPreferences prefs,
+  ) async {
     await _maybeAsk(prefs, requireMinDaysSinceFirstLaunch: false);
   }
 

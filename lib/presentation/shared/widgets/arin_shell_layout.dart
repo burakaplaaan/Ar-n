@@ -69,15 +69,46 @@ abstract final class ArinShellLayout {
   }
 
   /// Asistan yazma çubuğu — alt menünün hemen üstü; klavyede menü payı yok.
-  static double assistantComposerBottomPadding(BuildContext context) {
+  static double assistantComposerBottomPadding(
+    BuildContext context, {
+    double? bodyHeight,
+  }) {
     if (isKeyboardOpen(context)) return 10;
     final mq = MediaQuery.of(context);
-    final systemBottom = math.max(mq.viewPadding.bottom, mq.padding.bottom);
+    return assistantComposerBottomPaddingFromMedia(
+      viewPaddingBottom: mq.viewPadding.bottom,
+      paddingBottom: mq.padding.bottom,
+      screenHeight: mq.size.height,
+      bodyHeight: bodyHeight,
+    );
+  }
+
+  /// Gövde zaten alt çubuğun üstünde bitiyorsa veya [paddingBottom] menüyü
+  /// içeriyorsa yüksekliği ikinci kez eklemeyin — kutu havada kalır.
+  @visibleForTesting
+  static double assistantComposerBottomPaddingFromMedia({
+    required double viewPaddingBottom,
+    required double paddingBottom,
+    double? screenHeight,
+    double? bodyHeight,
+  }) {
+    const gapAboveBar = 8.0;
+    if (paddingBottom > viewPaddingBottom + 16) {
+      return gapAboveBar;
+    }
+    if (screenHeight != null &&
+        bodyHeight != null &&
+        screenHeight - bodyHeight > 56) {
+      return gapAboveBar;
+    }
     const innerBottomPad = 8;
     const rowHeight = 50;
-    const gapAboveBar = 8;
-    const navNudgeDown = 8;
-    return systemBottom + innerBottomPad + rowHeight + gapAboveBar - navNudgeDown;
+    const navNudgeDown = 32;
+    return viewPaddingBottom +
+        innerBottomPad +
+        rowHeight +
+        gapAboveBar -
+        navNudgeDown;
   }
 
   static double willpowerHubScrollBottomPadding(BuildContext context) {
