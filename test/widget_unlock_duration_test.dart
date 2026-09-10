@@ -18,7 +18,11 @@ void main() {
     });
 
     test('mevcut turu seçilen saate göre yeniden hesaplar', () async {
-      final startedAt = DateTime.utc(2026, 7, 29, 12);
+      // Tur hâlen aktif olmalı; süresi dolmuş turlar bilinçli olarak yeniden
+      // hesaplanmadığı için tarih sabit değil, "şimdi"ye göre kuruluyor.
+      final startedAt = DateTime.now().toUtc().subtract(
+        const Duration(hours: 1),
+      );
       SharedPreferences.setMockInitialValues({
         'arin_widget_unlock_hours': 10,
         'ad_gate_widget_quote_unlock_started_at': startedAt.toIso8601String(),
