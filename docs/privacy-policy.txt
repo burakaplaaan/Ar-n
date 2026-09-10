@@ -25,7 +25,9 @@ Arin respects your privacy. This policy explains what data is processed, why it 
 - Arin uses:
   - Trusted infrastructure providers for sign-in, notifications, data sync, analytics, and crash diagnostics.
   - Ad networks (for serving ads and analytics).
+  - Measurement providers (for campaign performance, app activation, and purchase events).
   - Billing providers (for processing and managing premium subscriptions).
+  - On iOS, the device advertising identifier is shared only if tracking permission is granted.
   - External prayer-time services (we may send your city or coordinates to calculate prayer times).
   - Secure third-party services to generate Premium Arın Assistant replies. Chat text is not stored in the app.
 

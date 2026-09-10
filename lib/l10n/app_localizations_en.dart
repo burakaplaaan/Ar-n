@@ -2026,7 +2026,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settingsPrivacyThirdPartyBody =>
-      'Arin uses trusted infrastructure providers for sign-in, notifications, sync, analytics, and crash diagnostics; ad networks for ads; billing providers for subscription and in-app purchase verification; and external prayer-time services. Premium Arın Assistant messages may be sent to secure third-party services to generate replies; chat text is not stored in the app.';
+      'Arin uses trusted infrastructure providers for sign-in, notifications, sync, analytics, and crash diagnostics; ad networks for ads; measurement providers for campaign and activation measurement; billing providers for subscription and in-app purchase verification; and external prayer-time services. Premium Arın Assistant messages may be sent to secure third-party services to generate replies; chat text is not stored in the app.';
 
   @override
   String get settingsPrivacyControlsTitle => 'User control';

@@ -1532,7 +1532,7 @@
   "settingsPrivacyStorageTitle": "Storage and retention",
   "settingsPrivacyStorageBody": "Most habit, zikr, and preference data is stored on your device. If you sign in, selected data may be synced with our secure servers. Data is kept until you delete it in the app or remove your account.",
   "settingsPrivacyThirdPartyTitle": "Third-party services",
-  "settingsPrivacyThirdPartyBody": "Arin uses trusted infrastructure providers for sign-in, notifications, sync, analytics, and crash diagnostics; ad networks for ads; billing providers for subscription and in-app purchase verification; and external prayer-time services. Premium Arın Assistant messages may be sent to secure third-party services to generate replies; chat text is not stored in the app.",
+  "settingsPrivacyThirdPartyBody": "Arin uses trusted infrastructure providers for sign-in, notifications, sync, analytics, and crash diagnostics; ad networks for ads; measurement providers for campaign and activation measurement; billing providers for subscription and in-app purchase verification; and external prayer-time services. Premium Arın Assistant messages may be sent to secure third-party services to generate replies; chat text is not stored in the app.",
   "settingsPrivacyControlsTitle": "User control",
   "settingsPrivacyControlsBody": "You can disable location and notification permissions from device settings, sign out from Settings, or delete your account and local data.",
   "settingsPrivacyChildrenTitle": "Children's privacy",

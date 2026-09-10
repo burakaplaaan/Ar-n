@@ -2016,7 +2016,7 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get settingsPrivacyThirdPartyBody =>
-      'Arin; oturum açma, bildirimler, veri eşitleme, kullanım analizi ve çökme tanılama için güvenilir altyapı sağlayıcıları; reklamlar için reklam ağları; abonelik ve uygulama içi satın alma doğrulaması için faturalama sağlayıcıları; namaz vakitleri için harici vakit servisleri kullanır. Premium Arın Asistanı mesajları yanıt üretmek üzere güvenli üçüncü taraf hizmetlere iletilebilir; sohbet metni uygulamada saklanmaz.';
+      'Arin; oturum açma, bildirimler, veri eşitleme, kullanım analizi ve çökme tanılama için güvenilir altyapı sağlayıcıları; reklamlar için reklam ağları; kampanya ve aktivasyon ölçümü için ölçüm sağlayıcıları; abonelik ve uygulama içi satın alma doğrulaması için faturalama sağlayıcıları; namaz vakitleri için harici vakit servisleri kullanır. Premium Arın Asistanı mesajları yanıt üretmek üzere güvenli üçüncü taraf hizmetlere iletilebilir; sohbet metni uygulamada saklanmaz.';
 
   @override
   String get settingsPrivacyControlsTitle => 'Kullanıcı kontrolü';
