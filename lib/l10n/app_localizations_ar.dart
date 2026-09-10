@@ -1980,7 +1980,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get settingsPrivacyPageTitle => 'سياسة الخصوصية';
 
   @override
-  String get settingsPrivacyLastUpdated => 'آخر تحديث: 09.09.2026';
+  String get settingsPrivacyLastUpdated => 'آخر تحديث: 10.09.2026';
 
   @override
   String get settingsPrivacyIntro =>
@@ -2012,7 +2012,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get settingsPrivacyThirdPartyBody =>
-      'تستخدم Arin مزودي بنية تحتية موثوقين لتسجيل الدخول والإشعارات والمزامنة والتحليلات وتشخيص الأعطال، وGoogle AdMob للإعلانات، وRevenueCat للتحقق من الاشتراكات وعمليات الشراء داخل التطبيق، وخدمات مواقيت صلاة خارجية. قد تُرسل رسائل مساعد أرِن في البريميوم إلى خدمات طرف ثالث آمنة لإنشاء الردود، ولا يُحفظ نص المحادثة في التطبيق.';
+      'تستخدم Arin مزودي بنية تحتية موثوقين لتسجيل الدخول والإشعارات والمزامنة والتحليلات وتشخيص الأعطال، وشبكات إعلانية للإعلانات، ومزودي فوترة للتحقق من الاشتراكات وعمليات الشراء داخل التطبيق، وخدمات مواقيت صلاة خارجية. قد تُرسل رسائل مساعد أرِن في البريميوم إلى خدمات طرف ثالث آمنة لإنشاء الردود، ولا يُحفظ نص المحادثة في التطبيق.';
 
   @override
   String get settingsPrivacyControlsTitle => 'تحكم المستخدم';

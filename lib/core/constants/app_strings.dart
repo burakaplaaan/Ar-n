@@ -469,7 +469,7 @@ abstract final class AppStrings {
       'Verilerinizi nasıl işlediğimiz';
   static const String settingsPrivacyPageTitle = 'Gizlilik Politikası';
   /// Politika içeriği değiştiğinde sürümle birlikte bu tarihi güncelleyin.
-  static const String settingsPrivacyLastUpdated = 'Son güncelleme: 09.09.2026';
+  static const String settingsPrivacyLastUpdated = 'Son güncelleme: 10.09.2026';
   static const String settingsPrivacyIntro =
       'Arin gizliliğinize saygı duyar. Bu metin, hangi verilerin işlendiğini, neden işlendiğini ve bu süreçleri nasıl yönetebileceğinizi açıklar.';
   static const String settingsPrivacyDataCollectedTitle = 'İşlenen veriler';
@@ -483,7 +483,7 @@ abstract final class AppStrings {
       'Alışkanlık, zikir ve tercih verilerinin büyük kısmı cihazınızda tutulur. Hesapla giriş yaparsanız seçili veriler güvenli sunucularımızla eşitlenebilir. Veriler, uygulama içinden silene veya hesabınızı kaldırana kadar saklanır.';
   static const String settingsPrivacyThirdPartyTitle = 'Üçüncü taraf servisler';
   static const String settingsPrivacyThirdPartyBody =
-      'Arin; oturum açma, bildirimler, veri eşitleme, kullanım analizi ve çökme tanılama için güvenilir altyapı sağlayıcıları; reklamlar için Google AdMob; abonelik ve uygulama içi satın alma doğrulaması için RevenueCat; namaz vakitleri için harici vakit servisleri kullanır. Premium Arın Asistanı mesajları yanıt üretmek üzere güvenli üçüncü taraf hizmetlere iletilebilir; sohbet metni uygulamada saklanmaz.';
+      'Arin; oturum açma, bildirimler, veri eşitleme, kullanım analizi ve çökme tanılama için güvenilir altyapı sağlayıcıları; reklamlar için reklam ağları; abonelik ve uygulama içi satın alma doğrulaması için faturalama sağlayıcıları; namaz vakitleri için harici vakit servisleri kullanır. Premium Arın Asistanı mesajları yanıt üretmek üzere güvenli üçüncü taraf hizmetlere iletilebilir; sohbet metni uygulamada saklanmaz.';
   static const String settingsPrivacyControlsTitle = 'Kullanıcı kontrolü';
   static const String settingsPrivacyControlsBody =
       'Konum ve bildirim izinlerini cihaz ayarlarından kapatabilir, Ayarlar ekranından çıkış yapabilir veya hesabınızı ve yerel verilerinizi silebilirsiniz.';

@@ -3500,7 +3500,7 @@ abstract class AppLocalizations {
   /// No description provided for @settingsPrivacyLastUpdated.
   ///
   /// In tr, this message translates to:
-  /// **'Son güncelleme: 09.09.2026'**
+  /// **'Son güncelleme: 10.09.2026'**
   String get settingsPrivacyLastUpdated;
 
   /// No description provided for @settingsPrivacyIntro.
@@ -3554,7 +3554,7 @@ abstract class AppLocalizations {
   /// No description provided for @settingsPrivacyThirdPartyBody.
   ///
   /// In tr, this message translates to:
-  /// **'Arin; oturum açma, bildirimler, veri eşitleme, kullanım analizi ve çökme tanılama için güvenilir altyapı sağlayıcıları; reklamlar için Google AdMob; abonelik ve uygulama içi satın alma doğrulaması için RevenueCat; namaz vakitleri için harici vakit servisleri kullanır. Premium Arın Asistanı mesajları yanıt üretmek üzere güvenli üçüncü taraf hizmetlere iletilebilir; sohbet metni uygulamada saklanmaz.'**
+  /// **'Arin; oturum açma, bildirimler, veri eşitleme, kullanım analizi ve çökme tanılama için güvenilir altyapı sağlayıcıları; reklamlar için reklam ağları; abonelik ve uygulama içi satın alma doğrulaması için faturalama sağlayıcıları; namaz vakitleri için harici vakit servisleri kullanır. Premium Arın Asistanı mesajları yanıt üretmek üzere güvenli üçüncü taraf hizmetlere iletilebilir; sohbet metni uygulamada saklanmaz.'**
   String get settingsPrivacyThirdPartyBody;
 
   /// No description provided for @settingsPrivacyControlsTitle.

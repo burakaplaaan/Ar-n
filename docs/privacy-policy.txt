@@ -1,5 +1,5 @@
 Arin Privacy Policy
-Last updated: 2026-09-09
+Last updated: 2026-09-10
 
 Arin respects your privacy. This policy explains what data is processed, why it is processed, and how you can control it.
 
@@ -24,8 +24,8 @@ Arin respects your privacy. This policy explains what data is processed, why it 
 4) Third-party services
 - Arin uses:
   - Trusted infrastructure providers for sign-in, notifications, data sync, analytics, and crash diagnostics.
-  - Google AdMob (for serving ads and analytics).
-  - RevenueCat (for processing and managing premium subscriptions).
+  - Ad networks (for serving ads and analytics).
+  - Billing providers (for processing and managing premium subscriptions).
   - External prayer-time services (we may send your city or coordinates to calculate prayer times).
   - Secure third-party services to generate Premium Arın Assistant replies. Chat text is not stored in the app.
 

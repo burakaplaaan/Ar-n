@@ -1984,7 +1984,7 @@ class AppLocalizationsTr extends AppLocalizations {
   String get settingsPrivacyPageTitle => 'Gizlilik Politikası';
 
   @override
-  String get settingsPrivacyLastUpdated => 'Son güncelleme: 09.09.2026';
+  String get settingsPrivacyLastUpdated => 'Son güncelleme: 10.09.2026';
 
   @override
   String get settingsPrivacyIntro =>
@@ -2016,7 +2016,7 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get settingsPrivacyThirdPartyBody =>
-      'Arin; oturum açma, bildirimler, veri eşitleme, kullanım analizi ve çökme tanılama için güvenilir altyapı sağlayıcıları; reklamlar için Google AdMob; abonelik ve uygulama içi satın alma doğrulaması için RevenueCat; namaz vakitleri için harici vakit servisleri kullanır. Premium Arın Asistanı mesajları yanıt üretmek üzere güvenli üçüncü taraf hizmetlere iletilebilir; sohbet metni uygulamada saklanmaz.';
+      'Arin; oturum açma, bildirimler, veri eşitleme, kullanım analizi ve çökme tanılama için güvenilir altyapı sağlayıcıları; reklamlar için reklam ağları; abonelik ve uygulama içi satın alma doğrulaması için faturalama sağlayıcıları; namaz vakitleri için harici vakit servisleri kullanır. Premium Arın Asistanı mesajları yanıt üretmek üzere güvenli üçüncü taraf hizmetlere iletilebilir; sohbet metni uygulamada saklanmaz.';
 
   @override
   String get settingsPrivacyControlsTitle => 'Kullanıcı kontrolü';
