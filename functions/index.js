@@ -92,6 +92,7 @@ async function _purgeUserDataByUid(db, uid) {
   await userRef.collection("user_backup").doc("state").delete().catch(() => {});
   await userRef.delete().catch(() => {});
   await db.collection("premium_entitlements").doc(uid).delete().catch(() => {});
+  await require("./socialBoard").testables.purgeSocialIdentity(db, uid);
 }
 
 async function _purgePremiumInviteByEmail(db, email) {
@@ -258,6 +259,7 @@ const _kProductFeatures = new Set([
   "prayer_circle",
   "qibla",
   "healing",
+  "social",
 ]);
 
 function _istanbulDayKey(ms = Date.now()) {
@@ -3889,6 +3891,7 @@ if (process.env.NODE_ENV === "test") {
 // ─────────────────────────────────────────────────────────────────────────────
 const quizModule = require("./quiz");
 const assistantModule = require("./assistant");
+const socialBoardModule = require("./socialBoard");
 const _kQuizOwnerHashRe = /^[a-f0-9]{64}$/i;
 
 function _quizWeekIdIstanbul(now = new Date()) {
@@ -4437,7 +4440,9 @@ exports.adminGrantQuizHeartsOne = onCall(
 // Hilal Düellosu callable'ları quiz modülünden dışa aktarılır.
 Object.assign(exports, quizModule.functions);
 Object.assign(exports, assistantModule.functions);
+Object.assign(exports, socialBoardModule.functions);
 if (process.env.NODE_ENV === "test") {
   Object.assign(exports._testables, quizModule.testables);
   Object.assign(exports._testables, assistantModule.testables);
+  Object.assign(exports._testables, socialBoardModule.testables);
 }

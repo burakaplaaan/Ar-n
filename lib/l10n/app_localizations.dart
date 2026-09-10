@@ -166,6 +166,30 @@ abstract class AppLocalizations {
   /// **'Oturum'**
   String get settingsSectionSession;
 
+  /// No description provided for @settingsSectionFollowArin.
+  ///
+  /// In tr, this message translates to:
+  /// **'ARIN\'I TAKİP ET'**
+  String get settingsSectionFollowArin;
+
+  /// No description provided for @settingsFollowInstagramTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Instagram'**
+  String get settingsFollowInstagramTitle;
+
+  /// No description provided for @settingsFollowTikTokTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'TikTok'**
+  String get settingsFollowTikTokTitle;
+
+  /// No description provided for @settingsFollowOpenFailed.
+  ///
+  /// In tr, this message translates to:
+  /// **'Profil açılamadı. Daha sonra tekrar dene.'**
+  String get settingsFollowOpenFailed;
+
   /// No description provided for @settingsMenuNotificationsSubtitle.
   ///
   /// In tr, this message translates to:
@@ -3476,7 +3500,7 @@ abstract class AppLocalizations {
   /// No description provided for @settingsPrivacyLastUpdated.
   ///
   /// In tr, this message translates to:
-  /// **'Son güncelleme: 26.04.2026'**
+  /// **'Son güncelleme: 09.09.2026'**
   String get settingsPrivacyLastUpdated;
 
   /// No description provided for @settingsPrivacyIntro.
@@ -3518,7 +3542,7 @@ abstract class AppLocalizations {
   /// No description provided for @settingsPrivacyStorageBody.
   ///
   /// In tr, this message translates to:
-  /// **'Alışkanlık, zikir ve tercih verilerinin büyük kısmı cihazınızda tutulur. Hesapla giriş yaparsanız seçili veriler Firebase servisleriyle eşitlenebilir. Veriler, uygulama içinden silene veya hesabınızı kaldırana kadar saklanır.'**
+  /// **'Alışkanlık, zikir ve tercih verilerinin büyük kısmı cihazınızda tutulur. Hesapla giriş yaparsanız seçili veriler güvenli sunucularımızla eşitlenebilir. Veriler, uygulama içinden silene veya hesabınızı kaldırana kadar saklanır.'**
   String get settingsPrivacyStorageBody;
 
   /// No description provided for @settingsPrivacyThirdPartyTitle.
@@ -3530,7 +3554,7 @@ abstract class AppLocalizations {
   /// No description provided for @settingsPrivacyThirdPartyBody.
   ///
   /// In tr, this message translates to:
-  /// **'Arin; oturum açma, bildirimler ve veri eşitleme için Firebase servislerini (Authentication, Firestore), kullanım analizi ve çökme tanılama için Firebase Analytics/Crashlytics\'i, reklamlar için Google AdMob\'u, abonelik ve uygulama içi satın alma doğrulaması için RevenueCat\'i ve namaz vakitleri için Aladhan/Diyanet API\'lerini kullanır. Premium Arın Asistanı mesajları Google Gemini’ye iletilir; sohbet metni uygulamada saklanmaz. Ücretsiz Gemini katmanında bu içerik Google’ın ürünlerini geliştirmek için kullanılabilir.'**
+  /// **'Arin; oturum açma, bildirimler, veri eşitleme, kullanım analizi ve çökme tanılama için güvenilir altyapı sağlayıcıları; reklamlar için Google AdMob; abonelik ve uygulama içi satın alma doğrulaması için RevenueCat; namaz vakitleri için harici vakit servisleri kullanır. Premium Arın Asistanı mesajları yanıt üretmek üzere güvenli üçüncü taraf hizmetlere iletilebilir; sohbet metni uygulamada saklanmaz.'**
   String get settingsPrivacyThirdPartyBody;
 
   /// No description provided for @settingsPrivacyControlsTitle.
@@ -7234,7 +7258,7 @@ abstract class AppLocalizations {
   /// No description provided for @inspireEmptySubtitle.
   ///
   /// In tr, this message translates to:
-  /// **'Görseller: assets/inspiration/ (1.jpg, 2.jpg, …).\nİçerik: assets/data/inspiration/*.json veya Firestore app_public/inspiration_cards.'**
+  /// **'İçerikler birazdan burada görünecek. Aşağı çekerek tekrar deneyebilirsin.'**
   String get inspireEmptySubtitle;
 
   /// No description provided for @inspirePullToRefreshHint.
@@ -7276,8 +7300,14 @@ abstract class AppLocalizations {
   /// No description provided for @asyncErrorDefaultMessage.
   ///
   /// In tr, this message translates to:
-  /// **'Bağlantın zayıf olabilir ya da hizmete şu an ulaşamıyoruz. Az sonra tekrar dene.'**
+  /// **'Bir şeyler ters gitti. Lütfen tekrar dene.'**
   String get asyncErrorDefaultMessage;
+
+  /// No description provided for @userGenericError.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bir şeyler ters gitti. Lütfen tekrar dene.'**
+  String get userGenericError;
 
   /// No description provided for @asyncErrorRetryAction.
   ///
@@ -7624,8 +7654,8 @@ abstract class AppLocalizations {
   /// No description provided for @purchaseErrorUnexpected.
   ///
   /// In tr, this message translates to:
-  /// **'Beklenmedik hata: {error}'**
-  String purchaseErrorUnexpected(Object error);
+  /// **'Bir şeyler ters gitti. Lütfen tekrar dene.'**
+  String get purchaseErrorUnexpected;
 
   /// No description provided for @purchaseErrorNotSupported.
   ///
@@ -9908,25 +9938,25 @@ abstract class AppLocalizations {
   /// No description provided for @appleSignInNotAuthorized.
   ///
   /// In tr, this message translates to:
-  /// **'Apple hesabı yetki vermedi. iPhone Ayarları > Apple Kimliği > Giriş Yapma ve Güvenlik bölümünden Apple ile giriş iznini kontrol edin.'**
+  /// **'Apple ile giriş yapılamadı. Lütfen tekrar dene.'**
   String get appleSignInNotAuthorized;
 
   /// No description provided for @appleSignInProviderDisabled.
   ///
   /// In tr, this message translates to:
-  /// **'Firebase konsolunda Apple giriş sağlayıcısı kapalı görünüyor.'**
+  /// **'Apple ile giriş yapılamadı. Lütfen tekrar dene.'**
   String get appleSignInProviderDisabled;
 
   /// No description provided for @appleSignInInvalidCredential.
   ///
   /// In tr, this message translates to:
-  /// **'Apple kimlik doğrulama bilgisi geçersiz geldi. Bundle ID ve Apple Sign In yetkisini Xcode/Firebase tarafında kontrol edin.'**
+  /// **'Apple ile giriş yapılamadı. Lütfen tekrar dene.'**
   String get appleSignInInvalidCredential;
 
   /// No description provided for @appleSignInNetworkFailed.
   ///
   /// In tr, this message translates to:
-  /// **'İnternet bağlantısı yüzünden Apple girişi tamamlanamadı.'**
+  /// **'Bir şeyler ters gitti. Lütfen tekrar dene.'**
   String get appleSignInNetworkFailed;
 
   /// No description provided for @settingsMenuPremiumTitle.
@@ -11020,6 +11050,348 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'Sonra'**
   String get appTourWidgetPromptLater;
+
+  /// No description provided for @qiblaHubSocialTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sosyal'**
+  String get qiblaHubSocialTitle;
+
+  /// No description provided for @qiblaHubSocialSubtitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Topluluk akışı — yaz, yorumla, beğen'**
+  String get qiblaHubSocialSubtitle;
+
+  /// No description provided for @socialTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sosyal'**
+  String get socialTitle;
+
+  /// No description provided for @socialSortNew.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yeni'**
+  String get socialSortNew;
+
+  /// No description provided for @socialSortNewest.
+  ///
+  /// In tr, this message translates to:
+  /// **'En yeni'**
+  String get socialSortNewest;
+
+  /// No description provided for @socialSortPopular.
+  ///
+  /// In tr, this message translates to:
+  /// **'Popüler'**
+  String get socialSortPopular;
+
+  /// No description provided for @socialYou.
+  ///
+  /// In tr, this message translates to:
+  /// **'sen'**
+  String get socialYou;
+
+  /// No description provided for @socialEmptyTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'İlk notu sen bırak'**
+  String get socialEmptyTitle;
+
+  /// No description provided for @socialEmptyBody.
+  ///
+  /// In tr, this message translates to:
+  /// **''**
+  String get socialEmptyBody;
+
+  /// No description provided for @socialDailyPromptDefault.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bugün neye şükrettin?'**
+  String get socialDailyPromptDefault;
+
+  /// No description provided for @socialChipGratitude.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bugün şükür'**
+  String get socialChipGratitude;
+
+  /// No description provided for @socialChipVerse.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bir ayet'**
+  String get socialChipVerse;
+
+  /// No description provided for @socialChipPrayer.
+  ///
+  /// In tr, this message translates to:
+  /// **'Dua iste'**
+  String get socialChipPrayer;
+
+  /// No description provided for @socialWriteComment.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yorum yaz…'**
+  String get socialWriteComment;
+
+  /// No description provided for @socialPostedToBoard.
+  ///
+  /// In tr, this message translates to:
+  /// **'Tahtaya düştü.'**
+  String get socialPostedToBoard;
+
+  /// No description provided for @socialLoadFailed.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bir şeyler ters gitti'**
+  String get socialLoadFailed;
+
+  /// No description provided for @socialTryAgain.
+  ///
+  /// In tr, this message translates to:
+  /// **'Tekrar dene'**
+  String get socialTryAgain;
+
+  /// No description provided for @socialCompose.
+  ///
+  /// In tr, this message translates to:
+  /// **'Paylaş'**
+  String get socialCompose;
+
+  /// No description provided for @socialComposeHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ne düşünüyorsun?'**
+  String get socialComposeHint;
+
+  /// No description provided for @socialCancel.
+  ///
+  /// In tr, this message translates to:
+  /// **'Vazgeç'**
+  String get socialCancel;
+
+  /// No description provided for @socialCommentHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yorum yaz…'**
+  String get socialCommentHint;
+
+  /// No description provided for @socialCommentsHeading.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yorumlar'**
+  String get socialCommentsHeading;
+
+  /// No description provided for @socialCommentsEmpty.
+  ///
+  /// In tr, this message translates to:
+  /// **'İlk yorumu sen yaz.'**
+  String get socialCommentsEmpty;
+
+  /// No description provided for @socialPostTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Gönderi'**
+  String get socialPostTitle;
+
+  /// No description provided for @socialCommentCount.
+  ///
+  /// In tr, this message translates to:
+  /// **'{count} yorum'**
+  String socialCommentCount(int count);
+
+  /// No description provided for @socialUsernameTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kullanıcı adın'**
+  String get socialUsernameTitle;
+
+  /// No description provided for @socialUsernameBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu ad bir kez seçilir, sonra değiştirilemez ve başkası alamaz.'**
+  String get socialUsernameBody;
+
+  /// No description provided for @socialUsernameLocked.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu ad bir daha değişmez.'**
+  String get socialUsernameLocked;
+
+  /// No description provided for @socialUsernameHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'ornek_ad'**
+  String get socialUsernameHint;
+
+  /// No description provided for @socialBioTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hakkında'**
+  String get socialBioTitle;
+
+  /// No description provided for @socialBioBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kendini kısaca anlat. Profilinden sonra da değiştirebilirsin.'**
+  String get socialBioBody;
+
+  /// No description provided for @socialBioHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Namazı kaçırmamaya çalışan biriyim.'**
+  String get socialBioHint;
+
+  /// No description provided for @socialBioEmpty.
+  ///
+  /// In tr, this message translates to:
+  /// **'Henüz bir şey yazmadı.'**
+  String get socialBioEmpty;
+
+  /// No description provided for @socialBioEdit.
+  ///
+  /// In tr, this message translates to:
+  /// **'Düzenle'**
+  String get socialBioEdit;
+
+  /// No description provided for @socialAvatarTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Avatar'**
+  String get socialAvatarTitle;
+
+  /// No description provided for @socialAvatarHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'İslami bir avatar seç.'**
+  String get socialAvatarHint;
+
+  /// No description provided for @socialAvatarNone.
+  ///
+  /// In tr, this message translates to:
+  /// **'Harf'**
+  String get socialAvatarNone;
+
+  /// No description provided for @socialAvatarLetterHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Avatar istemezsen adının baş harfi kalır.'**
+  String get socialAvatarLetterHint;
+
+  /// No description provided for @socialProfileTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Profil'**
+  String get socialProfileTitle;
+
+  /// No description provided for @socialSaveUsername.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kaydet'**
+  String get socialSaveUsername;
+
+  /// No description provided for @socialCopy.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kopyala'**
+  String get socialCopy;
+
+  /// No description provided for @socialShare.
+  ///
+  /// In tr, this message translates to:
+  /// **'Paylaş'**
+  String get socialShare;
+
+  /// No description provided for @socialDelete.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sil'**
+  String get socialDelete;
+
+  /// No description provided for @socialReport.
+  ///
+  /// In tr, this message translates to:
+  /// **'Şikayet et'**
+  String get socialReport;
+
+  /// No description provided for @socialCopied.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kopyalandı'**
+  String get socialCopied;
+
+  /// No description provided for @socialShareUnavailable.
+  ///
+  /// In tr, this message translates to:
+  /// **'Paylaşım açılamadı. Metin kopyalandı.'**
+  String get socialShareUnavailable;
+
+  /// No description provided for @socialReported.
+  ///
+  /// In tr, this message translates to:
+  /// **'Şikayetin alındı'**
+  String get socialReported;
+
+  /// No description provided for @socialBan.
+  ///
+  /// In tr, this message translates to:
+  /// **'Banla'**
+  String get socialBan;
+
+  /// No description provided for @socialBanTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kullanıcıyı banla'**
+  String get socialBanTitle;
+
+  /// No description provided for @socialBanHour.
+  ///
+  /// In tr, this message translates to:
+  /// **'1 saat'**
+  String get socialBanHour;
+
+  /// No description provided for @socialBanDay.
+  ///
+  /// In tr, this message translates to:
+  /// **'1 gün'**
+  String get socialBanDay;
+
+  /// No description provided for @socialBanWeek.
+  ///
+  /// In tr, this message translates to:
+  /// **'7 gün'**
+  String get socialBanWeek;
+
+  /// No description provided for @socialBanMonth.
+  ///
+  /// In tr, this message translates to:
+  /// **'30 gün'**
+  String get socialBanMonth;
+
+  /// No description provided for @socialBanPermanent.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kalıcı'**
+  String get socialBanPermanent;
+
+  /// No description provided for @socialBanned.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kullanıcı banlandı'**
+  String get socialBanned;
+
+  /// No description provided for @socialBannedBanner.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sosyal tahtaya yazamazsın.'**
+  String get socialBannedBanner;
+
+  /// No description provided for @socialProfanity.
+  ///
+  /// In tr, this message translates to:
+  /// **'Küfür veya hakaret yazılamaz.'**
+  String get socialProfanity;
 }
 
 class _AppLocalizationsDelegate

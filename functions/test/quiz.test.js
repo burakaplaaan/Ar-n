@@ -960,6 +960,58 @@ test("pickPairableCandidate requires a live funded ledger", () => {
   );
 });
 
+test("decideQuizPollWork skips the 200-doc scan between start and retry", () => {
+  const queuedAtMs = 1_000_000;
+  assert.equal(
+    t.decideQuizPollWork({
+      queuedAtMs,
+      lastPairScanAtMs: 0,
+      nowMs: queuedAtMs + 400,
+    }),
+    "cheap_wait",
+  );
+  assert.equal(
+    t.decideQuizPollWork({
+      queuedAtMs,
+      lastPairScanAtMs: queuedAtMs,
+      nowMs: queuedAtMs + t.QUEUE_PAIR_RETRY_MS - 1,
+    }),
+    "cheap_wait",
+  );
+  assert.equal(
+    t.decideQuizPollWork({
+      queuedAtMs,
+      lastPairScanAtMs: queuedAtMs,
+      nowMs: queuedAtMs + t.QUEUE_PAIR_RETRY_MS,
+    }),
+    "pair_scan",
+  );
+  assert.equal(
+    t.decideQuizPollWork({
+      queuedAtMs,
+      lastPairScanAtMs: queuedAtMs + t.QUEUE_PAIR_RETRY_MS,
+      nowMs: queuedAtMs + t.QUEUE_PAIR_RETRY_MS + 200,
+    }),
+    "cheap_wait",
+  );
+  assert.equal(
+    t.decideQuizPollWork({
+      queuedAtMs,
+      lastPairScanAtMs: queuedAtMs,
+      nowMs: queuedAtMs + t.QUEUE_WAIT_MS,
+    }),
+    "pair_scan",
+  );
+  assert.equal(
+    t.decideQuizPollWork({
+      queuedAtMs: 0,
+      lastPairScanAtMs: 0,
+      nowMs: Date.now(),
+    }),
+    "pair_scan",
+  );
+});
+
 test("decideLiveQueuePollAction pairs humans before the bot timeout", () => {
   const now = Date.now();
   assert.equal(

@@ -98,6 +98,9 @@ class AssistantToolExecutor {
       case 'prayer_circle':
         _push(AppRoutes.prayerCircle, returnTool: 'prayer_circle');
         return null;
+      case 'social':
+        _push(AppRoutes.social, returnTool: 'social');
+        return null;
       case 'hilal_duel':
         _push(AppRoutes.hilalDuel, returnTool: 'hilal_duel');
         return null;

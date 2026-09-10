@@ -228,6 +228,41 @@ service cloud.firestore {
       allow read, write: if false;
     }
 
+    // Sosyal tahta — okuma/yazma yalnız Cloud Functions.
+    match /social_posts/{postId} {
+      allow read, write: if false;
+      match /comments/{commentId} {
+        allow read, write: if false;
+      }
+      match /reports/{uid} {
+        allow read, write: if false;
+      }
+    }
+    match /social_feed/{docId} {
+      allow read, write: if false;
+    }
+    match /social_profiles/{uid} {
+      allow read, write: if false;
+    }
+    match /social_usernames/{nameKey} {
+      allow read, write: if false;
+    }
+    match /social_votes/{voteId} {
+      allow read, write: if false;
+    }
+    match /social_rate_limits/{docId} {
+      allow read, write: if false;
+    }
+    match /social_installs/{installHash} {
+      allow read, write: if false;
+    }
+    match /social_config/{docId} {
+      allow read, write: if false;
+    }
+    match /social_bans/{docId} {
+      allow read, write: if false;
+    }
+
     // Hilal Düellosu eşleştirme, cevap, profil ve reklam ödülleri yalnız
     // App Check kullanan Cloud Functions üzerinden işlenir. Doğru cevaplar ve
     // rakibin henüz açıklanmamış seçimi istemciye doğrudan açılmaz.

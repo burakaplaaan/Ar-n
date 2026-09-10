@@ -14,6 +14,7 @@ import 'package:purchases_flutter/purchases_flutter.dart';
 import '../../core/analytics/meta_app_events.dart';
 import '../../core/constants/premium_catalog.dart';
 import '../../core/constants/revenuecat_ids.dart';
+import '../../core/errors/user_facing_error.dart';
 import '../../l10n/app_localizations.dart';
 import '../models/premium_entitlement.dart';
 import '../models/purchase_result.dart';
@@ -234,7 +235,7 @@ class PurchaseService {
     }
     final ready = await _waitUntilConfigured();
     if (!ready) {
-      return PurchaseOutcome.error(l10n?.purchaseErrorUnexpected('Not ready') ?? 'Satın alma servisi henüz hazır değil. Lütfen birkaç saniye sonra tekrar deneyin.');
+      return PurchaseOutcome.error(userFacingErrorMessage(l10n));
     }
 
     // Offerings yerine doğrudan getProducts kullanılıyor.
@@ -298,9 +299,9 @@ class PurchaseService {
       if (code == PurchasesErrorCode.purchaseCancelledError) {
         return const PurchaseOutcome.cancelled();
       }
-      return PurchaseOutcome.error(l10n != null ? _errorMessage(code, l10n) : 'Hata: ${code.name}');
+      return PurchaseOutcome.error(userFacingErrorMessage(l10n));
     } catch (e) {
-      return PurchaseOutcome.error(l10n?.purchaseErrorUnexpected(e.toString()) ?? 'Beklenmedik hata: $e');
+      return PurchaseOutcome.error(userFacingErrorMessage(l10n));
     }
   }
 
@@ -321,7 +322,7 @@ class PurchaseService {
     }
     final ready = await _waitUntilConfigured();
     if (!ready) {
-      return PurchaseOutcome.error(l10n?.purchaseErrorUnexpected('Not ready') ?? 'Destek satın alma servisi henüz hazır değil. Lütfen tekrar deneyin.');
+      return PurchaseOutcome.error(userFacingErrorMessage(l10n));
     }
     try {
       // Billing client bağlantısı configure'dan hemen sonra hazır olmayabilir.
@@ -352,7 +353,7 @@ class PurchaseService {
         productId,
       );
       if (product == null) {
-        return PurchaseOutcome.error(l10n?.purchaseErrorNotFound ?? 'Ürün bulunamadı [ID: $productId]. Mağaza tarafında ürün aktif olmayabilir veya bağlantı sorunu olabilir.');
+        return PurchaseOutcome.error(l10n?.purchaseErrorNotFound ?? userFacingErrorMessage());
       }
       final result = await Purchases.purchase(
         PurchaseParams.storeProduct(product),
@@ -384,10 +385,10 @@ class PurchaseService {
       if (code == PurchasesErrorCode.purchaseCancelledError) {
         return const PurchaseOutcome.cancelled();
       }
-      return PurchaseOutcome.error(l10n != null ? _errorMessage(code, l10n) : 'Hata: ${code.name}');
+      return PurchaseOutcome.error(userFacingErrorMessage(l10n));
     } catch (e) {
       debugPrint('[PurchaseService] Unexpected error: $e');
-      return PurchaseOutcome.error(l10n?.purchaseErrorUnexpected(e.toString()) ?? 'Hata: $e');
+      return PurchaseOutcome.error(userFacingErrorMessage(l10n));
     }
   }
 
@@ -400,7 +401,7 @@ class PurchaseService {
     }
     final ready = await _waitUntilConfigured();
     if (!ready) {
-      return PurchaseOutcome.error(l10n?.purchaseErrorUnexpected('Not ready') ?? 'Satın alma servisi henüz hazır değil. Lütfen birkaç saniye sonra tekrar deneyin.');
+      return PurchaseOutcome.error(userFacingErrorMessage(l10n));
     }
     try {
       final info = await Purchases.restorePurchases();
@@ -409,9 +410,12 @@ class PurchaseService {
           : const PurchaseOutcome.notFound();
     } on PlatformException catch (e) {
       final code = PurchasesErrorHelper.getErrorCode(e);
-      return PurchaseOutcome.error(l10n != null ? _errorMessage(code, l10n) : 'Ağ hatası veya beklenmedik sorun.');
+      if (code == PurchasesErrorCode.purchaseCancelledError) {
+        return const PurchaseOutcome.cancelled();
+      }
+      return PurchaseOutcome.error(userFacingErrorMessage(l10n));
     } catch (e) {
-      return PurchaseOutcome.error(l10n?.purchaseErrorUnexpected(e.toString()) ?? 'Beklenmedik hata: $e');
+      return PurchaseOutcome.error(userFacingErrorMessage(l10n));
     }
   }
 
@@ -563,22 +567,6 @@ class PurchaseService {
   bool _hasPremium(CustomerInfo info) {
     return info.entitlements.active
         .containsKey(RevenueCatIds.premiumEntitlement);
-  }
-
-  String _errorMessage(PurchasesErrorCode code, AppLocalizations l10n) {
-    return switch (code) {
-      PurchasesErrorCode.networkError => l10n.purchaseErrorUnexpected('Network error'),
-      PurchasesErrorCode.receiptAlreadyInUseError => l10n.purchaseErrorUnexpected(
-        'Receipt already in use',
-      ),
-      PurchasesErrorCode.invalidAppUserIdError => l10n.purchaseErrorUnexpected(
-        'Invalid app user id',
-      ),
-      PurchasesErrorCode.paymentPendingError => l10n.purchaseErrorUnexpected(
-        'Payment pending',
-      ),
-      _ => l10n.purchaseErrorUnexpected(code.name),
-    };
   }
 
   static Future<void> _safeCall(Future<dynamic> Function() fn) async {

@@ -69,6 +69,8 @@ bool assistantReturnStillOnTool({
     case 'prayer_circle':
       return path == AppRoutes.prayerCircle ||
           qiblaTop == QiblaHubRoutes.prayerCircle;
+    case 'social':
+      return path == AppRoutes.social || qiblaTop == QiblaHubRoutes.social;
     case 'hilal_duel':
       return path == AppRoutes.hilalDuel ||
           qiblaTop == QiblaHubRoutes.hilalDuel;

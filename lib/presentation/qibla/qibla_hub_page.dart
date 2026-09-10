@@ -22,6 +22,7 @@ import 'qibla_nested_swipe_back.dart';
 import 'qibla_shell_swipe_provider.dart';
 import 'prayer_circle/prayer_circle_page.dart';
 import 'hilal_duel/hilal_duel_page.dart';
+import 'social/social_page.dart';
 import 'zikir_matik_page.dart';
 import 'healing_frequencies/healing_frequencies_page.dart';
 import '../willpower/breathing_exercise_page.dart';
@@ -34,6 +35,7 @@ abstract final class QiblaHubRoutes {
   static const String healing = '/healing';
   static const String prayerCircle = '/prayer-circle';
   static const String hilalDuel = '/hilal-duel';
+  static const String social = '/social';
   static const String islamicAi = '/islamic-ai';
 }
 
@@ -151,6 +153,7 @@ class _QiblaHubPageState extends ConsumerState<QiblaHubPage> {
       'breathing' => QiblaHubRoutes.breathing,
       'prayer-circle' || 'prayer_circle' => QiblaHubRoutes.prayerCircle,
       'hilal-duel' || 'hilal_duel' => QiblaHubRoutes.hilalDuel,
+      'social' => QiblaHubRoutes.social,
       'islamic-ai' => QiblaHubRoutes.islamicAi,
       _ => null,
     };
@@ -227,6 +230,12 @@ class _QiblaHubPageState extends ConsumerState<QiblaHubPage> {
             return _toolRoute(
               settings: settings,
               builder: (_) => const HilalDuelPage(),
+            );
+          case QiblaHubRoutes.social:
+            return _toolRoute(
+              settings: settings,
+              builder: (_) =>
+                  const QiblaNestedSwipeBack(child: SocialPage()),
             );
           case QiblaHubRoutes.islamicAi:
             return _toolRoute(

@@ -42,6 +42,19 @@ class AppLocalizationsAr extends AppLocalizations {
   String get settingsSectionSession => 'الجلسة';
 
   @override
+  String get settingsSectionFollowArin => 'تابع ARIN';
+
+  @override
+  String get settingsFollowInstagramTitle => 'Instagram';
+
+  @override
+  String get settingsFollowTikTokTitle => 'TikTok';
+
+  @override
+  String get settingsFollowOpenFailed =>
+      'تعذر فتح الملف الشخصي. حاول مرة أخرى.';
+
+  @override
   String get settingsMenuNotificationsSubtitle => 'الصلاة والتزكية والذكر';
 
   @override
@@ -1967,7 +1980,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get settingsPrivacyPageTitle => 'سياسة الخصوصية';
 
   @override
-  String get settingsPrivacyLastUpdated => 'آخر تحديث: 26.04.2026';
+  String get settingsPrivacyLastUpdated => 'آخر تحديث: 09.09.2026';
 
   @override
   String get settingsPrivacyIntro =>
@@ -1992,14 +2005,14 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get settingsPrivacyStorageBody =>
-      'يتم حفظ معظم بيانات العادات والذكر والتفضيلات على جهازك. إذا سجّلت الدخول، قد تتم مزامنة بيانات محددة مع خدمات Firebase. يتم الاحتفاظ بالبيانات حتى تحذفها من التطبيق أو تزيل حسابك.';
+      'يتم حفظ معظم بيانات العادات والذكر والتفضيلات على جهازك. إذا سجّلت الدخول، قد تتم مزامنة بيانات محددة مع خوادمنا الآمنة. يتم الاحتفاظ بالبيانات حتى تحذفها من التطبيق أو تزيل حسابك.';
 
   @override
   String get settingsPrivacyThirdPartyTitle => 'خدمات الطرف الثالث';
 
   @override
   String get settingsPrivacyThirdPartyBody =>
-      'تستخدم Arin خدمات Firebase (Authentication وFirestore) لتسجيل الدخول والإشعارات والمزامنة، وFirebase Analytics/Crashlytics للتحليلات وتشخيص الأعطال، وGoogle AdMob للإعلانات، وRevenueCat للتحقق من الاشتراكات وعمليات الشراء داخل التطبيق، وواجهات Aladhan/Diyanet لمواقيت الصلاة. تُرسل رسائل مساعد أرِن في البريميوم إلى Google Gemini ولا يُحفظ نص المحادثة في التطبيق. في الطبقة المجانية من Gemini قد يُستخدم هذا المحتوى لتحسين منتجات Google.';
+      'تستخدم Arin مزودي بنية تحتية موثوقين لتسجيل الدخول والإشعارات والمزامنة والتحليلات وتشخيص الأعطال، وGoogle AdMob للإعلانات، وRevenueCat للتحقق من الاشتراكات وعمليات الشراء داخل التطبيق، وخدمات مواقيت صلاة خارجية. قد تُرسل رسائل مساعد أرِن في البريميوم إلى خدمات طرف ثالث آمنة لإنشاء الردود، ولا يُحفظ نص المحادثة في التطبيق.';
 
   @override
   String get settingsPrivacyControlsTitle => 'تحكم المستخدم';
@@ -4132,7 +4145,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get inspireEmptySubtitle =>
-      'الصور: assets/inspiration/ (1.jpg, 2.jpg, ...).\nالمحتوى: assets/data/inspiration/*.json أو Firestore app_public/inspiration_cards.';
+      'سيظهر المحتوى هنا قريبًا. اسحب لأسفل للمحاولة مرة أخرى.';
 
   @override
   String get inspirePullToRefreshHint => 'اسحب لأسفل للتحديث.';
@@ -4153,8 +4166,10 @@ class AppLocalizationsAr extends AppLocalizations {
   String get asyncErrorDefaultTitle => 'حدث خطأ ما';
 
   @override
-  String get asyncErrorDefaultMessage =>
-      'قد يكون الاتصال ضعيفًا أو الخدمة غير متاحة الآن. حاول مرة أخرى بعد قليل.';
+  String get asyncErrorDefaultMessage => 'حدث خطأ ما. يرجى المحاولة مرة أخرى.';
+
+  @override
+  String get userGenericError => 'حدث خطأ ما. يرجى المحاولة مرة أخرى.';
 
   @override
   String get asyncErrorRetryAction => 'إعادة المحاولة';
@@ -4371,9 +4386,7 @@ class AppLocalizationsAr extends AppLocalizations {
       'لم يتم العثور على المنتج. يرجى التحقق من اتصالك بالإنترنت.';
 
   @override
-  String purchaseErrorUnexpected(Object error) {
-    return 'خطأ غير متوقع: $error';
-  }
+  String get purchaseErrorUnexpected => 'حدث خطأ ما. يرجى المحاولة مرة أخرى.';
 
   @override
   String get purchaseErrorNotSupported => 'الشراء غير مدعوم على هذه المنصة.';
@@ -5633,19 +5646,18 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get appleSignInNotAuthorized =>
-      'حساب Apple غير مصرح به. تحقق من إذن تسجيل الدخول باستخدام Apple من إعدادات iPhone > Apple ID > تسجيل الدخول والأمان.';
+      'تعذر إكمال تسجيل الدخول عبر Apple. يرجى المحاولة مرة أخرى.';
 
   @override
   String get appleSignInProviderDisabled =>
-      'يبدو أن موفر تسجيل الدخول عبر Apple معطل في وحدة تحكم Firebase.';
+      'تعذر إكمال تسجيل الدخول عبر Apple. يرجى المحاولة مرة أخرى.';
 
   @override
   String get appleSignInInvalidCredential =>
-      'بيانات مصادقة Apple غير صالحة. تحقق من Bundle ID وإمكانيات تسجيل الدخول عبر Apple في Xcode/Firebase.';
+      'تعذر إكمال تسجيل الدخول عبر Apple. يرجى المحاولة مرة أخرى.';
 
   @override
-  String get appleSignInNetworkFailed =>
-      'تعذر إكمال تسجيل الدخول عبر Apple بسبب اتصال الشبكة.';
+  String get appleSignInNetworkFailed => 'حدث خطأ ما. يرجى المحاولة مرة أخرى.';
 
   @override
   String get settingsMenuPremiumTitle => 'أرين بريميوم';
@@ -6297,4 +6309,180 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get appTourWidgetPromptLater => 'لاحقاً';
+
+  @override
+  String get qiblaHubSocialTitle => 'اجتماعي';
+
+  @override
+  String get qiblaHubSocialSubtitle => 'تحديثات المجتمع — اكتب وعلّق وأعجب';
+
+  @override
+  String get socialTitle => 'اجتماعي';
+
+  @override
+  String get socialSortNew => 'جديد';
+
+  @override
+  String get socialSortNewest => 'الأحدث';
+
+  @override
+  String get socialSortPopular => 'شائع';
+
+  @override
+  String get socialYou => 'أنت';
+
+  @override
+  String get socialEmptyTitle => 'اترك أول ملاحظة';
+
+  @override
+  String get socialEmptyBody => '';
+
+  @override
+  String get socialDailyPromptDefault => 'بما تشكر اليوم؟';
+
+  @override
+  String get socialChipGratitude => 'شكر اليوم';
+
+  @override
+  String get socialChipVerse => 'آية';
+
+  @override
+  String get socialChipPrayer => 'اطلب دعاء';
+
+  @override
+  String get socialWriteComment => 'اكتب تعليقاً…';
+
+  @override
+  String get socialPostedToBoard => 'وصلت إلى اللوحة.';
+
+  @override
+  String get socialLoadFailed => 'حدث خطأ ما';
+
+  @override
+  String get socialTryAgain => 'أعد المحاولة';
+
+  @override
+  String get socialCompose => 'انشر';
+
+  @override
+  String get socialComposeHint => 'بماذا تفكر؟';
+
+  @override
+  String get socialCancel => 'إلغاء';
+
+  @override
+  String get socialCommentHint => 'اكتب تعليقاً…';
+
+  @override
+  String get socialCommentsHeading => 'التعليقات';
+
+  @override
+  String get socialCommentsEmpty => 'كن أول من يعلّق.';
+
+  @override
+  String get socialPostTitle => 'منشور';
+
+  @override
+  String socialCommentCount(int count) {
+    return '$count تعليقات';
+  }
+
+  @override
+  String get socialUsernameTitle => 'اسم المستخدم';
+
+  @override
+  String get socialUsernameBody =>
+      'تختاره مرة واحدة ولا يمكن تغييره ولا يأخذه غيرك.';
+
+  @override
+  String get socialUsernameLocked => 'لا يمكن تغيير هذا الاسم.';
+
+  @override
+  String get socialUsernameHint => 'اسمك';
+
+  @override
+  String get socialBioTitle => 'نبذة';
+
+  @override
+  String get socialBioBody =>
+      'عرّف بنفسك باختصار. يمكنك تغييرها لاحقاً من ملفك.';
+
+  @override
+  String get socialBioHint => 'أحرص ألا تفوتني الصلاة.';
+
+  @override
+  String get socialBioEmpty => 'لم يكتب شيئاً بعد.';
+
+  @override
+  String get socialBioEdit => 'تعديل';
+
+  @override
+  String get socialAvatarTitle => 'الصورة';
+
+  @override
+  String get socialAvatarHint => 'اختر صورة إسلامية.';
+
+  @override
+  String get socialAvatarNone => 'حرف';
+
+  @override
+  String get socialAvatarLetterHint =>
+      'إن لم ترد رمزاً يبقى الحرف الأول من اسمك.';
+
+  @override
+  String get socialProfileTitle => 'الملف';
+
+  @override
+  String get socialSaveUsername => 'حفظ';
+
+  @override
+  String get socialCopy => 'نسخ';
+
+  @override
+  String get socialShare => 'مشاركة';
+
+  @override
+  String get socialDelete => 'حذف';
+
+  @override
+  String get socialReport => 'إبلاغ';
+
+  @override
+  String get socialCopied => 'تم النسخ';
+
+  @override
+  String get socialShareUnavailable => 'تعذرت المشاركة. تم نسخ النص.';
+
+  @override
+  String get socialReported => 'تم استلام البلاغ';
+
+  @override
+  String get socialBan => 'حظر';
+
+  @override
+  String get socialBanTitle => 'حظر المستخدم';
+
+  @override
+  String get socialBanHour => 'ساعة';
+
+  @override
+  String get socialBanDay => 'يوم';
+
+  @override
+  String get socialBanWeek => '7 أيام';
+
+  @override
+  String get socialBanMonth => '30 يوماً';
+
+  @override
+  String get socialBanPermanent => 'دائم';
+
+  @override
+  String get socialBanned => 'تم حظر المستخدم';
+
+  @override
+  String get socialBannedBanner => 'لا يمكنك الكتابة على اللوحة.';
+
+  @override
+  String get socialProfanity => 'لا يُسمح بالشتم أو الإهانة.';
 }

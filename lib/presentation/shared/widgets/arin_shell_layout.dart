@@ -10,24 +10,55 @@ abstract final class ArinShellLayout {
   /// Orta üçgen FAB’ın üstte taşan kısmı için ekstra boşluk.
   static const double centerFabLip = 12;
 
+  static const double _barInnerTop = 6;
+  static const double _barInnerBottom = 8;
+  static const double _barRowHeight = 50;
+  static const double _barFinger = 20;
+  static const double _keyboardOpenThreshold = 24;
+
+  /// Alt çubuğun üstünde bitmek için gereken toplam boşluk.
+  static double barClearance(double systemBottom) {
+    return systemBottom +
+        _barInnerTop +
+        _barInnerBottom +
+        _barRowHeight +
+        centerFabLip +
+        _barFinger;
+  }
+
+  /// Cihazın gerçek alt inset’i. MediaQuery soyulmuş olsa bile [View] kullanılır.
+  static double deviceSystemBottom(BuildContext context) {
+    final mq = MediaQuery.of(context);
+    var system = math.max(mq.viewPadding.bottom, mq.padding.bottom);
+    final view = View.maybeOf(context);
+    final dpr = view?.devicePixelRatio ?? 0;
+    if (view != null && dpr > 0) {
+      final fromView =
+          math.max(view.padding.bottom, view.viewPadding.bottom) / dpr;
+      system = math.max(system, fromView);
+    }
+    return system;
+  }
+
+  static double keyboardInset(BuildContext context) {
+    final mq = MediaQuery.viewInsetsOf(context).bottom;
+    final view = View.maybeOf(context);
+    final dpr = view?.devicePixelRatio ?? 0;
+    if (view != null && dpr > 0) {
+      return math.max(mq, view.viewInsets.bottom / dpr);
+    }
+    return mq;
+  }
+
   /// İçerik / FAB’ın alt çubuğun üstünde bitmesi için toplam padding.
   ///
   /// [ArinShell] `extendBody: true` kullandığı için iç sayfa [Scaffold]’ları
   /// gövdeyi alt çubuğun altına kadar çizer; [viewPadding] bazı cihazlarda
-  /// tek başına yetersiz kalabildiğinden sistem alt boşluğu `padding` ile
-  /// birlikte alınır. Ölçüler `_ArinBottomNav` ile uyumlu: Padding(6,8) +
-  /// satır ~50 + FAB dudak + parmak payı.
+  /// tek başına yetersiz kalabildiğinden sistem alt boşluğu `View` +
+  /// `padding` ile birlikte alınır. Ölçüler `_ArinBottomNav` ile uyumlu:
+  /// Padding(6,8) + satır ~50 + FAB dudak + parmak payı.
   static double bottomContentPadding(BuildContext context) {
-    final mq = MediaQuery.of(context);
-    final systemBottom = math.max(mq.viewPadding.bottom, mq.padding.bottom);
-    const barPaddingVertical = 6 + 8; // _ArinBottomNav iç dikey padding
-    const rowHeight = 50; // orta üçgen (layout yüksekliği)
-    const finger = 20;
-    return systemBottom +
-        barPaddingVertical +
-        rowHeight +
-        centerFabLip +
-        finger;
+    return barClearance(deviceSystemBottom(context));
   }
 
   /// Yeşil artı FAB’ın alt bar satırının **üst kenarına** yapışık minimal pay (logical px).
@@ -38,24 +69,18 @@ abstract final class ArinShellLayout {
   /// `_ArinBottomNav`: `SafeArea` + `Padding(…, 6, 8)` — Row’un altındaki **8** satırı ekran
   /// tabanından yukarı iter; üstteki **6** bu hizadan sayılmaz (önceki 6+8 toplamı ~6px fazla boşluk veriyordu).
   static double fabCornerBottomFromScreenBottom(BuildContext context) {
-    final mq = MediaQuery.of(context);
-    final systemBottom = math.max(mq.viewPadding.bottom, mq.padding.bottom);
-    const innerBottomPad = 8; // Row altı (_ArinBottomNav)
-    const rowHeight = 50; // _CenterFab / satır
-    return systemBottom + innerBottomPad + rowHeight + fabGapAboveBottomNav;
+    return deviceSystemBottom(context) +
+        _barInnerBottom +
+        _barRowHeight +
+        fabGapAboveBottomNav;
   }
 
   static const double willpowerHubFabSize = 58;
 
   /// Willpower hub listesi — alt çubuk + yeşil FAB üst üste binmesin (`bottomContentPadding` ile max).
-  /// Üst kabuk `viewInsets`'i yutsa bile klavye açık mı.
+  /// Gerçek klavye yüksekliği; MediaQuery soyulmuş olsa bile [View] kullanılır.
   static bool isKeyboardOpen(BuildContext context) {
-    final mq = MediaQuery.of(context);
-    return keyboardOpenFromMedia(
-      viewInsetsBottom: mq.viewInsets.bottom,
-      viewPaddingBottom: mq.viewPadding.bottom,
-      paddingBottom: mq.padding.bottom,
-    );
+    return keyboardInset(context) > _keyboardOpenThreshold;
   }
 
   @visibleForTesting
@@ -64,27 +89,25 @@ abstract final class ArinShellLayout {
     required double viewPaddingBottom,
     required double paddingBottom,
   }) {
-    return viewInsetsBottom > 0 ||
-        viewPaddingBottom > paddingBottom + 0.5;
+    return viewInsetsBottom > _keyboardOpenThreshold;
   }
 
-  /// Asistan yazma çubuğu — alt menünün hemen üstü; klavyede menü payı yok.
+  /// Yazma kutusu: klavye açıkken klavyenin üstü, değilse alt barın üstü.
+  /// 8px “kısayol” yok — kutu barın altına inemez.
+  static double composerBottomPadding(BuildContext context) {
+    if (isKeyboardOpen(context)) return 10 + keyboardInset(context);
+    return bottomContentPadding(context);
+  }
+
+  /// Asistan yazma çubuğu — [composerBottomPadding] ile aynı kural.
   static double assistantComposerBottomPadding(
     BuildContext context, {
     double? bodyHeight,
   }) {
-    if (isKeyboardOpen(context)) return 10;
-    final mq = MediaQuery.of(context);
-    return assistantComposerBottomPaddingFromMedia(
-      viewPaddingBottom: mq.viewPadding.bottom,
-      paddingBottom: mq.padding.bottom,
-      screenHeight: mq.size.height,
-      bodyHeight: bodyHeight,
-    );
+    return composerBottomPadding(context);
   }
 
-  /// Gövde zaten alt çubuğun üstünde bitiyorsa veya [paddingBottom] menüyü
-  /// içeriyorsa yüksekliği ikinci kez eklemeyin — kutu havada kalır.
+  /// Test için: her zaman bar boşluğunun tamamı. Kısa kesmek barın altına sokar.
   @visibleForTesting
   static double assistantComposerBottomPaddingFromMedia({
     required double viewPaddingBottom,
@@ -92,23 +115,7 @@ abstract final class ArinShellLayout {
     double? screenHeight,
     double? bodyHeight,
   }) {
-    const gapAboveBar = 8.0;
-    if (paddingBottom > viewPaddingBottom + 16) {
-      return gapAboveBar;
-    }
-    if (screenHeight != null &&
-        bodyHeight != null &&
-        screenHeight - bodyHeight > 56) {
-      return gapAboveBar;
-    }
-    const innerBottomPad = 8;
-    const rowHeight = 50;
-    const navNudgeDown = 32;
-    return viewPaddingBottom +
-        innerBottomPad +
-        rowHeight +
-        gapAboveBar -
-        navNudgeDown;
+    return barClearance(math.max(viewPaddingBottom, paddingBottom));
   }
 
   static double willpowerHubScrollBottomPadding(BuildContext context) {

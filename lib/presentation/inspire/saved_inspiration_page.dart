@@ -123,11 +123,11 @@ class SavedInspirationPage extends ConsumerWidget {
           loading: () => const Center(
             child: ArinLoader(color: AppColors.accentNeonGreen),
           ),
-          error: (e, _) => Center(
+          error: (_, _) => Center(
             child: Padding(
               padding: const EdgeInsets.all(24),
               child: Text(
-                '${l10n.savedInspirationLoadFailedPrefix}: $e',
+                l10n.userGenericError,
                 textAlign: TextAlign.center,
                 style: TextStyle(color: Colors.white.withValues(alpha: 0.7)),
               ),

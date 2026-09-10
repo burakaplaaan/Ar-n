@@ -23,6 +23,7 @@ bool dispatchQiblaHubBack({
   final onQiblaStack = currentPath == AppRoutes.qibla ||
       currentPath.startsWith('${AppRoutes.qibla}/') ||
       currentPath == AppRoutes.hilalDuel ||
+      currentPath == AppRoutes.social ||
       currentPath == AppRoutes.prayerCircle ||
       isQiblaVisible;
   if (!onQiblaStack) return false;

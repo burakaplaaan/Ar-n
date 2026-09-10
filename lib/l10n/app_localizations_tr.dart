@@ -42,6 +42,19 @@ class AppLocalizationsTr extends AppLocalizations {
   String get settingsSectionSession => 'Oturum';
 
   @override
+  String get settingsSectionFollowArin => 'ARIN\'I TAKİP ET';
+
+  @override
+  String get settingsFollowInstagramTitle => 'Instagram';
+
+  @override
+  String get settingsFollowTikTokTitle => 'TikTok';
+
+  @override
+  String get settingsFollowOpenFailed =>
+      'Profil açılamadı. Daha sonra tekrar dene.';
+
+  @override
   String get settingsMenuNotificationsSubtitle => 'Namaz, arınma ve zikir';
 
   @override
@@ -1971,7 +1984,7 @@ class AppLocalizationsTr extends AppLocalizations {
   String get settingsPrivacyPageTitle => 'Gizlilik Politikası';
 
   @override
-  String get settingsPrivacyLastUpdated => 'Son güncelleme: 26.04.2026';
+  String get settingsPrivacyLastUpdated => 'Son güncelleme: 09.09.2026';
 
   @override
   String get settingsPrivacyIntro =>
@@ -1996,14 +2009,14 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get settingsPrivacyStorageBody =>
-      'Alışkanlık, zikir ve tercih verilerinin büyük kısmı cihazınızda tutulur. Hesapla giriş yaparsanız seçili veriler Firebase servisleriyle eşitlenebilir. Veriler, uygulama içinden silene veya hesabınızı kaldırana kadar saklanır.';
+      'Alışkanlık, zikir ve tercih verilerinin büyük kısmı cihazınızda tutulur. Hesapla giriş yaparsanız seçili veriler güvenli sunucularımızla eşitlenebilir. Veriler, uygulama içinden silene veya hesabınızı kaldırana kadar saklanır.';
 
   @override
   String get settingsPrivacyThirdPartyTitle => 'Üçüncü taraf servisler';
 
   @override
   String get settingsPrivacyThirdPartyBody =>
-      'Arin; oturum açma, bildirimler ve veri eşitleme için Firebase servislerini (Authentication, Firestore), kullanım analizi ve çökme tanılama için Firebase Analytics/Crashlytics\'i, reklamlar için Google AdMob\'u, abonelik ve uygulama içi satın alma doğrulaması için RevenueCat\'i ve namaz vakitleri için Aladhan/Diyanet API\'lerini kullanır. Premium Arın Asistanı mesajları Google Gemini’ye iletilir; sohbet metni uygulamada saklanmaz. Ücretsiz Gemini katmanında bu içerik Google’ın ürünlerini geliştirmek için kullanılabilir.';
+      'Arin; oturum açma, bildirimler, veri eşitleme, kullanım analizi ve çökme tanılama için güvenilir altyapı sağlayıcıları; reklamlar için Google AdMob; abonelik ve uygulama içi satın alma doğrulaması için RevenueCat; namaz vakitleri için harici vakit servisleri kullanır. Premium Arın Asistanı mesajları yanıt üretmek üzere güvenli üçüncü taraf hizmetlere iletilebilir; sohbet metni uygulamada saklanmaz.';
 
   @override
   String get settingsPrivacyControlsTitle => 'Kullanıcı kontrolü';
@@ -4163,7 +4176,7 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get inspireEmptySubtitle =>
-      'Görseller: assets/inspiration/ (1.jpg, 2.jpg, …).\nİçerik: assets/data/inspiration/*.json veya Firestore app_public/inspiration_cards.';
+      'İçerikler birazdan burada görünecek. Aşağı çekerek tekrar deneyebilirsin.';
 
   @override
   String get inspirePullToRefreshHint => 'Yenilemek için aşağı çekin.';
@@ -4185,7 +4198,10 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get asyncErrorDefaultMessage =>
-      'Bağlantın zayıf olabilir ya da hizmete şu an ulaşamıyoruz. Az sonra tekrar dene.';
+      'Bir şeyler ters gitti. Lütfen tekrar dene.';
+
+  @override
+  String get userGenericError => 'Bir şeyler ters gitti. Lütfen tekrar dene.';
 
   @override
   String get asyncErrorRetryAction => 'Tekrar dene';
@@ -4395,9 +4411,8 @@ class AppLocalizationsTr extends AppLocalizations {
       'Ürün bulunamadı. İnternet bağlantınızı kontrol edin.';
 
   @override
-  String purchaseErrorUnexpected(Object error) {
-    return 'Beklenmedik hata: $error';
-  }
+  String get purchaseErrorUnexpected =>
+      'Bir şeyler ters gitti. Lütfen tekrar dene.';
 
   @override
   String get purchaseErrorNotSupported =>
@@ -5662,19 +5677,19 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get appleSignInNotAuthorized =>
-      'Apple hesabı yetki vermedi. iPhone Ayarları > Apple Kimliği > Giriş Yapma ve Güvenlik bölümünden Apple ile giriş iznini kontrol edin.';
+      'Apple ile giriş yapılamadı. Lütfen tekrar dene.';
 
   @override
   String get appleSignInProviderDisabled =>
-      'Firebase konsolunda Apple giriş sağlayıcısı kapalı görünüyor.';
+      'Apple ile giriş yapılamadı. Lütfen tekrar dene.';
 
   @override
   String get appleSignInInvalidCredential =>
-      'Apple kimlik doğrulama bilgisi geçersiz geldi. Bundle ID ve Apple Sign In yetkisini Xcode/Firebase tarafında kontrol edin.';
+      'Apple ile giriş yapılamadı. Lütfen tekrar dene.';
 
   @override
   String get appleSignInNetworkFailed =>
-      'İnternet bağlantısı yüzünden Apple girişi tamamlanamadı.';
+      'Bir şeyler ters gitti. Lütfen tekrar dene.';
 
   @override
   String get settingsMenuPremiumTitle => 'ARIN Premium';
@@ -6325,4 +6340,180 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get appTourWidgetPromptLater => 'Sonra';
+
+  @override
+  String get qiblaHubSocialTitle => 'Sosyal';
+
+  @override
+  String get qiblaHubSocialSubtitle => 'Topluluk akışı — yaz, yorumla, beğen';
+
+  @override
+  String get socialTitle => 'Sosyal';
+
+  @override
+  String get socialSortNew => 'Yeni';
+
+  @override
+  String get socialSortNewest => 'En yeni';
+
+  @override
+  String get socialSortPopular => 'Popüler';
+
+  @override
+  String get socialYou => 'sen';
+
+  @override
+  String get socialEmptyTitle => 'İlk notu sen bırak';
+
+  @override
+  String get socialEmptyBody => '';
+
+  @override
+  String get socialDailyPromptDefault => 'Bugün neye şükrettin?';
+
+  @override
+  String get socialChipGratitude => 'Bugün şükür';
+
+  @override
+  String get socialChipVerse => 'Bir ayet';
+
+  @override
+  String get socialChipPrayer => 'Dua iste';
+
+  @override
+  String get socialWriteComment => 'Yorum yaz…';
+
+  @override
+  String get socialPostedToBoard => 'Tahtaya düştü.';
+
+  @override
+  String get socialLoadFailed => 'Bir şeyler ters gitti';
+
+  @override
+  String get socialTryAgain => 'Tekrar dene';
+
+  @override
+  String get socialCompose => 'Paylaş';
+
+  @override
+  String get socialComposeHint => 'Ne düşünüyorsun?';
+
+  @override
+  String get socialCancel => 'Vazgeç';
+
+  @override
+  String get socialCommentHint => 'Yorum yaz…';
+
+  @override
+  String get socialCommentsHeading => 'Yorumlar';
+
+  @override
+  String get socialCommentsEmpty => 'İlk yorumu sen yaz.';
+
+  @override
+  String get socialPostTitle => 'Gönderi';
+
+  @override
+  String socialCommentCount(int count) {
+    return '$count yorum';
+  }
+
+  @override
+  String get socialUsernameTitle => 'Kullanıcı adın';
+
+  @override
+  String get socialUsernameBody =>
+      'Bu ad bir kez seçilir, sonra değiştirilemez ve başkası alamaz.';
+
+  @override
+  String get socialUsernameLocked => 'Bu ad bir daha değişmez.';
+
+  @override
+  String get socialUsernameHint => 'ornek_ad';
+
+  @override
+  String get socialBioTitle => 'Hakkında';
+
+  @override
+  String get socialBioBody =>
+      'Kendini kısaca anlat. Profilinden sonra da değiştirebilirsin.';
+
+  @override
+  String get socialBioHint => 'Namazı kaçırmamaya çalışan biriyim.';
+
+  @override
+  String get socialBioEmpty => 'Henüz bir şey yazmadı.';
+
+  @override
+  String get socialBioEdit => 'Düzenle';
+
+  @override
+  String get socialAvatarTitle => 'Avatar';
+
+  @override
+  String get socialAvatarHint => 'İslami bir avatar seç.';
+
+  @override
+  String get socialAvatarNone => 'Harf';
+
+  @override
+  String get socialAvatarLetterHint =>
+      'Avatar istemezsen adının baş harfi kalır.';
+
+  @override
+  String get socialProfileTitle => 'Profil';
+
+  @override
+  String get socialSaveUsername => 'Kaydet';
+
+  @override
+  String get socialCopy => 'Kopyala';
+
+  @override
+  String get socialShare => 'Paylaş';
+
+  @override
+  String get socialDelete => 'Sil';
+
+  @override
+  String get socialReport => 'Şikayet et';
+
+  @override
+  String get socialCopied => 'Kopyalandı';
+
+  @override
+  String get socialShareUnavailable => 'Paylaşım açılamadı. Metin kopyalandı.';
+
+  @override
+  String get socialReported => 'Şikayetin alındı';
+
+  @override
+  String get socialBan => 'Banla';
+
+  @override
+  String get socialBanTitle => 'Kullanıcıyı banla';
+
+  @override
+  String get socialBanHour => '1 saat';
+
+  @override
+  String get socialBanDay => '1 gün';
+
+  @override
+  String get socialBanWeek => '7 gün';
+
+  @override
+  String get socialBanMonth => '30 gün';
+
+  @override
+  String get socialBanPermanent => 'Kalıcı';
+
+  @override
+  String get socialBanned => 'Kullanıcı banlandı';
+
+  @override
+  String get socialBannedBanner => 'Sosyal tahtaya yazamazsın.';
+
+  @override
+  String get socialProfanity => 'Küfür veya hakaret yazılamaz.';
 }

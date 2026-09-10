@@ -12,6 +12,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/revenuecat_ids.dart';
+import '../../core/errors/user_facing_error.dart';
 import '../../core/router/app_router.dart';
 import '../../data/models/purchase_result.dart' show PurchaseOutcomeX;
 import '../../data/models/store_price_info.dart';
@@ -379,7 +380,10 @@ class _PremiumPageState extends ConsumerState<PremiumPage> {
       return true;
     } catch (e) {
       if (mounted) {
-        showArinTopToast(context, '${AppLocalizations.of(context)!.premiumSignInErrorPrefix}$e');
+        showArinTopToast(
+          context,
+          userFacingErrorMessage(AppLocalizations.of(context)),
+        );
       }
       return false;
     }

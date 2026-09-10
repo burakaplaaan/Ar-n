@@ -7,6 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../../core/ads/admob_ids.dart';
 import '../../../core/analytics/arin_analytics.dart';
 import '../../../core/constants/product_metric_features.dart';
+import '../../../core/errors/user_facing_error.dart';
 import '../../../data/services/admob_service.dart';
 import '../../../data/services/product_metrics_service.dart';
 import 'hilal_duel_level.dart';
@@ -1932,7 +1933,7 @@ class HilalDuelController extends ChangeNotifier {
         needHeartToken: needHeartErrorToken,
       );
     }
-    return 'Bir hata oluştu. Tekrar dene.';
+    return kUserGenericErrorFallback;
   }
 
   void _safeNotify() {

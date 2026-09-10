@@ -42,6 +42,19 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsSectionSession => 'Session';
 
   @override
+  String get settingsSectionFollowArin => 'FOLLOW ARIN';
+
+  @override
+  String get settingsFollowInstagramTitle => 'Instagram';
+
+  @override
+  String get settingsFollowTikTokTitle => 'TikTok';
+
+  @override
+  String get settingsFollowOpenFailed =>
+      'Couldn\'t open the profile. Please try again.';
+
+  @override
   String get settingsMenuNotificationsSubtitle =>
       'Prayer, purification, and dhikr';
 
@@ -1981,7 +1994,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsPrivacyPageTitle => 'Privacy Policy';
 
   @override
-  String get settingsPrivacyLastUpdated => 'Last updated: 26.04.2026';
+  String get settingsPrivacyLastUpdated => 'Last updated: 09.09.2026';
 
   @override
   String get settingsPrivacyIntro =>
@@ -2006,14 +2019,14 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settingsPrivacyStorageBody =>
-      'Most habit, zikr, and preference data is stored on your device. If you sign in, selected data may be synced with Firebase services. Data is kept until you delete it in the app or remove your account.';
+      'Most habit, zikr, and preference data is stored on your device. If you sign in, selected data may be synced with our secure servers. Data is kept until you delete it in the app or remove your account.';
 
   @override
   String get settingsPrivacyThirdPartyTitle => 'Third-party services';
 
   @override
   String get settingsPrivacyThirdPartyBody =>
-      'Arin uses Firebase services (Authentication, Firestore) for sign-in, notifications, and sync, Firebase Analytics/Crashlytics for analytics and crash diagnostics, Google AdMob for ads, RevenueCat for subscription and in-app purchase verification, and Aladhan/Diyanet APIs for prayer times. Premium Arın Assistant messages are sent to Google Gemini; chat text is not stored in the app. On Gemini’s free tier, this content may be used to improve Google’s products.';
+      'Arin uses trusted infrastructure providers for sign-in, notifications, sync, analytics, and crash diagnostics; Google AdMob for ads; RevenueCat for subscription and in-app purchase verification; and external prayer-time services. Premium Arın Assistant messages may be sent to secure third-party services to generate replies; chat text is not stored in the app.';
 
   @override
   String get settingsPrivacyControlsTitle => 'User control';
@@ -4174,7 +4187,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get inspireEmptySubtitle =>
-      'Images: assets/inspiration/ (1.jpg, 2.jpg, ...).\nContent: assets/data/inspiration/*.json or Firestore app_public/inspiration_cards.';
+      'Content will appear here shortly. Pull down to try again.';
 
   @override
   String get inspirePullToRefreshHint => 'Pull down to refresh.';
@@ -4196,7 +4209,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get asyncErrorDefaultMessage =>
-      'Your connection may be weak or the service is currently unreachable. Please try again shortly.';
+      'Something went wrong. Please try again.';
+
+  @override
+  String get userGenericError => 'Something went wrong. Please try again.';
 
   @override
   String get asyncErrorRetryAction => 'Retry';
@@ -4406,9 +4422,8 @@ class AppLocalizationsEn extends AppLocalizations {
       'Product not found. Please check your internet connection.';
 
   @override
-  String purchaseErrorUnexpected(Object error) {
-    return 'Unexpected error: $error';
-  }
+  String get purchaseErrorUnexpected =>
+      'Something went wrong. Please try again.';
 
   @override
   String get purchaseErrorNotSupported =>
@@ -5679,19 +5694,19 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get appleSignInNotAuthorized =>
-      'Apple account not authorized. Check Apple sign in permission from iPhone Settings > Apple ID > Sign-In & Security.';
+      'Apple sign in could not be completed. Please try again.';
 
   @override
   String get appleSignInProviderDisabled =>
-      'Apple sign in provider appears disabled in Firebase console.';
+      'Apple sign in could not be completed. Please try again.';
 
   @override
   String get appleSignInInvalidCredential =>
-      'Invalid Apple authentication credential. Check Bundle ID and Apple Sign In capabilities on Xcode/Firebase.';
+      'Apple sign in could not be completed. Please try again.';
 
   @override
   String get appleSignInNetworkFailed =>
-      'Apple sign in could not be completed due to network connection.';
+      'Something went wrong. Please try again.';
 
   @override
   String get settingsMenuPremiumTitle => 'ARIN Premium';
@@ -6345,4 +6360,180 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get appTourWidgetPromptLater => 'Later';
+
+  @override
+  String get qiblaHubSocialTitle => 'Social';
+
+  @override
+  String get qiblaHubSocialSubtitle => 'Community feed — write, comment, like';
+
+  @override
+  String get socialTitle => 'Social';
+
+  @override
+  String get socialSortNew => 'New';
+
+  @override
+  String get socialSortNewest => 'Newest';
+
+  @override
+  String get socialSortPopular => 'Popular';
+
+  @override
+  String get socialYou => 'you';
+
+  @override
+  String get socialEmptyTitle => 'Leave the first note';
+
+  @override
+  String get socialEmptyBody => '';
+
+  @override
+  String get socialDailyPromptDefault => 'What are you grateful for today?';
+
+  @override
+  String get socialChipGratitude => 'Today\'s thanks';
+
+  @override
+  String get socialChipVerse => 'A verse';
+
+  @override
+  String get socialChipPrayer => 'Ask for dua';
+
+  @override
+  String get socialWriteComment => 'Write a comment…';
+
+  @override
+  String get socialPostedToBoard => 'It\'s on the board.';
+
+  @override
+  String get socialLoadFailed => 'Something went wrong';
+
+  @override
+  String get socialTryAgain => 'Try again';
+
+  @override
+  String get socialCompose => 'Post';
+
+  @override
+  String get socialComposeHint => 'What\'s on your mind?';
+
+  @override
+  String get socialCancel => 'Cancel';
+
+  @override
+  String get socialCommentHint => 'Write a comment…';
+
+  @override
+  String get socialCommentsHeading => 'Comments';
+
+  @override
+  String get socialCommentsEmpty => 'Be the first to comment.';
+
+  @override
+  String get socialPostTitle => 'Post';
+
+  @override
+  String socialCommentCount(int count) {
+    return '$count comments';
+  }
+
+  @override
+  String get socialUsernameTitle => 'Your username';
+
+  @override
+  String get socialUsernameBody =>
+      'You pick this once. It cannot be changed, and nobody else can take it.';
+
+  @override
+  String get socialUsernameLocked => 'This name cannot be changed.';
+
+  @override
+  String get socialUsernameHint => 'your_name';
+
+  @override
+  String get socialBioTitle => 'About';
+
+  @override
+  String get socialBioBody =>
+      'Tell people who you are. You can change this from your profile.';
+
+  @override
+  String get socialBioHint => 'Trying not to miss my prayers.';
+
+  @override
+  String get socialBioEmpty => 'Hasn\'t written anything yet.';
+
+  @override
+  String get socialBioEdit => 'Edit';
+
+  @override
+  String get socialAvatarTitle => 'Avatar';
+
+  @override
+  String get socialAvatarHint => 'Pick an Islamic avatar.';
+
+  @override
+  String get socialAvatarNone => 'Letter';
+
+  @override
+  String get socialAvatarLetterHint =>
+      'If you skip avatars, your first letter stays.';
+
+  @override
+  String get socialProfileTitle => 'Profile';
+
+  @override
+  String get socialSaveUsername => 'Save';
+
+  @override
+  String get socialCopy => 'Copy';
+
+  @override
+  String get socialShare => 'Share';
+
+  @override
+  String get socialDelete => 'Delete';
+
+  @override
+  String get socialReport => 'Report';
+
+  @override
+  String get socialCopied => 'Copied';
+
+  @override
+  String get socialShareUnavailable => 'Sharing isn\'t available. Text copied.';
+
+  @override
+  String get socialReported => 'Report received';
+
+  @override
+  String get socialBan => 'Ban';
+
+  @override
+  String get socialBanTitle => 'Ban user';
+
+  @override
+  String get socialBanHour => '1 hour';
+
+  @override
+  String get socialBanDay => '1 day';
+
+  @override
+  String get socialBanWeek => '7 days';
+
+  @override
+  String get socialBanMonth => '30 days';
+
+  @override
+  String get socialBanPermanent => 'Permanent';
+
+  @override
+  String get socialBanned => 'User banned';
+
+  @override
+  String get socialBannedBanner => 'You can\'t write on the board.';
+
+  @override
+  String get socialProfanity => 'Swearing or insults are not allowed.';
 }

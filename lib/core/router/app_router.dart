@@ -32,6 +32,7 @@ import '../../presentation/kaza/kaza_tracker_page.dart';
 import '../../presentation/qibla/qibla_hub_page.dart';
 import '../../presentation/qibla/prayer_circle/prayer_circle_page.dart';
 import '../../presentation/qibla/hilal_duel/hilal_duel_page.dart';
+import '../../presentation/qibla/social/social_page.dart';
 import '../../presentation/settings/admin_content_page.dart';
 import '../../presentation/settings/admin_notifications_page.dart';
 import '../../presentation/settings/admin_performance_page.dart';
@@ -82,6 +83,7 @@ abstract final class AppRoutes {
     queryParameters: {'request': requestId},
   ).toString();
   static const String hilalDuel = '/qibla/hilal-duel';
+  static const String social = '/qibla/social';
   static const String assistant = '/assistant';
   static const String habits = '/habits';
 
@@ -352,6 +354,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             path: AppRoutes.hilalDuel,
             pageBuilder: (context, state) =>
                 _page(state, const HilalDuelPage()),
+          ),
+          GoRoute(
+            path: AppRoutes.social,
+            pageBuilder: (context, state) =>
+                _page(state, const SocialPage()),
           ),
           GoRoute(
             path: AppRoutes.assistant,

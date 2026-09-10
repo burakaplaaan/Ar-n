@@ -8,6 +8,44 @@ import 'package:uuid/uuid.dart';
 import '../../core/firebase/firebase_bootstrap.dart';
 import 'android_oem_settings_service.dart';
 
+/// İstanbul takvim günü (Türkiye sürekli UTC+3) — sunucu `dayKey` ile aynı.
+@visibleForTesting
+String istanbulMetricDayKey(DateTime now) {
+  final istanbul = now.toUtc().add(const Duration(hours: 3));
+  final y = istanbul.year.toString().padLeft(4, '0');
+  final m = istanbul.month.toString().padLeft(2, '0');
+  final d = istanbul.day.toString().padLeft(2, '0');
+  return '$y-$m-$d';
+}
+
+@visibleForTesting
+const kInstallPresenceMinInterval = Duration(hours: 6);
+
+@visibleForTesting
+bool shouldSkipInstallPresenceSync({
+  required int? lastSyncedAtMs,
+  required DateTime now,
+  Duration minInterval = kInstallPresenceMinInterval,
+}) {
+  final last = lastSyncedAtMs ?? 0;
+  if (last <= 0) return false;
+  return now.millisecondsSinceEpoch - last < minInterval.inMilliseconds;
+}
+
+@visibleForTesting
+String dailyMetricEventKey(String event, String entity) => '$event|$entity';
+
+@visibleForTesting
+bool shouldSkipDailyMetric({
+  required String storedDayKey,
+  required String todayKey,
+  required Iterable<String> sentKeys,
+  required String eventKey,
+}) {
+  if (storedDayKey.isEmpty || storedDayKey != todayKey) return false;
+  return sentKeys.contains(eventKey);
+}
+
 /// Admin performans ekranını besleyen anonim, tekilleştirilmiş ürün metrikleri.
 ///
 /// Kurulum kimliği cihazda üretilir; Firebase UID, e-posta, içerik metni veya
@@ -17,6 +55,20 @@ abstract final class ProductMetricsService {
   static const _installIdKey = 'arin_anonymous_install_id_v1';
   static const _pendingAudienceDeactivateKey =
       'arin_pending_audience_deactivate_id_v1';
+  static const _presenceAtKey = 'arin_install_presence_synced_at_ms_v1';
+  static const _metricDayKey = 'arin_metric_client_day_v1';
+  static const _metricSentKey = 'arin_metric_client_sent_v1';
+
+  static int? _presenceSyncedAtMs;
+  static String? _metricCacheDay;
+  static Set<String>? _metricCacheSent;
+
+  @visibleForTesting
+  static void resetClientThrottleCacheForTest() {
+    _presenceSyncedAtMs = null;
+    _metricCacheDay = null;
+    _metricCacheSent = null;
+  }
 
   static Future<String?> _installId({bool createIfMissing = true}) async {
     final prefs = await SharedPreferences.getInstance();
@@ -49,6 +101,75 @@ abstract final class ProductMetricsService {
     _ => 'other',
   };
 
+  static bool _usesDailyClientDedupe(String event) =>
+      event == 'content_view' || event == 'feature_open';
+
+  static Future<bool> _alreadySentDailyMetric(
+    String event,
+    String entity,
+  ) async {
+    final today = istanbulMetricDayKey(DateTime.now());
+    final eventKey = dailyMetricEventKey(event, entity);
+    if (_metricCacheDay == today &&
+        shouldSkipDailyMetric(
+          storedDayKey: _metricCacheDay ?? '',
+          todayKey: today,
+          sentKeys: _metricCacheSent ?? const {},
+          eventKey: eventKey,
+        )) {
+      return true;
+    }
+    final prefs = await SharedPreferences.getInstance();
+    final storedDay = prefs.getString(_metricDayKey) ?? '';
+    final sent = storedDay == today
+        ? (prefs.getStringList(_metricSentKey) ?? const <String>[])
+        : const <String>[];
+    _metricCacheDay = today;
+    _metricCacheSent = sent.toSet();
+    return shouldSkipDailyMetric(
+      storedDayKey: storedDay,
+      todayKey: today,
+      sentKeys: sent,
+      eventKey: eventKey,
+    );
+  }
+
+  static Future<void> _markDailyMetricSent(String event, String entity) async {
+    final today = istanbulMetricDayKey(DateTime.now());
+    final eventKey = dailyMetricEventKey(event, entity);
+    final prefs = await SharedPreferences.getInstance();
+    final storedDay = prefs.getString(_metricDayKey) ?? '';
+    final sent = storedDay == today
+        ? [...?prefs.getStringList(_metricSentKey)]
+        : <String>[];
+    if (!sent.contains(eventKey)) sent.add(eventKey);
+    await prefs.setString(_metricDayKey, today);
+    await prefs.setStringList(_metricSentKey, sent);
+    _metricCacheDay = today;
+    _metricCacheSent = sent.toSet();
+  }
+
+  static Future<bool> _shouldSkipPresence() async {
+    final now = DateTime.now();
+    if (shouldSkipInstallPresenceSync(
+      lastSyncedAtMs: _presenceSyncedAtMs,
+      now: now,
+    )) {
+      return true;
+    }
+    final prefs = await SharedPreferences.getInstance();
+    final last = prefs.getInt(_presenceAtKey);
+    _presenceSyncedAtMs = last;
+    return shouldSkipInstallPresenceSync(lastSyncedAtMs: last, now: now);
+  }
+
+  static Future<void> _markPresenceSynced() async {
+    final nowMs = DateTime.now().millisecondsSinceEpoch;
+    _presenceSyncedAtMs = nowMs;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt(_presenceAtKey, nowMs);
+  }
+
   static Future<bool> _record(
     String event, {
     String? cardId,
@@ -56,6 +177,10 @@ abstract final class ProductMetricsService {
     String? feature,
   }) async {
     if (!isFirebaseReady) return false;
+    final entity = (cardId ?? feature ?? '').trim();
+    if (_usesDailyClientDedupe(event) && entity.isNotEmpty) {
+      if (await _alreadySentDailyMetric(event, entity)) return true;
+    }
     try {
       final installId = await _installId();
       if (installId == null) return false;
@@ -70,7 +195,11 @@ abstract final class ProductMetricsService {
         if (feature != null) 'feature': feature,
       });
       final data = result.data;
-      return data is Map && data['accepted'] == true;
+      final accepted = data is Map && data['accepted'] == true;
+      if (accepted && _usesDailyClientDedupe(event) && entity.isNotEmpty) {
+        await _markDailyMetricSent(event, entity);
+      }
+      return accepted;
     } catch (e) {
       debugPrint('ProductMetricsService.$event başarısız (sessiz): $e');
       return false;
@@ -178,6 +307,7 @@ abstract final class ProductMetricsService {
   /// Bildirim izninden bağımsız; uygulamayı açan her kurulum sayılır.
   static Future<bool> syncInstallPresence() async {
     if (!isFirebaseReady || kIsWeb) return false;
+    if (await _shouldSkipPresence()) return true;
     try {
       final installId = await _installId();
       if (installId == null) return false;
@@ -196,7 +326,9 @@ abstract final class ProductMetricsService {
         'platform': _platform,
         'brand': brand,
       });
-      return result.data is Map && result.data['ok'] == true;
+      final ok = result.data is Map && result.data['ok'] == true;
+      if (ok) await _markPresenceSynced();
+      return ok;
     } catch (e) {
       debugPrint('ProductMetricsService.syncInstallPresence başarısız: $e');
       return false;

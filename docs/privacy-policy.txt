@@ -1,5 +1,5 @@
 Arin Privacy Policy
-Last updated: 2026-04-26
+Last updated: 2026-09-09
 
 Arin respects your privacy. This policy explains what data is processed, why it is processed, and how you can control it.
 
@@ -18,15 +18,16 @@ Arin respects your privacy. This policy explains what data is processed, why it 
 
 3) Storage and retention
 - Most habit, zikir, and preference data is stored on your device.
-- If you sign in, selected data may be synced with Firebase services.
+- If you sign in, selected data may be synced with our secure servers.
 - Data is kept until you delete it in the app or remove your account.
 
 4) Third-party services
 - Arin uses:
-  - Firebase Authentication (sign-in), Cloud Firestore (data sync), Firebase Cloud Messaging (notifications), Firebase Analytics, and Firebase Crashlytics.
+  - Trusted infrastructure providers for sign-in, notifications, data sync, analytics, and crash diagnostics.
   - Google AdMob (for serving ads and analytics).
   - RevenueCat (for processing and managing premium subscriptions).
-  - Aladhan / Diyanet APIs (we may send your city or coordinates to calculate prayer times).
+  - External prayer-time services (we may send your city or coordinates to calculate prayer times).
+  - Secure third-party services to generate Premium Arın Assistant replies. Chat text is not stored in the app.
 
 5) Your controls
 - You can deny location/notification permissions in device settings.

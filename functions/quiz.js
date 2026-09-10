@@ -79,6 +79,12 @@ const CHALLENGE_DOC_TTL_MS = 7 * 24 * 60 * 60_000;
 const QUEUE_WAIT_MS = 15_000;
 /** Canlı kuyruk taraması: stale kayıtlar gerçek rakibi limit dışına itmesin. */
 const QUEUE_CANDIDATE_SCAN_LIMIT = 200;
+/**
+ * Poll her 350ms; eşleşme start + pair-after-enqueue'de zaten denenir.
+ * 200'lük taramayı yalnızca 15sn bot eşiğinde ve ara sıra yarış
+ * (iki waiting aynı anda) için tekrarla.
+ */
+const QUEUE_PAIR_RETRY_MS = 2_500;
 /** Transaction içinde denenecek en iyi aday sayısı. */
 const QUEUE_CANDIDATE_PICK_LIMIT = 32;
 /** Az önce basanları eski/hayalet kuyruğun önüne al. */
@@ -1340,6 +1346,27 @@ function decideLiveQueuePollAction({
   const started = Number(queuedAtMs) || 0;
   if (!(started > 0) || nowMs - started >= waitMs) return "pair_bot";
   return "keep_waiting";
+}
+
+/**
+ * Poll işi: çoğu tick yalnızca kendi kuyruk dokümanına bakar.
+ * `pair_scan` = 200 aday sorgusu + transaction (insan / 15sn bot).
+ */
+function decideQuizPollWork({
+  queuedAtMs,
+  lastPairScanAtMs,
+  nowMs = Date.now(),
+  waitMs = QUEUE_WAIT_MS,
+  retryMs = QUEUE_PAIR_RETRY_MS,
+}) {
+  const started = Number(queuedAtMs) || 0;
+  const retryAfter = Math.max(500, Math.floor(Number(retryMs) || QUEUE_PAIR_RETRY_MS));
+  if (!(started > 0) || nowMs - started >= waitMs) return "pair_scan";
+  const lastScan = Number(lastPairScanAtMs) > 0
+    ? Number(lastPairScanAtMs)
+    : started;
+  if (nowMs - lastScan >= retryAfter) return "pair_scan";
+  return "cheap_wait";
 }
 
 function _mapWaitingQueueDocs(snap) {
@@ -3521,11 +3548,25 @@ const pollQuizMatch = onCall(
       });
       return { ok: true, status: "idle", refunded: true };
     }
+    const queuedAtMs = _queueQueuedAtMs(queue);
+    const pollWork = decideQuizPollWork({
+      queuedAtMs,
+      lastPairScanAtMs: Number(queue.lastPairScanAtMs) || 0,
+      nowMs: Date.now(),
+    });
+    if (pollWork === "cheap_wait") {
+      return {
+        ok: true,
+        status: "waiting",
+        queuedAtMs: queuedAtMs || Date.now(),
+      };
+    }
     const preselected = await _findPairableWaitingCandidates(
       db,
       ownerHash,
       Math.max(1, Math.floor(Number(queue.level) || 1)),
     );
+    await queueRef.update({ lastPairScanAtMs: Date.now() }).catch(() => {});
     try {
       return await db.runTransaction(async (tx) =>
         _resolveQuizMatchPollInTransaction({
@@ -6427,8 +6468,10 @@ module.exports = {
     rankLiveQueueCandidates,
     pickPairableCandidate,
     decideLiveQueuePollAction,
+    decideQuizPollWork,
     QUEUE_ABANDON_MS,
     QUEUE_WAIT_MS,
+    QUEUE_PAIR_RETRY_MS,
     QUEUE_RECENT_MS,
     QUEUE_CANDIDATE_SCAN_LIMIT,
     QUEUE_CANDIDATE_PICK_LIMIT,

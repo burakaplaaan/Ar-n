@@ -12,6 +12,7 @@ abstract final class ProductMetricFeatures {
   static const qibla = 'qibla';
   static const healing = 'healing';
   static const assistant = 'assistant';
+  static const social = 'social';
 
   static const all = <String>[
     explore,
@@ -24,6 +25,7 @@ abstract final class ProductMetricFeatures {
     qibla,
     healing,
     assistant,
+    social,
   ];
 
   static String labelTr(String feature) => switch (feature) {
@@ -37,6 +39,7 @@ abstract final class ProductMetricFeatures {
     qibla => 'Pusula',
     healing => 'Şifa frekansları',
     assistant => 'Arın Asistanı',
+    social => 'Sosyal',
     _ => feature,
   };
 }

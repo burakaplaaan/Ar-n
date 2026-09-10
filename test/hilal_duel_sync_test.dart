@@ -1,3 +1,4 @@
+import 'package:arin/core/errors/user_facing_error.dart';
 import 'package:arin/presentation/qibla/hilal_duel/hilal_duel_repository.dart';
 import 'package:arin/presentation/qibla/hilal_duel/hilal_duel_sync.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -648,46 +649,43 @@ void main() {
 
   group('hilalDuelFriendlyFunctionsMessage', () {
     test('hides raw INTERNAL from the lobby', () {
-      // Ham INTERNAL = istek cihazdan çıkamadı (App Check / ağ); kullanıcıya
-      // bağlantı odaklı yönlendirme gösterilir, sahte eşleşme hatası değil.
       expect(
         hilalDuelFriendlyFunctionsMessage(
           code: 'internal',
           message: 'INTERNAL',
         ),
-        'Sunucuya ulaşılamadı. İnternet bağlantını ve '
-        'Google Play Hizmetleri\'ni kontrol edip tekrar dene.',
+        kUserGenericErrorFallback,
       );
       expect(
         hilalDuelFriendlyFunctionsMessage(
           code: 'internal',
           message: 'Eşleşme başlatılamadı. Tekrar dene.',
         ),
-        'Eşleşme başlatılamadı. Tekrar dene.',
+        kUserGenericErrorFallback,
       );
       expect(
         hilalDuelFriendlyFunctionsMessage(
           code: 'unknown',
           message: 'INTERNAL',
         ),
-        'Bir hata oluştu. Tekrar dene.',
+        kUserGenericErrorFallback,
       );
     });
 
-    test('keeps challenge quota text instead of a fake rate-limit', () {
+    test('never echoes server details and keeps the heart token', () {
       expect(
         hilalDuelFriendlyFunctionsMessage(
           code: 'resource-exhausted',
           message: 'Aynı anda en fazla 3 açık meydan okuman olabilir.',
         ),
-        'Aynı anda en fazla 3 açık meydan okuman olabilir.',
+        'Çok hızlı işlem yapıldı. Kısa süre sonra tekrar dene.',
       );
       expect(
         hilalDuelFriendlyFunctionsMessage(
           code: 'failed-precondition',
           message: 'Bitmemiş 3 meydan okuman var. Önce onları tamamla.',
         ),
-        'Bitmemiş 3 meydan okuman var. Önce onları tamamla.',
+        kUserGenericErrorFallback,
       );
       expect(
         hilalDuelFriendlyFunctionsMessage(
@@ -702,6 +700,13 @@ void main() {
           message: 'Oynamak için reklam izleyerek can kazanmalısın.',
         ),
         'NEED_HEART',
+      );
+      expect(
+        hilalDuelFriendlyFunctionsMessage(
+          code: 'permission-denied',
+          message: 'App Check token missing for quizSubmitAnswer',
+        ),
+        kUserGenericErrorFallback,
       );
     });
   });

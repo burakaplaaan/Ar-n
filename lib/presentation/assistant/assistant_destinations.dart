@@ -62,6 +62,9 @@ String? matchAssistantPage(String raw) {
   if (t.contains('dua halk') || t.contains('prayer circle')) {
     return 'prayer_circle';
   }
+  if (t.contains('sosyal') || t.contains('social')) {
+    return 'social';
+  }
   if (t.contains('duello') ||
       t.contains('düello') ||
       t.contains('hilal')) {

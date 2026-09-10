@@ -337,7 +337,7 @@ class _InspireExplorePageState extends ConsumerState<InspireExplorePage> {
               ),
             ],
           ),
-          error: (e, _) => RefreshIndicator(
+          error: (_, _) => RefreshIndicator(
             color: AppColors.accentNeonGreen,
             backgroundColor: onLight
                 ? AppColors.creamSurface
@@ -355,7 +355,7 @@ class _InspireExplorePageState extends ConsumerState<InspireExplorePage> {
                 SliverFillRemaining(
                   hasScrollBody: false,
                   child: _ExploreError(
-                    message: '$e',
+                    message: l10n.userGenericError,
                     onClose: canPop ? () => context.pop() : null,
                   ),
                 ),

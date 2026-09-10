@@ -5,6 +5,7 @@
 // Tasarım: arin dark temasıyla uyumlu; orta-ekran centered, `RefreshIndicator`
 // ile eşleşecek biçimde scrollable (kullanıcı aşağı çekince de tekrar denesin).
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:arin/l10n/app_localizations.dart';
@@ -104,7 +105,7 @@ class AsyncErrorView extends StatelessWidget {
                     const EdgeInsets.symmetric(horizontal: 22, vertical: 12),
               ),
             ),
-            if (error != null) ...[
+            if (kDebugMode && error != null) ...[
               const SizedBox(height: 14),
               _ErrorDetailsTile(error: error!),
             ],

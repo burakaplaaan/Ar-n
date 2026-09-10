@@ -8,6 +8,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/product_metric_features.dart';
+import '../../../core/errors/user_facing_error.dart';
 import '../../../core/router/app_router.dart';
 import '../../../core/theme/arin_shell_background.dart';
 import '../../../data/services/product_metrics_service.dart';
@@ -2303,7 +2304,7 @@ class _WeeklyLeaderSheetState extends ConsumerState<_WeeklyLeaderSheet> {
       _reloadBoard();
     } catch (error) {
       if (!mounted) return;
-      showArinTopToast(context, error.toString());
+      showArinTopToast(context, userFacingErrorMessage(widget.l10n));
     } finally {
       if (mounted) {
         setState(() => _removingHashes.remove(entry.ownerHash));

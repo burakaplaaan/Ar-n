@@ -320,6 +320,14 @@
         </intent>
         <!-- Sosyal uygulama paket görünürlüğü — InspirationShareService
              "yüklü mü?" kontrolü ve grantUriPermission için. -->
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data android:scheme="https" />
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data android:scheme="instagram" />
+        </intent>
         <package android:name="com.instagram.android" />
         <package android:name="com.facebook.katana" />
         <package android:name="com.facebook.lite" />

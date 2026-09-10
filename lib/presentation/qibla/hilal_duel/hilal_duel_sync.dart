@@ -1,3 +1,4 @@
+import '../../../core/errors/user_facing_error.dart';
 import 'hilal_duel_repository.dart';
 
 /// Oyun içi / sonuç doğru-yanlış tahtası için tur durumu.
@@ -311,7 +312,7 @@ int computeRevealHoldMs({
 }
 
 /// Cloud Functions kod/mesaj → lobiye güvenle basılacak metin.
-/// Ham `INTERNAL` / `UNKNOWN` kullanıcıya gösterilmez.
+/// Sunucu mesajı, fonksiyon kodu ve altyapı adı kullanıcıya sızmaz.
 String hilalDuelFriendlyFunctionsMessage({
   required String code,
   required String message,
@@ -327,39 +328,16 @@ String hilalDuelFriendlyFunctionsMessage({
       return 'App Check doğrulanamadı. Debug token Console\'a ekli mi? '
           'Release APK emülatörde çalışmaz — flutter run kullan.';
     }
-    return 'Güvenli oturum gerekli. Tekrar dene.';
+    return kUserGenericErrorFallback;
   }
   switch (normalizedCode) {
     case 'resource-exhausted':
       if (_isHeartExhaustedMessage(trimmed, lowerMessage)) {
         return needHeartToken;
       }
-      // Kota / iş kuralı da bu koda düşebiliyordu; ham metni ezme.
-      if (_isSpecificFunctionsMessage(trimmed, lowerMessage)) {
-        return trimmed;
-      }
       return 'Çok hızlı işlem yapıldı. Kısa süre sonra tekrar dene.';
-    case 'failed-precondition':
-      return _isSpecificFunctionsMessage(trimmed, lowerMessage)
-          ? trimmed
-          : 'İşlem şu anda yapılamıyor. Tekrar dene.';
-    case 'unavailable':
-      return 'Bağlantı kurulamadı. Tekrar dene.';
-    case 'permission-denied':
-      return trimmed.isNotEmpty
-          ? trimmed
-          : 'Bu işlem için yetki doğrulanamadı. Tekrar dene.';
-    case 'internal':
-      // Ham INTERNAL: istek çoğu zaman cihazdan çıkamıyor (App Check /
-      // Play Integrity / ağ) — sunucu hatası gibi gösterme.
-      return _isRawFunctionsCode(lowerMessage)
-          ? 'Sunucuya ulaşılamadı. İnternet bağlantını ve '
-              'Google Play Hizmetleri\'ni kontrol edip tekrar dene.'
-          : trimmed;
     default:
-      return trimmed.isEmpty || _isRawFunctionsCode(lowerMessage)
-          ? 'Bir hata oluştu. Tekrar dene.'
-          : trimmed;
+      return kUserGenericErrorFallback;
   }
 }
 
@@ -367,20 +345,4 @@ bool _isHeartExhaustedMessage(String trimmed, String lowerMessage) {
   return trimmed.contains('can') ||
       trimmed.contains('Oynamak') ||
       lowerMessage.contains('heart');
-}
-
-bool _isSpecificFunctionsMessage(String trimmed, String lowerMessage) {
-  if (trimmed.isEmpty || _isRawFunctionsCode(lowerMessage)) return false;
-  if (lowerMessage.contains('çok hızlı')) return false;
-  if (lowerMessage.contains('too many') || lowerMessage.contains('rate limit')) {
-    return false;
-  }
-  return true;
-}
-
-bool _isRawFunctionsCode(String lowerMessage) {
-  return lowerMessage.isEmpty ||
-      lowerMessage == 'internal' ||
-      lowerMessage == 'unknown' ||
-      lowerMessage == 'internal error';
 }

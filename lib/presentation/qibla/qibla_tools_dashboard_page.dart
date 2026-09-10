@@ -40,6 +40,7 @@ enum _QiblaActionMotif {
   prayer,
   frequency,
   hilal,
+  social,
   assistant,
   ai,
 }
@@ -131,6 +132,13 @@ class _QiblaToolsDashboardPageState
                           );
                         }),
                       ),
+                    ),
+                    const SizedBox(height: 10),
+                    _SocialHubCard(
+                      onDark: onDark,
+                      title: l10n.qiblaHubSocialTitle,
+                      subtitle: l10n.qiblaHubSocialSubtitle,
+                      onTap: () => _openTool(route: QiblaHubRoutes.social),
                     ),
                     const SizedBox(height: 10),
                     AppTourAnchor(
@@ -296,6 +304,305 @@ class _SpiritualHeader extends StatelessWidget {
 /// Tüm hub kartları için tek estetik gövde. Yeşil temel + bronz manevi
 /// detaylar: köşe ışıltısı, yeşil→bronz ikon halkası, başlıkta baklava
 /// aksanı, ince bronz alt çizgi ve sıcak gölge.
+/// Sosyal ağ kartı — diğer araçlardan ayrı: üst üste profiller ve akış metni.
+abstract final class _SocialHubAccent {
+  static Color blue(bool onDark) =>
+      onDark ? const Color(0xFF7EB6FF) : const Color(0xFF2F5F99);
+  static const Color like = Color(0xFFE2556B);
+}
+
+class _SocialHubCard extends StatelessWidget {
+  const _SocialHubCard({
+    required this.onDark,
+    required this.title,
+    required this.subtitle,
+    required this.onTap,
+  });
+
+  final bool onDark;
+  final String title;
+  final String subtitle;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final bronze = _QiblaWarm.bronze(onDark);
+    final blue = _SocialHubAccent.blue(onDark);
+    final titleC = onDark
+        ? Colors.white.withValues(alpha: 0.96)
+        : AppColors.emeraldDark;
+    final subC = onDark
+        ? Colors.white.withValues(alpha: 0.7)
+        : AppColors.emeraldDark.withValues(alpha: 0.78);
+    final borderC = Color.lerp(
+      blue,
+      bronze,
+      0.22,
+    )!.withValues(alpha: onDark ? 0.62 : 0.58);
+    final surface = onDark
+        ? AppColors.homeCardSurface
+        : AppColors.creamSurface;
+
+    return Semantics(
+      button: true,
+      label: '$title. $subtitle',
+      onTap: onTap,
+      child: ExcludeSemantics(
+        child: ArinPressable(
+          onTap: onTap,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(_QiblaHubCardStyle.radius),
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(_QiblaHubCardStyle.radius),
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: onDark
+                      ? [
+                          const Color(0xFF15262F).withValues(alpha: 0.96),
+                          const Color(0xFF0A1412).withValues(alpha: 0.98),
+                        ]
+                      : [
+                          const Color(0xFFE8EEF3),
+                          AppColors.creamMist.withValues(alpha: 0.98),
+                        ],
+                ),
+                border: Border.all(
+                  color: borderC,
+                  width: 1.25,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: blue.withValues(alpha: onDark ? 0.22 : 0.16),
+                    blurRadius: 20,
+                    offset: const Offset(0, 7),
+                  ),
+                  BoxShadow(
+                    color: bronze.withValues(alpha: onDark ? 0.1 : 0.08),
+                    blurRadius: 14,
+                    offset: const Offset(0, 5),
+                  ),
+                ],
+              ),
+              child: Stack(
+                children: [
+                  Positioned(
+                    top: -42,
+                    right: -24,
+                    child: IgnorePointer(
+                      child: Container(
+                        width: 128,
+                        height: 128,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          gradient: RadialGradient(
+                            colors: [
+                              blue.withValues(alpha: onDark ? 0.22 : 0.16),
+                              Colors.transparent,
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  Positioned.fill(
+                    child: IgnorePointer(
+                      child: CustomPaint(
+                        painter: _SocialCardMotifPainter(
+                          blue: blue,
+                          bronze: bronze,
+                          onDark: onDark,
+                        ),
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
+                    child: Row(
+                      children: [
+                        _SocialAvatarCluster(
+                          onDark: onDark,
+                          surface: surface,
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                title,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  color: titleC,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w800,
+                                  letterSpacing: -0.25,
+                                ),
+                              ),
+                              const SizedBox(height: 5),
+                              Text(
+                                subtitle,
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  color: subC,
+                                  fontSize: _QiblaHubCardStyle.subtitleSize,
+                                  height: 1.3,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _SocialAvatarCluster extends StatelessWidget {
+  const _SocialAvatarCluster({
+    required this.onDark,
+    required this.surface,
+  });
+
+  final bool onDark;
+  final Color surface;
+
+  static const _fills = <Color>[
+    Color(0xFF3D6B8C),
+    Color(0xFF2D7A5F),
+    Color(0xFF8B5E3C),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: 72,
+      height: 50,
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          for (var i = 0; i < _fills.length; i++)
+            Positioned(
+              left: i * 15.0,
+              child: Container(
+                width: 38,
+                height: 38,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: _fills[i],
+                  border: Border.all(color: surface, width: 2),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: onDark ? 0.28 : 0.1),
+                      blurRadius: 4,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                alignment: Alignment.center,
+                child: Icon(
+                  Icons.person_rounded,
+                  size: 20,
+                  color: Colors.white.withValues(alpha: 0.94),
+                ),
+              ),
+            ),
+          Positioned(
+            right: 0,
+            bottom: 0,
+            child: Container(
+              width: 18,
+              height: 18,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: _SocialHubAccent.like,
+                border: Border.all(color: surface, width: 1.6),
+              ),
+              alignment: Alignment.center,
+              child: const Icon(
+                Icons.favorite_rounded,
+                size: 9,
+                color: Colors.white,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _SocialCardMotifPainter extends CustomPainter {
+  const _SocialCardMotifPainter({
+    required this.blue,
+    required this.bronze,
+    required this.onDark,
+  });
+
+  final Color blue;
+  final Color bronze;
+  final bool onDark;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final people = Paint()
+      ..color = blue.withValues(alpha: onDark ? 0.1 : 0.075)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.2
+      ..strokeCap = StrokeCap.round;
+    final warm = Paint()
+      ..color = bronze.withValues(alpha: onDark ? 0.12 : 0.09)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.1;
+
+    void head(Offset c, double r, Paint paint) {
+      canvas.drawCircle(c, r, paint);
+      final shoulders = Path()
+        ..moveTo(c.dx - r * 1.35, c.dy + r * 2.15)
+        ..quadraticBezierTo(
+          c.dx,
+          c.dy + r * 1.15,
+          c.dx + r * 1.35,
+          c.dy + r * 2.15,
+        );
+      canvas.drawPath(shoulders, paint);
+    }
+
+    head(Offset(size.width * 0.78, size.height * 0.28), 5.2, people);
+    head(Offset(size.width * 0.88, size.height * 0.34), 4.2, warm);
+    head(Offset(size.width * 0.18, size.height * 0.72), 4.6, people);
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(
+        Rect.fromCenter(
+          center: Offset(size.width * 0.72, size.height * 0.78),
+          width: 16,
+          height: 9,
+        ),
+        const Radius.circular(3),
+      ),
+      warm,
+    );
+  }
+
+  @override
+  bool shouldRepaint(covariant _SocialCardMotifPainter oldDelegate) {
+    return oldDelegate.blue != blue ||
+        oldDelegate.bronze != bronze ||
+        oldDelegate.onDark != onDark;
+  }
+}
+
 class _QiblaFeatureCard extends StatelessWidget {
   const _QiblaFeatureCard({
     required this.onDark,
@@ -679,12 +986,20 @@ class _QiblaToolGlyphPainter extends CustomPainter {
         }
         canvas.drawCircle(const Offset(18, 18), 2.1, bronzeFill);
 
+      case _QiblaActionMotif.social:
+        canvas.drawCircle(const Offset(13, 12.5), 4.2, primaryStroke);
+        canvas.drawCircle(const Offset(23, 12.5), 4.2, bronzeStroke);
+        final leftBody = Path()
+          ..moveTo(7.2, 26)
+          ..quadraticBezierTo(13, 18.5, 18.8, 26);
+        final rightBody = Path()
+          ..moveTo(17.4, 26)
+          ..quadraticBezierTo(23, 18.8, 28.8, 26);
+        canvas.drawPath(leftBody, primaryStroke);
+        canvas.drawPath(rightBody, bronzeStroke);
+        canvas.drawCircle(const Offset(18, 24.5), 1.5, bronzeFill);
+
       case _QiblaActionMotif.hilal:
-        final outer = Path()..addOval(const Rect.fromLTWH(8, 6, 20, 24));
-        canvas.drawPath(outer, bronzeStroke);
-        final innerCut = Path()..addOval(const Rect.fromLTWH(14.5, 8, 16, 20));
-        canvas.drawPath(innerCut, primaryStroke);
-        canvas.drawCircle(const Offset(24.5, 11.5), 1.6, bronzeFill);
       case _QiblaActionMotif.assistant:
         final assistantOuter = Path()..addOval(const Rect.fromLTWH(8, 6, 20, 24));
         canvas.drawPath(assistantOuter, bronzeStroke);
@@ -828,6 +1143,27 @@ class _CardMotifPatternPainter extends CustomPainter {
             i.isEven ? greenPaint : bronzePaint,
           );
         }
+
+      case _QiblaActionMotif.social:
+        canvas.drawCircle(
+          Offset(size.width * 0.4, size.height * 0.38),
+          2.4,
+          greenPaint,
+        );
+        canvas.drawCircle(
+          Offset(size.width * 0.62, size.height * 0.38),
+          2.2,
+          bronzePaint,
+        );
+        final left = Path()
+          ..moveTo(size.width * 0.26, size.height * 0.78)
+          ..quadraticBezierTo(
+            size.width * 0.4,
+            size.height * 0.52,
+            size.width * 0.54,
+            size.height * 0.78,
+          );
+        canvas.drawPath(left, greenPaint);
 
       case _QiblaActionMotif.hilal:
         canvas.drawOval(

@@ -37,6 +37,7 @@ import '../../data/services/user_cloud_backup_service.dart';
 import '../onboarding/app_tour/app_tour_anchor.dart';
 import '../onboarding/app_tour/app_tour_controller.dart';
 import '../onboarding/app_tour/app_tour_keys.dart';
+import '../settings/social_follow.dart';
 import '../settings/widgets/district_picker_sheet.dart';
 import '../shared/providers/auth_providers.dart';
 import '../shared/providers/habit_providers.dart';
@@ -271,23 +272,23 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
 
     try {
       await ref.read(authServiceProvider).reauthenticateCurrentUser();
-    } on FirebaseAuthException catch (e) {
+    } on FirebaseAuthException {
       if (loaderPushed && mounted) {
         rootNav.pop();
       }
       if (mounted) {
         setState(() => _accountDeleteBusy = false);
-        showArinTopToast(context, e.message ?? l10n.settingsAccountDeleteFailedMessage);
+        showArinTopToast(context, l10n.settingsAccountDeleteRetryMessage);
       }
       return;
-    } on StateError catch (e) {
+    } on StateError {
       // Kullanıcının reauth'u iptali ya da oturum bulunamaması.
       if (loaderPushed && mounted) {
         rootNav.pop();
       }
       if (mounted) {
         setState(() => _accountDeleteBusy = false);
-        showArinTopToast(context, e.message);
+        showArinTopToast(context, l10n.settingsAccountDeleteRetryMessage);
       }
       return;
     } catch (e) {
@@ -349,13 +350,13 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
       // Silme başarılı → analytics user ID'sini de temizle ve olayı yolla.
       unawaited(ArinAnalytics.accountDelete());
       unawaited(ArinAnalytics.resetUser());
-    } on FirebaseAuthException catch (e) {
+    } on FirebaseAuthException {
       if (loaderPushed && mounted) {
         rootNav.pop();
       }
       if (mounted) {
         setState(() => _accountDeleteBusy = false);
-        showArinTopToast(context, e.message ?? l10n.settingsAccountDeleteFailedMessage);
+        showArinTopToast(context, l10n.settingsAccountDeleteRetryMessage);
       }
       return;
     } catch (e) {
@@ -776,6 +777,20 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                         delayMs: 360,
                         onTap: () => context.push(AppRoutes.settingsSupport),
                       ),
+                      const SizedBox(height: 28),
+                      _SectionLabel(
+                        l10n.settingsSectionFollowArin,
+                        color: muted,
+                      ).animate().fadeIn(delay: 370.ms),
+                      const SizedBox(height: 12),
+                      SettingsSocialFollowCard(onDark: onDark)
+                          .animate()
+                          .fadeIn(delay: 380.ms)
+                          .scale(
+                            begin: const Offset(0.97, 0.97),
+                            duration: 420.ms,
+                            curve: Curves.elasticOut,
+                          ),
                       if (signedInUser != null) ...[
                         const SizedBox(height: 28),
                         _SectionLabel(

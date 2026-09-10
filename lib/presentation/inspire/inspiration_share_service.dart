@@ -244,51 +244,11 @@ abstract final class InspirationShareService {
 
   // ─── Error formatter ─────────────────────────────────────────────────
   static String _formatShareError(Object e, {required bool android}) {
-    if (isMethodChannelLateInitResultError(e)) {
-      return platformShareTransientErrorMessage();
-    }
-    if (e is TimeoutException) {
-      return 'Paylaşım zaman aşımına uğradı. Tekrar deneyin.';
-    }
-    if (e is PlatformException) {
-      final code = e.code;
-      final m = e.message;
-      if (code == 'not_found') {
-        return 'Paylaşım dosyası bulunamadı. Tekrar deneyin.';
-      }
-      if (code == 'not_installed') {
-        return 'Bu uygulama cihazınızda yüklü değil.';
-      }
-      if (code == 'share_failed' || code == 'bad_args') {
-        return 'Paylaşım açılamadı. Tekrar deneyin.';
-      }
-      final combined = '${m ?? ''} ${e.details ?? ''}'.toLowerCase();
-      if (android) {
-        if (combined.contains('activitynotfound') ||
-            combined.contains('no activity')) {
-          return 'Paylaşım menüsü açılamadı. Gerçek cihazda deneyin.';
-        }
-        if (combined.contains('ioexception') ||
-            combined.contains('permission') ||
-            combined.contains('eacces')) {
-          return 'Dosya paylaşılamadı. Depolama izni veya cihaz kısıtı olabilir.';
-        }
-      }
-      if (m != null && m.trim().isNotEmpty) {
-        return 'Paylaşım (${code.isNotEmpty ? '$code: ' : ''}'
-            '${m.length > 160 ? '${m.substring(0, 160)}…' : m})';
-      }
-      if (code.isNotEmpty) return 'Paylaşım hatası: $code';
-    }
-    final s = e.toString();
-    if (s.isNotEmpty && s != 'Instance of \'Exception\'') {
-      if (s.contains('LateInitializationError')) {
-        return platformShareTransientErrorMessage();
-      }
-      final short = s.length > 200 ? '${s.substring(0, 200)}…' : s;
-      return 'Paylaşım açılamadı: $short';
-    }
-    return 'Paylaşım açılamadı. Tekrar deneyin.';
+    assert(() {
+      debugPrint('Inspiration share error (android=$android): $e');
+      return true;
+    }());
+    return platformShareTransientErrorMessage();
   }
 }
 

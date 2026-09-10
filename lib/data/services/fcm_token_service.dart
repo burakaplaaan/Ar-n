@@ -132,6 +132,10 @@ abstract final class FcmTokenService {
     _navigate(AppRoutes.hilalDuel);
   }
 
+  static void _openSocial() {
+    _navigate(AppRoutes.social);
+  }
+
   static void _openQuitProgram(String payload) {
     final parsed = parseQuitNotificationPayload(payload);
     if (parsed == null) {
@@ -198,6 +202,9 @@ abstract final class FcmTokenService {
           final parts = payload.split('|');
           _openPrayerCircle(requestId: parts.length > 1 ? parts[1] : null);
         });
+        registerLocalNotificationTapHandler('social', (_) {
+          _openSocial();
+        });
         registerLocalNotificationTapHandler('hilal_duel', (_) {
           _openHilalDuel();
         });
@@ -225,6 +232,8 @@ abstract final class FcmTokenService {
           _openMomentVerse(deliveryId: initial.data['deliveryId']?.toString());
         } else if (initial?.data['type'] == 'prayer_circle') {
           _openPrayerCircle(requestId: initial?.data['requestId']?.toString());
+        } else if (initial?.data['type'] == 'social') {
+          _openSocial();
         } else if (initial?.data['type'] == 'hilal_duel') {
           _openHilalDuel();
         }
@@ -241,6 +250,8 @@ abstract final class FcmTokenService {
               _openPrayerCircle(
                 requestId: message.data['requestId']?.toString(),
               );
+            } else if (message.data['type'] == 'social') {
+              _openSocial();
             } else if (message.data['type'] == 'hilal_duel') {
               _openHilalDuel();
             }
@@ -306,30 +317,37 @@ abstract final class FcmTokenService {
       final type = message.data['type']?.toString() ?? '';
       final reason = message.data['reason']?.toString() ?? '';
       final isPrayerCircle = type == 'prayer_circle';
+      final isSocial = type == 'social';
       final isHilalDuel = type == 'hilal_duel';
       // Herkese hediye can: genel yayın kanalı (düello kanalı kapalı olsa da düşsün).
       final isHilalPromo = isHilalDuel && reason == 'admin_heart_grant_all';
       final channelId = isPrayerCircle
           ? 'arin_prayer_circle'
-          : isHilalPromo
-              ? 'arin_ntf_broadcast'
-              : isHilalDuel
-                  ? 'arin_hilal_duel'
-                  : 'arin_ntf_broadcast';
+          : isSocial
+              ? 'arin_social'
+              : isHilalPromo
+                  ? 'arin_ntf_broadcast'
+                  : isHilalDuel
+                      ? 'arin_hilal_duel'
+                      : 'arin_ntf_broadcast';
       final channelName = isPrayerCircle
           ? 'Dua Halkası'
-          : isHilalPromo
-              ? 'Ayet Bildirimleri'
-              : isHilalDuel
-                  ? 'Bilgi Düellosu'
-                  : 'Ayet Bildirimleri';
+          : isSocial
+              ? 'Sosyal'
+              : isHilalPromo
+                  ? 'Ayet Bildirimleri'
+                  : isHilalDuel
+                      ? 'Bilgi Düellosu'
+                      : 'Ayet Bildirimleri';
       final channelDescription = isPrayerCircle
           ? 'Dua taleplerine eşlik bildirimleri'
-          : isHilalPromo
-              ? 'Günlük ayet ve anlık bildirimler'
-              : isHilalDuel
-                  ? 'Bilgi Düellosu sıralama ve hatırlatma bildirimleri'
-                  : 'Günlük ayet ve anlık bildirimler';
+          : isSocial
+              ? 'Yazına gelen yorumlar'
+              : isHilalPromo
+                  ? 'Günlük ayet ve anlık bildirimler'
+                  : isHilalDuel
+                      ? 'Bilgi Düellosu sıralama ve hatırlatma bildirimleri'
+                      : 'Günlük ayet ve anlık bildirimler';
       await arinLocalNotificationsPlugin.show(
         DateTime.now().millisecondsSinceEpoch.remainder(1 << 31),
         ntf.title,
@@ -348,9 +366,11 @@ abstract final class FcmTokenService {
           type,
           isPrayerCircle
               ? message.data['requestId']?.toString() ?? ''
-              : isHilalDuel
-                  ? ''
-                  : message.data['deliveryId']?.toString() ?? '',
+              : isSocial
+                  ? message.data['postId']?.toString() ?? ''
+                  : isHilalDuel
+                      ? ''
+                      : message.data['deliveryId']?.toString() ?? '',
         ].join('|'),
       );
     } catch (e) {
@@ -427,6 +447,15 @@ abstract final class FcmTokenService {
           'Bilgi Düellosu',
           description: 'Bilgi Düellosu sıralama ve hatırlatma bildirimleri',
           importance: Importance.defaultImportance,
+          playSound: true,
+        ),
+      );
+      await android.createNotificationChannel(
+        const AndroidNotificationChannel(
+          'arin_social',
+          'Sosyal',
+          description: 'Yazına gelen yorumlar',
+          importance: Importance.high,
           playSound: true,
         ),
       );

@@ -2,14 +2,14 @@ import 'package:arin/presentation/shared/widgets/arin_shell_layout.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  test('klavye üst kabukta yutulsa bile açık sayılır', () {
+  test('klavye yalnızca gerçek viewInsets ile açık sayılır', () {
     expect(
       ArinShellLayout.keyboardOpenFromMedia(
         viewInsetsBottom: 0,
         viewPaddingBottom: 34,
         paddingBottom: 0,
       ),
-      isTrue,
+      isFalse,
     );
     expect(
       ArinShellLayout.keyboardOpenFromMedia(
@@ -29,27 +29,31 @@ void main() {
     );
   });
 
-  test('asistan yazma çubuğu alt menü insetini iki kez eklemez', () {
+  test('yazma çubuğu padding soyulunca da barın üstünde kalır', () {
     expect(
       ArinShellLayout.assistantComposerBottomPaddingFromMedia(
-        viewPaddingBottom: 34,
-        paddingBottom: 96,
+        viewPaddingBottom: 0,
+        paddingBottom: 0,
       ),
-      8,
+      96,
     );
-  });
-
-  test('asistan yazma çubuğu yalnızca sistem inseti varken menünün üstünde durur', () {
     expect(
       ArinShellLayout.assistantComposerBottomPaddingFromMedia(
         viewPaddingBottom: 34,
         paddingBottom: 34,
       ),
-      68,
+      130,
+    );
+    expect(
+      ArinShellLayout.assistantComposerBottomPaddingFromMedia(
+        viewPaddingBottom: 34,
+        paddingBottom: 96,
+      ),
+      ArinShellLayout.barClearance(96),
     );
   });
 
-  test('gövde alt menünün üstünde bitiyorsa yazma çubuğu tekrar pay eklemez', () {
+  test('gövde yüksekliği bar boşluğunu kısaltmaz', () {
     expect(
       ArinShellLayout.assistantComposerBottomPaddingFromMedia(
         viewPaddingBottom: 34,
@@ -57,7 +61,7 @@ void main() {
         screenHeight: 800,
         bodyHeight: 690,
       ),
-      8,
+      130,
     );
   });
 }

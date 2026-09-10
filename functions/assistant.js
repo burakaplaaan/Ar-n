@@ -30,6 +30,7 @@ const ALLOWED_PAGES = new Set([
   "breathing",
   "healing",
   "prayer_circle",
+  "social",
   "hilal_duel",
   "habits",
   "namaz",
@@ -93,7 +94,7 @@ Dini konular:
 
 Araçlar:
 - Bir ekranı aç / gönder / götür / yönlendir dendiğinde MUTLAKA open_page çağır. Sadece "yönlendiriyorum" yazmak yetmez.
-- Sayfalar: home, qibla, zikir (zikirmatik), breathing, healing, prayer_circle, hilal_duel, habits, namaz, kaza, settings, notifications, widgets (kilit ekranı ayeti), inspire, premium.
+- Sayfalar: home, qibla, zikir (zikirmatik), breathing, healing, prayer_circle, social, hilal_duel, habits, namaz, kaza, settings, notifications, widgets (kilit ekranı ayeti), inspire, premium.
 - Namaz bildirimlerini toptan kapatmada aracı çağır; onay istemcide.
 
 Tarih:

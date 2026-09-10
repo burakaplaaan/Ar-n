@@ -137,10 +137,10 @@ class _InspireViewerPageState extends ConsumerState<InspireViewerPage> {
             child: ArinSkeletonCard(height: 520, borderRadius: 24),
           ),
         ),
-        error: (e, _) => ColoredBox(
+        error: (_, _) => ColoredBox(
           color: Colors.black,
           child: _ViewerError(
-            message: '$e',
+            message: AppLocalizations.of(context)!.userGenericError,
             onClose: () => context.pop(),
             onRetry: () => ref.invalidate(inspirationCatalogProvider),
           ),
