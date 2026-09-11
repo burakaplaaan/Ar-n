@@ -918,117 +918,128 @@ class _UsernameGate extends StatelessWidget {
     final valid = nameOk && bioOk;
     final titleColor = onDark ? AppColors.textOnDark : AppColors.textPrimary;
     final bodyColor = onDark ? AppColors.textOnDarkMuted : AppColors.textSecondary;
-    return RefreshIndicator(
-      color: AppColors.accentNeonGreen,
-      onRefresh: onRetry,
-      child: ListView(
-      physics: const AlwaysScrollableScrollPhysics(),
-      padding: const EdgeInsets.fromLTRB(24, 28, 24, 24),
+    final footerBottom = ArinShellLayout.isKeyboardOpen(context)
+        ? 12.0
+        : ArinShellLayout.bottomContentPadding(context);
+    return Column(
       children: [
-        Text(
-          showUsername ? l10n.socialUsernameTitle : l10n.socialBioTitle,
-          style: TextStyle(
-            color: titleColor,
-            fontSize: 26,
-            fontWeight: FontWeight.w800,
-            letterSpacing: -0.6,
+        Expanded(
+          child: RefreshIndicator(
+            color: AppColors.accentNeonGreen,
+            onRefresh: onRetry,
+            child: ListView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              padding: const EdgeInsets.fromLTRB(24, 28, 24, 16),
+              children: [
+                Text(
+                  showUsername ? l10n.socialUsernameTitle : l10n.socialBioTitle,
+                  style: TextStyle(
+                    color: titleColor,
+                    fontSize: 26,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: -0.6,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  showUsername ? l10n.socialUsernameBody : l10n.socialBioBody,
+                  style: TextStyle(
+                    color: bodyColor,
+                    height: 1.4,
+                  ),
+                ),
+                if (showUsername) ...[
+                  const SizedBox(height: 22),
+                  TextField(
+                    controller: usernameController,
+                    maxLength: kSocialUsernameMax,
+                    onChanged: (_) => onChanged(),
+                    textInputAction: TextInputAction.next,
+                    onSubmitted: (_) => bioFocus.requestFocus(),
+                    style: TextStyle(
+                      color: titleColor,
+                      fontWeight: FontWeight.w600,
+                    ),
+                    decoration: InputDecoration(
+                      hintText: l10n.socialUsernameHint,
+                      prefixText: '@',
+                      counterText:
+                          '${usernameController.text.trim().length}/$kSocialUsernameMax',
+                    ),
+                  ),
+                  const SizedBox(height: 18),
+                  Text(
+                    l10n.socialBioTitle,
+                    style: TextStyle(
+                      color: titleColor,
+                      fontSize: 18,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: -0.3,
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    l10n.socialBioBody,
+                    style: TextStyle(
+                      color: bodyColor,
+                      height: 1.4,
+                    ),
+                  ),
+                ],
+                const SizedBox(height: 16),
+                TextField(
+                  controller: bioController,
+                  focusNode: bioFocus,
+                  minLines: 2,
+                  maxLines: 4,
+                  maxLength: kSocialBioMax,
+                  onChanged: (_) => onChanged(),
+                  textInputAction: TextInputAction.done,
+                  onSubmitted: (_) => onClaim(),
+                  style: TextStyle(
+                    color: titleColor,
+                    fontWeight: FontWeight.w500,
+                    height: 1.35,
+                  ),
+                  decoration: InputDecoration(
+                    hintText: l10n.socialBioHint,
+                    counterText:
+                        '${normalizeSocialBody(bioController.text).length}/$kSocialBioMax',
+                  ),
+                ),
+                const SizedBox(height: 20),
+                SocialAvatarPicker(
+                  username: showUsername
+                      ? usernameController.text.trim()
+                      : username,
+                  premium: premium,
+                  selectedId: avatarId,
+                  onSelected: onAvatarChanged,
+                ),
+              ],
+            ),
           ),
         ),
-        const SizedBox(height: 8),
-        Text(
-          showUsername ? l10n.socialUsernameBody : l10n.socialBioBody,
-          style: TextStyle(
-            color: bodyColor,
-            height: 1.4,
-          ),
-        ),
-        if (showUsername) ...[
-          const SizedBox(height: 22),
-          TextField(
-            controller: usernameController,
-            maxLength: kSocialUsernameMax,
-            onChanged: (_) => onChanged(),
-            textInputAction: TextInputAction.next,
-            onSubmitted: (_) => bioFocus.requestFocus(),
-            style: TextStyle(
-              color: titleColor,
-              fontWeight: FontWeight.w600,
+        Padding(
+          padding: EdgeInsets.fromLTRB(24, 8, 24, footerBottom),
+          child: FilledButton(
+            onPressed: valid && !claiming ? onClaim : null,
+            style: FilledButton.styleFrom(
+              minimumSize: const Size.fromHeight(50),
+              backgroundColor: onDark
+                  ? AppColors.emeraldMid
+                  : AppColors.emeraldDark,
             ),
-            decoration: InputDecoration(
-              hintText: l10n.socialUsernameHint,
-              prefixText: '@',
-              counterText:
-                  '${usernameController.text.trim().length}/$kSocialUsernameMax',
-            ),
+            child: claiming
+                ? const SizedBox(
+                    width: 18,
+                    height: 18,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
+                : Text(l10n.socialSaveUsername),
           ),
-          const SizedBox(height: 18),
-          Text(
-            l10n.socialBioTitle,
-            style: TextStyle(
-              color: titleColor,
-              fontSize: 18,
-              fontWeight: FontWeight.w800,
-              letterSpacing: -0.3,
-            ),
-          ),
-          const SizedBox(height: 6),
-          Text(
-            l10n.socialBioBody,
-            style: TextStyle(
-              color: bodyColor,
-              height: 1.4,
-            ),
-          ),
-        ],
-        const SizedBox(height: 16),
-        TextField(
-          controller: bioController,
-          focusNode: bioFocus,
-          minLines: 2,
-          maxLines: 4,
-          maxLength: kSocialBioMax,
-          onChanged: (_) => onChanged(),
-          textInputAction: TextInputAction.done,
-          onSubmitted: (_) => onClaim(),
-          style: TextStyle(
-            color: titleColor,
-            fontWeight: FontWeight.w500,
-            height: 1.35,
-          ),
-          decoration: InputDecoration(
-            hintText: l10n.socialBioHint,
-            counterText:
-                '${normalizeSocialBody(bioController.text).length}/$kSocialBioMax',
-          ),
-        ),
-        const SizedBox(height: 20),
-        SocialAvatarPicker(
-          username: showUsername
-              ? usernameController.text.trim()
-              : username,
-          premium: premium,
-          selectedId: avatarId,
-          onSelected: onAvatarChanged,
-        ),
-        const SizedBox(height: 16),
-        FilledButton(
-          onPressed: valid && !claiming ? onClaim : null,
-          style: FilledButton.styleFrom(
-            minimumSize: const Size.fromHeight(50),
-            backgroundColor: onDark
-                ? AppColors.emeraldMid
-                : AppColors.emeraldDark,
-          ),
-          child: claiming
-              ? const SizedBox(
-                  width: 18,
-                  height: 18,
-                  child: CircularProgressIndicator(strokeWidth: 2),
-                )
-              : Text(l10n.socialSaveUsername),
         ),
       ],
-    ),
     );
   }
 }
