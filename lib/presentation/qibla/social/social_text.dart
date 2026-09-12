@@ -104,6 +104,11 @@ bool isSocialBioValid(String raw) {
       !containsSocialInsult(value);
 }
 
+/// Empty is allowed; a filled hakkında must still pass [isSocialBioValid].
+bool isSocialOptionalBioValid(String raw) {
+  return normalizeSocialBody(raw).isEmpty || isSocialBioValid(raw);
+}
+
 const _insultWords = <String>{
   'orospu',
   'orospucocugu',

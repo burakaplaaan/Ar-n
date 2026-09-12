@@ -1,0 +1,1402 @@
+[
+  {
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 1,
+    "question": "Sabah namazının sünneti kaç rekâttır?",
+    "options": ["2", "4", "3", "1"],
+    "explanation": "Sabah namazının müekked sünneti iki rekâttır.",
+    "source": "Diyanet İlmihal",
+    "ar": {
+      "question": "كم ركعة سنة صلاة الفجر؟",
+      "options": ["2", "4", "3", "1"],
+      "explanation": "سنة الفجر المؤكدة ركعتان.",
+      "source": "رئاسة الشؤون الدينية: الفقه العملي"
+    }
+  },
+  {
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 1,
+    "question": "Akşam namazının sünneti genellikle ne zaman kılınır?",
+    "options": ["Farzdan sonra", "Farzdan önce", "Yatsıdan sonra", "Öğleden önce"],
+    "explanation": "Akşamın iki rekât sünneti farzdan sonra kılınır.",
+    "source": "Diyanet İlmihal",
+    "ar": {
+      "question": "متى تُصلّى سنة المغرب عادة؟",
+      "options": ["بعد الفريضة", "قبل الفريضة", "بعد العشاء", "قبل الظهر"],
+      "explanation": "سنة المغرب ركعتان بعد الفريضة.",
+      "source": "رئاسة الشؤون الدينية: الفقه العملي"
+    }
+  },
+  {
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 2,
+    "question": "Teheccüd namazı ne zaman kılınır?",
+    "options": ["Gecenin ilerleyen saatinde, uykudan sonra", "Güneş doğarken", "Öğle ezanından hemen sonra", "İkindi kerahat vaktinde"],
+    "explanation": "Teheccüd, yatsıdan sonra uyuyup gece kalkınca kılınan nafiledir.",
+    "source": "Diyanet İlmihal",
+    "ar": {
+      "question": "متى تُصلّى صلاة التهجد؟",
+      "options": ["في جوف الليل بعد نوم", "عند شروق الشمس", "فور أذان الظهر", "في وقت كراهة العصر"],
+      "explanation": "التهجد نافلة بعد العشاء يُقام لها من النوم.",
+      "source": "رئاسة الشؤون الدينية: الفقه العملي"
+    }
+  },
+  {
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 2,
+    "question": "Kuşluk (duhâ) namazı hangi vakitte kılınır?",
+    "options": ["Güneş yükselince ile öğleden önce", "İmsaktan önce", "Akşam ile yatsı arası zorunlu", "Yatsıdan sonra farz olarak"],
+    "explanation": "Duhâ, güneş yükseldikten sonra öğleye kadar kılınan nafiledir.",
+    "source": "Diyanet İlmihal",
+    "ar": {
+      "question": "في أي وقت تُصلّى صلاة الضحى؟",
+      "options": ["بعد ارتفاع الشمس إلى ما قبل الظهر", "قبل الإمساك", "واجبة بين المغرب والعشاء", "فريضة بعد العشاء"],
+      "explanation": "الضحى نافلة بعد ارتفاع الشمس إلى الزوال.",
+      "source": "رئاسة الشؤون الدينية: الفقه العملي"
+    }
+  },
+  {
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 2,
+    "question": "Evvâbîn namazı hangi namazın ardından kılınır?",
+    "options": ["Akşam", "Sabah", "Cuma", "Bayram"],
+    "explanation": "Evvâbîn, akşam namazından sonra kılınan nafiledir.",
+    "source": "Diyanet İlmihal",
+    "ar": {
+      "question": "بعد أي صلاة تُصلّى صلاة الأوابين؟",
+      "options": ["المغرب", "الفجر", "الجمعة", "العيد"],
+      "explanation": "الأوابين نافلة بعد صلاة المغرب.",
+      "source": "رئاسة الشؤون الدينية: الفقه العملي"
+    }
+  },
+  {
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 2,
+    "question": "İstihare namazı ne amaçla kılınır?",
+    "options": ["Hayırlısı belirsiz bir işte Allah'a danışmak için", "Zekât hesabı için", "Hac yerine geçsin diye", "Orucu bozmak için"],
+    "explanation": "İstihare, kararsız kalınan işte hayırlı olanı Allah'tan istemektir.",
+    "source": "Diyanet İlmihal",
+    "ar": {
+      "question": "لماذا تُصلّى صلاة الاستخارة؟",
+      "options": ["لاستشارة الله في أمر مجهول الخير", "لحساب الزكاة", "لتقوم مقام الحج", "لإفطار الصوم"],
+      "explanation": "الاستخارة طلب الخيرة من الله عند التردد.",
+      "source": "رئاسة الشؤون الدينية: الفقه العملي"
+    }
+  },
+  {
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 2,
+    "question": "Hadesten taharet namazda neyi ifade eder?",
+    "options": ["Abdest, gusül veya teyemmümle manevi kirlilikten arınmayı", "Yalnızca elbiseyi ütülemeyi", "Yalnızca ev süpürmeyi", "Yalnızca oruç tutmayı"],
+    "explanation": "Hadesten taharet, abdestsizlik ve cünüplük gibi hâllerin giderilmesidir.",
+    "source": "Diyanet Temel Dini Bilgiler",
+    "ar": {
+      "question": "ماذا تعني الطهارة من الحدث في الصلاة؟",
+      "options": ["رفع الحدث بالوضوء أو الغسل أو التيمم", "كيّ الثياب فقط", "كنس البيت فقط", "الصوم فقط"],
+      "explanation": "الطهارة من الحدث رفع الجنابة ونحوها.",
+      "source": "رئاسة الشؤون الدينية: المعلومات الدينية الأساسية"
+    }
+  },
+  {
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 2,
+    "question": "Necasetten taharet namazda neyi gerektirir?",
+    "options": ["Beden, elbise ve namaz yerinin pislikten temiz olmasını", "Yalnızca yüksek sesle okumayı", "Yalnızca yolculuğu", "Yalnızca zekât vermeyi"],
+    "explanation": "Namaz için beden, elbise ve mekân necasetten arınmış olmalıdır.",
+    "source": "Diyanet Temel Dini Bilgiler",
+    "ar": {
+      "question": "ماذا تتطلب الطهارة من النجاسة في الصلاة؟",
+      "options": ["طهارة البدن والثوب ومكان الصلاة من الخبث", "الجهر بالقراءة فقط", "السفر فقط", "إيتاء الزكاة فقط"],
+      "explanation": "يشترط طهارة البدن والثوب والمكان من النجاسة.",
+      "source": "رئاسة الشؤون الدينية: المعلومات الدينية الأساسية"
+    }
+  },
+  {
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 2,
+    "question": "Setr-i avret namazda neyi gerektirir?",
+    "options": ["Örtülmesi gereken yerlerin örtülmesini", "Yalnızca güzel koku sürünmeyi", "Yalnızca yüzük takmayı", "Yalnızca oruç niyetini"],
+    "explanation": "Namazın şartlarından biri örtülmesi gereken yerlerin kapatılmasıdır.",
+    "source": "Diyanet Temel Dini Bilgiler",
+    "ar": {
+      "question": "ماذا يتطلب ستر العورة في الصلاة؟",
+      "options": ["تغطية ما يجب ستره", "التطيب فقط", "لبس الخاتم فقط", "نية الصوم فقط"],
+      "explanation": "من شروط الصلاة ستر العورة.",
+      "source": "رئاسة الشؤون الدينية: المعلومات الدينية الأساسية"
+    }
+  },
+  {
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 1,
+    "question": "İftitah tekbiri namazda neyi başlatır?",
+    "options": ["Namazı", "Orucu", "Haccı", "Zekât yılını"],
+    "explanation": "Allahu ekber diyerek namaza girilir; buna iftitah tekbiri denir.",
+    "source": "Diyanet Temel Dini Bilgiler",
+    "ar": {
+      "question": "ماذا تبدأ تكبيرة الإحرام في الصلاة؟",
+      "options": ["الصلاة", "الصوم", "الحج", "حول الزكاة"],
+      "explanation": "يدخل المصلي الصلاة بقول الله أكبر.",
+      "source": "رئاسة الشؤون الدينية: المعلومات الدينية الأساسية"
+    }
+  },
+  {
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 1,
+    "question": "Namazda kıyam ne demektir?",
+    "options": ["Gücü yetenin ayakta durması", "Yalnızca yan yatması", "Yalnızca koşması", "Yalnızca zekât sayması"],
+    "explanation": "Kıyam, farz namazda gücü yetenin ayakta durmasıdır.",
+    "source": "Diyanet Temel Dini Bilgiler",
+    "ar": {
+      "question": "ماذا يعني القيام في الصلاة؟",
+      "options": ["وقوف القادر على قدميه", "الاضطجاع فقط", "الجري فقط", "عدّ الزكاة فقط"],
+      "explanation": "القيام وقوف القادر في الفريضة.",
+      "source": "رئاسة الشؤون الدينية: المعلومات الدينية الأساسية"
+    }
+  },
+  {
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 1,
+    "question": "Namazda kıraat ne demektir?",
+    "options": ["Kur'an okumak", "Zekât dağıtmak", "Kurban kesmek", "Tavaf saymak"],
+    "explanation": "Kıraat, namazda Kur'an okunmasıdır.",
+    "source": "Diyanet Temel Dini Bilgiler",
+    "ar": {
+      "question": "ماذا تعني القراءة في الصلاة؟",
+      "options": ["تلاوة القرآن", "توزيع الزكاة", "ذبح الأضحية", "عدّ أشواط الطواف"],
+      "explanation": "القراءة تلاوة القرآن في الصلاة.",
+      "source": "رئاسة الشؤون الدينية: المعلومات الدينية الأساسية"
+    }
+  },
+  {
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 2,
+    "question": "Ka'de-i ahîre namazda neyi ifade eder?",
+    "options": ["Son oturuşu", "İlk rükûyu", "Ezanı", "İmsakı"],
+    "explanation": "Ka'de-i ahîre, namazın sonundaki oturuştur.",
+    "source": "Diyanet İlmihal",
+    "ar": {
+      "question": "ماذا تعني القعدة الأخيرة في الصلاة؟",
+      "options": ["الجلوس الأخير", "الركوع الأول", "الأذان", "الإمساك"],
+      "explanation": "القعدة الأخيرة هي الجلوس في ختام الصلاة.",
+      "source": "رئاسة الشؤون الدينية: الفقه العملي"
+    }
+  },
+  {
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 3,
+    "question": "Tâdil-i erkân namazda neyi ifade eder?",
+    "options": ["Rükünleri acele etmeden hakkıyla yerine getirmeyi", "Namazı oturarak bozmayı", "Kıbleyi değiştirmeyi", "Abdesti terk etmeyi"],
+    "explanation": "Tâdil-i erkân, her rüknün sükûnetle tamamlanmasıdır.",
+    "source": "Diyanet İlmihal",
+    "ar": {
+      "question": "ماذا يعني تعديل الأركان في الصلاة؟",
+      "options": ["أداء الأركان بطمأنينة دون عجلة", "إفساد الصلاة بالقعود", "تغيير القبلة", "ترك الوضوء"],
+      "explanation": "تعديل الأركان إتمام كل ركن بطمأنينة.",
+      "source": "رئاسة الشؤون الدينية: الفقه العملي"
+    }
+  },
+  {
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 2,
+    "question": "Namazdayken bilerek konuşmak namazı nasıl etkiler?",
+    "options": ["Namazı bozar", "Namazı daha faziletli kılar", "Yalnızca orucu bozar", "Yalnızca zekâtı düşürür"],
+    "explanation": "Namazda bilerek konuşmak namazı bozar.",
+    "source": "Diyanet İlmihal",
+    "ar": {
+      "question": "كيف يؤثر الكلام عمداً أثناء الصلاة؟",
+      "options": ["يفسد الصلاة", "يزيد فضلها", "يفطر الصوم فقط", "يسقط الزكاة فقط"],
+      "explanation": "الكلام العمد في الصلاة مفسد لها.",
+      "source": "رئاسة الشؤون الدينية: الفقه العملي"
+    }
+  },
+  {
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 1,
+    "question": "Ezan metninde namaza çağrı ifadesi hangisidir?",
+    "options": ["Hayye ale's-salâh", "Esselâmü aleyküm", "Lebbeyk Allahümme", "Allāhümme salli"],
+    "explanation": "Hayye ale's-salâh, namaza geliniz demektir.",
+    "source": "Diyanet Temel Dini Bilgiler",
+    "ar": {
+      "question": "ما عبارة الدعوة إلى الصلاة في الأذان؟",
+      "options": ["حي على الصلاة", "السلام عليكم", "لبيك اللهم", "اللهم صل"],
+      "explanation": "حي على الصلاة تعني هلموا إلى الصلاة.",
+      "source": "رئاسة الشؤون الدينية: المعلومات الدينية الأساسية"
+    }
+  },
+  {
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 2,
+    "question": "Kamet ile ezan arasındaki temel fark nedir?",
+    "options": ["Kamet, farza durulmadan hemen önce getirilir", "Kamet yalnızca hacda okunur", "Ezan hiç okunmaz kamet yeter", "Kamet orucu açar"],
+    "explanation": "Kamet, cemaatin farza durmasından hemen önce okunur.",
+    "source": "Diyanet Temel Dini Bilgiler",
+    "ar": {
+      "question": "ما الفرق الأساسي بين الإقامة والأذان؟",
+      "options": ["الإقامة تُقال قبيل الدخول في الفريضة", "الإقامة في الحج فقط", "يكفي ترك الأذان بالإقامة", "الإقامة تفطر الصوم"],
+      "explanation": "الإقامة تكون قبيل شروع الجماعة في الفريضة.",
+      "source": "رئاسة الشؤون الدينية: المعلومات الدينية الأساسية"
+    }
+  },
+  {
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 1,
+    "question": "Namaz sonrası tesbihde Sübhânallah genellikle kaç kez çekilir?",
+    "options": ["33", "7", "40", "100 zorunlu"],
+    "explanation": "Namaz sonrası tesbihde Sübhânallah otuz üç kez çekilir.",
+    "source": "Diyanet Temel Dini Bilgiler",
+    "ar": {
+      "question": "كم مرة يُقال سبحان الله عادة في التسبيح بعد الصلاة؟",
+      "options": ["33", "7", "40", "100 واجباً"],
+      "explanation": "يُسبّح بعد الصلاة ثلاثاً وثلاثين.",
+      "source": "رئاسة الشؤون الدينية: المعلومات الدينية الأساسية"
+    }
+  },
+  {
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 2,
+    "question": "Cuma hutbesi Cuma namazının farzına göre ne zaman okunur?",
+    "options": ["Farzdan önce", "Farzdan sonra zorunlu", "Yatsıdan sonra", "Bayramdan bir gün sonra"],
+    "explanation": "Cuma hutbesi, iki rekât farzdan önce okunur.",
+    "source": "Diyanet İlmihal",
+    "ar": {
+      "question": "متى تُخطب خطبة الجمعة بالنسبة لفريضتها؟",
+      "options": ["قبل الفريضة", "واجبة بعد الفريضة", "بعد العشاء", "بعد العيد بيوم"],
+      "explanation": "خطبة الجمعة قبل الركعتين الفرض.",
+      "source": "رئاسة الشؤون الدينية: الفقه العملي"
+    }
+  },
+  {
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 3,
+    "question": "Teşrik tekbirleri Diyanet İlmihal'e göre hangi günlerde okunur?",
+    "options": ["Arefe sabahından bayramın dördüncü günü ikindiye kadar", "Yalnızca Ramazan'ın ilk gecesi", "Yalnızca Muharrem boyunca", "Yalnızca her Cuma hutbesinde"],
+    "explanation": "Teşrik tekbirleri Arefe sabahından Zilhicce'nin 13. günü ikindiye kadar okunur.",
+    "source": "Diyanet İlmihal",
+    "ar": {
+      "question": "في أي أيام تُقال تكبيرات التشريق وفق الفقه العملي لديوان الشؤون الدينية؟",
+      "options": ["من فجر عرفة إلى عصر اليوم الرابع من العيد", "ليلة رمضان الأولى فقط", "طوال المحرم فقط", "في خطبة كل جمعة فقط"],
+      "explanation": "تكبير التشريق من فجر عرفة إلى عصر اليوم الثالث عشر.",
+      "source": "رئاسة الشؤون الدينية: الفقه العملي"
+    }
+  },
+  {
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 1,
+    "question": "Kabir ziyaretinin temel amacı nedir?",
+    "options": ["Dua etmek ve ahireti hatırlamak", "Kabirde ticaret yapmak", "Kehanette bulunmak", "Ölüyü putlaştırmak"],
+    "explanation": "Kabir ziyareti dua, ibret ve ahiret hatırası içindir.",
+    "source": "Diyanet Temel Dini Bilgiler",
+    "ar": {
+      "question": "ما المقصد الأساس من زيارة القبور؟",
+      "options": ["الدعاء وتذكر الآخرة", "التجارة عند القبر", "ادعاء علم الغيب", "تأليه الميت"],
+      "explanation": "زيارة القبور للدعاء والعبرة وذكر الآخرة.",
+      "source": "رئاسة الشؤون الدينية: المعلومات الدينية الأساسية"
+    }
+  },
+  {
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 2,
+    "question": "Abdesti bozan hallerden biri hangisidir?",
+    "options": ["Derin uyku", "Bismillah demek", "Tesbih çekmek", "Selam vermek"],
+    "explanation": "Yatarak veya dayanakla derin uyku abdesti bozar.",
+    "source": "Diyanet İlmihal",
+    "ar": {
+      "question": "أيّ مما يلي ينقض الوضوء؟",
+      "options": ["النوم العميق", "قول بسم الله", "التسبيح", "إلقاء السلام"],
+      "explanation": "النوم المستغرق ناقض للوضوء.",
+      "source": "رئاسة الشؤون الدينية: الفقه العملي"
+    }
+  },
+  {
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 1,
+    "question": "Abdestte kollar nereye kadar yıkanır?",
+    "options": ["Dirseklerle birlikte", "Yalnızca bileklere kadar", "Yalnızca parmak uçlarına", "Yalnızca omuza kadar zorunlu"],
+    "explanation": "Kolların dirseklerle birlikte yıkanması abdestin farzlarındandır.",
+    "source": "Diyanet Temel Dini Bilgiler",
+    "ar": {
+      "question": "إلى أين تُغسل اليدان في الوضوء؟",
+      "options": ["مع المرفقين", "إلى الرسغين فقط", "إلى أطراف الأصابع فقط", "إلى الكتف واجباً"],
+      "explanation": "غسل اليدين مع المرفقين من فرائض الوضوء.",
+      "source": "رئاسة الشؤون الدينية: المعلومات الدينية الأساسية"
+    }
+  },
+  {
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 1,
+    "question": "Abdestte ayaklar nasıl yıkanır?",
+    "options": ["Topuklar ve aşık kemikleriyle birlikte", "Yalnızca tırnak uçları ıslatılarak", "Yalnızca çoraba bakılarak", "Yıkanmaz, sadece niyet yeter"],
+    "explanation": "Ayakların topuklarla birlikte yıkanması abdestin farzlarındandır.",
+    "source": "Diyanet Temel Dini Bilgiler",
+    "ar": {
+      "question": "كيف تُغسل القدمان في الوضوء؟",
+      "options": ["مع العقبين والكعبين", "ببلّ أطراف الأظفار فقط", "بالنظر إلى الجورب فقط", "تكفي النية دون غسل"],
+      "explanation": "غسل الرجلين مع العقبين من فرائض الوضوء.",
+      "source": "رئاسة الشؤون الدينية: المعلومات الدينية الأساسية"
+    }
+  },
+  {
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 2,
+    "question": "Teyemmümde mesh edilen başlıca uzuvlar hangileridir?",
+    "options": ["Yüz ve kollar", "Yalnızca saç", "Yalnızca ayaklar", "Yalnızca boyun"],
+    "explanation": "Teyemmümde yüz ve dirseklere kadar kollar mesh edilir.",
+    "source": "Diyanet İlmihal",
+    "ar": {
+      "question": "ما أبرز الأعضاء التي تُمسح في التيمم؟",
+      "options": ["الوجه واليدان", "الشعر فقط", "القدمان فقط", "العنق فقط"],
+      "explanation": "يُمسح في التيمم الوجه واليدان إلى المرفقين.",
+      "source": "رئاسة الشؤون الدينية: الفقه العملي"
+    }
+  },
+  {
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 3,
+    "question": "Diyanet İlmihal'e göre mukîmin mest üzerine mesh süresi nedir?",
+    "options": ["Bir gün bir gece", "Bir hafta", "Bir ay", "Süre yoktur"],
+    "explanation": "Mukîm, mest üzerine bir gün bir gece mesh edebilir.",
+    "source": "Diyanet İlmihal",
+    "ar": {
+      "question": "ما مدة المسح على الخفين للمقيم وفق الفقه العملي لديوان الشؤون الدينية؟",
+      "options": ["يوم وليلة", "أسبوع", "شهر", "بلا مدة"],
+      "explanation": "يمسح المقيم يوماً وليلة.",
+      "source": "رئاسة الشؤون الدينية: الفقه العملي"
+    }
+  },
+  {
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 3,
+    "question": "Diyanet İlmihal'e göre seferînin mest üzerine mesh süresi nedir?",
+    "options": ["Üç gün üç gece", "Bir saat", "Bir yıl", "Yalnızca Cuma günü"],
+    "explanation": "Seferî, mest üzerine üç gün üç gece mesh edebilir.",
+    "source": "Diyanet İlmihal",
+    "ar": {
+      "question": "ما مدة المسح على الخفين للمسافر وفق الفقه العملي لديوان الشؤون الدينية؟",
+      "options": ["ثلاثة أيام بلياليها", "ساعة واحدة", "سنة", "يوم الجمعة فقط"],
+      "explanation": "يمسح المسافر ثلاثة أيام بلياليها.",
+      "source": "رئاسة الشؤون الدينية: الفقه العملي"
+    }
+  },
+  {
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 2,
+    "question": "Cuma guslü Diyanet İlmihal'de nasıl değerlendirilir?",
+    "options": ["Sünnet", "Haccın rüknü", "Zekâtın farzı", "Orucun keffâreti"],
+    "explanation": "Cuma guslü sünnet bir temizliktir.",
+    "source": "Diyanet İlmihal",
+    "ar": {
+      "question": "كيف يُعدّ غسل الجمعة في الفقه العملي لديوان الشؤون الدينية؟",
+      "options": ["سنة", "ركن من الحج", "فرض الزكاة", "كفارة الصوم"],
+      "explanation": "غسل الجمعة سنة للنظافة.",
+      "source": "رئاسة الشؤون الدينية: الفقه العملي"
+    }
+  },
+  {
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 2,
+    "question": "Oruçluyken unutarak yiyip içmek orucu nasıl etkiler?",
+    "options": ["Oruç bozulmaz", "Oruç hemen keffâret ister", "Hac bozulur", "Namaz düşer"],
+    "explanation": "Unutarak yiyip içmek orucu bozmaz; hatırlayınca bırakılır.",
+    "source": "Diyanet İlmihal",
+    "ar": {
+      "question": "كيف يؤثر الأكل أو الشرب نسياناً على الصوم؟",
+      "options": ["لا يفسد الصوم", "تجب الكفارة فوراً", "يفسد الحج", "تسقط الصلاة"],
+      "explanation": "الأكل نسياناً لا يفطر، ويُمسك عند التذكر.",
+      "source": "رئاسة الشؤون الدينية: الفقه العملي"
+    }
+  },
+  {
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 3,
+    "question": "Oruç fidyesi kimler için söz konusu olur?",
+    "options": ["Oruç tutamayacak durumda olup kaza da umulmayanlara", "Yalnızca çocuklara bayramda", "Yalnızca yolculara vacip olarak", "Yalnızca hacılara Arafat'ta"],
+    "explanation": "İyileşme umulmayan hastalık veya yaşlılıkta fidye gündeme gelir.",
+    "source": "Diyanet İlmihal",
+    "ar": {
+      "question": "لمن تُشرع فدية الصوم؟",
+      "options": ["لمن يعجز عن الصوم ولا يُرجى قضاؤه", "للأطفال يوم العيد فقط", "واجبة على المسافر فقط", "للحجاج في عرفة فقط"],
+      "explanation": "الفدية لكبر أو مرض لا يُرجى برؤه.",
+      "source": "رئاسة الشؤون الدينية: الفقه العملي"
+    }
+  },
+  {
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 3,
+    "question": "Ramazan'da özürsüz ve bilerek orucu yeme içmeyle bozmanın keffâreti Diyanet İlmihal'de nasıl anlatılır?",
+    "options": ["Köle azadı, yoksa altmış gün oruç veya altmış fakiri doyurmak", "Yalnızca bir tesbih", "Yalnızca iki rekât namaz", "Yalnızca bir bardak su"],
+    "explanation": "Keffâret; azat, altmış gün oruç veya altmış fakiri doyurmak şeklinde anlatılır.",
+    "source": "Diyanet İlmihal",
+    "ar": {
+      "question": "كيف تُذكر كفارة إفساد صوم رمضان عمداً بالأكل والشرب في الفقه العملي؟",
+      "options": ["عتق أو صيام ستين يوماً أو إطعام ستين مسكيناً", "تسبيحة واحدة فقط", "ركعتان فقط", "كأس ماء فقط"],
+      "explanation": "الكفارة عتق أو صيام ستين أو إطعام ستين.",
+      "source": "رئاسة الشؤون الدينية: الفقه العملي"
+    }
+  },
+  {
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 2,
+    "question": "Şevval ayında tutulan altı gün oruç nasıl değerlendirilir?",
+    "options": ["Nafile / mendup bir oruçtur", "Ramazan'ın farzının yerini tutar", "Haccın rüknüdür", "Zekâtın şartıdır"],
+    "explanation": "Ramazan'dan sonra Şevval'de altı gün oruç tutmak menduptur.",
+    "source": "Diyanet İlmihal",
+    "ar": {
+      "question": "كيف يُعدّ صيام ستة أيام من شوال؟",
+      "options": ["صوم مندوب / نافلة", "يقوم مقام فرض رمضان", "ركن من الحج", "شرط الزكاة"],
+      "explanation": "صيام ستة من شوال مندوب بعد رمضان.",
+      "source": "رئاسة الشؤون الدينية: الفقه العملي"
+    }
+  },
+  {
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 2,
+    "question": "Muharrem'in onuncu günü tutulan nafile oruca ne ad verilir?",
+    "options": ["Aşûre orucu", "Kurban orucu", "Teravih orucu", "Cuma orucu"],
+    "explanation": "Muharrem'in onuncu günü Aşûre orucuyla anılır.",
+    "source": "Diyanet İlmihal",
+    "ar": {
+      "question": "ما اسم صوم النافلة في اليوم العاشر من المحرم؟",
+      "options": ["صوم عاشوراء", "صوم الأضحى", "صوم التراويح", "صوم الجمعة"],
+      "explanation": "اليوم العاشر من المحرم يوم عاشوراء.",
+      "source": "رئاسة الشؤون الدينية: الفقه العملي"
+    }
+  },
+  {
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 2,
+    "question": "Pazartesi ve perşembe oruçları nasıl bir ibadettir?",
+    "options": ["Nafile oruçlardır", "Beş vaktin farzıdır", "Haccın rüknüdür", "Zekâtın nisabıdır"],
+    "explanation": "Pazartesi ve perşembe oruçları sünnet/nafile oruçlardandır.",
+    "source": "Diyanet İlmihal",
+    "ar": {
+      "question": "ما نوع صيام الاثنين والخميس؟",
+      "options": ["صوم نافلة", "فرض الصلوات الخمس", "ركن الحج", "نصاب الزكاة"],
+      "explanation": "صيام الاثنين والخميس من النوافل.",
+      "source": "رئاسة الشؤون الدينية: الفقه العملي"
+    }
+  },
+  {
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 2,
+    "question": "Hacda olmayanlar için Arefe günü orucu nasıl değerlendirilir?",
+    "options": ["Mendup bir oruçtur", "Haccı iptal eder", "Farziyeti Cuma'ya bağlıdır", "Yalnızca çocuklara vaciptir"],
+    "explanation": "Arefe orucu, hacda olmayanlar için faziletli nafiledir.",
+    "source": "Diyanet İlmihal",
+    "ar": {
+      "question": "كيف يُعدّ صوم يوم عرفة لغير الحاج؟",
+      "options": ["صوم مندوب", "يبطل الحج", "فرضه مربوط بالجمعة", "واجب على الأطفال فقط"],
+      "explanation": "صوم عرفة مندوب لغير الحجاج.",
+      "source": "رئاسة الشؤون الدينية: الفقه العملي"
+    }
+  },
+  {
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 1,
+    "question": "Ramazan ayı kamerî olarak kaç gün sürebilir?",
+    "options": ["29 veya 30", "Daima 31", "Daima 28", "Daima 40"],
+    "explanation": "Kamerî aylar 29 veya 30 gün sürer; Ramazan da böyledir.",
+    "source": "Diyanet Temel Dini Bilgiler",
+    "ar": {
+      "question": "كم يوماً قد يستمر شهر رمضان قمرياً؟",
+      "options": ["29 أو 30", "31 دائماً", "28 دائماً", "40 دائماً"],
+      "explanation": "الشهر القمري 29 أو 30 يوماً.",
+      "source": "رئاسة الشؤون الدينية: المعلومات الدينية الأساسية"
+    }
+  },
+  {
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 3,
+    "question": "Kur'an'da zekât verilecek sınıflar Tevbe suresinde kaç grup olarak sayılır?",
+    "options": ["8", "3", "12", "5"],
+    "explanation": "Tevbe suresinde zekâtın sekiz sınıfa verileceği belirtilir.",
+    "source": "Diyanet Kur'an Yolu",
+    "ar": {
+      "question": "كم صنفاً يُذكر لمصارف الزكاة في سورة التوبة؟",
+      "options": ["8", "3", "12", "5"],
+      "explanation": "ذُكرت ثمانية أصناف لمصارف الزكاة.",
+      "source": "رئاسة الشؤون الدينية: طريق القرآن"
+    }
+  },
+  {
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 3,
+    "question": "Zekâtta havelânü'l-havl neyi ifade eder?",
+    "options": ["Malın üzerinden bir kamerî yıl geçmesini", "Namazın beş vakit olmasını", "Haccın Arafat'ta bitmesini", "Orucun imsakini"],
+    "explanation": "Nisaba ulaşan malda genellikle bir yılın dolması aranır.",
+    "source": "Diyanet İlmihal",
+    "ar": {
+      "question": "ماذا يعني حوَلان الحول في الزكاة؟",
+      "options": ["مضي سنة قمرية على المال", "كون الصلاة خمس مرات", "ختام الحج في عرفة", "إمساك الصوم"],
+      "explanation": "يشترط غالباً مضي حول على المال النصاب.",
+      "source": "رئاسة الشؤون الدينية: الفقه العملي"
+    }
+  },
+  {
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 2,
+    "question": "Öşür hangi tür maldan alınan paydır?",
+    "options": ["Toprak ürünlerinden", "Yalnızca ev eşyasından", "Yalnızca kitaplarından", "Yalnızca nafile namazdan"],
+    "explanation": "Öşür, ziraî ürünlerden verilen paydır.",
+    "source": "Diyanet İlmihal",
+    "ar": {
+      "question": "من أي مال يُؤخذ العشر؟",
+      "options": ["من غلة الأرض", "من أثاث البيت فقط", "من الكتب فقط", "من النوافل فقط"],
+      "explanation": "العشر حصة من الزروع.",
+      "source": "رئاسة الشؤون الدينية: الفقه العملي"
+    }
+  },
+  {
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 1,
+    "question": "Zekâtın verileceği kimselerden biri hangisidir?",
+    "options": ["Fakir", "Nisap üstü zengin zorunlu", "Put tapınıcısı vacip", "Zekât memuru olmayan herkes zorunlu"],
+    "explanation": "Zekât başta fakir ve miskinlere verilir.",
+    "source": "Diyanet Temel Dini Bilgiler",
+    "ar": {
+      "question": "من أصناف من تُعطى لهم الزكاة؟",
+      "options": ["الفقير", "الغني فوق النصاب واجباً", "عابد الوثن واجباً", "كل أحد بلا عامل"],
+      "explanation": "تُصرف الزكاة للفقراء والمساكين أولاً.",
+      "source": "رئاسة الشؤون الدينية: المعلومات الدينية الأساسية"
+    }
+  },
+  {
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 1,
+    "question": "Hac farzı, şartları oluşan kişiye ömürde kaç kez yerine getirilir?",
+    "options": ["Bir", "Her yıl zorunlu", "Beş", "On"],
+    "explanation": "Hac, gücü yetene ömürde bir kez farzdır.",
+    "source": "Diyanet Temel Dini Bilgiler",
+    "ar": {
+      "question": "كم مرة يجب الحج في العمر على من استطاع؟",
+      "options": ["مرة", "كل سنة حتماً", "خمس مرات", "عشر مرات"],
+      "explanation": "الحج فرض مرة في العمر على المستطيع.",
+      "source": "رئاسة الشؤون الدينية: المعلومات الدينية الأساسية"
+    }
+  },
+  {
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 2,
+    "question": "Hac ayları hangileridir?",
+    "options": ["Şevval, Zilkade ve Zilhicce", "Muharrem, Safer ve Recep", "Ramazan ve Şaban yalnızca", "Rebiülevvel'in tamamı"],
+    "explanation": "Hac ayları Şevval, Zilkade ve Zilhicce'dir.",
+    "source": "Diyanet İlmihal",
+    "ar": {
+      "question": "ما أشهر الحج؟",
+      "options": ["شوال وذو القعدة وذو الحجة", "المحرم وصفر ورجب", "رمضان وشعبان فقط", "ربيع الأول كله"],
+      "explanation": "أشهر الحج شوال وذو القعدة وذو الحجة.",
+      "source": "رئاسة الشؤون الدينية: الفقه العملي"
+    }
+  },
+  {
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 2,
+    "question": "Telbiye hac ve umrede hangi niyeti dile getirir?",
+    "options": ["Lebbeyk Allahümme lebbeyk diyerek icabeti", "Yalnızca zekât nisabını", "Yalnızca oruç iftarını", "Yalnızca vitir kunutunu"],
+    "explanation": "Telbiye, hac veya umreye icabet edildiğini bildiren zikirdir.",
+    "source": "Diyanet İlmihal",
+    "ar": {
+      "question": "ماذا تُظهر التلبية في الحج والعمرة؟",
+      "options": ["الإجابة بقول لبيك اللهم لبيك", "نصاب الزكاة فقط", "إفطار الصوم فقط", "قنوت الوتر فقط"],
+      "explanation": "التلبية ذكر إجابة لنداء الحج أو العمرة.",
+      "source": "رئاسة الشؤون الدينية: الفقه العملي"
+    }
+  },
+  {
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 2,
+    "question": "Hacerü'l-Esved tavafta neyle anılır?",
+    "options": ["Tavafa başlama yönü / istilâm", "Arafat vakfesinin yeri", "Mina cemresinin adı", "Müzdelife gecesi"],
+    "explanation": "Tavaf Hacerü'l-Esved hizasından başlar; istilâm edilir.",
+    "source": "Diyanet İlmihal",
+    "ar": {
+      "question": "بماذا يُعرف الحجر الأسود في الطواف؟",
+      "options": ["جهة بدء الطواف / الاستلام", "موضع وقوف عرفة", "اسم جمرة منى", "ليلة مزدلفة"],
+      "explanation": "يُبدأ الطواف محاذاة الحجر ويُستلم.",
+      "source": "رئاسة الشؤون الدينية: الفقه العملي"
+    }
+  },
+  {
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 1,
+    "question": "Makam-ı İbrahim nerededir?",
+    "options": ["Kâbe'nin yakınında", "Medine çarşısında", "Bedir ovasında", "Taif bağlarında"],
+    "explanation": "Makam-ı İbrahim, Mescid-i Haram'da Kâbe yakınındadır.",
+    "source": "Diyanet Temel Dini Bilgiler",
+    "ar": {
+      "question": "أين مقام إبراهيم؟",
+      "options": ["قرب الكعبة", "في سوق المدينة", "في بدر", "في طائف"],
+      "explanation": "مقام إبراهيم عند الكعبة في المسجد الحرام.",
+      "source": "رئاسة الشؤون الدينية: المعلومات الدينية الأساسية"
+    }
+  },
+  {
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 1,
+    "question": "Zemzem kuyusu nerededir?",
+    "options": ["Mescid-i Haram'da", "Kudüs surunda", "Uhud eteklerinde", "Kuba dışında zorunlu"],
+    "explanation": "Zemzem, Mekke'de Harem-i Şerif'tedir.",
+    "source": "Diyanet Temel Dini Bilgiler",
+    "ar": {
+      "question": "أين بئر زمزم؟",
+      "options": ["في المسجد الحرام", "على سور القدس", "في سفح أحد", "خارج قباء حتماً"],
+      "explanation": "زمزم في الحرم بمكة.",
+      "source": "رئاسة الشؤون الدينية: المعلومات الدينية الأساسية"
+    }
+  },
+  {
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 2,
+    "question": "Vedâ tavafı ne zaman yapılır?",
+    "options": ["Mekke'den ayrılmadan önce", "Medine'ye girince zorunlu", "Arafat'a çıkmadan önce farz", "Mina'da taşlamadan önce farz"],
+    "explanation": "Vedâ tavafı, Mekke'den ayrılırken yapılan tavaftır.",
+    "source": "Diyanet İlmihal",
+    "ar": {
+      "question": "متى يُؤدّى طواف الوداع؟",
+      "options": ["قبل مغادرة مكة", "عند دخول المدينة حتماً", "فرض قبل عرفة", "فرض قبل الرمي بمنى"],
+      "explanation": "طواف الوداع عند مغادرة مكة.",
+      "source": "رئاسة الشؤون الدينية: الفقه العملي"
+    }
+  },
+  {
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 3,
+    "question": "Mîkât nedir?",
+    "options": ["İhrama girilen sınır yerleri", "Zekât nisabı", "Vitir rekâtı", "İmsak saati"],
+    "explanation": "Mîkât, hac ve umre için ihrama girilen sınırlardır.",
+    "source": "Diyanet İlmihal",
+    "ar": {
+      "question": "ما هو الميقات؟",
+      "options": ["مواضع الإحرام", "نصاب الزكاة", "ركعة الوتر", "ساعة الإمساك"],
+      "explanation": "المواقيت حدود الإحرام للحج والعمرة.",
+      "source": "رئاسة الشؤون الدينية: الفقه العملي"
+    }
+  },
+  {
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 2,
+    "question": "Erkekler ihramda dikişli elbise giymekten neden sakınır?",
+    "options": ["İhram yasaklarındandır", "Namazı bozar diye", "Zekâtı düşürür diye", "Orucu açar diye"],
+    "explanation": "Erkeğin ihramda dikişli giysi giymesi yasaklardandır.",
+    "source": "Diyanet İlmihal",
+    "ar": {
+      "question": "لماذا يجتنب الرجال المخيط في الإحرام؟",
+      "options": ["لأنه من محظورات الإحرام", "لأنه يفسد الصلاة", "لأنه يسقط الزكاة", "لأنه يفطر"],
+      "explanation": "لبس المخيط محظور على الرجل المحرم.",
+      "source": "رئاسة الشؤون الدينية: الفقه العملي"
+    }
+  },
+  {
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 1,
+    "question": "Aşağıdakilerden hangisi İslam'ın şartlarındandır?",
+    "options": ["Namaz kılmak", "Şiir ezberlemek", "Deniz aşmak", "Yıldız saymak"],
+    "explanation": "Namaz, İslam'ın beş şartındandır.",
+    "source": "Diyanet Temel Dini Bilgiler",
+    "ar": {
+      "question": "أيّ مما يلي من أركان الإسلام؟",
+      "options": ["إقام الصلاة", "حفظ الشعر", "عبور البحر", "عدّ النجوم"],
+      "explanation": "الصلاة من أركان الإسلام الخمسة.",
+      "source": "رئاسة الشؤون الدينية: المعلومات الدينية الأساسية"
+    }
+  },
+  {
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 1,
+    "question": "Aşağıdakilerden hangisi imanın şartlarındandır?",
+    "options": ["Meleklere iman", "Ticaret defteri tutmak", "Şehir gezmek", "Takvim asmak"],
+    "explanation": "Meleklere iman, imanın altı şartındandır.",
+    "source": "Diyanet Temel Dini Bilgiler",
+    "ar": {
+      "question": "أيّ مما يلي من أركان الإيمان؟",
+      "options": ["الإيمان بالملائكة", "مسك دفتر التجارة", "السياحة في المدن", "تعليق التقويم"],
+      "explanation": "الإيمان بالملائكة من أركان الإيمان الستة.",
+      "source": "رئاسة الشؤون الدينية: المعلومات الدينية الأساسية"
+    }
+  },
+  {
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 1,
+    "question": "Beş vakit namaz hangi sırayla kılınır?",
+    "options": ["Sabah, öğle, ikindi, akşam, yatsı", "Öğle, sabah, yatsı, ikindi, akşam", "Akşam, sabah, ikindi, yatsı, öğle", "Yatsı, ikindi, sabah, öğle, akşam"],
+    "explanation": "Sıra: sabah, öğle, ikindi, akşam, yatsıdır.",
+    "source": "Diyanet Temel Dini Bilgiler",
+    "ar": {
+      "question": "بأي ترتيب تُصلّى الصلوات الخمس؟",
+      "options": ["الفجر والظهر والعصر والمغرب والعشاء", "الظهر فالفجر فالعشاء فالعصر فالمغرب", "المغرب فالفجر فالعصر فالعشاء فالظهر", "العشاء فالعصر فالفجر فالظهر فالمغرب"],
+      "explanation": "الترتيب: الفجر ثم الظهر ثم العصر ثم المغرب ثم العشاء.",
+      "source": "رئاسة الشؤون الدينية: المعلومات الدينية الأساسية"
+    }
+  },
+  {
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 2,
+    "question": "Vitir namazı hangi namazdan sonra kılınır?",
+    "options": ["Yatsı", "Öğle", "İkindi", "Kuşluk"],
+    "explanation": "Vitir, yatsı namazından sonra kılınır.",
+    "source": "Diyanet İlmihal",
+    "ar": {
+      "question": "بعد أي صلاة يُصلّى الوتر؟",
+      "options": ["العشاء", "الظهر", "العصر", "الضحى"],
+      "explanation": "الوتر بعد صلاة العشاء.",
+      "source": "رئاسة الشؤون الدينية: الفقه العملي"
+    }
+  },
+  {
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 1,
+    "question": "Oruçta iftar vakti neye göredir?",
+    "options": ["Güneşin batmasına", "Öğle gölgesine", "Yatsı ezanından bir saat sonraya", "Gece yarısına zorunlu"],
+    "explanation": "İftar, güneş battığında başlar.",
+    "source": "Diyanet Temel Dini Bilgiler",
+    "ar": {
+      "question": "بم يُعرف وقت الإفطار في الصوم؟",
+      "options": ["بغروب الشمس", "بظل الظهر", "بعد العشاء بساعة", "منتصف الليل حتماً"],
+      "explanation": "الإفطار بغروب الشمس.",
+      "source": "رئاسة الشؤون الدينية: المعلومات الدينية الأساسية"
+    }
+  },
+  {
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 1,
+    "question": "Sahur yemeği ne zamana kadar yenir?",
+    "options": ["Fecr-i sâdıka / imsak vaktine kadar", "Öğleye kadar", "İkindiye kadar", "Yatsıya kadar"],
+    "explanation": "Sahur, imsak (fecr-i sâdık) girinceye kadar yenir.",
+    "source": "Diyanet Temel Dini Bilgiler",
+    "ar": {
+      "question": "إلى متى يُؤكل السحور؟",
+      "options": ["إلى الفجر الصادق / الإمساك", "إلى الظهر", "إلى العصر", "إلى العشاء"],
+      "explanation": "يُمسك عن السحور بطلوع الفجر الصادق.",
+      "source": "رئاسة الشؤون الدينية: المعلومات الدينية الأساسية"
+    }
+  },
+  {
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 2,
+    "question": "Zekâtın farz oluşunun hikmetlerinden biri nedir?",
+    "options": ["Malı temizlemek ve ihtiyaç sahibini gözetmek", "Ticareti yasaklamak", "Namazı iptal etmek", "Haccı ertelemek"],
+    "explanation": "Zekât malı arındırır ve yoksulu gözetir.",
+    "source": "Diyanet Temel Dini Bilgiler",
+    "ar": {
+      "question": "من حِكم فرض الزكاة؟",
+      "options": ["تطهير المال ورعاية المحتاج", "تحريم التجارة", "إلغاء الصلاة", "تأخير الحج"],
+      "explanation": "الزكاة تطهّر المال وترعى الفقير.",
+      "source": "رئاسة الشؤون الدينية: المعلومات الدينية الأساسية"
+    }
+  },
+  {
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 1,
+    "question": "Cemaatle namaz kılmak tek başına kılmaya göre nasıl değerlendirilir?",
+    "options": ["Daha faziletlidir", "Namazı bozar", "Farziyeti düşürür", "Yalnızca yolcuda yasaktır"],
+    "explanation": "Farzları cemaatle kılmak daha faziletlidir.",
+    "source": "Diyanet Temel Dini Bilgiler",
+    "ar": {
+      "question": "كيف تُعدّ صلاة الجماعة مقارنة بالانفراد؟",
+      "options": ["أفضل", "تفسد الصلاة", "تسقط الفرض", "محرمة على المسافر فقط"],
+      "explanation": "صلاة الفرض جماعة أفضل.",
+      "source": "رئاسة الشؤون الدينية: المعلومات الدينية الأساسية"
+    }
+  },
+  {
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 1,
+    "question": "İmam namazda kimdir?",
+    "options": ["Cemaate namaz kıldıran kişi", "Yalnızca zekât toplayan", "Yalnızca müezzin yardımcısı zorunlu", "Yalnızca hac kılavuzu"],
+    "explanation": "İmam, önde durup cemaate namaz kıldırandır.",
+    "source": "Diyanet Temel Dini Bilgiler",
+    "ar": {
+      "question": "من الإمام في الصلاة؟",
+      "options": ["من يؤمّ الناس في الصلاة", "جابي الزكاة فقط", "مساعد المؤذن حتماً", "دليل الحج فقط"],
+      "explanation": "الإمام من يتقدم ليصلّي بالناس.",
+      "source": "رئاسة الشؤون الدينية: المعلومات الدينية الأساسية"
+    }
+  },
+  {
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 1,
+    "question": "Mihrap mescitte neyi gösterir?",
+    "options": ["Kıble yönünü", "Zekât kasasını", "İftar menüsünü", "Yolcu bileti"],
+    "explanation": "Mihrap, imamın durduğu ve kıbleyi gösteren niştir.",
+    "source": "Diyanet Temel Dini Bilgiler",
+    "ar": {
+      "question": "ماذا يبيّن المحراب في المسجد؟",
+      "options": ["جهة القبلة", "صندوق الزكاة", "قائمة الإفطار", "تذكرة السفر"],
+      "explanation": "المحراب يجوف يحدّد القبلة وموقف الإمام.",
+      "source": "رئاسة الشؤون الدينية: المعلومات الدينية الأساسية"
+    }
+  },
+  {
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 1,
+    "question": "Minber mescitte ne için kullanılır?",
+    "options": ["Hutbe okumak için", "Kurban kesmek için", "Oruç açmak için", "Tavaf saymak için"],
+    "explanation": "Minber, hutbenin okunduğu yükseltidir.",
+    "source": "Diyanet Temel Dini Bilgiler",
+    "ar": {
+      "question": "لِمَ يُستخدم المنبر في المسجد؟",
+      "options": ["لإلقاء الخطبة", "لذبح الأضحية", "للإفطار", "لعدّ الطواف"],
+      "explanation": "المنبر مرتفع تُلقى عليه الخطبة.",
+      "source": "رئاسة الشؤون الدينية: المعلومات الدينية الأساسية"
+    }
+  },
+  {
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 1,
+    "question": "Ezan okuyan kişiye ne ad verilir?",
+    "options": ["Müezzin", "Hatip zorunlu", "Müftü zorunlu", "Kadı zorunlu"],
+    "explanation": "Ezanı okuyana müezzin denir.",
+    "source": "Diyanet Temel Dini Bilgiler",
+    "ar": {
+      "question": "ما اسم من يرفع الأذان؟",
+      "options": ["المؤذن", "الخطيب حتماً", "المفتي حتماً", "القاضي حتماً"],
+      "explanation": "يُسمّى رافع الأذان مؤذناً.",
+      "source": "رئاسة الشؤون الدينية: المعلومات الدينية الأساسية"
+    }
+  },
+  {
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 2,
+    "question": "Abdestte yüz yıkanmadan önce yaygın sünnet temizlik hangisidir?",
+    "options": ["Ağız ve burnun temizlenmesi", "Saçın boyanması", "Tırnağın uzatılması", "Elbisenin katlanması"],
+    "explanation": "Mazmaza ve istinşak, abdestin sünnetlerindendir.",
+    "source": "Diyanet İlmihal",
+    "ar": {
+      "question": "ما السنة الشائعة قبل غسل الوجه في الوضوء؟",
+      "options": ["المضمضة والاستنشاق", "صبغ الشعر", "إطالة الظفر", "طوي الثوب"],
+      "explanation": "المضمضة والاستنشاق من سنن الوضوء.",
+      "source": "رئاسة الشؤون الدينية: الفقه العملي"
+    }
+  },
+  {
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 2,
+    "question": "İstinca ne demektir?",
+    "options": ["Tuvalet sonrası temizlenmek", "Hacca niyet etmek", "Zekât yılını saymak", "Ezan okumak"],
+    "explanation": "İstinca, abdest bozduktan sonra temizlenmektir.",
+    "source": "Diyanet İlmihal",
+    "ar": {
+      "question": "ماذا يعني الاستنجاء؟",
+      "options": ["التطهر بعد قضاء الحاجة", "نية الحج", "عدّ حول الزكاة", "رفع الأذان"],
+      "explanation": "الاستنجاء إزالة الأذى بعد الخلاء.",
+      "source": "رئاسة الشؤون الدينية: الفقه العملي"
+    }
+  },
+  {
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 2,
+    "question": "Kurbanlık hayvanda aranan temel şartlardan biri nedir?",
+    "options": ["Sağlıklı ve yaşı tutan olması", "Mutlaka yavru olması", "Mutlaka hasta olması", "Mutlaka vahşi olması"],
+    "explanation": "Kurbanlıkta yaş, sağlık ve kusursuzluk aranır.",
+    "source": "Diyanet İlmihal",
+    "ar": {
+      "question": "من الشروط الأساسية في الأضحية؟",
+      "options": ["أن تكون سليمة بالغة السن", "أن تكون رضيعة حتماً", "أن تكون مريضة حتماً", "أن تكون وحشية حتماً"],
+      "explanation": "يشترط في الأضحية السن والسلامة.",
+      "source": "رئاسة الشؤون الدينية: الفقه العملي"
+    }
+  },
+  {
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 2,
+    "question": "Adak ne demektir?",
+    "options": ["Kişinin Allah rızası için bir ibadeti kendine borç kılması", "Namazı terk etmek", "Orucu unutmak", "Zekâtı inkâr etmek"],
+    "explanation": "Adak, mübah bir ibadeti Allah için üzerine almaktır.",
+    "source": "Diyanet İlmihal",
+    "ar": {
+      "question": "ماذا يعني النذر؟",
+      "options": ["إلزام المرء نفسه عبادة لله", "ترك الصلاة", "نسيان الصوم", "إنكار الزكاة"],
+      "explanation": "النذر التزام عبادة مباحة لله.",
+      "source": "رئاسة الشؤون الدينية: الفقه العملي"
+    }
+  },
+  {
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 2,
+    "question": "Sadaka-i câriye neyi ifade eder?",
+    "options": ["Sevabı devam eden kalıcı hayrı", "Yalnızca bir kez yenen yemeği", "Yalnızca bozulan orucu", "Yalnızca kaza namazını"],
+    "explanation": "Sadaka-i câriye, faydası süren hayırdır.",
+    "source": "Diyanet Temel Dini Bilgiler",
+    "ar": {
+      "question": "ماذا تعني الصدقة الجارية؟",
+      "options": ["خيراً يدوم ثوابه", "طعاماً يُؤكل مرة فقط", "صوماً فسد فقط", "صلاة قضاء فقط"],
+      "explanation": "الصدقة الجارية نفع مستمر.",
+      "source": "رئاسة الشؤون الدينية: المعلومات الدينية الأساسية"
+    }
+  },
+  {
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 2,
+    "question": "Ramazan ve Kurban bayramlarının ilk günlerinde nafile oruç nasıl değerlendirilir?",
+    "options": ["Tutulmaz", "Farzdır", "Haccın yerini tutar", "Zekâtı düşürür"],
+    "explanation": "Bayram günlerinde oruç tutmak yasaktır.",
+    "source": "Diyanet İlmihal",
+    "ar": {
+      "question": "كيف يُعدّ صوم النافلة في أول أيام العيدين؟",
+      "options": ["لا يُصام", "فرض", "يقوم مقام الحج", "يسقط الزكاة"],
+      "explanation": "يُنهى عن الصوم يوم العيد.",
+      "source": "رئاسة الشؤون الدينية: الفقه العملي"
+    }
+  },
+  {
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 3,
+    "question": "Bayram namazı Diyanet İlmihal'de (Hanefi) nasıl değerlendirilir?",
+    "options": ["Vacip", "Zekâtın farzı", "Haccın rüknü", "Orucun keffâreti"],
+    "explanation": "Hanefi ilmihalde bayram namazı vaciptir.",
+    "source": "Diyanet İlmihal",
+    "ar": {
+      "question": "كيف تُعدّ صلاة العيد في الفقه العملي الحنفي لديوان الشؤون الدينية؟",
+      "options": ["واجبة", "فرض الزكاة", "ركن الحج", "كفارة الصوم"],
+      "explanation": "صلاة العيد واجبة في المذهب الحنفي.",
+      "source": "رئاسة الشؤون الدينية: الفقه العملي"
+    }
+  },
+  {
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 2,
+    "question": "Cenaze namazı yükümlülük bakımından nasıl değerlendirilir?",
+    "options": ["Farz-ı kifâye", "Beş vakit farzının yerine", "Yalnızca nafile", "Yalnızca yolcuya vacip"],
+    "explanation": "Cenaze namazı farz-ı kifâyedir; bir grup kılınca diğerlerinden düşer.",
+    "source": "Diyanet İlmihal",
+    "ar": {
+      "question": "كيف تُعدّ صلاة الجنازة من حيث التكليف؟",
+      "options": ["فرض كفاية", "بدل الفرائض الخمس", "نافلة فقط", "واجبة على المسافر فقط"],
+      "explanation": "صلاة الجنازة فرض كفاية.",
+      "source": "رئاسة الشؤون الدينية: الفقه العملي"
+    }
+  },
+  {
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 3,
+    "question": "Gusülde ağzın ve burnun içini yıkamak Hanefi'de nasıl değerlendirilir?",
+    "options": ["Farzlarındandır", "Haccı bozar", "Zekâtı düşürür", "Yalnızca bayramda vacip"],
+    "explanation": "Hanefi'de guslün farzlarından biri ağız ve burnun yıkanmasıdır.",
+    "source": "Diyanet İlmihal",
+    "ar": {
+      "question": "كيف يُعدّ المضمضة والاستنشاق في الغسل عند الحنفية؟",
+      "options": ["من الفرائض", "يفسد الحج", "يسقط الزكاة", "واجب يوم العيد فقط"],
+      "explanation": "المضمضة والاستنشاق من فرائض الغسل عند الحنفية.",
+      "source": "رئاسة الشؤون الدينية: الفقه العملي"
+    }
+  },
+  {
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 3,
+    "question": "Hanefi mezhebine göre başın meshinde yeterli görülen miktar nedir?",
+    "options": ["Başın dörtte biri", "Tek bir saç teli", "Yalnızca boyun", "Yalnızca kulak memesi"],
+    "explanation": "Hanefi'de başın dörtte birinin mesh edilmesi yeterlidir.",
+    "source": "Diyanet İlmihal",
+    "ar": {
+      "question": "ما القدر المجزئ لمسح الرأس عند الحنفية؟",
+      "options": ["ربع الرأس", "شعرة واحدة", "العنق فقط", "شحمة الأذن فقط"],
+      "explanation": "يجزئ مسح ربع الرأس عند الحنفية.",
+      "source": "رئاسة الشؤون الدينية: الفقه العملي"
+    }
+  },
+  {
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 2,
+    "question": "Seferînin Ramazan'da oruç tutmaması nasıl değerlendirilir?",
+    "options": ["Ruhsattır; sonra kaza edilir", "Hac bozulur", "İman gider", "Namaz düşer"],
+    "explanation": "Yolcuya oruç tutmama ruhsatı vardır; kaza edilir.",
+    "source": "Diyanet İlmihal",
+    "ar": {
+      "question": "كيف يُعدّ ترك المسافر صوم رمضان؟",
+      "options": ["رخصة يُقضى بعدها", "يفسد الحج", "يزيل الإيمان", "تسقط الصلاة"],
+      "explanation": "للمسافر رخصة الفطر ثم القضاء.",
+      "source": "رئاسة الشؤون الدينية: الفقه العملي"
+    }
+  },
+  {
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 2,
+    "question": "Hacda şeytan taşlama (cemre) hangi günlerde yapılır?",
+    "options": ["Bayram günlerinde Mina'da", "Ramazan'ın her gecesi", "Her Cuma hutbesinde", "Yalnızca Receb boyunca"],
+    "explanation": "Cemreler Kurban Bayramı günlerinde Mina'da taşlanır.",
+    "source": "Diyanet İlmihal",
+    "ar": {
+      "question": "في أي أيام يُرمى الجمار في الحج؟",
+      "options": ["أيام العيد بمنى", "كل ليالي رمضان", "في كل خطبة جمعة", "طوال رجب فقط"],
+      "explanation": "الرمي أيام النحر بمنى.",
+      "source": "رئاسة الشؤون الدينية: الفقه العملي"
+    }
+  },
+  {
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 2,
+    "question": "Umre ihramı hac ihramından nasıl ayrılır?",
+    "options": ["Ayrı niyetle girilir", "Aynıdır, niyet farketmez", "Yalnızca zekâtla olur", "Yalnızca oruçla olur"],
+    "explanation": "Umre için ihrama umre niyetiyle girilir.",
+    "source": "Diyanet İlmihal",
+    "ar": {
+      "question": "بم ينفصل إحرام العمرة عن إحرام الحج؟",
+      "options": ["بنية مستقلة", "لا فرق في النية", "بالزكاة فقط", "بالصوم فقط"],
+      "explanation": "يُحرم للعمرة بنيتها.",
+      "source": "رئاسة الشؤون الدينية: الفقه العملي"
+    }
+  },
+  {
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 2,
+    "question": "Oruçta dilini gıybet ve kötü sözden korumak neden önemlidir?",
+    "options": ["Orucun edeplerindendir", "Namazı bozar diye", "Haccı iptal eder diye", "Kıbleyi değiştirir diye"],
+    "explanation": "Oruç yalnız aç kalmak değil; dili ve bakışı da korumaktır.",
+    "source": "Diyanet Temel Dini Bilgiler",
+    "ar": {
+      "question": "لماذا يُطلب كف اللسان عن الغيبة في الصوم؟",
+      "options": ["لأنه من آداب الصوم", "لأنه يفسد الصلاة", "لأنه يبطل الحج", "لأنه يغيّر القبلة"],
+      "explanation": "الصوم إمساك عن الحرام قولاً ونظراً أيضاً.",
+      "source": "رئاسة الشؤون الدينية: المعلومات الدينية الأساسية"
+    }
+  },
+  {
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 1,
+    "question": "İftar duasında hamd ve şükür kime yöneltilir?",
+    "options": ["Allah'a", "Yıldıza", "Putlara", "Zamana"],
+    "explanation": "İftar, rızkı verene şükürle açılır.",
+    "source": "Diyanet Temel Dini Bilgiler",
+    "ar": {
+      "question": "إلى من يُوجّه الحمد والشكر في دعاء الإفطار؟",
+      "options": ["إلى الله", "إلى النجم", "إلى الأصنام", "إلى الزمن"],
+      "explanation": "يُفطر بحمد الرازق.",
+      "source": "رئاسة الشؤون الدينية: المعلومات الدينية الأساسية"
+    }
+  },
+  {
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 2,
+    "question": "Namazın farzlarından (rükünlerinden) biri hangisidir?",
+    "options": ["Rükû", "Zekât nisabı", "Kurban yaşı", "Hac ayları"],
+    "explanation": "Rükû namazın rükünlerindendir.",
+    "source": "Diyanet Temel Dini Bilgiler",
+    "ar": {
+      "question": "أيّ مما يلي من أركان الصلاة؟",
+      "options": ["الركوع", "نصاب الزكاة", "سن الأضحية", "أشهر الحج"],
+      "explanation": "الركوع ركن من الصلاة.",
+      "source": "رئاسة الشؤون الدينية: المعلومات الدينية الأساسية"
+    }
+  },
+  {
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 3,
+    "question": "Hanefi uygulamasında öğle namazının farzından önce kılınan müekked sünnet kaç rekâttır?",
+    "options": ["4", "1", "7", "11"],
+    "explanation": "Öğleden önce dört rekât müekked sünnet kılınır.",
+    "source": "Diyanet İlmihal",
+    "ar": {
+      "question": "كم ركعة السنة المؤكدة قبل فرض الظهر في التطبيق الحنفي؟",
+      "options": ["4", "1", "7", "11"],
+      "explanation": "قبل الظهر أربع ركعات سنة مؤكدة.",
+      "source": "رئاسة الشؤون الدينية: الفقه العملي"
+    }
+  },
+  {
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 2,
+    "question": "Yatsı namazının farzından sonra kılınan müekked sünnet kaç rekâttır?",
+    "options": ["2", "5", "8", "20"],
+    "explanation": "Yatsıdan sonra iki rekât müekked sünnet kılınır.",
+    "source": "Diyanet İlmihal",
+    "ar": {
+      "question": "كم ركعة السنة المؤكدة بعد فرض العشاء؟",
+      "options": ["2", "5", "8", "20"],
+      "explanation": "بعد العشاء ركعتان سنة مؤكدة.",
+      "source": "رئاسة الشؤون الدينية: الفقه العملي"
+    }
+  },
+  {
+    "category": "İbadet ve temel dini bilgiler",
+    "difficulty": 2,
+    "question": "Abdest alırken niyet etmek neden önemlidir?",
+    "options": ["Temizliğin ibadet olarak yapılmasını sağlar", "Kıbleyi değiştirir", "Orucu otomatik açar", "Haccı tamamlar"],
+    "explanation": "Niyet, abdestin ibadet yönünü belirler.",
+    "source": "Diyanet Temel Dini Bilgiler",
+    "ar": {
+      "question": "لماذا تُعدّ النية مهمة عند الوضوء؟",
+      "options": ["لتصير الطهارة عبادة", "لتغيير القبلة", "لإفطار الصوم تلقائياً", "لإتمام الحج"],
+      "explanation": "النية تميّز الوضوء عبادة.",
+      "source": "رئاسة الشؤون الدينية: المعلومات الدينية الأساسية"
+    }
+  },
+  {
+    "category": "Dini kavramlar",
+    "difficulty": 1,
+    "question": "İhlas ibadette neyi ifade eder?",
+    "options": ["Ameli yalnız Allah rızası için yapmak", "İnsanlara gösteriş yapmak", "İbadeti gizlemek zorunda olmamak ifadesi yanlış", "Namazı terk etmek"],
+    "explanation": "İhlas, ibadeti riya katmadan Allah için yapmaktır.",
+    "source": "Diyanet Temel Dini Bilgiler",
+    "ar": {
+      "question": "ماذا يعني الإخلاص في العبادة؟",
+      "options": ["عمل العبادة لله وحده", "الرياء للناس", "لا يلزم إخفاء العبادة عبارة خاطئة", "ترك الصلاة"],
+      "explanation": "الإخلاص إفراد الله بالعمل بلا رياء.",
+      "source": "رئاسة الشؤون الدينية: المعلومات الدينية الأساسية"
+    }
+  },
+  {
+    "category": "Dini kavramlar",
+    "difficulty": 1,
+    "question": "Tevbenin temel unsurlarından biri nedir?",
+    "options": ["Günahı bırakıp Allah'a yönelmek", "Günahı başkasına yüklemek", "Namazı ertelemek", "Zekâtı inkâr etmek"],
+    "explanation": "Tevbe, pişman olup günahtan dönmektir.",
+    "source": "Diyanet Temel Dini Bilgiler",
+    "ar": {
+      "question": "ما أحد أركان التوبة؟",
+      "options": ["ترك الذنب والإقبال على الله", "رمي الذنب على الغير", "تأخير الصلاة", "إنكار الزكاة"],
+      "explanation": "التوبة ندم وإقلاع ورجوع إلى الله.",
+      "source": "رئاسة الشؤون الدينية: المعلومات الدينية الأساسية"
+    }
+  },
+  {
+    "category": "Dini kavramlar",
+    "difficulty": 1,
+    "question": "İstiğfar duası kime yöneltilir?",
+    "options": ["Allah'a", "Yıldıza", "Putlara", "Zamana"],
+    "explanation": "İstiğfar, Allah'tan af dilemektir.",
+    "source": "Diyanet Temel Dini Bilgiler",
+    "ar": {
+      "question": "إلى من يُوجّه دعاء الاستغفار؟",
+      "options": ["إلى الله", "إلى النجم", "إلى الأصنام", "إلى الزمن"],
+      "explanation": "الاستغفار سؤال العفو من الله.",
+      "source": "رئاسة الشؤون الدينية: المعلومات الدينية الأساسية"
+    }
+  },
+  {
+    "category": "Dini kavramlar",
+    "difficulty": 1,
+    "question": "Zikir ibadetinde asıl yapılan nedir?",
+    "options": ["Allah'ı anmak", "Mal saymak", "Yol ölçmek", "Put övmek"],
+    "explanation": "Zikir, dil ve kalple Allah'ı anmaktır.",
+    "source": "Diyanet Temel Dini Bilgiler",
+    "ar": {
+      "question": "ما الأصل في عبادة الذكر؟",
+      "options": ["ذكر الله", "عدّ المال", "قياس الطريق", "مدح الوثن"],
+      "explanation": "الذكر استحضار الله لساناً وقلباً.",
+      "source": "رئاسة الشؤون الدينية: المعلومات الدينية الأساسية"
+    }
+  },
+  {
+    "category": "Dini kavramlar",
+    "difficulty": 2,
+    "question": "İnfak ne demektir?",
+    "options": ["Allah yolunda harcamak", "Malı saklayıp hiç vermemek", "Namazı kısaltmak", "Orucu unutmak"],
+    "explanation": "İnfak, malı hayır yolunda vermektir.",
+    "source": "Diyanet Temel Dini Bilgiler",
+    "ar": {
+      "question": "ماذا يعني الإنفاق؟",
+      "options": ["البذل في سبيل الله", "كنز المال بلا عطاء", "قصر الصلاة", "نسيان الصوم"],
+      "explanation": "الإنفاق بذل المال في الخير.",
+      "source": "رئاسة الشؤون الدينية: المعلومات الدينية الأساسية"
+    }
+  },
+  {
+    "category": "Dini kavramlar",
+    "difficulty": 2,
+    "question": "Sadaka ile zekât arasındaki temel fark nedir?",
+    "options": ["Zekât farz, sadaka genellikle nafiledir", "Sadaka farz, zekât nafiledir", "İkisi de namazdır", "İkisi de hacdır"],
+    "explanation": "Zekât farz mali ibadettir; sadaka nafile hayırdır.",
+    "source": "Diyanet Temel Dini Bilgiler",
+    "ar": {
+      "question": "ما الفرق الأساس بين الصدقة والزكاة؟",
+      "options": ["الزكاة فرض والصدقة نافلة غالباً", "الصدقة فرض والزكاة نافلة", "كلاهما صلاة", "كلاهما حج"],
+      "explanation": "الزكاة فريضة مالية والصدقة تطوع.",
+      "source": "رئاسة الشؤون الدينية: المعلومات الدينية الأساسية"
+    }
+  },
+  {
+    "category": "Dini kavramlar",
+    "difficulty": 1,
+    "question": "Kibir ne demektir?",
+    "options": ["Kendini büyük görüp başkalarını horlamak", "Alçakgönüllü olmak", "Sabırlı olmak", "Şükretmek"],
+    "explanation": "Kibir, büyüklük taslayıp hakkı reddetmektir.",
+    "source": "Diyanet Temel Dini Bilgiler",
+    "ar": {
+      "question": "ماذا يعني الكبر؟",
+      "options": ["تعظيم النفس واحتقار الناس", "التواضع", "الصبر", "الشكر"],
+      "explanation": "الكبر بطر الحق وغمط الناس.",
+      "source": "رئاسة الشؤون الدينية: المعلومات الدينية الأساسية"
+    }
+  },
+  {
+    "category": "Dini kavramlar",
+    "difficulty": 1,
+    "question": "Haset ne demektir?",
+    "options": ["Başkasındaki nimetin gitmesini istemek", "Başkasının iyiliğine sevinmek", "Tevekkül etmek", "Adaletli olmak"],
+    "explanation": "Haset, başkasının nimetinin yok olmasını temenni etmektir.",
+    "source": "Diyanet Temel Dini Bilgiler",
+    "ar": {
+      "question": "ماذا يعني الحسد؟",
+      "options": ["تمني زوال نعمة الغير", "الفرح بخير الغير", "التوكل", "العدل"],
+      "explanation": "الحسد تمني زوال النعمة عن الغير.",
+      "source": "رئاسة الشؤون الدينية: المعلومات الدينية الأساسية"
+    }
+  },
+  {
+    "category": "Dini kavramlar",
+    "difficulty": 2,
+    "question": "Hayâ dinde neyi ifade eder?",
+    "options": ["Utanma duygusuyla günahtan çekinmek", "Yüzsüzce ısrar etmek", "Kibirlenmek", "Gıybet etmek"],
+    "explanation": "Hayâ, çirkinden utanıp çekinmektir.",
+    "source": "Diyanet Temel Dini Bilgiler",
+    "ar": {
+      "question": "ماذا يعني الحياء في الدين؟",
+      "options": ["الانكفاف عن الإثم بوازع الحياء", "الإلحاح بلا حياء", "التكبر", "الغيبة"],
+      "explanation": "الحياء انقباض النفس عن القبيح.",
+      "source": "رئاسة الشؤون الدينية: المعلومات الدينية الأساسية"
+    }
+  },
+  {
+    "category": "Dini kavramlar",
+    "difficulty": 2,
+    "question": "Emanet ahlakı neyi gerektirir?",
+    "options": ["Güvenilen şeyi koruyup sahibine teslim etmeyi", "Emaneti inkâr etmeyi", "Emaneti satmayı vacip görmeyi", "Emaneti gizlemek için yalanı"],
+    "explanation": "Emanet, güvenilen hakkı yerine getirmektir.",
+    "source": "Diyanet Temel Dini Bilgiler",
+    "ar": {
+      "question": "ماذا يقتضي خلق الأمانة؟",
+      "options": ["حفظ ما اؤتمن عليه وأداؤه", "جحود الأمانة", "وجوب بيع الأمانة", "الكذب لإخفائها"],
+      "explanation": "الأمانة أداء الحق المؤتمن.",
+      "source": "رئاسة الشؤون الدينية: المعلومات الدينية الأساسية"
+    }
+  },
+  {
+    "category": "Dini kavramlar",
+    "difficulty": 1,
+    "question": "Sıdk ne demektir?",
+    "options": ["Doğruluk", "Yalan", "Hile", "Gıybet"],
+    "explanation": "Sıdk, sözde ve özde doğruluktur.",
+    "source": "Diyanet Temel Dini Bilgiler",
+    "ar": {
+      "question": "ماذا يعني الصدق؟",
+      "options": ["الصدق / الاستقامة", "الكذب", "المكر", "الغيبة"],
+      "explanation": "الصدق مطابقة القول والعمل للحق.",
+      "source": "رئاسة الشؤون الدينية: المعلومات الدينية الأساسية"
+    }
+  },
+  {
+    "category": "Dini kavramlar",
+    "difficulty": 2,
+    "question": "Kul hakkı neden önemlidir?",
+    "options": ["Allah hakkı yanında kulun hakkının da ödenmesi gerekir", "Kul hakkı yoktur", "Yalnızca namazla düşer", "Yalnızca oruçla düşer"],
+    "explanation": "Kul hakkı, helalleşmeden bırakılmaz.",
+    "source": "Diyanet Temel Dini Bilgiler",
+    "ar": {
+      "question": "لماذا تُعدّ حقوق العباد مهمة؟",
+      "options": ["يجب أداؤها إلى جانب حق الله", "لا حق للعباد", "تسقط بالصلاة فقط", "تسقط بالصوم فقط"],
+      "explanation": "حق العبد لا يسقط دون تحلل.",
+      "source": "رئاسة الشؤون الدينية: المعلومات الدينية الأساسية"
+    }
+  },
+  {
+    "category": "Dini kavramlar",
+    "difficulty": 1,
+    "question": "Anne ve babaya iyilik Kur'an'da nasıl vurgulanır?",
+    "options": ["İhsan / iyilikle emredilir", "Terk edilmesi emredilir", "Yalnızca ticaretle bağlanır", "Yalnızca hacca bağlanır"],
+    "explanation": "Kur'an, anne babaya ihsanı tekrar tekrar emreder.",
+    "source": "Diyanet Kur'an Yolu",
+    "ar": {
+      "question": "كيف يؤكد القرآن بر الوالدين؟",
+      "options": ["يأمر بالإحسان إليهما", "يأمر بتركهما", "يربطه بالتجارة فقط", "يربطه بالحج فقط"],
+      "explanation": "يأمر القرآن بالإحسان إلى الوالدين مراراً.",
+      "source": "رئاسة الشؤون الدينية: طريق القرآن"
+    }
+  },
+  {
+    "category": "Dini kavramlar",
+    "difficulty": 2,
+    "question": "Komşu hakkı dinde nasıl değerlendirilir?",
+    "options": ["Gözetilmesi gereken bir haktır", "Hiç yoktur", "Yalnızca zekât nisabıdır", "Yalnızca hac menasikidir"],
+    "explanation": "Komşuya eziyet etmemek ve iyilik etmek emredilir.",
+    "source": "Diyanet Temel Dini Bilgiler",
+    "ar": {
+      "question": "كيف يُنظر إلى حق الجار في الدين؟",
+      "options": ["حق يُرعى", "لا وجود له", "نصاب زكاة فقط", "منسك حج فقط"],
+      "explanation": "يُؤمر بكف الأذى عن الجار والإحسان إليه.",
+      "source": "رئاسة الشؤون الدينية: المعلومات الدينية الأساسية"
+    }
+  },
+  {
+    "category": "Dini kavramlar",
+    "difficulty": 2,
+    "question": "Yetim malı hakkında temel uyarı nedir?",
+    "options": ["Haksız yere yenilmesi yasaktır", "Serbestçe harcanır", "Namazın farzıdır", "Haccın rüknüdür"],
+    "explanation": "Kur'an, yetim malını haksız yemeği şiddetle yasaklar.",
+    "source": "Diyanet Kur'an Yolu",
+    "ar": {
+      "question": "ما التحذير الأساس في مال اليتيم؟",
+      "options": ["يحرم أكله بغير حق", "يُنفق كيف شاء", "فرض الصلاة", "ركن الحج"],
+      "explanation": "ينهى القرآن عن أكل مال اليتيم ظلماً.",
+      "source": "رئاسة الشؤون الدينية: طريق القرآن"
+    }
+  },
+  {
+    "category": "Dini kavramlar",
+    "difficulty": 1,
+    "question": "Adalet ahlakı kişiden neyi ister?",
+    "options": ["Hakkı gözetip eşit tartmayı", "Yakını kayırmayı", "Gücü kötüye kullanmayı", "Yalanı süslemeyi"],
+    "explanation": "Adalet, herkese hakkını vermektir.",
+    "source": "Diyanet Temel Dini Bilgiler",
+    "ar": {
+      "question": "ماذا يطلب خلق العدل من المرء؟",
+      "options": ["رعاية الحق والقسط", "محاباة القريب", "إساءة استعمال القوة", "تزيين الكذب"],
+      "explanation": "العدل إعطاء كل ذي حق حقه.",
+      "source": "رئاسة الشؤون الدينية: المعلومات الدينية الأساسية"
+    }
+  },
+  {
+    "category": "Dini kavramlar",
+    "difficulty": 1,
+    "question": "Tevazu ne demektir?",
+    "options": ["Alçakgönüllülük", "Kibir", "Haset", "Riya"],
+    "explanation": "Tevazu, kendini beğenmeden mütevazı durmaktır.",
+    "source": "Diyanet Temel Dini Bilgiler",
+    "ar": {
+      "question": "ماذا يعني التواضع؟",
+      "options": ["خفض الجناح", "الكبر", "الحسد", "الرياء"],
+      "explanation": "التواضع ترك العجب ولين الجانب.",
+      "source": "رئاسة الشؤون الدينية: المعلومات الدينية الأساسية"
+    }
+  },
+  {
+    "category": "Dini kavramlar",
+    "difficulty": 1,
+    "question": "Merhamet ne demektir?",
+    "options": ["Acıma ve şefkat göstermek", "Katı kalplilik", "Öç gütmek", "Alay etmek"],
+    "explanation": "Merhamet, yaratılmışlara şefkatle yaklaşmaktır.",
+    "source": "Diyanet Temel Dini Bilgiler",
+    "ar": {
+      "question": "ماذا تعني الرحمة؟",
+      "options": ["العطف والشفقة", "قسوة القلب", "طلب الثأر", "السخرية"],
+      "explanation": "الرحمة الرفق بالخلق.",
+      "source": "رئاسة الشؤون الدينية: المعلومات الدينية الأساسية"
+    }
+  },
+  {
+    "category": "Dini kavramlar",
+    "difficulty": 2,
+    "question": "Hikmet kavramı dinde neyi ifade eder?",
+    "options": ["Yerli yerinde söz ve iş / ilimle ameli", "Boş sözü", "Hileli ticareti", "Namazı terk etmeyi"],
+    "explanation": "Hikmet, doğruyu yerinde bilmek ve uygulamaktır.",
+    "source": "Diyanet Temel Dini Bilgiler",
+    "ar": {
+      "question": "ماذا يعني مفهوم الحكمة في الدين؟",
+      "options": ["وضع الشيء موضعه علماً وعملاً", "الكلام الفارغ", "التجارة الغاشة", "ترك الصلاة"],
+      "explanation": "الحكمة إصابة الحق قولاً وعملاً.",
+      "source": "رئاسة الشؤون الدينية: المعلومات الدينية الأساسية"
+    }
+  },
+  {
+    "category": "Dini kavramlar",
+    "difficulty": 2,
+    "question": "İstişare ne demektir?",
+    "options": ["Bir işte ehil olanlara danışmak", "Tek başına inat etmek", "Gıybet etmek", "Yalan yaymak"],
+    "explanation": "İstişare, kararda ehline danışmaktır.",
+    "source": "Diyanet Temel Dini Bilgiler",
+    "ar": {
+      "question": "ماذا تعني المشاورة؟",
+      "options": ["سؤال أهل العلم والكفاءة", "العناد منفرداً", "الغيبة", "نشر الكذب"],
+      "explanation": "الشورى استشارة أهل الخبرة.",
+      "source": "رئاسة الشؤون الدينية: المعلومات الدينية الأساسية"
+    }
+  }
+]

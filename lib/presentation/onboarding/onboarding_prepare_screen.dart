@@ -159,7 +159,9 @@ class _OnboardingPrepareScreenState extends State<OnboardingPrepareScreen>
     final l10n = AppLocalizations.of(context)!;
     final bars = [
       (
-        l10n.onboardingPrepareBar1Title(widget.name),
+        widget.name.trim().isEmpty
+            ? l10n.onboardingPrepareBar1TitleAnonymous
+            : l10n.onboardingPrepareBar1Title(widget.name.trim()),
         l10n.onboardingPrepareBar1Body,
         Icons.menu_book_rounded,
       ),

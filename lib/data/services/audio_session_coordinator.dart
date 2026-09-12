@@ -1,6 +1,6 @@
 // lib/data/services/audio_session_coordinator.dart
 //
-// Uzun soluklu ses kaynakları (Healing Frequencies + Keşfet BGM) arasında
+// Uzun soluklu ses kaynakları (Healing + Keşfet BGM + Kur'an) arasında
 // mutual exclusion sağlar. Kullanıcı healing'i açıp Keşfet'e geçip BGM'i
 // açtığında iki ses üst üste çalıyordu; şimdi bir oynatıcı "sahne"yi alınca
 // önceki sahibinin `pause` callback'i çağrılıyor.
@@ -26,6 +26,7 @@ import 'package:flutter/foundation.dart';
 enum AudioSessionOwner {
   healing,
   exploreBgm,
+  quran,
 }
 
 typedef AudioStopCallback = Future<void> Function();

@@ -15,6 +15,7 @@ import 'core/analytics/meta_app_events.dart';
 import 'core/debug/arin_error_reporting.dart';
 import 'core/providers/shared_preferences_provider.dart';
 import 'core/providers/app_locale_provider.dart';
+import 'core/providers/theme_mode_provider.dart';
 import 'core/router/app_router.dart';
 import 'core/router/app_router_refresh.dart';
 import 'core/theme/app_theme.dart';
@@ -56,12 +57,13 @@ import 'presentation/shared/widgets/global_edge_swipe_back.dart';
 import 'presentation/shared/widgets/location_change_listener.dart';
 import 'presentation/shared/widgets/widget_launch_gate_listener.dart';
 import 'presentation/assistant/assistant_session.dart';
+import 'presentation/assistant/carplay_assistant_host.dart';
 import 'presentation/onboarding/app_tour/app_tour_controller.dart';
 import 'presentation/qibla/qibla_hub_back_dispatcher.dart';
 import 'presentation/qibla/qibla_hub_navigator_key.dart';
 import 'main.dart' show runDeferredStartupIfNeeded;
 
-final themeModeProvider = StateProvider<ThemeMode>((ref) => ThemeMode.dark);
+export 'core/providers/theme_mode_provider.dart';
 
 /// Bir kerelik widget_quote cache tazeleme anahtarı.
 /// Üretimde kapalı. Admin panelinden büyük bir içerik revizyonu sonrası `true`
@@ -188,6 +190,7 @@ class _ArinAppState extends ConsumerState<ArinApp> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     _systemBackChannel.setMethodCallHandler(_handleNativeSystemBack);
+    CarPlayAssistantHost.bind(ref);
     AdMobService.setRewardedPreloadForeground(true);
     WidgetsBinding.instance.addObserver(this);
     WidgetsBinding.instance.addPostFrameCallback((_) {

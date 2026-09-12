@@ -1,0 +1,1402 @@
+[
+  {
+    "category": "Dini kavramlar",
+    "difficulty": 2,
+    "question": "Tefekkür ne demektir?",
+    "options": ["Yaratılış ve ayetler üzerinde düşünmek", "Düşünmeden acele etmek", "Gıybet etmek", "Put övmek"],
+    "explanation": "Tefekkür, ibret için düşünmektir.",
+    "source": "Diyanet Temel Dini Bilgiler",
+    "ar": {
+      "question": "ماذا يعني التفكر؟",
+      "options": ["النظر في الخلق والآيات", "العجلة بلا فكر", "الغيبة", "مدح الوثن"],
+      "explanation": "التفكر نظر للعبرة.",
+      "source": "رئاسة الشؤون الدينية: المعلومات الدينية الأساسية"
+    }
+  },
+  {
+    "category": "Dini kavramlar",
+    "difficulty": 1,
+    "question": "İslam kelimesinin kök anlamı neyi ifade eder?",
+    "options": ["Allah'a teslimiyeti", "İnatçılığı", "Şirki", "Kibri"],
+    "explanation": "İslam, Allah'a boyun eğip teslim olmaktır.",
+    "source": "Diyanet Temel Dini Bilgiler",
+    "ar": {
+      "question": "ماذا يعني الأصل اللغوي لكلمة الإسلام؟",
+      "options": ["الاستسلام لله", "العناد", "الشرك", "الكبر"],
+      "explanation": "الإسلام الانقياد لله.",
+      "source": "رئاسة الشؤون الدينية: المعلومات الدينية الأساسية"
+    }
+  },
+  {
+    "category": "Dini kavramlar",
+    "difficulty": 2,
+    "question": "Sahih hadis ne demektir?",
+    "options": ["Senedi ve metni güvenilir hadis", "Uydurma söz", "Yalnızca şiir", "Yalnızca atasözü"],
+    "explanation": "Sahih, râvileri güvenilir ve kopuksuz hadistir.",
+    "source": "Diyanet Temel Dini Bilgiler",
+    "ar": {
+      "question": "ماذا يعني الحديث الصحيح؟",
+      "options": ["حديث ثبت سنده ومتنه", "قول موضوع", "شعر فقط", "مثل فقط"],
+      "explanation": "الصحيح ما اتصل سنده بعدول ضابطين.",
+      "source": "رئاسة الشؤون الدينية: المعلومات الدينية الأساسية"
+    }
+  },
+  {
+    "category": "Dini kavramlar",
+    "difficulty": 3,
+    "question": "Keramet ile mucize arasındaki temel fark nedir?",
+    "options": ["Mucize peygamberde, keramet velîde görülür", "İkisi de namazdır", "İkisi de zekâttır", "Keramet yalnızca oruçtur"],
+    "explanation": "Mucize peygamberlere, keramet salih kullara nispet edilir.",
+    "source": "Diyanet Temel Dini Bilgiler",
+    "ar": {
+      "question": "ما الفرق الأساس بين الكرامة والمعجزة؟",
+      "options": ["المعجزة للرسول والكرامة للولي", "كلاهما صلاة", "كلاهما زكاة", "الكرامة صوم فقط"],
+      "explanation": "المعجزة للأنبياء والكرامة للصالحين.",
+      "source": "رئاسة الشؤون الدينية: المعلومات الدينية الأساسية"
+    }
+  },
+  {
+    "category": "Dini kavramlar",
+    "difficulty": 3,
+    "question": "İsmet peygamberler için neyi ifade eder?",
+    "options": ["Günahtan korunmuşluğu", "Ticareti", "Şiiri", "Yolculuğu"],
+    "explanation": "Peygamberler tebliğde ve büyük günahtan korunmuş kabul edilir.",
+    "source": "Diyanet Temel Dini Bilgiler",
+    "ar": {
+      "question": "ماذا تعني العصمة للأنبياء؟",
+      "options": ["الحفظ من الذنب", "التجارة", "الشعر", "السفر"],
+      "explanation": "الأنبياء معصومون في التبليغ عن الكبائر.",
+      "source": "رئاسة الشؤون الدينية: المعلومات الدينية الأساسية"
+    }
+  },
+  {
+    "category": "Dini kavramlar",
+    "difficulty": 2,
+    "question": "Ba's ahirette neyi ifade eder?",
+    "options": ["Yeniden dirilmeyi", "Dünya uykusunu", "Yalnızca ticareti", "Yalnızca haccı"],
+    "explanation": "Ba's, ölümden sonra diriliştir.",
+    "source": "Diyanet Temel Dini Bilgiler",
+    "ar": {
+      "question": "ماذا يعني البعث في الآخرة؟",
+      "options": ["الإحياء بعد الموت", "نوم الدنيا", "التجارة فقط", "الحج فقط"],
+      "explanation": "البعث الإحياء بعد الموت.",
+      "source": "رئاسة الشؤون الدينية: المعلومات الدينية الأساسية"
+    }
+  },
+  {
+    "category": "Dini kavramlar",
+    "difficulty": 2,
+    "question": "Mizan ahirette neyi ifade eder?",
+    "options": ["Amellerin tartılmasını", "Dünya terazisini", "Zekât tartısını yalnızca", "Kurban tartısını yalnızca"],
+    "explanation": "Mizan, ahirette amellerin tartıldığı terazidir.",
+    "source": "Diyanet Temel Dini Bilgiler",
+    "ar": {
+      "question": "ماذا يعني الميزان في الآخرة؟",
+      "options": ["وزن الأعمال", "ميزان الدنيا", "ميزان الزكاة فقط", "ميزان الأضحية فقط"],
+      "explanation": "الميزان وزن الأعمال يوم القيامة.",
+      "source": "رئاسة الشؤون الدينية: المعلومات الدينية الأساسية"
+    }
+  },
+  {
+    "category": "Dini kavramlar",
+    "difficulty": 2,
+    "question": "Sırat ahirette neyi ifade eder?",
+    "options": ["Cehennem üzerinde geçilecek köprüyü", "Dünya köprüsünü", "Yalnızca Mescid-i Nebevî'yi", "Yalnızca Arafat'ı"],
+    "explanation": "Sırat, ahirette geçilecek köprü olarak anlatılır.",
+    "source": "Diyanet Temel Dini Bilgiler",
+    "ar": {
+      "question": "ماذا يعني الصراط في الآخرة؟",
+      "options": ["جسراً يُجاز عليه فوق جهنم", "جسر الدنيا", "المسجد النبوي فقط", "عرفة فقط"],
+      "explanation": "الصراط جسر يُذكر في الآخرة.",
+      "source": "رئاسة الشؤون الدينية: المعلومات الدينية الأساسية"
+    }
+  },
+  {
+    "category": "Dini kavramlar",
+    "difficulty": 3,
+    "question": "Allah'ın zâtî sıfatlarından biri hangisidir?",
+    "options": ["Kıdem", "Yorgunluk", "Uyku", "Unutkanlık"],
+    "explanation": "Kıdem, Allah'ın öncesiz oluşunu ifade eden zâtî sıfattır.",
+    "source": "Diyanet Temel Dini Bilgiler",
+    "ar": {
+      "question": "أيّ مما يلي من الصفات الذاتية لله؟",
+      "options": ["القدم", "التعب", "النوم", "النسيان"],
+      "explanation": "القدم صفة ذاتية تعني أنه لا أول له.",
+      "source": "رئاسة الشؤون الدينية: المعلومات الدينية الأساسية"
+    }
+  },
+  {
+    "category": "Dini kavramlar",
+    "difficulty": 3,
+    "question": "Hayat, ilim ve irade gibi sıfatlar hangi grupta anılır?",
+    "options": ["Sübûtî sıfatlar", "İnsanın acizlikleri", "Put sıfatları", "Meleklerin günahları"],
+    "explanation": "Hayat, ilim, irade sübûtî sıfatlardandır.",
+    "source": "Diyanet Temel Dini Bilgiler",
+    "ar": {
+      "question": "في أي مجموعة تُذكر صفات كالحياة والعلم والإرادة؟",
+      "options": ["الصفات الثبوتية", "عجز البشر", "صفات الأوثان", "ذنوب الملائكة"],
+      "explanation": "الحياة والعلم والإرادة من الصفات الثبوتية.",
+      "source": "رئاسة الشؤون الدينية: المعلومات الدينية الأساسية"
+    }
+  },
+  {
+    "category": "Dini kavramlar",
+    "difficulty": 2,
+    "question": "Meleklerin yaratılış maddesi geleneksel akaidde nedir?",
+    "options": ["Nur", "Çamur", "Ateş", "Su zorunlu"],
+    "explanation": "Meleklerin nurdan yaratıldığı anlatılır.",
+    "source": "Diyanet Temel Dini Bilgiler",
+    "ar": {
+      "question": "ممّ خُلق الملائكة في العقيدة التقليدية؟",
+      "options": ["من نور", "من طين", "من نار", "من ماء حتماً"],
+      "explanation": "يُذكر أن الملائكة خُلقوا من نور.",
+      "source": "رئاسة الشؤون الدينية: المعلومات الدينية الأساسية"
+    }
+  },
+  {
+    "category": "Dini kavramlar",
+    "difficulty": 2,
+    "question": "Suhuf genel olarak neyi ifade eder?",
+    "options": ["Bazı peygamberlere verilen sahifeleri", "Yalnızca ticaret defterini", "Yalnızca şiir divanını", "Yalnızca vergi pusulasını"],
+    "explanation": "Suhuf, bazı peygamberlere indirilen sahifelerdir.",
+    "source": "Diyanet Temel Dini Bilgiler",
+    "ar": {
+      "question": "ماذا تعني الصحف عموماً؟",
+      "options": ["صحفاً أوتيها بعض الأنبياء", "دفتر التجارة فقط", "ديوان شعر فقط", "ورقة ضريبة فقط"],
+      "explanation": "الصحف صحف أُنزلت على بعض الأنبياء.",
+      "source": "رئاسة الشؤون الدينية: المعلومات الدينية الأساسية"
+    }
+  },
+  {
+    "category": "Dini kavramlar",
+    "difficulty": 2,
+    "question": "Fıtrat ne demektir?",
+    "options": ["İnsanın yaratılıştan gelen yönelimi", "Sonradan uydurulan put", "Yalnızca ticaret kârı", "Yalnızca yol yorgunluğu"],
+    "explanation": "Fıtrat, insanın Allah'ı tanımaya elverişli yaratılışıdır.",
+    "source": "Diyanet Temel Dini Bilgiler",
+    "ar": {
+      "question": "ماذا تعني الفطرة؟",
+      "options": ["الميل الأصلي في خلق الإنسان", "وثن مبتدع", "ربح التجارة فقط", "تعب السفر فقط"],
+      "explanation": "الفطرة تهيؤ الإنسان لمعرفة الله.",
+      "source": "رئاسة الشؤون الدينية: المعلومات الدينية الأساسية"
+    }
+  },
+  {
+    "category": "Dini kavramlar",
+    "difficulty": 1,
+    "question": "Ümmet kavramı kimleri bir araya getirir?",
+    "options": ["Aynı peygambere uyan topluluğu", "Tek bir evi", "Yalnızca bir kuyuyu", "Yalnızca bir dağı"],
+    "explanation": "Ümmet, bir peygamberin davetine bağlı topluluktur.",
+    "source": "Diyanet Temel Dini Bilgiler",
+    "ar": {
+      "question": "من يجمعهم مفهوم الأمة؟",
+      "options": ["جماعة تتبع نبياً", "بيتاً واحداً", "بئراً فقط", "جبلاً فقط"],
+      "explanation": "الأمة جماعة على دعوة نبي.",
+      "source": "رئاسة الشؤون الدينية: المعلومات الدينية الأساسية"
+    }
+  },
+  {
+    "category": "Dini kavramlar",
+    "difficulty": 2,
+    "question": "Akaid ilminin asıl konusu nedir?",
+    "options": ["İman esasları", "Yemek tarifleri", "Yol haritaları", "Ticaret kârı"],
+    "explanation": "Akaid, inanç konularını sistemli anlatır.",
+    "source": "Diyanet Temel Dini Bilgiler",
+    "ar": {
+      "question": "ما الموضوع الأساس لعلم العقيدة؟",
+      "options": ["أصول الإيمان", "وصفات الطعام", "خرائط السفر", "ربح التجارة"],
+      "explanation": "العقيدة تبيّن مسائل الإيمان.",
+      "source": "رئاسة الشؤون الدينية: المعلومات الدينية الأساسية"
+    }
+  },
+  {
+    "category": "Dini kavramlar",
+    "difficulty": 2,
+    "question": "Marifetullah neyi ifade eder?",
+    "options": ["Allah'ı tanımayı", "Putları saymayı", "Yıldızlara tapmayı", "Nefsi ilahlaştırmayı"],
+    "explanation": "Marifetullah, Allah'ı sıfatlarıyla tanımaktır.",
+    "source": "Diyanet Temel Dini Bilgiler",
+    "ar": {
+      "question": "ماذا تعني معرفة الله؟",
+      "options": ["معرفة الله", "عدّ الأصنام", "عبادة النجوم", "تأليه النفس"],
+      "explanation": "معرفة الله العلم به وبصفاته.",
+      "source": "رئاسة الشؤون الدينية: المعلومات الدينية الأساسية"
+    }
+  },
+  {
+    "category": "Dini kavramlar",
+    "difficulty": 2,
+    "question": "Tevekkül çalışmayı bırakmak mıdır?",
+    "options": ["Hayır; sebeplere yapışıp sonucu Allah'a bırakmaktır", "Evet; hiç çalışmamaktır", "Yalnızca ticareti yasaklar", "Yalnızca namazı iptal eder"],
+    "explanation": "Tevekkül, tedbir aldıktan sonra Allah'a güvenmektir.",
+    "source": "Diyanet Temel Dini Bilgiler",
+    "ar": {
+      "question": "هل التوكل ترك العمل؟",
+      "options": ["لا؛ هو الأخذ بالأسباب وتفويض النتيجة إلى الله", "نعم؛ ترك كل عمل", "يحرّم التجارة فقط", "يلغي الصلاة فقط"],
+      "explanation": "التوكل ثقة بالله بعد اتخاذ السبب.",
+      "source": "رئاسة الشؤون الدينية: المعلومات الدينية الأساسية"
+    }
+  },
+  {
+    "category": "Dini kavramlar",
+    "difficulty": 2,
+    "question": "İffet ne demektir?",
+    "options": ["Helal sınırda durup haramdan sakınmak", "Her yasağı çiğnemek", "Kibirlenmek", "Haset etmek"],
+    "explanation": "İffet, namus ve helal dairede durmaktır.",
+    "source": "Diyanet Temel Dini Bilgiler",
+    "ar": {
+      "question": "ماذا تعني العفة؟",
+      "options": ["الوقوف عند الحلال واجتناب الحرام", "انتهاك كل نهي", "التكبر", "الحسد"],
+      "explanation": "العفة صون النفس في دائرة الحلال.",
+      "source": "رئاسة الشؤون الدينية: المعلومات الدينية الأساسية"
+    }
+  },
+  {
+    "category": "Dini kavramlar",
+    "difficulty": 2,
+    "question": "Uhuvvet neyi ifade eder?",
+    "options": ["Müminler arası kardeşliği", "Düşmanlığı", "Şirki", "Kibri"],
+    "explanation": "Uhuvvet, iman kardeşliğidir.",
+    "source": "Diyanet Temel Dini Bilgiler",
+    "ar": {
+      "question": "ماذا تعني الأخوة؟",
+      "options": ["أخوة المؤمنين", "العداوة", "الشرك", "الكبر"],
+      "explanation": "الأخوة رابطة الإيمان.",
+      "source": "رئاسة الشؤون الدينية: المعلومات الدينية الأساسية"
+    }
+  },
+  {
+    "category": "Dini kavramlar",
+    "difficulty": 3,
+    "question": "Kabir hayatı (berzah) neyi ifade eder?",
+    "options": ["Ölümle mahşer arası âlemi", "Dünya pazarını", "Yalnızca hac yolunu", "Yalnızca Cuma hutbesini"],
+    "explanation": "Berzah, ölümden sonra dirilişe kadar süren hayattır.",
+    "source": "Diyanet Temel Dini Bilgiler",
+    "ar": {
+      "question": "ماذا تعني حياة القبر (البرزخ)؟",
+      "options": ["العالم بين الموت والحشر", "سوق الدنيا", "طريق الحج فقط", "خطبة الجمعة فقط"],
+      "explanation": "البرزخ حياة بعد الموت إلى البعث.",
+      "source": "رئاسة الشؤون الدينية: المعلومات الدينية الأساسية"
+    }
+  },
+  {
+    "category": "Siyer",
+    "difficulty": 2,
+    "question": "Hılfü'l-Fudûl neydi?",
+    "options": ["Mekke'de mazlumun hakkını savunan antlaşma", "Bedir savaş planı", "Hac menasiki", "Zekât nisabı"],
+    "explanation": "Hılfü'l-Fudûl, zulme karşı hak arama ittifakıdır.",
+    "source": "Diyanet Siyer-i Nebi / İslam Tarihi",
+    "ar": {
+      "question": "ما حلف الفضول؟",
+      "options": ["حلف بمكة لنصرة المظلوم", "خطة بدر", "منسك الحج", "نصاب الزكاة"],
+      "explanation": "حلف الفضول تعاهد على دفع الظلم.",
+      "source": "رئاسة الشؤون الدينية: السيرة والتاريخ الإسلامي"
+    }
+  },
+  {
+    "category": "Siyer",
+    "difficulty": 2,
+    "question": "Varaka b. Nevfel ilk vahiy sürecinde nasıl anılır?",
+    "options": ["Hatice'nin amcasının oğlu olup vahyi tasdik eden", "Bedir komutanı", "Uhud okçusu", "Hendek kazıcısı zorunlu"],
+    "explanation": "Varaka, ilk vahyin ardından Hz. Peygamber'i desteklemiştir.",
+    "source": "Diyanet Siyer-i Nebi / İslam Tarihi",
+    "ar": {
+      "question": "كيف يُذكر ورقة بن نوفل في بدء الوحي؟",
+      "options": ["ابن عم خديجة الذي صدّق الوحي", "قائد بدر", "رامي أحد", "حافر الخندق حتماً"],
+      "explanation": "صدّق ورقة الوحي بعد نزوله أولاً.",
+      "source": "رئاسة الشؤون الدينية: السيرة والتاريخ الإسلامي"
+    }
+  },
+  {
+    "category": "Siyer",
+    "difficulty": 2,
+    "question": "Bahîra rahibi siyerde hangi olayla anılır?",
+    "options": ["Şam yolculuğunda Hz. Peygamber'i tanıması", "Hendek kazısı", "Mekke'nin fethi hutbesi", "Veda Haccı cemresi"],
+    "explanation": "Bahîra, Şam ticaret yolunda çocuğun peygamberlik alametini fark eder.",
+    "source": "Diyanet Siyer-i Nebi / İslam Tarihi",
+    "ar": {
+      "question": "بأي حدث يُذكر الراهب بحيرى في السيرة؟",
+      "options": ["معرفته النبي في رحلة الشام", "حفر الخندق", "خطبة الفتح", "جمار حجة الوداع"],
+      "explanation": "عرف بحيرى علامات النبوة في طريق الشام.",
+      "source": "رئاسة الشؤون الدينية: السيرة والتاريخ الإسلامي"
+    }
+  },
+  {
+    "category": "Siyer",
+    "difficulty": 2,
+    "question": "Mus'ab b. Umeyr Medine'de neyle görevlendirilmiştir?",
+    "options": ["İslam'ı öğreten muallimlikle", "Zekât nisabı yazmakla", "Kurban kesmekle zorunlu", "Mest mesh etmekle"],
+    "explanation": "Mus'ab, Akabe sonrası Medine'ye öğretmen olarak gönderilmiştir.",
+    "source": "Diyanet Siyer-i Nebi / İslam Tarihi",
+    "ar": {
+      "question": "بماذا كُلّف مصعب بن عمير في المدينة؟",
+      "options": ["تعليم الإسلام", "كتابة نصاب الزكاة", "ذبح الأضحية حتماً", "المسح على الخف"],
+      "explanation": "أُرسل مصعب معلماً إلى المدينة بعد العقبة.",
+      "source": "رئاسة الشؤون الدينية: السيرة والتاريخ الإسلامي"
+    }
+  },
+  {
+    "category": "Siyer",
+    "difficulty": 1,
+    "question": "Ensar kimlerdir?",
+    "options": ["Medineli Müslümanlar", "Yalnızca Mekkeli müşrikler", "Yalnızca Habeş rahipleri", "Yalnızca Bizans askerleri"],
+    "explanation": "Ensar, Muhacirleri barındıran Medineli Müslümanlardır.",
+    "source": "Diyanet Siyer-i Nebi / İslam Tarihi",
+    "ar": {
+      "question": "من الأنصار؟",
+      "options": ["مسلمو المدينة", "مشركو مكة فقط", "رهبان الحبشة فقط", "جند الروم فقط"],
+      "explanation": "الأنصار أهل المدينة الذين آووا المهاجرين.",
+      "source": "رئاسة الشؤون الدينية: السيرة والتاريخ الإسلامي"
+    }
+  },
+  {
+    "category": "Siyer",
+    "difficulty": 2,
+    "question": "Mescid-i Kıbleteyn neyle anılır?",
+    "options": ["Kıblenin Kâbe'ye döndüğü yer olarak", "İlk ezanın okunduğu yer olarak zorunlu", "Bedir karargâhı olarak", "Taif pazarı olarak"],
+    "explanation": "Kıbleteyn, namazda kıblenin değiştiği mescit olarak bilinir.",
+    "source": "Diyanet Siyer-i Nebi / İslam Tarihi",
+    "ar": {
+      "question": "بماذا يُعرف مسجد القبلتين؟",
+      "options": ["موضع تحول القبلة إلى الكعبة", "أول أذان حتماً", "معسكر بدر", "سوق الطائف"],
+      "explanation": "يُذكر مسجد القبلتين بتحول القبلة.",
+      "source": "رئاسة الشؤون الدينية: السيرة والتاريخ الإسلامي"
+    }
+  },
+  {
+    "category": "Siyer",
+    "difficulty": 2,
+    "question": "Hendek Savaşı başka hangi adla anılır?",
+    "options": ["Ahzâb", "Bedir", "Huneyn", "Mute"],
+    "explanation": "Hendek Savaşı, Ahzâb Savaşı olarak da anılır.",
+    "source": "Diyanet Siyer-i Nebi / İslam Tarihi",
+    "ar": {
+      "question": "بأي اسم آخر تُعرف غزوة الخندق؟",
+      "options": ["الأحزاب", "بدر", "حنين", "مؤتة"],
+      "explanation": "الخندق هي غزوة الأحزاب.",
+      "source": "رئاسة الشؤون الدينية: السيرة والتاريخ الإسلامي"
+    }
+  },
+  {
+    "category": "Siyer",
+    "difficulty": 2,
+    "question": "Selmân-ı Fârisî Hendek savunmasında neyle anılır?",
+    "options": ["Hendek kazılmasını önermesiyle", "İlk ezanı okumasıyla", "Veda hutbesini yazmasıyla", "Kıbleyi değiştirmesiyle"],
+    "explanation": "Selmân, Hendek kazısı fikriyle anılır.",
+    "source": "Diyanet Siyer-i Nebi / İslam Tarihi",
+    "ar": {
+      "question": "بماذا يُذكر سلمان الفارسي في الخندق؟",
+      "options": ["بإشارته بحفر الخندق", "بأول أذان", "بكتابة خطبة الوداع", "بتحويل القبلة"],
+      "explanation": "يُنسب اقتراح الخندق إلى سلمان.",
+      "source": "رئاسة الشؤون الدينية: السيرة والتاريخ الإسلامي"
+    }
+  },
+  {
+    "category": "Siyer",
+    "difficulty": 1,
+    "question": "Ebu Leheb siyer ve Kur'an'da nasıl anılır?",
+    "options": ["Hz. Peygamber'e düşmanlık eden amca", "İlk müezzin", "İlk halife", "Hendek komutanı"],
+    "explanation": "Ebu Leheb, Tebbet suresinde kınanan amcadır.",
+    "source": "Diyanet Siyer-i Nebi / İslam Tarihi",
+    "ar": {
+      "question": "كيف يُذكر أبو لهب في السيرة والقرآن؟",
+      "options": ["عمّا عادى النبي", "أول مؤذن", "أول خليفة", "قائد الخندق"],
+      "explanation": "أبو لهب عمّ ذُمّ في سورة المسد.",
+      "source": "رئاسة الشؤون الدينية: السيرة والتاريخ الإسلامي"
+    }
+  },
+  {
+    "category": "Siyer",
+    "difficulty": 2,
+    "question": "Üsâme b. Zeyd hangi orduyla anılır?",
+    "options": ["Hz. Peygamber'in son hazırladığı ordu", "Bedir süvarileri zorunlu", "Fil ordusu", "Habeş donanması"],
+    "explanation": "Üsâme, vefat öncesi Şam yönüne sevk edilen ordunun komutanıdır.",
+    "source": "Diyanet Siyer-i Nebi / İslam Tarihi",
+    "ar": {
+      "question": "بأي جيش يُذكر أسامة بن زيد؟",
+      "options": ["آخر جيش جهّزه النبي", "فرسان بدر حتماً", "جيش الفيل", "أسطول الحبشة"],
+      "explanation": "أمّر النبي أسامة على جيش نحو الشام قبل وفاته.",
+      "source": "رئاسة الشؤون الدينية: السيرة والتاريخ الإسلامي"
+    }
+  },
+  {
+    "category": "Siyer",
+    "difficulty": 2,
+    "question": "Necâşî Habeşistan hicretinde nasıl anılır?",
+    "options": ["Müslüman muhacirlere kucak açan hükümdar", "Bedir düşmanı", "Uhud okçusu", "Taif valisi"],
+    "explanation": "Necâşî, Habeş'te muhacirleri korumuştur.",
+    "source": "Diyanet Siyer-i Nebi / İslam Tarihi",
+    "ar": {
+      "question": "كيف يُذكر النجاشي في هجرة الحبشة؟",
+      "options": ["ملكاً آوى المهاجرين", "عدواً في بدر", "رامياً في أحد", "والي الطائف"],
+      "explanation": "حمى النجاشي المهاجرين في الحبشة.",
+      "source": "رئاسة الشؤون الدينية: السيرة والتاريخ الإسلامي"
+    }
+  },
+  {
+    "category": "Siyer",
+    "difficulty": 2,
+    "question": "Hz. Peygamber'in oğullarından biri kimdir?",
+    "options": ["Kâsım", "Hamza", "Abbas", "Talha"],
+    "explanation": "Kâsım, Hz. Peygamber'in oğullarındandır.",
+    "source": "Diyanet Siyer-i Nebi / İslam Tarihi",
+    "ar": {
+      "question": "من أبناء النبي صلى الله عليه وسلم؟",
+      "options": ["القاسم", "حمزة", "العباس", "طلحة"],
+      "explanation": "القاسم من أبناء النبي.",
+      "source": "رئاسة الشؤون الدينية: السيرة والتاريخ الإسلامي"
+    }
+  },
+  {
+    "category": "Siyer",
+    "difficulty": 3,
+    "question": "Veda Hutbesi'nde vurgulanan temel mesajlardan biri nedir?",
+    "options": ["Irk üstünlüğünün olmadığı", "Zekâtın kalktığı", "Namazın kalktığı", "Haccın kalktığı"],
+    "explanation": "Veda Hutbesi takva dışında üstünlük olmadığını bildirir.",
+    "source": "Diyanet Siyer-i Nebi / İslam Tarihi",
+    "ar": {
+      "question": "من الرسائل الأساسية في خطبة الوداع؟",
+      "options": ["أنه لا فضل لعربي على عجمي", "سقوط الزكاة", "سقوط الصلاة", "سقوط الحج"],
+      "explanation": "بيّنت خطبة الوداع أن لا فضل إلا بالتقوى.",
+      "source": "رئاسة الشؤون الدينية: السيرة والتاريخ الإسلامي"
+    }
+  },
+  {
+    "category": "Siyer",
+    "difficulty": 2,
+    "question": "Miraç'ta Müslümanlara farz kılınan ibadet hangisidir?",
+    "options": ["Beş vakit namaz", "Zekât nisabı", "Kurban yaşı", "Umre tavafı zorunlu"],
+    "explanation": "Namazın farziyeti Miraç ile bağlanır.",
+    "source": "Diyanet Siyer-i Nebi / İslam Tarihi",
+    "ar": {
+      "question": "أي عبادة فُرضت على المسلمين في المعراج؟",
+      "options": ["الصلوات الخمس", "نصاب الزكاة", "سن الأضحية", "طواف العمرة حتماً"],
+      "explanation": "فُرضت الصلاة في المعراج.",
+      "source": "رئاسة الشؤون الدينية: السيرة والتاريخ الإسلامي"
+    }
+  },
+  {
+    "category": "Siyer",
+    "difficulty": 2,
+    "question": "İsrâ olayında Hz. Peygamber nereden nereye götürülmüştür?",
+    "options": ["Mescid-i Haram'dan Mescid-i Aksâ'ya", "Taif'ten Bedir'e", "Uhud'dan Huneyn'e", "Kuba'dan Hayber'e"],
+    "explanation": "İsrâ, Mekke'den Kudüs'e gece yürütülmesidir.",
+    "source": "Diyanet Siyer-i Nebi / İslam Tarihi",
+    "ar": {
+      "question": "من أين إلى أين أُسري بالنبي؟",
+      "options": ["من المسجد الحرام إلى المسجد الأقصى", "من الطائف إلى بدر", "من أحد إلى حنين", "من قباء إلى خيبر"],
+      "explanation": "الإسراء سير ليلي من مكة إلى القدس.",
+      "source": "رئاسة الشؤون الدينية: السيرة والتاريخ الإسلامي"
+    }
+  },
+  {
+    "category": "Siyer",
+    "difficulty": 2,
+    "question": "Sümeyye bint Hayyât siyerde nasıl anılır?",
+    "options": ["İlk kadın şehitlerden", "İlk müezzin", "İlk halife", "Hendek komutanı"],
+    "explanation": "Sümeyye, işkencede şehit olan ilk kadınlardandır.",
+    "source": "Diyanet Siyer-i Nebi / İslam Tarihi",
+    "ar": {
+      "question": "كيف تُذكر سمية بنت خياط في السيرة؟",
+      "options": ["من أوائل الشهيدات", "أول مؤذن", "أول خليفة", "قائدة الخندق"],
+      "explanation": "سمية من أوائل من استشهدوا تحت التعذيب.",
+      "source": "رئاسة الشؤون الدينية: السيرة والتاريخ الإسلامي"
+    }
+  },
+  {
+    "category": "Siyer",
+    "difficulty": 2,
+    "question": "Ebu Cehil siyerde nasıl anılır?",
+    "options": ["İslam'a şiddetle karşı çıkan Mekkeli önder", "İlk müezzin", "Ensar lideri", "Habeş kralı"],
+    "explanation": "Ebu Cehil, Mekke döneminin önde gelen düşmanlarındandır.",
+    "source": "Diyanet Siyer-i Nebi / İslam Tarihi",
+    "ar": {
+      "question": "كيف يُذكر أبو جهل في السيرة؟",
+      "options": ["زعيماً مكياً اشتد في عداء الإسلام", "أول مؤذن", "سيد الأنصار", "ملك الحبشة"],
+      "explanation": "أبو جهل من أشد أعداء العهد المكي.",
+      "source": "رئاسة الشؤون الدينية: السيرة والتاريخ الإسلامي"
+    }
+  },
+  {
+    "category": "Siyer",
+    "difficulty": 3,
+    "question": "Hz. Hatice ilk vahiy gecesinde nasıl bir tutum göstermiştir?",
+    "options": ["Teselli edip desteklemiştir", "İnkâr etmiştir", "Taif'e göndermiştir", "Boykot ilan etmiştir"],
+    "explanation": "Hatice, ilk vahiyde Hz. Peygamber'i yatıştırıp desteklemiştir.",
+    "source": "Diyanet Siyer-i Nebi / İslam Tarihi",
+    "ar": {
+      "question": "كيف كان موقف خديجة ليلة الوحي الأولى؟",
+      "options": ["واسته وثبّتته", "أنكرت", "أرسلته إلى الطائف", "أعلنت المقاطعة"],
+      "explanation": "ثبّتت خديجة النبي بعد الوحي الأول.",
+      "source": "رئاسة الشؤون الدينية: السيرة والتاريخ الإسلامي"
+    }
+  },
+  {
+    "category": "Siyer",
+    "difficulty": 2,
+    "question": "Zeyd b. Hârise Hz. Peygamber'in neyi olarak anılır?",
+    "options": ["Azatlısı ve evlatlığı", "Amcası", "Dedesi", "Sütannesi"],
+    "explanation": "Zeyd, azat edilip evlatlık edinilen sahabidir.",
+    "source": "Diyanet Siyer-i Nebi / İslam Tarihi",
+    "ar": {
+      "question": "بماذا يُعرف زيد بن حارثة عند النبي؟",
+      "options": ["مولاه ومتبنّاه", "عمه", "جده", "مرضعته"],
+      "explanation": "زيد مولى النبي ومتبنّاه.",
+      "source": "رئاسة الشؤون الدينية: السيرة والتاريخ الإسلامي"
+    }
+  },
+  {
+    "category": "Siyer",
+    "difficulty": 3,
+    "question": "Ficâr savaşları siyerde neyi ifade eder?",
+    "options": ["Cahiliye döneminde haram aylarda yapılan çatışmaları", "Bedir zaferini", "Hendek kazısını", "Veda Haccı'nı"],
+    "explanation": "Ficâr, haram aylardaki cahiliye savaşlarıdır; Hz. Peygamber gençliğinde tanık olmuştur.",
+    "source": "Diyanet Siyer-i Nebi / İslam Tarihi",
+    "ar": {
+      "question": "ماذا تعني حروب الفجار في السيرة؟",
+      "options": ["قتالاً في الأشهر الحرم جاهلية", "نصر بدر", "حفر الخندق", "حجة الوداع"],
+      "explanation": "الفجار حروب جاهلية شهد النبي شبابه بعضها.",
+      "source": "رئاسة الشؤون الدينية: السيرة والتاريخ الإسلامي"
+    }
+  },
+  {
+    "category": "Siyer",
+    "difficulty": 2,
+    "question": "Hz. Peygamber gençliğinde hangi ticaret yoluna katılmıştır?",
+    "options": ["Şam", "Endülüs", "Horasan", "Anadolu içi zorunlu"],
+    "explanation": "Hz. Peygamber, Hatice'nin kervanıyla Şam'a gitmiştir.",
+    "source": "Diyanet Siyer-i Nebi / İslam Tarihi",
+    "ar": {
+      "question": "إلى أي طريق تجاري خرج النبي في شبابه؟",
+      "options": ["الشام", "الأندلس", "خراسان", "داخل الأناضول حتماً"],
+      "explanation": "خرج النبي إلى الشام في تجارة خديجة.",
+      "source": "رئاسة الشؤون الدينية: السيرة والتاريخ الإسلامي"
+    }
+  },
+  {
+    "category": "Siyer",
+    "difficulty": 2,
+    "question": "Ammar b. Yâsir siyerde hangi aileyle işkenceye uğramıştır?",
+    "options": ["Yâsir ve Sümeyye", "Ebu Leheb ailesi zorunlu", "Necâşî ailesi", "Kureyş kâhinleri zorunlu"],
+    "explanation": "Ailesi, erken dönemde ağır işkence görmüştür.",
+    "source": "Diyanet Siyer-i Nebi / İslam Tarihi",
+    "ar": {
+      "question": "مع أي أسرة عُذّب عمار بن ياسر؟",
+      "options": ["ياسر وسمية", "آل أبي لهب حتماً", "آل النجاشي", "كهان قريش حتماً"],
+      "explanation": "أُوذي عمار مع أبويه أشد الإيذاء.",
+      "source": "رئاسة الشؤون الدينية: السيرة والتاريخ الإسلامي"
+    }
+  },
+  {
+    "category": "Siyer",
+    "difficulty": 3,
+    "question": "Hz. Peygamber'in oğlu İbrahim hangi annedendir?",
+    "options": ["Mâriye", "Hatice", "Âmine", "Halime"],
+    "explanation": "İbrahim, Mâriye'den doğan oğludur.",
+    "source": "Diyanet Siyer-i Nebi / İslam Tarihi",
+    "ar": {
+      "question": "من أم إبراهيم ابن النبي؟",
+      "options": ["مارية", "خديجة", "آمنة", "حليمة"],
+      "explanation": "إبراهيم ابن مارية.",
+      "source": "رئاسة الشؤون الدينية: السيرة والتاريخ الإسلامي"
+    }
+  },
+  {
+    "category": "Siyer",
+    "difficulty": 2,
+    "question": "Suffa ashabının geçimi nasıl sağlanırdı?",
+    "options": ["Mescitte kalarak ilimle meşgul olur, yardım görürlerdi", "Ticaret imparatorluğu kurarak", "Zekât nisabını kendileri koyarak", "Hac menasikini iptal ederek"],
+    "explanation": "Ashab-ı Suffe, Mescid-i Nebevî'de kalan ilim talebeleridir.",
+    "source": "Diyanet Siyer-i Nebi / İslam Tarihi",
+    "ar": {
+      "question": "كيف عاش أهل الصفة؟",
+      "options": ["أقاموا في المسجد للتعلم وأُعينوا", "بتأسيس إمبراطورية تجارية", "بوضع نصاب الزكاة بأنفسهم", "بإلغاء مناسك الحج"],
+      "explanation": "أهل الصفة طلاب علم أقاموا في المسجد النبوي.",
+      "source": "رئاسة الشؤون الدينية: السيرة والتاريخ الإسلامي"
+    }
+  },
+  {
+    "category": "Siyer",
+    "difficulty": 2,
+    "question": "Hz. Peygamber'in kızlarından biri kimdir?",
+    "options": ["Rukıyye", "Sümeyye", "Âmine", "Halime"],
+    "explanation": "Rukıyye, Hz. Peygamber'in kızlarındandır.",
+    "source": "Diyanet Siyer-i Nebi / İslam Tarihi",
+    "ar": {
+      "question": "من بنات النبي صلى الله عليه وسلم؟",
+      "options": ["رقية", "سمية", "آمنة", "حليمة"],
+      "explanation": "رقية من بنات النبي.",
+      "source": "رئاسة الشؤون الدينية: السيرة والتاريخ الإسلامي"
+    }
+  },
+  {
+    "category": "Peygamberler tarihi",
+    "difficulty": 1,
+    "question": "Hz. Nuh'un tufan kıssası neyi öğretir?",
+    "options": ["İmana çağrı ve inananların kurtuluşunu", "Zekât nisabını", "Namaz rekâtını", "Hac aylarını"],
+    "explanation": "Nuh kıssası, tebliğ ve iman edenlerin kurtuluşunu anlatır.",
+    "source": "Diyanet Kur'an Yolu",
+    "ar": {
+      "question": "ماذا تعلّم قصة طوفان نوح؟",
+      "options": ["الدعوة إلى الإيمان ونجاة المؤمنين", "نصاب الزكاة", "عدد ركعات الصلاة", "أشهر الحج"],
+      "explanation": "قصة نوح دعوة ونجاة من آمن.",
+      "source": "رئاسة الشؤون الدينية: طريق القرآن"
+    }
+  },
+  {
+    "category": "Peygamberler tarihi",
+    "difficulty": 1,
+    "question": "Hz. Musa'ya Tûr Dağı'nda ne verilmiştir?",
+    "options": ["Tevrat", "Zebur", "İncil", "Kur'an"],
+    "explanation": "Tûr'da Hz. Musa'ya Tevrat verilmiştir.",
+    "source": "Diyanet Temel Dini Bilgiler",
+    "ar": {
+      "question": "ماذا أُوتي موسى في الطور؟",
+      "options": ["التوراة", "الزبور", "الإنجيل", "القرآن"],
+      "explanation": "أُوتي موسى التوراة في الطور.",
+      "source": "رئاسة الشؤون الدينية: المعلومات الدينية الأساسية"
+    }
+  },
+  {
+    "category": "Peygamberler tarihi",
+    "difficulty": 2,
+    "question": "Hz. Yusuf rüya tabiriyle nasıl anılır?",
+    "options": ["Mısır'da rüyaları yorumlayan peygamber", "Arafat imamı", "İlk müezzin", "Hendek komutanı"],
+    "explanation": "Yusuf, zindanda ve sarayda rüya tabiriyle öne çıkar.",
+    "source": "Diyanet Kur'an Yolu",
+    "ar": {
+      "question": "كيف يُذكر يوسف بتعبير الرؤيا؟",
+      "options": ["نبياً عبّر الرؤى في مصر", "إمام عرفة", "أول مؤذن", "قائد الخندق"],
+      "explanation": "برز يوسف في تعبير الرؤيا سجناً وقصراً.",
+      "source": "رئاسة الشؤون الدينية: طريق القرآن"
+    }
+  },
+  {
+    "category": "Peygamberler tarihi",
+    "difficulty": 2,
+    "question": "Hz. Süleyman'ın hükümdarlığı neyle anılır?",
+    "options": ["Adaletli mülk ve kuşların dilini anlaması", "Zekât nisabı yazması", "Teravih kıldırması", "Mest mesh etmesi"],
+    "explanation": "Süleyman, kendisine verilen mülk ve nimetle anılır.",
+    "source": "Diyanet Kur'an Yolu",
+    "ar": {
+      "question": "بماذا تُعرف ملك سليمان؟",
+      "options": ["ملك عادل وفهم منطق الطير", "كتابة نصاب الزكاة", "إمامة التراويح", "المسح على الخف"],
+      "explanation": "يُذكر سليمان بما أوتي من ملك ونعمة.",
+      "source": "رئاسة الشؤون الدينية: طريق القرآن"
+    }
+  },
+  {
+    "category": "Peygamberler tarihi",
+    "difficulty": 2,
+    "question": "Hz. Eyyûb'un imtihanı neyi öğretir?",
+    "options": ["Sabır ve şükür", "Ticareti terk", "Namazı iptal", "Haccı erteleme farzı"],
+    "explanation": "Eyyûb, hastalık ve kayıpta sabır timsalidir.",
+    "source": "Diyanet Kur'an Yolu",
+    "ar": {
+      "question": "ماذا تعلّم محنة أيوب؟",
+      "options": ["الصبر والشكر", "ترك التجارة", "إلغاء الصلاة", "فرض تأخير الحج"],
+      "explanation": "أيوب مثال الصبر في البلاء.",
+      "source": "رئاسة الشؤون الدينية: طريق القرآن"
+    }
+  },
+  {
+    "category": "Peygamberler tarihi",
+    "difficulty": 2,
+    "question": "Hz. Yunus'un kavmi tevbe edince ne olmuştur?",
+    "options": ["Azap kaldırılmıştır", "Hac farzı kalkmıştır", "Namaz iptal olmuştur", "Zekât yasaklanmıştır"],
+    "explanation": "Yunus kavmi iman edince dünyevî azap kaldırılmıştır.",
+    "source": "Diyanet Kur'an Yolu",
+    "ar": {
+      "question": "ماذا حدث حين تاب قوم يونس؟",
+      "options": ["رُفع العذاب", "سقط فرض الحج", "أُلغيت الصلاة", "حُرّمت الزكاة"],
+      "explanation": "لما آمن قوم يونس كُشف عنهم العذاب.",
+      "source": "رئاسة الشؤون الدينية: طريق القرآن"
+    }
+  },
+  {
+    "category": "Peygamberler tarihi",
+    "difficulty": 2,
+    "question": "Lut peygamberin kıssası hangi temayı işler?",
+    "options": ["Toplumun sapmasına karşı uyarıyı", "Zekât nisabını", "Namaz rekâtını", "Mest süresini"],
+    "explanation": "Lut kıssası, ahlaki sapmaya karşı uyarıyı anlatır.",
+    "source": "Diyanet Kur'an Yolu",
+    "ar": {
+      "question": "أي موضوع تعالج قصة لوط؟",
+      "options": ["الإنذار لانحراف المجتمع", "نصاب الزكاة", "عدد ركعات الصلاة", "مدة المسح"],
+      "explanation": "قصة لوط إنذار لانحراف أخلاقي.",
+      "source": "رئاسة الشؤون الدينية: طريق القرآن"
+    }
+  },
+  {
+    "category": "Peygamberler tarihi",
+    "difficulty": 3,
+    "question": "Hz. İdris Kur'an'da nasıl anılır?",
+    "options": ["Sıddîk ve nebî olarak", "İlk müezzin olarak", "Hendek komutanı olarak", "Zekât memuru olarak"],
+    "explanation": "İdris, sıddîk bir peygamber olarak anılır.",
+    "source": "Diyanet Kur'an Yolu",
+    "ar": {
+      "question": "كيف يُذكر إدريس في القرآن؟",
+      "options": ["صديقاً نبياً", "أول مؤذن", "قائد الخندق", "عامل زكاة"],
+      "explanation": "إدريس صديق نبي.",
+      "source": "رئاسة الشؤون الدينية: طريق القرآن"
+    }
+  },
+  {
+    "category": "Peygamberler tarihi",
+    "difficulty": 3,
+    "question": "Hz. İlyas hangi sapmayla mücadeleyle anılır?",
+    "options": ["Put / Ba'l tapıcılığı", "Zekât nisabı", "Teravih rekâtı", "Mest süresi"],
+    "explanation": "İlyas, kavmini putperestlikten vazgeçirmeye çağırır.",
+    "source": "Diyanet Kur'an Yolu",
+    "ar": {
+      "question": "بأي انحراف يُذكر جهاد إلياس؟",
+      "options": ["عبادة البعل / الوثن", "نصاب الزكاة", "ركعات التراويح", "مدة المسح"],
+      "explanation": "دعا إلياس قومه لترك الوثنية.",
+      "source": "رئاسة الشؤون الدينية: طريق القرآن"
+    }
+  },
+  {
+    "category": "Peygamberler tarihi",
+    "difficulty": 2,
+    "question": "Hz. Şuayb ölçü ve tartıda neyi uyarmıştır?",
+    "options": ["Eksiltmemeyi / hile yapmamayı", "Namazı terk etmeyi", "Haccı iptal etmeyi", "Orucu bozmayı"],
+    "explanation": "Şuayb, ölçü ve tartıda adaleti emretmiştir.",
+    "source": "Diyanet Kur'an Yolu",
+    "ar": {
+      "question": "عمّ حذّر شعيب في الكيل والميزان؟",
+      "options": ["عن التطفيف والغش", "ترك الصلاة", "إلغاء الحج", "إفطار الصوم"],
+      "explanation": "أمر شعيب بالعدل في الكيل.",
+      "source": "رئاسة الشؤون الدينية: طريق القرآن"
+    }
+  },
+  {
+    "category": "Peygamberler tarihi",
+    "difficulty": 2,
+    "question": "Hz. Salih'in mucizesi olarak anılan nedir?",
+    "options": ["Deve", "Asâ", "Gemi", "Beşikte konuşma"],
+    "explanation": "Salih'in mucizesi Semûd'a verilen devedir.",
+    "source": "Diyanet Kur'an Yolu",
+    "ar": {
+      "question": "ما المعجزة المنسوبة إلى صالح؟",
+      "options": ["الناقة", "العصا", "السفينة", "الكلام في المهد"],
+      "explanation": "ناقة صالح آية لثمود.",
+      "source": "رئاسة الشؤون الدينية: طريق القرآن"
+    }
+  },
+  {
+    "category": "Peygamberler tarihi",
+    "difficulty": 3,
+    "question": "Hz. Zülkifl Kur'an'da nasıl anılır?",
+    "options": ["Sabredenlerden bir peygamber / salih kul", "İlk müezzin", "Bedir komutanı", "Hendek kazıcısı"],
+    "explanation": "Zülkifl, sabırlı salih kullar arasında anılır.",
+    "source": "Diyanet Kur'an Yolu",
+    "ar": {
+      "question": "كيف يُذكر ذو الكفل في القرآن؟",
+      "options": ["من الصابرين نبياً / عبداً صالحاً", "أول مؤذن", "قائد بدر", "حافر الخندق"],
+      "explanation": "ذُكر ذو الكفل مع الصابرين الصالحين.",
+      "source": "رئاسة الشؤون الدينية: طريق القرآن"
+    }
+  },
+  {
+    "category": "Peygamberler tarihi",
+    "difficulty": 1,
+    "question": "Hz. Hârûn'un görevi neydi?",
+    "options": ["Hz. Musa'ya yardımcı peygamberlik", "İlk ezanı okumak", "Kâbe'yi yıkmak", "Zekâtı iptal etmek"],
+    "explanation": "Hârûn, Musa'nın kardeşi ve yardımcı peygamberidir.",
+    "source": "Diyanet Kur'an Yolu",
+    "ar": {
+      "question": "ما مهمة هارون؟",
+      "options": ["النبوة معيناً لموسى", "أول أذان", "هدم الكعبة", "إلغاء الزكاة"],
+      "explanation": "هارون أخو موسى ونبي معين.",
+      "source": "رئاسة الشؤون الدينية: طريق القرآن"
+    }
+  },
+  {
+    "category": "Peygamberler tarihi",
+    "difficulty": 2,
+    "question": "Hz. Yahyâ'nın tebliğ vurgularından biri nedir?",
+    "options": ["Takva ve doğruluk", "Put çoğaltmak", "Namazı kaldırmak", "Zekâtı yasaklamak"],
+    "explanation": "Yahyâ, takva ve salih amelle anılır.",
+    "source": "Diyanet Kur'an Yolu",
+    "ar": {
+      "question": "من أبرز ما دعا إليه يحيى؟",
+      "options": ["التقوى والصدق", "تكثير الأوثان", "رفع الصلاة", "تحريم الزكاة"],
+      "explanation": "يُذكر يحيى بالتقوى والعمل الصالح.",
+      "source": "رئاسة الشؤون الدينية: طريق القرآن"
+    }
+  },
+  {
+    "category": "Peygamberler tarihi",
+    "difficulty": 2,
+    "question": "Hz. Îsâ'nın havarileri nasıl anılır?",
+    "options": ["Yardımcıları / davet arkadaşları", "Mekke müşrikleri", "Bedir süvarileri", "Hendek kazıcıları zorunlu"],
+    "explanation": "Havariler, Îsâ'ya iman eden yardımcılardır.",
+    "source": "Diyanet Kur'an Yolu",
+    "ar": {
+      "question": "كيف يُذكر الحواريون مع عيسى؟",
+      "options": ["أنصاراً وأصحاب دعوة", "مشركي مكة", "فرسان بدر", "حفّاري الخندق حتماً"],
+      "explanation": "الحواريون أنصار عيسى المؤمنين.",
+      "source": "رئاسة الشؤون الدينية: طريق القرآن"
+    }
+  },
+  {
+    "category": "Peygamberler tarihi",
+    "difficulty": 2,
+    "question": "Zemzem kuyusu hangi peygamber ailesinin kıssasıyla bağlanır?",
+    "options": ["Hz. İbrâhim ve İsmâil", "Hz. Nuh ve Yûnus", "Hz. Musa ve Hârûn", "Hz. Dâvûd ve Süleyman"],
+    "explanation": "Zemzem, Hacer ve İsmâil kıssasıyla anılır.",
+    "source": "Diyanet Siyer-i Nebi / İslam Tarihi",
+    "ar": {
+      "question": "بأسرة أي نبي تُربط بئر زمزم؟",
+      "options": ["إبراهيم وإسماعيل", "نوح ويونس", "موسى وهارون", "داود وسليمان"],
+      "explanation": "تُذكر زمزم مع هاجر وإسماعيل.",
+      "source": "رئاسة الشؤون الدينية: السيرة والتاريخ الإسلامي"
+    }
+  },
+  {
+    "category": "Peygamberler tarihi",
+    "difficulty": 1,
+    "question": "Hz. Muhammed ahir zaman peygamberi midir?",
+    "options": ["Evet; son peygamberdir", "Hayır; ondan sonra farz peygamber gelir", "Yalnızca şairdir", "Yalnızca tüccardır, peygamber değildir"],
+    "explanation": "Hz. Muhammed son peygamberdir.",
+    "source": "Diyanet Temel Dini Bilgiler",
+    "ar": {
+      "question": "هل محمد صلى الله عليه وسلم نبي آخر الزمان؟",
+      "options": ["نعم؛ هو خاتم النبيين", "لا؛ يأتي بعده نبي مفترض", "شاعر فقط", "تاجر غير نبي"],
+      "explanation": "محمد خاتم النبيين.",
+      "source": "رئاسة الشؤون الدينية: المعلومات الدينية الأساسية"
+    }
+  },
+  {
+    "category": "Peygamberler tarihi",
+    "difficulty": 1,
+    "question": "Peygamberlere iman neyi gerektirir?",
+    "options": ["Hepsini tasdik etmeyi, ayırmamayı", "Yalnızca birini seçmeyi", "Hepsini inkâr etmeyi", "Yalnızca şair saymayı"],
+    "explanation": "Peygamberlerin hepsine iman edilir; ayrım yapılmaz.",
+    "source": "Diyanet Temel Dini Bilgiler",
+    "ar": {
+      "question": "ماذا يقتضي الإيمان بالأنبياء؟",
+      "options": ["تصديق جميعهم بلا تفريق", "اختيار واحد فقط", "إنكار جميعهم", "عدّهم شعراء فقط"],
+      "explanation": "يُؤمن بجميع الأنبياء دون تفريق.",
+      "source": "رئاسة الشؤون الدينية: المعلومات الدينية الأساسية"
+    }
+  },
+  {
+    "category": "Peygamberler tarihi",
+    "difficulty": 2,
+    "question": "Mucize peygamberler için neyi gösterir?",
+    "options": ["Allah'ın desteğiyle verilen olağanüstü delili", "Kendi uydurdukları sihri", "Ticaret kârını", "Zekât nisabını"],
+    "explanation": "Mucize, peygamberliğin Allah katından olduğunu gösteren işarettir.",
+    "source": "Diyanet Temel Dini Bilgiler",
+    "ar": {
+      "question": "ماذا تبيّن المعجزة للأنبياء؟",
+      "options": ["آية خارقة بتأييد الله", "سحراً من عند أنفسهم", "ربح التجارة", "نصاب الزكاة"],
+      "explanation": "المعجزة آية على صدق النبوة.",
+      "source": "رئاسة الشؤون الدينية: المعلومات الدينية الأساسية"
+    }
+  },
+  {
+    "category": "Peygamberler tarihi",
+    "difficulty": 2,
+    "question": "Hz. Âdem'in yeryüzüne inişi kıssası neyi hatırlatır?",
+    "options": ["Tevbe ve imtihanı", "Zekât nisabını", "Cuma hutbesini", "Mest süresini"],
+    "explanation": "Âdem kıssası hata, tevbe ve yeryüzü imtihanını anlatır.",
+    "source": "Diyanet Kur'an Yolu",
+    "ar": {
+      "question": "ماذا تذكّر قصة هبوط آدم إلى الأرض؟",
+      "options": ["التوبة والابتلاء", "نصاب الزكاة", "خطبة الجمعة", "مدة المسح"],
+      "explanation": "قصة آدم خطأ ثم توبة ثم ابتلاء في الأرض.",
+      "source": "رئاسة الشؤون الدينية: طريق القرآن"
+    }
+  },
+  {
+    "category": "Peygamberler tarihi",
+    "difficulty": 3,
+    "question": "Hz. İsmâil ile ilgili 'zibh' kıssasının özü nedir?",
+    "options": ["Allah'a teslimiyet", "Ticaret ortaklığı", "Namaz rekâtı", "Zekât yılı"],
+    "explanation": "Kurban kıssası teslimiyet ve Allah'ın lütfunu öğretir.",
+    "source": "Diyanet Kur'an Yolu",
+    "ar": {
+      "question": "ما جوهر قصة الذبح مع إسماعيل؟",
+      "options": ["التسليم لله", "شركة تجارية", "عدد ركعات الصلاة", "حول الزكاة"],
+      "explanation": "قصة الذبح تسليم وفضل من الله.",
+      "source": "رئاسة الشؤون الدينية: طريق القرآن"
+    }
+  },
+  {
+    "category": "İslam tarihi",
+    "difficulty": 2,
+    "question": "Hz. Ebû Bekir dönemiyle anılan temel işlerden biri nedir?",
+    "options": ["Ridde ile mücadele ve mushafın cem'i", "İstanbul'un fethi", "Endülüs'ün kuruluşu", "Nizamiye'nin açılışı"],
+    "explanation": "Ebû Bekir, dinden dönüşle mücadele ve Kur'an'ın toplanmasıyla anılır.",
+    "source": "Diyanet İslam Tarihi",
+    "ar": {
+      "question": "من أبرز أعمال عهد أبي بكر؟",
+      "options": ["حروب الردة وجمع المصحف", "فتح إسطنبول", "تأسيس الأندلس", "افتتاح النظامية"],
+      "explanation": "يُذكر أبو بكر بحروب الردة وجمع القرآن.",
+      "source": "رئاسة الشؤون الدينية: التاريخ الإسلامي"
+    }
+  },
+  {
+    "category": "İslam tarihi",
+    "difficulty": 2,
+    "question": "Hz. Ömer dönemiyle anılan idari vurgu nedir?",
+    "options": ["Divan ve hicri takvimin yerleşmesi", "Tebbet suresinin inişi", "İlk vahyin gelişi", "Hendek kazısı"],
+    "explanation": "Ömer döneminde idari teşkilat ve hicri takvim öne çıkar.",
+    "source": "Diyanet İslam Tarihi",
+    "ar": {
+      "question": "ما السمة الإدارية لعهد عمر؟",
+      "options": ["الديوان والتقويم الهجري", "نزول المسد", "بدء الوحي", "حفر الخندق"],
+      "explanation": "برز في عهد عمر التنظيم والتقويم الهجري.",
+      "source": "رئاسة الشؤون الدينية: التاريخ الإسلامي"
+    }
+  },
+  {
+    "category": "İslam tarihi",
+    "difficulty": 2,
+    "question": "Hz. Osman dönemiyle anılan mushaf işi nedir?",
+    "options": ["Mushafın çoğaltılıp şehirlere gönderilmesi", "İlk ezanın okunması", "Kıblenin değişmesi", "Bedir'in yapılması"],
+    "explanation": "Osman, resmi mushaf nüshalarını çoğaltmıştır.",
+    "source": "Diyanet İslam Tarihi",
+    "ar": {
+      "question": "ما عمل المصحف المنسوب إلى عهد عثمان؟",
+      "options": ["نسخ المصحف وبعثه إلى الأمصار", "أول أذان", "تحويل القبلة", "وقوع بدر"],
+      "explanation": "نسخ عثمان المصاحف وبعث بها.",
+      "source": "رئاسة الشؤون الدينية: التاريخ الإسلامي"
+    }
+  },
+  {
+    "category": "İslam tarihi",
+    "difficulty": 2,
+    "question": "Selâhaddîn Eyyûbî hangi şehirle anılır?",
+    "options": ["Kudüs", "Kurtuba zorunlu", "Bursa zorunlu", "Semerkant zorunlu"],
+    "explanation": "Selâhaddîn, Kudüs'ü Haçlılardan geri almasıyla anılır.",
+    "source": "TDV İslam Ansiklopedisi",
+    "ar": {
+      "question": "بأي مدينة يُذكر صلاح الدين الأيوبي؟",
+      "options": ["القدس", "قرطبة حتماً", "بورصة حتماً", "سمرقند حتماً"],
+      "explanation": "يُذكر صلاح الدين باسترداد القدس.",
+      "source": "موسوعة وقف الديانة التركي"
+    }
+  },
+  {
+    "category": "İslam tarihi",
+    "difficulty": 2,
+    "question": "Osmanlı'da ilk başkentlerden biri hangisidir?",
+    "options": ["Bursa", "Mekke", "Taif", "Bedir"],
+    "explanation": "Bursa, Osmanlı'nın erken başkentlerindendir.",
+    "source": "TDV İslam Ansiklopedisi",
+    "ar": {
+      "question": "من أوائل عواصم الدولة العثمانية؟",
+      "options": ["بورصة", "مكة", "الطائف", "بدر"],
+      "explanation": "بورصة من العواصم المبكرة لعثمان.",
+      "source": "موسوعة وقف الديانة التركي"
+    }
+  },
+  {
+    "category": "İslam tarihi",
+    "difficulty": 2,
+    "question": "Süleymaniye külliyesi kimin dönemindedir?",
+    "options": ["Kanûnî Sultan Süleyman", "Fatih'ten önce Osman Gazi", "Yalnızca Emevi halifesi", "Yalnızca Abbasî veziri"],
+    "explanation": "Süleymaniye, Kanûnî döneminde inşa edilmiştir.",
+    "source": "TDV İslam Ansiklopedisi",
+    "ar": {
+      "question": "في عهد من أُنشئت كلية سليمانية؟",
+      "options": ["السلطان سليمان القانوني", "عثمان غازي قبل الفاتح", "خليفة أموي فقط", "وزير عباسي فقط"],
+      "explanation": "بُنيت السليمانية في عهد القانوني.",
+      "source": "موسوعة وقف الديانة التركي"
+    }
+  },
+  {
+    "category": "İslam tarihi",
+    "difficulty": 2,
+    "question": "Karahanlılar Türk-İslam tarihinde neyle anılır?",
+    "options": ["İlk müslüman Türk devletlerinden olmaları", "İlk ezanı okumaları", "Bedir'i kazanmaları", "Hendek kazmaları"],
+    "explanation": "Karahanlılar, topluca İslam'ı kabul eden ilk Türk devletlerindendir.",
+    "source": "TDV İslam Ansiklopedisi",
+    "ar": {
+      "question": "بماذا تُذكر القراخانيون في التاريخ التركي الإسلامي؟",
+      "options": ["من أوائل الدول التركية المسلمة", "بأول أذان", "بنصر بدر", "بحفر الخندق"],
+      "explanation": "القراخانيون من أوائل من أسلم من الدول التركية.",
+      "source": "موسوعة وقف الديانة التركي"
+    }
+  },
+  {
+    "category": "İslam tarihi",
+    "difficulty": 2,
+    "question": "Gazneli Mahmud hangi coğrafya seferleriyle anılır?",
+    "options": ["Hindistan", "Endülüs içi zorunlu", "Kuzey Kutbu", "Amerika"],
+    "explanation": "Gazneli Mahmud, Hindistan seferleriyle tanınır.",
+    "source": "TDV İslam Ansiklopedisi",
+    "ar": {
+      "question": "بأي جغرافيا تُذكر غزوات محمود الغزنوي؟",
+      "options": ["الهند", "داخل الأندلس حتماً", "القطب الشمالي", "أمريكا"],
+      "explanation": "عُرف محمود الغزنوي بغزوات الهند.",
+      "source": "موسوعة وقف الديانة التركي"
+    }
+  },
+  {
+    "category": "İslam tarihi",
+    "difficulty": 3,
+    "question": "Beytülhikme hangi şehirle anılır?",
+    "options": ["Bağdat", "Bedir", "Taif", "Kuba"],
+    "explanation": "Beytülhikme, Abbasî Bağdat'ında ilim merkezidir.",
+    "source": "TDV İslam Ansiklopedisi",
+    "ar": {
+      "question": "بأي مدينة يُذكر بيت الحكمة؟",
+      "options": ["بغداد", "بدر", "الطائف", "قباء"],
+      "explanation": "بيت الحكمة مركز علم في بغداد العباسية.",
+      "source": "موسوعة وقف الديانة التركي"
+    }
+  },
+  {
+    "category": "İslam tarihi",
+    "difficulty": 2,
+    "question": "Kurtuba Camii hangi medeniyetle anılır?",
+    "options": ["Endülüs", "Osmanlı ilk yılı zorunlu", "Gazne yalnızca", "Karahanlı yalnızca"],
+    "explanation": "Kurtuba Camii, Endülüs İslam medeniyetinin simgelerindendir.",
+    "source": "TDV İslam Ansiklopedisi",
+    "ar": {
+      "question": "بأي حضارة تُذكر مسجد قرطبة؟",
+      "options": ["الأندلس", "أول عام عثماني حتماً", "غزنة فقط", "القراخان فقط"],
+      "explanation": "جامع قرطبة من رموز الأندلس.",
+      "source": "موسوعة وقف الديانة التركي"
+    }
+  },
+  {
+    "category": "İslam tarihi",
+    "difficulty": 3,
+    "question": "Nizamiye medreseleri hangi şehirle öne çıkar?",
+    "options": ["Bağdat", "Mekke zorunlu tek yer", "Bedir", "Hira"],
+    "explanation": "En ünlü Nizamiye, Bağdat'tadır.",
+    "source": "TDV İslam Ansiklopedisi",
+    "ar": {
+      "question": "بأي مدينة تشتهر المدارس النظامية؟",
+      "options": ["بغداد", "مكة وحدها حتماً", "بدر", "حراء"],
+      "explanation": "أشهر نظامية في بغداد.",
+      "source": "موسوعة وقف الديانة التركي"
+    }
+  },
+  {
+    "category": "İslam tarihi",
+    "difficulty": 3,
+    "question": "İslam tarihindeki erken deniz seferlerinden biri hangi adaya yönelmiştir?",
+    "options": ["Kıbrıs", "İzlanda", "Japonya", "Grönland"],
+    "explanation": "Erken dönemde Akdeniz'de Kıbrıs seferleri anılır.",
+    "source": "TDV İslam Ansiklopedisi",
+    "ar": {
+      "question": "إلى أي جزيرة اتجهت غزوات بحرية مبكرة في التاريخ الإسلامي؟",
+      "options": ["قبرص", "آيسلندا", "اليابان", "غرينلاند"],
+      "explanation": "تُذكر غزوات قبرص المبكرة في المتوسط.",
+      "source": "موسوعة وقف الديانة التركي"
+    }
+  },
+  {
+    "category": "İslam tarihi",
+    "difficulty": 2,
+    "question": "Mescid-i Nebevî'nin ilk hali siyerde nasıl anılır?",
+    "options": ["Hurma kütükleri ve sade bir yapı", "Mermer saray zorunlu", "Altın kaplama zorunlu", "Çok katlı kule zorunlu"],
+    "explanation": "İlk mescit sade kerpiç ve hurma kütüğüyle yapılmıştır.",
+    "source": "Diyanet Siyer-i Nebi / İslam Tarihi",
+    "ar": {
+      "question": "كيف وُصف المسجد النبوي في أول أمره؟",
+      "options": ["بناء بسيط بجذوع النخل", "قصراً رخامياً حتماً", "مذهّباً حتماً", "برجاً متعدد الطوابق حتماً"],
+      "explanation": "بُني أول مسجد بلبن وجذوع النخل.",
+      "source": "رئاسة الشؤون الدينية: السيرة والتاريخ الإسلامي"
+    }
+  },
+  {
+    "category": "İslam tarihi",
+    "difficulty": 3,
+    "question": "Taberî İslam tarihinde hangi tür eserle öne çıkar?",
+    "options": ["Tarih ve tefsir", "Yalnızca yemek kitabı", "Yalnızca deniz haritası", "Yalnızca ticaret defteri"],
+    "explanation": "Taberî hem tarih hem tefsir yazarıdır.",
+    "source": "TDV İslam Ansiklopedisi",
+    "ar": {
+      "question": "بأي نوع من التأليف يبرز الطبري في التاريخ الإسلامي؟",
+      "options": ["التاريخ والتفسير", "كتاب طبخ فقط", "خريطة بحرية فقط", "دفتر تجارة فقط"],
+      "explanation": "للطبري تاريخ وتفسير.",
+      "source": "موسوعة وقف الديانة التركي"
+    }
+  },
+  {
+    "category": "İslam tarihi",
+    "difficulty": 2,
+    "question": "Kudüs'ün Hz. Ömer döneminde teslim alınması nasıl anılır?",
+    "options": ["Güvenlik ve ibadet hürriyeti vurgulu bir teslim", "Şehrin yakılması", "Mescid-i Aksâ'nın yıkılması", "Ehl-i kitabın sürülmesi zorunlu"],
+    "explanation": "Ömer'in Kudüs'ü alışında emân ve hoşgörü öne çıkar.",
+    "source": "Diyanet İslam Tarihi",
+    "ar": {
+      "question": "كيف يُذكر تسليم القدس في عهد عمر؟",
+      "options": ["تسليماً أبرز فيه الأمن وحرية العبادة", "بحرق المدينة", "بهدم الأقصى", "بإجلاء أهل الكتاب حتماً"],
+      "explanation": "برز الأمان والسماحة في فتح عمر للقدس.",
+      "source": "رئاسة الشؤون الدينية: التاريخ الإسلامي"
+    }
+  },
+  {
+    "category": "Kur'an bilgisi",
+    "difficulty": 1,
+    "question": "Sure ile ayet arasındaki fark nedir?",
+    "options": ["Sure bölüm, ayet o bölümün cümleleridir", "Ayet kitaptır sure satırdır", "İkisi de namazdır", "İkisi de zekâttır"],
+    "explanation": "Kur'an surelerden, sureler ayetlerden oluşur.",
+    "source": "Diyanet Temel Dini Bilgiler",
+    "ar": {
+      "question": "ما الفرق بين السورة والآية؟",
+      "options": ["السورة فصل والآية جمله", "الآية كتاب والسورة سطر", "كلاهما صلاة", "كلاهما زكاة"],
+      "explanation": "القرآن سور والسور آيات.",
+      "source": "رئاسة الشؤون الدينية: المعلومات الدينية الأساسية"
+    }
+  },
+  {
+    "category": "Kur'an bilgisi",
+    "difficulty": 1,
+    "question": "Mushaf ne demektir?",
+    "options": ["Kur'an'ın iki kapak arasındaki yazılı nüshası", "Yalnızca ezan metni", "Yalnızca hutbe taslağı", "Yalnızca zekât defteri"],
+    "explanation": "Mushaf, Kur'an'ın derlenmiş yazılı hâlidir.",
+    "source": "Diyanet Temel Dini Bilgiler",
+    "ar": {
+      "question": "ماذا يعني المصحف؟",
+      "options": ["نسخة القرآن المكتوبة بين دفتين", "نص الأذان فقط", "مسودة خطبة فقط", "دفتر الزكاة فقط"],
+      "explanation": "المصحف القرآن مجموعاً مكتوباً.",
+      "source": "رئاسة الشؤون الدينية: المعلومات الدينية الأساسية"
+    }
+  },
+  {
+    "category": "Kur'an bilgisi",
+    "difficulty": 1,
+    "question": "Hafız kimdir?",
+    "options": ["Kur'an'ı ezbere bilen", "Yalnızca müezzin", "Yalnızca tüccar", "Yalnızca yolcu"],
+    "explanation": "Hafız, Kur'an'ı ezberleyen kişidir.",
+    "source": "Diyanet Temel Dini Bilgiler",
+    "ar": {
+      "question": "من الحافظ؟",
+      "options": ["من يحفظ القرآن", "المؤذن فقط", "التاجر فقط", "المسافر فقط"],
+      "explanation": "الحافظ من أتم حفظ القرآن.",
+      "source": "رئاسة الشؤون الدينية: المعلومات الدينية الأساسية"
+    }
+  },
+  {
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "Kur'an kaç hizbe ayrılır?",
+    "options": ["60", "7", "12", "99"],
+    "explanation": "Kur'an 60 hizbe ayrılır; iki hizb bir cüz eder.",
+    "source": "Diyanet Temel Dini Bilgiler",
+    "ar": {
+      "question": "إلى كم حزباً يُقسم القرآن؟",
+      "options": ["60", "7", "12", "99"],
+      "explanation": "القرآن ستون حزباً؛ والحزبان جزء.",
+      "source": "رئاسة الشؤون الدينية: المعلومات الدينية الأساسية"
+    }
+  },
+  {
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "Osman mushafı neyi standartlaştırmıştır?",
+    "options": ["Yazım ve çoğaltılan resmi nüshayı", "Namaz rekâtını", "Zekât nisabını", "Hac aylarını"],
+    "explanation": "Osman döneminde resmi mushaf çoğaltılıp esas alınmıştır.",
+    "source": "Diyanet İslam Tarihi",
+    "ar": {
+      "question": "ماذا وحّد مصحف عثمان؟",
+      "options": ["الرسم والنسخ الرسمية", "عدد ركعات الصلاة", "نصاب الزكاة", "أشهر الحج"],
+      "explanation": "اعتمد في عهد عثمان مصحف رسمي نُسخ.",
+      "source": "رئاسة الشؤون الدينية: التاريخ الإسلامي"
+    }
+  },
+  {
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Kıraat-i aşere neyi ifade eder?",
+    "options": ["On mütevâtir okuyuş tariki", "On vakit namaz", "On zekât sınıfı zorunlu", "On hac menasiki zorunlu"],
+    "explanation": "Aşere, on mütevâtir kıraat imamının tarikidir.",
+    "source": "Diyanet Temel Dini Bilgiler",
+    "ar": {
+      "question": "ماذا تعني القراءات العشر؟",
+      "options": ["طرقاً متواترة عشر", "صلوات عشر", "أصناف زكاة عشراً حتماً", "مناسك حج عشراً حتماً"],
+      "explanation": "العشر قراءات أئمة متواترة.",
+      "source": "رئاسة الشؤون الدينية: المعلومات الدينية الأساسية"
+    }
+  },
+  {
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "Âyetü'l-Kürsî'nin temel konusu nedir?",
+    "options": ["Allah'ın birliği, ilmi ve koruyuculuğu", "Zekât nisabı", "Hac menasiki", "Namaz vakitleri listesi"],
+    "explanation": "Âyetü'l-Kürsî tevhid ve Allah'ın sıfatlarını anlatır.",
+    "source": "Diyanet Kur'an Yolu",
+    "ar": {
+      "question": "ما الموضوع الأساس لآية الكرسي؟",
+      "options": ["وحدانية الله وعلمه وحفظه", "نصاب الزكاة", "مناسك الحج", "قائمة أوقات الصلاة"],
+      "explanation": "آية الكرسي في التوحيد وصفات الله.",
+      "source": "رئاسة الشؤون الدينية: طريق القرآن"
+    }
+  },
+  {
+    "category": "Kur'an bilgisi",
+    "difficulty": 1,
+    "question": "Eûzü besmeleden önce neyi ifade eder?",
+    "options": ["Şeytandan Allah'a sığınmayı", "Zekât vermeyi", "Kurban kesmeyi", "Tavaf saymayı"],
+    "explanation": "Eûzü, okumaya şeytandan sığınarak başlamaktır.",
+    "source": "Diyanet Temel Dini Bilgiler",
+    "ar": {
+      "question": "ماذا تعني الاستعاذة قبل البسملة؟",
+      "options": ["الالتجاء إلى الله من الشيطان", "إيتاء الزكاة", "ذبح الأضحية", "عدّ الطواف"],
+      "explanation": "الاستعاذة بدء القراءة باللجوء من الشيطان.",
+      "source": "رئاسة الشؤون الدينية: المعلومات الدينية الأساسية"
+    }
+  },
+  {
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "Kadir Gecesi'nin fazileti Kur'an'da nasıl anlatılır?",
+    "options": ["Bin aydan hayırlı olduğu belirtilir", "Namazın kalktığı belirtilir", "Zekâtın kalktığı belirtilir", "Haccın kalktığı belirtilir"],
+    "explanation": "Kadr suresi, Kadir Gecesi'nin bin aydan hayırlı olduğunu söyler.",
+    "source": "Diyanet Kur'an Yolu",
+    "ar": {
+      "question": "كيف يصف القرآن فضل ليلة القدر؟",
+      "options": ["أنها خير من ألف شهر", "بسقوط الصلاة", "بسقوط الزكاة", "بسقوط الحج"],
+      "explanation": "سورة القدر تجعلها خيراً من ألف شهر.",
+      "source": "رئاسة الشؤون الدينية: طريق القرآن"
+    }
+  },
+  {
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Bakara suresinin son iki ayeti nasıl anılır?",
+    "options": ["Âmenerrasûlü / emanet ve dua", "Yalnızca hac menasiki", "Yalnızca zekât nisabı", "Yalnızca mest süresi"],
+    "explanation": "Bakara'nın sonu iman, teklif ve dua ile biter.",
+    "source": "Diyanet Kur'an Yolu",
+    "ar": {
+      "question": "كيف تُذكر الآيتان الأخيرتان من البقرة؟",
+      "options": ["آمن الرسول / الأمانة والدعاء", "مناسك الحج فقط", "نصاب الزكاة فقط", "مدة المسح فقط"],
+      "explanation": "خاتمة البقرة إيمان وتكليف ودعاء.",
+      "source": "رئاسة الشؤون الدينية: طريق القرآن"
+    }
+  },
+  {
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "Kur'an'da kıssa anlatımının amacı nedir?",
+    "options": ["İbret ve tevhid dersi vermek", "Yalnızca eğlendirmek", "Zekâtı gizlemek", "Namazı iptal etmek"],
+    "explanation": "Kıssalar ibret, sabır ve tevhid için anlatılır.",
+    "source": "Diyanet Kur'an Yolu",
+    "ar": {
+      "question": "ما غاية ذكر القصص في القرآن؟",
+      "options": ["العبرة ودرس التوحيد", "التسلية فقط", "إخفاء الزكاة", "إلغاء الصلاة"],
+      "explanation": "تُساق القصص للعبرة والصبر والتوحيد.",
+      "source": "رئاسة الشؤون الدينية: طريق القرآن"
+    }
+  },
+  {
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "Mushaf'ta sureler iniş sırasına göre midir?",
+    "options": ["Hayır; mushaf tertibi nüzul sırasından farklıdır", "Evet; birebir iniş sırasıdır", "Sure yoktur", "Yalnızca Cuma suresi vardır"],
+    "explanation": "Mushaf sıralaması nüzul sırasından ayrıdır.",
+    "source": "Diyanet Temel Dini Bilgiler",
+    "ar": {
+      "question": "هل سور المصحف على ترتيب النزول؟",
+      "options": ["لا؛ ترتيب المصحف غير ترتيب النزول", "نعم؛ هو النزول حرفاً", "لا سور فيه", "فيه الجمعة فقط"],
+      "explanation": "ترتيب المصحف غير ترتيب النزول.",
+      "source": "رئاسة الشؤون الدينية: المعلومات الدينية الأساسية"
+    }
+  },
+  {
+    "category": "Kur'an bilgisi",
+    "difficulty": 3,
+    "question": "Secavend işaretleri ne işe yarar?",
+    "options": ["Durulacak ve geçilecek yerleri gösterir", "Zekât miktarını yazar", "Namaz vaktini değiştirir", "Hac yolunu çizer"],
+    "explanation": "Secavend, kıraatte vakıf işaretleridir.",
+    "source": "Diyanet Temel Dini Bilgiler",
+    "ar": {
+      "question": "ما فائدة علامات السجاوند؟",
+      "options": ["تبيّن مواضع الوقف والوصل", "تكتب قدر الزكاة", "تغيّر وقت الصلاة", "ترسم طريق الحج"],
+      "explanation": "السجاوند علامات وقف في القراءة.",
+      "source": "رئاسة الشؤون الدينية: المعلومات الدينية الأساسية"
+    }
+  },
+  {
+    "category": "Kur'an bilgisi",
+    "difficulty": 1,
+    "question": "Hatim ne demektir?",
+    "options": ["Kur'an'ı baştan sona okuyup bitirmek", "Yalnızca bir ayet ezberlemek", "Yalnızca ezan okumak", "Yalnızca tesbih çekmek"],
+    "explanation": "Hatim, Mushaf'ı baştan sona tamamlamaktır.",
+    "source": "Diyanet Temel Dini Bilgiler",
+    "ar": {
+      "question": "ماذا يعني الختم؟",
+      "options": ["قراءة القرآن من أوله إلى آخره", "حفظ آية واحدة فقط", "رفع الأذان فقط", "التسبيح فقط"],
+      "explanation": "الختم إتمام المصحف.",
+      "source": "رئاسة الشؤون الدينية: المعلومات الدينية الأساسية"
+    }
+  },
+  {
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "Mukabele Ramazan'da neyi ifade eder?",
+    "options": ["Kur'an'ın cemaatle karşılıklı okunmasını", "Zekâtın gizlenmesini", "Namazın terkini", "Haccın iptalini"],
+    "explanation": "Mukabele, hafız veya imamın cemaatle Kur'an okumasıdır.",
+    "source": "Diyanet Temel Dini Bilgiler",
+    "ar": {
+      "question": "ماذا تعني المقابلة في رمضان؟",
+      "options": ["تلاوة القرآن جماعياً بالتتابع", "إخفاء الزكاة", "ترك الصلاة", "إلغاء الحج"],
+      "explanation": "المقابلة قراءة جماعية للقرآن.",
+      "source": "رئاسة الشؤون الدينية: المعلومات الدينية الأساسية"
+    }
+  },
+  {
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "Aşr-ı şerif okumak ne demektir?",
+    "options": ["Kur'an'dan bir bölüm okumak", "Zekât hesaplamak", "Kurban kesmek", "Mest giymek"],
+    "explanation": "Aşr-ı şerif, Kur'an'dan okunan kısa bir pasajdır.",
+    "source": "Diyanet Temel Dini Bilgiler",
+    "ar": {
+      "question": "ماذا يعني قراءة العشر الشريف؟",
+      "options": ["تلاوة مقطع من القرآن", "حساب الزكاة", "ذبح الأضحية", "لبس الخف"],
+      "explanation": "العشر الشريف مقطع يُتلى من القرآن.",
+      "source": "رئاسة الشؤون الدينية: المعلومات الدينية الأساسية"
+    }
+  },
+  {
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "Meal ile tefsir arasındaki fark nedir?",
+    "options": ["Meal çeviri, tefsir açıklamadır", "İkisi de namazdır", "İkisi de zekâttır", "Meal hacdır tefsir oruçtur"],
+    "explanation": "Meal anlam aktarır; tefsir ayeti açıklar.",
+    "source": "Diyanet Temel Dini Bilgiler",
+    "ar": {
+      "question": "ما الفرق بين الترجمة التفسيرية والتفسير؟",
+      "options": ["الترجمة نقل معنى والتفسير بيان", "كلاهما صلاة", "كلاهما زكاة", "الترجمة حج والتفسير صوم"],
+      "explanation": "الترجمة تنقل المعنى والتفسير يشرح الآية.",
+      "source": "رئاسة الشؤون الدينية: المعلومات الدينية الأساسية"
+    }
+  },
+  {
+    "category": "Kur'an bilgisi",
+    "difficulty": 1,
+    "question": "Kur'an'da ilk inen emirlerden biri nedir?",
+    "options": ["Oku", "Ticaret yap", "Yolculuğa çık", "Put yont"],
+    "explanation": "Alak suresinin başı 'Oku' emriyle açılır.",
+    "source": "Diyanet Kur'an Yolu",
+    "ar": {
+      "question": "من أوائل الأوامر في القرآن؟",
+      "options": ["اقرأ", "اتجر", "سافر", "انحت وثناً"],
+      "explanation": "افتتحت العلق بـ اقرأ.",
+      "source": "رئاسة الشؤون الدينية: طريق القرآن"
+    }
+  },
+  {
+    "category": "Kur'an bilgisi",
+    "difficulty": 2,
+    "question": "Vahiy kâtibi olarak öne çıkan sahabilerden biri kimdir?",
+    "options": ["Zeyd b. Sâbit", "Ebu Leheb", "Ebu Cehil", "Ebu Talib"],
+    "explanation": "Zeyd b. Sâbit, vahiy kâtipliği ve mushaf cem'iyle anılır.",
+    "source": "Diyanet Siyer-i Nebi / İslam Tarihi",
+    "ar": {
+      "question": "من كتّاب الوحي البارزين من الصحابة؟",
+      "options": ["زيد بن ثابت", "أبو لهب", "أبو جهل", "أبو طالب"],
+      "explanation": "زيد بن ثابت من كتّاب الوحي وجمّاع المصحف.",
+      "source": "رئاسة الشؤون الدينية: السيرة والتاريخ الإسلامي"
+    }
+  }
+]

@@ -5,3 +5,5 @@
 "NSLocationAlwaysAndWhenInUseUsageDescription" = "Konumunuz, namaz vakitlerini hesaplamak ve kıble yönünü göstermek için kullanılır.";
 "NSPhotoLibraryUsageDescription" = "Profil veya paylaşım için seçtiğiniz görselleri kullanmak amacıyla fotoğraf arşivinize erişilir.";
 "NSAppleMusicUsageDescription" = "Namaz bildirimi için telefonunuzdan seçtiğiniz ses dosyasını kullanmak amacıyla medya arşivinize erişilir.";
+"NSMicrophoneUsageDescription" = "CarPlay'de Hilal ile konuşmak için mikrofon kullanılır.";
+"NSSpeechRecognitionUsageDescription" = "CarPlay'de söylediklerin Hilal'e yazıya çevrilir. Ses kaydı sunucuya gitmez.";

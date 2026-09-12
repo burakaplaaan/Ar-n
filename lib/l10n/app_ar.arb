@@ -695,14 +695,14 @@
   "willpowerHubStreakSeriesLabel": "سلسلة",
   "willpowerHubStreakDaySeriesLabel": "سلسلة الأيام",
   "qiblaHubCompassTitle": "اعثر على اتجاه القبلة",
-  "qiblaHubCompassSubtitle": "اعرض اتجاه الكعبة باستخدام البوصلة والموقع",
+  "qiblaHubCompassSubtitle": "يُظهر اتجاه الكعبة",
   "qiblaHubOpenAction": "فتح",
   "qiblaHubZikirTitle": "عداد الذكر",
-  "qiblaHubZikirFeatureSubtitle": "عداد رقمي مع تفاصيل الذكر، سجل الجولات، والهدف (33/99)",
+  "qiblaHubZikirFeatureSubtitle": "تسبيح رقمي",
   "qiblaHubBreathingTitle": "تمرين التنفس",
-  "qiblaHubBreathingSubtitle": "اهدأ واستعد تركيزك عبر دورة التنفس 4-7-8",
+  "qiblaHubBreathingSubtitle": "اهدأ مع 4-7-8",
   "qiblaHubAssistantTitle": "مساعد أرِن",
-  "qiblaHubAssistantSubtitle": "محادثة؛ إدارة الصلاة والتنبيهات والتذكيرات",
+  "qiblaHubAssistantSubtitle": "الصلاة والتذكيرات",
   "assistantTitle": "مساعد أرِن",
   "assistantSubtitle": "",
   "assistantAskChip": "المساعد",
@@ -844,9 +844,10 @@
   "assistantCancel": "إلغاء",
   "assistantConfirm": "إيقاف",
   "qiblaHubHealingTitle": "ترددات الشفاء",
-  "qiblaHubHealingSubtitle": "جلسة هادئة مع نغمات علاجية، أجواء صوتية، ومؤقت نوم",
+  "qiblaHubHealingSubtitle": "أصوات مهدئة",
   "qiblaHubAiTitle": "الذكاء الاصطناعي الإسلامي",
-  "qiblaHubAiSubtitle": "اسأل ما يدور في ذهنك وابدأ محادثة إسلامية",
+  "qiblaHubAiSubtitle": "إجابات لأسئلتك الإسلامية",
+  "qiblaHubPremiumBadge": "بريميوم",
   "islamicAiComingSoonTitle": "الذكاء الاصطناعي الإسلامي",
   "islamicAiComingSoonBody": "هذه الميزة قيد الإعداد. Premium لديك مفعّل؛ ستُفتح المحادثة هنا بعد دمج الشيفرة.",
   "widgetThemeSectionTitle": "سمات الأدوات",
@@ -859,7 +860,7 @@
   "widgetLockTextSoft": "ناعم",
   "widgetLockTextApplied": "تم تحديث نص شاشة القفل.",
   "qiblaHubHilalDuelTitle": "مبارزة المعرفة",
-  "qiblaHubHilalDuelSubtitle": "تنافس في 7 أسئلة إسلامية، واجمع الأهلة وتقدّم بالمستوى",
+  "qiblaHubHilalDuelSubtitle": "مسابقة معرفية إسلامية",
   "hilalDuelTitle": "مبارزة المعرفة",
   "hilalDuelLanguageNote": "الأسئلة حالياً بالتركية",
   "hilalDuelRulesSummary": "7 أسئلة • 20 ثانية لكل سؤال\nالدقة والسرعة تحسمان الفوز. يفتح السؤال التالي فور إجابة الطرفين. شاهد إعلانًا لقلب أو العب بلا حدود مع بريميوم.",
@@ -974,6 +975,24 @@
       "level": {"type": "int"}
     }
   },
+  "hilalDuelNextRewardFrameGold": "المكافأة التالية: إطار ذهبي (LV {level})",
+  "@hilalDuelNextRewardFrameGold": {
+    "placeholders": {
+      "level": {"type": "int"}
+    }
+  },
+  "hilalDuelNextRewardHilalPulse": "المكافأة التالية: توهج الهلال (LV {level})",
+  "@hilalDuelNextRewardHilalPulse": {
+    "placeholders": {
+      "level": {"type": "int"}
+    }
+  },
+  "hilalDuelNextRewardNameGilt": "المكافأة التالية: اسم مذهب (LV {level})",
+  "@hilalDuelNextRewardNameGilt": {
+    "placeholders": {
+      "level": {"type": "int"}
+    }
+  },
   "hilalDuelWeeklyTitle": "أفضل لاعب هذا الأسبوع",
   "hilalDuelWeeklyResetHint": "يُصفَّر يوم الاثنين",
   "hilalDuelWeeklyThisWeek": "هذا الأسبوع: {count} هلال",
@@ -1014,9 +1033,29 @@
   },
   "hilalDuelAdminRemoveAction": "إزالة",
   "hilalDuelAdminRemoved": "تمت إزالة اللاعب من القائمة.",
+  "hilalDuelTitleComez": "مبتدئ",
   "hilalDuelTitleTalebe": "طالب",
+  "hilalDuelTitleKayyim": "قيّم",
+  "hilalDuelTitleMuezzin": "مؤذن",
+  "hilalDuelTitleHatip": "خطيب",
+  "hilalDuelTitleImam": "إمام",
+  "hilalDuelTitleVaiz": "واعظ",
+  "hilalDuelTitleHoca": "خواجة",
   "hilalDuelTitleMuderris": "مدرّس",
+  "hilalDuelTitleDervis": "درويش",
+  "hilalDuelTitleSeyh": "شيخ",
+  "hilalDuelTitleMuftu": "مفتي",
+  "hilalDuelTitleKadi": "قاضي",
+  "hilalDuelTitleKazasker": "قاضي عسكر",
+  "hilalDuelTitleSeyhulislam": "شيخ الإسلام",
   "hilalDuelTitleIlimDostu": "صديق العلم",
+  "hilalDuelGoldenCrescent": "الهلال الذهبي",
+  "hilalDuelChampionCount": "×{count}",
+  "@hilalDuelChampionCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
   "hilalDuelYouLabel": "أنت",
   "hilalDuelOpponentLabel": "المنافس",
   "hilalDuelChallengeAction": "تحدَّ",
@@ -1873,6 +1912,7 @@
   "onboardingShapeCard3Title": "حول القرآن",
   "onboardingShapeCard3Body": "يسير اليوم مع الآية والذكر على خط واحد.",
   "onboardingPrayerTitle": "{name}، كيف تصف إيقاع صلاتك ودعائك؟",
+  "onboardingPrayerTitleAnonymous": "كيف تصف إيقاع صلاتك ودعائك؟",
   "@onboardingPrayerTitle": {
     "placeholders": {
       "name": { "type": "String" }
@@ -1885,6 +1925,7 @@
   "onboardingPrayerStarting": "ما زلت أتدرّب",
   "onboardingPrayerBeginHere": "أريد أن أبدأ من هذه الشاشة",
   "onboardingWaswasaTitle": "{name}، ماذا تفعل حين يأتيك الشك أو الوسوسة؟",
+  "onboardingWaswasaTitleAnonymous": "ماذا تفعل حين يأتيك الشك أو الوسوسة؟",
   "@onboardingWaswasaTitle": {
     "placeholders": {
       "name": { "type": "String" }
@@ -1947,6 +1988,7 @@
   "onboardingPrepareYes": "نعم",
   "onboardingPrepareNo": "لا",
   "onboardingPrepareBar1Title": "{name}، يُنسج مسار آياتك",
+  "onboardingPrepareBar1TitleAnonymous": "يُنسج مسار آياتك",
   "@onboardingPrepareBar1Title": {
     "placeholders": {
       "name": { "type": "String" }
@@ -1958,7 +2000,7 @@
   "onboardingPrepareBar3Title": "يُضبط للوصول إلى المزيد من الناس",
   "onboardingPrepareBar3Body": "تُقاس مصادر الاكتشاف بخصوصية.",
   "onboardingPrepareBar4Title": "تُوضع الاختصارات",
-  "onboardingPrepareBar4Body": "يُجهَّز التسبيح والقبلة والصلاة والمحادثة.",
+  "onboardingPrepareBar4Body": "يُجهَّز التسبيح والقبلة والصلاة والاجتماعي والمحادثة.",
   "onboardingPrepareAskLock": "هل نستخدم عرضاً بسيطاً للآية على شاشة القفل؟",
   "onboardingPrepareAskVerses": "هل نقدّم الآيات وفق إجاباتك؟",
   "onboardingPrepareAskShortcuts": "هل نبرز اختصارات العبادة في المسار الرئيسي؟",
@@ -1969,6 +2011,7 @@
       "name": { "type": "String" }
     }
   },
+  "onboardingDuaBodyAnonymous": "اللهم ارزق هذا العبد خيراً وبركة وصحة وسكينة وحكمة واستقامة. أحيِ قلبه بالقرآن وثبّت خطاه في الخير. ولتكن كلمتك قريبة منه في كل حين.",
   "onboardingDuaVerseArabic": "رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً",
   "onboardingDuaVerseTranslation": "ربنا آتنا في الدنيا حسنة وفي الآخرة حسنة.",
   "onboardingDuaVerseSource": "البقرة ٢:٢٠١",
@@ -2593,7 +2636,7 @@
   "insightCommentGood": "تم تحديد {count}/5 صلوات أمس؛ من الممكن إكمال التوازن بصلاة أو صلاتين اليوم.",
   "insightCommentDefault": "بيانات الأيام الماضية هي مرآة لك: رحمة في الأجزاء المفقودة، وامتنان في الأجزاء المكتملة.",
   "qiblaHubPrayerCircleTitle": "حلقة الدعاء",
-  "qiblaHubPrayerCircleSubtitle": "شارك طلب دعاء ورافق الآخرين بإخلاص",
+  "qiblaHubPrayerCircleSubtitle": "شارك دعاء وقل آمين",
   "prayerCircleTitle": "حلقة الدعاء",
   "prayerCircleHeroTitle": "شارك في دعاء من قلبك",
   "prayerCircleHeroBody": "تجتمع هنا طلبات الدعاء المجهولة. لنقل آمين بهدوء لنوايا بعضنا.",
@@ -2689,7 +2732,9 @@
   "appTourHomePrayerTimesTitle": "مواقيت الصلاة",
   "appTourHomePrayerTimesBody": "المواقيت حسب منطقتك. يمكنك تغيير الموقع من الإعدادات.",
   "appTourNavToolsTitle": "الأدوات",
-  "appTourNavToolsBody": "القبلة والذكر وحلقة الدعاء وبقية الأدوات الروحية في هذا التبويب.",
+  "appTourNavToolsBody": "القبلة والقرآن والذكر واللوحة الاجتماعية وبقية الأدوات الروحية في هذا التبويب.",
+  "appTourQiblaSocialTitle": "اجتماعي",
+  "appTourQiblaSocialBody": "لوحة المجتمع. اكتب باختصار، وعلّق وأعجب — باسمك.",
   "appTourQiblaAssistantTitle": "مساعد أرِن",
   "appTourQiblaAssistantBody": "أدِر الصلاة والإشعارات والتذكيرات عبر المحادثة.",
   "appTourQiblaAiTitle": "الذكاء الاصطناعي الإسلامي",
@@ -2698,6 +2743,8 @@
   "appTourQiblaCompassBody": "تُظهر اتجاه الكعبة من موقعك.",
   "appTourQiblaZikirTitle": "عداد الذكر",
   "appTourQiblaZikirBody": "تسبيح رقمي مع الأهداف والجولات وملاحظات الذكر.",
+  "appTourQiblaQuranTitle": "القرآن",
+  "appTourQiblaQuranBody": "اقرأ بالترجمة واستمع للتلاوة، وأكمل من حيث توقفت.",
   "appTourQiblaHilalTitle": "مبارزة المعرفة",
   "appTourQiblaHilalBody": "اختبر نفسك بأسئلة إسلامية وثبّت ما تعرفه.",
   "appTourQiblaPrayerCircleTitle": "حلقة الدعاء",
@@ -2737,7 +2784,22 @@
   "appTourWidgetPromptYes": "نعم",
   "appTourWidgetPromptLater": "لاحقاً",
   "qiblaHubSocialTitle": "اجتماعي",
-  "qiblaHubSocialSubtitle": "تحديثات المجتمع — اكتب وعلّق وأعجب",
+  "qiblaHubSocialSubtitle": "اكتب وعلّق وأعجب",
+  "qiblaHubQuranTitle": "القرآن",
+  "qiblaHubQuranSubtitle": "اقرأ واستمع",
+  "qiblaHubGroupWorship": "الاتجاه والعبادة",
+  "qiblaHubGroupTogether": "معاً",
+  "qiblaHubGroupCalm": "سكينة",
+  "qiblaHubDoorAi": "ذكاء",
+  "qiblaHubDoorCompass": "قبلة",
+  "qiblaHubDoorZikir": "ذكر",
+  "qiblaHubDoorHilal": "مبارزة",
+  "qiblaHubDoorPrayer": "دعاء",
+  "qiblaHubDoorHealing": "تردد",
+  "qiblaHubDoorBreath": "تنفس",
+  "qiblaHubContinueQuran": "تابع القرآن",
+  "qiblaHubOpenQuran": "افتح القرآن",
+  "qiblaHubOpenQuranHint": "اقرأ واستمع",
   "socialTitle": "اجتماعي",
   "socialSortNew": "جديد",
   "socialSortNewest": "الأحدث",
@@ -2771,7 +2833,7 @@
   "socialUsernameLocked": "لا يمكن تغيير هذا الاسم.",
   "socialUsernameHint": "اسمك",
   "socialBioTitle": "نبذة",
-  "socialBioBody": "عرّف بنفسك باختصار. يمكنك تغييرها لاحقاً من ملفك.",
+  "socialBioBody": "يمكنك التعريف بنفسك باختصار. اتركها فارغة وأضفها لاحقاً من ملفك.",
   "socialBioHint": "أحرص ألا تفوتني الصلاة.",
   "socialBioEmpty": "لم يكتب شيئاً بعد.",
   "socialBioEdit": "تعديل",
@@ -2797,5 +2859,45 @@
   "socialBanPermanent": "دائم",
   "socialBanned": "تم حظر المستخدم",
   "socialBannedBanner": "لا يمكنك الكتابة على اللوحة.",
-  "socialProfanity": "لا يُسمح بالشتم أو الإهانة."
+  "socialProfanity": "لا يُسمح بالشتم أو الإهانة.",
+  "quranTitle": "القرآن",
+  "quranSearchHint": "اسم السورة أو رقمها",
+  "quranContinueTitle": "متابعة القراءة",
+  "quranContinueBody": "{surah} · الآية {ayah}",
+  "@quranContinueBody": {
+    "placeholders": {
+      "surah": {"type": "String"},
+      "ayah": {"type": "int"}
+    }
+  },
+  "quranMeccan": "مكية",
+  "quranMedinan": "مدنية",
+  "quranAyahCount": "{count} آيات",
+  "@quranAyahCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "quranAyahLabel": "الآية {ayah}",
+  "@quranAyahLabel": {
+    "placeholders": {
+      "ayah": {"type": "int"}
+    }
+  },
+  "quranTranslationOn": "الترجمة ظاهرة",
+  "quranTranslationOff": "الترجمة مخفية",
+  "quranFontSize": "حجم النص",
+  "quranLoadError": "تعذر فتح النص الآن. تحقق من الاتصال وأعد المحاولة.",
+  "quranRetry": "إعادة المحاولة",
+  "quranAudioError": "تعذر بدء التلاوة. حاول بعد قليل.",
+  "quranReciterName": "مشاري راشد العفاسي",
+  "quranNowPlaying": "{surah} · الآية {ayah}",
+  "@quranNowPlaying": {
+    "placeholders": {
+      "surah": {"type": "String"},
+      "ayah": {"type": "int"}
+    }
+  },
+  "quranMealAttribution": "التلاوة: مشاري راشد العفاسي",
+  "quranEmptySearch": "لا توجد سورة مطابقة لهذا البحث."
 }

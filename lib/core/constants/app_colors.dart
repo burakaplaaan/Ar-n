@@ -177,4 +177,8 @@ abstract final class AppColors {
       _isLightShell(context)
           ? const Color(0xFF5D6E64)
           : creamBase.withValues(alpha: 0.72);
+
+  /// Çekme-yenile, yükleyici ve vurgu halkası.
+  static Color shellAccent(BuildContext context) =>
+      _isLightShell(context) ? accentGreenOnLight : accentNeonGreen;
 }

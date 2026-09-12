@@ -41,6 +41,10 @@ import 'onboarding_verse_hold_screen.dart';
 import 'onboarding_embedded_willpower.dart';
 import 'onboarding_willpower_invite_screen.dart';
 
+/// İlk isim / niyet / kalp / sıkıntı / not / ton / yöneliş zinciri atlanır.
+/// Eski soru akışına dönüş: `false`.
+const bool kOnboardingSkipEarlyQuestions = true;
+
 enum _OnboardingPhase {
   landing,
   welcome,
@@ -172,7 +176,12 @@ class _OnboardingPageState extends State<OnboardingPage> {
         _goTo(_OnboardingPhase.tone, forward: false);
         return true;
       case _OnboardingPhase.shape:
-        _goTo(_OnboardingPhase.turn, forward: false);
+        _goTo(
+          kOnboardingSkipEarlyQuestions
+              ? _OnboardingPhase.story
+              : _OnboardingPhase.turn,
+          forward: false,
+        );
         return true;
       case _OnboardingPhase.prayer:
         _goTo(_OnboardingPhase.shape, forward: false);
@@ -569,7 +578,12 @@ class _OnboardingPageState extends State<OnboardingPage> {
           onBack: () {
             _handleBack();
           },
-          onContinue: () => _goTo(_OnboardingPhase.name, forward: true),
+          onContinue: () => _goTo(
+            kOnboardingSkipEarlyQuestions
+                ? _OnboardingPhase.shape
+                : _OnboardingPhase.name,
+            forward: true,
+          ),
         ),
       ),
       _OnboardingPhase.name => Scaffold(
@@ -744,7 +758,9 @@ class _OnboardingPageState extends State<OnboardingPage> {
       ),
       _OnboardingPhase.prayer => Scaffold(
         body: _autoChoice(
-          title: l10n.onboardingPrayerTitle(_displayName),
+          title: _displayName.trim().isEmpty
+              ? l10n.onboardingPrayerTitleAnonymous
+              : l10n.onboardingPrayerTitle(_displayName.trim()),
           subtitle: l10n.onboardingPrayerSubtitle,
           options: _prayerOptions(l10n),
           progress: 0.82,
@@ -758,7 +774,9 @@ class _OnboardingPageState extends State<OnboardingPage> {
       ),
       _OnboardingPhase.waswasa => Scaffold(
         body: _autoChoice(
-          title: l10n.onboardingWaswasaTitle(_displayName),
+          title: _displayName.trim().isEmpty
+              ? l10n.onboardingWaswasaTitleAnonymous
+              : l10n.onboardingWaswasaTitle(_displayName.trim()),
           subtitle: l10n.onboardingWaswasaSubtitle,
           options: _waswasaOptions(l10n),
           progress: 0.86,

@@ -14,15 +14,21 @@ void main() {
       expect(levelForHilals(250).level, 5);
     });
 
-    test('maksimum seviye 10', () {
+    test('maksimum seviye 20', () {
       expect(levelForHilals(900).level, 10);
-      expect(levelForHilals(900).maxLevel, isTrue);
-      expect(levelForHilals(900).progress, 1);
-      expect(levelForHilals(50_000).level, 10);
-      expect(nextRewardAfterLevel(4)?.level, 5);
-      expect(titleForLevel(5), 'Talebe');
+      expect(levelForHilals(900).maxLevel, isFalse);
+      expect(levelForHilals(3324).level, 19);
+      expect(levelForHilals(3325).level, 20);
+      expect(levelForHilals(3325).maxLevel, isTrue);
+      expect(levelForHilals(3325).progress, 1);
+      expect(levelForHilals(50_000).level, 20);
+      expect(titleForLevel(1), 'Çömez');
+      expect(titleForLevel(2), 'Talebe');
+      expect(titleForLevel(5), 'Hatip');
       expect(titleForLevel(9), 'Müderris');
-      expect(titleForLevel(10), 'İlim Dostu');
+      expect(titleForLevel(10), 'Derviş');
+      expect(titleForLevel(12), 'Şeyh');
+      expect(titleForLevel(20), 'Şeyhülislam');
     });
 
     test('ilerleme çubuğu 0-1 aralığında kalır', () {
@@ -38,57 +44,74 @@ void main() {
       expect(hilalsFloorForLevel(3), 95);
       expect(levelForHilals(hilalsFloorForLevel(5)).level, 5);
       expect(levelForHilals(hilalsFloorForLevel(10)).level, 10);
+      expect(levelForHilals(hilalsFloorForLevel(20)).level, 20);
     });
   });
 
   group('cosmeticsForLevel', () {
-    test('1–2 hediyesiz, 3–10 merdiveni kilitlenir', () {
-      expect(cosmeticsForLevel(1), HilalDuelCosmetics.none);
+    test('1–2 çerçevesiz, 3–20 merdiveni kilitlenir', () {
+      expect(cosmeticsForLevel(1).frameTier, 0);
+      expect(cosmeticsForLevel(1).title, 'Çömez');
       expect(cosmeticsForLevel(2).frameTier, 0);
-      expect(cosmeticsForLevel(2).title, isNull);
+      expect(cosmeticsForLevel(2).title, 'Talebe');
 
       expect(cosmeticsForLevel(3).frameTier, 1);
       expect(cosmeticsForLevel(3).avatarGlow, isFalse);
+      expect(cosmeticsForLevel(3).title, 'Kayyım');
 
       expect(cosmeticsForLevel(4).frameTier, 2);
-      expect(cosmeticsForLevel(4).title, isNull);
+      expect(cosmeticsForLevel(4).title, 'Müezzin');
 
-      expect(cosmeticsForLevel(5).title, 'Talebe');
+      expect(cosmeticsForLevel(5).title, 'Hatip');
       expect(cosmeticsForLevel(5).avatarGlow, isFalse);
       expect(cosmeticsForLevel(5).nameAccent, HilalDuelNameAccent.none);
 
       expect(cosmeticsForLevel(6).avatarGlow, isTrue);
       expect(cosmeticsForLevel(6).nameAccent, HilalDuelNameAccent.faint);
+      expect(cosmeticsForLevel(6).title, 'İmam');
 
       expect(cosmeticsForLevel(7).nameAccent, HilalDuelNameAccent.soft);
       expect(cosmeticsForLevel(7).specialHilalIcon, isFalse);
 
       expect(cosmeticsForLevel(8).specialHilalIcon, isTrue);
-      expect(cosmeticsForLevel(8).title, 'Talebe');
+      expect(cosmeticsForLevel(8).title, 'Hoca');
 
       expect(cosmeticsForLevel(9).title, 'Müderris');
       expect(cosmeticsForLevel(9).nameAccent, HilalDuelNameAccent.soft);
 
-      expect(cosmeticsForLevel(10).title, 'İlim Dostu');
+      expect(cosmeticsForLevel(10).title, 'Derviş');
       expect(cosmeticsForLevel(10).nameAccent, HilalDuelNameAccent.full);
       expect(cosmeticsForLevel(10).frameTier, 2);
       expect(cosmeticsForLevel(10).avatarGlow, isTrue);
+
+      expect(cosmeticsForLevel(11).frameTier, 3);
+      expect(cosmeticsForLevel(11).title, 'Şeyh');
+      expect(cosmeticsForLevel(13).hilalPulse, isTrue);
+      expect(cosmeticsForLevel(13).title, 'Müftü');
+      expect(cosmeticsForLevel(17).nameAccent, HilalDuelNameAccent.gilt);
+      expect(cosmeticsForLevel(20).title, 'Şeyhülislam');
     });
 
     test('haftalık bot kozmetik almaz', () {
+      expect(cosmeticsForLevel(3, isBot: true), HilalDuelCosmetics.none);
       expect(cosmeticsForLevel(10, isBot: true), HilalDuelCosmetics.none);
     });
 
     test('sonraki ödül her basamakta bir sonraki hediyeyi gösterir', () {
-      expect(nextRewardAfterLevel(1)?.kind, HilalDuelRewardKind.frame);
-      expect(nextRewardAfterLevel(3)?.kind, HilalDuelRewardKind.frameSilver);
-      expect(nextRewardAfterLevel(4)?.kind, HilalDuelRewardKind.titleTalebe);
-      expect(nextRewardAfterLevel(5)?.kind, HilalDuelRewardKind.avatarGlow);
-      expect(nextRewardAfterLevel(6)?.kind, HilalDuelRewardKind.nameAccentSoft);
-      expect(nextRewardAfterLevel(7)?.kind, HilalDuelRewardKind.specialHilal);
-      expect(nextRewardAfterLevel(8)?.kind, HilalDuelRewardKind.titleMuderris);
-      expect(nextRewardAfterLevel(9)?.kind, HilalDuelRewardKind.titleIlimDostu);
-      expect(nextRewardAfterLevel(10), isNull);
+      expect(nextRewardAfterLevel(1)?.title, 'Talebe');
+      expect(nextRewardAfterLevel(2)?.title, 'Kayyım');
+      expect(nextRewardAfterLevel(10)?.title, 'Şeyh');
+      expect(nextRewardAfterLevel(11)?.title, 'Müftü');
+      expect(nextRewardAfterLevel(18)?.title, 'Şeyhülislam');
+      expect(nextRewardAfterLevel(19), isNull);
+      expect(nextRewardAfterLevel(20), isNull);
+    });
+
+    test('altın hilal 10 haftalık birincilikte açılır', () {
+      expect(hasGoldenCrescent(0), isFalse);
+      expect(hasGoldenCrescent(9), isFalse);
+      expect(hasGoldenCrescent(10), isTrue);
+      expect(hasGoldenCrescent(12), isTrue);
     });
   });
 
@@ -111,10 +134,12 @@ void main() {
         'nextLevelHilals': 95,
         'hearts': 1,
         'premium': false,
+        'championWeeks': 3,
       });
       expect(profile.name, 'Ayşe');
       expect(profile.level, 2);
       expect(profile.levelProgress, 0);
+      expect(profile.championWeeks, 3);
     });
 
     test('soru zorluğunu parse eder', () {
@@ -152,6 +177,7 @@ void main() {
           'hilals': 10,
           'level': 1,
           'isBot': false,
+          'championWeeks': 10,
         },
         'opponent': {
           'id': 'b',
@@ -195,6 +221,8 @@ void main() {
       expect(match.version, 12);
       expect(match.doubled, isTrue);
       expect(match.opponent.isBot, isTrue);
+      expect(match.self.championWeeks, 10);
+      expect(hasGoldenCrescent(match.self.championWeeks), isTrue);
       expect(match.result?.winnerId, 'a');
       expect(match.result?.players.first.hilalsAwarded, 15);
       expect(match.result?.roundMarks['b']?[1], 'correct');

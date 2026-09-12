@@ -5,3 +5,5 @@
 "NSLocationAlwaysAndWhenInUseUsageDescription" = "Your location is used to calculate prayer times and show the Qibla direction.";
 "NSPhotoLibraryUsageDescription" = "Access to your photo library is used for images you select for your profile or sharing.";
 "NSAppleMusicUsageDescription" = "Access to your media library is used for the sound file you select for prayer notifications.";
+"NSMicrophoneUsageDescription" = "The microphone is used so you can speak with Hilal in CarPlay.";
+"NSSpeechRecognitionUsageDescription" = "In CarPlay, your speech is turned into text for Hilal. Audio is not uploaded.";

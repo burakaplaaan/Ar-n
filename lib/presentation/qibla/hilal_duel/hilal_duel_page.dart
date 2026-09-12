@@ -365,8 +365,41 @@ String _localizedHilalTitle(AppLocalizations l10n, String? title) {
   final raw = (title ?? '').trim();
   if (raw.isEmpty) return '';
   final lower = raw.toLowerCase();
-  if (lower.contains('ilim') || lower.contains('knowledge')) {
-    return l10n.hilalDuelTitleIlimDostu;
+  if (lower.contains('şeyhülislam') ||
+      lower.contains('seyhulislam') ||
+      lower.contains('shaykh al-islam') ||
+      lower.contains('sheikh al-islam') ||
+      lower.contains('شيخ الإسلام') ||
+      lower.contains('شيخ الاسلام')) {
+    return l10n.hilalDuelTitleSeyhulislam;
+  }
+  if (lower.contains('kazasker') || lower.contains('قاضي عسكر')) {
+    return l10n.hilalDuelTitleKazasker;
+  }
+  if (lower.contains('müftü') ||
+      lower.contains('muftu') ||
+      lower.contains('mufti') ||
+      lower.contains('مفتي')) {
+    return l10n.hilalDuelTitleMuftu;
+  }
+  if (lower.contains('kadı') ||
+      lower.contains('kadi') ||
+      lower.contains('qadi') ||
+      lower.contains('قاضي')) {
+    return l10n.hilalDuelTitleKadi;
+  }
+  if (lower.contains('şeyh') ||
+      lower.contains('seyh') ||
+      lower.contains('sheikh') ||
+      lower.contains('shaykh') ||
+      lower.contains('شيخ')) {
+    return l10n.hilalDuelTitleSeyh;
+  }
+  if (lower.contains('derviş') ||
+      lower.contains('dervis') ||
+      lower.contains('dervish') ||
+      lower.contains('درويش')) {
+    return l10n.hilalDuelTitleDervis;
   }
   if (lower.contains('müderris') ||
       lower.contains('muderris') ||
@@ -374,8 +407,53 @@ String _localizedHilalTitle(AppLocalizations l10n, String? title) {
       lower.contains('مدر')) {
     return l10n.hilalDuelTitleMuderris;
   }
-  if (lower.contains('talebe') || lower.contains('student') || lower.contains('طالب')) {
+  if (lower.contains('kayyım') ||
+      lower.contains('kayyim') ||
+      lower.contains('qayyim') ||
+      lower.contains('قيّم') ||
+      lower.contains('قيم')) {
+    return l10n.hilalDuelTitleKayyim;
+  }
+  if (lower.contains('müezzin') ||
+      lower.contains('muezzin') ||
+      lower.contains('مؤذن')) {
+    return l10n.hilalDuelTitleMuezzin;
+  }
+  if (lower.contains('hatip') ||
+      lower.contains('khatib') ||
+      lower.contains('خطيب')) {
+    return l10n.hilalDuelTitleHatip;
+  }
+  if (lower.contains('imam') ||
+      lower.contains('imâm') ||
+      lower.contains('إمام') ||
+      lower.contains('امام')) {
+    return l10n.hilalDuelTitleImam;
+  }
+  if (lower.contains('vaiz') ||
+      lower.contains('preacher') ||
+      lower.contains('واعظ')) {
+    return l10n.hilalDuelTitleVaiz;
+  }
+  if (lower.contains('çömez') ||
+      lower.contains('comez') ||
+      lower.contains('apprentice') ||
+      lower.contains('مبتدئ')) {
+    return l10n.hilalDuelTitleComez;
+  }
+  if (lower.contains('hoca') ||
+      lower.contains('hoja') ||
+      lower.contains('خواجة') ||
+      lower.contains('خوجة')) {
+    return l10n.hilalDuelTitleHoca;
+  }
+  if (lower.contains('talebe') ||
+      lower.contains('student') ||
+      lower.contains('طالب')) {
     return l10n.hilalDuelTitleTalebe;
+  }
+  if (lower.contains('ilim') || lower.contains('knowledge')) {
+    return l10n.hilalDuelTitleIlimDostu;
   }
   return raw;
 }
@@ -398,6 +476,8 @@ Color _hilalNameColor({
 }) {
   final cosmetics = cosmeticsForLevel(level, isBot: isBot);
   switch (cosmetics.nameAccent) {
+    case HilalDuelNameAccent.gilt:
+      return fullOverride ?? const Color(0xFFE8C56A);
     case HilalDuelNameAccent.full:
       return fullOverride ?? bronze;
     case HilalDuelNameAccent.soft:
@@ -431,15 +511,17 @@ String _hilalDifficultyLabel(AppLocalizations l10n, int difficulty) {
 String _nextRewardLabel(AppLocalizations l10n, int level, bool maxLevel) {
   if (maxLevel) return l10n.hilalDuelMaxLevel;
   final next = nextRewardAfterLevel(level);
-  if (next == null) return l10n.hilalDuelMaxLevel;
+  if (next == null) return l10n.hilalDuelNextLevel;
   switch (next.kind) {
     case HilalDuelRewardKind.frame:
       return l10n.hilalDuelNextRewardFrame(next.level);
     case HilalDuelRewardKind.frameSilver:
       return l10n.hilalDuelNextRewardFrameSilver(next.level);
-    case HilalDuelRewardKind.titleTalebe:
+    case HilalDuelRewardKind.frameGold:
+      return l10n.hilalDuelNextRewardFrameGold(next.level);
+    case HilalDuelRewardKind.title:
       return l10n.hilalDuelNextRewardTitle(
-        l10n.hilalDuelTitleTalebe,
+        _localizedHilalTitle(l10n, next.title),
         next.level,
       );
     case HilalDuelRewardKind.avatarGlow:
@@ -448,16 +530,10 @@ String _nextRewardLabel(AppLocalizations l10n, int level, bool maxLevel) {
       return l10n.hilalDuelNextRewardNameAccent(next.level);
     case HilalDuelRewardKind.specialHilal:
       return l10n.hilalDuelNextRewardHilalIcon(next.level);
-    case HilalDuelRewardKind.titleMuderris:
-      return l10n.hilalDuelNextRewardTitle(
-        l10n.hilalDuelTitleMuderris,
-        next.level,
-      );
-    case HilalDuelRewardKind.titleIlimDostu:
-      return l10n.hilalDuelNextRewardTitle(
-        l10n.hilalDuelTitleIlimDostu,
-        next.level,
-      );
+    case HilalDuelRewardKind.hilalPulse:
+      return l10n.hilalDuelNextRewardHilalPulse(next.level);
+    case HilalDuelRewardKind.nameAccentGilt:
+      return l10n.hilalDuelNextRewardNameGilt(next.level);
   }
 }
 
@@ -1112,8 +1188,8 @@ class _InboxActionButton extends StatelessWidget {
   }
 }
 
-/// Seviye kozmetiği: bronz çerçeve (3), gümüş çift halka (4), hale (6).
-class _HilalRankAvatar extends StatelessWidget {
+/// Seviye kozmetiği: bronz (3), gümüş (4), hale (6), altın (11), nefes (13).
+class _HilalRankAvatar extends StatefulWidget {
   const _HilalRankAvatar({
     required this.level,
     required this.size,
@@ -1122,6 +1198,7 @@ class _HilalRankAvatar extends StatelessWidget {
     required this.fillColors,
     this.answeredGlow,
     this.fallbackBorder,
+    this.isBot = false,
   });
 
   final int level;
@@ -1131,30 +1208,79 @@ class _HilalRankAvatar extends StatelessWidget {
   final List<Color> fillColors;
   final Color? answeredGlow;
   final Color? fallbackBorder;
+  final bool isBot;
 
   static const _gold = Color(0xFFE0B35A);
+  static const _goldSoft = Color(0xFFF0D080);
   static const _silver = Color(0xFFB0BEC5);
 
   @override
+  State<_HilalRankAvatar> createState() => _HilalRankAvatarState();
+}
+
+class _HilalRankAvatarState extends State<_HilalRankAvatar>
+    with SingleTickerProviderStateMixin {
+  AnimationController? _pulse;
+
+  bool get _shouldPulse =>
+      cosmeticsForLevel(widget.level, isBot: widget.isBot).hilalPulse;
+
+  @override
+  void initState() {
+    super.initState();
+    if (_shouldPulse) _startPulse();
+  }
+
+  @override
+  void didUpdateWidget(covariant _HilalRankAvatar oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (_shouldPulse && _pulse == null) {
+      _startPulse();
+    } else if (!_shouldPulse && _pulse != null) {
+      _pulse!.dispose();
+      _pulse = null;
+    }
+  }
+
+  void _startPulse() {
+    _pulse = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 2600),
+    )..repeat(reverse: true);
+  }
+
+  @override
+  void dispose() {
+    _pulse?.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final cosmetics = cosmeticsForLevel(level);
-    final bronze = _HilalPalette.bronze(onDark);
+    final cosmetics = cosmeticsForLevel(widget.level, isBot: widget.isBot);
+    final bronze = _HilalPalette.bronze(widget.onDark);
     final shadows = <BoxShadow>[
       if (cosmetics.avatarGlow)
         BoxShadow(
-          color: _gold.withValues(alpha: onDark ? 0.62 : 0.48),
-          blurRadius: size * 0.42,
+          color: _HilalRankAvatar._gold.withValues(
+            alpha: widget.onDark ? 0.62 : 0.48,
+          ),
+          blurRadius: widget.size * 0.42,
           spreadRadius: 1.2,
         )
       else if (cosmetics.frameTier >= 1)
         BoxShadow(
-          color: (cosmetics.frameTier >= 2 ? _gold : bronze)
+          color: (cosmetics.frameTier >= 3
+                  ? _HilalRankAvatar._gold
+                  : cosmetics.frameTier >= 2
+                  ? _HilalRankAvatar._gold
+                  : bronze)
               .withValues(alpha: 0.45),
           blurRadius: 10,
         ),
-      if (answeredGlow != null)
+      if (widget.answeredGlow != null)
         BoxShadow(
-          color: answeredGlow!,
+          color: widget.answeredGlow!,
           blurRadius: 12,
         ),
     ];
@@ -1165,19 +1291,40 @@ class _HilalRankAvatar extends StatelessWidget {
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: fillColors,
+          colors: widget.fillColors,
         ),
       ),
-      child: Center(child: child),
+      child: Center(child: widget.child),
     );
 
-    if (cosmetics.frameTier >= 2) {
-      return Container(
-        width: size,
-        height: size,
+    late final Widget framed;
+    if (cosmetics.frameTier >= 3) {
+      framed = Container(
+        width: widget.size,
+        height: widget.size,
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          border: Border.all(color: _silver, width: 2),
+          border: Border.all(color: _HilalRankAvatar._gold, width: 2.4),
+          boxShadow: shadows.isEmpty ? null : shadows,
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(2.4),
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(color: _HilalRankAvatar._goldSoft, width: 2.2),
+            ),
+            child: ClipOval(child: fill),
+          ),
+        ),
+      );
+    } else if (cosmetics.frameTier >= 2) {
+      framed = Container(
+        width: widget.size,
+        height: widget.size,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          border: Border.all(color: _HilalRankAvatar._silver, width: 2),
           boxShadow: shadows.isEmpty ? null : shadows,
         ),
         child: Padding(
@@ -1185,29 +1332,54 @@ class _HilalRankAvatar extends StatelessWidget {
           child: DecoratedBox(
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              border: Border.all(color: _gold, width: 2),
+              border: Border.all(color: _HilalRankAvatar._gold, width: 2),
             ),
             child: ClipOval(child: fill),
           ),
         ),
       );
+    } else {
+      final borderColor = cosmetics.frameTier >= 1
+          ? _HilalRankAvatar._gold
+          : (widget.fallbackBorder ?? bronze);
+      framed = Container(
+        width: widget.size,
+        height: widget.size,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          border: Border.all(
+            color: borderColor,
+            width: cosmetics.frameTier >= 1
+                ? 3.2
+                : (widget.fallbackBorder != null ? 1.5 : 2),
+          ),
+          boxShadow: shadows.isEmpty ? null : shadows,
+        ),
+        child: ClipOval(child: fill),
+      );
     }
 
-    final borderColor = cosmetics.frameTier >= 1
-        ? _gold
-        : (fallbackBorder ?? bronze);
-    return Container(
-      width: size,
-      height: size,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        border: Border.all(
-          color: borderColor,
-          width: cosmetics.frameTier >= 1 ? 3.2 : (fallbackBorder != null ? 1.5 : 2),
-        ),
-        boxShadow: shadows.isEmpty ? null : shadows,
-      ),
-      child: ClipOval(child: fill),
+    final pulse = _pulse;
+    if (pulse == null) return framed;
+    return AnimatedBuilder(
+      animation: pulse,
+      builder: (context, child) {
+        final t = pulse.value;
+        return Container(
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            boxShadow: [
+              BoxShadow(
+                color: _HilalRankAvatar._gold.withValues(alpha: 0.20 + t * 0.28),
+                blurRadius: widget.size * (0.18 + t * 0.20),
+                spreadRadius: 0.4 + t * 1.6,
+              ),
+            ],
+          ),
+          child: child,
+        );
+      },
+      child: framed,
     );
   }
 }
@@ -1349,16 +1521,29 @@ class _GamePlayerBanner extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      playerName,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        color: nameColor,
-                        fontWeight: FontWeight.w800,
-                        fontSize: 16,
-                        letterSpacing: 0.2,
-                      ),
+                    Row(
+                      children: [
+                        Flexible(
+                          child: _HilalShinyName(
+                            text: playerName,
+                            level: profile.level,
+                            onDark: onDark,
+                            colorOverride: nameColor,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.w800,
+                              fontSize: 16,
+                              letterSpacing: 0.2,
+                            ),
+                          ),
+                        ),
+                        if (profile.championWeeks > 0) ...[
+                          const SizedBox(width: 6),
+                          _ChampionBadge(
+                            count: profile.championWeeks,
+                            l10n: l10n,
+                          ),
+                        ],
+                      ],
                     ),
                     if (title.isNotEmpty) ...[
                       const SizedBox(height: 2),
@@ -1735,6 +1920,7 @@ class _WeeklyLeaderCardState extends ConsumerState<_WeeklyLeaderCard> {
                               entry: entry,
                               onDark: onDark,
                               boardSize: board?.top.length ?? 0,
+                              l10n: l10n,
                               showPremiumBadge: isAdmin && entry.premium,
                             ),
                           ),
@@ -1780,7 +1966,7 @@ class _WeeklyLeaderCardState extends ConsumerState<_WeeklyLeaderCard> {
 bool _isWeeklyMaxLevel(HilalDuelWeeklyEntry entry) =>
     !entry.isBot && entry.level >= kHilalDuelMaxLevel;
 
-/// Seviye 10 — sıralamada altın parıltı.
+/// Maks seviye — sıralamada altın parıltı.
 abstract final class _MaxLevelShine {
   static const gold = Color(0xFFE0B35A);
   static const goldDeep = Color(0xFFC4892A);
@@ -2056,16 +2242,23 @@ class _LastWeekWinnersPromo extends StatelessWidget {
   }
 }
 
-/// Haftalık birincilik rozeti (sayaç).
+/// Haftalık birincilik etiketi: ×n kalıcı; 10+ Altın Hilal.
 class _ChampionBadge extends StatelessWidget {
-  const _ChampionBadge({required this.count, this.compact = false});
+  const _ChampionBadge({
+    required this.count,
+    required this.l10n,
+    this.compact = false,
+  });
 
   final int count;
+  final AppLocalizations l10n;
   final bool compact;
 
   @override
   Widget build(BuildContext context) {
-    final n = count < 1 ? 1 : count;
+    final n = championWeeksOf(count);
+    if (n < 1) return const SizedBox.shrink();
+    final golden = hasGoldenCrescent(n);
     return Container(
       padding: EdgeInsets.symmetric(
         horizontal: compact ? 5 : 6,
@@ -2073,22 +2266,44 @@ class _ChampionBadge extends StatelessWidget {
       ),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(99),
-        gradient: const LinearGradient(
-          colors: [Color(0xFFFFE082), Color(0xFFE0B35A)],
+        gradient: LinearGradient(
+          colors: golden
+              ? const [Color(0xFFFFF3C4), Color(0xFFE0B35A), Color(0xFFC4892A)]
+              : const [Color(0xFFFFE082), Color(0xFFE0B35A)],
         ),
         border: Border.all(color: const Color(0xFFC4892A).withValues(alpha: 0.85)),
+        boxShadow: golden
+            ? [
+                BoxShadow(
+                  color: const Color(0xFFE0B35A).withValues(alpha: 0.45),
+                  blurRadius: compact ? 5 : 8,
+                ),
+              ]
+            : null,
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(
-            Icons.emoji_events_rounded,
+            golden ? Icons.brightness_5_rounded : Icons.emoji_events_rounded,
             size: compact ? 9 : 11,
             color: const Color(0xFF1A1208),
           ),
+          if (golden && !compact) ...[
+            SizedBox(width: compact ? 2 : 3),
+            Text(
+              l10n.hilalDuelGoldenCrescent,
+              style: const TextStyle(
+                color: Color(0xFF1A1208),
+                fontWeight: FontWeight.w900,
+                fontSize: 9.5,
+                height: 1.1,
+              ),
+            ),
+          ],
           SizedBox(width: compact ? 2 : 3),
           Text(
-            '×$n',
+            l10n.hilalDuelChampionCount(n),
             style: TextStyle(
               color: const Color(0xFF1A1208),
               fontWeight: FontWeight.w900,
@@ -2102,17 +2317,134 @@ class _ChampionBadge extends StatelessWidget {
   }
 }
 
+class _HilalShinyName extends StatefulWidget {
+  const _HilalShinyName({
+    required this.text,
+    required this.level,
+    required this.style,
+    required this.onDark,
+    this.isBot = false,
+    this.colorOverride,
+    this.maxLines = 1,
+    this.textAlign,
+  });
+
+  final String text;
+  final int level;
+  final TextStyle style;
+  final bool onDark;
+  final bool isBot;
+  final Color? colorOverride;
+  final int maxLines;
+  final TextAlign? textAlign;
+
+  @override
+  State<_HilalShinyName> createState() => _HilalShinyNameState();
+}
+
+class _HilalShinyNameState extends State<_HilalShinyName>
+    with SingleTickerProviderStateMixin {
+  AnimationController? _controller;
+
+  bool get _shimmer {
+    if (widget.isBot) return false;
+    return cosmeticsForLevel(widget.level).nameAccentGilt ||
+        widget.level >= kHilalDuelMaxLevel;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    if (_shimmer) _start();
+  }
+
+  @override
+  void didUpdateWidget(covariant _HilalShinyName oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (_shimmer && _controller == null) {
+      _start();
+    } else if (!_shimmer && _controller != null) {
+      _controller!.dispose();
+      _controller = null;
+    }
+  }
+
+  void _start() {
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 2200),
+    )..repeat();
+  }
+
+  @override
+  void dispose() {
+    _controller?.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final color = widget.colorOverride ??
+        _hilalNameColor(
+          level: widget.level,
+          onDark: widget.onDark,
+          bronze: _HilalPalette.bronze(widget.onDark),
+          isBot: widget.isBot,
+        );
+    final plain = Text(
+      widget.text,
+      maxLines: widget.maxLines,
+      overflow: TextOverflow.ellipsis,
+      textAlign: widget.textAlign,
+      style: widget.style.copyWith(color: color),
+    );
+    final controller = _controller;
+    if (controller == null) return plain;
+    return AnimatedBuilder(
+      animation: controller,
+      builder: (context, child) {
+        final t = controller.value;
+        return ShaderMask(
+          blendMode: BlendMode.srcIn,
+          shaderCallback: (bounds) {
+            return LinearGradient(
+              begin: Alignment(-1.2 + t * 2.4, 0),
+              end: Alignment(-0.4 + t * 2.4, 0),
+              colors: [
+                color,
+                const Color(0xFFF8E7B0),
+                color,
+              ],
+              stops: const [0.22, 0.5, 0.78],
+            ).createShader(bounds);
+          },
+          child: child,
+        );
+      },
+      child: Text(
+        widget.text,
+        maxLines: widget.maxLines,
+        overflow: TextOverflow.ellipsis,
+        textAlign: widget.textAlign,
+        style: widget.style.copyWith(color: Colors.white),
+      ),
+    );
+  }
+}
+
 class _WeeklyPreviewRow extends StatelessWidget {
   const _WeeklyPreviewRow({
     required this.entry,
     required this.onDark,
     required this.boardSize,
+    required this.l10n,
     this.showPremiumBadge = false,
   });
 
   final HilalDuelWeeklyEntry entry;
   final bool onDark;
   final int boardSize;
+  final AppLocalizations l10n;
   final bool showPremiumBadge;
 
   @override
@@ -2174,12 +2506,13 @@ class _WeeklyPreviewRow extends StatelessWidget {
             child: Row(
               children: [
                 Flexible(
-                  child: Text(
-                    _leaderboardEntryName(entry),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      color: nameColor,
+                  child: _HilalShinyName(
+                    text: _leaderboardEntryName(entry),
+                    level: entry.level,
+                    onDark: onDark,
+                    isBot: entry.isBot,
+                    colorOverride: nameColor,
+                    style: const TextStyle(
                       fontWeight: FontWeight.w900,
                       fontSize: 13,
                     ),
@@ -2191,7 +2524,11 @@ class _WeeklyPreviewRow extends StatelessWidget {
                 ],
                 if (!entry.isBot && entry.championWeeks > 0) ...[
                   const SizedBox(width: 6),
-                  _ChampionBadge(count: entry.championWeeks, compact: true),
+                  _ChampionBadge(
+                    count: entry.championWeeks,
+                    l10n: l10n,
+                    compact: true,
+                  ),
                 ],
                 if (showPremiumBadge) ...[
                   const SizedBox(width: 6),
@@ -2535,12 +2872,13 @@ class _WeeklyLeaderSheetState extends ConsumerState<_WeeklyLeaderSheet> {
                                     Row(
                                       children: [
                                         Flexible(
-                                          child: Text(
-                                            _leaderboardEntryName(entry),
-                                            maxLines: 1,
-                                            overflow: TextOverflow.ellipsis,
-                                            style: TextStyle(
-                                              color: nameColor,
+                                          child: _HilalShinyName(
+                                            text: _leaderboardEntryName(entry),
+                                            level: entry.level,
+                                            onDark: widget.onDark,
+                                            isBot: entry.isBot,
+                                            colorOverride: nameColor,
+                                            style: const TextStyle(
                                               fontWeight: FontWeight.w900,
                                               fontSize: 14.5,
                                             ),
@@ -2555,6 +2893,7 @@ class _WeeklyLeaderSheetState extends ConsumerState<_WeeklyLeaderSheet> {
                                           const SizedBox(width: 6),
                                           _ChampionBadge(
                                             count: entry.championWeeks,
+                                            l10n: widget.l10n,
                                           ),
                                         ],
                                         if (isAdmin && entry.premium) ...[
@@ -3753,6 +4092,7 @@ class _HudPlayerSide extends StatelessWidget {
     final title = _localizedTitleForLevel(
       l10n,
       player.level,
+      isBot: player.isBot,
     );
     final initial = _nameInitial(displayName, fallback: alignEnd ? 'R' : 'S');
     final meta = [
@@ -3763,6 +4103,7 @@ class _HudPlayerSide extends StatelessWidget {
     final avatar = _HilalRankAvatar(
       level: player.level,
       size: 40,
+      isBot: player.isBot,
       onDark: onDark,
       answeredGlow: accent.withValues(alpha: answered ? 0.45 : 0.18),
       fallbackBorder: accent.withValues(alpha: 0.9),
@@ -3782,24 +4123,40 @@ class _HudPlayerSide extends StatelessWidget {
       ),
     );
 
-    final nameStyle = TextStyle(
-      color: _hilalNameColor(
-        level: player.level,
-        onDark: onDark,
-        bronze: bronze,
-      ),
+    final nameStyle = const TextStyle(
       fontWeight: FontWeight.w800,
       fontSize: 13.5,
       height: 1.1,
       letterSpacing: 0.1,
     );
+    final shinyName = _HilalShinyName(
+      text: displayName,
+      level: player.level,
+      onDark: onDark,
+      isBot: player.isBot,
+      colorOverride: _hilalNameColor(
+        level: player.level,
+        onDark: onDark,
+        bronze: bronze,
+        isBot: player.isBot,
+      ),
+      style: nameStyle,
+      textAlign: alignEnd ? TextAlign.end : TextAlign.start,
+    );
+    final championMark = !player.isBot && player.championWeeks > 0
+        ? _ChampionBadge(
+            count: player.championWeeks,
+            l10n: l10n,
+            compact: true,
+          )
+        : null;
     // İsim satırı yüksekliği sabit — "Cevapladı" soruyu kaydırmaz.
     final texts = Column(
       crossAxisAlignment:
           alignEnd ? CrossAxisAlignment.end : CrossAxisAlignment.start,
       children: [
         SizedBox(
-          height: 20,
+          height: 22,
           child: Row(
             mainAxisAlignment:
                 alignEnd ? MainAxisAlignment.end : MainAxisAlignment.start,
@@ -3810,25 +4167,18 @@ class _HudPlayerSide extends StatelessWidget {
                       label: l10n.hilalDuelAnsweredBubble,
                       onDark: onDark,
                     ),
-                    Flexible(
-                      child: Text(
-                        displayName,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        textAlign: TextAlign.end,
-                        style: nameStyle,
-                      ),
-                    ),
+                    if (championMark != null) ...[
+                      championMark,
+                      const SizedBox(width: 4),
+                    ],
+                    Flexible(child: shinyName),
                   ]
                 : [
-                    Flexible(
-                      child: Text(
-                        displayName,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: nameStyle,
-                      ),
-                    ),
+                    Flexible(child: shinyName),
+                    if (championMark != null) ...[
+                      const SizedBox(width: 4),
+                      championMark,
+                    ],
                     _AnsweredInlineMark(
                       visible: answered,
                       label: l10n.hilalDuelAnsweredBubble,

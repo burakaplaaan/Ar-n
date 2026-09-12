@@ -14,6 +14,7 @@ import '../../../core/theme/arin_shell_background.dart';
 import '../../../data/services/arin_widget_sync.dart';
 import '../../shared/providers/habit_providers.dart';
 import '../../shared/providers/prayer_time_providers.dart';
+import '../../shared/widgets/ritual_pulse.dart';
 import '../salat_providers.dart';
 
 class _UpTrianglePainter extends CustomPainter {
@@ -129,13 +130,23 @@ class SalatPrayerRow extends ConsumerWidget {
                 );
                 ref.read(habitSummaryProvider.notifier).refresh();
                 unawaited(ArinWidgetSync.refreshPrayerTodayMarks());
-                if (markingDone &&
-                    salat.countDone(habitId, storageDay) >= 5) {
+                if (markingDone && context.mounted) {
+                  final allDone = salat.countDone(habitId, storageDay) >= 5;
                   unawaited(
-                    ArinReviewPrompter.maybeAskAfterPositiveMoment(
-                      ref.read(sharedPreferencesProvider),
+                    RitualPulse.show(
+                      context,
+                      strength: allDone
+                          ? RitualPulseStrength.day
+                          : RitualPulseStrength.tick,
                     ),
                   );
+                  if (allDone) {
+                    unawaited(
+                      ArinReviewPrompter.maybeAskAfterPositiveMoment(
+                        ref.read(sharedPreferencesProvider),
+                      ),
+                    );
+                  }
                 }
               },
               borderRadius: BorderRadius.circular(10),

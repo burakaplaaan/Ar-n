@@ -84,6 +84,22 @@ import workmanager_apple
       binaryMessenger: messenger
     ).setStreamHandler(compassHandler)
 
+    let carPlayChannel = FlutterMethodChannel(
+      name: "com.arin.arin/carplay",
+      binaryMessenger: messenger
+    )
+    ArinCarPlayBridge.ask = { text, done in
+      carPlayChannel.invokeMethod("ask", arguments: text) { value in
+        if let error = value as? FlutterError {
+          done(error.message ?? "Şu an cevap veremiyorum.")
+          return
+        }
+        let reply = (value as? String)?
+          .trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        done(reply)
+      }
+    }
+
     FlutterMethodChannel(
       name: "com.arin.arin/compass_geomagnetic",
       binaryMessenger: messenger

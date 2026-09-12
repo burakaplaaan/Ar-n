@@ -695,14 +695,14 @@
   "willpowerHubStreakSeriesLabel": "seri",
   "willpowerHubStreakDaySeriesLabel": "gün serisi",
   "qiblaHubCompassTitle": "Kıble yönünü bul",
-  "qiblaHubCompassSubtitle": "Pusula ve konum ile Kâbe yönünü göster",
+  "qiblaHubCompassSubtitle": "Kâbe yönünü gösterir",
   "qiblaHubOpenAction": "Aç",
   "qiblaHubZikirTitle": "Zikirmatik",
-  "qiblaHubZikirFeatureSubtitle": "Dijital sayaç; zikir bilgisi, tur geçmişi ve hedef (33/99)",
+  "qiblaHubZikirFeatureSubtitle": "Dijital tesbih",
   "qiblaHubBreathingTitle": "Nefes Egzersizi",
-  "qiblaHubBreathingSubtitle": "4-7-8 nefes döngüsü ile sakinleş, odağını toparla",
+  "qiblaHubBreathingSubtitle": "4-7-8 ile sakinleş",
   "qiblaHubAssistantTitle": "Arın Asistanı",
-  "qiblaHubAssistantSubtitle": "Sohbet; namaz, bildirim ve hatırlatıcıları yönet",
+  "qiblaHubAssistantSubtitle": "Namaz ve hatırlatıcılar",
   "assistantTitle": "Arın Asistanı",
   "assistantSubtitle": "",
   "assistantAskChip": "Asistan",
@@ -844,9 +844,10 @@
   "assistantCancel": "Vazgeç",
   "assistantConfirm": "Kapat",
   "qiblaHubHealingTitle": "İyileştirici Frekanslar",
-  "qiblaHubHealingSubtitle": "Terapi tonları, ambiyans ve uyku zamanlayıcısı ile sakin bir oturum",
+  "qiblaHubHealingSubtitle": "Sakinleştirici sesler",
   "qiblaHubAiTitle": "İslami Yapay Zeka",
-  "qiblaHubAiSubtitle": "Aklındaki soruyu sor, İslami sohbet başlat",
+  "qiblaHubAiSubtitle": "İslami sorularına yanıt",
+  "qiblaHubPremiumBadge": "Premium",
   "islamicAiComingSoonTitle": "İslami Yapay Zeka",
   "islamicAiComingSoonBody": "Bu özellik hazırlanıyor. Premium’un var; arkadaşın kodu birleştirilince sohbet burada açılacak.",
   "widgetThemeSectionTitle": "Widget temaları",
@@ -859,7 +860,7 @@
   "widgetLockTextSoft": "Yumuşak",
   "widgetLockTextApplied": "Kilit yazısı güncellendi.",
   "qiblaHubHilalDuelTitle": "Bilgi Düellosu",
-  "qiblaHubHilalDuelSubtitle": "7 İslami bilgi sorusunda yarış; hilal kazan, seviye atla",
+  "qiblaHubHilalDuelSubtitle": "İslami bilgi yarışı",
   "hilalDuelTitle": "Bilgi Düellosu",
   "hilalDuelLanguageNote": "Sorular şu an Türkçe",
   "hilalDuelRulesSummary": "7 soru • Her soru 20 saniye\nDoğruluk ve hız kazanır. İki taraf cevaplayınca sonraki soru otomatik açılır. Can için reklam izle veya Premium ile sınırsız oyna.",
@@ -974,6 +975,24 @@
       "level": {"type": "int"}
     }
   },
+  "hilalDuelNextRewardFrameGold": "Sonraki ödül: Altın çerçeve (LV {level})",
+  "@hilalDuelNextRewardFrameGold": {
+    "placeholders": {
+      "level": {"type": "int"}
+    }
+  },
+  "hilalDuelNextRewardHilalPulse": "Sonraki ödül: Hilal ışıması (LV {level})",
+  "@hilalDuelNextRewardHilalPulse": {
+    "placeholders": {
+      "level": {"type": "int"}
+    }
+  },
+  "hilalDuelNextRewardNameGilt": "Sonraki ödül: İsim yaldızı (LV {level})",
+  "@hilalDuelNextRewardNameGilt": {
+    "placeholders": {
+      "level": {"type": "int"}
+    }
+  },
   "hilalDuelWeeklyTitle": "Haftanın En İyisi",
   "hilalDuelWeeklyResetHint": "Pazartesi sıfırlanır",
   "hilalDuelWeeklyThisWeek": "Bu hafta: {count} hilal",
@@ -1014,9 +1033,29 @@
   },
   "hilalDuelAdminRemoveAction": "Kaldır",
   "hilalDuelAdminRemoved": "Oyuncu listeden kaldırıldı.",
+  "hilalDuelTitleComez": "Çömez",
   "hilalDuelTitleTalebe": "Talebe",
+  "hilalDuelTitleKayyim": "Kayyım",
+  "hilalDuelTitleMuezzin": "Müezzin",
+  "hilalDuelTitleHatip": "Hatip",
+  "hilalDuelTitleImam": "İmam",
+  "hilalDuelTitleVaiz": "Vaiz",
+  "hilalDuelTitleHoca": "Hoca",
   "hilalDuelTitleMuderris": "Müderris",
+  "hilalDuelTitleDervis": "Derviş",
+  "hilalDuelTitleSeyh": "Şeyh",
+  "hilalDuelTitleMuftu": "Müftü",
+  "hilalDuelTitleKadi": "Kadı",
+  "hilalDuelTitleKazasker": "Kazasker",
+  "hilalDuelTitleSeyhulislam": "Şeyhülislam",
   "hilalDuelTitleIlimDostu": "İlim Dostu",
+  "hilalDuelGoldenCrescent": "Altın Hilal",
+  "hilalDuelChampionCount": "×{count}",
+  "@hilalDuelChampionCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
   "hilalDuelYouLabel": "Sen",
   "hilalDuelOpponentLabel": "Rakip",
   "hilalDuelChallengeAction": "Meydan oku",
@@ -1878,6 +1917,7 @@
       "name": { "type": "String" }
     }
   },
+  "onboardingPrayerTitleAnonymous": "Namaz ve dua ritmini nasıl tarif edersin?",
   "onboardingPrayerSubtitle": "Sana uyan bir başlangıç temposu seçelim.",
   "onboardingPrayerRegular": "Düzenimi koruyorum",
   "onboardingPrayerOccasional": "Ara sıra tutturuyorum",
@@ -1890,6 +1930,7 @@
       "name": { "type": "String" }
     }
   },
+  "onboardingWaswasaTitleAnonymous": "Vesvese veya şüphe geldiğinde ne yapıyorsun?",
   "onboardingWaswasaSubtitle": "Bu cevap, yanında duruşumuzu belirler.",
   "onboardingWaswasaPray": "Dua ile karşılarım",
   "onboardingWaswasaRead": "Okuyup anlamaya çalışırım",
@@ -1952,13 +1993,14 @@
       "name": { "type": "String" }
     }
   },
+  "onboardingPrepareBar1TitleAnonymous": "Ayet akışın örülüyor",
   "onboardingPrepareBar1Body": "Cevaplarına göre dil ve vurgu seçiliyor.",
   "onboardingPrepareBar2Title": "Kilit ekranı görünümü hazırlanıyor",
   "onboardingPrepareBar2Body": "Saat ve ayet düzeni sade tutuluyor.",
   "onboardingPrepareBar3Title": "Daha çok kişiye ulaşmak için ayarlanıyor",
   "onboardingPrepareBar3Body": "Keşif kaynakları gizlilikle ölçülüyor.",
   "onboardingPrepareBar4Title": "Kısa yollar yerleştiriliyor",
-  "onboardingPrepareBar4Body": "Tesbihat, kıble, namaz ve sohbet hazırlanıyor.",
+  "onboardingPrepareBar4Body": "Tesbihat, kıble, namaz, sosyal ve sohbet hazırlanıyor.",
   "onboardingPrepareAskLock": "Kilit ekranında sade ayet görünümünü kullanalım mı?",
   "onboardingPrepareAskVerses": "Ayetleri cevaplarına göre öne alalım mı?",
   "onboardingPrepareAskShortcuts": "İbadet kısa yollarını ana akışta öne alalım mı?",
@@ -1969,6 +2011,7 @@
       "name": { "type": "String" }
     }
   },
+  "onboardingDuaBodyAnonymous": "Allah'ım, bu kulun için hayır, bereket, sağlık, huzur, hikmet ve istikamet nasip et. Kalbini Kur'an'la diri, adımlarını hayırla sabit kıl. Sözün her mevsimde ona yakın olsun.",
   "onboardingDuaVerseArabic": "رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً",
   "onboardingDuaVerseTranslation": "Rabbimiz! Bize dünyada da iyilik, ahirette de iyilik ver.",
   "onboardingDuaVerseSource": "Bakara 2:201",
@@ -2593,7 +2636,7 @@
   "insightCommentGood": "Dün {count}/5 vakit işaretli; bugün bir iki vakitle dengeyi tamamlamak mümkün.",
   "insightCommentDefault": "Geçmiş günler verisi senin için bir ayna: eksik kalan yerlerde merhamet, tamamlananlarda şükür.",
   "qiblaHubPrayerCircleTitle": "Dua Halkası",
-  "qiblaHubPrayerCircleSubtitle": "Dua talebini paylaş, gönülden eşlik et",
+  "qiblaHubPrayerCircleSubtitle": "Dua paylaş, amin de",
   "prayerCircleTitle": "Dua Halkası",
   "prayerCircleHeroTitle": "Bir duaya gönülden eşlik et",
   "prayerCircleHeroBody": "İsimsiz dua talepleri burada buluşur. Birbirimizin niyetine sessizce “âmin” diyelim.",
@@ -2689,7 +2732,9 @@
   "appTourHomePrayerTimesTitle": "Namaz vakitleri",
   "appTourHomePrayerTimesBody": "İlçene göre vakitler. Konumu Ayarlar’dan değiştirebilirsin.",
   "appTourNavToolsTitle": "Araçlar",
-  "appTourNavToolsBody": "Kıble, zikir, dua halkası ve diğer manevi araçlar bu sekmede.",
+  "appTourNavToolsBody": "Kıble, Kur'an, zikir, sosyal pano ve diğer manevi araçlar bu sekmede.",
+  "appTourQiblaSocialTitle": "Sosyal",
+  "appTourQiblaSocialBody": "Topluluk panosu. Kısa yaz, yorumla, beğen — kullanıcı adınla.",
   "appTourQiblaAssistantTitle": "Arın Asistanı",
   "appTourQiblaAssistantBody": "Namaz, bildirim ve hatırlatıcıları sohbetle yönet.",
   "appTourQiblaAiTitle": "İslami Yapay Zeka",
@@ -2698,6 +2743,8 @@
   "appTourQiblaCompassBody": "Konumunla Kâbe yönünü gösterir.",
   "appTourQiblaZikirTitle": "Zikirmatik",
   "appTourQiblaZikirBody": "Dijital tesbih; hedef, tur ve zikir bilgisi.",
+  "appTourQiblaQuranTitle": "Kur'an",
+  "appTourQiblaQuranBody": "Meal ile oku, tilavetle dinle; kaldığın yerden devam et.",
   "appTourQiblaHilalTitle": "Bilgi düellosu",
   "appTourQiblaHilalBody": "İslami sorularla yarış, bilgilerini pekiştir.",
   "appTourQiblaPrayerCircleTitle": "Dua halkası",
@@ -2737,7 +2784,22 @@
   "appTourWidgetPromptYes": "Evet",
   "appTourWidgetPromptLater": "Sonra",
   "qiblaHubSocialTitle": "Sosyal",
-  "qiblaHubSocialSubtitle": "Topluluk akışı — yaz, yorumla, beğen",
+  "qiblaHubSocialSubtitle": "Yaz, yorumla, beğen",
+  "qiblaHubQuranTitle": "Kur'an",
+  "qiblaHubQuranSubtitle": "Oku ve dinle",
+  "qiblaHubGroupWorship": "Yön ve ibadet",
+  "qiblaHubGroupTogether": "Birlikte",
+  "qiblaHubGroupCalm": "Sakinlik",
+  "qiblaHubDoorAi": "Yapay zeka",
+  "qiblaHubDoorCompass": "Kıble",
+  "qiblaHubDoorZikir": "Zikir",
+  "qiblaHubDoorHilal": "Düello",
+  "qiblaHubDoorPrayer": "Dua",
+  "qiblaHubDoorHealing": "Frekans",
+  "qiblaHubDoorBreath": "Nefes",
+  "qiblaHubContinueQuran": "Kur'an'a devam",
+  "qiblaHubOpenQuran": "Kur'an'ı aç",
+  "qiblaHubOpenQuranHint": "Meal ve tilavet",
   "socialTitle": "Sosyal",
   "socialSortNew": "Yeni",
   "socialSortNewest": "En yeni",
@@ -2771,7 +2833,7 @@
   "socialUsernameLocked": "Bu ad bir daha değişmez.",
   "socialUsernameHint": "ornek_ad",
   "socialBioTitle": "Hakkında",
-  "socialBioBody": "Kendini kısaca anlat. Profilinden sonra da değiştirebilirsin.",
+  "socialBioBody": "İstersen kendini kısaca anlat. Boş bırakabilir, sonra profilinden yazabilirsin.",
   "socialBioHint": "Namazı kaçırmamaya çalışan biriyim.",
   "socialBioEmpty": "Henüz bir şey yazmadı.",
   "socialBioEdit": "Düzenle",
@@ -2797,5 +2859,45 @@
   "socialBanPermanent": "Kalıcı",
   "socialBanned": "Kullanıcı banlandı",
   "socialBannedBanner": "Sosyal tahtaya yazamazsın.",
-  "socialProfanity": "Küfür veya hakaret yazılamaz."
+  "socialProfanity": "Küfür veya hakaret yazılamaz.",
+  "quranTitle": "Kur'an",
+  "quranSearchHint": "Sure adı veya numarası",
+  "quranContinueTitle": "Kaldığın yer",
+  "quranContinueBody": "{surah} · {ayah}. ayet",
+  "@quranContinueBody": {
+    "placeholders": {
+      "surah": {"type": "String"},
+      "ayah": {"type": "int"}
+    }
+  },
+  "quranMeccan": "Mekkî",
+  "quranMedinan": "Medenî",
+  "quranAyahCount": "{count} ayet",
+  "@quranAyahCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "quranAyahLabel": "{ayah}. ayet",
+  "@quranAyahLabel": {
+    "placeholders": {
+      "ayah": {"type": "int"}
+    }
+  },
+  "quranTranslationOn": "Meal görünür",
+  "quranTranslationOff": "Meal gizli",
+  "quranFontSize": "Yazı boyutu",
+  "quranLoadError": "Metin şu an açılamadı. Bağlantını kontrol edip tekrar dene.",
+  "quranRetry": "Tekrar dene",
+  "quranAudioError": "Tilavet şu an başlayamadı. Biraz sonra dene.",
+  "quranReciterName": "Mişari Raşid el-Afasi",
+  "quranNowPlaying": "{surah} · {ayah}. ayet",
+  "@quranNowPlaying": {
+    "placeholders": {
+      "surah": {"type": "String"},
+      "ayah": {"type": "int"}
+    }
+  },
+  "quranMealAttribution": "Meal: Diyanet İşleri Başkanlığı · Tilavet: el-Afasi",
+  "quranEmptySearch": "Bu aramaya uyan sure yok."
 }

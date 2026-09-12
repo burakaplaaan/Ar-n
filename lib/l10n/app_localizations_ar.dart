@@ -1367,8 +1367,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get qiblaHubCompassTitle => 'اعثر على اتجاه القبلة';
 
   @override
-  String get qiblaHubCompassSubtitle =>
-      'اعرض اتجاه الكعبة باستخدام البوصلة والموقع';
+  String get qiblaHubCompassSubtitle => 'يُظهر اتجاه الكعبة';
 
   @override
   String get qiblaHubOpenAction => 'فتح';
@@ -1377,22 +1376,19 @@ class AppLocalizationsAr extends AppLocalizations {
   String get qiblaHubZikirTitle => 'عداد الذكر';
 
   @override
-  String get qiblaHubZikirFeatureSubtitle =>
-      'عداد رقمي مع تفاصيل الذكر، سجل الجولات، والهدف (33/99)';
+  String get qiblaHubZikirFeatureSubtitle => 'تسبيح رقمي';
 
   @override
   String get qiblaHubBreathingTitle => 'تمرين التنفس';
 
   @override
-  String get qiblaHubBreathingSubtitle =>
-      'اهدأ واستعد تركيزك عبر دورة التنفس 4-7-8';
+  String get qiblaHubBreathingSubtitle => 'اهدأ مع 4-7-8';
 
   @override
   String get qiblaHubAssistantTitle => 'مساعد أرِن';
 
   @override
-  String get qiblaHubAssistantSubtitle =>
-      'محادثة؛ إدارة الصلاة والتنبيهات والتذكيرات';
+  String get qiblaHubAssistantSubtitle => 'الصلاة والتذكيرات';
 
   @override
   String get assistantTitle => 'مساعد أرِن';
@@ -1609,14 +1605,16 @@ class AppLocalizationsAr extends AppLocalizations {
   String get qiblaHubHealingTitle => 'ترددات الشفاء';
 
   @override
-  String get qiblaHubHealingSubtitle =>
-      'جلسة هادئة مع نغمات علاجية، أجواء صوتية، ومؤقت نوم';
+  String get qiblaHubHealingSubtitle => 'أصوات مهدئة';
 
   @override
   String get qiblaHubAiTitle => 'الذكاء الاصطناعي الإسلامي';
 
   @override
-  String get qiblaHubAiSubtitle => 'اسأل ما يدور في ذهنك وابدأ محادثة إسلامية';
+  String get qiblaHubAiSubtitle => 'إجابات لأسئلتك الإسلامية';
+
+  @override
+  String get qiblaHubPremiumBadge => 'بريميوم';
 
   @override
   String get islamicAiComingSoonTitle => 'الذكاء الاصطناعي الإسلامي';
@@ -1658,8 +1656,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get qiblaHubHilalDuelTitle => 'مبارزة المعرفة';
 
   @override
-  String get qiblaHubHilalDuelSubtitle =>
-      'تنافس في 7 أسئلة إسلامية، واجمع الأهلة وتقدّم بالمستوى';
+  String get qiblaHubHilalDuelSubtitle => 'مسابقة معرفية إسلامية';
 
   @override
   String get hilalDuelTitle => 'مبارزة المعرفة';
@@ -1832,6 +1829,21 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String hilalDuelNextRewardFrameGold(int level) {
+    return 'المكافأة التالية: إطار ذهبي (LV $level)';
+  }
+
+  @override
+  String hilalDuelNextRewardHilalPulse(int level) {
+    return 'المكافأة التالية: توهج الهلال (LV $level)';
+  }
+
+  @override
+  String hilalDuelNextRewardNameGilt(int level) {
+    return 'المكافأة التالية: اسم مذهب (LV $level)';
+  }
+
+  @override
   String get hilalDuelWeeklyTitle => 'أفضل لاعب هذا الأسبوع';
 
   @override
@@ -1900,13 +1912,60 @@ class AppLocalizationsAr extends AppLocalizations {
   String get hilalDuelAdminRemoved => 'تمت إزالة اللاعب من القائمة.';
 
   @override
+  String get hilalDuelTitleComez => 'مبتدئ';
+
+  @override
   String get hilalDuelTitleTalebe => 'طالب';
+
+  @override
+  String get hilalDuelTitleKayyim => 'قيّم';
+
+  @override
+  String get hilalDuelTitleMuezzin => 'مؤذن';
+
+  @override
+  String get hilalDuelTitleHatip => 'خطيب';
+
+  @override
+  String get hilalDuelTitleImam => 'إمام';
+
+  @override
+  String get hilalDuelTitleVaiz => 'واعظ';
+
+  @override
+  String get hilalDuelTitleHoca => 'خواجة';
 
   @override
   String get hilalDuelTitleMuderris => 'مدرّس';
 
   @override
+  String get hilalDuelTitleDervis => 'درويش';
+
+  @override
+  String get hilalDuelTitleSeyh => 'شيخ';
+
+  @override
+  String get hilalDuelTitleMuftu => 'مفتي';
+
+  @override
+  String get hilalDuelTitleKadi => 'قاضي';
+
+  @override
+  String get hilalDuelTitleKazasker => 'قاضي عسكر';
+
+  @override
+  String get hilalDuelTitleSeyhulislam => 'شيخ الإسلام';
+
+  @override
   String get hilalDuelTitleIlimDostu => 'صديق العلم';
+
+  @override
+  String get hilalDuelGoldenCrescent => 'الهلال الذهبي';
+
+  @override
+  String hilalDuelChampionCount(int count) {
+    return '×$count';
+  }
 
   @override
   String get hilalDuelYouLabel => 'أنت';
@@ -3640,6 +3699,9 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String get onboardingPrayerTitleAnonymous => 'كيف تصف إيقاع صلاتك ودعائك؟';
+
+  @override
   String get onboardingPrayerSubtitle => 'لنختر إيقاعاً يناسبك في البداية.';
 
   @override
@@ -3661,6 +3723,10 @@ class AppLocalizationsAr extends AppLocalizations {
   String onboardingWaswasaTitle(String name) {
     return '$name، ماذا تفعل حين يأتيك الشك أو الوسوسة؟';
   }
+
+  @override
+  String get onboardingWaswasaTitleAnonymous =>
+      'ماذا تفعل حين يأتيك الشك أو الوسوسة؟';
 
   @override
   String get onboardingWaswasaSubtitle => 'هذا الجواب يحدّد كيف نقف إلى جانبك.';
@@ -3839,6 +3905,9 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String get onboardingPrepareBar1TitleAnonymous => 'يُنسج مسار آياتك';
+
+  @override
   String get onboardingPrepareBar1Body => 'يُختار اللسان والتأكيد وفق إجاباتك.';
 
   @override
@@ -3858,7 +3927,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get onboardingPrepareBar4Body =>
-      'يُجهَّز التسبيح والقبلة والصلاة والمحادثة.';
+      'يُجهَّز التسبيح والقبلة والصلاة والاجتماعي والمحادثة.';
 
   @override
   String get onboardingPrepareAskLock =>
@@ -3878,6 +3947,10 @@ class AppLocalizationsAr extends AppLocalizations {
   String onboardingDuaBody(String name) {
     return 'اللهم ارزق عبدك $name خيراً وبركة وصحة وسكينة وحكمة واستقامة. أحيِ قلبه بالقرآن وثبّت خطاه في الخير. ولتكن كلمتك قريبة منه في كل حين.';
   }
+
+  @override
+  String get onboardingDuaBodyAnonymous =>
+      'اللهم ارزق هذا العبد خيراً وبركة وصحة وسكينة وحكمة واستقامة. أحيِ قلبه بالقرآن وثبّت خطاه في الخير. ولتكن كلمتك قريبة منه في كل حين.';
 
   @override
   String get onboardingDuaVerseArabic =>
@@ -5868,8 +5941,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get qiblaHubPrayerCircleTitle => 'حلقة الدعاء';
 
   @override
-  String get qiblaHubPrayerCircleSubtitle =>
-      'شارك طلب دعاء ورافق الآخرين بإخلاص';
+  String get qiblaHubPrayerCircleSubtitle => 'شارك دعاء وقل آمين';
 
   @override
   String get prayerCircleTitle => 'حلقة الدعاء';
@@ -6153,7 +6225,14 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get appTourNavToolsBody =>
-      'القبلة والذكر وحلقة الدعاء وبقية الأدوات الروحية في هذا التبويب.';
+      'القبلة والقرآن والذكر واللوحة الاجتماعية وبقية الأدوات الروحية في هذا التبويب.';
+
+  @override
+  String get appTourQiblaSocialTitle => 'اجتماعي';
+
+  @override
+  String get appTourQiblaSocialBody =>
+      'لوحة المجتمع. اكتب باختصار، وعلّق وأعجب — باسمك.';
 
   @override
   String get appTourQiblaAssistantTitle => 'مساعد أرِن';
@@ -6181,6 +6260,13 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get appTourQiblaZikirBody =>
       'تسبيح رقمي مع الأهداف والجولات وملاحظات الذكر.';
+
+  @override
+  String get appTourQiblaQuranTitle => 'القرآن';
+
+  @override
+  String get appTourQiblaQuranBody =>
+      'اقرأ بالترجمة واستمع للتلاوة، وأكمل من حيث توقفت.';
 
   @override
   String get appTourQiblaHilalTitle => 'مبارزة المعرفة';
@@ -6314,7 +6400,52 @@ class AppLocalizationsAr extends AppLocalizations {
   String get qiblaHubSocialTitle => 'اجتماعي';
 
   @override
-  String get qiblaHubSocialSubtitle => 'تحديثات المجتمع — اكتب وعلّق وأعجب';
+  String get qiblaHubSocialSubtitle => 'اكتب وعلّق وأعجب';
+
+  @override
+  String get qiblaHubQuranTitle => 'القرآن';
+
+  @override
+  String get qiblaHubQuranSubtitle => 'اقرأ واستمع';
+
+  @override
+  String get qiblaHubGroupWorship => 'الاتجاه والعبادة';
+
+  @override
+  String get qiblaHubGroupTogether => 'معاً';
+
+  @override
+  String get qiblaHubGroupCalm => 'سكينة';
+
+  @override
+  String get qiblaHubDoorAi => 'ذكاء';
+
+  @override
+  String get qiblaHubDoorCompass => 'قبلة';
+
+  @override
+  String get qiblaHubDoorZikir => 'ذكر';
+
+  @override
+  String get qiblaHubDoorHilal => 'مبارزة';
+
+  @override
+  String get qiblaHubDoorPrayer => 'دعاء';
+
+  @override
+  String get qiblaHubDoorHealing => 'تردد';
+
+  @override
+  String get qiblaHubDoorBreath => 'تنفس';
+
+  @override
+  String get qiblaHubContinueQuran => 'تابع القرآن';
+
+  @override
+  String get qiblaHubOpenQuran => 'افتح القرآن';
+
+  @override
+  String get qiblaHubOpenQuranHint => 'اقرأ واستمع';
 
   @override
   String get socialTitle => 'اجتماعي';
@@ -6405,7 +6536,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get socialBioBody =>
-      'عرّف بنفسك باختصار. يمكنك تغييرها لاحقاً من ملفك.';
+      'يمكنك التعريف بنفسك باختصار. اتركها فارغة وأضفها لاحقاً من ملفك.';
 
   @override
   String get socialBioHint => 'أحرص ألا تفوتني الصلاة.';
@@ -6485,4 +6616,67 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get socialProfanity => 'لا يُسمح بالشتم أو الإهانة.';
+
+  @override
+  String get quranTitle => 'القرآن';
+
+  @override
+  String get quranSearchHint => 'اسم السورة أو رقمها';
+
+  @override
+  String get quranContinueTitle => 'متابعة القراءة';
+
+  @override
+  String quranContinueBody(String surah, int ayah) {
+    return '$surah · الآية $ayah';
+  }
+
+  @override
+  String get quranMeccan => 'مكية';
+
+  @override
+  String get quranMedinan => 'مدنية';
+
+  @override
+  String quranAyahCount(int count) {
+    return '$count آيات';
+  }
+
+  @override
+  String quranAyahLabel(int ayah) {
+    return 'الآية $ayah';
+  }
+
+  @override
+  String get quranTranslationOn => 'الترجمة ظاهرة';
+
+  @override
+  String get quranTranslationOff => 'الترجمة مخفية';
+
+  @override
+  String get quranFontSize => 'حجم النص';
+
+  @override
+  String get quranLoadError =>
+      'تعذر فتح النص الآن. تحقق من الاتصال وأعد المحاولة.';
+
+  @override
+  String get quranRetry => 'إعادة المحاولة';
+
+  @override
+  String get quranAudioError => 'تعذر بدء التلاوة. حاول بعد قليل.';
+
+  @override
+  String get quranReciterName => 'مشاري راشد العفاسي';
+
+  @override
+  String quranNowPlaying(String surah, int ayah) {
+    return '$surah · الآية $ayah';
+  }
+
+  @override
+  String get quranMealAttribution => 'التلاوة: مشاري راشد العفاسي';
+
+  @override
+  String get quranEmptySearch => 'لا توجد سورة مطابقة لهذا البحث.';
 }

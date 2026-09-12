@@ -228,6 +228,15 @@ class PrayerTimesModel {
   ///
   /// UI: yalnızca bu kurala göre tik; yükleme veya günü uyuşmayan önbellekte
   /// tüm vakitlere `true` fallback vermeyin.
+  /// Şu anki farz penceresi (0=İmsak … 4=Yatsı). Pencere yoksa null.
+  int? currentSalatIndex(DateTime now) {
+    final day = salatTickCalendarDay(now);
+    for (var i = 4; i >= 0; i--) {
+      if (isSalatIndexInMarkingWindow(i, now, day)) return i;
+    }
+    return null;
+  }
+
   bool isSalatIndexInMarkingWindow(int index, DateTime now, DateTime day) {
     assert(index >= 0 && index < 5);
     final starts = List.generate(5, (i) => salatSlotStart(i, day));

@@ -80,19 +80,15 @@ class _ZikirmatikRoundToolColumn extends StatelessWidget {
   }
 }
 
-/// Beton hisli zikir metni kartı: giriş animasyonu, metin değişiminde geçiş, nefes ölçeği.
+/// Beton hisli zikir metni kartı: giriş animasyonu, metin değişiminde geçiş.
 class _ZikirPhraseConcreteCard extends StatelessWidget {
   const _ZikirPhraseConcreteCard({
     required this.phrase,
     required this.onTap,
-    required this.phraseAnim,
-    required this.phraseScale,
   });
 
   final String phrase;
   final VoidCallback onTap;
-  final Animation<double> phraseAnim;
-  final Animation<double> phraseScale;
 
   static const _betonTop = Color(0xFF4E616C);
   static const _betonMid = Color(0xFF384854);
@@ -198,104 +194,70 @@ class _ZikirPhraseConcreteCard extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Expanded(
-                            child: AnimatedBuilder(
-                              animation: Listenable.merge(<Listenable>[
-                                phraseAnim,
-                                phraseScale,
-                              ]),
-                              builder: (context, _) {
-                                final glow =
-                                    0.08 +
-                                    0.16 *
-                                        Curves.easeInOut.transform(
-                                          phraseAnim.value,
-                                        );
-                                final blur =
-                                    10 +
-                                    14 *
-                                        Curves.easeInOut.transform(
-                                          phraseAnim.value,
-                                        );
-                                return Transform.scale(
-                                  scale: phraseScale.value,
-                                  alignment: Alignment.center,
-                                  child: AnimatedSwitcher(
-                                    duration: const Duration(milliseconds: 420),
-                                    switchInCurve: Curves.easeOutCubic,
-                                    switchOutCurve: Curves.easeInCubic,
-                                    transitionBuilder:
-                                        (Widget child, Animation<double> anim) {
-                                          final slide =
-                                              Tween<Offset>(
-                                                begin: const Offset(0, 0.07),
-                                                end: Offset.zero,
-                                              ).animate(
-                                                CurvedAnimation(
-                                                  parent: anim,
-                                                  curve: Curves.easeOutCubic,
-                                                ),
-                                              );
-                                          return FadeTransition(
-                                            opacity: anim,
-                                            child: SlideTransition(
-                                              position: slide,
-                                              child: child,
-                                            ),
-                                          );
-                                        },
-                                    child: Text(
-                                      phrase,
-                                      key: ValueKey<String>(phrase),
-                                      textAlign: TextAlign.center,
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: GoogleFonts.fraunces(
-                                        fontSize: 27,
-                                        fontWeight: FontWeight.w600,
-                                        height: 1.18,
-                                        letterSpacing: -0.4,
-                                        color: const Color(0xFFF2F6FA),
-                                        shadows: [
-                                          Shadow(
-                                            color: _ZikirmatikColors.outer
-                                                .withValues(alpha: glow),
-                                            blurRadius: blur,
+                            child: AnimatedSwitcher(
+                              duration: const Duration(milliseconds: 420),
+                              switchInCurve: Curves.easeOutCubic,
+                              switchOutCurve: Curves.easeInCubic,
+                              transitionBuilder:
+                                  (Widget child, Animation<double> anim) {
+                                    final slide =
+                                        Tween<Offset>(
+                                          begin: const Offset(0, 0.07),
+                                          end: Offset.zero,
+                                        ).animate(
+                                          CurvedAnimation(
+                                            parent: anim,
+                                            curve: Curves.easeOutCubic,
                                           ),
-                                          Shadow(
-                                            color: Colors.black.withValues(
-                                              alpha: 0.35,
-                                            ),
-                                            blurRadius: 0,
-                                            offset: const Offset(0, 1.2),
-                                          ),
-                                        ],
+                                        );
+                                    return FadeTransition(
+                                      opacity: anim,
+                                      child: SlideTransition(
+                                        position: slide,
+                                        child: child,
                                       ),
+                                    );
+                                  },
+                              child: Text(
+                                phrase,
+                                key: ValueKey<String>(phrase),
+                                textAlign: TextAlign.center,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: GoogleFonts.fraunces(
+                                  fontSize: 27,
+                                  fontWeight: FontWeight.w600,
+                                  height: 1.18,
+                                  letterSpacing: -0.4,
+                                  color: const Color(0xFFF2F6FA),
+                                  shadows: [
+                                    Shadow(
+                                      color: _ZikirmatikColors.outer
+                                          .withValues(alpha: 0.16),
+                                      blurRadius: 17,
                                     ),
-                                  ),
-                                );
-                              },
+                                    Shadow(
+                                      color: Colors.black.withValues(
+                                        alpha: 0.35,
+                                      ),
+                                      blurRadius: 0,
+                                      offset: const Offset(0, 1.2),
+                                    ),
+                                  ],
+                                ),
+                              ),
                             ),
                           ),
                           const SizedBox(width: 4),
-                          AnimatedBuilder(
-                            animation: phraseAnim,
-                            builder: (context, _) {
-                              final t = Curves.easeInOut.transform(
-                                phraseAnim.value,
-                              );
-                              return Padding(
-                                padding: const EdgeInsets.only(top: 4),
-                                child: Transform.rotate(
-                                  angle: (t - 0.5) * 0.12,
-                                  child: Icon(
-                                    Icons.keyboard_arrow_down_rounded,
-                                    size: 30,
-                                    color: _ZikirmatikColors.labelMuted
-                                        .withValues(alpha: 0.88),
-                                  ),
-                                ),
-                              );
-                            },
+                          Padding(
+                            padding: const EdgeInsets.only(top: 4),
+                            child: Icon(
+                              Icons.keyboard_arrow_down_rounded,
+                              size: 30,
+                              color: _ZikirmatikColors.labelMuted.withValues(
+                                alpha: 0.88,
+                              ),
+                            ),
                           ),
                         ],
                       ),

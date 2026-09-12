@@ -43,8 +43,6 @@ class _SocialPageState extends ConsumerState<SocialPage> {
   bool _posting = false;
   Object? _error;
   final _usernameCtrl = TextEditingController();
-  final _bioCtrl = TextEditingController();
-  final _bioFocus = FocusNode();
   final _composeCtrl = TextEditingController();
   final _composeFocus = FocusNode();
   final _composerKey = GlobalKey();
@@ -92,8 +90,6 @@ class _SocialPageState extends ConsumerState<SocialPage> {
       unawaited(_repo.saveDraft(_composeCtrl.text));
     }
     _usernameCtrl.dispose();
-    _bioCtrl.dispose();
-    _bioFocus.dispose();
     _composeCtrl.dispose();
     _composeFocus.dispose();
     super.dispose();
@@ -125,7 +121,7 @@ class _SocialPageState extends ConsumerState<SocialPage> {
       _sort = sort;
       _profile = profile;
       _claimAvatarId = profile.avatarId;
-      if (profile.hasUsername && (profile.hasBio || profile.banned)) {
+      if (profile.hasUsername) {
         final posts = await _repo.loadFeed(sort: sort);
         if (!mounted) return;
         _indexBios(posts);
@@ -222,10 +218,16 @@ class _SocialPageState extends ConsumerState<SocialPage> {
   }
 
   void _indexBios(Iterable<SocialPost> posts) {
+    final myUid = _profile?.uid ?? '';
+    final keepOwnStamp = _profile?.hasBio == true;
     for (final post in posts) {
       if (post.authorUid.isEmpty) continue;
       if (post.authorBio.isNotEmpty) {
-        _knownBios[post.authorUid] = post.authorBio;
+        if (post.authorUid == myUid && !keepOwnStamp) {
+          _knownBios.remove(post.authorUid);
+        } else {
+          _knownBios[post.authorUid] = post.authorBio;
+        }
       }
       if (post.authorAvatarId > 0) {
         _knownAvatars[post.authorUid] = post.authorAvatarId;
@@ -245,16 +247,21 @@ class _SocialPageState extends ConsumerState<SocialPage> {
 
   Future<String> _saveOwnBio(String bio) async {
     final profile = await _repo.setBio(bio);
+    final saved = (profile.bio ?? bio).trim();
     if (mounted) {
       setState(() {
         _profile = profile;
         _claimAvatarId = profile.avatarId;
-        if (profile.uid.isNotEmpty && profile.hasBio) {
-          _knownBios[profile.uid] = profile.bio!.trim();
+        if (profile.uid.isNotEmpty) {
+          if (saved.isEmpty) {
+            _knownBios.remove(profile.uid);
+          } else {
+            _knownBios[profile.uid] = saved;
+          }
         }
       });
     }
-    return profile.bio ?? bio;
+    return saved;
   }
 
   Future<int> _saveOwnAvatar(int avatarId) async {
@@ -303,23 +310,13 @@ class _SocialPageState extends ConsumerState<SocialPage> {
 
   Future<void> _claim() async {
     final name = _usernameCtrl.text.trim();
-    final bio = normalizeSocialBody(_bioCtrl.text);
-    final updatingBio = _profile?.hasUsername == true;
-    if (containsSocialInsult(bio)) {
-      showArinTopToast(
-        context,
-        AppLocalizations.of(context)!.socialProfanity,
-        tone: ArinTopToastTone.error,
-      );
-      return;
-    }
-    if (!isSocialBioValid(bio) || _claiming) return;
-    if (!updatingBio && !isSocialUsernameValid(name)) return;
+    if (_claiming || !isSocialUsernameValid(name)) return;
     setState(() => _claiming = true);
     try {
-      final profile = updatingBio
-          ? await _repo.setBio(bio, avatarId: _claimAvatarId)
-          : await _repo.claimUsername(name, bio, avatarId: _claimAvatarId);
+      final profile = await _repo.claimUsername(
+        name,
+        avatarId: _claimAvatarId,
+      );
       if (!mounted) return;
       setState(() {
         _profile = profile;
@@ -381,7 +378,6 @@ class _SocialPageState extends ConsumerState<SocialPage> {
   void _focusComposeIfEmpty() {
     if (_posts.isNotEmpty ||
         _profile?.hasUsername != true ||
-        _profile?.hasBio != true ||
         _profile?.banned == true ||
         _loading) {
       return;
@@ -427,7 +423,11 @@ class _SocialPageState extends ConsumerState<SocialPage> {
             setState(() {
               _profile = current.copyWith(bio: bio);
               if (current.uid.isNotEmpty) {
-                _knownBios[current.uid] = bio;
+                if (bio.trim().isEmpty) {
+                  _knownBios.remove(current.uid);
+                } else {
+                  _knownBios[current.uid] = bio;
+                }
               }
             });
           },
@@ -569,8 +569,7 @@ class _SocialPageState extends ConsumerState<SocialPage> {
   Widget build(BuildContext context) {
     final onDark = !ArinShellBackground.isLight(context);
     final l10n = AppLocalizations.of(context)!;
-    final ready = _profile?.hasUsername == true &&
-        (_profile?.hasBio == true || _profile?.banned == true);
+    final ready = _profile?.hasUsername == true;
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: ArinShellBackground.buildLayered(
@@ -642,14 +641,10 @@ class _SocialPageState extends ConsumerState<SocialPage> {
                 child: !ready
                     ? _UsernameGate(
                         usernameController: _usernameCtrl,
-                        bioController: _bioCtrl,
-                        bioFocus: _bioFocus,
-                        username: _profile?.username ?? _usernameCtrl.text,
                         premium: _profile?.premium == true,
                         avatarId: _claimAvatarId,
                         onAvatarChanged: (id) =>
                             setState(() => _claimAvatarId = id),
-                        showUsername: _profile?.hasUsername != true,
                         claiming: _claiming,
                         loading: _loading,
                         error: _error,
@@ -849,13 +844,9 @@ class _SocialPageState extends ConsumerState<SocialPage> {
 class _UsernameGate extends StatelessWidget {
   const _UsernameGate({
     required this.usernameController,
-    required this.bioController,
-    required this.bioFocus,
-    required this.username,
     required this.premium,
     required this.avatarId,
     required this.onAvatarChanged,
-    required this.showUsername,
     required this.claiming,
     required this.loading,
     required this.error,
@@ -866,13 +857,9 @@ class _UsernameGate extends StatelessWidget {
   });
 
   final TextEditingController usernameController;
-  final TextEditingController bioController;
-  final FocusNode bioFocus;
-  final String username;
   final bool premium;
   final int avatarId;
   final ValueChanged<int> onAvatarChanged;
-  final bool showUsername;
   final bool claiming;
   final bool loading;
   final bool banned;
@@ -913,9 +900,7 @@ class _UsernameGate extends StatelessWidget {
         body: l10n.socialBannedBanner,
       );
     }
-    final nameOk = !showUsername || isSocialUsernameValid(usernameController.text);
-    final bioOk = isSocialBioValid(bioController.text);
-    final valid = nameOk && bioOk;
+    final valid = isSocialUsernameValid(usernameController.text);
     final titleColor = onDark ? AppColors.textOnDark : AppColors.textPrimary;
     final bodyColor = onDark ? AppColors.textOnDarkMuted : AppColors.textSecondary;
     final footerBottom = ArinShellLayout.isKeyboardOpen(context)
@@ -932,7 +917,7 @@ class _UsernameGate extends StatelessWidget {
               padding: const EdgeInsets.fromLTRB(24, 28, 24, 16),
               children: [
                 Text(
-                  showUsername ? l10n.socialUsernameTitle : l10n.socialBioTitle,
+                  l10n.socialUsernameTitle,
                   style: TextStyle(
                     color: titleColor,
                     fontSize: 26,
@@ -942,76 +927,35 @@ class _UsernameGate extends StatelessWidget {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  showUsername ? l10n.socialUsernameBody : l10n.socialBioBody,
+                  l10n.socialUsernameBody,
                   style: TextStyle(
                     color: bodyColor,
                     height: 1.4,
                   ),
                 ),
-                if (showUsername) ...[
-                  const SizedBox(height: 22),
-                  TextField(
-                    controller: usernameController,
-                    maxLength: kSocialUsernameMax,
-                    onChanged: (_) => onChanged(),
-                    textInputAction: TextInputAction.next,
-                    onSubmitted: (_) => bioFocus.requestFocus(),
-                    style: TextStyle(
-                      color: titleColor,
-                      fontWeight: FontWeight.w600,
-                    ),
-                    decoration: InputDecoration(
-                      hintText: l10n.socialUsernameHint,
-                      prefixText: '@',
-                      counterText:
-                          '${usernameController.text.trim().length}/$kSocialUsernameMax',
-                    ),
-                  ),
-                  const SizedBox(height: 18),
-                  Text(
-                    l10n.socialBioTitle,
-                    style: TextStyle(
-                      color: titleColor,
-                      fontSize: 18,
-                      fontWeight: FontWeight.w800,
-                      letterSpacing: -0.3,
-                    ),
-                  ),
-                  const SizedBox(height: 6),
-                  Text(
-                    l10n.socialBioBody,
-                    style: TextStyle(
-                      color: bodyColor,
-                      height: 1.4,
-                    ),
-                  ),
-                ],
-                const SizedBox(height: 16),
+                const SizedBox(height: 22),
                 TextField(
-                  controller: bioController,
-                  focusNode: bioFocus,
-                  minLines: 2,
-                  maxLines: 4,
-                  maxLength: kSocialBioMax,
+                  controller: usernameController,
+                  maxLength: kSocialUsernameMax,
                   onChanged: (_) => onChanged(),
                   textInputAction: TextInputAction.done,
-                  onSubmitted: (_) => onClaim(),
+                  onSubmitted: (_) {
+                    if (valid && !claiming) onClaim();
+                  },
                   style: TextStyle(
                     color: titleColor,
-                    fontWeight: FontWeight.w500,
-                    height: 1.35,
+                    fontWeight: FontWeight.w600,
                   ),
                   decoration: InputDecoration(
-                    hintText: l10n.socialBioHint,
+                    hintText: l10n.socialUsernameHint,
+                    prefixText: '@',
                     counterText:
-                        '${normalizeSocialBody(bioController.text).length}/$kSocialBioMax',
+                        '${usernameController.text.trim().length}/$kSocialUsernameMax',
                   ),
                 ),
                 const SizedBox(height: 20),
                 SocialAvatarPicker(
-                  username: showUsername
-                      ? usernameController.text.trim()
-                      : username,
+                  username: usernameController.text.trim(),
                   premium: premium,
                   selectedId: avatarId,
                   onSelected: onAvatarChanged,

@@ -695,14 +695,14 @@
   "willpowerHubStreakSeriesLabel": "streak",
   "willpowerHubStreakDaySeriesLabel": "day streak",
   "qiblaHubCompassTitle": "Find the Qibla direction",
-  "qiblaHubCompassSubtitle": "Show the Kaaba direction using compass and location",
+  "qiblaHubCompassSubtitle": "Shows the Kaaba direction",
   "qiblaHubOpenAction": "Open",
   "qiblaHubZikirTitle": "Dhikr Counter",
-  "qiblaHubZikirFeatureSubtitle": "Digital counter with dhikr details, round history, and target (33/99)",
+  "qiblaHubZikirFeatureSubtitle": "Digital tasbih",
   "qiblaHubBreathingTitle": "Breathing Exercise",
-  "qiblaHubBreathingSubtitle": "Calm down and refocus with the 4-7-8 breathing cycle",
+  "qiblaHubBreathingSubtitle": "Calm with 4-7-8",
   "qiblaHubAssistantTitle": "Arın Assistant",
-  "qiblaHubAssistantSubtitle": "Chat; manage prayer, alerts, and reminders",
+  "qiblaHubAssistantSubtitle": "Prayer and reminders",
   "assistantTitle": "Arın Assistant",
   "assistantSubtitle": "",
   "assistantAskChip": "Assistant",
@@ -844,9 +844,10 @@
   "assistantCancel": "Cancel",
   "assistantConfirm": "Turn off",
   "qiblaHubHealingTitle": "Healing Frequencies",
-  "qiblaHubHealingSubtitle": "A calming session with therapy tones, ambience, and sleep timer",
+  "qiblaHubHealingSubtitle": "Calming sounds",
   "qiblaHubAiTitle": "Islamic AI",
-  "qiblaHubAiSubtitle": "Ask what's on your mind and start an Islamic chat",
+  "qiblaHubAiSubtitle": "Answers to Islamic questions",
+  "qiblaHubPremiumBadge": "Premium",
   "islamicAiComingSoonTitle": "Islamic AI",
   "islamicAiComingSoonBody": "This feature is being prepared. You already have Premium; the chat will open here after the code is merged.",
   "widgetThemeSectionTitle": "Widget themes",
@@ -859,7 +860,7 @@
   "widgetLockTextSoft": "Soft",
   "widgetLockTextApplied": "Lock screen text updated.",
   "qiblaHubHilalDuelTitle": "Knowledge Duel",
-  "qiblaHubHilalDuelSubtitle": "Compete across 7 Islamic knowledge questions, earn crescents, and level up",
+  "qiblaHubHilalDuelSubtitle": "Islamic knowledge duel",
   "hilalDuelTitle": "Knowledge Duel",
   "hilalDuelLanguageNote": "Questions are currently in Turkish",
   "hilalDuelRulesSummary": "7 questions • 20 seconds each\nAccuracy and speed win. The next question opens once both players answer. Watch an ad for a heart or play unlimited with Premium.",
@@ -974,6 +975,24 @@
       "level": {"type": "int"}
     }
   },
+  "hilalDuelNextRewardFrameGold": "Next reward: Gold frame (LV {level})",
+  "@hilalDuelNextRewardFrameGold": {
+    "placeholders": {
+      "level": {"type": "int"}
+    }
+  },
+  "hilalDuelNextRewardHilalPulse": "Next reward: Crescent glow (LV {level})",
+  "@hilalDuelNextRewardHilalPulse": {
+    "placeholders": {
+      "level": {"type": "int"}
+    }
+  },
+  "hilalDuelNextRewardNameGilt": "Next reward: Gilded name (LV {level})",
+  "@hilalDuelNextRewardNameGilt": {
+    "placeholders": {
+      "level": {"type": "int"}
+    }
+  },
   "hilalDuelWeeklyTitle": "Player of the Week",
   "hilalDuelWeeklyResetHint": "Resets on Monday",
   "hilalDuelWeeklyThisWeek": "This week: {count} crescents",
@@ -1014,9 +1033,29 @@
   },
   "hilalDuelAdminRemoveAction": "Remove",
   "hilalDuelAdminRemoved": "Player removed from the board.",
+  "hilalDuelTitleComez": "Comez",
   "hilalDuelTitleTalebe": "Student",
+  "hilalDuelTitleKayyim": "Qayyim",
+  "hilalDuelTitleMuezzin": "Muezzin",
+  "hilalDuelTitleHatip": "Khatib",
+  "hilalDuelTitleImam": "Imam",
+  "hilalDuelTitleVaiz": "Preacher",
+  "hilalDuelTitleHoca": "Hoja",
   "hilalDuelTitleMuderris": "Mudarris",
+  "hilalDuelTitleDervis": "Dervish",
+  "hilalDuelTitleSeyh": "Sheikh",
+  "hilalDuelTitleMuftu": "Mufti",
+  "hilalDuelTitleKadi": "Qadi",
+  "hilalDuelTitleKazasker": "Kazasker",
+  "hilalDuelTitleSeyhulislam": "Shaykh al-Islam",
   "hilalDuelTitleIlimDostu": "Friend of Knowledge",
+  "hilalDuelGoldenCrescent": "Golden Crescent",
+  "hilalDuelChampionCount": "×{count}",
+  "@hilalDuelChampionCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
   "hilalDuelYouLabel": "You",
   "hilalDuelOpponentLabel": "Opponent",
   "hilalDuelChallengeAction": "Challenge",
@@ -1873,6 +1912,7 @@
   "onboardingShapeCard3Title": "Around the Quran",
   "onboardingShapeCard3Body": "The day walks the same line as verse and remembrance.",
   "onboardingPrayerTitle": "{name}, how would you describe your prayer rhythm?",
+  "onboardingPrayerTitleAnonymous": "How would you describe your prayer rhythm?",
   "@onboardingPrayerTitle": {
     "placeholders": {
       "name": { "type": "String" }
@@ -1885,6 +1925,7 @@
   "onboardingPrayerStarting": "I am only just settling in",
   "onboardingPrayerBeginHere": "I want to start from this screen",
   "onboardingWaswasaTitle": "{name}, what do you do when doubt or whispers come?",
+  "onboardingWaswasaTitleAnonymous": "What do you do when doubt or whispers come?",
   "@onboardingWaswasaTitle": {
     "placeholders": {
       "name": { "type": "String" }
@@ -1947,6 +1988,7 @@
   "onboardingPrepareYes": "Yes",
   "onboardingPrepareNo": "No",
   "onboardingPrepareBar1Title": "{name}, your verse flow is being woven",
+  "onboardingPrepareBar1TitleAnonymous": "Your verse flow is being woven",
   "@onboardingPrepareBar1Title": {
     "placeholders": {
       "name": { "type": "String" }
@@ -1958,7 +2000,7 @@
   "onboardingPrepareBar3Title": "Adjusting so we can reach more people",
   "onboardingPrepareBar3Body": "Discovery sources are measured privately.",
   "onboardingPrepareBar4Title": "Shortcuts are being placed",
-  "onboardingPrepareBar4Body": "Tasbih, qibla, prayer, and conversation are being readied.",
+  "onboardingPrepareBar4Body": "Tasbih, qibla, prayer, social, and conversation are being readied.",
   "onboardingPrepareAskLock": "Shall we use a simple verse view on the lock screen?",
   "onboardingPrepareAskVerses": "Shall we put verses first according to your answers?",
   "onboardingPrepareAskShortcuts": "Shall we lift worship shortcuts in the main flow?",
@@ -1969,6 +2011,7 @@
       "name": { "type": "String" }
     }
   },
+  "onboardingDuaBodyAnonymous": "O Allah, grant this servant goodness, blessing, health, peace, wisdom, and steadfastness. Keep their heart alive with the Quran, and their steps firm in what is good. Let Your word stay close to them in every season.",
   "onboardingDuaVerseArabic": "رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً",
   "onboardingDuaVerseTranslation": "Our Lord, give us good in this world and good in the Hereafter.",
   "onboardingDuaVerseSource": "Al-Baqarah 2:201",
@@ -2593,7 +2636,7 @@
   "insightCommentGood": "{count}/5 prayers marked yesterday; it's possible to complete the balance with one or two prayers today.",
   "insightCommentDefault": "Past days' data is a mirror for you: mercy in the missing parts, gratitude in the completed ones.",
   "qiblaHubPrayerCircleTitle": "Prayer Circle",
-  "qiblaHubPrayerCircleSubtitle": "Share a prayer request and join with sincerity",
+  "qiblaHubPrayerCircleSubtitle": "Share a prayer, say amen",
   "prayerCircleTitle": "Prayer Circle",
   "prayerCircleHeroTitle": "Join a prayer wholeheartedly",
   "prayerCircleHeroBody": "Anonymous prayer requests meet here. Let us quietly say amen to one another's intentions.",
@@ -2689,7 +2732,9 @@
   "appTourHomePrayerTimesTitle": "Prayer times",
   "appTourHomePrayerTimesBody": "Times for your district. You can change the location in Settings.",
   "appTourNavToolsTitle": "Tools",
-  "appTourNavToolsBody": "Qibla, dhikr, the prayer circle, and other spiritual tools live on this tab.",
+  "appTourNavToolsBody": "Qibla, Qur'an, dhikr, the social board, and other spiritual tools live on this tab.",
+  "appTourQiblaSocialTitle": "Social",
+  "appTourQiblaSocialBody": "The community board. Write a short post, comment, and like — under your handle.",
   "appTourQiblaAssistantTitle": "Arin Assistant",
   "appTourQiblaAssistantBody": "Manage prayer, notifications, and reminders through chat.",
   "appTourQiblaAiTitle": "Islamic AI",
@@ -2698,6 +2743,8 @@
   "appTourQiblaCompassBody": "Shows the direction of the Kaaba from your location.",
   "appTourQiblaZikirTitle": "Dhikr counter",
   "appTourQiblaZikirBody": "A digital tasbih with goals, rounds, and dhikr notes.",
+  "appTourQiblaQuranTitle": "Qur'an",
+  "appTourQiblaQuranBody": "Read with translation and listen; continue where you left off.",
   "appTourQiblaHilalTitle": "Knowledge duel",
   "appTourQiblaHilalBody": "Quiz yourself with Islamic questions and sharpen what you know.",
   "appTourQiblaPrayerCircleTitle": "Prayer circle",
@@ -2737,7 +2784,22 @@
   "appTourWidgetPromptYes": "Yes",
   "appTourWidgetPromptLater": "Later",
   "qiblaHubSocialTitle": "Social",
-  "qiblaHubSocialSubtitle": "Community feed — write, comment, like",
+  "qiblaHubSocialSubtitle": "Write, comment, like",
+  "qiblaHubQuranTitle": "Qur'an",
+  "qiblaHubQuranSubtitle": "Read and listen",
+  "qiblaHubGroupWorship": "Direction and worship",
+  "qiblaHubGroupTogether": "Together",
+  "qiblaHubGroupCalm": "Calm",
+  "qiblaHubDoorAi": "AI",
+  "qiblaHubDoorCompass": "Qibla",
+  "qiblaHubDoorZikir": "Dhikr",
+  "qiblaHubDoorHilal": "Duel",
+  "qiblaHubDoorPrayer": "Dua",
+  "qiblaHubDoorHealing": "Healing",
+  "qiblaHubDoorBreath": "Breath",
+  "qiblaHubContinueQuran": "Continue Qur'an",
+  "qiblaHubOpenQuran": "Open Qur'an",
+  "qiblaHubOpenQuranHint": "Read and listen",
   "socialTitle": "Social",
   "socialSortNew": "New",
   "socialSortNewest": "Newest",
@@ -2771,7 +2833,7 @@
   "socialUsernameLocked": "This name cannot be changed.",
   "socialUsernameHint": "your_name",
   "socialBioTitle": "About",
-  "socialBioBody": "Tell people who you are. You can change this from your profile.",
+  "socialBioBody": "You can say a little about yourself. Leave it empty and add it later from your profile.",
   "socialBioHint": "Trying not to miss my prayers.",
   "socialBioEmpty": "Hasn't written anything yet.",
   "socialBioEdit": "Edit",
@@ -2797,5 +2859,45 @@
   "socialBanPermanent": "Permanent",
   "socialBanned": "User banned",
   "socialBannedBanner": "You can't write on the board.",
-  "socialProfanity": "Swearing or insults are not allowed."
+  "socialProfanity": "Swearing or insults are not allowed.",
+  "quranTitle": "Qur'an",
+  "quranSearchHint": "Surah name or number",
+  "quranContinueTitle": "Continue reading",
+  "quranContinueBody": "{surah} · verse {ayah}",
+  "@quranContinueBody": {
+    "placeholders": {
+      "surah": {"type": "String"},
+      "ayah": {"type": "int"}
+    }
+  },
+  "quranMeccan": "Meccan",
+  "quranMedinan": "Medinan",
+  "quranAyahCount": "{count} verses",
+  "@quranAyahCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "quranAyahLabel": "Verse {ayah}",
+  "@quranAyahLabel": {
+    "placeholders": {
+      "ayah": {"type": "int"}
+    }
+  },
+  "quranTranslationOn": "Translation visible",
+  "quranTranslationOff": "Translation hidden",
+  "quranFontSize": "Text size",
+  "quranLoadError": "The text could not be opened. Check your connection and try again.",
+  "quranRetry": "Try again",
+  "quranAudioError": "Recitation could not start. Try again shortly.",
+  "quranReciterName": "Mishary Rashid Alafasy",
+  "quranNowPlaying": "{surah} · verse {ayah}",
+  "@quranNowPlaying": {
+    "placeholders": {
+      "surah": {"type": "String"},
+      "ayah": {"type": "int"}
+    }
+  },
+  "quranMealAttribution": "Translation: Sahih International · Recitation: Alafasy",
+  "quranEmptySearch": "No surah matches this search."
 }

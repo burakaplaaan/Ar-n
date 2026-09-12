@@ -9,7 +9,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:arin/l10n/app_localizations.dart';
 
-import '../../../app.dart';
+import '../../../core/providers/theme_mode_provider.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/providers/shared_preferences_provider.dart';
 import '../../../core/router/app_router.dart';
@@ -17,6 +17,7 @@ import '../../../data/services/audio_session_coordinator.dart';
 import '../../home/home_page.dart';
 import '../../inspire/inspire_explore_page.dart';
 import '../../inspire/inspire_viewer_session_provider.dart';
+import '../../qibla/qibla_hub_assets.dart';
 import '../../qibla/qibla_hub_back_dispatcher.dart';
 import '../../qibla/qibla_hub_page.dart';
 import '../../qibla/qibla_shell_swipe_provider.dart';
@@ -72,7 +73,7 @@ class _ShellTabTickerScope extends InheritedWidget {
 /// PageView.builder ile kullanılır; ziyaret edilmemiş sekmeler hiç build edilmez,
 /// daha önce açılmış sekmeler AutomaticKeepAlive sayesinde ağaçta kalır.
 class _KeepAlivePage extends StatefulWidget {
-  const _KeepAlivePage({required this.index, required this.child});
+  const _KeepAlivePage({super.key, required this.index, required this.child});
   final int index;
   final Widget child;
   @override
@@ -94,6 +95,42 @@ class _KeepAlivePageState extends State<_KeepAlivePage>
         currentIndex: current,
       ),
       child: widget.child,
+    );
+  }
+}
+
+/// Araç açılınca yalnızca PageView fiziği rebuild olur; kabuk ağacı durur.
+class _ShellSwipeAwarePageView extends ConsumerWidget {
+  const _ShellSwipeAwarePageView({
+    required this.controller,
+    required this.lockSwipe,
+    required this.qiblaTab,
+    required this.onPageChanged,
+  });
+
+  final PageController controller;
+  final bool lockSwipe;
+  final bool qiblaTab;
+  final ValueChanged<int> onPageChanged;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final blockQibla =
+        qiblaTab && ref.watch(qiblaHubBlocksShellSwipeProvider);
+    return PageView.builder(
+      controller: controller,
+      physics: lockSwipe || blockQibla
+          ? const NeverScrollableScrollPhysics()
+          : const BouncingScrollPhysics(),
+      itemCount: 5,
+      onPageChanged: onPageChanged,
+      itemBuilder: (context, index) {
+        return _KeepAlivePage(
+          key: ValueKey<int>(index),
+          index: index,
+          child: _kShellPages[index],
+        );
+      },
     );
   }
 }
@@ -138,6 +175,8 @@ class _ArinShellState extends State<ArinShell> {
   String? _lastPathForNavSolidity;
   String? _lastPathForAudioVisibility;
   bool _widgetPromptResumeChecked = false;
+  bool _hubAssetsWarm = false;
+  bool _tourKickoffDone = false;
 
   static bool _isShellSwipeRoot(String path) {
     return path == AppRoutes.home ||
@@ -440,9 +479,6 @@ class _ArinShellState extends State<ArinShell> {
           _lastPathForNavSolidity = path;
           _navBarSolidity.value = 1.0;
         }
-        final blockShellSwipeOnQibla = ref.watch(
-          qiblaHubBlocksShellSwipeProvider,
-        );
         final previousAudioPath = _lastPathForAudioVisibility;
         if (previousAudioPath != path) {
           _lastPathForAudioVisibility = path;
@@ -451,6 +487,9 @@ class _ArinShellState extends State<ArinShell> {
               !_isQiblaStackPath(path)) {
             unawaited(
               AudioSessionCoordinator.pauseOwner(AudioSessionOwner.healing),
+            );
+            unawaited(
+              AudioSessionCoordinator.pauseOwner(AudioSessionOwner.quran),
             );
           }
         }
@@ -469,35 +508,46 @@ class _ArinShellState extends State<ArinShell> {
               ),
             );
           }
-        });
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (!context.mounted) return;
-          final controller = ref.read(appTourControllerProvider.notifier);
-          controller.maybeStart();
-          final started = ref.read(appTourControllerProvider);
-          if (started.active && started.step != null && path != started.step!.route) {
-            context.go(started.step!.route);
+          final step = next.step;
+          if (next.active &&
+              step != null &&
+              GoRouterState.of(context).uri.path != step.route) {
+            context.go(step.route);
           }
-          if (!_widgetPromptResumeChecked) {
-            _widgetPromptResumeChecked = true;
-            if (!started.active) {
-              unawaited(
-                maybeShowPostTourWidgetPrompt(
-                  context: context,
-                  prefs: ref.read(sharedPreferencesProvider),
-                ),
-              );
+        });
+        ref.read(appTourControllerProvider.notifier).maybeStart();
+        if (!_tourKickoffDone) {
+          _tourKickoffDone = true;
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (!context.mounted) return;
+            final started = ref.read(appTourControllerProvider);
+            if (started.active &&
+                started.step != null &&
+                path != started.step!.route) {
+              context.go(started.step!.route);
             }
-          }
-        });
-        final pagePhysics =
-            onInspireView ||
-                tourActive ||
-                !swipeRoot ||
-                _holdRouterChild ||
-                (currentIndex == 1 && blockShellSwipeOnQibla)
-            ? const NeverScrollableScrollPhysics()
-            : const BouncingScrollPhysics();
+            if (!_widgetPromptResumeChecked) {
+              _widgetPromptResumeChecked = true;
+              if (!started.active) {
+                unawaited(
+                  maybeShowPostTourWidgetPrompt(
+                    context: context,
+                    prefs: ref.read(sharedPreferencesProvider),
+                  ),
+                );
+              }
+            }
+          });
+        }
+        if (!_hubAssetsWarm) {
+          _hubAssetsWarm = true;
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (!context.mounted) return;
+            unawaited(QiblaHubAssets.precache(context));
+          });
+        }
+        final lockShellSwipe =
+            onInspireView || tourActive || !swipeRoot || _holdRouterChild;
 
         // PageView aynı Stack yuvasında kalsın; aksi halde kapanışta
         // initialPage=0 (Home) ile yeniden kurulup bir kare flaşlar.
@@ -508,10 +558,10 @@ class _ArinShellState extends State<ArinShell> {
             child: Stack(
               fit: StackFit.expand,
               children: [
-                PageView.builder(
+                _ShellSwipeAwarePageView(
                   controller: _pageController!,
-                  physics: pagePhysics,
-                  itemCount: 5,
+                  lockSwipe: lockShellSwipe,
+                  qiblaTab: currentIndex == 1,
                   onPageChanged: (i) {
                     if (onInspireView) return;
                     HapticFeedback.selectionClick();
@@ -524,12 +574,6 @@ class _ArinShellState extends State<ArinShell> {
                       return;
                     }
                     context.go(next);
-                  },
-                  itemBuilder: (context, index) {
-                    return _KeepAlivePage(
-                      index: index,
-                      child: _kShellPages[index],
-                    );
                   },
                 ),
                 if (!swipeRoot || _holdRouterChild) widget.child,

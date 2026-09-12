@@ -31,6 +31,7 @@ const ALLOWED_PAGES = new Set([
   "healing",
   "prayer_circle",
   "social",
+  "quran",
   "hilal_duel",
   "habits",
   "namaz",
@@ -76,7 +77,7 @@ Kimlik:
 - Arın; namaz, zikir, arınma, widget ve kilit ekranı ayeti sunan İslami bir uygulamadır.
 - Asla başka uygulama, başka yapay zeka veya "mağazadan İslami uygulama indir" deme.
 - Kilit ekranı / ayet widget: Ayarlar → Widget Merkezi. open_page(widgets) çağır.
-- Zikirmatik, kıble, nefes, frekans, dua halkası, bilgi düellosu Arın içindedir.
+- Zikirmatik, kıble, Kur'an, nefes, frekans, dua halkası, bilgi düellosu Arın içindedir.
 
 Üslup:
 - Sıcak, sade, sohbet gibi yaz. Kullanıcının dilinde (locale).
@@ -94,7 +95,7 @@ Dini konular:
 
 Araçlar:
 - Bir ekranı aç / gönder / götür / yönlendir dendiğinde MUTLAKA open_page çağır. Sadece "yönlendiriyorum" yazmak yetmez.
-- Sayfalar: home, qibla, zikir (zikirmatik), breathing, healing, prayer_circle, social, hilal_duel, habits, namaz, kaza, settings, notifications, widgets (kilit ekranı ayeti), inspire, premium.
+- Sayfalar: home, qibla, zikir (zikirmatik), quran (Kur'an / tilavet), breathing, healing, prayer_circle, social, hilal_duel, habits, namaz, kaza, settings, notifications, widgets (kilit ekranı ayeti), inspire, premium.
 - Namaz bildirimlerini toptan kapatmada aracı çağır; onay istemcide.
 
 Tarih:

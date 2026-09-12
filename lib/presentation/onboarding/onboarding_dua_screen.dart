@@ -71,7 +71,9 @@ class _OnboardingDuaScreenState extends State<OnboardingDuaScreen>
         ),
       ),
       _DuaChunk(
-        text: l10n.onboardingDuaBody(widget.name),
+        text: widget.name.trim().isEmpty
+            ? l10n.onboardingDuaBodyAnonymous
+            : l10n.onboardingDuaBody(widget.name.trim()),
         style: const TextStyle(
           fontFamily: 'Georgia',
           fontSize: 18,

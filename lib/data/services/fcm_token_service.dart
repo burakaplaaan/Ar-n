@@ -342,7 +342,7 @@ abstract final class FcmTokenService {
       final channelDescription = isPrayerCircle
           ? 'Dua taleplerine eşlik bildirimleri'
           : isSocial
-              ? 'Yazına gelen yorumlar'
+              ? 'Gönderilerine gelen yorumlar'
               : isHilalPromo
                   ? 'Günlük ayet ve anlık bildirimler'
                   : isHilalDuel
@@ -454,7 +454,7 @@ abstract final class FcmTokenService {
         const AndroidNotificationChannel(
           'arin_social',
           'Sosyal',
-          description: 'Yazına gelen yorumlar',
+          description: 'Gönderilerine gelen yorumlar',
           importance: Importance.high,
           playSound: true,
         ),

@@ -175,7 +175,7 @@ class _InspireExplorePageState extends ConsumerState<InspireExplorePage> {
           data: (cards) {
             if (cards.isEmpty) {
               return RefreshIndicator(
-                color: AppColors.accentNeonGreen,
+                color: AppColors.shellAccent(context),
                 backgroundColor: onLight
                     ? AppColors.creamSurface
                     : AppColors.homeGradientTop,
@@ -202,7 +202,7 @@ class _InspireExplorePageState extends ConsumerState<InspireExplorePage> {
             final filtered = _filtered(cards, filter);
             final searchActive = _query.trim().isNotEmpty;
             return RefreshIndicator(
-              color: AppColors.accentNeonGreen,
+              color: AppColors.shellAccent(context),
               backgroundColor: onLight
                   ? AppColors.creamSurface
                   : AppColors.homeGradientTop,
@@ -338,7 +338,7 @@ class _InspireExplorePageState extends ConsumerState<InspireExplorePage> {
             ],
           ),
           error: (_, _) => RefreshIndicator(
-            color: AppColors.accentNeonGreen,
+            color: AppColors.shellAccent(context),
             backgroundColor: onLight
                 ? AppColors.creamSurface
                 : AppColors.homeGradientTop,
@@ -599,7 +599,7 @@ class _ExploreEmpty extends StatelessWidget {
               onPressed: onClose,
               icon: Icon(
                 Icons.arrow_back_ios_new_rounded,
-                color: Colors.white.withValues(alpha: 0.9),
+                color: AppColors.shellOnCanvasPrimary(context),
               ),
             ),
           const SizedBox(height: 8),
@@ -607,7 +607,7 @@ class _ExploreEmpty extends StatelessWidget {
             l10n.inspireEmptyTitle,
             textAlign: TextAlign.center,
             style: TextStyle(
-              color: Colors.white.withValues(alpha: 0.9),
+              color: AppColors.shellOnCanvasPrimary(context),
               fontSize: 20,
               fontWeight: FontWeight.w700,
             ),
@@ -617,7 +617,7 @@ class _ExploreEmpty extends StatelessWidget {
             l10n.inspireEmptySubtitle,
             textAlign: TextAlign.center,
             style: TextStyle(
-              color: Colors.white.withValues(alpha: 0.55),
+              color: AppColors.shellOnCanvasSecondary(context),
               height: 1.45,
             ),
           ),
@@ -626,7 +626,7 @@ class _ExploreEmpty extends StatelessWidget {
             l10n.inspirePullToRefreshHint,
             textAlign: TextAlign.center,
             style: TextStyle(
-              color: Colors.white.withValues(alpha: 0.4),
+              color: AppColors.shellOnCanvasTertiary(context),
               fontSize: 13,
             ),
           ),
@@ -656,7 +656,7 @@ class _ExploreError extends StatelessWidget {
               onPressed: onClose,
               icon: Icon(
                 Icons.arrow_back_ios_new_rounded,
-                color: Colors.white.withValues(alpha: 0.9),
+                color: AppColors.shellOnCanvasPrimary(context),
               ),
             ),
           const SizedBox(height: 8),
@@ -664,7 +664,7 @@ class _ExploreError extends StatelessWidget {
             l10n.inspireLoadFailedTitle,
             textAlign: TextAlign.center,
             style: TextStyle(
-              color: Colors.white.withValues(alpha: 0.9),
+              color: AppColors.shellOnCanvasPrimary(context),
               fontSize: 18,
               fontWeight: FontWeight.w700,
             ),
@@ -674,7 +674,7 @@ class _ExploreError extends StatelessWidget {
             message,
             textAlign: TextAlign.center,
             style: TextStyle(
-              color: Colors.white.withValues(alpha: 0.5),
+              color: AppColors.shellOnCanvasSecondary(context),
               fontSize: 12,
             ),
           ),
@@ -683,7 +683,7 @@ class _ExploreError extends StatelessWidget {
             l10n.inspirePullToRetryHint,
             textAlign: TextAlign.center,
             style: TextStyle(
-              color: Colors.white.withValues(alpha: 0.4),
+              color: AppColors.shellOnCanvasTertiary(context),
               fontSize: 13,
             ),
           ),

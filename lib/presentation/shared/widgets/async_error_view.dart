@@ -49,6 +49,9 @@ class AsyncErrorView extends StatelessWidget {
     final msg = message ??
         l10n.asyncErrorDefaultMessage;
     final resolvedRetry = retryLabel ?? l10n.asyncErrorRetryAction;
+    final accent = AppColors.shellAccent(context);
+    final titleColor = AppColors.shellOnCanvasPrimary(context);
+    final bodyColor = AppColors.shellOnCanvasSecondary(context);
     return Center(
       child: SingleChildScrollView(
         padding: padding,
@@ -60,24 +63,18 @@ class AsyncErrorView extends StatelessWidget {
               width: 72,
               height: 72,
               decoration: BoxDecoration(
-                color: AppColors.accentNeonGreen.withValues(alpha: 0.10),
+                color: accent.withValues(alpha: 0.10),
                 shape: BoxShape.circle,
-                border: Border.all(
-                  color: AppColors.accentNeonGreen.withValues(alpha: 0.28),
-                ),
+                border: Border.all(color: accent.withValues(alpha: 0.28)),
               ),
-              child: Icon(
-                icon,
-                size: 34,
-                color: AppColors.accentNeonGreen.withValues(alpha: 0.85),
-              ),
+              child: Icon(icon, size: 34, color: accent.withValues(alpha: 0.85)),
             ),
             const SizedBox(height: 18),
             Text(
               resolvedTitle,
               textAlign: TextAlign.center,
               style: TextStyle(
-                color: Colors.white.withValues(alpha: 0.92),
+                color: titleColor,
                 fontSize: 17,
                 fontWeight: FontWeight.w700,
                 letterSpacing: -0.2,
@@ -88,7 +85,7 @@ class AsyncErrorView extends StatelessWidget {
               msg,
               textAlign: TextAlign.center,
               style: TextStyle(
-                color: Colors.white.withValues(alpha: 0.58),
+                color: bodyColor,
                 fontSize: 13.5,
                 height: 1.4,
               ),
@@ -127,16 +124,14 @@ class _ErrorDetailsTile extends StatelessWidget {
     final raw = error.toString();
     // Çok uzun stack'i kısalt — admin'e göndermek için kopyalanabilir.
     final preview = raw.length > 220 ? '${raw.substring(0, 220)}…' : raw;
+    final muted = AppColors.shellOnCanvasTertiary(context);
     return ExpansionTile(
       title: Text(
         l10n.asyncErrorTechnicalDetailsTitle,
-        style: TextStyle(
-          color: Colors.white.withValues(alpha: 0.5),
-          fontSize: 12,
-        ),
+        style: TextStyle(color: muted, fontSize: 12),
       ),
-      iconColor: Colors.white.withValues(alpha: 0.5),
-      collapsedIconColor: Colors.white.withValues(alpha: 0.5),
+      iconColor: muted,
+      collapsedIconColor: muted,
       tilePadding: EdgeInsets.zero,
       childrenPadding: const EdgeInsets.only(bottom: 8),
       children: [
@@ -148,16 +143,18 @@ class _ErrorDetailsTile extends StatelessWidget {
           child: Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: Colors.black.withValues(alpha: 0.35),
+              color: Colors.black.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(8),
               border: Border.all(
-                color: Colors.white.withValues(alpha: 0.08),
+                color: AppColors.shellOnCanvasSecondary(
+                  context,
+                ).withValues(alpha: 0.18),
               ),
             ),
             child: Text(
               preview,
               style: TextStyle(
-                color: Colors.white.withValues(alpha: 0.7),
+                color: AppColors.shellOnCanvasSecondary(context),
                 fontSize: 11,
                 fontFamily: 'monospace',
                 height: 1.35,

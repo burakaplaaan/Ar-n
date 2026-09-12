@@ -7,6 +7,7 @@ import 'package:arin/l10n/app_localizations.dart';
 
 import '../../core/constants/app_colors.dart';
 import '../../core/router/app_router.dart';
+import '../../core/theme/arin_shell_background.dart';
 import '../../data/models/inspiration_card_model.dart';
 import 'inspiration_catalog_provider.dart';
 import 'inspiration_engagement_provider.dart';
@@ -26,15 +27,8 @@ class SavedInspirationPage extends ConsumerWidget {
     final catalogAsync = ref.watch(inspirationCatalogProvider);
 
     return Scaffold(
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [AppColors.homeGradientTop, AppColors.homeGradientBottom],
-            stops: [0.0, 0.65],
-          ),
-        ),
+      body: ArinShellBackground.buildLayered(
+        context,
         child: catalogAsync.when(
           data: (catalog) {
             final byId = {for (final c in catalog) c.id: c};
@@ -54,12 +48,12 @@ class SavedInspirationPage extends ConsumerWidget {
                   leading: IconButton(
                     onPressed: () => context.pop(),
                     icon: const Icon(Icons.arrow_back_ios_new_rounded),
-                    color: Colors.white.withValues(alpha: 0.85),
+                    color: AppColors.shellOnCanvasPrimary(context),
                   ),
                   title: Text(
                     l10n.savedInspirationTitle,
                     style: TextStyle(
-                      color: Colors.white.withValues(alpha: 0.92),
+                      color: AppColors.shellOnCanvasPrimary(context),
                       fontWeight: FontWeight.w600,
                       fontSize: 18,
                     ),
@@ -120,8 +114,8 @@ class SavedInspirationPage extends ConsumerWidget {
               ],
             );
           },
-          loading: () => const Center(
-            child: ArinLoader(color: AppColors.accentNeonGreen),
+          loading: () => Center(
+            child: ArinLoader(color: AppColors.shellAccent(context)),
           ),
           error: (_, _) => Center(
             child: Padding(
@@ -129,7 +123,9 @@ class SavedInspirationPage extends ConsumerWidget {
               child: Text(
                 l10n.userGenericError,
                 textAlign: TextAlign.center,
-                style: TextStyle(color: Colors.white.withValues(alpha: 0.7)),
+                style: TextStyle(
+                  color: AppColors.shellOnCanvasSecondary(context),
+                ),
               ),
             ),
           ),
@@ -150,7 +146,9 @@ class _SavedEmptyState extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    const accent = AppColors.accentNeonGreen;
+    final accent = AppColors.shellAccent(context);
+    final titleColor = AppColors.shellOnCanvasPrimary(context);
+    final bodyColor = AppColors.shellOnCanvasSecondary(context);
     return Stack(
       alignment: Alignment.center,
       children: [
@@ -161,7 +159,7 @@ class _SavedEmptyState extends StatelessWidget {
             'ٱلْحِكْمَةُ',
             style: GoogleFonts.scheherazadeNew(
               fontSize: 74,
-              color: Colors.white.withValues(alpha: 0.06),
+              color: titleColor.withValues(alpha: 0.08),
               fontWeight: FontWeight.w500,
               height: 1,
             ),
@@ -210,7 +208,7 @@ class _SavedEmptyState extends StatelessWidget {
                 l10n.savedInspirationEmptyTitle,
                 textAlign: TextAlign.center,
                 style: GoogleFonts.plusJakartaSans(
-                  color: Colors.white.withValues(alpha: 0.92),
+                  color: titleColor,
                   fontSize: 22,
                   fontWeight: FontWeight.w800,
                   letterSpacing: -0.4,
@@ -221,7 +219,7 @@ class _SavedEmptyState extends StatelessWidget {
                 l10n.savedInspirationEmptySubtitle,
                 textAlign: TextAlign.center,
                 style: GoogleFonts.plusJakartaSans(
-                  color: Colors.white.withValues(alpha: 0.55),
+                  color: bodyColor,
                   fontSize: 14,
                   height: 1.55,
                 ),

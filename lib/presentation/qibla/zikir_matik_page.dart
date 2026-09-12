@@ -17,6 +17,7 @@ import 'package:arin/l10n/app_localizations.dart';
 import '../../core/analytics/arin_analytics.dart';
 import '../../core/constants/product_metric_features.dart';
 import '../../core/providers/shared_preferences_provider.dart';
+import '../../core/theme/arin_shell_background.dart';
 import '../../data/models/zikir_matik_tur_log.dart';
 import '../../data/repositories/zikir_matik_repository.dart';
 import '../../data/services/product_metrics_service.dart';
@@ -47,6 +48,10 @@ const double _kZikirTasbeehBottomOverlayReserve = 100.0;
 
 /// Titreşim ve zikir bilgisi yuvarlak çapı (aynı boyut).
 const double _kZikirRoundToolsDiameter = 58.0;
+
+/// Tesbih renkleri aynı kalır; sayfa kenarı evin zeminine bağlanır.
+/// Eski tam-teal sayfaya dönüş: `false`.
+const bool kZikirmatikShellBackdrop = true;
 
 /// Renkler: [tasbeeh_counter](https://github.com/n4ff4h/tasbeeh_counter) light tema
 /// (`constants.dart`: primaryColor, primaryLightColor, tasbeehCounterColor, LCD).
@@ -118,8 +123,6 @@ class _ZikirMatikPageState extends ConsumerState<ZikirMatikPage>
 
   static const _uuid = Uuid();
 
-  late final AnimationController _phraseAnim;
-  late final Animation<double> _phraseScale;
   late final AnimationController _cardIntro;
   late final Animation<double> _cardIntroCurve;
 
@@ -163,14 +166,6 @@ class _ZikirMatikPageState extends ConsumerState<ZikirMatikPage>
     startReviewPromptTracking();
     WidgetsBinding.instance.addObserver(this);
     unawaited(ProductMetricsService.featureOpen(ProductMetricFeatures.zikir));
-    _phraseAnim = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 2600),
-    )..repeat(reverse: true);
-    _phraseScale = Tween<double>(
-      begin: 1.0,
-      end: 1.055,
-    ).animate(CurvedAnimation(parent: _phraseAnim, curve: Curves.easeInOut));
     _cardIntro = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 580),
@@ -198,7 +193,6 @@ class _ZikirMatikPageState extends ConsumerState<ZikirMatikPage>
       unawaited(_persist());
     }
     _persistDebounce = null;
-    _phraseAnim.dispose();
     _cardIntro.dispose();
     super.dispose();
   }
@@ -640,26 +634,38 @@ class _ZikirMatikPageState extends ConsumerState<ZikirMatikPage>
     await _persist();
   }
 
+  Widget _wrapZikirPage(Widget scaffold) {
+    if (!kZikirmatikShellBackdrop) return scaffold;
+    return ArinShellBackground.buildLayered(context, child: scaffold);
+  }
+
+  Color get _pageBackground => kZikirmatikShellBackdrop
+      ? Colors.transparent
+      : _ZikirmatikColors.pageBg;
+
   @override
   Widget build(BuildContext context) {
     if (!_sessionReady || _repo == null) {
-      return const Scaffold(
-        backgroundColor: _ZikirmatikColors.pageBg,
-        body: Center(
-          child: ArinLoader(
-            color: _ZikirmatikColors.outer,
-            strokeWidth: 2.5,
+      return _wrapZikirPage(
+        Scaffold(
+          backgroundColor: _pageBackground,
+          body: const Center(
+            child: ArinLoader(
+              color: _ZikirmatikColors.outer,
+              strokeWidth: 2.5,
+            ),
           ),
         ),
       );
     }
 
     final l10n = AppLocalizations.of(context)!;
-    return Semantics(
+    return _wrapZikirPage(
+      Semantics(
       label: l10n.zikirmatikCounterSemantics,
       value: '$_total, ${l10n.zikirmatikRound} $_tur',
       child: Scaffold(
-        backgroundColor: _ZikirmatikColors.pageBg,
+        backgroundColor: _pageBackground,
         body: SafeArea(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -693,8 +699,6 @@ class _ZikirMatikPageState extends ConsumerState<ZikirMatikPage>
                   child: _ZikirPhraseConcreteCard(
                     phrase: _phrase,
                     onTap: _pickPhrase,
-                    phraseAnim: _phraseAnim,
-                    phraseScale: _phraseScale,
                   ),
                 ),
               ),
@@ -918,6 +922,7 @@ class _ZikirMatikPageState extends ConsumerState<ZikirMatikPage>
           ),
         ),
       ),
+    ),
     );
   }
 }

@@ -33,6 +33,8 @@ String foldAssistantText(String raw) {
       .replaceAll('ö', 'o')
       .replaceAll('ç', 'c')
       .replaceAll('ı', 'i')
+      .replaceAll('\'', '')
+      .replaceAll('’', '')
       .replaceAll(RegExp(r'\s+'), ' ')
       .trim();
 }
@@ -64,6 +66,15 @@ String? matchAssistantPage(String raw) {
   }
   if (t.contains('sosyal') || t.contains('social')) {
     return 'social';
+  }
+  if (t.contains('kuran') ||
+      t.contains('quran') ||
+      t.contains('mushaf') ||
+      t.contains('tilavet') ||
+      t.contains('قرآن') ||
+      t.contains('قران') ||
+      t.contains('مصحف')) {
+    return 'quran';
   }
   if (t.contains('duello') ||
       t.contains('düello') ||

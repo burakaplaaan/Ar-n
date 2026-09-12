@@ -207,7 +207,10 @@ class HealingAudioNotifier extends StateNotifier<HealingAudioState> {
     _ambient = AudioPlayer();
     // Keşfet BGM sahneyi alırsa healing otomatik pause olur (state korunur,
     // user geri dönüp play'e dokununca kaldığı yerden devam eder).
-    AudioSessionCoordinator.register(AudioSessionOwner.healing, pause);
+    AudioSessionCoordinator.register(
+      AudioSessionOwner.healing,
+      silenceForForeignClaim,
+    );
   }
 
   final SharedPreferences _prefs;
@@ -215,6 +218,7 @@ class HealingAudioNotifier extends StateNotifier<HealingAudioState> {
   late final AudioPlayer _tone;
   late final AudioPlayer _ambient;
   bool _sessionReady = false;
+  bool _playersHeld = false;
   bool _disposed = false;
   Timer? _fadeTimer;
   int _fadeTicks = 0;
@@ -229,33 +233,62 @@ class HealingAudioNotifier extends StateNotifier<HealingAudioState> {
   static const int _fadeTicksTotal = 2400 ~/ _fadeTickMs; // ~2.4s ramp
 
   Future<void> _prepareSession() async {
-    if (_sessionReady) return;
+    if (!_sessionReady) {
+      try {
+        if (!kIsWeb) {
+          final session = await AudioSession.instance;
+          // İki player aynı anda: iOS’ta diğer oturumlarla karışım; Android’de daha yumuşak focus.
+          await session.configure(
+            const AudioSessionConfiguration.music().copyWith(
+              avAudioSessionCategoryOptions:
+                  AVAudioSessionCategoryOptions.mixWithOthers,
+              androidAudioFocusGainType:
+                  AndroidAudioFocusGainType.gainTransientMayDuck,
+            ),
+          );
+          await session.setActive(true);
+        }
+        await _ambient.setPlayerMode(PlayerMode.mediaPlayer);
+        // Android: SoundPool sonsuz döngü, PCM sınırında genelde `MediaPlayer`/`seek` tığından daha temiz.
+        if (!kIsWeb && defaultTargetPlatform == TargetPlatform.android) {
+          await _tone.setPlayerMode(PlayerMode.lowLatency);
+        } else {
+          await _tone.setPlayerMode(PlayerMode.mediaPlayer);
+        }
+      } catch (_) {}
+      _sessionReady = true;
+    }
+    await _armLoopingPlayers();
+  }
+
+  Future<void> _armLoopingPlayers() async {
+    if (_disposed) return;
     try {
-      if (!kIsWeb) {
-        final session = await AudioSession.instance;
-        // İki player aynı anda: iOS’ta diğer oturumlarla karışım; Android’de daha yumuşak focus.
-        await session.configure(
-          const AudioSessionConfiguration.music().copyWith(
-            avAudioSessionCategoryOptions:
-                AVAudioSessionCategoryOptions.mixWithOthers,
-            androidAudioFocusGainType:
-                AndroidAudioFocusGainType.gainTransientMayDuck,
-          ),
-        );
-        await session.setActive(true);
-      }
-      await _ambient.setPlayerMode(PlayerMode.mediaPlayer);
-      // Android: SoundPool sonsuz döngü, PCM sınırında genelde `MediaPlayer`/`seek` tığından daha temiz.
-      if (!kIsWeb && defaultTargetPlatform == TargetPlatform.android) {
-        await _tone.setPlayerMode(PlayerMode.lowLatency);
-      } else {
-        await _tone.setPlayerMode(PlayerMode.mediaPlayer);
-      }
       await _tone.setReleaseMode(ReleaseMode.loop);
       await _ambient.setReleaseMode(ReleaseMode.loop);
       await _configureHealingAudioContexts();
     } catch (_) {}
-    _sessionReady = true;
+    _playersHeld = true;
+  }
+
+  Future<void> _releasePlayers({bool force = false}) async {
+    if (!force && !_playersHeld) return;
+    _playersHeld = false;
+    try {
+      await _tone.stop();
+      await _ambient.stop();
+      await _tone.release();
+      await _ambient.release();
+    } catch (_) {}
+  }
+
+  Future<void> silenceForForeignClaim() async {
+    if (_disposed) return;
+    if (state.isPlaying) {
+      await pause();
+      return;
+    }
+    await _releasePlayers();
   }
 
   /// İki [AudioPlayer] aynı anda çalsın: Android’de ton `AUDIOFOCUS_NONE` ile ambiyansın
@@ -324,7 +357,7 @@ class HealingAudioNotifier extends StateNotifier<HealingAudioState> {
   }
 
   Future<void> _startTone() async {
-    if (_disposed) return;
+    if (_disposed || !state.isPlaying) return;
     if (state.isInshirahMode) {
       try {
         await _tone.stop();
@@ -340,6 +373,10 @@ class HealingAudioNotifier extends StateNotifier<HealingAudioState> {
       // `stop()` bazı cihazlarda ambiyans player’ını da kesiyormuş gibi davranabiliyor;
       // `play` kaynağı değiştirip devam ettirir.
       await _tone.play(AssetSource(path));
+      if (!state.isPlaying) {
+        await _releasePlayers(force: true);
+        return;
+      }
       await _tone.setVolume(vol);
     } catch (_) {}
   }
@@ -362,11 +399,14 @@ class HealingAudioNotifier extends StateNotifier<HealingAudioState> {
         return;
       }
       await _ambient.play(AssetSource(path));
+      if (!state.isPlaying) {
+        await _releasePlayers(force: true);
+      }
     } catch (_) {}
   }
 
   Future<void> _startOrStopAmbient() async {
-    if (_disposed) return;
+    if (_disposed || !state.isPlaying) return;
     if (state.isInshirahMode) {
       await _startInshirahCycle();
       return;
@@ -379,6 +419,9 @@ class HealingAudioNotifier extends StateNotifier<HealingAudioState> {
       if (path.isEmpty) return;
       await _ambient.setVolume(state.ambientVolume01);
       await _ambient.play(AssetSource(path));
+      if (!state.isPlaying) {
+        await _releasePlayers(force: true);
+      }
     } catch (_) {}
   }
 
@@ -456,6 +499,7 @@ class HealingAudioNotifier extends StateNotifier<HealingAudioState> {
     );
 
     // Ambiyans odak alsın; ton Android’de AUDIOFOCUS_NONE ile üstüne eklenir.
+    await _armLoopingPlayers();
     await _startOrStopAmbient();
     if (!await _continueOrAbortStalePlayStart(startEpoch)) return;
     await _ensureAmbientAudible();
@@ -478,10 +522,7 @@ class HealingAudioNotifier extends StateNotifier<HealingAudioState> {
   Future<bool> _continueOrAbortStalePlayStart(int startEpoch) async {
     if (_isPlayStartCurrent(startEpoch)) return true;
     if (!_disposed && !state.isPlaying) {
-      try {
-        await _tone.pause();
-        await _ambient.pause();
-      } catch (_) {}
+      await _releasePlayers(force: true);
     }
     AudioSessionCoordinator.release(AudioSessionOwner.healing);
     return false;
@@ -502,7 +543,7 @@ class HealingAudioNotifier extends StateNotifier<HealingAudioState> {
   }
 
   Future<void> pause() async {
-    if (_disposed) return;
+    if (_disposed || !state.isPlaying) return;
     _playbackEpoch++;
     _stopPlaybackTicker();
     _cancelInshirahCycle();
@@ -522,10 +563,7 @@ class HealingAudioNotifier extends StateNotifier<HealingAudioState> {
       clearSleepRemainingPaused: rem == null,
       inSleepFade: false,
     );
-    try {
-      await _tone.pause();
-      await _ambient.pause();
-    } catch (_) {}
+    await _releasePlayers();
     // Sahneyi bırak (aktif sahibi biz değilsek no-op).
     AudioSessionCoordinator.release(AudioSessionOwner.healing);
     state = state.copyWith(tickCounter: state.tickCounter + 1);

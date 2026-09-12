@@ -62,6 +62,12 @@ abstract final class AppTourCatalog {
       body: _qiblaAiBody,
     ),
     AppTourStep(
+      id: AppTourTargetId.qiblaSocial,
+      route: AppRoutes.qibla,
+      title: _qiblaSocialTitle,
+      body: _qiblaSocialBody,
+    ),
+    AppTourStep(
       id: AppTourTargetId.qiblaCompass,
       route: AppRoutes.qibla,
       title: _qiblaCompassTitle,
@@ -72,6 +78,12 @@ abstract final class AppTourCatalog {
       route: AppRoutes.qibla,
       title: _qiblaZikirTitle,
       body: _qiblaZikirBody,
+    ),
+    AppTourStep(
+      id: AppTourTargetId.qiblaQuran,
+      route: AppRoutes.qibla,
+      title: _qiblaQuranTitle,
+      body: _qiblaQuranBody,
     ),
     AppTourStep(
       id: AppTourTargetId.qiblaHilal,
@@ -200,6 +212,10 @@ abstract final class AppTourCatalog {
   static String _navToolsBody(AppLocalizations l) => l.appTourNavToolsBody;
   static String _qiblaAiTitle(AppLocalizations l) => l.appTourQiblaAiTitle;
   static String _qiblaAiBody(AppLocalizations l) => l.appTourQiblaAiBody;
+  static String _qiblaSocialTitle(AppLocalizations l) =>
+      l.appTourQiblaSocialTitle;
+  static String _qiblaSocialBody(AppLocalizations l) =>
+      l.appTourQiblaSocialBody;
   static String _qiblaCompassTitle(AppLocalizations l) =>
       l.appTourQiblaCompassTitle;
   static String _qiblaCompassBody(AppLocalizations l) =>
@@ -207,6 +223,9 @@ abstract final class AppTourCatalog {
   static String _qiblaZikirTitle(AppLocalizations l) =>
       l.appTourQiblaZikirTitle;
   static String _qiblaZikirBody(AppLocalizations l) => l.appTourQiblaZikirBody;
+  static String _qiblaQuranTitle(AppLocalizations l) =>
+      l.appTourQiblaQuranTitle;
+  static String _qiblaQuranBody(AppLocalizations l) => l.appTourQiblaQuranBody;
   static String _qiblaHilalTitle(AppLocalizations l) =>
       l.appTourQiblaHilalTitle;
   static String _qiblaHilalBody(AppLocalizations l) => l.appTourQiblaHilalBody;

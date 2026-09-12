@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 
 import '../constants/app_colors.dart';
+import 'shell_day_period.dart';
 
 /// Ana sekmelerde (home, kıble, willpower, inspire, settings…) ortak zemin.
 ///
@@ -14,9 +15,9 @@ import '../constants/app_colors.dart';
 ///   yalın kalır (eskiye dönüş: tek satır).
 ///
 /// Eskiye dönüş:
-///   • v2 "Eucalyptus Night"  → aşağıdaki "v3 GRADIENT"i yoruma al,
-///     "v2 GRADIENT" bloğunu aç + `app_colors.dart` içinde v2 hex'lerini
-///     geri getir.
+///   • Günün ışığı kapansın → [kShellDayAtmosphere] `false`.
+///   • v2 "Eucalyptus Night"  → [kShellDayAtmosphere] kapat, v2 bloğunu aç
+///     + `app_colors.dart` içinde v2 hex'lerini geri getir.
 ///   • v1 ilk sürüm            → "v1 GRADIENT" bloğunu aç.
 class ArinShellBackground {
   ArinShellBackground._();
@@ -25,67 +26,73 @@ class ArinShellBackground {
   /// "Eskiye dön" senaryosu için dokunulması gereken TEK yer burası.
   static const bool enableBubbles = true;
 
+  static const BoxDecoration _kLightDecoration = BoxDecoration(
+    gradient: LinearGradient(
+      begin: Alignment.topCenter,
+      end: Alignment.bottomCenter,
+      colors: [
+        AppColors.creamMist,
+        AppColors.creamBase,
+        AppColors.creamShellDeep,
+      ],
+      stops: [0.0, 0.45, 1.0],
+    ),
+  );
+
+  static const BoxDecoration _kDarkV3Decoration = BoxDecoration(
+    gradient: LinearGradient(
+      begin: Alignment.topLeft,
+      end: Alignment.bottomRight,
+      colors: [
+        AppColors.homeGradientTop,
+        AppColors.homeGradientMid,
+        AppColors.homeGradientBottom,
+      ],
+      stops: [0.0, 0.55, 1.0],
+    ),
+  );
+
   static bool isLight(BuildContext context) =>
       Theme.of(context).brightness == Brightness.light;
 
+  static int _periodHourStamp = -1;
+  static ShellDayPeriod _periodCache = ShellDayPeriod.dhuhr;
+
+  static ShellDayPeriod _periodOf() {
+    if (!kShellDayAtmosphere) return ShellDayPeriod.dhuhr;
+    final now = DateTime.now();
+    final stamp =
+        now.year * 1000000 + now.month * 10000 + now.day * 100 + now.hour;
+    if (stamp == _periodHourStamp) return _periodCache;
+    _periodHourStamp = stamp;
+    _periodCache = ShellDayPeriod.fromClock(now);
+    return _periodCache;
+  }
+
   static BoxDecoration decoration(BuildContext context) {
-    if (isLight(context)) {
-      return const BoxDecoration(
+    final light = isLight(context);
+    if (!kShellDayAtmosphere) {
+      return light ? _kLightDecoration : _kDarkV3Decoration;
+    }
+    final period = _periodOf();
+    if (light) {
+      return BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
-          colors: [
-            AppColors.creamMist,
-            AppColors.creamBase,
-            AppColors.creamShellDeep,
-          ],
-          stops: [0.0, 0.45, 1.0],
+          colors: period.gradientColors(light: true),
+          stops: const [0.0, 0.45, 1.0],
         ),
       );
     }
-
-    // ─── v3 GRADIENT (aktif) — alışkanlık hub ile aynı ──────────────────
-    // Köşegen yönü (topLeft → bottomRight) + koyu zümrüt-siyah 3 durak.
-    // app_colors: homeGradientTop #030806, Mid #0A1610, Bottom #050A07.
-    return const BoxDecoration(
+    return BoxDecoration(
       gradient: LinearGradient(
         begin: Alignment.topLeft,
         end: Alignment.bottomRight,
-        colors: [
-          AppColors.homeGradientTop,    // #030806
-          AppColors.homeGradientMid,    // #0A1610
-          AppColors.homeGradientBottom, // #050A07
-        ],
-        stops: [0.0, 0.55, 1.0],
+        colors: period.gradientColors(light: false),
+        stops: const [0.0, 0.55, 1.0],
       ),
     );
-
-    // ─── v2 GRADIENT (yedek, Eucalyptus Night) ──────────────────────────
-    // return const BoxDecoration(
-    //   gradient: LinearGradient(
-    //     begin: Alignment.topCenter,
-    //     end: Alignment.bottomCenter,
-    //     colors: [
-    //       AppColors.homeGradientTop,    // v2: #153C2D
-    //       AppColors.homeGradientMid,    // v2: #0D271E
-    //       AppColors.homeGradientBottom, // v2: #081511
-    //     ],
-    //     stops: [0.0, 0.55, 1.0],
-    //   ),
-    // );
-
-    // ─── v1 GRADIENT (yedek, 2 durak) ───────────────────────────────────
-    // return const BoxDecoration(
-    //   gradient: LinearGradient(
-    //     begin: Alignment.topCenter,
-    //     end: Alignment.bottomCenter,
-    //     colors: [
-    //       AppColors.homeGradientTop,    // v1: #0F2419
-    //       AppColors.homeGradientBottom, // v1: #030806
-    //     ],
-    //     stops: [0.0, 0.6],
-    //   ),
-    // );
   }
 
   /// Gradient zemininin üstüne yerleştirilen yumuşak aksan katmanı.
@@ -100,50 +107,52 @@ class ArinShellBackground {
   static Widget bubbleLayer(BuildContext context) {
     if (!enableBubbles) return const SizedBox.shrink();
     final light = isLight(context);
+    final period = kShellDayAtmosphere ? _periodOf() : null;
+    final topBubble = period == null
+        ? (light
+              ? AppColors.emeraldFaint.withValues(alpha: 0.34)
+              : AppColors.emeraldMid.withValues(alpha: 0.07))
+        : period.bubbleColor(light: light);
     return IgnorePointer(
-      child: Stack(
-        fit: StackFit.expand,
-        children: [
-          // Sağ üst — ana/büyük yumuşak zümrüt daire.
-          Positioned(
-            top: -100,
-            right: -80,
-            child: Container(
-              width: 280,
-              height: 280,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: light
-                    // Açık temada pastel emeraldFaint daha tutarlı.
-                    ? AppColors.emeraldFaint.withValues(alpha: 0.34)
-                    : AppColors.emeraldMid.withValues(alpha: 0.07),
+      child: RepaintBoundary(
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            Positioned(
+              top: -100,
+              right: -80,
+              child: Container(
+                width: 280,
+                height: 280,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: topBubble,
+                ),
               ),
             ),
-          ),
-          // Sol alt — yumuşak üçgen watermark (hub ile aynı forma).
-          // Açık temada daireye düşüyoruz (üçgen kalabalık olmasın).
-          Positioned(
-            bottom: light ? 40 : 80,
-            left: light ? -90 : -100,
-            child: light
-                ? Container(
-                    width: 200,
-                    height: 200,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: AppColors.accentGreenOnLight
-                          .withValues(alpha: 0.10),
+            Positioned(
+              bottom: light ? 40 : 80,
+              left: light ? -90 : -100,
+              child: light
+                  ? Container(
+                      width: 200,
+                      height: 200,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: AppColors.accentGreenOnLight.withValues(
+                          alpha: 0.10,
+                        ),
+                      ),
+                    )
+                  : CustomPaint(
+                      size: const Size(240, 200),
+                      painter: _TriangleWatermarkPainter(
+                        color: AppColors.accentNeonGreen.withValues(alpha: 0.04),
+                      ),
                     ),
-                  )
-                : CustomPaint(
-                    size: const Size(240, 200),
-                    painter: _TriangleWatermarkPainter(
-                      color: AppColors.accentNeonGreen
-                          .withValues(alpha: 0.04),
-                    ),
-                  ),
-          ),
-        ],
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -162,27 +171,33 @@ class ArinShellBackground {
   ///
   /// Willpower hub, `_HubBackground` yerine bunu kullanır → tek kaynak.
   static Widget backdropLayer(BuildContext context) {
-    return Stack(
-      fit: StackFit.expand,
-      children: [
-        DecoratedBox(decoration: decoration(context)),
-        bubbleLayer(context),
-      ],
+    return RepaintBoundary(
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          DecoratedBox(decoration: decoration(context)),
+          bubbleLayer(context),
+        ],
+      ),
     );
   }
 
   /// Gradient + baloncuk + sayfa içeriğini tek seferde saran helper.
   /// Container-based çağrı yerleri (home, kıble, kıble-dashboard) bunu
   /// kullanır.
-  static Widget buildLayered(
-    BuildContext context, {
-    required Widget child,
-  }) {
+  static Widget buildLayered(BuildContext context, {required Widget child}) {
     return Stack(
       fit: StackFit.expand,
       children: [
-        DecoratedBox(decoration: decoration(context)),
-        bubbleLayer(context),
+        RepaintBoundary(
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              DecoratedBox(decoration: decoration(context)),
+              bubbleLayer(context),
+            ],
+          ),
+        ),
         child,
       ],
     );
