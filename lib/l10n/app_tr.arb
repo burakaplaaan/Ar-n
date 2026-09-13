@@ -2480,7 +2480,7 @@
   "zikirmatikRound": "TUR",
   "zikirmatikRoundCompleted": "Tur tamamlandı",
   "zikirmatikResetCounter": "Sayacı sıfırla?",
-  "zikirmatikResetCounterDesc": "Toplam sayı ve tur bilgisi sıfırlanır.",
+  "zikirmatikResetCounterDesc": "Yalnızca bu zikrin sayısı ve turu sıfırlanır. Diğer zikirlerin sayısı korunur.",
   "zikirmatikCancel": "Vazgeç",
   "zikirmatikReset": "Sıfırla",
   "zikirmatikEditPhraseTitle": "Zikir adını düzenle",

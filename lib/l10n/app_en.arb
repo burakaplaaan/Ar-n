@@ -2480,7 +2480,7 @@
   "zikirmatikRound": "ROUND",
   "zikirmatikRoundCompleted": "Round completed",
   "zikirmatikResetCounter": "Reset counter?",
-  "zikirmatikResetCounterDesc": "Total count and round information will reset.",
+  "zikirmatikResetCounterDesc": "Only this dhikr's count and round will reset. Other phrases keep their counts.",
   "zikirmatikCancel": "Cancel",
   "zikirmatikReset": "Reset",
   "zikirmatikEditPhraseTitle": "Edit dhikr name",

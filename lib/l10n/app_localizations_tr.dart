@@ -5441,7 +5441,7 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get zikirmatikResetCounterDesc =>
-      'Toplam sayı ve tur bilgisi sıfırlanır.';
+      'Yalnızca bu zikrin sayısı ve turu sıfırlanır. Diğer zikirlerin sayısı korunur.';
 
   @override
   String get zikirmatikCancel => 'Vazgeç';

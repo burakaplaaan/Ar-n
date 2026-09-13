@@ -5457,7 +5457,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get zikirmatikResetCounterDesc =>
-      'Total count and round information will reset.';
+      'Only this dhikr\'s count and round will reset. Other phrases keep their counts.';
 
   @override
   String get zikirmatikCancel => 'Cancel';

@@ -12,6 +12,7 @@ import '../../core/firebase/firebase_bootstrap.dart';
 import '../../core/utils/hive_boxes.dart';
 import '../repositories/habit_repository.dart';
 import '../models/kaza_tracking_state.dart';
+import '../models/zikir_matik_phrase_session.dart';
 import '../models/zikir_matik_record.dart';
 import '../models/zikir_matik_tur_log.dart';
 import '../repositories/kaza_tracking_repository.dart';
@@ -95,7 +96,7 @@ abstract final class UserCloudBackupService {
     final repo = ZikirMatikRepository(prefs);
     final session = repo.loadSession();
     await _zikirRef(fs, uid).set({
-      'schemaVersion': 1,
+      'schemaVersion': 2,
       'updatedAtMs': nowMs,
       'syncedAt': FieldValue.serverTimestamp(),
       'session': {
@@ -105,6 +106,7 @@ abstract final class UserCloudBackupService {
         'phrase': session.phrase,
         'target': session.target,
       },
+      'phraseSessions': _phraseSessionsToJson(repo.loadPhraseSessions()),
       'customPhrases': repo.loadCustomPhrases(),
       'records': repo
           .loadRecords()
@@ -135,7 +137,19 @@ abstract final class UserCloudBackupService {
     final repo = ZikirMatikRepository(prefs);
     final cloudSession = _asMap(data['session']);
     final localSession = repo.loadSession();
-    if (_isEmptyZikirSession(localSession) && cloudSession.isNotEmpty) {
+    final localEmpty = _isEmptyZikirSession(localSession) &&
+        !repo.hasMeaningfulPhraseProgress;
+    final cloudPhraseSessions = _phraseSessionsFrom(
+      data['phraseSessions'],
+      fallbackSession: cloudSession,
+      fallbackUpdatedAtMs: _asInt(data['updatedAtMs']),
+    );
+    final mergedPhrases = ZikirMatikRepository.mergePhraseSessions(
+      cloud: cloudPhraseSessions,
+      local: repo.loadPhraseSessions(),
+    );
+    await repo.replacePhraseSessions(mergedPhrases);
+    if (localEmpty && cloudSession.isNotEmpty) {
       await repo.saveSession(
         total: _asInt(cloudSession['total']),
         round: _asInt(cloudSession['round']),
@@ -425,6 +439,47 @@ abstract final class UserCloudBackupService {
         hubEnabled: raw['hubEnabled'] as bool? ?? false,
       ),
     );
+  }
+
+  static Map<String, dynamic> _phraseSessionsToJson(
+    Map<String, ZikirMatikPhraseSession> items,
+  ) {
+    final out = <String, dynamic>{};
+    items.forEach((key, value) {
+      out[key] = value.toJson();
+    });
+    return out;
+  }
+
+  static Map<String, ZikirMatikPhraseSession> _phraseSessionsFrom(
+    Object? raw, {
+    Map<String, dynamic> fallbackSession = const <String, dynamic>{},
+    int fallbackUpdatedAtMs = 0,
+  }) {
+    final out = <String, ZikirMatikPhraseSession>{};
+    final map = _asMap(raw);
+    map.forEach((key, value) {
+      final session = ZikirMatikPhraseSession.fromJson(_asMap(value));
+      if (session == null) return;
+      out[ZikirMatikRepository.phraseSessionKey(key)] = session;
+    });
+    if (out.isEmpty && fallbackSession.isNotEmpty) {
+      final phrase = (fallbackSession['phrase'] as String?)?.trim() ?? '';
+      final synthesized = ZikirMatikPhraseSession(
+        total: _asInt(fallbackSession['total']),
+        round: _asInt(fallbackSession['round']),
+        tur: _asInt(fallbackSession['tur'], fallback: 1),
+        target: _asInt(fallbackSession['target'], fallback: 33).clamp(3, 9999),
+        updatedAtMillis: fallbackUpdatedAtMs,
+      );
+      if (synthesized.total > 0 ||
+          synthesized.round > 0 ||
+          synthesized.tur > 1 ||
+          phrase.isNotEmpty) {
+        out[ZikirMatikRepository.phraseSessionKey(phrase)] = synthesized;
+      }
+    }
+    return out;
   }
 
   static bool _isEmptyZikirSession(

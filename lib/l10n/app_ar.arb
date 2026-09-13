@@ -2480,7 +2480,7 @@
   "zikirmatikRound": "جولة",
   "zikirmatikRoundCompleted": "اكتملت الجولة",
   "zikirmatikResetCounter": "إعادة تعيين العداد؟",
-  "zikirmatikResetCounterDesc": "سيتم تصفير العدد الإجمالي ومعلومات الجولة.",
+  "zikirmatikResetCounterDesc": "يُصفَّر عداد هذا الذكر وجولته فقط. تبقى أعداد الأذكار الأخرى.",
   "zikirmatikCancel": "إلغاء",
   "zikirmatikReset": "تصفير",
   "zikirmatikEditPhraseTitle": "تعديل اسم الذكر",

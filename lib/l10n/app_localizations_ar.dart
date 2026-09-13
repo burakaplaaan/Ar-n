@@ -5412,7 +5412,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get zikirmatikResetCounterDesc =>
-      'سيتم تصفير العدد الإجمالي ومعلومات الجولة.';
+      'يُصفَّر عداد هذا الذكر وجولته فقط. تبقى أعداد الأذكار الأخرى.';
 
   @override
   String get zikirmatikCancel => 'إلغاء';
