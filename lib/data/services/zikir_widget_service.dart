@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:home_widget/home_widget.dart';
 
+import '../repositories/zikir_matik_repository.dart';
 import 'arin_widget_sync.dart';
 
 /// Zikirmatik widget'ı ile uygulama oturumu arasındaki köprü.
@@ -29,14 +30,19 @@ abstract final class ZikirWidgetService {
     var effRound = round;
     var effTur = tur;
     if (!allowDecrease) {
-      final widgetTotal = await readWidgetTotal();
-      if (widgetTotal != null && widgetTotal > total) {
+      final snap = await readWidgetSnapshot();
+      if (snap.total != null &&
+          snap.total! > total &&
+          shouldAdoptWidgetTotal(
+            sessionPhrase: phrase,
+            widgetPhrase: snap.phrase,
+          )) {
         final rec = reconcile(
           sessionTotal: total,
           sessionRound: round,
           sessionTur: tur,
           target: target,
-          widgetTotal: widgetTotal,
+          widgetTotal: snap.total!,
         );
         effTotal = rec.total;
         effRound = rec.round;
@@ -55,19 +61,42 @@ abstract final class ZikirWidgetService {
   /// Widget'ın (native +1 butonu) yazdığı kümülatif toplamı okur. Henüz hiç
   /// yazılmamışsa `null` döner.
   static Future<int?> readWidgetTotal() async {
-    if (kIsWeb) return null;
+    final snap = await readWidgetSnapshot();
+    return snap.total;
+  }
+
+  static Future<({String phrase, int? total})> readWidgetSnapshot() async {
+    if (kIsWeb) return (phrase: '', total: null);
     try {
-      final raw = await HomeWidget.getWidgetData<String>(
+      final rawPhrase = await HomeWidget.getWidgetData<String>(
+        ArinWidgetKeys.zikirPhrase,
+      );
+      final rawCount = await HomeWidget.getWidgetData<String>(
         ArinWidgetKeys.zikirCount,
       );
-      if (raw == null || raw.isEmpty) return null;
-      final n = int.tryParse(raw) ?? double.tryParse(raw)?.toInt();
-      if (n == null || n < 0) return null;
-      return n;
+      if (rawCount == null || rawCount.isEmpty) {
+        return (phrase: rawPhrase?.trim() ?? '', total: null);
+      }
+      final n = int.tryParse(rawCount) ?? double.tryParse(rawCount)?.toInt();
+      if (n == null || n < 0) {
+        return (phrase: rawPhrase?.trim() ?? '', total: null);
+      }
+      return (phrase: rawPhrase?.trim() ?? '', total: n);
     } catch (e) {
-      debugPrint('ZikirWidgetService.readWidgetTotal: $e');
-      return null;
+      debugPrint('ZikirWidgetService.readWidgetSnapshot: $e');
+      return (phrase: '', total: null);
     }
+  }
+
+  /// Widget sayacı yalnızca aynı zikre aitse oturuma karışır.
+  static bool shouldAdoptWidgetTotal({
+    required String sessionPhrase,
+    required String widgetPhrase,
+  }) {
+    final sessionKey = ZikirMatikRepository.phraseSessionKey(sessionPhrase);
+    final widgetKey = ZikirMatikRepository.phraseSessionKey(widgetPhrase);
+    if (widgetKey.isEmpty) return sessionKey.isEmpty;
+    return sessionKey == widgetKey;
   }
 
   /// Widget toplamı oturum toplamından ileriyse (kullanıcı widget'tan saydı),

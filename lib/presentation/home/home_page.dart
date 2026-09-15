@@ -2,6 +2,7 @@
 
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -104,9 +105,13 @@ class _HomePageState extends ConsumerState<HomePage> {
             } catch (_) {}
           },
           child: CustomScrollView(
-            physics: const BouncingScrollPhysics(
-              parent: AlwaysScrollableScrollPhysics(),
-            ),
+            physics: defaultTargetPlatform == TargetPlatform.android
+                ? const AlwaysScrollableScrollPhysics(
+                    parent: ClampingScrollPhysics(),
+                  )
+                : const BouncingScrollPhysics(
+                    parent: AlwaysScrollableScrollPhysics(),
+                  ),
             slivers: [
               SliverSafeArea(
                 bottom: false,
@@ -803,59 +808,43 @@ class _PrayerTimeRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     const accent = AppColors.accentNeonGreen;
-    final borderColor = isNext
-        ? accent.withValues(alpha: 0.78)
-        : accent.withValues(alpha: isDarkShell ? 0.2 : 0.3);
+    final ornament = isDarkShell
+        ? AppColors.ornamentGold
+        : AppColors.ornamentGoldDeep;
+    final idleFill = isDarkShell
+        ? AppColors.homeCardSurface.withValues(alpha: 0.52)
+        : AppColors.creamMist.withValues(alpha: 0.72);
+    // Sıradaki: aynı koyu zemin, kahve ılık dolgu — neon yeşil blok yok.
     final bg = isNext
-        ? AppColors.accentGlowGreen.withValues(alpha: isDarkShell ? 0.16 : 0.2)
-        : (isDarkShell
-              ? AppColors.homeCardSurface.withValues(alpha: 0.52)
-              : AppColors.creamMist.withValues(alpha: 0.72));
+        ? Color.lerp(idleFill, ornament, isDarkShell ? 0.16 : 0.12)!
+        : idleFill;
+    final borderColor = isNext
+        ? Color.lerp(accent, ornament, 0.45)!.withValues(
+            alpha: isDarkShell ? 0.62 : 0.55,
+          )
+        : Color.lerp(
+            accent.withValues(alpha: isDarkShell ? 0.2 : 0.3),
+            ornament,
+            0.35,
+          )!.withValues(alpha: isDarkShell ? 0.3 : 0.4);
     final nameC = isDarkShell
         ? Colors.white.withValues(alpha: isNext ? 0.98 : 0.82)
         : AppColors.emeraldDark.withValues(alpha: isNext ? 0.95 : 0.8);
     final timeMuted = isDarkShell
         ? Colors.white.withValues(alpha: 0.8)
         : AppColors.textSecondary.withValues(alpha: 0.9);
-    // Çok hafif kahverengi/bronz vurgu — yeşil paleti bozmadan sıcaklık katar.
-    final ornament = isDarkShell
-        ? AppColors.ornamentGold
-        : AppColors.ornamentGoldDeep;
     final iconColor = isNext
         ? accent
         : ornament.withValues(alpha: isDarkShell ? 0.62 : 0.7);
 
     return Container(
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [
-            bg.withValues(alpha: isNext ? 0.95 : 0.9),
-            bg.withValues(alpha: isNext ? 0.72 : 0.62),
-          ],
-        ),
+        color: bg,
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
-          color: isNext
-              ? borderColor
-              : Color.lerp(
-                  borderColor,
-                  ornament,
-                  0.35,
-                )!.withValues(alpha: isDarkShell ? 0.3 : 0.4),
-          width: isNext ? 1.35 : 0.95,
+          color: borderColor,
+          width: isNext ? 1.2 : 0.95,
         ),
-        boxShadow: isNext
-            ? [
-                BoxShadow(
-                  color: AppColors.accentGlowGreen.withValues(alpha: 0.14),
-                  blurRadius: 10,
-                  spreadRadius: 0.2,
-                  offset: const Offset(0, 3),
-                ),
-              ]
-            : null,
       ),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 13),
@@ -868,9 +857,7 @@ class _PrayerTimeRow extends StatelessWidget {
               height: 32,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: isNext
-                    ? accent.withValues(alpha: 0.14)
-                    : ornament.withValues(alpha: isDarkShell ? 0.1 : 0.12),
+                color: ornament.withValues(alpha: isDarkShell ? 0.1 : 0.12),
                 border: Border.all(
                   color: isNext
                       ? accent.withValues(alpha: 0.4)
@@ -1209,53 +1196,53 @@ class _LocationRow extends ConsumerWidget {
     return ArinPressable(
       onTap: () => _openPicker(context, ref),
       child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 0),
-          child: Row(
-            children: [
-              Icon(Icons.place_outlined, size: 14, color: meta),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  label,
-                  style: TextStyle(
-                    color: meta,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w500,
-                    decoration: TextDecoration.underline,
-                    decorationColor: meta.withValues(alpha: 0.35),
-                    decorationThickness: 1,
-                  ),
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-              Icon(
-                Icons.chevron_right,
-                size: 14,
-                color: meta.withValues(alpha: 0.7),
-              ),
-              if (freshness != null) ...[
-                const SizedBox(width: 6),
-                Text(
-                  freshness,
-                  style: TextStyle(
-                    color: meta.withValues(alpha: 0.78),
-                    fontSize: 10.5,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ],
-              const SizedBox(width: 8),
-              Text(
-                dateLabel,
+        padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 0),
+        child: Row(
+          children: [
+            Icon(Icons.place_outlined, size: 14, color: meta),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                label,
                 style: TextStyle(
-                  color: meta.withValues(alpha: isDarkShell ? 0.9 : 1.0),
-                  fontSize: 11,
+                  color: meta,
+                  fontSize: 12,
                   fontWeight: FontWeight.w500,
+                  decoration: TextDecoration.underline,
+                  decorationColor: meta.withValues(alpha: 0.35),
+                  decorationThickness: 1,
+                ),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            Icon(
+              Icons.chevron_right,
+              size: 14,
+              color: meta.withValues(alpha: 0.7),
+            ),
+            if (freshness != null) ...[
+              const SizedBox(width: 6),
+              Text(
+                freshness,
+                style: TextStyle(
+                  color: meta.withValues(alpha: 0.78),
+                  fontSize: 10.5,
+                  fontWeight: FontWeight.w600,
                 ),
               ),
             ],
-          ),
+            const SizedBox(width: 8),
+            Text(
+              dateLabel,
+              style: TextStyle(
+                color: meta.withValues(alpha: isDarkShell ? 0.9 : 1.0),
+                fontSize: 11,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
         ),
+      ),
     );
   }
 

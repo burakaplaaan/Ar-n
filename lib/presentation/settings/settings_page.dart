@@ -66,6 +66,8 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
   bool _oauthBusy = false;
   bool _signOutBusy = false;
   bool _accountDeleteBusy = false;
+  bool _playIntro = true;
+  Timer? _introTimer;
 
   @override
   void initState() {
@@ -74,10 +76,14 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
     final raw = loc.savedCity;
     final display = matchTurkeyProvinceExact(raw) ?? raw;
     _cityController = TextEditingController(text: display);
+    _introTimer = Timer(const Duration(milliseconds: 720), () {
+      if (mounted && _playIntro) setState(() => _playIntro = false);
+    });
   }
 
   @override
   void dispose() {
+    _introTimer?.cancel();
     _cityController.dispose();
     super.dispose();
   }
@@ -542,6 +548,11 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
         : AppColors.emeraldDark;
     final muted = onDark ? AppColors.textOnDarkMuted : AppColors.textSecondary;
 
+    Widget enter(Widget child, Widget Function(Widget) motion) {
+      if (!_playIntro) return child;
+      return motion(child);
+    }
+
     return SizedBox.expand(
       child: Stack(
         fit: StackFit.expand,
@@ -553,9 +564,13 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
             // kurulduğu için sayfa state'i sıfırlanır; PageStorageKey kaydırma
             // konumunu route'un kalıcı PageStorage bucket'ında saklayıp geri yükler.
             key: const PageStorageKey<String>('settingsScroll'),
-            physics: const BouncingScrollPhysics(
-              parent: AlwaysScrollableScrollPhysics(),
-            ),
+            physics: defaultTargetPlatform == TargetPlatform.android
+                ? const AlwaysScrollableScrollPhysics(
+                    parent: ClampingScrollPhysics(),
+                  )
+                : const BouncingScrollPhysics(
+                    parent: AlwaysScrollableScrollPhysics(),
+                  ),
             slivers: [
               SliverSafeArea(
                 bottom: false,
@@ -563,93 +578,120 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                   padding: const EdgeInsets.fromLTRB(22, 12, 22, 0),
                   sliver: SliverList(
                     delegate: SliverChildListDelegate([
-                      _BrandRow(titleColor: titleColor, muted: muted)
-                          .animate()
-                          .fadeIn(duration: 520.ms, curve: Curves.easeOutCubic)
-                          .slideY(
-                            begin: 0.08,
-                            end: 0,
-                            duration: 560.ms,
-                            curve: Curves.elasticOut,
-                          ),
-                      const SizedBox(height: 8),
-                      Text(
-                            l10n.settingsPageHeader,
-                            style: GoogleFonts.plusJakartaSans(
-                              fontSize: 32,
-                              fontWeight: FontWeight.w800,
-                              letterSpacing: -1.2,
-                              color: titleColor,
-                              height: 1.05,
+                      enter(
+                        _BrandRow(titleColor: titleColor, muted: muted),
+                        (child) => child
+                            .animate()
+                            .fadeIn(
+                              duration: 520.ms,
+                              curve: Curves.easeOutCubic,
+                            )
+                            .slideY(
+                              begin: 0.08,
+                              end: 0,
+                              duration: 560.ms,
+                              curve: Curves.easeOutCubic,
                             ),
-                          )
-                          .animate()
-                          .fadeIn(delay: 60.ms, duration: 480.ms)
-                          .slideX(
-                            begin: -0.02,
-                            end: 0,
-                            duration: 500.ms,
-                            curve: Curves.easeOutBack,
+                      ),
+                      const SizedBox(height: 8),
+                      enter(
+                        Text(
+                          l10n.settingsPageHeader,
+                          style: GoogleFonts.plusJakartaSans(
+                            fontSize: 32,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: -1.2,
+                            color: titleColor,
+                            height: 1.05,
                           ),
+                        ),
+                        (child) => child
+                            .animate()
+                            .fadeIn(delay: 60.ms, duration: 480.ms)
+                            .slideX(
+                              begin: -0.02,
+                              end: 0,
+                              duration: 500.ms,
+                              curve: Curves.easeOutCubic,
+                            ),
+                      ),
                       const SizedBox(height: 28),
-                      _SectionLabel(
-                        l10n.settingsSectionAccount,
-                        color: muted,
-                      ).animate().fadeIn(delay: 100.ms),
+                      enter(
+                        _SectionLabel(
+                          l10n.settingsSectionAccount,
+                          color: muted,
+                        ),
+                        (child) => child.animate().fadeIn(delay: 100.ms),
+                      ),
                       const SizedBox(height: 12),
-                      _AccountCard(
-                            onDark: onDark,
-                            authAsync: authAsync,
-                            profileName: ref
-                                .watch(userProfileProvider)
-                                .name
-                                ?.trim(),
-                            oauthBusy: _oauthBusy || _signOutBusy,
-                            onGoogle: _signInGoogle,
-                            onApple: _signInApple,
-                          )
-                          .animate()
-                          .fadeIn(delay: 140.ms)
-                          .scale(
-                            begin: const Offset(0.97, 0.97),
-                            duration: 420.ms,
-                            curve: Curves.elasticOut,
-                          ),
+                      enter(
+                        _AccountCard(
+                          onDark: onDark,
+                          authAsync: authAsync,
+                          profileName: ref
+                              .watch(userProfileProvider)
+                              .name
+                              ?.trim(),
+                          oauthBusy: _oauthBusy || _signOutBusy,
+                          onGoogle: _signInGoogle,
+                          onApple: _signInApple,
+                        ),
+                        (child) => child.animate().fadeIn(delay: 140.ms),
+                      ),
                       const SizedBox(height: 28),
-                      _SectionLabel(
-                        l10n.settingsSectionAppearance,
-                        color: muted,
-                      ).animate().fadeIn(delay: 160.ms),
+                      enter(
+                        _SectionLabel(
+                          l10n.settingsSectionAppearance,
+                          color: muted,
+                        ),
+                        (child) => child.animate().fadeIn(delay: 160.ms),
+                      ),
                       const SizedBox(height: 12),
-                      _CreamThemeToggle(
-                        value: useCream,
-                        onDark: onDark,
-                        onChanged: (v) {
-                          ref.read(themeModeProvider.notifier).state = v
-                              ? ThemeMode.light
-                              : ThemeMode.dark;
-                          HapticFeedback.selectionClick();
-                        },
-                      ).animate().fadeIn(delay: 180.ms),
+                      enter(
+                        _CreamThemeToggle(
+                          value: useCream,
+                          onDark: onDark,
+                          onChanged: (v) {
+                            unawaited(
+                              ref
+                                  .read(themeModeProvider.notifier)
+                                  .setThemeMode(
+                                    v ? ThemeMode.light : ThemeMode.dark,
+                                  ),
+                            );
+                            HapticFeedback.selectionClick();
+                          },
+                        ),
+                        (child) => child.animate().fadeIn(delay: 180.ms),
+                      ),
                       const SizedBox(height: 28),
-                      _SectionLabel(
-                        l10n.settingsSectionPrayerTimes,
-                        color: muted,
-                      ).animate().fadeIn(delay: 200.ms),
+                      enter(
+                        _SectionLabel(
+                          l10n.settingsSectionPrayerTimes,
+                          color: muted,
+                        ),
+                        (child) => child.animate().fadeIn(delay: 200.ms),
+                      ),
                       const SizedBox(height: 12),
-                      _LocationCard(
-                        onDark: onDark,
-                        cityController: _cityController,
-                        locationLoading: _locationLoading,
-                        onProvinceSelected: _onProvinceSelected,
-                        onPickDistrict: _onDistrictSelected,
-                        onDetect: _detectLocation,
-                      ).animate().fadeIn(delay: 220.ms),
+                      enter(
+                        _LocationCard(
+                          onDark: onDark,
+                          cityController: _cityController,
+                          locationLoading: _locationLoading,
+                          onProvinceSelected: _onProvinceSelected,
+                          onPickDistrict: _onDistrictSelected,
+                          onDetect: _detectLocation,
+                        ),
+                        (child) => child.animate().fadeIn(delay: 220.ms),
+                      ),
                       const SizedBox(height: 28),
-                      _SectionLabel(
-                        l10n.settingsSectionApp,
-                        color: muted,
-                      ).animate().fadeIn(delay: 240.ms),
+                      enter(
+                        _SectionLabel(
+                          l10n.settingsSectionApp,
+                          color: muted,
+                        ),
+                        (child) => child.animate().fadeIn(delay: 240.ms),
+                      ),
                       const SizedBox(height: 12),
                       AppTourAnchor(
                         id: AppTourTargetId.settingsNotifications,
@@ -660,6 +702,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                         iconBgColor: _settingsMenuIconCircle(onDark),
                         title: l10n.settingsMenuNotificationsTitle,
                         subtitle: l10n.settingsMenuNotificationsSubtitle,
+                        playIntro: _playIntro,
                         delayMs: 260,
                         onTap: () =>
                             context.push(AppRoutes.settingsNotifications),
@@ -675,6 +718,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                         ),
                         title: l10n.settingsMenuPremiumTitle,
                         subtitle: l10n.settingsMenuPremiumSubtitle,
+                        playIntro: _playIntro,
                         delayMs: 270,
                         onTap: () => context.push(AppRoutes.premium),
                       ),
@@ -686,6 +730,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                         iconBgColor: _settingsMenuIconCircle(onDark),
                         title: l10n.settingsMenuAboutTitle,
                         subtitle: l10n.settingsMenuAboutSubtitle,
+                        playIntro: _playIntro,
                         delayMs: 280,
                         onTap: () => context.push(AppRoutes.settingsAbout),
                       ),
@@ -701,6 +746,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                         ),
                         title: l10n.settingsMenuWidgetsTitle,
                         subtitle: l10n.settingsMenuWidgetsSubtitle,
+                        playIntro: _playIntro,
                         delayMs: 285,
                         onTap: () => context.push(AppRoutes.settingsWidgets),
                       ),
@@ -713,6 +759,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                         iconBgColor: _settingsMenuIconCircle(onDark),
                         title: l10n.settingsMenuPrivacyTitle,
                         subtitle: l10n.settingsMenuPrivacySubtitle,
+                        playIntro: _playIntro,
                         delayMs: 290,
                         onTap: () =>
                             context.push(AppRoutes.settingsPrivacyPolicy),
@@ -725,6 +772,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                         iconBgColor: _settingsMenuIconCircle(onDark),
                         title: l10n.settingsMenuSavedTitle,
                         subtitle: l10n.settingsMenuSavedSubtitle,
+                        playIntro: _playIntro,
                         delayMs: 300,
                         onTap: () => context.push(AppRoutes.settingsSaved),
                       ),
@@ -737,6 +785,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                           iconBgColor: _settingsMenuIconCircle(onDark),
                           title: l10n.settingsMenuAdminTitle,
                           subtitle: l10n.settingsMenuAdminSubtitle,
+                          playIntro: _playIntro,
                           delayMs: 310,
                           onTap: () => context.push(AppRoutes.settingsAdmin),
                         ),
@@ -749,6 +798,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                         iconBgColor: _settingsMenuIconCircle(onDark),
                         title: l10n.settingsMenuContactTitle,
                         subtitle: l10n.settingsMenuContactSubtitle,
+                        playIntro: _playIntro,
                         delayMs: 320,
                         onTap: () => context.push(AppRoutes.settingsContact),
                       ),
@@ -762,6 +812,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                         iconBgColor: _settingsMenuIconCircle(onDark),
                         title: l10n.languageSettingsTitle,
                         subtitle: _languageLabelForLocale(context, appLocale),
+                        playIntro: _playIntro,
                         delayMs: 340,
                         onTap: () => context.push(AppRoutes.settingsLanguage),
                       ),
@@ -774,37 +825,44 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                         iconBgColor: _settingsMenuIconCircle(onDark),
                         title: l10n.settingsMenuSupportTitle,
                         subtitle: l10n.settingsMenuSupportSubtitle,
+                        playIntro: _playIntro,
                         delayMs: 360,
                         onTap: () => context.push(AppRoutes.settingsSupport),
                       ),
                       const SizedBox(height: 28),
-                      _SectionLabel(
-                        l10n.settingsSectionFollowArin,
-                        color: muted,
-                      ).animate().fadeIn(delay: 370.ms),
+                      enter(
+                        _SectionLabel(
+                          l10n.settingsSectionFollowArin,
+                          color: muted,
+                        ),
+                        (child) => child.animate().fadeIn(delay: 370.ms),
+                      ),
                       const SizedBox(height: 12),
-                      SettingsSocialFollowCard(onDark: onDark)
-                          .animate()
-                          .fadeIn(delay: 380.ms)
-                          .scale(
-                            begin: const Offset(0.97, 0.97),
-                            duration: 420.ms,
-                            curve: Curves.elasticOut,
-                          ),
+                      enter(
+                        SettingsSocialFollowCard(onDark: onDark),
+                        (child) => child.animate().fadeIn(delay: 380.ms),
+                      ),
                       if (signedInUser != null) ...[
                         const SizedBox(height: 28),
-                        _SectionLabel(
-                          l10n.settingsSectionSession,
-                          color: muted,
-                        ).animate().fadeIn(delay: 380.ms),
+                        enter(
+                          _SectionLabel(
+                            l10n.settingsSectionSession,
+                            color: muted,
+                          ),
+                          (child) => child.animate().fadeIn(delay: 380.ms),
+                        ),
                         const SizedBox(height: 12),
-                        _SessionActionsPanel(
-                          onDark: onDark,
-                          sessionBusy:
-                              _oauthBusy || _signOutBusy || _accountDeleteBusy,
-                          onSignOut: _signOut,
-                          onDeleteAccount: _deleteAccount,
-                        ).animate().fadeIn(delay: 400.ms),
+                        enter(
+                          _SessionActionsPanel(
+                            onDark: onDark,
+                            sessionBusy: _oauthBusy ||
+                                _signOutBusy ||
+                                _accountDeleteBusy,
+                            onSignOut: _signOut,
+                            onDeleteAccount: _deleteAccount,
+                          ),
+                          (child) => child.animate().fadeIn(delay: 400.ms),
+                        ),
                       ],
                       SizedBox(
                         height: MediaQuery.paddingOf(context).bottom + 100,
@@ -1525,6 +1583,7 @@ class _SettingsMenuTile extends StatelessWidget {
     required this.subtitle,
     required this.delayMs,
     required this.onTap,
+    this.playIntro = true,
   }) : assert(icon != null || iconWidget != null);
 
   final bool onDark;
@@ -1535,6 +1594,7 @@ class _SettingsMenuTile extends StatelessWidget {
   final String title;
   final String subtitle;
   final int delayMs;
+  final bool playIntro;
   final VoidCallback? onTap;
 
   @override
@@ -1547,7 +1607,7 @@ class _SettingsMenuTile extends StatelessWidget {
         ? AppColors.cardSurface.withValues(alpha: 0.42)
         : Colors.white.withValues(alpha: 0.65);
 
-    return ArinPressable(
+    final tile = ArinPressable(
           enabled: enabled,
           haptic: false,
           onTap: enabled
@@ -1618,7 +1678,9 @@ class _SettingsMenuTile extends StatelessWidget {
               ),
             ),
           ),
-        )
+        );
+    if (!playIntro) return tile;
+    return tile
         .animate()
         .fadeIn(
           delay: Duration(milliseconds: delayMs),
@@ -1629,7 +1691,7 @@ class _SettingsMenuTile extends StatelessWidget {
           end: 0,
           delay: Duration(milliseconds: delayMs),
           duration: 450.ms,
-          curve: Curves.elasticOut,
+          curve: Curves.easeOutCubic,
         );
   }
 }

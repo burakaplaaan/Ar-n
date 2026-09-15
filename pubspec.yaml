@@ -59,6 +59,7 @@ dependencies:
   image: ^4.5.4
   uuid: ^4.3.3
   audioplayers: ^6.6.0
+  scrollable_positioned_list: ^0.3.8
   path_provider: ^2.1.5
   audio_session: ^0.2.3
   vibration: ^3.1.8
@@ -183,6 +184,7 @@ flutter:
     - assets/animations/
     - assets/social/avatars/
     - assets/images/zikir/
+    - assets/images/qibla_hub/
     - assets/images/widget_guide/
     - assets/data/
     - assets/data/inspiration/

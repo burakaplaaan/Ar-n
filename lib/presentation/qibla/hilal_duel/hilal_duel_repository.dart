@@ -57,6 +57,7 @@ class HilalDuelProfile {
     this.avatarFrame = false,
     this.specialHilalIcon = false,
     this.nameAccent = false,
+    this.championWeeks = 0,
   });
 
   final String name;
@@ -73,6 +74,7 @@ class HilalDuelProfile {
   final bool avatarFrame;
   final bool specialHilalIcon;
   final bool nameAccent;
+  final int championWeeks;
 
   double get levelProgress {
     if (maxLevel || nextLevelHilals <= levelFloorHilals) return 1;
@@ -97,6 +99,7 @@ class HilalDuelProfile {
       avatarFrame: map['avatarFrame'] == true,
       specialHilalIcon: map['specialHilalIcon'] == true,
       nameAccent: map['nameAccent'] == true,
+      championWeeks: (map['championWeeks'] as num?)?.toInt() ?? 0,
     );
   }
 }
@@ -113,6 +116,7 @@ class HilalDuelPlayer {
     this.avatarFrame = false,
     this.specialHilalIcon = false,
     this.nameAccent = false,
+    this.championWeeks = 0,
   });
 
   final String id;
@@ -125,6 +129,7 @@ class HilalDuelPlayer {
   final bool avatarFrame;
   final bool specialHilalIcon;
   final bool nameAccent;
+  final int championWeeks;
 
   factory HilalDuelPlayer.fromMap(Map<String, dynamic> map) {
     return HilalDuelPlayer(
@@ -138,6 +143,7 @@ class HilalDuelPlayer {
       avatarFrame: map['avatarFrame'] == true,
       specialHilalIcon: map['specialHilalIcon'] == true,
       nameAccent: map['nameAccent'] == true,
+      championWeeks: (map['championWeeks'] as num?)?.toInt() ?? 0,
     );
   }
 }

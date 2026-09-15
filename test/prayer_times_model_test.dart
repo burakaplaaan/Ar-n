@@ -268,6 +268,29 @@ void main() {
     });
   });
 
+  group('PrayerTimesModel.currentSalatIndex', () {
+    final model = PrayerTimesModel.fromJson(
+      {
+        'Fajr': '05:00',
+        'Sunrise': '06:30',
+        'Dhuhr': '13:00',
+        'Asr': '16:30',
+        'Maghrib': '19:00',
+        'Isha': '20:30',
+      },
+      '2026-04-22',
+      'Test',
+    );
+
+    test('öğleden sonra ikindi öncesi öğledir', () {
+      expect(model.currentSalatIndex(DateTime(2026, 4, 22, 14, 0)), 1);
+    });
+
+    test('imsaktan önce yatsıdır', () {
+      expect(model.currentSalatIndex(DateTime(2026, 4, 22, 4, 0)), 4);
+    });
+  });
+
   group('PrayerTimesModel.matchesCalendarDay', () {
     test('Aynı gün → true', () {
       final m = PrayerTimesModel.fromMap({

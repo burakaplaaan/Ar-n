@@ -1,7 +1,8 @@
 // Bilgi Düellosu seviye / ödül yardımcıları — sunucu quiz.js ile aynı kurallar.
 
-const int kHilalDuelMaxLevel = 10;
+const int kHilalDuelMaxLevel = 20;
 const int kHilalDuelForfeitPenalty = 5;
+const int kHilalDuelGoldenCrescentWeeks = 10;
 
 class HilalDuelLevelProgress {
   const HilalDuelLevelProgress({
@@ -28,28 +29,31 @@ class HilalDuelLevelProgress {
   }
 }
 
-/// Seviye ödülleri — satılmaz, otomatik açılır. LV 1–2 hediyesiz.
+/// Seviye ödülleri — satılmaz, otomatik açılır.
 enum HilalDuelRewardKind {
   frame,
   frameSilver,
-  titleTalebe,
+  frameGold,
+  title,
   avatarGlow,
   nameAccentSoft,
   specialHilal,
-  titleMuderris,
-  titleIlimDostu,
+  hilalPulse,
+  nameAccentGilt,
 }
 
-enum HilalDuelNameAccent { none, faint, soft, full }
+enum HilalDuelNameAccent { none, faint, soft, full, gilt }
 
 class HilalDuelLevelReward {
   const HilalDuelLevelReward({
     required this.level,
     required this.kind,
+    this.title,
   });
 
   final int level;
   final HilalDuelRewardKind kind;
+  final String? title;
 }
 
 class HilalDuelCosmetics {
@@ -58,6 +62,7 @@ class HilalDuelCosmetics {
     required this.avatarGlow,
     required this.nameAccent,
     required this.specialHilalIcon,
+    required this.hilalPulse,
     required this.title,
   });
 
@@ -66,20 +71,25 @@ class HilalDuelCosmetics {
     avatarGlow: false,
     nameAccent: HilalDuelNameAccent.none,
     specialHilalIcon: false,
+    hilalPulse: false,
     title: null,
   );
 
-  /// 0 yok, 1 bronz çerçeve (LV3), 2 gümüş çift halka (LV4+).
+  /// 0 yok, 1 bronz (LV3), 2 gümüş çift halka (LV4), 3 altın çift halka (LV11).
   final int frameTier;
   final bool avatarGlow;
   final HilalDuelNameAccent nameAccent;
   final bool specialHilalIcon;
+  final bool hilalPulse;
   final String? title;
 
   bool get avatarFrame => frameTier >= 1;
-  bool get nameAccentFull => nameAccent == HilalDuelNameAccent.full;
+  bool get nameAccentFull =>
+      nameAccent == HilalDuelNameAccent.full ||
+      nameAccent == HilalDuelNameAccent.gilt;
   bool get nameAccentSoft => nameAccent == HilalDuelNameAccent.soft;
   bool get nameAccentFaint => nameAccent == HilalDuelNameAccent.faint;
+  bool get nameAccentGilt => nameAccent == HilalDuelNameAccent.gilt;
 
   @override
   bool operator ==(Object other) =>
@@ -88,6 +98,7 @@ class HilalDuelCosmetics {
       avatarGlow == other.avatarGlow &&
       nameAccent == other.nameAccent &&
       specialHilalIcon == other.specialHilalIcon &&
+      hilalPulse == other.hilalPulse &&
       title == other.title;
 
   @override
@@ -96,19 +107,46 @@ class HilalDuelCosmetics {
         avatarGlow,
         nameAccent,
         specialHilalIcon,
+        hilalPulse,
         title,
       );
 }
 
 const List<HilalDuelLevelReward> kHilalDuelRewards = [
+  HilalDuelLevelReward(level: 2, kind: HilalDuelRewardKind.title, title: 'Talebe'),
+  HilalDuelLevelReward(level: 3, kind: HilalDuelRewardKind.title, title: 'Kayyım'),
   HilalDuelLevelReward(level: 3, kind: HilalDuelRewardKind.frame),
+  HilalDuelLevelReward(level: 4, kind: HilalDuelRewardKind.title, title: 'Müezzin'),
   HilalDuelLevelReward(level: 4, kind: HilalDuelRewardKind.frameSilver),
-  HilalDuelLevelReward(level: 5, kind: HilalDuelRewardKind.titleTalebe),
+  HilalDuelLevelReward(level: 5, kind: HilalDuelRewardKind.title, title: 'Hatip'),
+  HilalDuelLevelReward(level: 6, kind: HilalDuelRewardKind.title, title: 'İmam'),
   HilalDuelLevelReward(level: 6, kind: HilalDuelRewardKind.avatarGlow),
+  HilalDuelLevelReward(level: 7, kind: HilalDuelRewardKind.title, title: 'Vaiz'),
   HilalDuelLevelReward(level: 7, kind: HilalDuelRewardKind.nameAccentSoft),
+  HilalDuelLevelReward(level: 8, kind: HilalDuelRewardKind.title, title: 'Hoca'),
   HilalDuelLevelReward(level: 8, kind: HilalDuelRewardKind.specialHilal),
-  HilalDuelLevelReward(level: 9, kind: HilalDuelRewardKind.titleMuderris),
-  HilalDuelLevelReward(level: 10, kind: HilalDuelRewardKind.titleIlimDostu),
+  HilalDuelLevelReward(
+    level: 9,
+    kind: HilalDuelRewardKind.title,
+    title: 'Müderris',
+  ),
+  HilalDuelLevelReward(level: 10, kind: HilalDuelRewardKind.title, title: 'Derviş'),
+  HilalDuelLevelReward(level: 11, kind: HilalDuelRewardKind.title, title: 'Şeyh'),
+  HilalDuelLevelReward(level: 11, kind: HilalDuelRewardKind.frameGold),
+  HilalDuelLevelReward(level: 13, kind: HilalDuelRewardKind.title, title: 'Müftü'),
+  HilalDuelLevelReward(level: 13, kind: HilalDuelRewardKind.hilalPulse),
+  HilalDuelLevelReward(level: 15, kind: HilalDuelRewardKind.title, title: 'Kadı'),
+  HilalDuelLevelReward(
+    level: 17,
+    kind: HilalDuelRewardKind.title,
+    title: 'Kazasker',
+  ),
+  HilalDuelLevelReward(level: 17, kind: HilalDuelRewardKind.nameAccentGilt),
+  HilalDuelLevelReward(
+    level: 19,
+    kind: HilalDuelRewardKind.title,
+    title: 'Şeyhülislam',
+  ),
 ];
 
 /// [hilals] toplam hilal (eksi olabilir); seviye hesabı 0 tabanlıdır.
@@ -162,41 +200,68 @@ int hilalAward({
       (safeCorrect == roundCount ? 3 : 0);
 }
 
-int _clampedLevel(int rawLevel) {
+int clampedHilalLevel(int rawLevel) {
   if (rawLevel < 1) return 1;
   if (rawLevel > kHilalDuelMaxLevel) return kHilalDuelMaxLevel;
   return rawLevel;
 }
 
+int _frameTierForLevel(int level) {
+  if (level >= 11) return 3;
+  if (level >= 4) return 2;
+  if (level >= 3) return 1;
+  return 0;
+}
+
+HilalDuelNameAccent _nameAccentForLevel(int level) {
+  if (level >= 17) return HilalDuelNameAccent.gilt;
+  if (level >= 10) return HilalDuelNameAccent.full;
+  if (level >= 7) return HilalDuelNameAccent.soft;
+  if (level >= 6) return HilalDuelNameAccent.faint;
+  return HilalDuelNameAccent.none;
+}
+
+int championWeeksOf(int rawWeeks) {
+  if (rawWeeks < 0) return 0;
+  return rawWeeks;
+}
+
+bool hasGoldenCrescent(int rawWeeks) =>
+    championWeeksOf(rawWeeks) >= kHilalDuelGoldenCrescentWeeks;
+
 /// Görsel kozmetikler seviyedendir; eski sunucu alanı olmasa da çalışır.
 /// Haftalık listedeki botlar kozmetik almaz (`isBot: true`).
 HilalDuelCosmetics cosmeticsForLevel(int rawLevel, {bool isBot = false}) {
   if (isBot) return HilalDuelCosmetics.none;
-  final level = _clampedLevel(rawLevel);
-  final HilalDuelNameAccent accent;
-  if (level >= 10) {
-    accent = HilalDuelNameAccent.full;
-  } else if (level >= 7) {
-    accent = HilalDuelNameAccent.soft;
-  } else if (level >= 6) {
-    accent = HilalDuelNameAccent.faint;
-  } else {
-    accent = HilalDuelNameAccent.none;
-  }
+  final level = clampedHilalLevel(rawLevel);
   return HilalDuelCosmetics(
-    frameTier: level >= 4 ? 2 : (level >= 3 ? 1 : 0),
+    frameTier: _frameTierForLevel(level),
     avatarGlow: level >= 6,
-    nameAccent: accent,
+    nameAccent: _nameAccentForLevel(level),
     specialHilalIcon: level >= 8,
+    hilalPulse: level >= 13,
     title: titleForLevel(level),
   );
 }
 
-String? titleForLevel(int level) {
-  if (level >= 10) return 'İlim Dostu';
+/// 15 bilindik rütbe, 20 basamak. LV11–12 / 13–14 / 15–16 / 17–18 / 19–20 çift.
+String titleForLevel(int rawLevel) {
+  final level = clampedHilalLevel(rawLevel);
+  if (level >= 19) return 'Şeyhülislam';
+  if (level >= 17) return 'Kazasker';
+  if (level >= 15) return 'Kadı';
+  if (level >= 13) return 'Müftü';
+  if (level >= 11) return 'Şeyh';
+  if (level >= 10) return 'Derviş';
   if (level >= 9) return 'Müderris';
-  if (level >= 5) return 'Talebe';
-  return null;
+  if (level >= 8) return 'Hoca';
+  if (level >= 7) return 'Vaiz';
+  if (level >= 6) return 'İmam';
+  if (level >= 5) return 'Hatip';
+  if (level >= 4) return 'Müezzin';
+  if (level >= 3) return 'Kayyım';
+  if (level >= 2) return 'Talebe';
+  return 'Çömez';
 }
 
 bool hasAvatarFrame(int level) => cosmeticsForLevel(level).avatarFrame;

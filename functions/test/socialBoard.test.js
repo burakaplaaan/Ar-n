@@ -124,6 +124,8 @@ test("ban hours and active window", () => {
 });
 
 test("bio length and clean text", () => {
+  assert.equal(testables.validateBio(""), "");
+  assert.equal(testables.validateBio("   "), "");
   assert.equal(
     testables.validateBio("Namazı kaçırmamaya çalışan biriyim."),
     "Namazı kaçırmamaya çalışan biriyim.",
@@ -211,6 +213,29 @@ test("avatar ids stay in the local emoji set", () => {
   assert.equal(testables.normalizeAvatarId(99), 0);
   assert.throws(() => testables.validateAvatarId(13), /avatar/);
   assert.throws(() => testables.validateAvatarId(-1), /avatar/);
+});
+
+test("comment push copy is a complete sentence", () => {
+  assert.deepEqual(testables.socialCommentPushCopy("tr", "Ayşe"), {
+    title: "Sosyal",
+    body: "Ayşe senin gönderine yorum yaptı.",
+  });
+  assert.deepEqual(testables.socialCommentPushCopy("en", "Ayse"), {
+    title: "Social",
+    body: "Ayse commented on your post.",
+  });
+  assert.deepEqual(testables.socialCommentPushCopy("ar", "Aisha"), {
+    title: "اجتماعي",
+    body: "Aisha علّق على منشورك.",
+  });
+  assert.equal(
+    testables.socialCommentPushCopy("", "  ").body,
+    "Biri senin gönderine yorum yaptı.",
+  );
+  assert.equal(
+    testables.socialCommentPushCopy("en-US", "").body,
+    "Someone commented on your post.",
+  );
 });
 
 test("premiumRecordActive honors expiry", () => {

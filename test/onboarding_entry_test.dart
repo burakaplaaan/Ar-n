@@ -2,6 +2,7 @@ import 'package:arin/core/providers/shared_preferences_provider.dart';
 import 'package:arin/l10n/app_localizations.dart';
 import 'package:arin/l10n/app_localizations_tr.dart';
 import 'package:arin/presentation/onboarding/onboarding_heart_screen.dart';
+import 'package:arin/presentation/onboarding/onboarding_name_screen.dart';
 import 'package:arin/presentation/onboarding/onboarding_page.dart';
 import 'package:arin/presentation/onboarding/onboarding_struggle_copy.dart';
 import 'package:arin/presentation/onboarding/onboarding_choice_screen.dart';
@@ -54,6 +55,56 @@ void main() {
     await tester.pump(const Duration(seconds: 4));
     expect(find.textContaining('Devam'), findsOneWidget);
     await tester.pumpAndSettle();
+  });
+
+  testWidgets('hikaye sonrası ilk soru zinciri atlanır', (tester) async {
+    expect(kOnboardingSkipEarlyQuestions, isTrue);
+    SharedPreferences.setMockInitialValues({});
+    final prefs = await SharedPreferences.getInstance();
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [sharedPreferencesProvider.overrideWithValue(prefs)],
+        child: MaterialApp(
+          locale: const Locale('tr'),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: const OnboardingPage(),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.textContaining('Başla'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.textContaining('Başlayalım'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
+    await tester.tap(find.byKey(const Key('onboarding_story_typewriter')));
+    await tester.pump();
+    await tester.pump(const Duration(seconds: 4));
+    await tester.tap(find.textContaining('Devam'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Bunu kalbine göre örüyoruz'), findsOneWidget);
+    expect(find.byType(OnboardingNameScreen), findsNothing);
+
+    await tester.tap(find.textContaining('Devam'));
+    await tester.pumpAndSettle();
+    expect(
+      find.text('Namaz ve dua ritmini nasıl tarif edersin?'),
+      findsOneWidget,
+    );
+    expect(find.textContaining(', namaz'), findsNothing);
+  });
+
+  test('isimsiz kurulum başlıklarında virgül kalmaz', () {
+    final l10n = AppLocalizationsTr();
+    expect(l10n.onboardingPrayerTitleAnonymous.startsWith(','), isFalse);
+    expect(l10n.onboardingWaswasaTitleAnonymous.startsWith(','), isFalse);
+    expect(l10n.onboardingPrepareBar1TitleAnonymous.startsWith(','), isFalse);
+    expect(l10n.onboardingPrayerTitle('').startsWith(','), isTrue);
+    expect(l10n.onboardingDuaBodyAnonymous.contains('bu kulun'), isTrue);
   });
 
   test('kalp yüzdesi etiketleri aralıklara göre değişir', () {

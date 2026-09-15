@@ -95,6 +95,10 @@ class AssistantToolExecutor {
         _go(AppRoutes.qibla, returnTool: 'healing');
         await pushQiblaHubRoute(QiblaHubRoutes.healing);
         return null;
+      case 'quran':
+        _go(AppRoutes.qibla, returnTool: 'quran');
+        await pushQiblaHubRoute(QiblaHubRoutes.quran);
+        return null;
       case 'prayer_circle':
         _push(AppRoutes.prayerCircle, returnTool: 'prayer_circle');
         return null;

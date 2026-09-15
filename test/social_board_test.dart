@@ -33,10 +33,18 @@ void main() {
     expect(isSocialCommentValid('amin'), isTrue);
   });
 
-  test('bio is required once and stays short', () {
+  test('bio is optional and stays short when written', () {
+    expect(isSocialBioValid(''), isFalse);
+    expect(isSocialOptionalBioValid(''), isTrue);
+    expect(isSocialOptionalBioValid('kısa'), isFalse);
     expect(isSocialBioValid('kısa'), isFalse);
     expect(isSocialBioValid('Namazı kaçırmamaya çalışan biriyim.'), isTrue);
+    expect(
+      isSocialOptionalBioValid('Namazı kaçırmamaya çalışan biriyim.'),
+      isTrue,
+    );
     expect(isSocialBioValid('Bu kadar siktir yeter kardeşim'), isFalse);
+    expect(isSocialOptionalBioValid('Bu kadar siktir yeter kardeşim'), isFalse);
   });
 
   test('profile peek prefers own bio then stamped then cache', () {
@@ -64,6 +72,16 @@ void main() {
         knownBios: const {'u2': 'Cache'},
       ),
       'Cache',
+    );
+    expect(
+      socialPeekBio(
+        authorUid: 'me',
+        stampedBio: 'Damgalı',
+        myUid: 'me',
+        myBio: '',
+        knownBios: const {'me': 'Cache'},
+      ),
+      '',
     );
   });
 

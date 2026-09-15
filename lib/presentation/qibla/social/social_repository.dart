@@ -50,8 +50,8 @@ class SocialRepository {
   }
 
   Future<SocialProfile> claimUsername(
-    String username,
-    String bio, {
+    String username, {
+    String bio = '',
     int avatarId = 0,
   }) async {
     final token = await _fcmToken();

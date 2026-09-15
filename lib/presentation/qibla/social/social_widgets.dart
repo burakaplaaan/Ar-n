@@ -470,23 +470,28 @@ class _SocialProfilePeekState extends State<_SocialProfilePeek> {
     });
   }
 
-  Future<void> _saveAvatar() async {
+  bool get _bioDirty =>
+      _editing && normalizeSocialBody(_bioCtrl.text) != _bio;
+
+  bool get _canCommit =>
+      !_saving && !_savingAvatar && (_avatarDirty || _bioDirty);
+
+  Future<bool> _persistAvatar() async {
     final onSave = widget.onSaveAvatar;
-    if (onSave == null || _savingAvatar || _avatarId == _savedAvatarId) return;
+    if (onSave == null || _avatarId == _savedAvatarId) return true;
     _savingAvatar = true;
-    if (mounted) {
-      setState(() => _error = null);
-    }
+    if (mounted) setState(() => _error = null);
     try {
       final saved = socialNormalizeAvatarId(await onSave(_avatarId));
-      if (!mounted) return;
+      if (!mounted) return false;
       setState(() {
         _avatarId = saved;
         _savedAvatarId = saved;
         _savingAvatar = false;
       });
+      return true;
     } catch (error) {
-      if (!mounted) return;
+      if (!mounted) return false;
       setState(() {
         _savingAvatar = false;
         _error = socialUserError(
@@ -494,24 +499,25 @@ class _SocialProfilePeekState extends State<_SocialProfilePeek> {
           AppLocalizations.of(context)!.userGenericError,
         );
       });
+      return false;
     }
   }
 
-  Future<void> _save() async {
+  Future<bool> _persistBio() async {
     final onSave = widget.onSaveBio;
     final next = normalizeSocialBody(_bioCtrl.text);
-    if (onSave == null || _saving) return;
+    if (onSave == null) return true;
     if (containsSocialInsult(next)) {
       setState(() => _error = AppLocalizations.of(context)!.socialProfanity);
-      return;
+      return false;
     }
-    if (!isSocialBioValid(next)) return;
+    if (!isSocialOptionalBioValid(next)) return false;
     if (next == _bio) {
       setState(() {
         _editing = false;
         _error = null;
       });
-      return;
+      return true;
     }
     setState(() {
       _saving = true;
@@ -519,15 +525,16 @@ class _SocialProfilePeekState extends State<_SocialProfilePeek> {
     });
     try {
       final saved = (await onSave(next)).trim();
-      if (!mounted) return;
+      if (!mounted) return false;
       setState(() {
         _bio = saved.isEmpty ? next : saved;
         _bioCtrl.text = _bio;
         _editing = false;
         _saving = false;
       });
+      return true;
     } catch (error) {
-      if (!mounted) return;
+      if (!mounted) return false;
       setState(() {
         _saving = false;
         _error = socialUserError(
@@ -535,7 +542,17 @@ class _SocialProfilePeekState extends State<_SocialProfilePeek> {
           AppLocalizations.of(context)!.userGenericError,
         );
       });
+      return false;
     }
+  }
+
+  Future<void> _commitAndClose() async {
+    if (!_canCommit) return;
+    if (_avatarDirty && !await _persistAvatar()) return;
+    if (!mounted) return;
+    if (_bioDirty && !await _persistBio()) return;
+    if (!mounted) return;
+    Navigator.of(context, rootNavigator: true).pop();
   }
 
   @override
@@ -552,7 +569,7 @@ class _SocialProfilePeekState extends State<_SocialProfilePeek> {
         ? Colors.white.withValues(alpha: 0.05)
         : Colors.black.withValues(alpha: 0.04);
     final empty = _bio.isEmpty;
-    final draftOk = isSocialBioValid(_bioCtrl.text);
+    final draftOk = isSocialOptionalBioValid(_bioCtrl.text);
     final keyboard = MediaQuery.viewInsetsOf(context).bottom;
     return Semantics(
       label: l10n.socialProfileTitle,
@@ -722,10 +739,12 @@ class _SocialProfilePeekState extends State<_SocialProfilePeek> {
                           const SizedBox(width: 8),
                           Expanded(
                             child: ArinPressable(
-                              enabled: draftOk && !_saving,
+                              enabled: draftOk && _canCommit,
                               scale: 0.98,
                               sink: 0,
-                              onTap: draftOk && !_saving ? _save : null,
+                              onTap: draftOk && _canCommit
+                                  ? _commitAndClose
+                                  : null,
                               child: DecoratedBox(
                                 decoration: BoxDecoration(
                                   color: onDark
@@ -766,9 +785,7 @@ class _SocialProfilePeekState extends State<_SocialProfilePeek> {
                     if (_canEditAvatar) ...[
                       const SizedBox(height: 16),
                       FilledButton(
-                        onPressed: _avatarDirty && !_savingAvatar
-                            ? _saveAvatar
-                            : null,
+                        onPressed: _canCommit && draftOk ? _commitAndClose : null,
                         style: FilledButton.styleFrom(
                           minimumSize: const Size.fromHeight(48),
                           backgroundColor: onDark

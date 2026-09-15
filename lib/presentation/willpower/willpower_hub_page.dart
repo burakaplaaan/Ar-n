@@ -30,6 +30,7 @@ import '../shared/providers/willpower_hub_nav_provider.dart';
 import '../shared/widgets/arin_popup.dart';
 import '../shared/widgets/arin_pressable.dart';
 import '../shared/widgets/arin_shell_layout.dart';
+import '../shared/widgets/ritual_pulse.dart';
 import '../kaza/kaza_tracking_provider.dart';
 import 'salat_celebration.dart';
 import 'salat_providers.dart';
@@ -194,7 +195,7 @@ class _HubNefesEgzersiziRow extends StatelessWidget {
           ),
         ],
       ),
-    ).animate().fadeIn(delay: 60.ms, duration: 320.ms);
+    );
   }
 }
 
@@ -1844,9 +1845,14 @@ class _BuildTab extends ConsumerWidget {
                     emphasis: e.habit.isCustomTracked,
                     child: _WillHabitTile(
                       item: e,
-                      onToggle: () => ref
-                          .read(habitSummaryProvider.notifier)
-                          .toggleToday(e.habit.id),
+                      onToggle: () => unawaited(
+                        toggleHabitTodayWithPulse(
+                          context: context,
+                          ref: ref,
+                          habitId: e.habit.id,
+                          templateId: e.habit.templateId,
+                        ),
+                      ),
                       onDelete: () =>
                           _confirmDeleteHabitHub(context, ref, e.habit.id),
                       onOpen: () {
@@ -1874,9 +1880,14 @@ class _BuildTab extends ConsumerWidget {
                     item: e,
                     embedSalatPrayerRow: true,
                     gelisimHubCardHeight: _kHubKazaNamazCardHeight,
-                    onToggle: () => ref
-                        .read(habitSummaryProvider.notifier)
-                        .toggleToday(e.habit.id),
+                    onToggle: () => unawaited(
+                      toggleHabitTodayWithPulse(
+                        context: context,
+                        ref: ref,
+                        habitId: e.habit.id,
+                        templateId: e.habit.templateId,
+                      ),
+                    ),
                     onDelete: () =>
                         _confirmDeleteHabitHub(context, ref, e.habit.id),
                     onOpen: () {
@@ -2144,28 +2155,10 @@ Widget _hubListTileEntrance({
   required int index,
   required bool emphasis,
 }) {
-  if (emphasis) {
-    return child
-        .animate()
-        .fadeIn(
-          duration: 420.ms,
-          delay: (index * 68).ms,
-          curve: Curves.easeOutCubic,
-        )
-        .slideY(
-          begin: 0.08,
-          duration: 460.ms,
-          delay: (index * 68).ms,
-          curve: Curves.easeOutCubic,
-        )
-        .scale(
-          begin: const Offset(0.92, 0.92),
-          duration: 520.ms,
-          delay: (index * 52).ms,
-          curve: Curves.easeOutBack,
-        );
-  }
-  return child.animate().fadeIn(duration: 300.ms, delay: (index * 55).ms);
+  return RepaintBoundary(
+    key: ValueKey<int>(index * 2 + (emphasis ? 1 : 0)),
+    child: child,
+  );
 }
 
 class _QuitTab extends ConsumerWidget {
@@ -2277,9 +2270,14 @@ class _QuitTab extends ConsumerWidget {
                   emphasis: e.habit.isCustomTracked,
                   child: _WillHabitTile(
                     item: e,
-                    onToggle: () => ref
-                        .read(habitSummaryProvider.notifier)
-                        .toggleToday(e.habit.id),
+                    onToggle: () => unawaited(
+                      toggleHabitTodayWithPulse(
+                        context: context,
+                        ref: ref,
+                        habitId: e.habit.id,
+                        templateId: e.habit.templateId,
+                      ),
+                    ),
                     onDelete: () =>
                         _confirmDeleteHabitHub(context, ref, e.habit.id),
                     onOpen: () {

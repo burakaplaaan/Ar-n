@@ -57,6 +57,9 @@ bool assistantReturnStillOnTool({
       return qiblaTop == QiblaHubRoutes.zikir;
     case 'healing':
       return qiblaTop == QiblaHubRoutes.healing;
+    case 'quran':
+      return qiblaTop == QiblaHubRoutes.quran ||
+          qiblaTop == QiblaHubRoutes.quranReader;
     case 'qibla':
       return path == AppRoutes.qibla &&
           (qiblaTop == null || qiblaTop == QiblaHubRoutes.dashboard);

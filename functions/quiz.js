@@ -27,8 +27,10 @@ const ROUND_DURATION_MS = 20_000;
 const ANSWER_GRACE_MS = 1_500;
 /** Tur sonucu şıklar üzerinde gösterilirken sonraki soruya geçmeden önce bekleme. */
 const ROUND_REVEAL_MS = 2_600;
-/** Şimdilik son seviye; ödüller buna göre kilitlenir. */
-const MAX_LEVEL = 10;
+/** 15 rütbe, 20 basamak; ödüller buna göre kilitlenir. */
+const MAX_LEVEL = 20;
+/** Haftalık 1. ×10 sonrası kalıcı Altın Hilal. */
+const GOLDEN_CRESCENT_WEEKS = 10;
 /** Maçı yarıda terk cezası (hilal). Eksi bakiyeye düşebilir. */
 const FORFEIT_PENALTY = 5;
 const WEEKLY_TOP_LIMIT = 20;
@@ -436,23 +438,50 @@ function emptyCosmetics() {
     avatarGlow: false,
     title: null,
     specialHilalIcon: false,
+    hilalPulse: false,
     nameAccentFaint: false,
     nameAccentSoft: false,
     nameAccent: false,
+    nameAccentGilt: false,
   };
+}
+
+function titleForLevel(rawLevel) {
+  const level = Math.max(1, Math.min(MAX_LEVEL, Math.floor(Number(rawLevel) || 1)));
+  if (level >= 19) return "Şeyhülislam";
+  if (level >= 17) return "Kazasker";
+  if (level >= 15) return "Kadı";
+  if (level >= 13) return "Müftü";
+  if (level >= 11) return "Şeyh";
+  if (level >= 10) return "Derviş";
+  if (level >= 9) return "Müderris";
+  if (level >= 8) return "Hoca";
+  if (level >= 7) return "Vaiz";
+  if (level >= 6) return "İmam";
+  if (level >= 5) return "Hatip";
+  if (level >= 4) return "Müezzin";
+  if (level >= 3) return "Kayyım";
+  if (level >= 2) return "Talebe";
+  return "Çömez";
+}
+
+function championWeeksOf(data) {
+  return Math.max(0, Math.floor(Number(data?.hilalChampionWeeks ?? data?.championWeeks) || 0));
 }
 
 function cosmeticsForLevel(rawLevel) {
   const level = Math.max(1, Math.min(MAX_LEVEL, Math.floor(Number(rawLevel) || 1)));
   return {
     avatarFrame: level >= 3,
-    avatarFrameTier: level >= 4 ? 2 : level >= 3 ? 1 : 0,
+    avatarFrameTier: level >= 11 ? 3 : level >= 4 ? 2 : level >= 3 ? 1 : 0,
     avatarGlow: level >= 6,
-    title: level >= 10 ? "İlim Dostu" : level >= 9 ? "Müderris" : level >= 5 ? "Talebe" : null,
+    title: titleForLevel(level),
     specialHilalIcon: level >= 8,
+    hilalPulse: level >= 13,
     nameAccentFaint: level >= 6,
     nameAccentSoft: level >= 7,
     nameAccent: level >= 10,
+    nameAccentGilt: level >= 17,
   };
 }
 
@@ -463,22 +492,26 @@ function cosmeticsDocFields(cosmetics) {
     avatarFrameTier: Math.max(0, Math.floor(Number(cosmetics.avatarFrameTier) || 0)),
     avatarGlow: cosmetics.avatarGlow === true,
     specialHilalIcon: cosmetics.specialHilalIcon === true,
+    hilalPulse: cosmetics.hilalPulse === true,
     nameAccentFaint: cosmetics.nameAccentFaint === true,
     nameAccentSoft: cosmetics.nameAccentSoft === true,
     nameAccent: cosmetics.nameAccent === true,
+    nameAccentGilt: cosmetics.nameAccentGilt === true,
   };
 }
 
 function _decoratePlayer(player) {
   const level = Math.max(1, Math.floor(Number(player?.level) || 1));
-  const cosmetics = cosmeticsForLevel(level);
+  const isBot = player?.isBot === true;
+  const cosmetics = isBot ? emptyCosmetics() : cosmeticsForLevel(level);
   return {
     id: String(player?.id || ""),
     name: String(player?.name || "Oyuncu").slice(0, 32),
     hilals: Math.floor(Number(player?.hilals) || 0),
     level,
-    isBot: player?.isBot === true,
+    isBot,
     badge: null,
+    championWeeks: isBot ? 0 : championWeeksOf(player),
     ...cosmetics,
   };
 }
@@ -1621,6 +1654,7 @@ function _publicProfile(ownerHash, data = {}) {
     weeklyRank: Math.max(0, Math.floor(Number(data.weeklyRank) || 0)),
     hearts: premium ? 999 : adHearts,
     premium,
+    championWeeks: championWeeksOf(data),
   };
 }
 
@@ -2439,6 +2473,10 @@ async function _createMatchInTransaction({
   if (typeof afterReads === "function") {
     await afterReads();
   }
+  firstPlayer.championWeeks = championWeeksOf(firstPlayerSnap.data());
+  secondPlayer.championWeeks = secondPlayer.isBot
+    ? 0
+    : championWeeksOf(secondPlayerSnap?.data());
   const match = {
     players: [firstPlayer, secondPlayer],
     questionIds,
@@ -4553,6 +4591,9 @@ function _serializeChallenge(challengeId, challenge, ownerHash, locale = "tr") {
       ? Math.max(1, Math.floor(Number(challenge.challengerLevel) || 1))
       : Math.max(1, Math.floor(Number(challenge.challengedLevel) || 1)),
     isBot: !selfIsChallenger && challengedIsBot,
+    championWeeks: selfIsChallenger
+      ? Math.max(0, Math.floor(Number(challenge.challengerChampionWeeks) || 0))
+      : Math.max(0, Math.floor(Number(challenge.challengedChampionWeeks) || 0)),
   };
   const opponent = {
     id: selfIsChallenger ? challengedId : challengerId,
@@ -4566,6 +4607,9 @@ function _serializeChallenge(challengeId, challenge, ownerHash, locale = "tr") {
       ? Math.max(1, Math.floor(Number(challenge.challengedLevel) || 1))
       : Math.max(1, Math.floor(Number(challenge.challengerLevel) || 1)),
     isBot: selfIsChallenger && challengedIsBot,
+    championWeeks: selfIsChallenger
+      ? Math.max(0, Math.floor(Number(challenge.challengedChampionWeeks) || 0))
+      : Math.max(0, Math.floor(Number(challenge.challengerChampionWeeks) || 0)),
   };
   const status = String(challenge.status || "");
   const currentRound = Math.min(
@@ -5304,11 +5348,15 @@ const createQuizChallenge = onCall(
         challengerLevel: levelForHilals(Math.floor(Number(me.hilals) || 0)).level,
         challengerHilals: Math.floor(Number(me.hilals) || 0),
         challengerRank: selfRank,
+        challengerChampionWeeks: championWeeksOf(me),
         challengedId: opponentId,
         challengedName,
         challengedLevel,
         challengedHilals,
         challengedRank: oppRank,
+        challengedChampionWeeks: isBotOpponent
+          ? 0
+          : championWeeksOf(freshOpponent?.data() || opponentData),
         challengedIsBot: isBotOpponent,
         botRespondAfterMs: 0,
         participantIds: [ownerHash, opponentId],
@@ -6420,9 +6468,12 @@ module.exports = {
     HILAL_WEEKLY_PREMIUM_DAYS,
     HILAL_WEEKLY_PREMIUM_MS,
     cosmeticsForLevel,
+    titleForLevel,
+    championWeeksOf,
     emptyCosmetics,
     cosmeticsDocFields,
     MAX_LEVEL,
+    GOLDEN_CRESCENT_WEEKS,
     FORFEIT_PENALTY,
     BOT_WEEKLY_CAP,
     orderWeeklyLeaderboard: _orderWeeklyLeaderboard,

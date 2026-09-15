@@ -99,8 +99,13 @@ class _SocialPostPageState extends State<SocialPostPage> {
   }
 
   void _rememberBio(String uid, String bio) {
-    if (uid.isEmpty || bio.trim().isEmpty) return;
-    _knownBios[uid] = bio.trim();
+    if (uid.isEmpty) return;
+    final trimmed = bio.trim();
+    if (trimmed.isEmpty) {
+      if (uid == widget.myUid) _knownBios.remove(uid);
+      return;
+    }
+    _knownBios[uid] = trimmed;
   }
 
   void _rememberAvatar(String uid, int avatarId) {

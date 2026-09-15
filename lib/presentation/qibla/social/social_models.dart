@@ -213,10 +213,8 @@ String socialPeekBio({
   String? myBio,
   Map<String, String> knownBios = const {},
 }) {
-  if (authorUid.isNotEmpty &&
-      authorUid == myUid &&
-      (myBio ?? '').trim().isNotEmpty) {
-    return myBio!.trim();
+  if (authorUid.isNotEmpty && authorUid == myUid) {
+    return (myBio ?? '').trim();
   }
   final stamped = stampedBio.trim();
   if (stamped.isNotEmpty) return stamped;

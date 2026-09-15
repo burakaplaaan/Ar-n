@@ -4,6 +4,7 @@ import 'dart:convert';
 
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../models/zikir_matik_phrase_session.dart';
 import '../models/zikir_matik_record.dart';
 import '../models/zikir_matik_tur_log.dart';
 
@@ -16,6 +17,7 @@ abstract final class ZikirMatikPrefsKeys {
   static const sessionTur = 'zikir_matik_session_tur';
   static const sessionPhrase = 'zikir_matik_session_phrase';
   static const sessionTarget = 'zikir_matik_session_target';
+  static const phraseSessionsJson = 'zikir_matik_phrase_sessions_json';
   static const soundTick = 'zikir_matik_sound_tick';
   static const vibrateTarget = 'zikir_matik_vibrate_target';
 }
@@ -24,8 +26,19 @@ class ZikirMatikRepository {
   ZikirMatikRepository(this._prefs);
 
   final SharedPreferences _prefs;
+  Future<void> _phraseWriteChain = Future<void>.value();
 
   static const int _maxCustomPhrases = 24;
+  static const int _maxPhraseSessions = 80;
+
+  /// Aynı zikrin farklı yazımlarını tek anahtarda tutar.
+  static String phraseSessionKey(String phrase) {
+    return phrase
+        .trim()
+        .replaceAll('İ', 'i')
+        .replaceAll('I', 'ı')
+        .toLowerCase();
+  }
 
   List<ZikirMatikRecord> loadRecords() {
     final raw = _prefs.getString(ZikirMatikPrefsKeys.recordsJson);
@@ -126,6 +139,7 @@ class ZikirMatikRepository {
         .where((e) => e.toLowerCase() != phrase.toLowerCase())
         .toList();
     await _writeCustomPhrases(all);
+    await deletePhraseSession(phrase);
   }
 
   static const int _maxTurLogs = 800;
@@ -175,12 +189,146 @@ class ZikirMatikRepository {
   }
 
   ({int total, int round, int tur, String phrase, int target}) loadSession() {
-    return (
+    final phrase = _prefs.getString(ZikirMatikPrefsKeys.sessionPhrase) ?? '';
+    final legacy = (
       total: _prefs.getInt(ZikirMatikPrefsKeys.sessionTotal) ?? 0,
       round: _prefs.getInt(ZikirMatikPrefsKeys.sessionRound) ?? 0,
       tur: _prefs.getInt(ZikirMatikPrefsKeys.sessionTur) ?? 1,
-      phrase: _prefs.getString(ZikirMatikPrefsKeys.sessionPhrase) ?? '',
+      phrase: phrase,
       target: _prefs.getInt(ZikirMatikPrefsKeys.sessionTarget) ?? 33,
+    );
+    final snap = loadPhraseSession(phrase);
+    if (snap == null) return legacy;
+    return (
+      total: snap.total,
+      round: snap.round,
+      tur: snap.tur,
+      phrase: phrase,
+      target: snap.target,
+    );
+  }
+
+  Map<String, ZikirMatikPhraseSession> loadPhraseSessions() {
+    final raw = _prefs.getString(ZikirMatikPrefsKeys.phraseSessionsJson);
+    if (raw == null || raw.isEmpty) return {};
+    try {
+      final decoded = jsonDecode(raw);
+      if (decoded is! Map) return {};
+      final out = <String, ZikirMatikPhraseSession>{};
+      decoded.forEach((key, value) {
+        if (key is! String || value is! Map) return;
+        final session = ZikirMatikPhraseSession.fromJson(
+          Map<String, dynamic>.from(value),
+        );
+        if (session == null) return;
+        out[phraseSessionKey(key)] = session;
+      });
+      return out;
+    } catch (_) {
+      return {};
+    }
+  }
+
+  ZikirMatikPhraseSession? loadPhraseSession(String phrase) {
+    final map = loadPhraseSessions();
+    return map[phraseSessionKey(phrase)];
+  }
+
+  Future<void> _writePhraseSessions(
+    Map<String, ZikirMatikPhraseSession> items,
+  ) async {
+    final encoded = <String, dynamic>{};
+    items.forEach((key, value) {
+      encoded[key] = value.toJson();
+    });
+    await _prefs.setString(
+      ZikirMatikPrefsKeys.phraseSessionsJson,
+      jsonEncode(encoded),
+    );
+  }
+
+  Future<void> _enqueuePhraseWrite(Future<void> Function() write) {
+    final done = _phraseWriteChain.then((_) => write());
+    _phraseWriteChain = done.catchError((_) {});
+    return done;
+  }
+
+  Future<void> upsertPhraseSession({
+    required String phrase,
+    required int total,
+    required int round,
+    required int tur,
+    required int target,
+    int? nowMillis,
+  }) {
+    return _enqueuePhraseWrite(() async {
+      final key = phraseSessionKey(phrase);
+      final map = loadPhraseSessions();
+      map[key] = ZikirMatikPhraseSession(
+        total: total.clamp(0, 999999),
+        round: round.clamp(0, 999999),
+        tur: tur < 1 ? 1 : tur,
+        target: target < 3 ? 33 : target.clamp(3, 9999),
+        updatedAtMillis: nowMillis ?? DateTime.now().millisecondsSinceEpoch,
+      );
+      if (map.length > _maxPhraseSessions) {
+        final stale = map.entries.where((e) => e.key != key).toList()
+          ..sort(
+            (a, b) =>
+                a.value.updatedAtMillis.compareTo(b.value.updatedAtMillis),
+          );
+        while (map.length > _maxPhraseSessions && stale.isNotEmpty) {
+          map.remove(stale.removeAt(0).key);
+        }
+      }
+      await _writePhraseSessions(map);
+    });
+  }
+
+  Future<void> replacePhraseSessions(
+    Map<String, ZikirMatikPhraseSession> items,
+  ) {
+    return _enqueuePhraseWrite(() async {
+      final next = <String, ZikirMatikPhraseSession>{};
+      items.forEach((key, value) {
+        next[phraseSessionKey(key)] = value;
+      });
+      await _writePhraseSessions(next);
+    });
+  }
+
+  Future<void> deletePhraseSession(String phrase) {
+    return _enqueuePhraseWrite(() async {
+      final key = phraseSessionKey(phrase);
+      final map = loadPhraseSessions();
+      if (!map.containsKey(key)) return;
+      map.remove(key);
+      await _writePhraseSessions(map);
+    });
+  }
+
+  static Map<String, ZikirMatikPhraseSession> mergePhraseSessions({
+    required Map<String, ZikirMatikPhraseSession> cloud,
+    required Map<String, ZikirMatikPhraseSession> local,
+  }) {
+    final out = <String, ZikirMatikPhraseSession>{};
+    local.forEach((key, value) {
+      out[phraseSessionKey(key)] = value;
+    });
+    cloud.forEach((key, value) {
+      final normalized = phraseSessionKey(key);
+      final existing = out[normalized];
+      if (existing == null ||
+          value.updatedAtMillis >= existing.updatedAtMillis) {
+        out[normalized] = value;
+      }
+    });
+    return out;
+  }
+
+  bool get hasMeaningfulPhraseProgress {
+    return loadPhraseSessions().values.any(
+      (s) => s.total > 0 || s.round > 0 || s.tur > 1,
     );
   }
 
@@ -196,6 +344,13 @@ class ZikirMatikRepository {
     await _prefs.setInt(ZikirMatikPrefsKeys.sessionTur, tur);
     await _prefs.setString(ZikirMatikPrefsKeys.sessionPhrase, phrase);
     await _prefs.setInt(ZikirMatikPrefsKeys.sessionTarget, target);
+    await upsertPhraseSession(
+      phrase: phrase,
+      total: total,
+      round: round,
+      tur: tur,
+      target: target,
+    );
   }
 
   bool get soundTickEnabled =>

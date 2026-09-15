@@ -3,7 +3,6 @@
 
 import 'dart:async';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -17,6 +16,7 @@ import 'qibla_hub_navigator_key.dart';
 import 'qibla_hub_open.dart';
 import 'qibla_page.dart';
 import 'qibla_tool_opening_gate.dart';
+import 'qibla_tool_page_route.dart';
 import 'qibla_tools_dashboard_page.dart';
 import 'qibla_nested_swipe_back.dart';
 import 'qibla_shell_swipe_provider.dart';
@@ -25,6 +25,10 @@ import 'hilal_duel/hilal_duel_page.dart';
 import 'social/social_page.dart';
 import 'zikir_matik_page.dart';
 import 'healing_frequencies/healing_frequencies_page.dart';
+import 'quran/quran_library_page.dart';
+import 'quran/quran_reader_page.dart';
+import '../../data/quran/quran_models.dart';
+import '../../data/quran/quran_surah_catalog.dart';
 import '../willpower/breathing_exercise_page.dart';
 
 abstract final class QiblaHubRoutes {
@@ -37,6 +41,8 @@ abstract final class QiblaHubRoutes {
   static const String hilalDuel = '/hilal-duel';
   static const String social = '/social';
   static const String islamicAi = '/islamic-ai';
+  static const String quran = '/quran';
+  static const String quranReader = '/quran/read';
 }
 
 /// [Navigator] gözlemcisi: araç paneli dışına çıkıldığında shell kaydırmayı kilitler.
@@ -56,23 +62,32 @@ class _QiblaHubShellSwipeObserver extends NavigatorObserver {
     });
   }
 
-  void _pauseHealingIfLeaving(Route<dynamic>? from, Route<dynamic>? to) {
+  static bool _isQuranRoute(String? name) {
+    return name == QiblaHubRoutes.quran || name == QiblaHubRoutes.quranReader;
+  }
+
+  void _pauseLongAudioIfLeaving(Route<dynamic>? from, Route<dynamic>? to) {
     final fromHealing = from?.settings.name == QiblaHubRoutes.healing;
     final toHealing = to?.settings.name == QiblaHubRoutes.healing;
     if (fromHealing && !toHealing) {
       unawaited(AudioSessionCoordinator.pauseOwner(AudioSessionOwner.healing));
     }
+    final fromQuran = _isQuranRoute(from?.settings.name);
+    final toQuran = _isQuranRoute(to?.settings.name);
+    if (fromQuran && !toQuran) {
+      unawaited(AudioSessionCoordinator.pauseOwner(AudioSessionOwner.quran));
+    }
   }
 
   @override
   void didPush(Route<dynamic> route, Route<dynamic>? previousRoute) {
-    _pauseHealingIfLeaving(previousRoute, route);
+    _pauseLongAudioIfLeaving(previousRoute, route);
     _applyForTop(route);
   }
 
   @override
   void didPop(Route<dynamic> route, Route<dynamic>? previousRoute) {
-    _pauseHealingIfLeaving(route, previousRoute);
+    _pauseLongAudioIfLeaving(route, previousRoute);
     _applyForTop(previousRoute);
     if (previousRoute?.settings.name == QiblaHubRoutes.dashboard &&
         route.settings.name != QiblaHubRoutes.islamicAi) {
@@ -91,13 +106,13 @@ class _QiblaHubShellSwipeObserver extends NavigatorObserver {
 
   @override
   void didReplace({Route<dynamic>? newRoute, Route<dynamic>? oldRoute}) {
-    _pauseHealingIfLeaving(oldRoute, newRoute);
+    _pauseLongAudioIfLeaving(oldRoute, newRoute);
     if (newRoute != null) _applyForTop(newRoute);
   }
 
   @override
   void didRemove(Route<dynamic> route, Route<dynamic>? previousRoute) {
-    _pauseHealingIfLeaving(route, previousRoute);
+    _pauseLongAudioIfLeaving(route, previousRoute);
     _applyForTop(previousRoute);
   }
 }
@@ -155,6 +170,7 @@ class _QiblaHubPageState extends ConsumerState<QiblaHubPage> {
       'hilal-duel' || 'hilal_duel' => QiblaHubRoutes.hilalDuel,
       'social' => QiblaHubRoutes.social,
       'islamic-ai' => QiblaHubRoutes.islamicAi,
+      'quran' || 'kuran' || 'mushaf' => QiblaHubRoutes.quran,
       _ => null,
     };
     if (route == null) return;
@@ -185,63 +201,89 @@ class _QiblaHubPageState extends ConsumerState<QiblaHubPage> {
             final fromHome = args['fromHomeShortcut'] == true;
             return _toolRoute(
               settings: settings,
-              builder: (context) => QiblaNestedSwipeBack(
+              builder: (context) => _wrapTool(
+                QiblaPage(exitToHomeOnBack: fromHome),
+                ad: AdGatePlacement.qiblaSession,
                 onBack: fromHome ? () => context.go(AppRoutes.home) : null,
-                child: QiblaToolOpeningGate(
-                  adPlacement: AdGatePlacement.qiblaSession,
-                  child: QiblaPage(exitToHomeOnBack: fromHome),
-                ),
               ),
             );
           case QiblaHubRoutes.zikir:
             return _toolRoute(
               settings: settings,
-              builder: (_) => const QiblaNestedSwipeBack(
-                child: QiblaToolOpeningGate(
-                  adPlacement: AdGatePlacement.zikirSession,
-                  child: ZikirMatikPage(),
-                ),
+              builder: (_) => _wrapTool(
+                const ZikirMatikPage(),
+                ad: AdGatePlacement.zikirSession,
               ),
             );
           case QiblaHubRoutes.breathing:
             return _toolRoute(
               settings: settings,
-              builder: (_) =>
-                  const QiblaNestedSwipeBack(child: BreathingExercisePage()),
+              builder: (_) => _wrapTool(const BreathingExercisePage()),
             );
           case QiblaHubRoutes.healing:
             return _toolRoute(
               settings: settings,
-              builder: (_) => const QiblaNestedSwipeBack(
-                child: QiblaToolOpeningGate(
-                  adPlacement: AdGatePlacement.healingSession,
-                  child: HealingFrequenciesPage(),
-                ),
+              builder: (_) => _wrapTool(
+                const HealingFrequenciesPage(),
+                ad: AdGatePlacement.healingSession,
               ),
             );
           case QiblaHubRoutes.prayerCircle:
             return _toolRoute(
               settings: settings,
-              builder: (_) =>
-                  const QiblaNestedSwipeBack(child: PrayerCirclePage()),
+              builder: (_) => _wrapTool(const PrayerCirclePage()),
             );
           case QiblaHubRoutes.hilalDuel:
             // NestedSwipeBack zorla pop eder; eşleşme iptali/iade HilalDuelPage içinde.
             return _toolRoute(
               settings: settings,
-              builder: (_) => const HilalDuelPage(),
+              builder: (_) =>
+                  _wrapTool(const HilalDuelPage(), swipeBack: false),
             );
           case QiblaHubRoutes.social:
             return _toolRoute(
               settings: settings,
-              builder: (_) =>
-                  const QiblaNestedSwipeBack(child: SocialPage()),
+              builder: (_) => _wrapTool(const SocialPage()),
+            );
+          case QiblaHubRoutes.quran:
+            return _toolRoute(
+              settings: settings,
+              builder: (_) => _wrapTool(const QuranLibraryPage()),
+            );
+          case QiblaHubRoutes.quranReader:
+            final raw = settings.arguments;
+            var surah = 1;
+            int? ayah;
+            var autoplay = false;
+            if (raw is QuranReaderArgs) {
+              surah = raw.surah.clamp(1, 114);
+              ayah = raw.ayah;
+              autoplay = raw.autoplay;
+            } else if (raw is Map) {
+              surah = ((raw['surah'] as num?)?.toInt() ?? 1).clamp(1, 114);
+              ayah = (raw['ayah'] as num?)?.toInt();
+              autoplay = raw['autoplay'] == true;
+            }
+            if (ayah != null) {
+              ayah = ayah.clamp(
+                1,
+                QuranSurahCatalog.byNumber(surah).ayahCount,
+              );
+            }
+            return _toolRoute(
+              settings: settings,
+              builder: (_) => _wrapTool(
+                QuranReaderPage(
+                  surah: surah,
+                  initialAyah: ayah,
+                  autoplay: autoplay,
+                ),
+              ),
             );
           case QiblaHubRoutes.islamicAi:
             return _toolRoute(
               settings: settings,
-              builder: (_) =>
-                  const QiblaNestedSwipeBack(child: IslamicAiPage()),
+              builder: (_) => _wrapTool(const IslamicAiPage()),
             );
           case QiblaHubRoutes.dashboard:
           default:
@@ -254,13 +296,21 @@ class _QiblaHubPageState extends ConsumerState<QiblaHubPage> {
     );
   }
 
+  Widget _wrapTool(
+    Widget page, {
+    AdGatePlacement? ad,
+    VoidCallback? onBack,
+    bool swipeBack = true,
+  }) {
+    final gated = QiblaToolOpeningGate(adPlacement: ad, child: page);
+    if (!swipeBack) return gated;
+    return QiblaNestedSwipeBack(onBack: onBack, child: gated);
+  }
+
   PageRoute<void> _toolRoute({
     required RouteSettings settings,
     required WidgetBuilder builder,
   }) {
-    return CupertinoPageRoute<void>(
-      settings: settings,
-      builder: builder,
-    );
+    return qiblaToolPageRoute(settings: settings, builder: builder);
   }
 }

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -10,6 +12,7 @@ import '../../core/constants/willpower_templates.dart';
 import '../../data/models/habit_model.dart';
 import '../../data/willpower/willpower_content_loader.dart';
 import '../shared/providers/habit_providers.dart';
+import '../shared/widgets/ritual_pulse.dart';
 import 'package:arin/presentation/shared/widgets/arin_loader.dart';
 
 class BuildProgramDetailPage extends ConsumerStatefulWidget {
@@ -130,9 +133,14 @@ class _BuildProgramDetailPageState extends ConsumerState<BuildProgramDetailPage>
                 _GeneralTab(
                   habit: habit,
                   completedToday: completedToday,
-                  onToggle: () => ref
-                      .read(habitSummaryProvider.notifier)
-                      .toggleToday(habit.id),
+                  onToggle: () => unawaited(
+                    toggleHabitTodayWithPulse(
+                      context: context,
+                      ref: ref,
+                      habitId: habit.id,
+                      templateId: habit.templateId,
+                    ),
+                  ),
                 ),
                 _TipsTab(content: _content!),
                 _ProgressTab(

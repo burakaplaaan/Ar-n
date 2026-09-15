@@ -463,6 +463,7 @@ function validateCommentText(raw) {
 
 function validateBio(raw) {
   const value = String(raw || "").replace(/\s+/g, " ").trim();
+  if (!value) return "";
   if (value.length < BIO_MIN || value.length > BIO_MAX) {
     throw new HttpsError(
       "invalid-argument",
@@ -601,15 +602,22 @@ async function loadLastCommentPreviews(postRef) {
     });
 }
 
+function socialCommentAnonymousName(lang) {
+  if (lang === "en") return "Someone";
+  if (lang === "ar") return "أحدهم";
+  return "Biri";
+}
+
 function socialCommentPushCopy(locale, name) {
   const lang = String(locale || "tr").toLowerCase().slice(0, 2);
+  const who = String(name || "").trim() || socialCommentAnonymousName(lang);
   if (lang === "en") {
-    return { title: "Social", body: `${name} commented on your note` };
+    return { title: "Social", body: `${who} commented on your post.` };
   }
   if (lang === "ar") {
-    return { title: "اجتماعي", body: `${name} علّق على ملاحظتك` };
+    return { title: "اجتماعي", body: `${who} علّق على منشورك.` };
   }
-  return { title: "Sosyal", body: `${name} yazına yorumladı` };
+  return { title: "Sosyal", body: `${who} senin gönderine yorum yaptı.` };
 }
 
 async function notifyPostAuthorOnComment({
@@ -624,8 +632,10 @@ async function notifyPostAuthorOnComment({
   const snap = await ref.get();
   const token = validatedFcmToken(snap.data()?.fcmToken);
   if (!token) return;
-  const name = String(commenterName || "").trim() || "Biri";
-  const copy = socialCommentPushCopy(snap.data()?.locale, name);
+  const copy = socialCommentPushCopy(
+    snap.data()?.locale,
+    commenterName,
+  );
   try {
     await getMessaging().send({
       token,
@@ -966,17 +976,6 @@ async function requireProfile(db, uid) {
   return profile;
 }
 
-function requireSocialBio(profile) {
-  if (!String(profile?.bio || "").trim()) {
-    throw new HttpsError(
-      "failed-precondition",
-      "Önce hakkında yaz.",
-      { reason: "bio_required" },
-    );
-  }
-  return profile;
-}
-
 function callable(handler) {
   return onCall(
     {
@@ -1263,7 +1262,6 @@ const createSocialPost = callable(async (req) => {
     requireProfile(db, uid),
     callerIsPremium(db, req, uid),
   ]);
-  requireSocialBio(profile);
   await assertSocialRates(
     db,
     req,
@@ -1352,7 +1350,6 @@ const addSocialComment = callable(async (req) => {
     requireProfile(db, uid),
     callerIsPremium(db, req, uid),
   ]);
-  requireSocialBio(profile);
   await assertSocialRates(
     db,
     req,
@@ -1725,6 +1722,7 @@ module.exports = {
     previewCommentsFromData,
     appendLastComments,
     validatedFcmToken,
+    socialCommentPushCopy,
     asciiUsernameKey,
     RESERVED_USERNAMES,
     POST_MIN,

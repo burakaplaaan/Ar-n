@@ -17,6 +17,7 @@ import 'package:arin/l10n/app_localizations.dart';
 import '../../core/analytics/arin_analytics.dart';
 import '../../core/constants/product_metric_features.dart';
 import '../../core/providers/shared_preferences_provider.dart';
+import '../../core/theme/arin_shell_background.dart';
 import '../../data/models/zikir_matik_tur_log.dart';
 import '../../data/repositories/zikir_matik_repository.dart';
 import '../../data/services/product_metrics_service.dart';
@@ -47,6 +48,10 @@ const double _kZikirTasbeehBottomOverlayReserve = 100.0;
 
 /// Titreşim ve zikir bilgisi yuvarlak çapı (aynı boyut).
 const double _kZikirRoundToolsDiameter = 58.0;
+
+/// Tesbih renkleri aynı kalır; sayfa kenarı evin zeminine bağlanır.
+/// Eski tam-teal sayfaya dönüş: `false`.
+const bool kZikirmatikShellBackdrop = true;
 
 /// Renkler: [tasbeeh_counter](https://github.com/n4ff4h/tasbeeh_counter) light tema
 /// (`constants.dart`: primaryColor, primaryLightColor, tasbeehCounterColor, LCD).
@@ -118,8 +123,6 @@ class _ZikirMatikPageState extends ConsumerState<ZikirMatikPage>
 
   static const _uuid = Uuid();
 
-  late final AnimationController _phraseAnim;
-  late final Animation<double> _phraseScale;
   late final AnimationController _cardIntro;
   late final Animation<double> _cardIntroCurve;
 
@@ -149,6 +152,7 @@ class _ZikirMatikPageState extends ConsumerState<ZikirMatikPage>
   /// bekleyen bir flush'ı kaçırmadan işler (veri kaybı riski yok).
   static const _kTapPersistDebounce = Duration(milliseconds: 800);
   Timer? _persistDebounce;
+  Future<void> _persistChain = Future<void>.value();
 
   void _schedulePersist() {
     _persistDebounce?.cancel();
@@ -163,14 +167,6 @@ class _ZikirMatikPageState extends ConsumerState<ZikirMatikPage>
     startReviewPromptTracking();
     WidgetsBinding.instance.addObserver(this);
     unawaited(ProductMetricsService.featureOpen(ProductMetricFeatures.zikir));
-    _phraseAnim = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 2600),
-    )..repeat(reverse: true);
-    _phraseScale = Tween<double>(
-      begin: 1.0,
-      end: 1.055,
-    ).animate(CurvedAnimation(parent: _phraseAnim, curve: Curves.easeInOut));
     _cardIntro = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 580),
@@ -198,7 +194,6 @@ class _ZikirMatikPageState extends ConsumerState<ZikirMatikPage>
       unawaited(_persist());
     }
     _persistDebounce = null;
-    _phraseAnim.dispose();
     _cardIntro.dispose();
     super.dispose();
   }
@@ -228,13 +223,21 @@ class _ZikirMatikPageState extends ConsumerState<ZikirMatikPage>
   /// edecek şekilde günceller; değişiklik yoksa mevcut oturumu widget'a basar.
   Future<void> _reconcileWithWidget() async {
     if (_repo == null) return;
-    final widgetTotal = await ZikirWidgetService.readWidgetTotal();
+    final snap = await ZikirWidgetService.readWidgetSnapshot();
     if (!mounted) return;
-    if (widgetTotal == null) {
+    if (snap.total == null) {
       // Okuma başarısız/boş → widget sayacını düşürme riskine girme.
-      unawaited(_pushToWidget());
+      await _enqueueWidgetPush(reset: false);
       return;
     }
+    if (!ZikirWidgetService.shouldAdoptWidgetTotal(
+      sessionPhrase: _phrase,
+      widgetPhrase: snap.phrase,
+    )) {
+      await _enqueueWidgetPush(reset: true);
+      return;
+    }
+    final widgetTotal = snap.total!;
     final prevTotal = _total;
     final prevRound = _round;
     final prevTur = _tur;
@@ -249,7 +252,7 @@ class _ZikirMatikPageState extends ConsumerState<ZikirMatikPage>
     if (rec.total == prevTotal &&
         rec.round == prevRound &&
         rec.tur == prevTur) {
-      unawaited(_pushToWidget());
+      await _enqueueWidgetPush(reset: false);
       return;
     }
     setState(() {
@@ -300,15 +303,26 @@ class _ZikirMatikPageState extends ConsumerState<ZikirMatikPage>
     }
   }
 
-  Future<void> _pushToWidget({bool reset = false}) {
-    return ZikirWidgetService.pushSession(
-      phrase: _phrase,
-      total: _total,
-      round: _round,
-      tur: _tur,
-      target: _target,
-      allowDecrease: reset,
-    );
+  Future<void> _enqueueWidgetPush({required bool reset}) {
+    final phrase = _phrase;
+    final total = _total;
+    final round = _round;
+    final tur = _tur;
+    final target = _target;
+    final done = _persistChain.then((_) {
+      return ZikirWidgetService.pushSession(
+        phrase: phrase,
+        total: total,
+        round: round,
+        tur: tur,
+        target: target,
+        allowDecrease: reset,
+      );
+    });
+    _persistChain = done.catchError((Object e, StackTrace st) {
+      debugPrint('ZikirMatik widget push: $e\n$st');
+    });
+    return done;
   }
 
   void _loadSession() {
@@ -330,24 +344,94 @@ class _ZikirMatikPageState extends ConsumerState<ZikirMatikPage>
     });
     if (mounted) {
       _cardIntro.forward(from: 0);
-      if (_normalizeStoredPhrase(s.phrase) != s.phrase.trim()) {
-        _persist();
-      }
+      unawaited(_seedAndReconcile(s.phrase));
     }
-    unawaited(_reconcileWithWidget());
   }
 
-  Future<void> _persist({bool resetPush = false}) async {
+  Future<void> _seedAndReconcile(String rawStoredPhrase) async {
+    final needsSeed = _repo?.loadPhraseSession(_phrase) == null ||
+        _normalizeStoredPhrase(rawStoredPhrase) != rawStoredPhrase.trim();
+    if (needsSeed) {
+      await _persist();
+    }
+    if (!mounted) return;
+    await _reconcileWithWidget();
+  }
+
+  bool _samePhrase(String a, String b) {
+    return ZikirMatikRepository.phraseSessionKey(a) ==
+        ZikirMatikRepository.phraseSessionKey(b);
+  }
+
+  Future<void> _selectPhrase(String rawNext) async {
+    final next = _normalizeStoredPhrase(rawNext);
+    if (_samePhrase(next, _phrase)) {
+      if (_phrase != next) {
+        setState(() => _phrase = next);
+        await _persist();
+      }
+      return;
+    }
+    _persistDebounce?.cancel();
+    _persistDebounce = null;
+    await _reconcileWithWidget();
+    if (!mounted) return;
+    final repo = _repo;
+    if (repo != null) {
+      await repo.upsertPhraseSession(
+        phrase: _phrase,
+        total: _total,
+        round: _round,
+        tur: _tur,
+        target: _target,
+      );
+    }
+    final snap = repo?.loadPhraseSession(next);
+    if (!mounted) return;
+    setState(() {
+      _phrase = next;
+      _total = snap?.total ?? 0;
+      _round = snap?.round ?? 0;
+      _tur = snap?.tur ?? 1;
+      if (snap != null) {
+        _target = snap.target < 3 ? 33 : snap.target;
+      }
+    });
+    // Widget tek sayaç gösterir; zikir değişince yeni metnin sayısına inmeli.
+    await _persist(resetPush: true);
+  }
+
+  Future<void> _persist({bool resetPush = false}) {
+    final done = _persistChain.then((_) => _persistNow(resetPush: resetPush));
+    _persistChain = done.catchError((Object e, StackTrace st) {
+      debugPrint('ZikirMatik persist: $e\n$st');
+    });
+    return done;
+  }
+
+  Future<void> _persistNow({required bool resetPush}) async {
     final r = _repo;
     if (r == null) return;
+    final phrase = _phrase;
+    final total = _total;
+    final round = _round;
+    final tur = _tur;
+    final target = _target;
     await r.saveSession(
-      total: _total,
-      round: _round,
-      tur: _tur,
-      phrase: _phrase,
-      target: _target,
+      total: total,
+      round: round,
+      tur: tur,
+      phrase: phrase,
+      target: target,
     );
-    unawaited(_pushToWidget(reset: resetPush));
+    await ZikirWidgetService.pushSession(
+      phrase: phrase,
+      total: total,
+      round: round,
+      tur: tur,
+      target: target,
+      allowDecrease: resetPush,
+    );
   }
 
   void _reloadCustomPhrases() {
@@ -485,6 +569,8 @@ class _ZikirMatikPageState extends ConsumerState<ZikirMatikPage>
       icon: Icons.refresh_rounded,
     );
     if (ok == true) {
+      _persistDebounce?.cancel();
+      _persistDebounce = null;
       setState(() {
         _total = 0;
         _round = 0;
@@ -559,8 +645,7 @@ class _ZikirMatikPageState extends ConsumerState<ZikirMatikPage>
                     onPick: (p) {
                       closePicker();
                       if (!mounted) return;
-                      setState(() => _phrase = p);
-                      _persist();
+                      unawaited(_selectPhrase(p));
                     },
                     onDeleteCustom: (p) async {
                       setDialogState(() {
@@ -570,6 +655,15 @@ class _ZikirMatikPageState extends ConsumerState<ZikirMatikPage>
                       });
                       await _repo?.deleteCustomPhrase(p);
                       _reloadCustomPhrases();
+                      if (_samePhrase(p, _phrase)) {
+                        setState(() {
+                          _phrase = '';
+                          _total = 0;
+                          _round = 0;
+                          _tur = 1;
+                        });
+                        await _persist(resetPush: true);
+                      }
                     },
                     onCustom: () {
                       closePicker();
@@ -631,35 +725,44 @@ class _ZikirMatikPageState extends ConsumerState<ZikirMatikPage>
       await _repo?.saveCustomPhrase(t);
       if (!mounted) return;
     }
-    setState(() {
-      _phrase = t.isEmpty ? '' : t;
-    });
     if (result.action == _ZikirCustomPhraseAction.saveAndUse) {
       _reloadCustomPhrases();
     }
-    await _persist();
+    await _selectPhrase(t);
   }
+
+  Widget _wrapZikirPage(Widget scaffold) {
+    if (!kZikirmatikShellBackdrop) return scaffold;
+    return ArinShellBackground.buildLayered(context, child: scaffold);
+  }
+
+  Color get _pageBackground => kZikirmatikShellBackdrop
+      ? Colors.transparent
+      : _ZikirmatikColors.pageBg;
 
   @override
   Widget build(BuildContext context) {
     if (!_sessionReady || _repo == null) {
-      return const Scaffold(
-        backgroundColor: _ZikirmatikColors.pageBg,
-        body: Center(
-          child: ArinLoader(
-            color: _ZikirmatikColors.outer,
-            strokeWidth: 2.5,
+      return _wrapZikirPage(
+        Scaffold(
+          backgroundColor: _pageBackground,
+          body: const Center(
+            child: ArinLoader(
+              color: _ZikirmatikColors.outer,
+              strokeWidth: 2.5,
+            ),
           ),
         ),
       );
     }
 
     final l10n = AppLocalizations.of(context)!;
-    return Semantics(
+    return _wrapZikirPage(
+      Semantics(
       label: l10n.zikirmatikCounterSemantics,
       value: '$_total, ${l10n.zikirmatikRound} $_tur',
       child: Scaffold(
-        backgroundColor: _ZikirmatikColors.pageBg,
+        backgroundColor: _pageBackground,
         body: SafeArea(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -693,8 +796,6 @@ class _ZikirMatikPageState extends ConsumerState<ZikirMatikPage>
                   child: _ZikirPhraseConcreteCard(
                     phrase: _phrase,
                     onTap: _pickPhrase,
-                    phraseAnim: _phraseAnim,
-                    phraseScale: _phraseScale,
                   ),
                 ),
               ),
@@ -918,6 +1019,7 @@ class _ZikirMatikPageState extends ConsumerState<ZikirMatikPage>
           ),
         ),
       ),
+    ),
     );
   }
 }

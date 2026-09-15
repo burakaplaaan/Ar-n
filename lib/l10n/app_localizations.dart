@@ -2452,7 +2452,7 @@ abstract class AppLocalizations {
   /// No description provided for @qiblaHubCompassSubtitle.
   ///
   /// In tr, this message translates to:
-  /// **'Pusula ve konum ile Kâbe yönünü göster'**
+  /// **'Kâbe yönünü gösterir'**
   String get qiblaHubCompassSubtitle;
 
   /// No description provided for @qiblaHubOpenAction.
@@ -2470,7 +2470,7 @@ abstract class AppLocalizations {
   /// No description provided for @qiblaHubZikirFeatureSubtitle.
   ///
   /// In tr, this message translates to:
-  /// **'Dijital sayaç; zikir bilgisi, tur geçmişi ve hedef (33/99)'**
+  /// **'Dijital tesbih'**
   String get qiblaHubZikirFeatureSubtitle;
 
   /// No description provided for @qiblaHubBreathingTitle.
@@ -2482,7 +2482,7 @@ abstract class AppLocalizations {
   /// No description provided for @qiblaHubBreathingSubtitle.
   ///
   /// In tr, this message translates to:
-  /// **'4-7-8 nefes döngüsü ile sakinleş, odağını toparla'**
+  /// **'4-7-8 ile sakinleş'**
   String get qiblaHubBreathingSubtitle;
 
   /// No description provided for @qiblaHubAssistantTitle.
@@ -2494,7 +2494,7 @@ abstract class AppLocalizations {
   /// No description provided for @qiblaHubAssistantSubtitle.
   ///
   /// In tr, this message translates to:
-  /// **'Sohbet; namaz, bildirim ve hatırlatıcıları yönet'**
+  /// **'Namaz ve hatırlatıcılar'**
   String get qiblaHubAssistantSubtitle;
 
   /// No description provided for @assistantTitle.
@@ -2858,7 +2858,7 @@ abstract class AppLocalizations {
   /// No description provided for @qiblaHubHealingSubtitle.
   ///
   /// In tr, this message translates to:
-  /// **'Terapi tonları, ambiyans ve uyku zamanlayıcısı ile sakin bir oturum'**
+  /// **'Sakinleştirici sesler'**
   String get qiblaHubHealingSubtitle;
 
   /// No description provided for @qiblaHubAiTitle.
@@ -2870,8 +2870,14 @@ abstract class AppLocalizations {
   /// No description provided for @qiblaHubAiSubtitle.
   ///
   /// In tr, this message translates to:
-  /// **'Aklındaki soruyu sor, İslami sohbet başlat'**
+  /// **'İslami sorularına yanıt'**
   String get qiblaHubAiSubtitle;
+
+  /// No description provided for @qiblaHubPremiumBadge.
+  ///
+  /// In tr, this message translates to:
+  /// **'Premium'**
+  String get qiblaHubPremiumBadge;
 
   /// No description provided for @islamicAiComingSoonTitle.
   ///
@@ -2948,7 +2954,7 @@ abstract class AppLocalizations {
   /// No description provided for @qiblaHubHilalDuelSubtitle.
   ///
   /// In tr, this message translates to:
-  /// **'7 İslami bilgi sorusunda yarış; hilal kazan, seviye atla'**
+  /// **'İslami bilgi yarışı'**
   String get qiblaHubHilalDuelSubtitle;
 
   /// No description provided for @hilalDuelTitle.
@@ -3233,6 +3239,24 @@ abstract class AppLocalizations {
   /// **'Sonraki ödül: İsim rengi (LV {level})'**
   String hilalDuelNextRewardNameAccent(int level);
 
+  /// No description provided for @hilalDuelNextRewardFrameGold.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sonraki ödül: Altın çerçeve (LV {level})'**
+  String hilalDuelNextRewardFrameGold(int level);
+
+  /// No description provided for @hilalDuelNextRewardHilalPulse.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sonraki ödül: Hilal ışıması (LV {level})'**
+  String hilalDuelNextRewardHilalPulse(int level);
+
+  /// No description provided for @hilalDuelNextRewardNameGilt.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sonraki ödül: İsim yaldızı (LV {level})'**
+  String hilalDuelNextRewardNameGilt(int level);
+
   /// No description provided for @hilalDuelWeeklyTitle.
   ///
   /// In tr, this message translates to:
@@ -3347,11 +3371,53 @@ abstract class AppLocalizations {
   /// **'Oyuncu listeden kaldırıldı.'**
   String get hilalDuelAdminRemoved;
 
+  /// No description provided for @hilalDuelTitleComez.
+  ///
+  /// In tr, this message translates to:
+  /// **'Çömez'**
+  String get hilalDuelTitleComez;
+
   /// No description provided for @hilalDuelTitleTalebe.
   ///
   /// In tr, this message translates to:
   /// **'Talebe'**
   String get hilalDuelTitleTalebe;
+
+  /// No description provided for @hilalDuelTitleKayyim.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kayyım'**
+  String get hilalDuelTitleKayyim;
+
+  /// No description provided for @hilalDuelTitleMuezzin.
+  ///
+  /// In tr, this message translates to:
+  /// **'Müezzin'**
+  String get hilalDuelTitleMuezzin;
+
+  /// No description provided for @hilalDuelTitleHatip.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hatip'**
+  String get hilalDuelTitleHatip;
+
+  /// No description provided for @hilalDuelTitleImam.
+  ///
+  /// In tr, this message translates to:
+  /// **'İmam'**
+  String get hilalDuelTitleImam;
+
+  /// No description provided for @hilalDuelTitleVaiz.
+  ///
+  /// In tr, this message translates to:
+  /// **'Vaiz'**
+  String get hilalDuelTitleVaiz;
+
+  /// No description provided for @hilalDuelTitleHoca.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hoca'**
+  String get hilalDuelTitleHoca;
 
   /// No description provided for @hilalDuelTitleMuderris.
   ///
@@ -3359,11 +3425,59 @@ abstract class AppLocalizations {
   /// **'Müderris'**
   String get hilalDuelTitleMuderris;
 
+  /// No description provided for @hilalDuelTitleDervis.
+  ///
+  /// In tr, this message translates to:
+  /// **'Derviş'**
+  String get hilalDuelTitleDervis;
+
+  /// No description provided for @hilalDuelTitleSeyh.
+  ///
+  /// In tr, this message translates to:
+  /// **'Şeyh'**
+  String get hilalDuelTitleSeyh;
+
+  /// No description provided for @hilalDuelTitleMuftu.
+  ///
+  /// In tr, this message translates to:
+  /// **'Müftü'**
+  String get hilalDuelTitleMuftu;
+
+  /// No description provided for @hilalDuelTitleKadi.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kadı'**
+  String get hilalDuelTitleKadi;
+
+  /// No description provided for @hilalDuelTitleKazasker.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kazasker'**
+  String get hilalDuelTitleKazasker;
+
+  /// No description provided for @hilalDuelTitleSeyhulislam.
+  ///
+  /// In tr, this message translates to:
+  /// **'Şeyhülislam'**
+  String get hilalDuelTitleSeyhulislam;
+
   /// No description provided for @hilalDuelTitleIlimDostu.
   ///
   /// In tr, this message translates to:
   /// **'İlim Dostu'**
   String get hilalDuelTitleIlimDostu;
+
+  /// No description provided for @hilalDuelGoldenCrescent.
+  ///
+  /// In tr, this message translates to:
+  /// **'Altın Hilal'**
+  String get hilalDuelGoldenCrescent;
+
+  /// No description provided for @hilalDuelChampionCount.
+  ///
+  /// In tr, this message translates to:
+  /// **'×{count}'**
+  String hilalDuelChampionCount(int count);
 
   /// No description provided for @hilalDuelYouLabel.
   ///
@@ -6331,6 +6445,12 @@ abstract class AppLocalizations {
   /// **'{name}, namaz ve dua ritmini nasıl tarif edersin?'**
   String onboardingPrayerTitle(String name);
 
+  /// No description provided for @onboardingPrayerTitleAnonymous.
+  ///
+  /// In tr, this message translates to:
+  /// **'Namaz ve dua ritmini nasıl tarif edersin?'**
+  String get onboardingPrayerTitleAnonymous;
+
   /// No description provided for @onboardingPrayerSubtitle.
   ///
   /// In tr, this message translates to:
@@ -6372,6 +6492,12 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'{name}, vesvese veya şüphe geldiğinde ne yapıyorsun?'**
   String onboardingWaswasaTitle(String name);
+
+  /// No description provided for @onboardingWaswasaTitleAnonymous.
+  ///
+  /// In tr, this message translates to:
+  /// **'Vesvese veya şüphe geldiğinde ne yapıyorsun?'**
+  String get onboardingWaswasaTitleAnonymous;
 
   /// No description provided for @onboardingWaswasaSubtitle.
   ///
@@ -6685,6 +6811,12 @@ abstract class AppLocalizations {
   /// **'{name}, ayet akışın örülüyor'**
   String onboardingPrepareBar1Title(String name);
 
+  /// No description provided for @onboardingPrepareBar1TitleAnonymous.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ayet akışın örülüyor'**
+  String get onboardingPrepareBar1TitleAnonymous;
+
   /// No description provided for @onboardingPrepareBar1Body.
   ///
   /// In tr, this message translates to:
@@ -6724,7 +6856,7 @@ abstract class AppLocalizations {
   /// No description provided for @onboardingPrepareBar4Body.
   ///
   /// In tr, this message translates to:
-  /// **'Tesbihat, kıble, namaz ve sohbet hazırlanıyor.'**
+  /// **'Tesbihat, kıble, namaz, sosyal ve sohbet hazırlanıyor.'**
   String get onboardingPrepareBar4Body;
 
   /// No description provided for @onboardingPrepareAskLock.
@@ -6756,6 +6888,12 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'Allah\'ım, kulun {name} için hayır, bereket, sağlık, huzur, hikmet ve istikamet nasip et. Kalbini Kur\'an\'la diri, adımlarını hayırla sabit kıl. Sözün her mevsimde ona yakın olsun.'**
   String onboardingDuaBody(String name);
+
+  /// No description provided for @onboardingDuaBodyAnonymous.
+  ///
+  /// In tr, this message translates to:
+  /// **'Allah\'ım, bu kulun için hayır, bereket, sağlık, huzur, hikmet ve istikamet nasip et. Kalbini Kur\'an\'la diri, adımlarını hayırla sabit kıl. Sözün her mevsimde ona yakın olsun.'**
+  String get onboardingDuaBodyAnonymous;
 
   /// No description provided for @onboardingDuaVerseArabic.
   ///
@@ -10322,7 +10460,7 @@ abstract class AppLocalizations {
   /// No description provided for @qiblaHubPrayerCircleSubtitle.
   ///
   /// In tr, this message translates to:
-  /// **'Dua talebini paylaş, gönülden eşlik et'**
+  /// **'Dua paylaş, amin de'**
   String get qiblaHubPrayerCircleSubtitle;
 
   /// No description provided for @prayerCircleTitle.
@@ -10772,8 +10910,20 @@ abstract class AppLocalizations {
   /// No description provided for @appTourNavToolsBody.
   ///
   /// In tr, this message translates to:
-  /// **'Kıble, zikir, dua halkası ve diğer manevi araçlar bu sekmede.'**
+  /// **'Kıble, Kur\'an, zikir, sosyal pano ve diğer manevi araçlar bu sekmede.'**
   String get appTourNavToolsBody;
+
+  /// No description provided for @appTourQiblaSocialTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sosyal'**
+  String get appTourQiblaSocialTitle;
+
+  /// No description provided for @appTourQiblaSocialBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'Topluluk panosu. Kısa yaz, yorumla, beğen — kullanıcı adınla.'**
+  String get appTourQiblaSocialBody;
 
   /// No description provided for @appTourQiblaAssistantTitle.
   ///
@@ -10822,6 +10972,18 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'Dijital tesbih; hedef, tur ve zikir bilgisi.'**
   String get appTourQiblaZikirBody;
+
+  /// No description provided for @appTourQiblaQuranTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kur\'an'**
+  String get appTourQiblaQuranTitle;
+
+  /// No description provided for @appTourQiblaQuranBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'Meal ile oku, tilavetle dinle; kaldığın yerden devam et.'**
+  String get appTourQiblaQuranBody;
 
   /// No description provided for @appTourQiblaHilalTitle.
   ///
@@ -11060,8 +11222,98 @@ abstract class AppLocalizations {
   /// No description provided for @qiblaHubSocialSubtitle.
   ///
   /// In tr, this message translates to:
-  /// **'Topluluk akışı — yaz, yorumla, beğen'**
+  /// **'Yaz, yorumla, beğen'**
   String get qiblaHubSocialSubtitle;
+
+  /// No description provided for @qiblaHubQuranTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kur\'an'**
+  String get qiblaHubQuranTitle;
+
+  /// No description provided for @qiblaHubQuranSubtitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Oku ve dinle'**
+  String get qiblaHubQuranSubtitle;
+
+  /// No description provided for @qiblaHubGroupWorship.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yön ve ibadet'**
+  String get qiblaHubGroupWorship;
+
+  /// No description provided for @qiblaHubGroupTogether.
+  ///
+  /// In tr, this message translates to:
+  /// **'Birlikte'**
+  String get qiblaHubGroupTogether;
+
+  /// No description provided for @qiblaHubGroupCalm.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sakinlik'**
+  String get qiblaHubGroupCalm;
+
+  /// No description provided for @qiblaHubDoorAi.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yapay zeka'**
+  String get qiblaHubDoorAi;
+
+  /// No description provided for @qiblaHubDoorCompass.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kıble'**
+  String get qiblaHubDoorCompass;
+
+  /// No description provided for @qiblaHubDoorZikir.
+  ///
+  /// In tr, this message translates to:
+  /// **'Zikir'**
+  String get qiblaHubDoorZikir;
+
+  /// No description provided for @qiblaHubDoorHilal.
+  ///
+  /// In tr, this message translates to:
+  /// **'Düello'**
+  String get qiblaHubDoorHilal;
+
+  /// No description provided for @qiblaHubDoorPrayer.
+  ///
+  /// In tr, this message translates to:
+  /// **'Dua'**
+  String get qiblaHubDoorPrayer;
+
+  /// No description provided for @qiblaHubDoorHealing.
+  ///
+  /// In tr, this message translates to:
+  /// **'Frekans'**
+  String get qiblaHubDoorHealing;
+
+  /// No description provided for @qiblaHubDoorBreath.
+  ///
+  /// In tr, this message translates to:
+  /// **'Nefes'**
+  String get qiblaHubDoorBreath;
+
+  /// No description provided for @qiblaHubContinueQuran.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kur\'an\'a devam'**
+  String get qiblaHubContinueQuran;
+
+  /// No description provided for @qiblaHubOpenQuran.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kur\'an\'ı aç'**
+  String get qiblaHubOpenQuran;
+
+  /// No description provided for @qiblaHubOpenQuranHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Meal ve tilavet'**
+  String get qiblaHubOpenQuranHint;
 
   /// No description provided for @socialTitle.
   ///
@@ -11234,7 +11486,7 @@ abstract class AppLocalizations {
   /// No description provided for @socialBioBody.
   ///
   /// In tr, this message translates to:
-  /// **'Kendini kısaca anlat. Profilinden sonra da değiştirebilirsin.'**
+  /// **'İstersen kendini kısaca anlat. Boş bırakabilir, sonra profilinden yazabilirsin.'**
   String get socialBioBody;
 
   /// No description provided for @socialBioHint.
@@ -11392,6 +11644,114 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'Küfür veya hakaret yazılamaz.'**
   String get socialProfanity;
+
+  /// No description provided for @quranTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kur\'an'**
+  String get quranTitle;
+
+  /// No description provided for @quranSearchHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sure adı veya numarası'**
+  String get quranSearchHint;
+
+  /// No description provided for @quranContinueTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kaldığın yer'**
+  String get quranContinueTitle;
+
+  /// No description provided for @quranContinueBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'{surah} · {ayah}. ayet'**
+  String quranContinueBody(String surah, int ayah);
+
+  /// No description provided for @quranMeccan.
+  ///
+  /// In tr, this message translates to:
+  /// **'Mekkî'**
+  String get quranMeccan;
+
+  /// No description provided for @quranMedinan.
+  ///
+  /// In tr, this message translates to:
+  /// **'Medenî'**
+  String get quranMedinan;
+
+  /// No description provided for @quranAyahCount.
+  ///
+  /// In tr, this message translates to:
+  /// **'{count} ayet'**
+  String quranAyahCount(int count);
+
+  /// No description provided for @quranAyahLabel.
+  ///
+  /// In tr, this message translates to:
+  /// **'{ayah}. ayet'**
+  String quranAyahLabel(int ayah);
+
+  /// No description provided for @quranTranslationOn.
+  ///
+  /// In tr, this message translates to:
+  /// **'Meal görünür'**
+  String get quranTranslationOn;
+
+  /// No description provided for @quranTranslationOff.
+  ///
+  /// In tr, this message translates to:
+  /// **'Meal gizli'**
+  String get quranTranslationOff;
+
+  /// No description provided for @quranFontSize.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yazı boyutu'**
+  String get quranFontSize;
+
+  /// No description provided for @quranLoadError.
+  ///
+  /// In tr, this message translates to:
+  /// **'Metin şu an açılamadı. Bağlantını kontrol edip tekrar dene.'**
+  String get quranLoadError;
+
+  /// No description provided for @quranRetry.
+  ///
+  /// In tr, this message translates to:
+  /// **'Tekrar dene'**
+  String get quranRetry;
+
+  /// No description provided for @quranAudioError.
+  ///
+  /// In tr, this message translates to:
+  /// **'Tilavet şu an başlayamadı. Biraz sonra dene.'**
+  String get quranAudioError;
+
+  /// No description provided for @quranReciterName.
+  ///
+  /// In tr, this message translates to:
+  /// **'Mişari Raşid el-Afasi'**
+  String get quranReciterName;
+
+  /// No description provided for @quranNowPlaying.
+  ///
+  /// In tr, this message translates to:
+  /// **'{surah} · {ayah}. ayet'**
+  String quranNowPlaying(String surah, int ayah);
+
+  /// No description provided for @quranMealAttribution.
+  ///
+  /// In tr, this message translates to:
+  /// **'Meal: Diyanet İşleri Başkanlığı · Tilavet: el-Afasi'**
+  String get quranMealAttribution;
+
+  /// No description provided for @quranEmptySearch.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu aramaya uyan sure yok.'**
+  String get quranEmptySearch;
 }
 
 class _AppLocalizationsDelegate

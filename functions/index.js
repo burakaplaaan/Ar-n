@@ -260,6 +260,7 @@ const _kProductFeatures = new Set([
   "qibla",
   "healing",
   "social",
+  "quran",
 ]);
 
 function _istanbulDayKey(ms = Date.now()) {

@@ -414,7 +414,7 @@
 		<key>UIApplicationSceneManifest</key>
 		<dict>
 			<key>UIApplicationSupportsMultipleScenes</key>
-			<false/>
+			<true/>
 			<key>UISceneConfigurations</key>
 			<dict>
 				<key>UIWindowSceneSessionRoleApplication</key>
@@ -428,6 +428,17 @@
 						<string>$(PRODUCT_MODULE_NAME).SceneDelegate</string>
 						<key>UISceneStoryboardFile</key>
 						<string>Main</string>
+					</dict>
+				</array>
+				<key>CPTemplateApplicationSceneSessionRoleApplication</key>
+				<array>
+					<dict>
+						<key>UISceneClassName</key>
+						<string>CPTemplateApplicationScene</string>
+						<key>UISceneConfigurationName</key>
+						<string>CarPlay</string>
+						<key>UISceneDelegateClassName</key>
+						<string>$(PRODUCT_MODULE_NAME).CarPlaySceneDelegate</string>
 					</dict>
 				</array>
 			</dict>
@@ -480,8 +491,13 @@
 		     arka plan konum kontrolü. Frekans ios/Runner/AppDelegate.swift
 		     içinde WorkmanagerPlugin.registerPeriodicTask ile ayarlanır;
 		     Info.plist'teki kimlik burada birebir aynı olmalı. -->
+		<key>NSMicrophoneUsageDescription</key>
+		<string>CarPlay'de Hilal ile konuşmak için mikrofon kullanılır.</string>
+		<key>NSSpeechRecognitionUsageDescription</key>
+		<string>CarPlay'de söylediklerin Hilal'e yazıya çevrilir. Ses kaydı sunucuya gitmez.</string>
 		<key>UIBackgroundModes</key>
 		<array>
+			<string>audio</string>
 			<string>processing</string>
 			<string>remote-notification</string>
 		</array>

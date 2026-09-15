@@ -5,3 +5,5 @@
 "NSLocationAlwaysAndWhenInUseUsageDescription" = "يُستخدم موقعك لحساب أوقات الصلاة وإظهار اتجاه القبلة.";
 "NSPhotoLibraryUsageDescription" = "يُستخدم الوصول إلى مكتبة الصور للصور التي تختارها للملف الشخصي أو المشاركة.";
 "NSAppleMusicUsageDescription" = "يُستخدم الوصول إلى مكتبة الوسائط لملف الصوت الذي تختاره لإشعارات الصلاة.";
+"NSMicrophoneUsageDescription" = "يُستخدم الميكروفون للتحدث مع هلال في CarPlay.";
+"NSSpeechRecognitionUsageDescription" = "في CarPlay يُحوَّل كلامك إلى نص لهلال. لا يُرفع التسجيل.";

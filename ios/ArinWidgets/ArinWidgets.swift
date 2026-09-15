@@ -302,7 +302,85 @@ private extension View {
   @ViewBuilder
   func arinTransparentWidgetSurface() -> some View {
     modifier(ArinWidgetSurfaceModifier())
+      .modifier(ArinCarPlaySurfaceModifier())
   }
+}
+
+/// CarPlay / StandBy: sistem arka planı kaldırır; yazı büyük ve nefesli kalmalı.
+private struct ArinCarPlaySurfaceModifier: ViewModifier {
+  func body(content: Content) -> some View {
+    if #available(iOSApplicationExtension 17.0, *) {
+      content.containerBackgroundRemovable(true)
+    } else {
+      content
+    }
+  }
+}
+
+/// Ana ekran kartı ile CarPlay/StandBy tuvali arasında geçiş.
+private struct ArinWidgetCanvas<Home: View, Car: View>: View {
+  let family: WidgetFamily
+  @ViewBuilder var home: () -> Home
+  @ViewBuilder var car: () -> Car
+
+  var body: some View {
+    if #available(iOSApplicationExtension 17.0, *) {
+      ArinWidgetCanvas17(family: family, home: home, car: car)
+    } else {
+      home()
+    }
+  }
+}
+
+@available(iOSApplicationExtension 17.0, *)
+private struct ArinWidgetCanvas17<Home: View, Car: View>: View {
+  let family: WidgetFamily
+  @Environment(\.showsWidgetContainerBackground) private var showsBackground
+  @ViewBuilder var home: () -> Home
+  @ViewBuilder var car: () -> Car
+
+  var body: some View {
+    let carCanvas = !showsBackground &&
+      (family == .systemSmall || family == .systemMedium)
+    if carCanvas {
+      car()
+    } else {
+      home()
+    }
+  }
+}
+
+/// İnce hilâl — kalan süreye göre doluluk.
+private struct ArinHilalGlyph: View {
+  var progress: Double
+  var color: Color
+
+  var body: some View {
+    Canvas { context, size in
+      let inset = size.width * 0.08
+      let rect = CGRect(origin: .zero, size: size).insetBy(dx: inset, dy: inset)
+      var path = Path()
+      path.addEllipse(in: rect)
+      path.addEllipse(in: rect.offsetBy(dx: rect.width * 0.28, dy: -rect.height * 0.04))
+      context.fill(
+        path,
+        with: .color(color.opacity(0.22 + 0.78 * progress.clamped01)),
+        style: FillStyle(eoFill: true)
+      )
+    }
+    .frame(width: 22, height: 22)
+    .accessibilityHidden(true)
+  }
+}
+
+private extension Double {
+  var clamped01: Double { min(1, max(0, self)) }
+}
+
+private func carRemainingProgress(nextDate: Date?) -> Double {
+  guard let nextDate, nextDate > Date() else { return 0.08 }
+  let remaining = nextDate.timeIntervalSinceNow
+  return min(1, max(0.08, remaining / (4 * 3600)))
 }
 
 /// Tüm widget'larda kilitli durumda gösterilen ortak görsel.
@@ -545,15 +623,48 @@ struct QuoteWidgetView: View {
     if isLocked {
       LockedWidgetView(family: family, kindId: "quote")
     } else {
-      switch family {
-      case .accessoryRectangular:
-        quoteAccessory
-      case .systemSmall:
-        quoteCompact
-      default:
-        quoteExpanded
+      ArinWidgetCanvas(family: family) {
+        switch family {
+        case .accessoryRectangular:
+          quoteAccessory
+        case .systemSmall:
+          quoteCompact
+        default:
+          quoteExpanded
+        }
+      } car: {
+        quoteCarPlay
       }
     }
+  }
+
+  /// CarPlay / StandBy: tek nefes — kaynak ince, meal büyük.
+  private var quoteCarPlay: some View {
+    VStack(alignment: .leading, spacing: family == .systemMedium ? 10 : 8) {
+      if hasSource {
+        Text(entry.source.uppercased())
+          .font(.system(size: family == .systemMedium ? 11 : 10, weight: .semibold))
+          .tracking(1.8)
+          .foregroundStyle(primaryTextColor.opacity(0.58))
+          .lineLimit(1)
+          .minimumScaleFactor(0.7)
+      }
+      Text(entry.text.isEmpty ? "ARIN" : entry.text)
+        .font(.system(
+          size: family == .systemMedium ? 24 : 20,
+          weight: .regular,
+          design: .serif
+        ))
+        .foregroundStyle(primaryTextColor)
+        .lineSpacing(3)
+        .lineLimit(family == .systemMedium ? 5 : 4)
+        .minimumScaleFactor(0.62)
+        .allowsTightening(true)
+      Spacer(minLength: 0)
+    }
+    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+    .padding(.horizontal, 8)
+    .padding(.vertical, 6)
   }
 
   private var quoteAccessory: some View {
@@ -853,15 +964,55 @@ struct PrayerWidgetView: View {
     if isLocked {
       LockedWidgetView(family: family, kindId: "prayer")
     } else {
-      switch family {
-      case .accessoryRectangular:
-        prayerLockCompact
-      case .systemSmall:
-        prayerCompact
-      default:
-        prayerExpanded
+      ArinWidgetCanvas(family: family) {
+        switch family {
+        case .accessoryRectangular:
+          prayerLockCompact
+        case .systemSmall:
+          prayerCompact
+        default:
+          prayerExpanded
+        }
+      } car: {
+        prayerCarPlay
       }
     }
+  }
+
+  /// CarPlay HUD: sıradaki vakit isim, hilâl, canlı geri sayım.
+  private var prayerCarPlay: some View {
+    let clock = clockLabel(from: entry.nextDate)
+    let progress = carRemainingProgress(nextDate: entry.nextDate)
+    return VStack(alignment: .leading, spacing: 4) {
+      HStack(alignment: .center, spacing: 8) {
+        Text(localizedWidgetText(tr: "SIRADAKİ"))
+          .font(.system(size: 9, weight: .semibold))
+          .tracking(2.2)
+          .foregroundStyle(secondaryTextColor)
+        Spacer(minLength: 4)
+        ArinHilalGlyph(progress: progress, color: primaryTextColor)
+      }
+      Text(headerTitle)
+        .font(.system(
+          size: family == .systemMedium ? 38 : 30,
+          weight: .light,
+          design: .serif
+        ))
+        .foregroundStyle(primaryTextColor)
+        .lineLimit(1)
+        .minimumScaleFactor(0.64)
+      countdownText(size: family == .systemMedium ? 24 : 20, minScale: 0.7)
+      if !clock.isEmpty {
+        Text(clock)
+          .font(.system(size: 13, weight: .medium, design: .rounded))
+          .foregroundStyle(secondaryTextColor)
+          .lineLimit(1)
+      }
+      Spacer(minLength: 0)
+    }
+    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+    .padding(.horizontal, 8)
+    .padding(.vertical, 6)
   }
 
   /// Kilit ekranı: tema yok, sıkı dikdörtgen — sadece vakit + kalan süre.
@@ -1315,8 +1466,57 @@ struct ComboWidgetView: View {
     } else if family == .accessoryRectangular {
       accessoryLayout
     } else {
-      expandedLayout
+      ArinWidgetCanvas(family: family) {
+        expandedLayout
+      } car: {
+        comboCarPlay
+      }
     }
+  }
+
+  private var comboCarPlay: some View {
+    VStack(alignment: .leading, spacing: 8) {
+      HStack(alignment: .firstTextBaseline, spacing: 8) {
+        Text(carPrayerName)
+          .font(.system(size: 16, weight: .light, design: .serif))
+          .foregroundStyle(primaryTextColor)
+          .lineLimit(1)
+          .minimumScaleFactor(0.7)
+        Spacer(minLength: 6)
+        countdownText(size: 16)
+      }
+      Rectangle()
+        .fill(primaryTextColor.opacity(0.22))
+        .frame(height: 0.7)
+      if !entry.quoteText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+        Text(entry.quoteText)
+          .font(.system(
+            size: family == .systemMedium ? 22 : 18,
+            weight: .regular,
+            design: .serif
+          ))
+          .foregroundStyle(primaryTextColor)
+          .lineSpacing(2)
+          .lineLimit(family == .systemMedium ? 4 : 3)
+          .minimumScaleFactor(0.58)
+        if hasSource {
+          Text(displayQuoteSource.uppercased())
+            .font(.system(size: 10, weight: .semibold))
+            .tracking(1.4)
+            .foregroundStyle(secondaryTextColor)
+            .lineLimit(1)
+        }
+      }
+      Spacer(minLength: 0)
+    }
+    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+    .padding(.horizontal, 8)
+    .padding(.vertical, 6)
+  }
+
+  private var carPrayerName: String {
+    let n = entry.nextName.trimmingCharacters(in: .whitespacesAndNewlines)
+    return n.isEmpty ? localizedWidgetText(tr: "Vakit") : n
   }
 
   private var expandedLayout: some View {
