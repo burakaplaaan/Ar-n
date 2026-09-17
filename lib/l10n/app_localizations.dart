@@ -9520,7 +9520,7 @@ abstract class AppLocalizations {
   /// No description provided for @zikirmatikResetCounterDesc.
   ///
   /// In tr, this message translates to:
-  /// **'Toplam sayı ve tur bilgisi sıfırlanır.'**
+  /// **'Yalnızca bu zikrin sayısı ve turu sıfırlanır. Diğer zikirlerin sayısı korunur.'**
   String get zikirmatikResetCounterDesc;
 
   /// No description provided for @zikirmatikCancel.

@@ -9,6 +9,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../core/constants/willpower_templates.dart';
 import '../../core/firebase/firebase_bootstrap.dart';
+import '../../core/firebase/firestore_field_keys.dart';
 import '../../core/utils/hive_boxes.dart';
 import '../repositories/habit_repository.dart';
 import '../models/kaza_tracking_state.dart';
@@ -95,34 +96,37 @@ abstract final class UserCloudBackupService {
   }) async {
     final repo = ZikirMatikRepository(prefs);
     final session = repo.loadSession();
-    await _zikirRef(fs, uid).set({
-      'schemaVersion': 2,
-      'updatedAtMs': nowMs,
-      'syncedAt': FieldValue.serverTimestamp(),
-      'session': {
-        'total': session.total,
-        'round': session.round,
-        'tur': session.tur,
-        'phrase': session.phrase,
-        'target': session.target,
-      },
-      'phraseSessions': _phraseSessionsToJson(repo.loadPhraseSessions()),
-      'customPhrases': repo.loadCustomPhrases(),
-      'records': repo
-          .loadRecords()
-          .take(_maxZikirRecords)
-          .map((e) => e.toJson())
-          .toList(growable: false),
-      'turLogs': repo
-          .loadTurLogs()
-          .take(_maxZikirTurLogs)
-          .map((e) => e.toJson())
-          .toList(growable: false),
-      'settings': {
-        'soundTick': repo.soundTickEnabled,
-        'vibrateTarget': repo.vibrateOnTargetEnabled,
-      },
-    }, SetOptions(merge: true));
+    await _zikirRef(fs, uid).set(
+      sanitizeFirestoreMap({
+        'schemaVersion': 2,
+        'updatedAtMs': nowMs,
+        'syncedAt': FieldValue.serverTimestamp(),
+        'session': {
+          'total': session.total,
+          'round': session.round,
+          'tur': session.tur,
+          'phrase': session.phrase,
+          'target': session.target,
+        },
+        'phraseSessions': _phraseSessionsToJson(repo.loadPhraseSessions()),
+        'customPhrases': repo.loadCustomPhrases(),
+        'records': repo
+            .loadRecords()
+            .take(_maxZikirRecords)
+            .map((e) => e.toJson())
+            .toList(growable: false),
+        'turLogs': repo
+            .loadTurLogs()
+            .take(_maxZikirTurLogs)
+            .map((e) => e.toJson())
+            .toList(growable: false),
+        'settings': {
+          'soundTick': repo.soundTickEnabled,
+          'vibrateTarget': repo.vibrateOnTargetEnabled,
+        },
+      }),
+      SetOptions(merge: true),
+    );
   }
 
   static Future<void> _pullZikir({
@@ -137,8 +141,8 @@ abstract final class UserCloudBackupService {
     final repo = ZikirMatikRepository(prefs);
     final cloudSession = _asMap(data['session']);
     final localSession = repo.loadSession();
-    final localEmpty = _isEmptyZikirSession(localSession) &&
-        !repo.hasMeaningfulPhraseProgress;
+    final localEmpty =
+        _isEmptyZikirSession(localSession) && !repo.hasMeaningfulPhraseProgress;
     final cloudPhraseSessions = _phraseSessionsFrom(
       data['phraseSessions'],
       fallbackSession: cloudSession,
@@ -194,16 +198,19 @@ abstract final class UserCloudBackupService {
     required SharedPreferences prefs,
     required int nowMs,
   }) async {
-    await _backupRef(fs, uid).set({
-      'schemaVersion': 1,
-      'updatedAtMs': nowMs,
-      'syncedAt': FieldValue.serverTimestamp(),
-      'salatLogs': _exportSalatLogs(),
-      'location': LocationService().exportBackupJson(),
-      'notifications': _exportNotificationPrefs(prefs),
-      'appPrefs': _exportAppPrefs(prefs),
-      'kaza': _exportKaza(prefs),
-    }, SetOptions(merge: true));
+    await _backupRef(fs, uid).set(
+      sanitizeFirestoreMap({
+        'schemaVersion': 1,
+        'updatedAtMs': nowMs,
+        'syncedAt': FieldValue.serverTimestamp(),
+        'salatLogs': _exportSalatLogs(),
+        'location': LocationService().exportBackupJson(),
+        'notifications': _exportNotificationPrefs(prefs),
+        'appPrefs': _exportAppPrefs(prefs),
+        'kaza': _exportKaza(prefs),
+      }),
+      SetOptions(merge: true),
+    );
   }
 
   static Future<void> _pullUserBackup({
@@ -446,10 +453,16 @@ abstract final class UserCloudBackupService {
   ) {
     final out = <String, dynamic>{};
     items.forEach((key, value) {
+      if (!isSafeFirestoreFieldKey(key)) return;
       out[key] = value.toJson();
     });
     return out;
   }
+
+  @visibleForTesting
+  static Map<String, dynamic> phraseSessionsToJsonForTest(
+    Map<String, ZikirMatikPhraseSession> items,
+  ) => _phraseSessionsToJson(items);
 
   static Map<String, ZikirMatikPhraseSession> _phraseSessionsFrom(
     Object? raw, {
@@ -461,7 +474,9 @@ abstract final class UserCloudBackupService {
     map.forEach((key, value) {
       final session = ZikirMatikPhraseSession.fromJson(_asMap(value));
       if (session == null) return;
-      out[ZikirMatikRepository.phraseSessionKey(key)] = session;
+      final normalized = ZikirMatikRepository.phraseSessionKey(key);
+      if (!isSafeFirestoreFieldKey(normalized)) return;
+      out[normalized] = session;
     });
     if (out.isEmpty && fallbackSession.isNotEmpty) {
       final phrase = (fallbackSession['phrase'] as String?)?.trim() ?? '';
@@ -472,15 +487,28 @@ abstract final class UserCloudBackupService {
         target: _asInt(fallbackSession['target'], fallback: 33).clamp(3, 9999),
         updatedAtMillis: fallbackUpdatedAtMs,
       );
-      if (synthesized.total > 0 ||
-          synthesized.round > 0 ||
-          synthesized.tur > 1 ||
-          phrase.isNotEmpty) {
-        out[ZikirMatikRepository.phraseSessionKey(phrase)] = synthesized;
+      final key = ZikirMatikRepository.phraseSessionKey(phrase);
+      if (isSafeFirestoreFieldKey(key) &&
+          (synthesized.total > 0 ||
+              synthesized.round > 0 ||
+              synthesized.tur > 1 ||
+              phrase.isNotEmpty)) {
+        out[key] = synthesized;
       }
     }
     return out;
   }
+
+  @visibleForTesting
+  static Map<String, ZikirMatikPhraseSession> phraseSessionsFromForTest(
+    Object? raw, {
+    Map<String, dynamic> fallbackSession = const <String, dynamic>{},
+    int fallbackUpdatedAtMs = 0,
+  }) => _phraseSessionsFrom(
+    raw,
+    fallbackSession: fallbackSession,
+    fallbackUpdatedAtMs: fallbackUpdatedAtMs,
+  );
 
   static bool _isEmptyZikirSession(
     ({int total, int round, int tur, String phrase, int target}) s,

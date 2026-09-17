@@ -302,18 +302,13 @@ private extension View {
   @ViewBuilder
   func arinTransparentWidgetSurface() -> some View {
     modifier(ArinWidgetSurfaceModifier())
-      .modifier(ArinCarPlaySurfaceModifier())
   }
 }
 
-/// CarPlay / StandBy: sistem arka planı kaldırır; yazı büyük ve nefesli kalmalı.
-private struct ArinCarPlaySurfaceModifier: ViewModifier {
-  func body(content: Content) -> some View {
-    if #available(iOSApplicationExtension 17.0, *) {
-      content.containerBackgroundRemovable(true)
-    } else {
-      content
-    }
+private extension WidgetConfiguration {
+  /// CarPlay / StandBy: sistem arka planının kalkmasına izin verir.
+  func arinCarPlaySurface() -> some WidgetConfiguration {
+    containerBackgroundRemovable(true)
   }
 }
 
@@ -764,6 +759,7 @@ struct ArinQuoteWidget: Widget {
     .configurationDisplayName(localizedWidgetText(tr: "ARIN — Söz"))
     .description(localizedWidgetText(tr: "Günlük söz ve kaynak."))
     .supportedFamilies([.systemSmall, .systemMedium, .accessoryRectangular])
+    .arinCarPlaySurface()
   }
 }
 
@@ -1162,6 +1158,7 @@ struct ArinPrayerWidget: Widget {
     .configurationDisplayName(localizedWidgetText(tr: "ARIN — Namaz"))
     .description(localizedWidgetText(tr: "Sıradaki vakte kalan süre ve bugünün namazları."))
     .supportedFamilies([.systemSmall, .systemMedium, .accessoryRectangular])
+    .arinCarPlaySurface()
   }
 }
 
@@ -1642,6 +1639,7 @@ struct ArinComboWidget: Widget {
     .configurationDisplayName(localizedWidgetText(tr: "ARIN — Karma"))
     .description(localizedWidgetText(tr: "Sıradaki vakit ve günlük söz."))
     .supportedFamilies([.systemSmall, .systemMedium, .accessoryRectangular])
+    .arinCarPlaySurface()
   }
 }
 
@@ -1822,6 +1820,7 @@ struct ArinTrackingWidget: Widget {
     .configurationDisplayName(localizedWidgetText(tr: "ARIN — Takip"))
     .description(localizedWidgetText(tr: "Seçili gelişim veya arınma takibi."))
     .supportedFamilies([.systemSmall, .systemMedium, .accessoryRectangular])
+    .arinCarPlaySurface()
   }
 }
 
@@ -2140,6 +2139,7 @@ struct ArinZikirWidget: Widget {
     .configurationDisplayName(localizedWidgetText(tr: "ARIN — Zikirmatik"))
     .description(localizedWidgetText(tr: "Aktif zikir ve sayaç."))
     .supportedFamilies([.systemSmall, .systemMedium, .accessoryRectangular])
+    .arinCarPlaySurface()
   }
 }
 
@@ -2258,6 +2258,7 @@ struct ArinEsmaWidget: Widget {
     .configurationDisplayName(localizedWidgetText(tr: "ARIN — Esma-ül Hüsna"))
     .description(localizedWidgetText(tr: "Günün ism-i şerifi."))
     .supportedFamilies([.systemSmall, .systemMedium])
+    .arinCarPlaySurface()
   }
 }
 

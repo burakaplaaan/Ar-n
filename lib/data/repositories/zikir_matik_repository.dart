@@ -4,6 +4,7 @@ import 'dart:convert';
 
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../core/firebase/firestore_field_keys.dart';
 import '../models/zikir_matik_phrase_session.dart';
 import '../models/zikir_matik_record.dart';
 import '../models/zikir_matik_tur_log.dart';
@@ -38,6 +39,10 @@ class ZikirMatikRepository {
         .replaceAll('İ', 'i')
         .replaceAll('I', 'ı')
         .toLowerCase();
+  }
+
+  static bool _isSafePhraseSessionKey(String key) {
+    return isSafeFirestoreFieldKey(key);
   }
 
   List<ZikirMatikRecord> loadRecords() {
@@ -217,11 +222,13 @@ class ZikirMatikRepository {
       final out = <String, ZikirMatikPhraseSession>{};
       decoded.forEach((key, value) {
         if (key is! String || value is! Map) return;
+        final normalized = phraseSessionKey(key);
+        if (!_isSafePhraseSessionKey(normalized)) return;
         final session = ZikirMatikPhraseSession.fromJson(
           Map<String, dynamic>.from(value),
         );
         if (session == null) return;
-        out[phraseSessionKey(key)] = session;
+        out[normalized] = session;
       });
       return out;
     } catch (_) {
@@ -239,6 +246,7 @@ class ZikirMatikRepository {
   ) async {
     final encoded = <String, dynamic>{};
     items.forEach((key, value) {
+      if (!_isSafePhraseSessionKey(key)) return;
       encoded[key] = value.toJson();
     });
     await _prefs.setString(
@@ -263,6 +271,7 @@ class ZikirMatikRepository {
   }) {
     return _enqueuePhraseWrite(() async {
       final key = phraseSessionKey(phrase);
+      if (!_isSafePhraseSessionKey(key)) return;
       final map = loadPhraseSessions();
       map[key] = ZikirMatikPhraseSession(
         total: total.clamp(0, 999999),
@@ -291,7 +300,9 @@ class ZikirMatikRepository {
     return _enqueuePhraseWrite(() async {
       final next = <String, ZikirMatikPhraseSession>{};
       items.forEach((key, value) {
-        next[phraseSessionKey(key)] = value;
+        final normalized = phraseSessionKey(key);
+        if (!_isSafePhraseSessionKey(normalized)) return;
+        next[normalized] = value;
       });
       await _writePhraseSessions(next);
     });
@@ -313,10 +324,13 @@ class ZikirMatikRepository {
   }) {
     final out = <String, ZikirMatikPhraseSession>{};
     local.forEach((key, value) {
-      out[phraseSessionKey(key)] = value;
+      final normalized = phraseSessionKey(key);
+      if (!_isSafePhraseSessionKey(normalized)) return;
+      out[normalized] = value;
     });
     cloud.forEach((key, value) {
       final normalized = phraseSessionKey(key);
+      if (!_isSafePhraseSessionKey(normalized)) return;
       final existing = out[normalized];
       if (existing == null ||
           value.updatedAtMillis >= existing.updatedAtMillis) {

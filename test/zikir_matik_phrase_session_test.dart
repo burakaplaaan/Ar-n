@@ -70,6 +70,13 @@ void main() {
     expect(repo.loadPhraseSession('hasbünallah')?.total, 42);
   });
 
+  test('blank phrase keeps session prefs but no phraseSessions key', () async {
+    final repo = await repoWith({});
+    await repo.saveSession(total: 12, round: 3, tur: 2, phrase: '', target: 33);
+    expect(repo.loadSession().total, 12);
+    expect(repo.loadPhraseSessions(), isEmpty);
+  });
+
   test('legacy session is used until a phrase snapshot exists', () async {
     final repo = await repoWith({
       ZikirMatikPrefsKeys.sessionTotal: 250,
