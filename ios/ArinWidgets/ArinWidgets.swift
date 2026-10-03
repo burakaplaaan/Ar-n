@@ -97,21 +97,145 @@ private struct PrayerSchedulePayload: Decodable {
   let entries: [PrayerScheduleItem]
 }
 
-private struct PrayerTodayPayload: Decodable {
+private struct PrayerTodayPayload: Codable {
+  let day: String?
+  let trackingEnabled: Bool?
+  let validFromEpochMs: Double?
+  let validUntilEpochMs: Double?
   let nextClock: String?
   let hijri: String?
-  let doneCount: Int?
-  let slots: [PrayerTodaySlot]?
+  var doneCount: Int?
+  var slots: [PrayerTodaySlot]?
 }
 
-private struct PrayerTodaySlot: Decodable {
+private struct PrayerTodaySlot: Codable {
   let name: String
   let time: String
-  let done: Bool
+  var done: Bool
 }
 
 private func loadPrayerTodayBoard() -> PrayerTodayPayload? {
   decodeWidgetJson("arin_prayer_today_json", as: PrayerTodayPayload.self)
+}
+
+/// Tahta işaretlenebilir mi: namaz takibi açık ve takip gününün imsakı ile
+/// ertesi imsak arasındayız. Legacy tahtada pencere yoktur.
+private func isPrayerBoardInteractive(_ board: PrayerTodayPayload?, at now: Date) -> Bool {
+  guard let board,
+        board.trackingEnabled == true,
+        let from = board.validFromEpochMs,
+        let until = board.validUntilEpochMs,
+        from > 0,
+        until > from else {
+    return false
+  }
+  let nowMs = now.timeIntervalSince1970 * 1000
+  return nowMs >= from && nowMs < until
+}
+
+private func prayerBoardWindowEnd() -> Date? {
+  guard let until = loadPrayerTodayBoard()?.validUntilEpochMs, until > 0 else { return nil }
+  return Date(timeIntervalSince1970: until / 1000.0).addingTimeInterval(1)
+}
+
+private func hasUnackedPrayerPendingForDifferentDay(
+  index: Int,
+  boardDay: String?
+) -> Bool {
+  guard let u = suite(),
+        let boardDay,
+        let raw = u.string(forKey: "arin_prayer_pending_\(index)"),
+        let data = raw.data(using: .utf8),
+        let pending = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+        let pendingId = pending["id"] as? String,
+        !pendingId.isEmpty,
+        pendingId != u.string(forKey: "arin_prayer_pending_ack_\(index)") else {
+    return false
+  }
+  return pending["day"] as? String != boardDay
+}
+
+@available(iOSApplicationExtension 17.0, *)
+private actor PrayerWidgetMutationStore {
+  static let shared = PrayerWidgetMutationStore()
+
+  func toggle(index: Int) {
+    guard (0..<5).contains(index),
+          !widgetLocked("prayer"),
+          let u = suite(),
+          var board = loadPrayerTodayBoard(),
+          let day = board.day,
+          day.range(of: #"^\d{4}-\d{2}-\d{2}$"#, options: .regularExpression) != nil,
+          var slots = board.slots,
+          slots.count >= 5,
+          isPrayerBoardInteractive(board, at: Date()),
+          !hasUnackedPrayerPendingForDifferentDay(index: index, boardDay: day) else {
+      return
+    }
+
+    var currentDone = slots[index].done
+    if let pendingRaw = u.string(forKey: "arin_prayer_pending_\(index)"),
+       let pendingData = pendingRaw.data(using: .utf8),
+       let pending = try? JSONSerialization.jsonObject(with: pendingData) as? [String: Any],
+       let pendingId = pending["id"] as? String,
+       !pendingId.isEmpty,
+       pendingId != u.string(forKey: "arin_prayer_pending_ack_\(index)"),
+       pending["day"] as? String == day,
+       pending["index"] as? Int == index,
+       let pendingDone = pending["done"] as? Bool {
+      currentDone = pendingDone
+    }
+    slots[index].done = !currentDone
+    let done = slots[index].done
+    board.slots = slots
+    board.doneCount = slots.prefix(5).filter(\.done).count
+    guard let boardData = try? JSONEncoder().encode(board),
+          let boardJson = String(data: boardData, encoding: .utf8) else {
+      return
+    }
+
+    let nowMs = Int64(Date().timeIntervalSince1970 * 1000)
+    let action: [String: Any] = [
+      "id": "\(UUID().uuidString)-\(index)",
+      "day": day,
+      "index": index,
+      "done": done,
+      "atMs": nowMs,
+    ]
+    guard let actionData = try? JSONSerialization.data(withJSONObject: action),
+          let actionJson = String(data: actionData, encoding: .utf8) else {
+      return
+    }
+
+    u.set(actionJson, forKey: "arin_prayer_pending_\(index)")
+    u.set(boardJson, forKey: "arin_prayer_today_json")
+  }
+}
+
+@available(iOSApplicationExtension 17.0, *)
+struct TogglePrayerIntent: AppIntent {
+  static var title: LocalizedStringResource = "Namazı İşaretle"
+  static var description = IntentDescription(
+    "Seçilen namazın kılındı durumunu değiştirir."
+  )
+  static var openAppWhenRun: Bool = false
+
+  @Parameter(title: "Vakit")
+  var index: Int
+
+  init() {
+    index = 0
+  }
+
+  init(index: Int) {
+    self.index = index
+  }
+
+  func perform() async throws -> some IntentResult {
+    await PrayerWidgetMutationStore.shared.toggle(index: index)
+    WidgetCenter.shared.reloadTimelines(ofKind: "ArinPrayerWidget")
+    return .result()
+  }
 }
 
 private func clockLabel(from date: Date?) -> String {
@@ -898,11 +1022,22 @@ struct PrayerProvider: TimelineProvider {
         nextDate: nil
       )
       let contentRefresh = now.addingTimeInterval(21_600)
-      let refresh = [contentRefresh, widgetGateRefreshDate("prayer")].compactMap { $0 }.min() ?? contentRefresh
+      let windowEnd = prayerBoardWindowEnd().flatMap { $0 > now ? $0 : nil }
+      let refresh = [contentRefresh, widgetGateRefreshDate("prayer"), windowEnd]
+        .compactMap { $0 }.min() ?? contentRefresh
       return Timeline(entries: [stale], policy: .after(refresh))
     }
 
     var entries = [entry(at: now, next: sorted[firstNextIndex])]
+    // Tahta penceresi kapanınca slotlar toggle yerine uygulamayı açan
+    // Link'e dönsün; ertesi gün vakti tahmini olduğunda imsak girişiyle
+    // birebir örtüşmeyebilir.
+    if let windowEnd = prayerBoardWindowEnd(),
+       windowEnd > now,
+       !sorted.contains(where: { abs($0.date.addingTimeInterval(1).timeIntervalSince(windowEnd)) < 1 }),
+       let nextAfterWindow = sorted.first(where: { $0.date > windowEnd }) {
+      entries.append(entry(at: windowEnd, next: nextAfterWindow))
+    }
     let gateDate = widgetGateRefreshDate("prayer")
     if firstNextIndex + 1 < sorted.count {
       let endExclusive = min(sorted.count, firstNextIndex + 1 + kPrayerTimelineFutureLimit)
@@ -919,6 +1054,7 @@ struct PrayerProvider: TimelineProvider {
         )
       }
     }
+    entries.sort { $0.date < $1.date }
     let contentRefresh = entries.last?.date.addingTimeInterval(3600) ?? now.addingTimeInterval(3600)
     let refresh = [contentRefresh, gateDate].compactMap { $0 }.min() ?? contentRefresh
     return Timeline(entries: entries, policy: .after(refresh))
@@ -956,21 +1092,41 @@ struct PrayerWidgetView: View {
     entry.nextName == "🔒"
   }
 
+  private var openURL: URL {
+    URL(string: "arin://widget/prayer?homeWidget=true")!
+  }
+
+  private var lockURL: URL {
+    URL(string: "arin://widget/prayer?homeWidget=true&lock=1")!
+  }
+
   var body: some View {
     if isLocked {
-      LockedWidgetView(family: family, kindId: "prayer")
+      Link(destination: lockURL) {
+        LockedWidgetView(family: family, kindId: "prayer")
+      }
+      .buttonStyle(.plain)
     } else {
       ArinWidgetCanvas(family: family) {
         switch family {
         case .accessoryRectangular:
-          prayerLockCompact
+          Link(destination: openURL) {
+            prayerLockCompact
+          }
+          .buttonStyle(.plain)
         case .systemSmall:
-          prayerCompact
+          Link(destination: openURL) {
+            prayerCompact
+          }
+          .buttonStyle(.plain)
         default:
           prayerExpanded
         }
       } car: {
-        prayerCarPlay
+        Link(destination: openURL) {
+          prayerCarPlay
+        }
+        .buttonStyle(.plain)
       }
     }
   }
@@ -1056,51 +1212,46 @@ struct PrayerWidgetView: View {
     let board = loadPrayerTodayBoard()
     let slots = board?.slots ?? []
     let doneCount = board?.doneCount ?? slots.filter(\.done).count
+    let boardIsCurrent = isPrayerBoardInteractive(board, at: entry.date)
     let clock = clockLabel(from: entry.nextDate)
     return VStack(alignment: .leading, spacing: 8) {
-      HStack(alignment: .top) {
-        VStack(alignment: .leading, spacing: 2) {
-          Text(localizedWidgetText(tr: "Bugünün namazları"))
-            .font(.system(size: 13, weight: .bold))
-            .foregroundStyle(primaryTextColor)
-          Text("\(doneCount)/5 tamamlandı")
-            .font(.system(size: 11, weight: .medium))
-            .foregroundStyle(secondaryTextColor)
-        }
-        Spacer(minLength: 8)
-        VStack(alignment: .trailing, spacing: 2) {
-          countdownText(size: 18, minScale: 0.7)
-          Text(headerTitle)
-            .font(.system(size: 11, weight: .semibold))
-            .foregroundStyle(secondaryTextColor)
-          if !clock.isEmpty {
-            Text(clock)
-              .font(.system(size: 10, weight: .medium))
+      Link(destination: openURL) {
+        HStack(alignment: .top) {
+          VStack(alignment: .leading, spacing: 2) {
+            Text(localizedWidgetText(tr: "Bugünün namazları"))
+              .font(.system(size: 13, weight: .bold))
+              .foregroundStyle(primaryTextColor)
+            Text("\(doneCount)/5 tamamlandı")
+              .font(.system(size: 11, weight: .medium))
               .foregroundStyle(secondaryTextColor)
+          }
+          Spacer(minLength: 8)
+          VStack(alignment: .trailing, spacing: 2) {
+            countdownText(size: 18, minScale: 0.7)
+            Text(headerTitle)
+              .font(.system(size: 11, weight: .semibold))
+              .foregroundStyle(secondaryTextColor)
+            if !clock.isEmpty {
+              Text(clock)
+                .font(.system(size: 10, weight: .medium))
+                .foregroundStyle(secondaryTextColor)
+            }
           }
         }
       }
+      .buttonStyle(.plain)
       if !slots.isEmpty {
         HStack(spacing: 0) {
-          ForEach(Array(slots.enumerated()), id: \.offset) { _, slot in
-            VStack(spacing: 4) {
-              ZStack {
-                Circle()
-                  .stroke(primaryTextColor.opacity(slot.done ? 0.95 : 0.28), lineWidth: 1.4)
-                  .frame(width: 26, height: 26)
-                if slot.done {
-                  Image(systemName: "checkmark")
-                    .font(.system(size: 11, weight: .bold))
-                    .foregroundStyle(primaryTextColor)
-                }
-              }
-              Text(slot.name)
-                .font(.system(size: 9, weight: .semibold))
-                .foregroundStyle(secondaryTextColor)
-                .lineLimit(1)
-                .minimumScaleFactor(0.7)
-            }
-            .frame(maxWidth: .infinity)
+          ForEach(Array(slots.prefix(5).enumerated()), id: \.offset) { index, slot in
+            prayerSlot(
+              index: index,
+              slot: slot,
+              isInteractive: boardIsCurrent &&
+                !hasUnackedPrayerPendingForDifferentDay(
+                  index: index,
+                  boardDay: board?.day
+                )
+            )
           }
         }
         GeometryReader { geo in
@@ -1124,6 +1275,47 @@ struct PrayerWidgetView: View {
     }
     .padding(14)
     .shadow(color: .black.opacity(textShadowOpacity), radius: 3.0, x: 0, y: 1)
+  }
+
+  @ViewBuilder
+  private func prayerSlot(
+    index: Int,
+    slot: PrayerTodaySlot,
+    isInteractive: Bool
+  ) -> some View {
+    if #available(iOSApplicationExtension 17.0, *), isInteractive {
+      Button(intent: TogglePrayerIntent(index: index)) {
+        prayerSlotContent(slot)
+      }
+      .buttonStyle(.plain)
+      .frame(maxWidth: .infinity)
+    } else {
+      Link(destination: openURL) {
+        prayerSlotContent(slot)
+      }
+      .buttonStyle(.plain)
+      .frame(maxWidth: .infinity)
+    }
+  }
+
+  private func prayerSlotContent(_ slot: PrayerTodaySlot) -> some View {
+    VStack(spacing: 4) {
+      ZStack {
+        Circle()
+          .stroke(primaryTextColor.opacity(slot.done ? 0.95 : 0.28), lineWidth: 1.4)
+          .frame(width: 26, height: 26)
+        if slot.done {
+          Image(systemName: "checkmark")
+            .font(.system(size: 11, weight: .bold))
+            .foregroundStyle(primaryTextColor)
+        }
+      }
+      Text(slot.name)
+        .font(.system(size: 9, weight: .semibold))
+        .foregroundStyle(secondaryTextColor)
+        .lineLimit(1)
+        .minimumScaleFactor(0.7)
+    }
   }
 
   @ViewBuilder
@@ -1151,9 +1343,6 @@ struct ArinPrayerWidget: Widget {
     StaticConfiguration(kind: kind, provider: PrayerProvider()) { entry in
       PrayerWidgetView(entry: entry)
         .arinTransparentWidgetSurface()
-        .widgetURL(URL(string: entry.nextName == "🔒"
-          ? "arin://widget/prayer?homeWidget=true&lock=1"
-          : "arin://widget/prayer?homeWidget=true"))
     }
     .configurationDisplayName(localizedWidgetText(tr: "ARIN — Namaz"))
     .description(localizedWidgetText(tr: "Sıradaki vakte kalan süre ve bugünün namazları."))

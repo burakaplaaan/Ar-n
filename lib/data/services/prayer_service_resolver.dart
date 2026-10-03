@@ -30,6 +30,62 @@ import 'location_service.dart';
 /// "Kaynak: Diyanet" rozeti için; ayrıca log & telemetri için.
 enum PrayerSource { diyanet, aladhan, cacheOnly, unavailable }
 
+/// Açılışta GPS'i beklemek yalnız hiç kullanılabilir kayıtlı konum yoksa gerekir.
+/// İlçe, koordinat veya şehirden biri yeterliyse mevcut veriyle vakit gösterilir;
+/// konum tazeleme arka planda yapılır.
+bool shouldWaitForInitialPrayerLocation({
+  required bool isManual,
+  required String city,
+  required int? districtId,
+  required double? lat,
+  required double? lon,
+}) {
+  if (isManual) return false;
+  final hasDistrict = districtId != null && city.trim().isNotEmpty;
+  final hasCoordinates = lat != null && lon != null;
+  final hasCity = city.trim().isNotEmpty;
+  return !hasDistrict && !hasCoordinates && !hasCity;
+}
+
+class _PrayerLocationSnapshot {
+  const _PrayerLocationSnapshot({
+    required this.city,
+    required this.country,
+    required this.districtId,
+    required this.lat,
+    required this.lon,
+    required this.isManual,
+  });
+
+  final String city;
+  final String country;
+  final int? districtId;
+  final double? lat;
+  final double? lon;
+  final bool isManual;
+
+  String get key {
+    final normalizedCity = city.trim().toLowerCase();
+    final normalizedCountry = country.trim().toLowerCase();
+    if (isManual) {
+      return 'manual|${districtId ?? 'nil'}|$normalizedCountry|$normalizedCity';
+    }
+    if (_isTurkeyCountry(normalizedCountry) && districtId != null) {
+      return 'diyanet|$districtId|$normalizedCity';
+    }
+    if (lat != null && lon != null) {
+      return 'coords|$normalizedCountry|$normalizedCity|'
+          '${lat!.toStringAsFixed(3)}|${lon!.toStringAsFixed(3)}';
+    }
+    return 'city|$normalizedCountry|$normalizedCity';
+  }
+}
+
+bool _isTurkeyCountry(String country) {
+  final c = country.trim().toLowerCase();
+  return c == 'turkey' || c == 'türkiye' || c == 'turkiye' || c == 'tr';
+}
+
 class PrayerFetchResult {
   final PrayerTimesModel? model;
   final PrayerSource source;
@@ -48,9 +104,9 @@ class PrayerServiceResolver {
     required DiyanetPrayerService diyanet,
     required AladhanService aladhan,
     required LocationService location,
-  })  : _diyanet = diyanet,
-        _aladhan = aladhan,
-        _location = location;
+  }) : _diyanet = diyanet,
+       _aladhan = aladhan,
+       _location = location;
 
   // Bellek içi kısa süreli önbellek — aynı günün verisini tekrar tekrar
   // Hive/GPS/ağdan çekmekten kaçınır. PrayerServiceResolver bir Provider
@@ -64,15 +120,22 @@ class PrayerServiceResolver {
 
   static const _memCacheTtl = Duration(minutes: 30);
 
+  Future<void>? _backgroundLocationRefresh;
+
   VoidCallback? onCacheInvalidated;
 
   void notifyCacheInvalidated() => onCacheInvalidated?.call();
 
-  String _locationKey() {
-    final id = _location.savedDistrictId;
-    final city = _location.savedCity.trim().toLowerCase();
-    return '${id ?? 'nil'}|$city';
-  }
+  _PrayerLocationSnapshot _locationSnapshot() => _PrayerLocationSnapshot(
+    city: _location.savedCity,
+    country: _location.savedCountry,
+    districtId: _location.savedDistrictId,
+    lat: _location.savedLat,
+    lon: _location.savedLon,
+    isManual: _location.isManualPrayerLocation,
+  );
+
+  String _locationKey() => _locationSnapshot().key;
 
   void invalidateCache() {
     _memCache = null;
@@ -92,52 +155,71 @@ class PrayerServiceResolver {
   /// GPS beklenmesinden kaynaklanan ilk yüklenme gecikmesi ortadan kalkar.
   Future<PrayerFetchResult> fetchToday() async {
     final now = DateTime.now();
-
-    // İlk açılışta şehir/koordinat boşsa bir kez konum senkronu bekle;
-    // aksi halde Aladhan'a boş şehirle gidip sürekli hata döngüsüne girer.
-    // Sistem izin diyaloğu burada açılmaz — aksi halde hazırlık ekranı
-    // ile ev ekranı aynı anda iki kez soruyordu.
-    if (!_location.isManualPrayerLocation &&
-        (_location.savedCity.trim().isEmpty ||
-            _location.savedCountry.trim().isEmpty ||
-            (_location.savedLat == null || _location.savedLon == null))) {
-      await _location.syncPrayerLocation(
-        forceRefresh: true,
-        promptIfNeeded: false,
-      );
-    }
+    var location = _locationSnapshot();
 
     // 1) Bellek içi önbellek kontrolü — aynı takvim günü + aynı konum +
-    //    30 dk içinde ise anında dön; arka planda konumu tazele (GPS bloklamaz).
+    //    30 dk içinde ise anında dön.
     final cached = _memCache;
     final cachedAt = _memCacheAt;
     if (cached != null && cached.hasData && cachedAt != null) {
-      final sameDay = cachedAt.year == now.year &&
+      final sameDay =
+          cachedAt.year == now.year &&
           cachedAt.month == now.month &&
           cachedAt.day == now.day;
       final sameLocation = _memCacheLocationKey == _locationKey();
       if (sameDay && sameLocation && now.difference(cachedAt) < _memCacheTtl) {
-        // Konum senkronizasyonu arka planda; bu çağrıyı bloklamaz.
-        unawaited(_location.syncPrayerLocation());
+        _refreshLocationInBackground();
         return cached;
       }
     }
 
-    // 2) Konumu önce senkronize et; böylece şehir/ilçe değişikliği sonrası
-    //    yanlış konumdan çekim yapılıp cache'e yazılmaz.
-    await _location.syncPrayerLocation();
-    final fetchLocationKey = _locationKey();
+    // 2) Bugünün aynı konuma ait disk cache'i varsa GPS/ağı beklemeden göster.
+    //    Diyanet aylık payload'ı ve Aladhan günlük kaydı uygulama kapanınca da
+    //    Hive'da kalır. Konum kontrolü arka planda devam eder.
+    final diskCached = _tryLoadTodayCachedForLocation(location);
+    if (diskCached != null) {
+      final result = PrayerFetchResult(diskCached, PrayerSource.cacheOnly);
+      _memCache = result;
+      _memCacheAt = now;
+      _memCacheLocationKey = location.key;
+      _refreshLocationInBackground();
+      return result;
+    }
 
-    final isTR = _isTurkey(_location.savedCountry);
-    final ilceId = _location.savedDistrictId;
+    // 3) İlk kurulumda hiç konum yoksa bir kez sessiz GPS'i beklemek gerekir.
+    //    Kayıtlı şehir/ilçe/koordinat varsa ağ isteğini onunla hemen başlat;
+    //    GPS ana sayfadaki namaz kartını bloklamasın.
+    final waitForLocation = shouldWaitForInitialPrayerLocation(
+      isManual: _location.isManualPrayerLocation,
+      city: location.city,
+      districtId: location.districtId,
+      lat: location.lat,
+      lon: location.lon,
+    );
+    if (waitForLocation) {
+      await _location.syncPrayerLocation(
+        forceRefresh: true,
+        promptIfNeeded: false,
+      );
+      location = _locationSnapshot();
+    } else {
+      _refreshLocationInBackground();
+    }
+    final fetchLocationKey = location.key;
+
+    final isTR = _isTurkey(location.country);
+    final ilceId = location.districtId;
 
     if (isTR && ilceId != null) {
       final m = await _diyanet.fetchToday(
         ilceId: ilceId,
-        cityLabel: _location.savedCity,
+        cityLabel: location.city,
       );
       if (m != null) {
         final result = PrayerFetchResult(m, PrayerSource.diyanet);
+        if (_locationKey() != fetchLocationKey) {
+          return _resultAfterLocationChanged(now);
+        }
         _memCache = result;
         _memCacheAt = now;
         _memCacheLocationKey = fetchLocationKey;
@@ -145,12 +227,11 @@ class PrayerServiceResolver {
       }
     }
 
-    final lat = _location.savedLat;
-    final lon = _location.savedLon;
-    final city = _location.savedCity.trim();
-    final country = _location.savedCountry.trim();
-    final canQueryAladhan =
-        (lat != null && lon != null) || city.isNotEmpty;
+    final lat = location.lat;
+    final lon = location.lon;
+    final city = location.city.trim();
+    final country = location.country.trim();
+    final canQueryAladhan = (lat != null && lon != null) || city.isNotEmpty;
     if (canQueryAladhan) {
       try {
         final m = await _fetchAladhanToday(
@@ -158,9 +239,12 @@ class PrayerServiceResolver {
           lon: lon,
           city: city,
           country: country,
-          preferCity: _location.isManualPrayerLocation,
+          preferCity: location.isManual,
         );
         final result = PrayerFetchResult(m, PrayerSource.aladhan);
+        if (_locationKey() != fetchLocationKey) {
+          return _resultAfterLocationChanged(now);
+        }
         _memCache = result;
         _memCacheAt = now;
         _memCacheLocationKey = fetchLocationKey;
@@ -173,9 +257,12 @@ class PrayerServiceResolver {
             lon: lon,
             city: city,
             country: country,
-            preferCity: _location.isManualPrayerLocation,
+            preferCity: location.isManual,
           );
           final result = PrayerFetchResult(m, PrayerSource.aladhan);
+          if (_locationKey() != fetchLocationKey) {
+            return _resultAfterLocationChanged(now);
+          }
           _memCache = result;
           _memCacheAt = now;
           _memCacheLocationKey = fetchLocationKey;
@@ -186,30 +273,77 @@ class PrayerServiceResolver {
       }
     }
 
-    // Cache zinciri — önce Diyanet (daha doğru), sonra Aladhan.
-    if (isTR && ilceId != null) {
-      final m = _diyanet.tryLoadTodayCached(
-        ilceId: ilceId,
-        cityLabel: _location.savedCity,
-      );
-      if (m != null) {
-        final result = PrayerFetchResult(m, PrayerSource.cacheOnly);
-        _memCache = result;
-        _memCacheAt = now;
-        _memCacheLocationKey = fetchLocationKey;
-        return result;
+    // UI'da yalnız aynı konum kapsamına ait cache kullanılabilir. Başka bir
+    // şehrin `AnyScope` kaydı yalnız bildirim scheduler'ının son çaresidir.
+    final exactFallback = _tryLoadTodayCachedForLocation(location);
+    if (exactFallback != null) {
+      final result = PrayerFetchResult(exactFallback, PrayerSource.cacheOnly);
+      if (_locationKey() != fetchLocationKey) {
+        return _resultAfterLocationChanged(now);
       }
-    }
-    final anyScope = _aladhan.tryLoadTodayCachedAnyScope();
-    if (anyScope != null) {
-      final result = PrayerFetchResult(anyScope, PrayerSource.cacheOnly);
       _memCache = result;
       _memCacheAt = now;
       _memCacheLocationKey = fetchLocationKey;
       return result;
     }
 
+    if (_locationKey() != fetchLocationKey) {
+      return _resultAfterLocationChanged(now);
+    }
     return const PrayerFetchResult(null, PrayerSource.unavailable);
+  }
+
+  PrayerFetchResult _resultAfterLocationChanged(DateTime now) {
+    invalidateCache();
+    final current = _locationSnapshot();
+    final cached = _tryLoadTodayCachedForLocation(current);
+    if (cached == null) {
+      return const PrayerFetchResult(null, PrayerSource.unavailable);
+    }
+    final result = PrayerFetchResult(cached, PrayerSource.cacheOnly);
+    _memCache = result;
+    _memCacheAt = now;
+    _memCacheLocationKey = current.key;
+    return result;
+  }
+
+  PrayerTimesModel? _tryLoadTodayCachedForLocation(
+    _PrayerLocationSnapshot location,
+  ) {
+    final city = location.city.trim();
+    final country = location.country.trim();
+
+    if (_isTurkey(country) && location.districtId != null) {
+      final diyanet = _diyanet.tryLoadTodayCached(
+        ilceId: location.districtId!,
+        cityLabel: city,
+      );
+      if (diyanet != null) return diyanet;
+    }
+    if ((location.lat != null && location.lon != null) || city.isNotEmpty) {
+      return _aladhan.tryLoadTodayCached(
+        city: city,
+        country: country,
+        lat: location.isManual ? null : location.lat,
+        lon: location.isManual ? null : location.lon,
+      );
+    }
+    return null;
+  }
+
+  void _refreshLocationInBackground() {
+    if (_backgroundLocationRefresh != null) return;
+    final job = _location.syncPrayerLocation();
+    _backgroundLocationRefresh = job;
+    unawaited(
+      job
+          .then<void>((_) {}, onError: (Object _, StackTrace __) {})
+          .whenComplete(() {
+            if (identical(_backgroundLocationRefresh, job)) {
+              _backgroundLocationRefresh = null;
+            }
+          }),
+    );
   }
 
   /// Scheduler için senkron fallback: offline'da bile bildirim planını
@@ -262,10 +396,11 @@ class PrayerServiceResolver {
     final city = _location.savedCity.trim();
     if ((lat != null && lon != null) || city.isNotEmpty) {
       try {
-        final list = shouldUseAladhanCityName(
-              isManual: _location.isManualPrayerLocation,
-              city: city,
-            ) ||
+        final list =
+            shouldUseAladhanCityName(
+                  isManual: _location.isManualPrayerLocation,
+                  city: city,
+                ) ||
                 lat == null ||
                 lon == null
             ? await _aladhan.fetchUpcomingByCity(
@@ -319,11 +454,7 @@ class PrayerServiceResolver {
   }
 
   static bool _isTurkey(String country) {
-    final c = country.trim().toLowerCase();
-    return c == 'turkey' ||
-        c == 'türkiye' ||
-        c == 'turkiye' ||
-        c == 'tr';
+    return _isTurkeyCountry(country);
   }
 }
 

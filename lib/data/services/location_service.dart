@@ -42,14 +42,10 @@ class LocationChangeResult {
 bool shouldHoldManualPrayerLocation({
   required bool isManual,
   required bool overwriteManual,
-}) =>
-    isManual && !overwriteManual;
+}) => isManual && !overwriteManual;
 
 /// Elle seçilen şehirde Aladhan kalan GPS koordinatını kullanmasın.
-bool shouldUseAladhanCityName({
-  required bool isManual,
-  required String city,
-}) =>
+bool shouldUseAladhanCityName({required bool isManual, required String city}) =>
     isManual && city.trim().isNotEmpty;
 
 /// Konum güncelleme tercihi sabitleri (Hive key: `location_auto_update_pref`).
@@ -204,9 +200,25 @@ class LocationService {
   }
 
   String _locationKey() {
-    final id = savedDistrictId;
+    final manual = isManualPrayerLocation ? 'manual' : 'auto';
+    final country = savedCountry.trim().toLowerCase();
     final city = savedCity.trim().toLowerCase();
-    return '${id ?? 'nil'}|$city';
+    final id = savedDistrictId;
+    final isTurkey =
+        country == 'turkey' ||
+        country == 'türkiye' ||
+        country == 'turkiye' ||
+        country == 'tr';
+    if (isTurkey && id != null) {
+      return '$manual|diyanet|$id|$country|$city';
+    }
+    final lat = savedLat;
+    final lon = savedLon;
+    if (lat != null && lon != null) {
+      return '$manual|coords|$country|$city|'
+          '${lat.toStringAsFixed(3)}|${lon.toStringAsFixed(3)}';
+    }
+    return '$manual|city|$country|$city';
   }
 
   /// Aşağı çekince GPS + ters jeokodun tekrar çalışması için.
@@ -341,9 +353,7 @@ class LocationService {
           await _resolveDistrictIdFromPlacemark(p);
         } else {
           // TR dışına çıkıldıysa eski ilçe ID'si yanıltıcı; sıfırla.
-          final oldCountry = (_prefs.get(_countryKey) as String?) ?? '';
-          if (oldCountry.toUpperCase() == 'TR' ||
-              oldCountry.toUpperCase() == 'TURKEY') {
+          if (savedDistrictId != null) {
             await saveDistrictId(null);
           }
         }
@@ -352,13 +362,14 @@ class LocationService {
           _lastPrayerLocSyncMs,
           DateTime.now().millisecondsSinceEpoch,
         );
-
-        final newLocationKey = _locationKey();
-        if (oldLocationKey != newLocationKey) {
-          _notifySilentLocationChange();
-        }
       } catch (_) {
         // Koordinatlar kayıtlı; Aladhan yine doğru vakit döner, şehir etiketi eski kalabilir.
+      } finally {
+        // Ters geocoding başarısız olsa bile koordinatlar değişmiş olabilir.
+        // Cache bu durumda da eski kapsamda kalmamalı.
+        if (currentGen == _syncGeneration && oldLocationKey != _locationKey()) {
+          _notifySilentLocationChange();
+        }
       }
     } catch (_) {
       // GPS/izin hatası üst katmanda cache veya ilçe seçimine düşer.

@@ -22,18 +22,14 @@ final aladhanServiceProvider = Provider<AladhanService>(
 /// Admin test kaydırması [AdminDevPrefs] ile uygulanır (API yanıtı değişmez).
 final prayerTimesProvider = FutureProvider<PrayerTimesModel>((ref) async {
   final resolver = ref.read(prayerServiceResolverProvider);
-  
+
   resolver.onCacheInvalidated = () {
     ref.invalidateSelf();
   };
 
   final prefs = ref.read(sharedPreferencesProvider);
 
-  var result = await resolver.fetchToday();
-  if (result.model == null) {
-    await Future<void>.delayed(const Duration(milliseconds: 800));
-    result = await resolver.fetchToday();
-  }
+  final result = await resolver.fetchToday();
   final raw = result.model;
   if (raw == null) {
     throw Exception(

@@ -32,6 +32,8 @@ abstract final class ArinWidgetKeys {
   static const prayerScheduleJson = 'arin_prayer_schedule_json';
   static const prayerTodayJson = 'arin_prayer_today_json';
   static const prayerNextClock = 'arin_prayer_next_clock';
+  static const prayerPendingPrefix = 'arin_prayer_pending_';
+  static const prayerPendingAckPrefix = 'arin_prayer_pending_ack_';
   static const esmaArabic = 'arin_esma_arabic';
   static const esmaTurkish = 'arin_esma_turkish';
   static const esmaIndex = 'arin_esma_index';
@@ -73,8 +75,19 @@ abstract final class ArinWidgetKeys {
 abstract final class ArinWidgetSync {
   static const _forcedWidgetLocale = 'tr';
   static final RegExp _arabicChars = RegExp(r'[\u0600-\u06FF]');
+
+  static String _prayerPendingKey(int index) =>
+      '${ArinWidgetKeys.prayerPendingPrefix}$index';
+  static String _prayerPendingAckKey(int index) =>
+      '${ArinWidgetKeys.prayerPendingAckPrefix}$index';
   static Future<bool>? _appGroupFuture;
   static Future<void> _nativeGateMutationTail = Future<void>.value();
+  static bool _prayerReconcileRetryScheduled = false;
+  static Future<void> _prayerReconcileTail = Future<void>.value();
+
+  /// Widget eylemleri Hive'a uygulandığında (retry turları dahil) UI'ın
+  /// özet state'ini tazelemesi için uygulama katmanı bağlar.
+  static void Function()? onPrayerWidgetActionsApplied;
 
   /// Uygulama açılışında (deferred startup) bir kez çağrılır. AppGroup
   /// hazırlığı paralelde başlasın ki widget yazımı sırasında bekletme
@@ -860,11 +873,7 @@ abstract final class ArinWidgetSync {
         ArinWidgetKeys.prayerNextEpochMs,
         '${next.at.millisecondsSinceEpoch}',
       );
-      await _writeTodayAndEsma(
-        models: models,
-        now: now,
-        nextAt: next.at,
-      );
+      await _writeTodayAndEsma(models: models, now: now, nextAt: next.at);
       await HomeWidget.updateWidget(
         qualifiedAndroidName: _androidPrayer,
         iOSName: iOSPrayerWidgetName,
@@ -937,6 +946,22 @@ abstract final class ArinWidgetSync {
     return '$h:${m.toString().padLeft(2, '0')}:${s.toString().padLeft(2, '0')}';
   }
 
+  static int? _epochMs(Object? raw) {
+    final value = raw is num ? raw.toInt() : null;
+    return value == null || value <= 0 ? null : value;
+  }
+
+  static bool _salatTrackingEnabled() {
+    try {
+      return HabitRepository().findActiveByTemplateId(
+            WillpowerTemplates.salatDaily,
+          ) !=
+          null;
+    } catch (_) {
+      return false;
+    }
+  }
+
   static List<bool> _todaySalatDone(DateTime day) {
     try {
       final habit = HabitRepository().findActiveByTemplateId(
@@ -963,6 +988,7 @@ abstract final class ArinWidgetSync {
       nextAt: nextAt,
       done: _todaySalatDone(tickDay),
       tickDay: tickDay,
+      trackingEnabled: _salatTrackingEnabled(),
     );
   }
 
@@ -972,6 +998,7 @@ abstract final class ArinWidgetSync {
     required DateTime nextAt,
   }) async {
     final board = _todayBoard(models: models, now: now, nextAt: nextAt);
+    await _overlayPendingPrayerStates(board);
     await HomeWidget.saveWidgetData<String>(
       ArinWidgetKeys.prayerTodayJson,
       jsonEncode(board),
@@ -1021,6 +1048,218 @@ abstract final class ArinWidgetSync {
     );
   }
 
+  /// Native namaz widget'ının uygulama kapalıyken bıraktığı son durumları
+  /// Hive'a taşır. Her vakit ayrı anahtar kullandığı için hızlı/çakışan
+  /// dokunuşlarda bir vaktin yazımı diğerini silemez.
+  ///
+  /// İşlenen kayıt silinmez; ayrı bir ack anahtarına id'si yazılır. Pending
+  /// kaydı native tarafça aynı anda yenilense bile eski id'yi ack'lemek yeni
+  /// kaydı silemez. `setPrayer` idempotent olduğundan ack yazımı başarısız
+  /// olursa aynı durumun yeniden uygulanması da güvenlidir.
+  static Future<bool> reconcilePrayerWidgetActions() {
+    if (kIsWeb) return Future<bool>.value(false);
+    final run = _prayerReconcileTail.then((_) => _reconcilePrayerWidgetOnce());
+    _prayerReconcileTail = run.then((_) {}, onError: (_) {});
+    return run;
+  }
+
+  /// Uygulama içinden bir vakit değiştirildiğinde o slottaki eski widget
+  /// eylemini geçersiz kılar; aksi halde sonraki uzlaştırma kullanıcının daha
+  /// yeni seçimini eski widget dokunuşuyla ezebilirdi.
+  static Future<void> markPrayerChangedInApp(int index) async {
+    if (kIsWeb || index < 0 || index > 4) return;
+    final run = _prayerReconcileTail.then((_) async {
+      if (!await _ensureAppGroupReady()) return;
+      await _ackPendingPrayerAction(index);
+    });
+    _prayerReconcileTail = run.then((_) {}, onError: (_) {});
+    try {
+      await run;
+    } catch (e, st) {
+      debugPrint('ArinWidgetSync.markPrayerChangedInApp: $e\n$st');
+    }
+    await refreshPrayerTodayMarks();
+  }
+
+  static Future<void> _ackPendingPrayerAction(int slot) async {
+    final raw = await HomeWidget.getWidgetData<String>(_prayerPendingKey(slot));
+    if (raw == null || raw.trim().isEmpty) return;
+    final action = _decodePrayerWidgetAction(raw, expectedIndex: slot);
+    if (action == null) return;
+    await HomeWidget.saveWidgetData<String>(
+      _prayerPendingAckKey(slot),
+      action.id,
+    );
+  }
+
+  static Future<bool> _reconcilePrayerWidgetOnce() async {
+    try {
+      if (!await _ensureAppGroupReady()) return false;
+
+      final habitRepo = HabitRepository();
+      final salatHabit = habitRepo.findActiveByTemplateId(
+        WillpowerTemplates.salatDaily,
+      );
+      if (salatHabit == null) {
+        // Takip kapalıyken board toggle sunmaz; önceden kalan eylemler
+        // uygulanamaz. Kapatılmazlarsa slotu kalıcı olarak kilitlerlerdi.
+        for (var slot = 0; slot < 5; slot++) {
+          await _ackPendingPrayerAction(slot);
+        }
+        await refreshPrayerTodayMarks();
+        return false;
+      }
+
+      final salatRepo = SalatLogRepository();
+      var appliedAny = false;
+      for (var slot = 0; slot < 5; slot++) {
+        final key = _prayerPendingKey(slot);
+        final ackKey = _prayerPendingAckKey(slot);
+        // Uygulama A'yı işlerken native B'yi yazabilir. Aynı foreground
+        // turunda son duruma yakınsamaya çalış; sürekli dokunmada UI thread'ini
+        // tutmamak için makul bir üst sınır bırak.
+        for (var attempt = 0; attempt < 8; attempt++) {
+          final raw = await HomeWidget.getWidgetData<String>(key);
+          if (raw == null || raw.trim().isEmpty) break;
+          final action = _decodePrayerWidgetAction(raw, expectedIndex: slot);
+          if (action == null) break;
+          final ackId = await HomeWidget.getWidgetData<String>(ackKey);
+          if (ackId == action.id) break;
+
+          try {
+            await salatRepo.setPrayer(
+              salatHabit.id,
+              action.day,
+              action.index,
+              action.done,
+              habitRepo,
+            );
+            appliedAny = true;
+            await HomeWidget.saveWidgetData<String>(ackKey, action.id);
+          } catch (e, st) {
+            // Geçici Hive/IO hatasında eylemi bırak; sonraki resume tekrar dener.
+            debugPrint(
+              'ArinWidgetSync.reconcilePrayerWidgetActions[$slot]: $e\n$st',
+            );
+            break;
+          }
+        }
+      }
+
+      if (appliedAny) {
+        await refreshPrayerTodayMarks();
+        onPrayerWidgetActionsApplied?.call();
+      }
+      if (await _hasUnackedPrayerWidgetActions()) {
+        _schedulePrayerReconcileRetry();
+      }
+      return appliedAny;
+    } catch (e, st) {
+      debugPrint('ArinWidgetSync.reconcilePrayerWidgetActions: $e\n$st');
+      return false;
+    }
+  }
+
+  static Future<bool> _hasUnackedPrayerWidgetActions() async {
+    for (var slot = 0; slot < 5; slot++) {
+      final raw = await HomeWidget.getWidgetData<String>(
+        _prayerPendingKey(slot),
+      );
+      if (raw == null || raw.trim().isEmpty) continue;
+      final action = _decodePrayerWidgetAction(raw, expectedIndex: slot);
+      if (action == null) continue;
+      final ack = await HomeWidget.getWidgetData<String>(
+        _prayerPendingAckKey(slot),
+      );
+      if (ack != action.id) return true;
+    }
+    return false;
+  }
+
+  static void _schedulePrayerReconcileRetry() {
+    if (_prayerReconcileRetryScheduled) return;
+    _prayerReconcileRetryScheduled = true;
+    unawaited(() async {
+      try {
+        // Son ack kontrolüyle eşzamanlı gelen native yazımı da yakala. Sürekli
+        // dokunmada sınırsız foreground işi üretmemek için bounded retry.
+        for (var attempt = 0; attempt < 8; attempt++) {
+          await Future<void>.delayed(const Duration(milliseconds: 120));
+          await reconcilePrayerWidgetActions();
+          if (!await _hasUnackedPrayerWidgetActions()) break;
+        }
+      } finally {
+        _prayerReconcileRetryScheduled = false;
+      }
+    }());
+  }
+
+  static ({String id, DateTime day, int index, bool done})?
+  _decodePrayerWidgetAction(String raw, {required int expectedIndex}) {
+    try {
+      final decoded = jsonDecode(raw);
+      if (decoded is! Map) return null;
+      final map = Map<String, Object?>.from(decoded);
+      final id = map['id'];
+      final dayRaw = map['day'];
+      final index = map['index'];
+      final done = map['done'];
+      if (id is! String ||
+          id.trim().isEmpty ||
+          dayRaw is! String ||
+          index is! int ||
+          index != expectedIndex ||
+          done is! bool) {
+        return null;
+      }
+      final day = DateTime.tryParse(dayRaw);
+      if (day == null ||
+          dayRaw != SalatLogRepository.dayKey(day) ||
+          day.year < 2020 ||
+          day.year > 2100) {
+        return null;
+      }
+      return (id: id, day: day, index: index, done: done);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  /// Flutter'ın normal widget refresh'i henüz Hive'a alınmamış native
+  /// dokunuşları ezmemeli. Board üretilirken yalnızca ack edilmemiş son
+  /// durumlar aynı güne aitse tekrar bind edilir.
+  static Future<void> _overlayPendingPrayerStates(
+    Map<String, Object?> board,
+  ) async {
+    final day = board['day'];
+    final rawSlots = board['slots'];
+    if (day is! String || rawSlots is! List) return;
+    final slots = <Map<String, Object?>>[];
+    for (final rawSlot in rawSlots.take(5)) {
+      if (rawSlot is Map) {
+        slots.add(Map<String, Object?>.from(rawSlot));
+      }
+    }
+    if (slots.length != 5) return;
+
+    for (var slot = 0; slot < 5; slot++) {
+      final raw = await HomeWidget.getWidgetData<String>(
+        _prayerPendingKey(slot),
+      );
+      if (raw == null || raw.trim().isEmpty) continue;
+      final action = _decodePrayerWidgetAction(raw, expectedIndex: slot);
+      if (action == null || SalatLogRepository.dayKey(action.day) != day) {
+        continue;
+      }
+      final ackId = await HomeWidget.getWidgetData<String>(
+        _prayerPendingAckKey(slot),
+      );
+      if (ackId != action.id) slots[slot]['done'] = action.done;
+    }
+    board['slots'] = slots;
+    board['doneCount'] = slots.where((slot) => slot['done'] == true).length;
+  }
+
   /// Namaz tiklenince sadece günlük tahta güncellenir.
   static Future<void> refreshPrayerTodayMarks() async {
     if (kIsWeb) return;
@@ -1033,23 +1272,22 @@ abstract final class ArinWidgetSync {
       final decoded = jsonDecode(raw);
       if (decoded is! Map) return;
       final map = Map<String, Object?>.from(decoded);
-      final now = DateTime.now();
-      var imsakClock = '';
-      final slotsProbe = map['slots'];
-      if (slotsProbe is List && slotsProbe.isNotEmpty) {
-        final first = slotsProbe.first;
-        if (first is Map) {
-          imsakClock = '${first['time'] ?? ''}';
-        }
+      // Geçerlilik penceresi dışındaki (eski gün / legacy) board'un slotlarını
+      // yeni güne taşıma; namaz vakti refresh'i doğru günü baştan üretir.
+      final nowMs = DateTime.now().millisecondsSinceEpoch;
+      final validFrom = _epochMs(map['validFromEpochMs']);
+      final validUntil = _epochMs(map['validUntilEpochMs']);
+      final dayRaw = map['day'];
+      final tickDay = dayRaw is String ? DateTime.tryParse(dayRaw) : null;
+      if (validFrom == null ||
+          validUntil == null ||
+          nowMs < validFrom ||
+          nowMs >= validUntil ||
+          tickDay == null) {
+        return;
       }
-      final tickDay = imsakClock.isEmpty
-          ? DateTime(now.year, now.month, now.day)
-          : PrayerTodayBoard.salatBoardDayFromClock(
-              now: now,
-              imsakClock: imsakClock,
-            );
+      map['trackingEnabled'] = _salatTrackingEnabled();
       final done = _todaySalatDone(tickDay);
-      map['day'] = PrayerTodayBoard.ymd(tickDay);
       final slotsRaw = map['slots'];
       if (slotsRaw is List) {
         final slots = <Map<String, Object?>>[];
@@ -1063,6 +1301,7 @@ abstract final class ArinWidgetSync {
         map['slots'] = slots;
       }
       map['doneCount'] = done.where((e) => e).length;
+      await _overlayPendingPrayerStates(map);
       await HomeWidget.saveWidgetData<String>(
         ArinWidgetKeys.prayerTodayJson,
         jsonEncode(map),
@@ -1142,6 +1381,10 @@ abstract final class ArinWidgetSync {
         ArinWidgetKeys.widgetGateLockNote,
       ]) {
         await HomeWidget.saveWidgetData<String>(k, '');
+      }
+      for (var i = 0; i < 5; i++) {
+        await HomeWidget.saveWidgetData<String>(_prayerPendingKey(i), '');
+        await HomeWidget.saveWidgetData<String>(_prayerPendingAckKey(i), '');
       }
       for (final kind in const [
         'quote',

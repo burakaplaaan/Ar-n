@@ -165,7 +165,7 @@ class AssistantToolExecutor {
       ref.read(habitRepositoryProvider),
     );
     ref.read(habitSummaryProvider.notifier).refresh();
-    unawaited(ArinWidgetSync.refreshPrayerTodayMarks());
+    unawaited(ArinWidgetSync.markPrayerChangedInApp(index));
     return done ? l10n.assistantPrayerMarked : l10n.assistantPrayerUnmarked;
   }
 

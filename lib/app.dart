@@ -38,6 +38,7 @@ import 'l10n/app_localizations.dart';
 import 'data/services/habit_cloud_sync_service.dart';
 import 'data/services/inspiration_engagement_sync_service.dart';
 import 'data/services/tracking_widget_service.dart';
+import 'data/services/arin_widget_sync.dart';
 import 'data/services/user_cloud_backup_service.dart';
 import 'data/services/widget_access_service.dart';
 import 'data/services/widget_metrics_service.dart';
@@ -193,7 +194,13 @@ class _ArinAppState extends ConsumerState<ArinApp> with WidgetsBindingObserver {
     CarPlayAssistantHost.bind(ref);
     AdMobService.setRewardedPreloadForeground(true);
     WidgetsBinding.instance.addObserver(this);
+    ArinWidgetSync.onPrayerWidgetActionsApplied = () {
+      if (mounted) ref.read(habitSummaryProvider.notifier).refresh();
+    };
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      // Bakım turunun beklemelerinden bağımsız: widget'tan atılan tikler
+      // kullanıcı uygulama içinde etkileşmeden önce Hive'a alınmalı.
+      unawaited(ArinWidgetSync.reconcilePrayerWidgetActions());
       // FCM bildirim tıklaması yönlendirmesi: router hazır olduktan hemen
       // sonra callback enjekte edilir; initIfNeeded henüz çağrılmamışsa
       // _pendingNavigationRoute mekanizması yarış durumunu yakalar.
@@ -406,6 +413,7 @@ class _ArinAppState extends ConsumerState<ArinApp> with WidgetsBindingObserver {
     _systemBackChannel.setMethodCallHandler(null);
     AdMobService.setRewardedPreloadForeground(false);
     WidgetsBinding.instance.removeObserver(this);
+    ArinWidgetSync.onPrayerWidgetActionsApplied = null;
     super.dispose();
   }
 
@@ -418,6 +426,7 @@ class _ArinAppState extends ConsumerState<ArinApp> with WidgetsBindingObserver {
       return;
     }
     if (state == AppLifecycleState.resumed) {
+      unawaited(ArinWidgetSync.reconcilePrayerWidgetActions());
       // Kullanıcı iOS Ayarlar'dan ATT tercihini değiştirmiş olabilir.
       unawaited(MetaAppEvents.syncTrackingAuthorization());
       AdMobService.markRewardedEligibilityPending();

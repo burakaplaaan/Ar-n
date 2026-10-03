@@ -129,7 +129,7 @@ class SalatPrayerRow extends ConsumerWidget {
                   habitRepo,
                 );
                 ref.read(habitSummaryProvider.notifier).refresh();
-                unawaited(ArinWidgetSync.refreshPrayerTodayMarks());
+                unawaited(ArinWidgetSync.markPrayerChangedInApp(i));
                 if (markingDone && context.mounted) {
                   final allDone = salat.countDone(habitId, storageDay) >= 5;
                   unawaited(

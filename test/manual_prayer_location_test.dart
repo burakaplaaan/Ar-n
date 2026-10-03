@@ -3,46 +3,72 @@ import 'dart:io';
 import 'package:arin/core/utils/hive_boxes.dart';
 import 'package:arin/data/services/diyanet_district_matcher.dart';
 import 'package:arin/data/services/location_service.dart';
+import 'package:arin/data/services/prayer_service_resolver.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
 
 void main() {
   test('elle seçilen konum GPS ile sessizce ezilmez', () {
     expect(
-      shouldHoldManualPrayerLocation(
-        isManual: true,
-        overwriteManual: false,
-      ),
+      shouldHoldManualPrayerLocation(isManual: true, overwriteManual: false),
       isTrue,
     );
     expect(
-      shouldHoldManualPrayerLocation(
-        isManual: true,
-        overwriteManual: true,
-      ),
+      shouldHoldManualPrayerLocation(isManual: true, overwriteManual: true),
       isFalse,
     );
     expect(
-      shouldHoldManualPrayerLocation(
-        isManual: false,
-        overwriteManual: false,
-      ),
+      shouldHoldManualPrayerLocation(isManual: false, overwriteManual: false),
       isFalse,
     );
   });
 
   test('elle seçimde Aladhan şehir adını kullanır', () {
+    expect(shouldUseAladhanCityName(isManual: true, city: 'Ankara'), isTrue);
+    expect(shouldUseAladhanCityName(isManual: true, city: '  '), isFalse);
+    expect(shouldUseAladhanCityName(isManual: false, city: 'Ankara'), isFalse);
+  });
+
+  test('kayıtlı namaz konumu varsa açılış GPS beklemez', () {
     expect(
-      shouldUseAladhanCityName(isManual: true, city: 'Ankara'),
+      shouldWaitForInitialPrayerLocation(
+        isManual: false,
+        city: 'Kocaeli',
+        districtId: 9654,
+        lat: null,
+        lon: null,
+      ),
+      isFalse,
+    );
+    expect(
+      shouldWaitForInitialPrayerLocation(
+        isManual: false,
+        city: '',
+        districtId: null,
+        lat: 40.76,
+        lon: 29.94,
+      ),
+      isFalse,
+    );
+    expect(
+      shouldWaitForInitialPrayerLocation(
+        isManual: true,
+        city: 'Ankara',
+        districtId: 9206,
+        lat: null,
+        lon: null,
+      ),
+      isFalse,
+    );
+    expect(
+      shouldWaitForInitialPrayerLocation(
+        isManual: false,
+        city: '',
+        districtId: null,
+        lat: null,
+        lon: null,
+      ),
       isTrue,
-    );
-    expect(
-      shouldUseAladhanCityName(isManual: true, city: '  '),
-      isFalse,
-    );
-    expect(
-      shouldUseAladhanCityName(isManual: false, city: 'Ankara'),
-      isFalse,
     );
   });
 

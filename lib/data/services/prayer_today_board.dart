@@ -66,21 +66,43 @@ abstract final class PrayerTodayBoard {
     return civil;
   }
 
+  /// Takip gününün widget'tan işaretlenebildiği aralık: o günün imsakından
+  /// ertesi günün imsakına kadar. İki günden birinin vakti bilinmiyorsa
+  /// diğerinin imsak saati kullanılır (günlük imsak kayması birkaç dakikayı
+  /// geçmez). İmsaktan önce takip günü dündür ve vakit listeleri bugünden
+  /// başladığı için bu yedek gece yarısı sonrası için gereklidir.
+  static ({DateTime from, DateTime until})? trackingWindow({
+    required List<PrayerTimesModel> models,
+    required DateTime day,
+  }) {
+    final nextDay = DateTime(day.year, day.month, day.day + 1);
+    final dayFajr = modelOnDay(models, day)?.fajr;
+    final nextFajr = modelOnDay(models, nextDay)?.fajr;
+    final fromClock = dayFajr ?? nextFajr;
+    final untilClock = nextFajr ?? dayFajr;
+    if (fromClock == null || untilClock == null) return null;
+    final from = at(day, fromClock);
+    final until = at(nextDay, untilClock);
+    if (from == null || until == null || !until.isAfter(from)) return null;
+    return (from: from, until: until);
+  }
+
   static Map<String, Object?> build({
     required List<PrayerTimesModel> models,
     required DateTime now,
     required DateTime nextAt,
     required List<bool> done,
     DateTime? tickDay,
+    bool trackingEnabled = true,
   }) {
-    final boardDay = tickDay ?? DateTime(now.year, now.month, now.day);
-    final dayModel = modelOnDay(models, boardDay) ??
-        modelOnDay(models, DateTime(now.year, now.month, now.day)) ??
+    final civilDay = DateTime(now.year, now.month, now.day);
+    final boardDay = tickDay ?? civilDay;
+    final window = trackingWindow(models: models, day: boardDay);
+    final dayModel =
+        modelOnDay(models, boardDay) ??
+        modelOnDay(models, civilDay) ??
         (models.isEmpty ? null : models.first);
-    final marks = List<bool>.generate(
-      5,
-      (i) => i < done.length && done[i],
-    );
+    final marks = List<bool>.generate(5, (i) => i < done.length && done[i]);
     final slots = <Map<String, Object?>>[];
     if (dayModel != null) {
       final day = parseIsoDate(dayModel.date) ?? boardDay;
@@ -121,6 +143,9 @@ abstract final class PrayerTodayBoard {
         : '';
     return {
       'day': ymd(boardDay),
+      'trackingEnabled': trackingEnabled,
+      'validFromEpochMs': window?.from.millisecondsSinceEpoch,
+      'validUntilEpochMs': window?.until.millisecondsSinceEpoch,
       'nextClock': formatClock(nextAt),
       'hijri': '${hijri.hDay} $month ${hijri.hYear}',
       'doneCount': marks.where((e) => e).length,

@@ -12,9 +12,9 @@ import android.os.Build
 import android.os.SystemClock
 import android.view.View
 import android.widget.RemoteViews
+import es.antonborri.home_widget.HomeWidgetPlugin
 import es.antonborri.home_widget.HomeWidgetProvider
 import org.json.JSONObject
-
 /**
  * Namaz vakitleri widget: `arin_prayer_*` anahtarları.
  * API 24+: [Chronometer] (layout-v24) ile sistem içi saniye saniye geri sayım.
@@ -150,10 +150,12 @@ class ArinPrayerWidgetProvider : HomeWidgetProvider() {
             }
             views.setTextViewText(R.id.widget_prayer_location, safeLocation)
             bindTodayBoard(
+                context,
                 views,
                 widgetData,
                 epochMs,
                 showBoard = shouldShowTodayBoard(appWidgetManager, widgetId),
+                openApp = contentPi,
             )
             views.setOnClickPendingIntent(R.id.widget_prayer_root, contentPi)
             ArinWidgetTheme.apply(
@@ -178,7 +180,10 @@ class ArinPrayerWidgetProvider : HomeWidgetProvider() {
             appWidgetManager.updateAppWidget(widgetId, views)
         }
 
-        val gateRefresh = gateRefreshMs(widgetData, "prayer")
+        val gateRefresh = listOfNotNull(
+            gateRefreshMs(widgetData, "prayer"),
+            boardWindowRefreshMs(widgetData),
+        ).minOrNull()
         if (canUseChronometer) {
             cancelTickAlarm(context)
             val prayerRefresh = epochMs!! + 1_000L
@@ -482,10 +487,12 @@ class ArinPrayerWidgetProvider : HomeWidgetProvider() {
     }
 
     private fun bindTodayBoard(
+        context: Context,
         views: RemoteViews,
         widgetData: SharedPreferences,
         epochMs: Long?,
         showBoard: Boolean,
+        openApp: PendingIntent,
     ) {
         val clock = widgetData.getString(KEY_NEXT_CLOCK, null)?.trim().orEmpty().ifEmpty {
             formatClock(epochMs)
@@ -509,6 +516,7 @@ class ArinPrayerWidgetProvider : HomeWidgetProvider() {
         }
         try {
             val root = JSONObject(raw)
+            val boardIsCurrent = isBoardInteractive(root, System.currentTimeMillis())
             val doneCount = root.optInt("doneCount", 0)
             views.setTextViewText(R.id.widget_prayer_done, "$doneCount/5 tamamlandı")
             views.setViewVisibility(R.id.widget_prayer_done, View.VISIBLE)
@@ -533,8 +541,31 @@ class ArinPrayerWidgetProvider : HomeWidgetProvider() {
                     val obj = slots.optJSONObject(i)
                     val name = obj?.optString("name").orEmpty()
                     val done = obj?.optBoolean("done") == true
-                    val mark = if (done) "✓" else "·"
+                    val mark = if (done) "✓" else "○"
                     views.setTextViewText(slotIds[i], "$mark\n$name")
+                    if (obj != null &&
+                        boardIsCurrent &&
+                        !hasUnackedPendingForDifferentDay(widgetData, i, root.optString("day", ""))
+                    ) {
+                        val toggleIntent =
+                            Intent(context, ArinPrayerToggleReceiver::class.java).apply {
+                                putExtra(EXTRA_PRAYER_INDEX, i)
+                            }
+                        val togglePi = PendingIntent.getBroadcast(
+                            context,
+                            REQUEST_CODE_TOGGLE_BASE + i,
+                            toggleIntent,
+                            PendingIntent.FLAG_UPDATE_CURRENT or
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                                    PendingIntent.FLAG_IMMUTABLE
+                                } else {
+                                    0
+                                },
+                        )
+                        views.setOnClickPendingIntent(slotIds[i], togglePi)
+                    } else {
+                        views.setOnClickPendingIntent(slotIds[i], openApp)
+                    }
                 }
             } else {
                 views.setViewVisibility(R.id.widget_prayer_slots, View.GONE)
@@ -544,6 +575,111 @@ class ArinPrayerWidgetProvider : HomeWidgetProvider() {
             views.setViewVisibility(R.id.widget_prayer_slots, View.GONE)
             views.setViewVisibility(R.id.widget_prayer_hijri, View.GONE)
         }
+    }
+
+    /** Bir vakti uygulamayı açmadan iyimser olarak değiştirir ve Flutter'a bırakır. */
+    internal fun handlePrayerToggle(context: Context, index: Int) {
+        if (index !in 0..4) return
+        synchronized(PRAYER_TOGGLE_LOCK) {
+            val prefs = HomeWidgetPlugin.getData(context)
+            if (isWidgetLocked(prefs, "prayer")) {
+                requestUpdate(context)
+                return
+            }
+            val raw = prefs.getString(KEY_TODAY_JSON, null)?.trim().orEmpty()
+            if (raw.isEmpty()) return
+            try {
+                val root = JSONObject(raw)
+                val day = root.optString("day", "").trim()
+                val slots = root.optJSONArray("slots")
+                if (!DATE_KEY.matches(day) ||
+                    !isBoardInteractive(root, System.currentTimeMillis()) ||
+                    slots == null ||
+                    slots.length() < 5 ||
+                    hasUnackedPendingForDifferentDay(prefs, index, day)
+                ) {
+                    requestUpdate(context)
+                    return
+                }
+                val prayer = slots.optJSONObject(index) ?: return
+                var currentDone = prayer.optBoolean("done", false)
+                val pending = prefs.getString("$KEY_PENDING_PREFIX$index", null)
+                    ?.let { runCatching { JSONObject(it) }.getOrNull() }
+                val pendingId = pending?.optString("id", "").orEmpty()
+                val ackId = prefs.getString("$KEY_PENDING_ACK_PREFIX$index", null).orEmpty()
+                if (pending != null &&
+                    pendingId.isNotEmpty() &&
+                    pendingId != ackId &&
+                    pending.optString("day", "") == day &&
+                    pending.optInt("index", -1) == index
+                ) {
+                    currentDone = pending.optBoolean("done", currentDone)
+                }
+                val newDone = !currentDone
+                prayer.put("done", newDone)
+
+                var doneCount = 0
+                for (i in 0 until minOf(5, slots.length())) {
+                    if (slots.optJSONObject(i)?.optBoolean("done", false) == true) doneCount++
+                }
+                root.put("doneCount", doneCount)
+
+                val now = System.currentTimeMillis()
+                val action = JSONObject()
+                    .put("id", "$now-${System.nanoTime()}-$index")
+                    .put("day", day)
+                    .put("index", index)
+                    .put("done", newDone)
+                    .put("atMs", now)
+                // commit(): requestUpdate bu değerleri okumadan önce kalıcı olsun.
+                prefs.edit()
+                    .putString(KEY_TODAY_JSON, root.toString())
+                    .putString("$KEY_PENDING_PREFIX$index", action.toString())
+                    .commit()
+            } catch (_: Exception) {
+                return
+            }
+        }
+        requestUpdate(context)
+    }
+
+    private fun hasUnackedPendingForDifferentDay(
+        prefs: SharedPreferences,
+        index: Int,
+        boardDay: String,
+    ): Boolean {
+        val pendingRaw = prefs.getString("$KEY_PENDING_PREFIX$index", null)
+            ?.trim()
+            .orEmpty()
+        if (pendingRaw.isEmpty()) return false
+        val pending = runCatching { JSONObject(pendingRaw) }.getOrNull() ?: return false
+        val pendingId = pending.optString("id", "")
+        if (pendingId.isEmpty() ||
+            pendingId == prefs.getString("$KEY_PENDING_ACK_PREFIX$index", null)
+        ) {
+            return false
+        }
+        return pending.optString("day", "") != boardDay
+    }
+
+    /**
+     * Tahta işaretlenebilir mi: namaz takibi açık ve şu an takip gününün
+     * imsakı ile ertesi imsak arasındayız. Legacy tahtada pencere yoktur.
+     */
+    /** Tahta penceresi kapanınca slotlar toggle yerine uygulamayı açacak şekilde yeniden çizilsin. */
+    private fun boardWindowRefreshMs(widgetData: SharedPreferences): Long? {
+        val raw = widgetData.getString(KEY_TODAY_JSON, null)?.trim().orEmpty()
+        if (raw.isEmpty()) return null
+        val until = runCatching { JSONObject(raw).optLong("validUntilEpochMs", 0L) }
+            .getOrDefault(0L)
+        return if (until > System.currentTimeMillis()) until + 1_000L else null
+    }
+
+    private fun isBoardInteractive(root: JSONObject, nowMs: Long): Boolean {
+        if (!root.optBoolean("trackingEnabled", false)) return false
+        val from = root.optLong("validFromEpochMs", 0L)
+        val until = root.optLong("validUntilEpochMs", 0L)
+        return from > 0L && until > from && nowMs in from until until
     }
 
     private fun formatClock(epochMs: Long?): String {
@@ -568,6 +704,8 @@ class ArinPrayerWidgetProvider : HomeWidgetProvider() {
         private const val KEY_NEXT_EPOCH = "arin_prayer_next_epoch_ms"
         private const val KEY_PRAYER_SCHEDULE = "arin_prayer_schedule_json"
         private const val KEY_TODAY_JSON = "arin_prayer_today_json"
+        private const val KEY_PENDING_PREFIX = "arin_prayer_pending_"
+        private const val KEY_PENDING_ACK_PREFIX = "arin_prayer_pending_ack_"
         private const val KEY_NEXT_CLOCK = "arin_prayer_next_clock"
         private const val KEY_LOCALE = "arin_widget_locale"
         private const val KEY_GATE_LOCKED = "arin_widget_gate_prayer_locked"
@@ -578,8 +716,12 @@ class ArinPrayerWidgetProvider : HomeWidgetProvider() {
         private const val ACTION_TICK = "com.arin.arin.action.PRAYER_WIDGET_TICK"
         private const val ACTION_DEADLINE_REFRESH =
             "com.arin.arin.action.PRAYER_WIDGET_DEADLINE_REFRESH"
+        private const val EXTRA_PRAYER_INDEX = "prayer_index"
         private const val REQUEST_CODE_TICK = 19021
         private const val REQUEST_CODE_DEADLINE_REFRESH = 19022
+        private const val REQUEST_CODE_TOGGLE_BASE = 19030
+        private val PRAYER_TOGGLE_LOCK = Any()
+        private val DATE_KEY = Regex("""^\d{4}-\d{2}-\d{2}$""")
         /** Kronometreyi sıfır sınırına sokmadan önce statik moda geçiş tamponu. */
         private const val DEADLINE_GUARD_MS = 1500L
         /** API 23 / chronometer fallback: dakikalık coarse güncelleme. */
@@ -596,6 +738,20 @@ class ArinPrayerWidgetProvider : HomeWidgetProvider() {
             }
             context.sendBroadcast(update)
         }
+    }
+}
+
+/**
+ * İnteraktif slot PendingIntent'leri için dışarıya kapalı receiver. AppWidget
+ * provider sistem gereği exported olduğu için kullanıcı verisini değiştiren
+ * aksiyon burada ayrıştırılır.
+ */
+class ArinPrayerToggleReceiver : BroadcastReceiver() {
+    override fun onReceive(context: Context, intent: Intent) {
+        ArinPrayerWidgetProvider().handlePrayerToggle(
+            context.applicationContext,
+            intent.getIntExtra("prayer_index", -1),
+        )
     }
 }
 
