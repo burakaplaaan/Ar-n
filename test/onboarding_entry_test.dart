@@ -57,8 +57,8 @@ void main() {
     await tester.pumpAndSettle();
   });
 
-  testWidgets('hikaye sonrası ilk soru zinciri atlanır', (tester) async {
-    expect(kOnboardingSkipEarlyQuestions, isTrue);
+  testWidgets('hikaye sonrası isim adımı gelir', (tester) async {
+    expect(kOnboardingSkipEarlyQuestions, isFalse);
     SharedPreferences.setMockInitialValues({});
     final prefs = await SharedPreferences.getInstance();
 
@@ -86,16 +86,9 @@ void main() {
     await tester.tap(find.textContaining('Devam'));
     await tester.pumpAndSettle();
 
-    expect(find.text('Bunu kalbine göre örüyoruz'), findsOneWidget);
-    expect(find.byType(OnboardingNameScreen), findsNothing);
-
-    await tester.tap(find.textContaining('Devam'));
-    await tester.pumpAndSettle();
-    expect(
-      find.text('Namaz ve dua ritmini nasıl tarif edersin?'),
-      findsOneWidget,
-    );
-    expect(find.textContaining(', namaz'), findsNothing);
+    expect(find.byType(OnboardingNameScreen), findsOneWidget);
+    expect(find.text('Sana nasıl hitap edelim?'), findsOneWidget);
+    expect(find.text('Bunu kalbine göre örüyoruz'), findsNothing);
   });
 
   test('isimsiz kurulum başlıklarında virgül kalmaz', () {

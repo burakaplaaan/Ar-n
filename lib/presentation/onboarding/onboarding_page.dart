@@ -43,7 +43,7 @@ import 'onboarding_willpower_invite_screen.dart';
 
 /// İlk isim / niyet / kalp / sıkıntı / not / ton / yöneliş zinciri atlanır.
 /// Eski soru akışına dönüş: `false`.
-const bool kOnboardingSkipEarlyQuestions = true;
+const bool kOnboardingSkipEarlyQuestions = false;
 
 enum _OnboardingPhase {
   landing,
