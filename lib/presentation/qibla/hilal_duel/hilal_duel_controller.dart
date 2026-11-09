@@ -36,13 +36,13 @@ class HilalDuelController extends ChangeNotifier {
        _adMob = adMob,
        _displayName = displayName;
 
-  static const _pendingHeartProofKey =
-      'arin_hilal_duel_pending_heart_proof_v1';
+  static const _pendingHeartProofKey = 'arin_hilal_duel_pending_heart_proof_v1';
   static const _pendingHeartProofExpiryKey =
       'arin_hilal_duel_pending_heart_proof_expiry_v1';
-  static const _queueWait = Duration(seconds: 15);
+  static const _queueWait = Duration(seconds: 10);
   static const _pollInterval = Duration(milliseconds: 900);
   static const _queuePollInterval = Duration(milliseconds: 350);
+
   /// Rakip/bot cevabı beklerken daha sık yokla — sonuç geç düşmesin.
   static const _awaitingPollInterval = Duration(milliseconds: 350);
 
@@ -59,18 +59,25 @@ class HilalDuelController extends ChangeNotifier {
   List<HilalDuelChallengeSummary> challenges = const [];
   String? errorMessage;
   int? queuedAtMs;
+
+  /// Rakip bulundu; maç açılmadan önce kısa bir onay. Süre ekranda yok.
+  bool matchFound = false;
   bool busy = false;
   bool doubledThisMatch = false;
   bool challengeMode = false;
+
   /// Challenger bitirdi → lobide tek seferlik 24 saat bilgilendirmesi.
   String? challengeSentNoticeOpponentName;
   int? selectedChoice;
   bool awaitingOpponent = false;
+
   /// Tur çözümü şıklar üzerinde; cihaz saatine bağlı değil (yerel timer).
   bool revealingResolution = false;
+
   /// Reveal / beklerken yerel ipucu; sunucu `-1` yazdıysa skor için kullanılmaz.
   int? lastSubmittedChoice;
   int? lastSubmittedRound;
+
   /// Oyun içi doğru/yanlış tahtası (sunucu çözümüne göre, tur indeksli).
   List<HilalDuelRoundMark> selfRoundMarks = const [];
   List<HilalDuelRoundMark> opponentRoundMarks = const [];
@@ -91,10 +98,13 @@ class HilalDuelController extends ChangeNotifier {
   bool _botAssignRequested = false;
   bool _heartProofRecoveryInFlight = false;
   bool _finalRevealScheduled = false;
+
   /// Aynı lastResolution.round için reveal bir kez başlatılır.
   int? _revealForRound;
+
   /// start/waiting sunucuda onaylanmadan poll yapılmaz.
   bool _queueConfirmed = false;
+  bool _enteringMatch = false;
   Completer<HilalDuelLeaveSettle>? _leaveCompleter;
   Future<void>? _startFuture;
   Future<HilalDuelLeaveSettle>? _cancelFuture;
@@ -305,6 +315,7 @@ class HilalDuelController extends ChangeNotifier {
     }
     busy = true;
     errorMessage = null;
+    matchFound = false;
     _queueConfirmed = false;
     // RPC öncesi armed — geri/dispose/iptal atlamasın.
     _arms = armBeforeStartRpc(_arms);
@@ -796,8 +807,7 @@ class HilalDuelController extends ChangeNotifier {
           final retryable = _isRoundNotStartedError(error) && attempt < 2;
           if (retryable) {
             final startAt = match?.roundStartedAtMs ?? nowMs;
-            final waitMs =
-                startAt - DateTime.now().millisecondsSinceEpoch;
+            final waitMs = startAt - DateTime.now().millisecondsSinceEpoch;
             await Future<void>.delayed(
               Duration(milliseconds: waitMs.clamp(200, 1200)),
             );
@@ -859,7 +869,8 @@ class HilalDuelController extends ChangeNotifier {
       } catch (_) {
         // AdMob SSV, SDK ödül callback'inden sonra ulaşabilir. Kanıtı diskte
         // tutup süresi dolana kadar arka planda teslim etmeyi sürdür.
-        errorMessage = 'Canın doğrulanıyor; kısa süre içinde hesabına eklenecek.';
+        errorMessage =
+            'Canın doğrulanıyor; kısa süre içinde hesabına eklenecek.';
         unawaited(_recoverPendingHeartReward());
         return;
       }
@@ -915,8 +926,7 @@ class HilalDuelController extends ChangeNotifier {
           await refreshProfile();
           return;
         } on FirebaseFunctionsException catch (error) {
-          if (error.code == 'deadline-exceeded' ||
-              error.code == 'not-found') {
+          if (error.code == 'deadline-exceeded' || error.code == 'not-found') {
             await _clearPendingHeartProof(proofId);
             return;
           }
@@ -925,8 +935,7 @@ class HilalDuelController extends ChangeNotifier {
           // Ağ/servis geçici olarak yoksa kanıt sonraki açılışta da korunur.
           return;
         }
-        final remainingMs =
-            expiresAtMs - DateTime.now().millisecondsSinceEpoch;
+        final remainingMs = expiresAtMs - DateTime.now().millisecondsSinceEpoch;
         if (remainingMs <= 0) break;
         await Future<void>.delayed(
           Duration(milliseconds: remainingMs.clamp(1, 10_000).toInt()),
@@ -1055,14 +1064,14 @@ class HilalDuelController extends ChangeNotifier {
     await startMatchmaking();
   }
 
-  bool get isChallengeResult =>
-      challengeMode || match?.isChallenge == true;
+  bool get isChallengeResult => challengeMode || match?.isChallenge == true;
 
   String? get challengeOpponentId {
     final fromMatch = match?.opponent.id.trim() ?? '';
     if (fromMatch.isNotEmpty) return fromMatch;
     final selfId = match?.self.id;
-    for (final player in match?.result?.players ?? const <HilalDuelPlayerResult>[]) {
+    for (final player
+        in match?.result?.players ?? const <HilalDuelPlayerResult>[]) {
       final id = player.id.trim();
       if (id.isNotEmpty && id != selfId) return id;
     }
@@ -1257,7 +1266,8 @@ class HilalDuelController extends ChangeNotifier {
       if (_disposed) return;
       final friendly = _friendlyError(error);
       final lower = friendly.toLowerCase();
-      final missingQueue = lower.contains('bulunamadı') ||
+      final missingQueue =
+          lower.contains('bulunamadı') ||
           lower.contains('not-found') ||
           (error is FirebaseFunctionsException &&
               error.code.toLowerCase() == 'not-found');
@@ -1286,11 +1296,28 @@ class HilalDuelController extends ChangeNotifier {
   }
 
   Future<void> _enterMatch(String matchId) async {
-    challengeMode = false;
-    await _enterPlaySession(matchId);
+    if (_enteringMatch || _disposed) return;
+    _enteringMatch = true;
+    try {
+      challengeMode = false;
+      if (phase == HilalDuelPhase.matchmaking ||
+          phase == HilalDuelPhase.cancelRetry) {
+        matchFound = true;
+        _stopTimers();
+        _safeNotify();
+        await Future<void>.delayed(const Duration(milliseconds: 700));
+        if (_disposed) return;
+      }
+      await _enterPlaySession(matchId);
+    } finally {
+      _enteringMatch = false;
+    }
   }
 
-  Future<void> _enterChallenge(String challengeId, {HilalDuelMatch? seed}) async {
+  Future<void> _enterChallenge(
+    String challengeId, {
+    HilalDuelMatch? seed,
+  }) async {
     challengeMode = true;
     await _enterPlaySession(challengeId, seed: seed);
   }
@@ -1309,7 +1336,8 @@ class HilalDuelController extends ChangeNotifier {
       unawaited(_returnToLobbyAfterChallengeSent(finished));
       return;
     }
-    final alreadyThisRound = _revealForRound == res.round && revealingResolution;
+    final alreadyThisRound =
+        _revealForRound == res.round && revealingResolution;
     if (!alreadyThisRound) {
       _revealForRound = res.round;
       revealingResolution = true;
@@ -1334,8 +1362,9 @@ class HilalDuelController extends ChangeNotifier {
   Future<void> _returnToLobbyAfterChallengeSent(HilalDuelMatch finished) async {
     _stopTimers();
     final opponentName = finished.opponent.name.trim();
-    challengeSentNoticeOpponentName =
-        opponentName.isEmpty ? 'Rakip' : opponentName;
+    challengeSentNoticeOpponentName = opponentName.isEmpty
+        ? 'Rakip'
+        : opponentName;
     match = null;
     _activeMatchId = null;
     challengeMode = false;
@@ -1358,7 +1387,40 @@ class HilalDuelController extends ChangeNotifier {
     return name;
   }
 
-  Future<void> _enterPlaySession(String sessionId, {HilalDuelMatch? seed}) async {
+  Future<HilalDuelMatch> _loadPlaySession(
+    String sessionId, {
+    HilalDuelMatch? seed,
+  }) async {
+    if (seed != null) return seed;
+    Future<HilalDuelMatch> load(String id) {
+      return challengeMode
+          ? _repository.loadChallenge(id)
+          : _repository.loadMatch(id);
+    }
+
+    try {
+      return await load(sessionId);
+    } catch (error) {
+      if (!challengeMode) {
+        try {
+          final polled = await _repository.pollMatch();
+          if (polled.matched &&
+              polled.matchId != null &&
+              polled.matchId!.isNotEmpty &&
+              polled.matchId != sessionId) {
+            _activeMatchId = polled.matchId;
+            return await load(polled.matchId!);
+          }
+        } catch (_) {}
+      }
+      return await load(_activeMatchId ?? sessionId);
+    }
+  }
+
+  Future<void> _enterPlaySession(
+    String sessionId, {
+    HilalDuelMatch? seed,
+  }) async {
     if (_disposed) return;
     _stopTimers();
     _activeMatchId = sessionId;
@@ -1378,10 +1440,7 @@ class HilalDuelController extends ChangeNotifier {
     unawaited(ArinAnalytics.hilalDuelMatchStart());
     final seq = ++_matchRequestSeq;
     try {
-      final loaded = seed ??
-          (challengeMode
-              ? await _repository.loadChallenge(sessionId)
-              : await _repository.loadMatch(sessionId));
+      final loaded = await _loadPlaySession(sessionId, seed: seed);
       if (_disposed) return;
       if (loaded.isAwaitingChallengeOpponent) {
         await _returnToLobbyAfterChallengeSent(loaded);
@@ -1402,6 +1461,7 @@ class HilalDuelController extends ChangeNotifier {
       match = null;
       _activeMatchId = null;
       challengeMode = false;
+      matchFound = false;
       _stopTimers();
       _arms = const HilalDuelQueueArms();
       _queueConfirmed = false;
@@ -1429,8 +1489,9 @@ class HilalDuelController extends ChangeNotifier {
         _activeMatchId == null) {
       return;
     }
-    final interval =
-        _isAwaitingOpponentPoll ? _awaitingPollInterval : _pollInterval;
+    final interval = _isAwaitingOpponentPoll
+        ? _awaitingPollInterval
+        : _pollInterval;
     _pollTimer = Timer(delay ?? interval, () async {
       await _pollMatch();
       if (!_disposed && phase == HilalDuelPhase.playing) {
@@ -1863,7 +1924,9 @@ class HilalDuelController extends ChangeNotifier {
 
   bool get _opponentMarksUnresolved {
     if (opponentRoundMarks.isEmpty) return true;
-    return opponentRoundMarks.every((mark) => mark == HilalDuelRoundMark.pending);
+    return opponentRoundMarks.every(
+      (mark) => mark == HilalDuelRoundMark.pending,
+    );
   }
 
   Future<void> _refreshChallengeRoundMarks() async {
@@ -1905,13 +1968,6 @@ class HilalDuelController extends ChangeNotifier {
     if (!_disposed && _opponentMarksUnresolved) {
       await _refreshChallengeRoundMarks();
     }
-  }
-
-  double matchmakingProgress() {
-    final started = queuedAtMs;
-    if (started == null) return 0;
-    final elapsed = DateTime.now().millisecondsSinceEpoch - started;
-    return (elapsed / _queueWait.inMilliseconds).clamp(0, 1);
   }
 
   void _stopTimers() {

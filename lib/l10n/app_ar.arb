@@ -888,6 +888,7 @@
   "hilalDuelNeedHeartHint": "شاهد إعلاناً قصيراً ← احصل على قلب واحد والعب فوراً",
   "hilalDuelNeedHeartCta": "شاهد الإعلان",
   "hilalDuelSearching": "جارٍ البحث عن منافس…",
+  "hilalDuelMatchFound": "تم العثور على منافس",
   "hilalDuelCancelSearch": "إلغاء البحث",
   "hilalDuelCancelFailed": "تعذّر الإلغاء. أعد المحاولة لاسترداد القلب.",
   "hilalDuelQuestionProgress": "سؤال {current}/{total}",

@@ -188,6 +188,50 @@ test("digest prepend and drop stay local", () => {
   assert.deepEqual(resorted.map((row) => row.id), ["a", "b"]);
 });
 
+test("new post is last in popular and first in latest", () => {
+  const full = Array.from({ length: 10 }, (_, i) => ({
+    id: `f${i}`,
+    likeCount: 4,
+    createdAtMs: i,
+  }));
+  const tailed = testables.appendPopularTail(full, {
+    id: "new",
+    likeCount: 0,
+    createdAtMs: 99,
+  });
+  assert.equal(tailed.length, 10);
+  assert.equal(tailed[tailed.length - 1].id, "new");
+  assert.equal(tailed[0].id, "f1");
+  assert.equal(tailed.some((row) => row.id === "f0"), false);
+  const short = testables.appendPopularTail(
+    [
+      { id: "hot", likeCount: 3, createdAtMs: 1 },
+      { id: "old", likeCount: 0, createdAtMs: 2 },
+    ],
+    { id: "new", likeCount: 0, createdAtMs: 9 },
+  );
+  assert.deepEqual(short.map((row) => row.id), ["hot", "old", "new"]);
+  const crowded = testables.appendPopularTail(
+    [
+      { id: "hot", likeCount: 6, createdAtMs: 1 },
+      ...Array.from({ length: 9 }, (_, i) => ({
+        id: `z${i}`,
+        likeCount: 0,
+        createdAtMs: 10 + i,
+      })),
+    ],
+    { id: "new", likeCount: 0, createdAtMs: 99 },
+  );
+  assert.equal(crowded.at(-1).id, "new");
+  assert.equal(crowded.some((row) => row.id === "z0"), false);
+  assert.equal(crowded.some((row) => row.id === "z8"), true);
+  const latest = testables.prependLatestItems(
+    [{ id: "p1" }, { id: "p2" }],
+    { id: "new" },
+  );
+  assert.deepEqual(latest.map((row) => row.id), ["new", "p1", "p2"]);
+});
+
 test("digest stamps author bio", () => {
   const item = testables.digestItemFromData("p2", {
     text: "Merhaba",

@@ -827,6 +827,31 @@ function popularRank(a, b) {
     (Number(b.createdAtMs) || 0) - (Number(a.createdAtMs) || 0);
 }
 
+// A just-written post has no likes, so rank-based insert drops it once the
+// page is full. Keep the existing order and pin that post to the last slot,
+// evicting the weakest row only when the page is already full.
+function appendPopularTail(items, item) {
+  let kept = (Array.isArray(items) ? items : [])
+    .filter((row) => row && row.id && row.id !== item.id);
+  const nextItem = {
+    ...item,
+    id: item.id,
+    likeCount: Math.max(0, Number(item.likeCount) || 0),
+    commentCount: Math.max(
+      0,
+      Number.isFinite(Number(item.commentCount))
+        ? Number(item.commentCount)
+        : 0,
+    ),
+  };
+  while (kept.length >= FEED_PAGE) {
+    const weakest = [...kept].sort(popularRank).pop();
+    if (!weakest) break;
+    kept = kept.filter((row) => row.id !== weakest.id);
+  }
+  return [...kept, nextItem];
+}
+
 function upsertPopularItems(items, item) {
   const others = (Array.isArray(items) ? items : [])
     .filter((row) => row && row.id && row.id !== item.id);
@@ -884,7 +909,6 @@ async function prependLatestDigest(db, item) {
   const snap = await latestRef.get();
   if (!snap.exists || !Array.isArray(snap.data()?.items)) {
     await rebuildSocialDigests(db);
-    return;
   }
   await db.runTransaction(async (tx) => {
     const [latestSnap, popularSnap] = await Promise.all([
@@ -892,15 +916,20 @@ async function prependLatestDigest(db, item) {
       tx.get(popularRef),
     ]);
     const now = FieldValue.serverTimestamp();
+    const latestItems = Array.isArray(latestSnap.data()?.items)
+      ? latestSnap.data().items
+      : [];
+    const popularItems = Array.isArray(popularSnap.data()?.items)
+      ? popularSnap.data().items
+      : [];
     tx.set(latestRef, {
-      items: prependLatestItems(latestSnap.data()?.items, item),
+      items: prependLatestItems(latestItems, item),
       builtAt: now,
     }, { merge: true });
-    if (!popularSnap.exists || !Array.isArray(popularSnap.data()?.items)) {
-      return;
-    }
-    const popular = upsertPopularItems(popularSnap.data()?.items, item);
-    tx.set(popularRef, { items: popular, builtAt: now }, { merge: true });
+    tx.set(popularRef, {
+      items: appendPopularTail(popularItems, item),
+      builtAt: now,
+    }, { merge: true });
   });
 }
 
@@ -1708,6 +1737,7 @@ module.exports = {
     normalizeAvatarId,
     prependLatestItems,
     dropDigestItem,
+    appendPopularTail,
     upsertPopularItems,
     containsSocialInsult,
     validatedBanHours,

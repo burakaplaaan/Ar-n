@@ -888,6 +888,7 @@
   "hilalDuelNeedHeartHint": "Watch a short ad → earn 1 heart and find a rival",
   "hilalDuelNeedHeartCta": "Watch ad",
   "hilalDuelSearching": "Searching for opponent…",
+  "hilalDuelMatchFound": "Opponent found",
   "hilalDuelCancelSearch": "Cancel search",
   "hilalDuelCancelFailed": "Cancel failed. Retry to refund your heart.",
   "hilalDuelQuestionProgress": "Question {current}/{total}",

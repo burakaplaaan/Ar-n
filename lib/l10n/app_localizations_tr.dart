@@ -1707,6 +1707,9 @@ class AppLocalizationsTr extends AppLocalizations {
   String get hilalDuelSearching => 'Rakip aranıyor…';
 
   @override
+  String get hilalDuelMatchFound => 'Eşleşme bulundu';
+
+  @override
   String get hilalDuelCancelSearch => 'Aramayı iptal et';
 
   @override

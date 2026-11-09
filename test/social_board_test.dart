@@ -193,6 +193,42 @@ void main() {
     expect(socialAvatarColorIndex('ali', 1), 0);
   });
 
+  test('a new post closes popular and opens latest', () {
+    SocialPost row(String id, int likes, int createdAtMs) {
+      return SocialPost(
+        id: id,
+        text: 'Sabaha kadar sabretmek güzeldir.',
+        authorUid: 'u$id',
+        authorUsername: id,
+        authorPremium: false,
+        likeCount: likes,
+        commentCount: 0,
+        createdAt: DateTime.fromMillisecondsSinceEpoch(createdAtMs),
+      );
+    }
+
+    final full = List<SocialPost>.generate(
+      kSocialFeedPageSize,
+      (i) => row('f$i', 4, i + 1),
+    );
+    final popular = placeCreatedSocialPost(
+      items: full,
+      post: row('new', 0, 99),
+      sort: SocialFeedSort.popular,
+    );
+    expect(popular.length, kSocialFeedPageSize);
+    expect(popular.last.id, 'new');
+    expect(popular.first.id, 'f1');
+    expect(popular.map((post) => post.id), isNot(contains('f0')));
+
+    final latest = placeCreatedSocialPost(
+      items: [row('p1', 1, 1), row('p2', 0, 2)],
+      post: row('new', 0, 99),
+      sort: SocialFeedSort.latest,
+    );
+    expect(latest.map((post) => post.id), ['new', 'p1', 'p2']);
+  });
+
   test('callable details never reach the user', () {
     final missing = FirebaseFunctionsException(
       code: 'not-found',

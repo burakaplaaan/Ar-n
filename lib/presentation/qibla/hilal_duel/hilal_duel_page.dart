@@ -98,6 +98,7 @@ class _HilalDuelPageState extends ConsumerState<HilalDuelPage>
   HilalDuelController? _controller;
   late final AnimationController _pulse;
   Timer? _tick;
+
   /// PopScope(canPop:false) + maybePop yeniden _handleBack çağırır → donma.
   bool _backInFlight = false;
 
@@ -251,8 +252,9 @@ class _HilalDuelPageState extends ConsumerState<HilalDuelPage>
         onBack: _handleBack,
         child: Scaffold(
           // Saydam scaffold + fade pop = siyah flash; zemin her zaman dolu.
-          backgroundColor:
-              onDark ? const Color(0xFF0A1210) : const Color(0xFFF3F6F2),
+          backgroundColor: onDark
+              ? const Color(0xFF0A1210)
+              : const Color(0xFFF3F6F2),
           body: ArinShellBackground.buildLayered(
             context,
             child: SafeArea(
@@ -280,10 +282,7 @@ class _HilalDuelPageState extends ConsumerState<HilalDuelPage>
   ) {
     switch (c.phase) {
       case HilalDuelPhase.loading:
-        return const Center(
-          key: ValueKey('loading'),
-          child: ArinLoader(),
-        );
+        return const Center(key: ValueKey('loading'), child: ArinLoader());
       case HilalDuelPhase.error:
         return _ErrorBody(
           key: const ValueKey('error'),
@@ -298,7 +297,7 @@ class _HilalDuelPageState extends ConsumerState<HilalDuelPage>
           key: ValueKey(
             c.phase == HilalDuelPhase.cancelRetry ? 'cancel-retry' : 'mm',
           ),
-          progress: c.matchmakingProgress(),
+          matchFound: c.matchFound,
           cancelFailed: c.phase == HilalDuelPhase.cancelRetry,
           errorMessage: c.errorMessage,
           onCancel: () async {
@@ -853,9 +852,10 @@ class _LobbyBodyState extends ConsumerState<_LobbyBody>
         ),
         const SizedBox(height: 8),
         ScaleTransition(
-          scale: Tween(begin: 0.97, end: 1.03).animate(
-            CurvedAnimation(parent: pulse, curve: Curves.easeInOut),
-          ),
+          scale: Tween(
+            begin: 0.97,
+            end: 1.03,
+          ).animate(CurvedAnimation(parent: pulse, curve: Curves.easeInOut)),
           child: Center(
             child: CustomPaint(
               size: const Size.square(44),
@@ -893,18 +893,12 @@ class _LobbyBodyState extends ConsumerState<_LobbyBody>
                   },
           ),
         const SizedBox(height: 10),
-        _RulesCard(
-          text: l10n.hilalDuelRulesSummary,
-          onDark: onDark,
-        ),
+        _RulesCard(text: l10n.hilalDuelRulesSummary, onDark: onDark),
         if (controller.errorMessage != null &&
             controller.errorMessage !=
                 HilalDuelController.needHeartErrorToken) ...[
           const SizedBox(height: 8),
-          _LobbyErrorBanner(
-            message: controller.errorMessage!,
-            onDark: onDark,
-          ),
+          _LobbyErrorBanner(message: controller.errorMessage!, onDark: onDark),
         ],
         const SizedBox(height: 14),
         _PrimaryButton(
@@ -1088,7 +1082,9 @@ class _ChallengeInboxCard extends StatelessWidget {
                       ],
                     ),
                   ),
-                  if (item.canAccept || item.myTurn || item.status == 'completed')
+                  if (item.canAccept ||
+                      item.myTurn ||
+                      item.status == 'completed')
                     _InboxActionButton(
                       label: item.status == 'completed'
                           ? l10n.hilalDuelChallengeSeeResult
@@ -1270,19 +1266,17 @@ class _HilalRankAvatarState extends State<_HilalRankAvatar>
         )
       else if (cosmetics.frameTier >= 1)
         BoxShadow(
-          color: (cosmetics.frameTier >= 3
-                  ? _HilalRankAvatar._gold
-                  : cosmetics.frameTier >= 2
-                  ? _HilalRankAvatar._gold
-                  : bronze)
-              .withValues(alpha: 0.45),
+          color:
+              (cosmetics.frameTier >= 3
+                      ? _HilalRankAvatar._gold
+                      : cosmetics.frameTier >= 2
+                      ? _HilalRankAvatar._gold
+                      : bronze)
+                  .withValues(alpha: 0.45),
           blurRadius: 10,
         ),
       if (widget.answeredGlow != null)
-        BoxShadow(
-          color: widget.answeredGlow!,
-          blurRadius: 12,
-        ),
+        BoxShadow(color: widget.answeredGlow!, blurRadius: 12),
     ];
 
     final fill = DecoratedBox(
@@ -1370,7 +1364,9 @@ class _HilalRankAvatarState extends State<_HilalRankAvatar>
             shape: BoxShape.circle,
             boxShadow: [
               BoxShadow(
-                color: _HilalRankAvatar._gold.withValues(alpha: 0.20 + t * 0.28),
+                color: _HilalRankAvatar._gold.withValues(
+                  alpha: 0.20 + t * 0.28,
+                ),
                 blurRadius: widget.size * (0.18 + t * 0.20),
                 spreadRadius: 0.4 + t * 1.6,
               ),
@@ -1412,10 +1408,7 @@ class _GamePlayerBanner extends StatelessWidget {
     const emerald = AppColors.emeraldMid;
     final progress = profile.levelProgress.clamp(0.0, 1.0);
     final cosmetics = cosmeticsForLevel(profile.level);
-    final title = _localizedTitleForLevel(
-      l10n,
-      profile.level,
-    );
+    final title = _localizedTitleForLevel(l10n, profile.level);
     final nameColor = _hilalNameColor(
       level: profile.level,
       onDark: onDark,
@@ -1429,11 +1422,7 @@ class _GamePlayerBanner extends StatelessWidget {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: onDark
-              ? const [
-                  Color(0xFF0B1611),
-                  Color(0xFF142820),
-                  Color(0xFF1C3428),
-                ]
+              ? const [Color(0xFF0B1611), Color(0xFF142820), Color(0xFF1C3428)]
               : [AppColors.creamSurface, Colors.white.withValues(alpha: 0.94)],
         ),
         border: Border.all(color: bronze.withValues(alpha: 0.55), width: 1.2),
@@ -1607,9 +1596,7 @@ class _GamePlayerBanner extends StatelessWidget {
               ),
               const SizedBox(width: 10),
               Text(
-                profile.maxLevel
-                    ? 'MAX'
-                    : '${(progress * 100).round()}%',
+                profile.maxLevel ? 'MAX' : '${(progress * 100).round()}%',
                 style: TextStyle(
                   color: bronze,
                   fontSize: 11,
@@ -1649,8 +1636,8 @@ class _WeeklyRankTheme {
   final Color fillB;
 
   static _WeeklyRankTheme forRank(int rank, bool onDark, {int boardSize = 0}) {
-    final isLastBand = rank > 0 &&
-        ((boardSize >= 6 && rank >= boardSize - 2) || rank >= 18);
+    final isLastBand =
+        rank > 0 && ((boardSize >= 6 && rank >= boardSize - 2) || rank >= 18);
     if (rank > 0 && rank <= 10) {
       return _WeeklyRankTheme(
         accent: const Color(0xFF3CB371),
@@ -1751,7 +1738,9 @@ class _WeeklyLeaderCardState extends ConsumerState<_WeeklyLeaderCard> {
                     height: 36,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: theme.accent.withValues(alpha: onDark ? 0.22 : 0.18),
+                      color: theme.accent.withValues(
+                        alpha: onDark ? 0.22 : 0.18,
+                      ),
                       border: Border.all(
                         color: theme.accent.withValues(alpha: 0.75),
                       ),
@@ -1800,7 +1789,9 @@ class _WeeklyLeaderCardState extends ConsumerState<_WeeklyLeaderCard> {
                     ),
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(99),
-                      color: theme.accent.withValues(alpha: onDark ? 0.28 : 0.2),
+                      color: theme.accent.withValues(
+                        alpha: onDark ? 0.28 : 0.2,
+                      ),
                       border: Border.all(
                         color: theme.accent.withValues(alpha: 0.75),
                       ),
@@ -1851,9 +1842,11 @@ class _WeeklyLeaderCardState extends ConsumerState<_WeeklyLeaderCard> {
                 future: _previewFuture,
                 builder: (context, snap) {
                   final board = snap.data;
-                  final top = board?.top.take(3).toList(growable: false) ??
+                  final top =
+                      board?.top.take(3).toList(growable: false) ??
                       const <HilalDuelWeeklyEntry>[];
-                  final winners = board?.lastWeekWinners ??
+                  final winners =
+                      board?.lastWeekWinners ??
                       const <HilalDuelWeeklyLastWinner>[];
                   if (snap.connectionState != ConnectionState.done) {
                     return SizedBox(
@@ -2189,8 +2182,8 @@ class _LastWeekWinnersPromo extends StatelessWidget {
             final accent = winner.rank == 1
                 ? gold
                 : winner.rank == 2
-                    ? const Color(0xFFB0BEC5)
-                    : const Color(0xFFC48A5A);
+                ? const Color(0xFFB0BEC5)
+                : const Color(0xFFC48A5A);
             return Padding(
               padding: EdgeInsets.only(bottom: compact ? 4 : 6),
               child: Row(
@@ -2271,7 +2264,9 @@ class _ChampionBadge extends StatelessWidget {
               ? const [Color(0xFFFFF3C4), Color(0xFFE0B35A), Color(0xFFC4892A)]
               : const [Color(0xFFFFE082), Color(0xFFE0B35A)],
         ),
-        border: Border.all(color: const Color(0xFFC4892A).withValues(alpha: 0.85)),
+        border: Border.all(
+          color: const Color(0xFFC4892A).withValues(alpha: 0.85),
+        ),
         boxShadow: golden
             ? [
                 BoxShadow(
@@ -2384,7 +2379,8 @@ class _HilalShinyNameState extends State<_HilalShinyName>
 
   @override
   Widget build(BuildContext context) {
-    final color = widget.colorOverride ??
+    final color =
+        widget.colorOverride ??
         _hilalNameColor(
           level: widget.level,
           onDark: widget.onDark,
@@ -2410,11 +2406,7 @@ class _HilalShinyNameState extends State<_HilalShinyName>
             return LinearGradient(
               begin: Alignment(-1.2 + t * 2.4, 0),
               end: Alignment(-0.4 + t * 2.4, 0),
-              colors: [
-                color,
-                const Color(0xFFF8E7B0),
-                color,
-              ],
+              colors: [color, const Color(0xFFF8E7B0), color],
               stops: const [0.22, 0.5, 0.78],
             ).createShader(bounds);
           },
@@ -2458,12 +2450,12 @@ class _WeeklyPreviewRow extends StatelessWidget {
     final podium = maxLevel
         ? _MaxLevelShine.gold
         : entry.rank == 1
-            ? const Color(0xFFE0B35A)
-            : entry.rank == 2
-                ? const Color(0xFFB0BEC5)
-                : entry.rank == 3
-                    ? const Color(0xFFC48A5A)
-                    : theme.accent;
+        ? const Color(0xFFE0B35A)
+        : entry.rank == 2
+        ? const Color(0xFFB0BEC5)
+        : entry.rank == 3
+        ? const Color(0xFFC48A5A)
+        : theme.accent;
     final nameColor = maxLevel || entry.isSelf
         ? podium
         : _hilalNameColor(
@@ -2476,10 +2468,7 @@ class _WeeklyPreviewRow extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
       decoration: maxLevel
-          ? _MaxLevelShine.rowDecoration(
-              onDark: onDark,
-              isSelf: entry.isSelf,
-            )
+          ? _MaxLevelShine.rowDecoration(onDark: onDark, isSelf: entry.isSelf)
           : BoxDecoration(
               borderRadius: BorderRadius.circular(12),
               color: podium.withValues(alpha: onDark ? 0.14 : 0.12),
@@ -2731,7 +2720,8 @@ class _WeeklyLeaderSheetState extends ConsumerState<_WeeklyLeaderSheet> {
                 final selfRank = board.selfRank > 0
                     ? board.selfRank
                     : widget.fallbackRank;
-                final selfWeekly = board.top.isEmpty && board.selfWeeklyHilals == 0
+                final selfWeekly =
+                    board.top.isEmpty && board.selfWeeklyHilals == 0
                     ? widget.fallbackWeekly
                     : board.selfWeeklyHilals;
                 // Shell alt nav SafeArea'ya dahil değil; son sıra bar altında kalmasın.
@@ -2932,12 +2922,10 @@ class _WeeklyLeaderSheetState extends ConsumerState<_WeeklyLeaderSheet> {
                                   onPressed:
                                       _removingHashes.contains(entry.ownerHash)
                                       ? null
-                                      : () => unawaited(
-                                          _adminRemoveEntry(entry),
-                                        ),
-                                  icon: _removingHashes.contains(
-                                        entry.ownerHash,
-                                      )
+                                      : () =>
+                                            unawaited(_adminRemoveEntry(entry)),
+                                  icon:
+                                      _removingHashes.contains(entry.ownerHash)
                                       ? SizedBox(
                                           width: 18,
                                           height: 18,
@@ -2988,9 +2976,9 @@ class _WeeklyLeaderSheetState extends ConsumerState<_WeeklyLeaderSheet> {
                                     if (isAdmin) {
                                       final mode =
                                           await _promptAdminChallengeMode(
-                                        context: context,
-                                        l10n: widget.l10n,
-                                      );
+                                            context: context,
+                                            l10n: widget.l10n,
+                                          );
                                       if (mode == null) return;
                                       autoPlay = mode;
                                     }
@@ -3049,10 +3037,7 @@ class _ChallengeActionButton extends StatelessWidget {
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: enabled
-                  ? [
-                      accent,
-                      Color.lerp(accent, Colors.white, 0.18) ?? accent,
-                    ]
+                  ? [accent, Color.lerp(accent, Colors.white, 0.18) ?? accent]
                   : [
                       accent.withValues(alpha: 0.35),
                       accent.withValues(alpha: 0.22),
@@ -3125,10 +3110,7 @@ class _StatChip extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          if (leading != null) ...[
-            leading!,
-            const SizedBox(width: 4),
-          ],
+          if (leading != null) ...[leading!, const SizedBox(width: 4)],
           Text(
             label,
             style: TextStyle(
@@ -3186,7 +3168,9 @@ class _HeartsChip extends StatelessWidget {
         : rose;
     final textColor = empty
         ? Colors.white
-        : (onDark ? Colors.white.withValues(alpha: 0.95) : const Color(0xFF5C1A1A));
+        : (onDark
+              ? Colors.white.withValues(alpha: 0.95)
+              : const Color(0xFF5C1A1A));
 
     Widget chip = Material(
       color: Colors.transparent,
@@ -3229,9 +3213,7 @@ class _HeartsChip extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               Icon(
-                empty
-                    ? Icons.heart_broken_rounded
-                    : Icons.favorite_rounded,
+                empty ? Icons.heart_broken_rounded : Icons.favorite_rounded,
                 size: 14,
                 color: empty ? Colors.white : tone,
               ),
@@ -3276,10 +3258,7 @@ class _HeartsChip extends StatelessWidget {
 }
 
 class _LobbyErrorBanner extends StatelessWidget {
-  const _LobbyErrorBanner({
-    required this.message,
-    required this.onDark,
-  });
+  const _LobbyErrorBanner({required this.message, required this.onDark});
 
   final String message;
   final bool onDark;
@@ -3362,16 +3341,16 @@ class _RulesCard extends StatelessWidget {
 class _MatchmakingBody extends StatelessWidget {
   const _MatchmakingBody({
     super.key,
-    required this.progress,
     required this.onCancel,
     required this.l10n,
     required this.onDark,
     required this.pulse,
+    this.matchFound = false,
     this.cancelFailed = false,
     this.errorMessage,
   });
 
-  final double progress;
+  final bool matchFound;
   final Future<void> Function() onCancel;
   final AppLocalizations l10n;
   final bool onDark;
@@ -3388,12 +3367,16 @@ class _MatchmakingBody extends StatelessWidget {
         children: [
           Align(
             alignment: Alignment.centerLeft,
-            child: TextButton(
-              onPressed: () => unawaited(onCancel()),
-              child: Text(
-                cancelFailed ? l10n.hilalDuelRetry : l10n.hilalDuelCancelSearch,
-              ),
-            ),
+            child: matchFound
+                ? const SizedBox(height: 48)
+                : TextButton(
+                    onPressed: () => unawaited(onCancel()),
+                    child: Text(
+                      cancelFailed
+                          ? l10n.hilalDuelRetry
+                          : l10n.hilalDuelCancelSearch,
+                    ),
+                  ),
           ),
           const Spacer(),
           ScaleTransition(
@@ -3405,7 +3388,11 @@ class _MatchmakingBody extends StatelessWidget {
           ),
           const SizedBox(height: 22),
           Text(
-            cancelFailed ? l10n.hilalDuelCancelFailed : l10n.hilalDuelSearching,
+            cancelFailed
+                ? l10n.hilalDuelCancelFailed
+                : matchFound
+                ? l10n.hilalDuelMatchFound
+                : l10n.hilalDuelSearching,
             textAlign: TextAlign.center,
             style: TextStyle(
               color: _HilalPalette.ink(onDark),
@@ -3424,181 +3411,9 @@ class _MatchmakingBody extends StatelessWidget {
               ),
             ),
           ],
-          if (!cancelFailed) ...[
-            const SizedBox(height: 26),
-            _MatchmakingProgressBar(
-              progress: progress,
-              bronze: bronze,
-              onDark: onDark,
-              pulse: pulse,
-            ),
-            const SizedBox(height: 12),
-            Text(
-              '${(progress * 15).clamp(0, 15).floor()} / 15',
-              style: TextStyle(
-                color: _HilalPalette.muted(onDark),
-                fontSize: 13,
-                fontWeight: FontWeight.w600,
-                letterSpacing: 0.6,
-              ),
-            ),
-          ],
           const Spacer(flex: 2),
         ],
       ),
-    );
-  }
-}
-
-/// Rakip arama süresi — yumuşak doluş, bronz→zümrüt gradient, hafif ışıltı.
-class _MatchmakingProgressBar extends StatelessWidget {
-  const _MatchmakingProgressBar({
-    required this.progress,
-    required this.bronze,
-    required this.onDark,
-    required this.pulse,
-  });
-
-  final double progress;
-  final Color bronze;
-  final bool onDark;
-  final AnimationController pulse;
-
-  @override
-  Widget build(BuildContext context) {
-    const emerald = AppColors.emeraldLight;
-    final target = progress.clamp(0.0, 1.0);
-    return TweenAnimationBuilder<double>(
-      // begin yalnızca ilk frame'de kullanılır; sonraki tick'lerde mevcut
-      // değerden yeni hedefe yumuşak geçiş yapılır.
-      tween: Tween(begin: 0, end: target),
-      duration: const Duration(milliseconds: 180),
-      curve: Curves.easeOutCubic,
-      builder: (context, value, _) {
-        return SizedBox(
-          height: 18,
-          child: LayoutBuilder(
-            builder: (context, constraints) {
-              final width = constraints.maxWidth;
-              final fillWidth = (width * value).clamp(0.0, width);
-              return Stack(
-                alignment: Alignment.centerLeft,
-                children: [
-                  // Track
-                  Container(
-                    height: 10,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(99),
-                      color: bronze.withValues(alpha: onDark ? 0.12 : 0.1),
-                      border: Border.all(
-                        color: bronze.withValues(alpha: onDark ? 0.28 : 0.22),
-                      ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(
-                            alpha: onDark ? 0.28 : 0.06,
-                          ),
-                          blurRadius: 8,
-                          offset: const Offset(0, 2),
-                        ),
-                      ],
-                    ),
-                  ),
-                  // Soft outer glow of the fill
-                  if (fillWidth > 0)
-                    Container(
-                      width: fillWidth,
-                      height: 14,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(99),
-                        boxShadow: [
-                          BoxShadow(
-                            color: bronze.withValues(
-                              alpha: onDark ? 0.45 : 0.28,
-                            ),
-                            blurRadius: 12,
-                            spreadRadius: 0.5,
-                          ),
-                        ],
-                      ),
-                    ),
-                  // Gradient fill + shimmer
-                  if (fillWidth > 0)
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(99),
-                      child: SizedBox(
-                        width: fillWidth,
-                        height: 10,
-                        child: Stack(
-                          fit: StackFit.expand,
-                          children: [
-                            DecoratedBox(
-                              decoration: BoxDecoration(
-                                gradient: LinearGradient(
-                                  colors: [
-                                    bronze.withValues(alpha: 0.85),
-                                    bronze,
-                                    emerald.withValues(alpha: 0.95),
-                                  ],
-                                  stops: const [0.0, 0.55, 1.0],
-                                ),
-                              ),
-                            ),
-                            // Moving highlight tied to the crescent pulse.
-                            AnimatedBuilder(
-                              animation: pulse,
-                              builder: (context, _) {
-                                final t = pulse.value;
-                                return FractionallySizedBox(
-                                  alignment: Alignment(-1.2 + (t * 2.4), 0),
-                                  widthFactor: 0.38,
-                                  child: DecoratedBox(
-                                    decoration: BoxDecoration(
-                                      gradient: LinearGradient(
-                                        colors: [
-                                          Colors.white.withValues(alpha: 0),
-                                          Colors.white.withValues(
-                                            alpha: onDark ? 0.34 : 0.42,
-                                          ),
-                                          Colors.white.withValues(alpha: 0),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                );
-                              },
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  // Leading tip cap for a finished feel while filling
-                  if (fillWidth > 4)
-                    Positioned(
-                      left: (fillWidth - 8).clamp(0.0, width),
-                      child: Container(
-                        width: 8,
-                        height: 8,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: Colors.white.withValues(
-                            alpha: onDark ? 0.55 : 0.7,
-                          ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: emerald.withValues(alpha: 0.55),
-                              blurRadius: 8,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                ],
-              );
-            },
-          ),
-        );
-      },
     );
   }
 }
@@ -3625,8 +3440,7 @@ class _PlayingBody extends StatelessWidget {
     final now = DateTime.now().millisecondsSinceEpoch;
     final resolution = match.lastResolution;
     // Cihaz saatine bağlı değil; controller yerel timer ile yönetir.
-    final showReveal =
-        controller.revealingResolution && resolution != null;
+    final showReveal = controller.revealingResolution && resolution != null;
 
     final HilalDuelQuestion? question = showReveal
         ? resolution.question
@@ -3655,7 +3469,8 @@ class _PlayingBody extends StatelessWidget {
                 !match.opponentAnswered));
 
     final revealRound = resolution?.round;
-    final opponentAnsweredHud = match.opponentAnswered ||
+    final opponentAnsweredHud =
+        match.opponentAnswered ||
         (showReveal &&
             revealRound != null &&
             controller.opponentChoiceForRevealRound(revealRound) != null);
@@ -3673,8 +3488,7 @@ class _PlayingBody extends StatelessWidget {
           opponent: match.opponent,
           selfLabel: selfName,
           opponentLabel: opponentName,
-          selfAnswered:
-              match.selfAnswered || controller.selectedChoice != null,
+          selfAnswered: match.selfAnswered || controller.selectedChoice != null,
           opponentAnswered: opponentAnsweredHud,
           selfMarks: controller.selfRoundMarks,
           opponentMarks: controller.opponentRoundMarks,
@@ -3682,8 +3496,10 @@ class _PlayingBody extends StatelessWidget {
           activeRound: activeRoundHud,
           seconds: seconds,
           revealing: showReveal,
-          questionProgressLabel:
-              l10n.hilalDuelQuestionProgress(displayRound, match.totalRounds),
+          questionProgressLabel: l10n.hilalDuelQuestionProgress(
+            displayRound,
+            match.totalRounds,
+          ),
           l10n: l10n,
           onDark: onDark,
         ),
@@ -3752,13 +3568,16 @@ class _PlayingBody extends StatelessWidget {
         ...List.generate(question?.options.length ?? 0, (index) {
           if (showReveal) {
             final correct = resolution.question.correctIndex ?? -1;
-            final selfChoice = controller.choiceForRevealRound(resolution.round);
+            final selfChoice = controller.choiceForRevealRound(
+              resolution.round,
+            );
             final opponentChoice = controller.opponentChoiceForRevealRound(
               resolution.round,
             );
             final selfPicked =
                 selfChoice != null && selfChoice >= 0 && selfChoice == index;
-            final opponentPicked = opponentChoice != null &&
+            final opponentPicked =
+                opponentChoice != null &&
                 opponentChoice >= 0 &&
                 opponentChoice == index;
             final isCorrect = index == correct;
@@ -3791,7 +3610,8 @@ class _PlayingBody extends StatelessWidget {
           // roundStartedAtMs ile kilitleme: yeni soru görünürken ölü buton hissi.
           // Reveal sırasında zaten showReveal dalı enabled:false.
           // Süre bitince yerel tap'i kapat — sunucu grace'i poll timeout ile yarışmasın.
-          final locked = match.selfAnswered ||
+          final locked =
+              match.selfAnswered ||
               controller.selectedChoice != null ||
               controller.busy ||
               remainingMs <= 0;
@@ -3925,8 +3745,9 @@ class _DigitalMatchHud extends StatelessWidget {
         border: Border.all(color: edge, width: 1.15),
         boxShadow: [
           BoxShadow(
-            color: (onDark ? const Color(0xFF3DDC84) : bronze)
-                .withValues(alpha: onDark ? 0.12 : 0.1),
+            color: (onDark ? const Color(0xFF3DDC84) : bronze).withValues(
+              alpha: onDark ? 0.12 : 0.1,
+            ),
             blurRadius: 18,
             offset: const Offset(0, 6),
           ),
@@ -3937,9 +3758,7 @@ class _DigitalMatchHud extends StatelessWidget {
         children: [
           Positioned.fill(
             child: IgnorePointer(
-              child: CustomPaint(
-                painter: _HudGridPainter(color: gridLine),
-              ),
+              child: CustomPaint(painter: _HudGridPainter(color: gridLine)),
             ),
           ),
           Column(
@@ -3959,11 +3778,11 @@ class _DigitalMatchHud extends StatelessWidget {
                     ),
                   ),
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                    child: _HudVsBadge(
-                      bronze: bronze,
-                      onDark: onDark,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 6,
+                      vertical: 2,
                     ),
+                    child: _HudVsBadge(bronze: bronze, onDark: onDark),
                   ),
                   Expanded(
                     child: _HudPlayerSide(
@@ -4037,12 +3856,12 @@ class _HudVsBadge extends StatelessWidget {
                 bronze.withValues(alpha: 0.08),
               ],
             ),
-            border: Border.all(color: bronze.withValues(alpha: 0.7), width: 1.2),
+            border: Border.all(
+              color: bronze.withValues(alpha: 0.7),
+              width: 1.2,
+            ),
             boxShadow: [
-              BoxShadow(
-                color: bronze.withValues(alpha: 0.28),
-                blurRadius: 12,
-              ),
+              BoxShadow(color: bronze.withValues(alpha: 0.28), blurRadius: 12),
             ],
           ),
           alignment: Alignment.center,
@@ -4109,8 +3928,9 @@ class _HudPlayerSide extends StatelessWidget {
       fallbackBorder: accent.withValues(alpha: 0.9),
       fillColors: [
         accent.withValues(alpha: onDark ? 0.34 : 0.22),
-        (onDark ? const Color(0xFF0B1A14) : Colors.white)
-            .withValues(alpha: 0.9),
+        (onDark ? const Color(0xFF0B1A14) : Colors.white).withValues(
+          alpha: 0.9,
+        ),
       ],
       child: Text(
         initial,
@@ -4144,22 +3964,20 @@ class _HudPlayerSide extends StatelessWidget {
       textAlign: alignEnd ? TextAlign.end : TextAlign.start,
     );
     final championMark = !player.isBot && player.championWeeks > 0
-        ? _ChampionBadge(
-            count: player.championWeeks,
-            l10n: l10n,
-            compact: true,
-          )
+        ? _ChampionBadge(count: player.championWeeks, l10n: l10n, compact: true)
         : null;
     // İsim satırı yüksekliği sabit — "Cevapladı" soruyu kaydırmaz.
     final texts = Column(
-      crossAxisAlignment:
-          alignEnd ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+      crossAxisAlignment: alignEnd
+          ? CrossAxisAlignment.end
+          : CrossAxisAlignment.start,
       children: [
         SizedBox(
           height: 22,
           child: Row(
-            mainAxisAlignment:
-                alignEnd ? MainAxisAlignment.end : MainAxisAlignment.start,
+            mainAxisAlignment: alignEnd
+                ? MainAxisAlignment.end
+                : MainAxisAlignment.start,
             children: alignEnd
                 ? [
                     _AnsweredInlineMark(
@@ -4204,16 +4022,8 @@ class _HudPlayerSide extends StatelessWidget {
 
     return Row(
       children: alignEnd
-          ? [
-              Expanded(child: texts),
-              const SizedBox(width: 8),
-              avatar,
-            ]
-          : [
-              avatar,
-              const SizedBox(width: 8),
-              Expanded(child: texts),
-            ],
+          ? [Expanded(child: texts), const SizedBox(width: 8), avatar]
+          : [avatar, const SizedBox(width: 8), Expanded(child: texts)],
     );
   }
 }
@@ -4282,9 +4092,7 @@ class _DigitalTimerReadout extends StatelessWidget {
     final tone = urgent
         ? const Color(0xFFFF6B6B)
         : _HilalPalette.bronze(onDark);
-    final label = revealing
-        ? '--'
-        : seconds.toString().padLeft(2, '0');
+    final label = revealing ? '--' : seconds.toString().padLeft(2, '0');
 
     return AnimatedContainer(
       duration: const Duration(milliseconds: 180),
@@ -4299,22 +4107,13 @@ class _DigitalTimerReadout extends StatelessWidget {
           width: urgent ? 1.4 : 1.1,
         ),
         boxShadow: urgent
-            ? [
-                BoxShadow(
-                  color: tone.withValues(alpha: 0.35),
-                  blurRadius: 10,
-                ),
-              ]
+            ? [BoxShadow(color: tone.withValues(alpha: 0.35), blurRadius: 10)]
             : null,
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(
-            Icons.timer_outlined,
-            size: 14,
-            color: tone,
-          ),
+          Icon(Icons.timer_outlined, size: 14, color: tone),
           const SizedBox(width: 5),
           Text(
             label,
@@ -4420,9 +4219,7 @@ class _RoundMarksBoard extends StatelessWidget {
                     children: List.generate(rounds, (index) {
                       return Expanded(
                         child: Padding(
-                          padding: EdgeInsets.only(
-                            left: index == 0 ? 0 : 3,
-                          ),
+                          padding: EdgeInsets.only(left: index == 0 ? 0 : 3),
                           child: _RoundMarkDot(
                             mark: _markAt(marks, index),
                             active: index == activeRound,
@@ -4496,8 +4293,9 @@ class _RoundMarkDot extends StatelessWidget {
     const missed = Color(0xFF9AA5A0);
     final pendingBorder = onAccentCard
         ? Colors.white.withValues(alpha: 0.45)
-        : (sideAccent ?? _HilalPalette.bronze(onDark))
-            .withValues(alpha: active ? 0.85 : 0.4);
+        : (sideAccent ?? _HilalPalette.bronze(onDark)).withValues(
+            alpha: active ? 0.85 : 0.4,
+          );
     final pendingFill = onAccentCard
         ? Colors.white.withValues(alpha: 0.12)
         : Colors.black.withValues(alpha: onDark ? 0.28 : 0.06);
@@ -4526,19 +4324,18 @@ class _RoundMarkDot extends StatelessWidget {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(3),
           color: fill,
-          border: Border.all(
-            color: border,
-            width: active ? 1.4 : 1,
-          ),
-          boxShadow: mark == HilalDuelRoundMark.correct ||
+          border: Border.all(color: border, width: active ? 1.4 : 1),
+          boxShadow:
+              mark == HilalDuelRoundMark.correct ||
                   mark == HilalDuelRoundMark.wrong ||
                   active
               ? [
                   BoxShadow(
-                    color: (active && mark == HilalDuelRoundMark.pending
-                            ? (sideAccent ?? border)
-                            : border)
-                        .withValues(alpha: active ? 0.55 : 0.35),
+                    color:
+                        (active && mark == HilalDuelRoundMark.pending
+                                ? (sideAccent ?? border)
+                                : border)
+                            .withValues(alpha: active ? 0.55 : 0.35),
                     blurRadius: active ? 8 : 5,
                   ),
                 ]
@@ -4555,14 +4352,10 @@ class _RoundMarkDot extends StatelessWidget {
         shape: BoxShape.circle,
         color: fill,
         border: Border.all(color: border, width: active ? 1.6 : 1.1),
-        boxShadow: mark == HilalDuelRoundMark.correct ||
+        boxShadow:
+            mark == HilalDuelRoundMark.correct ||
                 mark == HilalDuelRoundMark.wrong
-            ? [
-                BoxShadow(
-                  color: border.withValues(alpha: 0.35),
-                  blurRadius: 5,
-                ),
-              ]
+            ? [BoxShadow(color: border.withValues(alpha: 0.35), blurRadius: 5)]
             : null,
       ),
     );
@@ -4571,10 +4364,7 @@ class _RoundMarkDot extends StatelessWidget {
 
 /// Cevapların hemen altında: rakip beklerken yumuşak nabız + nokta animasyonu.
 class _WaitingOpponentBanner extends StatefulWidget {
-  const _WaitingOpponentBanner({
-    required this.label,
-    required this.onDark,
-  });
+  const _WaitingOpponentBanner({required this.label, required this.onDark});
 
   final String label;
   final bool onDark;
@@ -4622,7 +4412,9 @@ class _WaitingOpponentBannerState extends State<_WaitingOpponentBanner>
               end: Alignment.centerRight,
               colors: [
                 bronze.withValues(alpha: widget.onDark ? 0.34 : 0.22),
-                bronze.withValues(alpha: widget.onDark ? 0.22 + glow : 0.12 + glow),
+                bronze.withValues(
+                  alpha: widget.onDark ? 0.22 + glow : 0.12 + glow,
+                ),
                 bronze.withValues(alpha: widget.onDark ? 0.34 : 0.22),
               ],
             ),
@@ -4632,7 +4424,9 @@ class _WaitingOpponentBannerState extends State<_WaitingOpponentBanner>
             ),
             boxShadow: [
               BoxShadow(
-                color: bronze.withValues(alpha: widget.onDark ? 0.18 * t : 0.12 * t),
+                color: bronze.withValues(
+                  alpha: widget.onDark ? 0.18 * t : 0.12 * t,
+                ),
                 blurRadius: 10 + (6 * t),
                 offset: const Offset(0, 3),
               ),
@@ -4671,10 +4465,7 @@ class _WaitingOpponentBannerState extends State<_WaitingOpponentBanner>
 }
 
 class _WaitingDots extends StatelessWidget {
-  const _WaitingDots({
-    required this.color,
-    required this.animation,
-  });
+  const _WaitingDots({required this.color, required this.animation});
 
   final Color color;
   final Animation<double> animation;
@@ -4749,9 +4540,10 @@ class _ResultBodyState extends State<_ResultBody>
       duration: const Duration(milliseconds: 520),
     );
     _fade = CurvedAnimation(parent: _anim, curve: Curves.easeOutCubic);
-    _scale = Tween<double>(begin: 0.86, end: 1).animate(
-      CurvedAnimation(parent: _anim, curve: Curves.easeOutBack),
-    );
+    _scale = Tween<double>(
+      begin: 0.86,
+      end: 1,
+    ).animate(CurvedAnimation(parent: _anim, curve: Curves.easeOutBack));
     unawaited(_anim.forward());
   }
 
@@ -4782,15 +4574,15 @@ class _ResultBodyState extends State<_ResultBody>
     final title = isExpired
         ? l10n.hilalDuelChallengeExpired
         : isDraw
-            ? l10n.hilalDuelResultDraw
-            : isWin
-                ? l10n.hilalDuelResultWin
-                : l10n.hilalDuelResultLose;
+        ? l10n.hilalDuelResultDraw
+        : isWin
+        ? l10n.hilalDuelResultWin
+        : l10n.hilalDuelResultLose;
     final cardColor = isExpired || isDraw
         ? bronze
         : isWin
-            ? const Color(0xFF2E9B5E)
-            : const Color(0xFFD64545);
+        ? const Color(0xFF2E9B5E)
+        : const Color(0xFFD64545);
     final selfScore = self?.correct ?? 0;
     final opponentScore = opponent?.correct ?? 0;
 
@@ -4833,8 +4625,9 @@ class _ResultBodyState extends State<_ResultBody>
                               children: [
                                 CircleAvatar(
                                   radius: 28,
-                                  backgroundColor:
-                                      Colors.white.withValues(alpha: 0.22),
+                                  backgroundColor: Colors.white.withValues(
+                                    alpha: 0.22,
+                                  ),
                                   child: Text(
                                     _nameInitial(
                                       widget.playerName,
@@ -4867,8 +4660,9 @@ class _ResultBodyState extends State<_ResultBody>
                               children: [
                                 CircleAvatar(
                                   radius: 28,
-                                  backgroundColor:
-                                      Colors.white.withValues(alpha: 0.22),
+                                  backgroundColor: Colors.white.withValues(
+                                    alpha: 0.22,
+                                  ),
                                   child: Text(
                                     _nameInitial(
                                       match?.opponent.name ?? '',
@@ -4959,7 +4753,9 @@ class _ResultBodyState extends State<_ResultBody>
                 onDark: onDark,
               ),
               _StatLine(
-                label: l10n.hilalDuelTotalSeconds((self.elapsedMs / 1000).round()),
+                label: l10n.hilalDuelTotalSeconds(
+                  (self.elapsedMs / 1000).round(),
+                ),
                 onDark: onDark,
               ),
               _StatLine(
@@ -5114,8 +4910,10 @@ class _AnsweredInlineMark extends StatelessWidget {
                   return Transform.scale(scale: scale, child: child);
                 },
                 child: Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 6,
+                    vertical: 2,
+                  ),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(99),
                     color: tone.withValues(alpha: onDark ? 0.22 : 0.16),
@@ -5159,7 +4957,10 @@ class _SideNameChip extends StatelessWidget {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(99),
         color: color,
-        border: Border.all(color: Colors.white.withValues(alpha: 0.85), width: 1.4),
+        border: Border.all(
+          color: Colors.white.withValues(alpha: 0.85),
+          width: 1.4,
+        ),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.18),
@@ -5241,9 +5042,7 @@ class _OptionTile extends StatelessWidget {
     }
 
     final emphasized = visual != _OptionVisualState.idle;
-    final textColor = emphasized
-        ? Colors.white
-        : _HilalPalette.ink(onDark);
+    final textColor = emphasized ? Colors.white : _HilalPalette.ink(onDark);
 
     return Opacity(
       opacity: !enabled && visual == _OptionVisualState.idle ? 0.55 : 1,
@@ -5275,7 +5074,9 @@ class _OptionTile extends StatelessWidget {
                   boxShadow: emphasized
                       ? [
                           BoxShadow(
-                            color: border.withValues(alpha: onDark ? 0.35 : 0.18),
+                            color: border.withValues(
+                              alpha: onDark ? 0.35 : 0.18,
+                            ),
                             blurRadius: 10,
                             offset: const Offset(0, 2),
                           ),
@@ -5336,7 +5137,6 @@ String _leaderboardEntryName(HilalDuelWeeklyEntry entry) {
   return _shortPlayerName(entry.name, fallback: entry.name);
 }
 
-
 class _PrimaryButton extends StatelessWidget {
   const _PrimaryButton({
     required this.label,
@@ -5367,9 +5167,7 @@ class _PrimaryButton extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 12),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
-            side: BorderSide(
-              color: bronze.withValues(alpha: 0.55),
-            ),
+            side: BorderSide(color: bronze.withValues(alpha: 0.55)),
           ),
         ),
         child: busy
@@ -5422,10 +5220,7 @@ class _SecondaryButton extends StatelessWidget {
         ),
         child: Text(
           label,
-          style: const TextStyle(
-            fontWeight: FontWeight.w700,
-            fontSize: 13,
-          ),
+          style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
         ),
       ),
     );
@@ -5448,9 +5243,7 @@ class _ChallengeLobbyButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final accent = onDark
-        ? const Color(0xFFE0B35A)
-        : const Color(0xFFC4892A);
+    final accent = onDark ? const Color(0xFFE0B35A) : const Color(0xFFC4892A);
     const fg = Color(0xFF1A1208);
     return SizedBox(
       width: double.infinity,

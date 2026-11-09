@@ -103,10 +103,12 @@ HilalDuelMatch? selectFresherMatch(
   if (incoming.version < current.version) return current;
   if (incoming.version > current.version) return incoming;
   // Eşit version: submit cevabını poll'un cevapsız kopyası ezmesin.
-  final currentProgress = (current.selfAnswered ? 2 : 0) +
+  final currentProgress =
+      (current.selfAnswered ? 2 : 0) +
       (current.opponentAnswered ? 1 : 0) +
       current.currentRound * 10;
-  final incomingProgress = (incoming.selfAnswered ? 2 : 0) +
+  final incomingProgress =
+      (incoming.selfAnswered ? 2 : 0) +
       (incoming.opponentAnswered ? 1 : 0) +
       incoming.currentRound * 10;
   if (incomingProgress < currentProgress) return current;
@@ -134,7 +136,8 @@ bool shouldStartResolutionReveal({
   if (alreadyRevealedRound == res.round) return false;
   if (match.isChallenge) {
     final selfId = match.self.id;
-    final selfPlayed = res.selfChoice != null ||
+    final selfPlayed =
+        res.selfChoice != null ||
         (selfId.isNotEmpty && res.choices.containsKey(selfId));
     if (!selfPlayed) return false;
   }
@@ -329,6 +332,9 @@ String hilalDuelFriendlyFunctionsMessage({
           'Release APK emülatörde çalışmaz — flutter run kullan.';
     }
     return kUserGenericErrorFallback;
+  }
+  if (lowerMessage.contains('eşleşme') || lowerMessage.contains('eslesme')) {
+    return 'Eşleşme kurulamadı. Tekrar dene.';
   }
   switch (normalizedCode) {
     case 'resource-exhausted':

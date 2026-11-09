@@ -14,6 +14,41 @@ import '../../../data/services/product_metrics_service.dart';
 import 'social_models.dart';
 import 'social_text.dart';
 
+/// Matches `FEED_PAGE` in functions/socialBoard.js.
+const kSocialFeedPageSize = 10;
+
+int _popularStrength(SocialPost a, SocialPost b) {
+  final byLikes = b.likeCount.compareTo(a.likeCount);
+  if (byLikes != 0) return byLikes;
+  return b.createdAt.compareTo(a.createdAt);
+}
+
+/// Newest post opens the latest feed and closes the popular feed.
+List<SocialPost> placeCreatedSocialPost({
+  required List<SocialPost> items,
+  required SocialPost post,
+  required SocialFeedSort sort,
+}) {
+  final rest = <SocialPost>[
+    for (final row in items)
+      if (row.id != post.id) row,
+  ];
+  if (sort == SocialFeedSort.latest) {
+    final next = <SocialPost>[post, ...rest];
+    if (next.length <= kSocialFeedPageSize) return next;
+    return next.sublist(0, kSocialFeedPageSize);
+  }
+  final kept = [...rest];
+  while (kept.length >= kSocialFeedPageSize) {
+    final ranked = [...kept]..sort(_popularStrength);
+    final weakestId = ranked.last.id;
+    final removed = kept.length;
+    kept.removeWhere((row) => row.id == weakestId);
+    if (kept.length == removed) break;
+  }
+  return [...kept, post];
+}
+
 class SocialRepository {
   SocialRepository({
     FirebaseAuth? auth,
@@ -175,8 +210,23 @@ class SocialRepository {
 
   Future<SocialPost> createPost(String text) async {
     final data = await _call('createSocialPost', {'text': text});
-    _feedCache.clear();
-    return SocialPost.fromMap(Map<String, dynamic>.from(data['post'] as Map));
+    final post = SocialPost.fromMap(
+      Map<String, dynamic>.from(data['post'] as Map),
+    );
+    final now = DateTime.now();
+    for (final sort in SocialFeedSort.values) {
+      final cached = _feedCache[sort];
+      if (cached == null) continue;
+      _feedCache[sort] = _CachedFeed(
+        items: placeCreatedSocialPost(
+          items: cached.items,
+          post: post,
+          sort: sort,
+        ),
+        at: now,
+      );
+    }
+    return post;
   }
 
   Future<void> deletePost(String postId) async {

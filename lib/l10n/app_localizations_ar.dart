@@ -1703,6 +1703,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get hilalDuelSearching => 'جارٍ البحث عن منافس…';
 
   @override
+  String get hilalDuelMatchFound => 'تم العثور على منافس';
+
+  @override
   String get hilalDuelCancelSearch => 'إلغاء البحث';
 
   @override
