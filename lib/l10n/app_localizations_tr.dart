@@ -4002,6 +4002,19 @@ class AppLocalizationsTr extends AppLocalizations {
   String get onboardingDuaHoldHint => 'Basılı tut';
 
   @override
+  String get onboardingSupportTitle => 'Arın\'ı desteklemek ister misin?';
+
+  @override
+  String get onboardingSupportBody =>
+      'Puanın daha çok kişiye ulaşmamıza yardım eder.';
+
+  @override
+  String get onboardingSupportRate => 'Evet, puan vereyim';
+
+  @override
+  String get onboardingSupportTour => 'Uygulama turu ile devam et';
+
+  @override
   String get onboardingSkip => 'Geç';
 
   @override

@@ -3973,6 +3973,19 @@ class AppLocalizationsAr extends AppLocalizations {
   String get onboardingDuaHoldHint => 'اضغط مع الاستمرار';
 
   @override
+  String get onboardingSupportTitle => 'هل تود دعم Arın؟';
+
+  @override
+  String get onboardingSupportBody =>
+      'تقييمك يساعدنا على الوصول إلى المزيد من الناس.';
+
+  @override
+  String get onboardingSupportRate => 'نعم، أقيّم التطبيق';
+
+  @override
+  String get onboardingSupportTour => 'تابع مع جولة التطبيق';
+
+  @override
   String get onboardingSkip => 'تخطي';
 
   @override

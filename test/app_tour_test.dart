@@ -216,4 +216,60 @@ void main() {
     expect(container.read(appTourControllerProvider).active, isTrue);
     expect(container.read(appTourControllerProvider).stepIndex, 0);
   });
+
+  testWidgets('kickoff build sırasında turu başlatmaz, frame sonunda başlatır', (
+    tester,
+  ) async {
+    SharedPreferences.setMockInitialValues({
+      'onboarding_completed': true,
+      kAppTourPendingKey: true,
+    });
+    final prefs = await SharedPreferences.getInstance();
+    var activeDuringBuild = true;
+    AppTourState? ready;
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [sharedPreferencesProvider.overrideWithValue(prefs)],
+        child: Consumer(
+          builder: (context, ref, _) {
+            scheduleAppTourKickoff(
+              ref: ref,
+              isMounted: () => context.mounted,
+              onReady: (started) => ready = started,
+            );
+            activeDuringBuild = ref.read(appTourControllerProvider).active;
+            return const SizedBox.shrink();
+          },
+        ),
+      ),
+    );
+
+    expect(tester.takeException(), isNull);
+    expect(activeDuringBuild, isFalse);
+    expect(ready?.active, isTrue);
+    expect(ready?.stepIndex, 0);
+  });
+
+  testWidgets('build içinde maybeStart provider yazımını reddeder', (
+    tester,
+  ) async {
+    SharedPreferences.setMockInitialValues({
+      'onboarding_completed': true,
+      kAppTourPendingKey: true,
+    });
+    final prefs = await SharedPreferences.getInstance();
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [sharedPreferencesProvider.overrideWithValue(prefs)],
+        child: Consumer(
+          builder: (context, ref, _) {
+            ref.read(appTourControllerProvider.notifier).maybeStart();
+            return const SizedBox.shrink();
+          },
+        ),
+      ),
+    );
+
+    expect(tester.takeException(), isA<FlutterError>());
+  });
 }

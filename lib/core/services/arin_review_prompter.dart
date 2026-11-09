@@ -55,6 +55,7 @@ abstract final class ArinReviewPrompter {
   static int get maxTotalAsks => _maxTotalAsks;
 
   static bool _askInFlight = false;
+  static bool _explicitReviewIssued = false;
 
   /// Uygulamanın ilk açılışında çağrılmalı (main.dart). İlk-launch timestamp'i
   /// yazar (yalnız ilk kez); kullanıcıyı daha açılışın 1. gününde bombalamamak
@@ -118,6 +119,31 @@ abstract final class ArinReviewPrompter {
     SharedPreferences prefs,
   ) async {
     await _maybeAsk(prefs, requireMinDaysSinceFirstLaunch: false);
+  }
+
+  /// Kurulumdaki destek kartında kullanıcı kendisi istedi.
+  /// Gün ve ilk-gün kapısı uygulanmaz. İstek bir kez sayılır;
+  /// pencere açılmazsa `false` döner ve sonraki dokunuş deneyebilir.
+  static Future<bool> askBecauseUserChose(SharedPreferences prefs) async {
+    if (_explicitReviewIssued || _askInFlight) return _explicitReviewIssued;
+    _askInFlight = true;
+    var issued = false;
+    try {
+      if (prefs.getBool(_prefsAskDisabled) == true) return false;
+      final totalAsks = prefs.getInt(_prefsTotalAskCount) ?? 0;
+      if (totalAsks >= _maxTotalAsks) return false;
+      if (!await InAppReview.instance.isAvailable()) return false;
+      _explicitReviewIssued = true;
+      issued = true;
+      await _askNow(prefs);
+      return true;
+    } catch (e) {
+      if (issued) _explicitReviewIssued = false;
+      debugPrint('ArinReviewPrompter: $e');
+      return false;
+    } finally {
+      _askInFlight = false;
+    }
   }
 
   static Future<void> _maybeAsk(

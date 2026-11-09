@@ -4014,6 +4014,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String get onboardingDuaHoldHint => 'Hold down';
 
   @override
+  String get onboardingSupportTitle => 'Would you like to support Arın?';
+
+  @override
+  String get onboardingSupportBody => 'Your rating helps us reach more people.';
+
+  @override
+  String get onboardingSupportRate => 'Yes, I\'ll rate it';
+
+  @override
+  String get onboardingSupportTour => 'Continue with the app tour';
+
+  @override
   String get onboardingSkip => 'Skip';
 
   @override

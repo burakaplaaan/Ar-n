@@ -16,6 +16,7 @@ import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_text_styles.dart';
 import '../../core/constants/profile_prefs_keys.dart';
 import '../../core/router/app_router.dart';
+import '../../core/services/arin_review_prompter.dart';
 import '../../core/theme/app_theme.dart';
 import '../../data/services/arin_local_notifications_plugin.dart';
 import '../../data/services/fcm_token_service.dart';
@@ -34,6 +35,7 @@ import 'onboarding_info_screen.dart';
 import 'onboarding_prepare_screen.dart';
 import 'onboarding_name_screen.dart';
 import 'onboarding_story_screen.dart';
+import 'onboarding_support_screen.dart';
 import 'onboarding_struggle_copy.dart';
 import 'onboarding_struggle_note_screen.dart';
 import 'onboarding_tone_screen.dart';
@@ -68,6 +70,7 @@ enum _OnboardingPhase {
   location,
   prepare,
   dua,
+  support,
   slides,
 }
 
@@ -111,6 +114,8 @@ class _OnboardingPageState extends State<OnboardingPage> {
   bool _prepareReady = false;
   bool _finishing = false;
   bool _permissionBusy = false;
+  bool _supportReviewBusy = false;
+  bool _supportReviewIssued = false;
 
   static const _phaseSlideDuration = Duration(milliseconds: 380);
 
@@ -210,6 +215,9 @@ class _OnboardingPageState extends State<OnboardingPage> {
       case _OnboardingPhase.dua:
         _goTo(_OnboardingPhase.prepare, forward: false);
         return true;
+      case _OnboardingPhase.support:
+        _goTo(_OnboardingPhase.dua, forward: false);
+        return true;
       case _OnboardingPhase.slides:
         if (_currentPage > 0) {
           _pageController.previousPage(
@@ -308,6 +316,26 @@ class _OnboardingPageState extends State<OnboardingPage> {
       case OnboardingPrepareQuestion.shortcuts:
         unawaited(_persistFlag(kOnboardingShortcutsPromoteKey, yes));
     }
+  }
+
+  Future<void> _requestSupportReview() async {
+    if (_supportReviewBusy || _supportReviewIssued) return;
+    _supportReviewBusy = true;
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final issued = await ArinReviewPrompter.askBecauseUserChose(prefs);
+      if (issued) _supportReviewIssued = true;
+    } finally {
+      _supportReviewBusy = false;
+    }
+  }
+
+  /// Puan penceresi sistemde açılır; kart onun kapanmasını beklemez.
+  Future<void> _rateAndContinue() async {
+    if (_finishing || _supportReviewBusy) return;
+    await _requestSupportReview();
+    if (!mounted || _finishing) return;
+    await _finishToTour();
   }
 
   Future<void> _finishToTour() async {
@@ -926,7 +954,14 @@ class _OnboardingPageState extends State<OnboardingPage> {
       _OnboardingPhase.dua => Scaffold(
         body: OnboardingDuaScreen(
           name: _displayName,
-          onFinished: () => unawaited(_finishToTour()),
+          onFinished: () => _goTo(_OnboardingPhase.support, forward: true),
+        ),
+      ),
+      _OnboardingPhase.support => Scaffold(
+        body: OnboardingSupportScreen(
+          onBack: _handleBack,
+          onRate: () => unawaited(_rateAndContinue()),
+          onContinueTour: () => unawaited(_finishToTour()),
         ),
       ),
       _OnboardingPhase.slides => _buildSlides(context, l10n),

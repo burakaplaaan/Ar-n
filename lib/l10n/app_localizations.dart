@@ -6931,6 +6931,30 @@ abstract class AppLocalizations {
   /// **'Basılı tut'**
   String get onboardingDuaHoldHint;
 
+  /// No description provided for @onboardingSupportTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Arın\'ı desteklemek ister misin?'**
+  String get onboardingSupportTitle;
+
+  /// No description provided for @onboardingSupportBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'Puanın daha çok kişiye ulaşmamıza yardım eder.'**
+  String get onboardingSupportBody;
+
+  /// No description provided for @onboardingSupportRate.
+  ///
+  /// In tr, this message translates to:
+  /// **'Evet, puan vereyim'**
+  String get onboardingSupportRate;
+
+  /// No description provided for @onboardingSupportTour.
+  ///
+  /// In tr, this message translates to:
+  /// **'Uygulama turu ile devam et'**
+  String get onboardingSupportTour;
+
   /// No description provided for @onboardingSkip.
   ///
   /// In tr, this message translates to:
