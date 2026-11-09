@@ -1715,6 +1715,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get hilalDuelSearching => 'Searching for opponent…';
 
   @override
+  String get hilalDuelMatchFound => 'Opponent found';
+
+  @override
   String get hilalDuelCancelSearch => 'Cancel search';
 
   @override

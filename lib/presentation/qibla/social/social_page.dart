@@ -46,6 +46,7 @@ class _SocialPageState extends ConsumerState<SocialPage> {
   final _composeCtrl = TextEditingController();
   final _composeFocus = FocusNode();
   final _composerKey = GlobalKey();
+  final _feedScroll = ScrollController();
   final _knownBios = <String, String>{};
   final _knownAvatars = <String, int>{};
   int _claimAvatarId = 0;
@@ -92,6 +93,7 @@ class _SocialPageState extends ConsumerState<SocialPage> {
     _usernameCtrl.dispose();
     _composeCtrl.dispose();
     _composeFocus.dispose();
+    _feedScroll.dispose();
     super.dispose();
   }
 
@@ -517,6 +519,31 @@ class _SocialPageState extends ConsumerState<SocialPage> {
     }
   }
 
+  void _revealCreatedPost() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || !_feedScroll.hasClients) return;
+      if (_sort == SocialFeedSort.latest) {
+        if (_feedScroll.offset <= 0) return;
+        _feedScroll.animateTo(
+          0,
+          duration: const Duration(milliseconds: 280),
+          curve: Curves.easeOutCubic,
+        );
+        return;
+      }
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted || !_feedScroll.hasClients) return;
+        final target = _feedScroll.position.maxScrollExtent;
+        if (target <= _feedScroll.offset + 1) return;
+        _feedScroll.animateTo(
+          target,
+          duration: const Duration(milliseconds: 320),
+          curve: Curves.easeOutCubic,
+        );
+      });
+    });
+  }
+
   Future<void> _submitPost() async {
     final text = normalizeSocialBody(_composeCtrl.text);
     if (containsSocialInsult(text)) {
@@ -540,11 +567,16 @@ class _SocialPageState extends ConsumerState<SocialPage> {
       if (!mounted) return;
       _indexBios([post]);
       setState(() {
-        _posts = [post, ..._posts.where((row) => row.id != post.id)];
+        _posts = placeCreatedSocialPost(
+          items: _posts,
+          post: post,
+          sort: _sort,
+        );
         _posting = false;
         _freshPostId = post.id;
       });
       _repo.rememberFeed(_sort, _posts);
+      _revealCreatedPost();
       final showToast = await _repo.shouldShowFirstPostToast();
       if (!mounted) return;
       if (showToast) {
@@ -661,6 +693,7 @@ class _SocialPageState extends ConsumerState<SocialPage> {
                         displacement: 40,
                         onRefresh: _pullToRefresh,
                         child: CustomScrollView(
+                          controller: _feedScroll,
                           physics: const AlwaysScrollableScrollPhysics(),
                           slivers: [
                             if (_profile!.banned)

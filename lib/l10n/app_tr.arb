@@ -888,6 +888,7 @@
   "hilalDuelNeedHeartHint": "Kısa bir reklam izle → 1 can kazan, hemen rakip bul",
   "hilalDuelNeedHeartCta": "Reklamı izle",
   "hilalDuelSearching": "Rakip aranıyor…",
+  "hilalDuelMatchFound": "Eşleşme bulundu",
   "hilalDuelCancelSearch": "Aramayı iptal et",
   "hilalDuelCancelFailed": "İptal tamamlanamadı. Can iadesi için tekrar dene.",
   "hilalDuelQuestionProgress": "Soru {current}/{total}",

@@ -580,28 +580,25 @@ void main() {
       expect(parseRoundMarkToken('missed'), HilalDuelRoundMark.missed);
       expect(parseRoundMarkToken('pending'), HilalDuelRoundMark.pending);
       expect(parseRoundMarkToken(null), HilalDuelRoundMark.pending);
-      expect(
-        parseRoundMarks(
-          ['correct', 'wrong', 'missed'],
-          total: 7,
-        ),
-        [
-          HilalDuelRoundMark.correct,
-          HilalDuelRoundMark.wrong,
-          HilalDuelRoundMark.missed,
-          HilalDuelRoundMark.pending,
-          HilalDuelRoundMark.pending,
-          HilalDuelRoundMark.pending,
-          HilalDuelRoundMark.pending,
-        ],
-      );
+      expect(parseRoundMarks(['correct', 'wrong', 'missed'], total: 7), [
+        HilalDuelRoundMark.correct,
+        HilalDuelRoundMark.wrong,
+        HilalDuelRoundMark.missed,
+        HilalDuelRoundMark.pending,
+        HilalDuelRoundMark.pending,
+        HilalDuelRoundMark.pending,
+        HilalDuelRoundMark.pending,
+      ]);
     });
   });
 
   group('hilalDuelIsTransientTransportError', () {
     test('raw INTERNAL / unavailable / deadline-exceeded retryable', () {
       expect(
-        hilalDuelIsTransientTransportError(code: 'internal', message: 'INTERNAL'),
+        hilalDuelIsTransientTransportError(
+          code: 'internal',
+          message: 'INTERNAL',
+        ),
         isTrue,
       );
       expect(
@@ -661,13 +658,10 @@ void main() {
           code: 'internal',
           message: 'Eşleşme başlatılamadı. Tekrar dene.',
         ),
-        kUserGenericErrorFallback,
+        'Eşleşme kurulamadı. Tekrar dene.',
       );
       expect(
-        hilalDuelFriendlyFunctionsMessage(
-          code: 'unknown',
-          message: 'INTERNAL',
-        ),
+        hilalDuelFriendlyFunctionsMessage(code: 'unknown', message: 'INTERNAL'),
         kUserGenericErrorFallback,
       );
     });

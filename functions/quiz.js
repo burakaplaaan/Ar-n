@@ -78,7 +78,7 @@ const CHALLENGE_BOT_DELAY_MS = 12 * 60 * 60_000;
 const CHALLENGE_REMINDER_BEFORE_MS = 2 * 60 * 60_000;
 /** Challenge dokümanı geçmişte görünsün; TTL silmesi 7 gün sonra. */
 const CHALLENGE_DOC_TTL_MS = 7 * 24 * 60 * 60_000;
-const QUEUE_WAIT_MS = 15_000;
+const QUEUE_WAIT_MS = 10_000;
 /** Canlı kuyruk taraması: stale kayıtlar gerçek rakibi limit dışına itmesin. */
 const QUEUE_CANDIDATE_SCAN_LIMIT = 200;
 /**
@@ -86,7 +86,7 @@ const QUEUE_CANDIDATE_SCAN_LIMIT = 200;
  * 200'lük taramayı yalnızca 15sn bot eşiğinde ve ara sıra yarış
  * (iki waiting aynı anda) için tekrarla.
  */
-const QUEUE_PAIR_RETRY_MS = 2_500;
+const QUEUE_PAIR_RETRY_MS = 800;
 /** Transaction içinde denenecek en iyi aday sayısı. */
 const QUEUE_CANDIDATE_PICK_LIMIT = 32;
 /** Az önce basanları eski/hayalet kuyruğun önüne al. */
@@ -1362,8 +1362,59 @@ function pickPairableCandidate(candidates, chargeRecords, {
   return null;
 }
 
+function _liveLobbyRef(db) {
+  return db.collection("quiz_live_lobby").doc("current");
+}
+
 /**
- * Poll kararı: insan varsa her zaman insan; bot yalnızca 15sn ve rakip yoksa.
+ * Aynı anda basan iki telefonu aynı dokümanda buluşturur. Sorgu, karşı taraf
+ * yazılmadan çalışırsa ikisini de kaçırır; bu harita transaction içinde
+ * okunduğu için kaybeden işlem yeniden denendiğinde rakibi görür.
+ */
+function lobbyWaiterIds(data, {
+  exclude = "",
+  nowMs = Date.now(),
+  limit = QUEUE_CANDIDATE_PICK_LIMIT,
+  maxAgeMs = QUEUE_ABANDON_MS,
+} = {}) {
+  const waiters = data?.waiters && typeof data.waiters === "object"
+    ? data.waiters
+    : {};
+  const excluded = String(exclude || "").trim();
+  return Object.entries(waiters)
+    .filter(([id, info]) => {
+      if (!id || id === excluded) return false;
+      const queuedAt = Number(info?.queuedAtMs) || 0;
+      if (!(queuedAt > 0)) return false;
+      return nowMs - queuedAt <= maxAgeMs;
+    })
+    .sort((a, b) => (Number(b[1]?.queuedAtMs) || 0) - (Number(a[1]?.queuedAtMs) || 0))
+    .slice(0, Math.max(1, Math.floor(Number(limit) || QUEUE_CANDIDATE_PICK_LIMIT)))
+    .map(([id]) => id);
+}
+
+function _writeLobbyWaiter(tx, lobbyRef, ownerHash, queuedAtMs, level) {
+  if (!lobbyRef || !ownerHash) return;
+  tx.set(lobbyRef, {
+    [`waiters.${ownerHash}`]: {
+      queuedAtMs: Number(queuedAtMs) || Date.now(),
+      level: Math.max(1, Math.floor(Number(level) || 1)),
+    },
+    updatedAt: FieldValue.serverTimestamp(),
+  }, { merge: true });
+}
+
+function _removeLobbyWaiters(tx, lobbyRef, ids) {
+  if (!lobbyRef) return;
+  const unique = [...new Set((ids || []).map((id) => String(id || "").trim()).filter(Boolean))];
+  if (unique.length === 0) return;
+  const patch = { updatedAt: FieldValue.serverTimestamp() };
+  for (const id of unique) patch[`waiters.${id}`] = FieldValue.delete();
+  tx.set(lobbyRef, patch, { merge: true });
+}
+
+/**
+ * Poll kararı: insan varsa her zaman insan; bot yalnızca 10sn ve rakip yoksa.
  * queuedAt yoksa bot'a düş — sonsuz waiting üretmesin.
  */
 function decideLiveQueuePollAction({
@@ -1383,7 +1434,7 @@ function decideLiveQueuePollAction({
 
 /**
  * Poll işi: çoğu tick yalnızca kendi kuyruk dokümanına bakar.
- * `pair_scan` = 200 aday sorgusu + transaction (insan / 15sn bot).
+ * `pair_scan` = 200 aday sorgusu + transaction (insan / 10sn bot).
  */
 function decideQuizPollWork({
   queuedAtMs,
@@ -2393,6 +2444,7 @@ async function _createMatchInTransaction({
   ownerHashOverride = null,
   chargeRecordsPreRead = null,
   afterReads = null,
+  lobbyRef = null,
 }) {
   const firstOwner = String(
     ownerHashOverride || firstQueue.ownerHash || "",
@@ -2540,6 +2592,10 @@ async function _createMatchInTransaction({
       updatedAt: FieldValue.serverTimestamp(),
     }, { merge: true });
   }
+  _removeLobbyWaiters(tx, lobbyRef, [
+    firstOwner,
+    secondPlayer.isBot ? "" : secondPlayer.id,
+  ]);
   return { matchId, match };
 }
 
@@ -3131,15 +3187,22 @@ async function _startOrPairQuizMatchInTransaction({
   preselectedCandidates = [],
 }) {
   const nowMs = Date.now();
+  const lobbyRef = _liveLobbyRef(db);
   const freshPlayer = await tx.get(playerRef);
   const freshQueue = await tx.get(queueRef);
+  const lobbySnap = await tx.get(lobbyRef);
   const currentQueue = freshQueue.data() || {};
+  const lobbyPeerIds = lobbyWaiterIds(lobbySnap.data(), {
+    exclude: ownerHash,
+    nowMs,
+  });
 
   if (currentQueue.status === "matched" && currentQueue.matchId) {
     const activeMatchSnap = await tx.get(
       db.collection("quiz_matches").doc(String(currentQueue.matchId)),
     );
     if (activeMatchSnap.exists && activeMatchSnap.data()?.status === "playing") {
+      _removeLobbyWaiters(tx, lobbyRef, [ownerHash]);
       return {
         ok: true,
         status: "matched",
@@ -3158,14 +3221,16 @@ async function _startOrPairQuizMatchInTransaction({
       queue: currentQueue,
       playerRef,
     });
+    _removeLobbyWaiters(tx, lobbyRef, [ownerHash]);
     return { ok: true, status: "idle", refunded: true };
   }
 
+  const lobbyCandidates = lobbyPeerIds.map((id) => ({ ownerHash: id, id }));
   const locked = allowPair
     ? await _lockQueueCandidatesInTx(
       tx,
       db,
-      preselectedCandidates,
+      [...preselectedCandidates, ...lobbyCandidates],
       ownerHash,
     )
     : [];
@@ -3221,13 +3286,22 @@ async function _startOrPairQuizMatchInTransaction({
         },
         secondQueue: pair,
         chargeRecordsPreRead,
+        lobbyRef,
       });
       return { ok: true, status: "matched", matchId: created.matchId };
     }
+    const waitingSince = _timestampMs(currentQueue.queuedAt) || nowMs;
+    _writeLobbyWaiter(
+      tx,
+      lobbyRef,
+      ownerHash,
+      waitingSince,
+      currentQueue.level,
+    );
     return {
       ok: true,
       status: "waiting",
-      queuedAtMs: _timestampMs(currentQueue.queuedAt) || nowMs,
+      queuedAtMs: waitingSince,
     };
   }
 
@@ -3281,12 +3355,20 @@ async function _startOrPairQuizMatchInTransaction({
       secondQueue: pair,
       chargeRecordsPreRead,
       afterReads: applyHeartCharge,
+      lobbyRef,
     });
     return { ok: true, status: "matched", matchId: created.matchId };
   }
 
   applyHeartCharge();
   tx.set(queueRef, queueData);
+  _writeLobbyWaiter(
+    tx,
+    lobbyRef,
+    ownerHash,
+    queueData.queuedAt.toMillis(),
+    profile.level,
+  );
   return {
     ok: true,
     status: "waiting",
@@ -3303,10 +3385,17 @@ async function _resolveQuizMatchPollInTransaction({
   preselectedCandidates = [],
 }) {
   const nowMs = Date.now();
+  const lobbyRef = _liveLobbyRef(db);
   const fresh = await tx.get(queueRef);
+  const lobbySnap = await tx.get(lobbyRef);
   const data = fresh.data() || {};
+  const lobbyPeerIds = lobbyWaiterIds(lobbySnap.data(), {
+    exclude: ownerHash,
+    nowMs,
+  });
 
   if (data.status === "matched" && data.matchId) {
+    _removeLobbyWaiters(tx, lobbyRef, [ownerHash]);
     return { ok: true, status: "matched", matchId: String(data.matchId) };
   }
   if (data.status !== "waiting") {
@@ -3326,6 +3415,7 @@ async function _resolveQuizMatchPollInTransaction({
       queue: data,
       playerRef,
     });
+    _removeLobbyWaiters(tx, lobbyRef, [ownerHash]);
     return {
       ok: true,
       status: "idle",
@@ -3336,10 +3426,11 @@ async function _resolveQuizMatchPollInTransaction({
     };
   }
 
+  const lobbyCandidates = lobbyPeerIds.map((id) => ({ ownerHash: id, id }));
   const locked = await _lockQueueCandidatesInTx(
     tx,
     db,
-    preselectedCandidates,
+    [...preselectedCandidates, ...lobbyCandidates],
     ownerHash,
   );
   const ranked = rankLiveQueueCandidates(locked, {
@@ -3376,10 +3467,12 @@ async function _resolveQuizMatchPollInTransaction({
       firstQueue: { ...data, ownerHash: data.ownerHash || ownerHash },
       secondQueue: pair,
       chargeRecordsPreRead,
+      lobbyRef,
     });
     return { ok: true, status: "matched", matchId: created.matchId };
   }
   if (action === "keep_waiting") {
+    _writeLobbyWaiter(tx, lobbyRef, ownerHash, queuedAtMs || nowMs, data.level);
     return { ok: true, status: "waiting", queuedAtMs: queuedAtMs || nowMs };
   }
 
@@ -3390,6 +3483,7 @@ async function _resolveQuizMatchPollInTransaction({
     bot: true,
     ownerHashOverride: ownerHash,
     chargeRecordsPreRead,
+    lobbyRef,
   });
   return { ok: true, status: "matched", matchId: created.matchId };
 }
@@ -3406,7 +3500,9 @@ const startQuizMatch = onCall(
 
     // Önce terk edilmiş waiting'i iade et (claim-on-reentry).
     await db.runTransaction(async (tx) => {
+      const lobbyRef = _liveLobbyRef(db);
       const queueSnap = await tx.get(queueRef);
+      await tx.get(lobbyRef);
       const queue = queueSnap.data() || null;
       const fundingValid = queue?.status === "waiting"
         ? await _isQueueFundingValidInTransaction(tx, db, queue)
@@ -3420,6 +3516,7 @@ const startQuizMatch = onCall(
           queue,
           playerRef,
         });
+        _removeLobbyWaiters(tx, lobbyRef, [ownerHash]);
       }
     });
 
@@ -3485,6 +3582,9 @@ const startQuizMatch = onCall(
         console.error("[HilalDuel] startQuizMatch enqueue fallback failed:", fallbackError);
         const second = await _readLiveQueueFallback(db, queueRef);
         if (second) return second;
+        await new Promise((resolve) => setTimeout(resolve, 300));
+        const third = await _readLiveQueueFallback(db, queueRef);
+        if (third) return third;
         throw new HttpsError(
           "internal",
           "Eşleşme başlatılamadı. Tekrar dene.",
@@ -3503,13 +3603,18 @@ const cancelQuizMatchmaking = onCall(
     const queueRef = db.collection("quiz_queue").doc(ownerHash);
     const playerRef = db.collection("quiz_players").doc(ownerHash);
     const outcome = await db.runTransaction(async (tx) => {
+      const lobbyRef = _liveLobbyRef(db);
       const queueSnap = await tx.get(queueRef);
+      const lobbySnap = await tx.get(lobbyRef);
+      void lobbySnap;
       if (!queueSnap.exists) {
+        _removeLobbyWaiters(tx, lobbyRef, [ownerHash]);
         return { ok: true, refunded: false, status: "idle" };
       }
       const queue = queueSnap.data() || {};
       if (queue.status === "matched" && queue.matchId) {
         // İptal yarışı: maç oluşmuşsa istemci maça girer.
+        _removeLobbyWaiters(tx, lobbyRef, [ownerHash]);
         return {
           ok: true,
           refunded: false,
@@ -3519,6 +3624,7 @@ const cancelQuizMatchmaking = onCall(
       }
       if (queue.status !== "waiting") {
         tx.set(queueRef, _idleQueuePatch(), { merge: true });
+        _removeLobbyWaiters(tx, lobbyRef, [ownerHash]);
         return { ok: true, refunded: false, status: "idle" };
       }
       const refund = await _refundQueueHeartInTransaction(tx, db, {
@@ -3526,6 +3632,7 @@ const cancelQuizMatchmaking = onCall(
         queue,
         playerRef,
       });
+      _removeLobbyWaiters(tx, lobbyRef, [ownerHash]);
       return {
         ok: true,
         refunded: refund.refunded,
@@ -3560,7 +3667,9 @@ const pollQuizMatch = onCall(
     }
     if (!isFundedQueue(queue)) {
       await db.runTransaction(async (tx) => {
+        const lobbyRef = _liveLobbyRef(db);
         const fresh = await tx.get(queueRef);
+        await tx.get(lobbyRef);
         const data = fresh.data() || {};
         if (data.status === "waiting" && !isFundedQueue(data)) {
           await _refundQueueHeartInTransaction(tx, db, {
@@ -3568,13 +3677,16 @@ const pollQuizMatch = onCall(
             queue: data,
             playerRef,
           });
+          _removeLobbyWaiters(tx, lobbyRef, [ownerHash]);
         }
       });
       return { ok: true, status: "idle", reason: "invalid_funding_retired" };
     }
     if (shouldRetireStaleWaitingQueue(queue, Date.now())) {
       await db.runTransaction(async (tx) => {
+        const lobbyRef = _liveLobbyRef(db);
         const fresh = await tx.get(queueRef);
+        await tx.get(lobbyRef);
         const data = fresh.data() || {};
         if (shouldRetireStaleWaitingQueue(data, Date.now())) {
           await _refundQueueHeartInTransaction(tx, db, {
@@ -3582,6 +3694,7 @@ const pollQuizMatch = onCall(
             queue: data,
             playerRef,
           });
+          _removeLobbyWaiters(tx, lobbyRef, [ownerHash]);
         }
       });
       return { ok: true, status: "idle", refunded: true };
@@ -3599,11 +3712,16 @@ const pollQuizMatch = onCall(
         queuedAtMs: queuedAtMs || Date.now(),
       };
     }
-    const preselected = await _findPairableWaitingCandidates(
-      db,
-      ownerHash,
-      Math.max(1, Math.floor(Number(queue.level) || 1)),
-    );
+    let preselected = [];
+    try {
+      preselected = await _findPairableWaitingCandidates(
+        db,
+        ownerHash,
+        Math.max(1, Math.floor(Number(queue.level) || 1)),
+      );
+    } catch (error) {
+      console.error("[HilalDuel] queue scan failed:", error);
+    }
     await queueRef.update({ lastPairScanAtMs: Date.now() }).catch(() => {});
     try {
       return await db.runTransaction(async (tx) =>
@@ -6520,6 +6638,7 @@ module.exports = {
     pickPairableCandidate,
     decideLiveQueuePollAction,
     decideQuizPollWork,
+    lobbyWaiterIds,
     QUEUE_ABANDON_MS,
     QUEUE_WAIT_MS,
     QUEUE_PAIR_RETRY_MS,

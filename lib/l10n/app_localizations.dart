@@ -3029,6 +3029,12 @@ abstract class AppLocalizations {
   /// **'Rakip aranıyor…'**
   String get hilalDuelSearching;
 
+  /// No description provided for @hilalDuelMatchFound.
+  ///
+  /// In tr, this message translates to:
+  /// **'Eşleşme bulundu'**
+  String get hilalDuelMatchFound;
+
   /// No description provided for @hilalDuelCancelSearch.
   ///
   /// In tr, this message translates to:

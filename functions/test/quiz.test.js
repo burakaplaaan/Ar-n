@@ -1022,6 +1022,21 @@ test("decideQuizPollWork skips the 200-doc scan between start and retry", () => 
   );
 });
 
+test("live lobby keeps the newest other waiter and drops stale ids", () => {
+  assert.equal(t.QUEUE_WAIT_MS, 10_000);
+  const now = 2_000_000;
+  const ids = t.lobbyWaiterIds({
+    waiters: {
+      self: { queuedAtMs: now - 1000 },
+      fresh: { queuedAtMs: now - 500 },
+      older: { queuedAtMs: now - 4000 },
+      ghost: { queuedAtMs: now - t.QUEUE_ABANDON_MS - 1 },
+      blank: { queuedAtMs: 0 },
+    },
+  }, { exclude: "self", nowMs: now, limit: 10 });
+  assert.deepEqual(ids, ["fresh", "older"]);
+});
+
 test("decideLiveQueuePollAction pairs humans before the bot timeout", () => {
   const now = Date.now();
   assert.equal(
