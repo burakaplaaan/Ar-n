@@ -515,29 +515,31 @@ class _ArinShellState extends State<ArinShell> {
             context.go(step.route);
           }
         });
-        ref.read(appTourControllerProvider.notifier).maybeStart();
         if (!_tourKickoffDone) {
           _tourKickoffDone = true;
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            if (!context.mounted) return;
-            final started = ref.read(appTourControllerProvider);
-            if (started.active &&
-                started.step != null &&
-                path != started.step!.route) {
-              context.go(started.step!.route);
-            }
-            if (!_widgetPromptResumeChecked) {
-              _widgetPromptResumeChecked = true;
-              if (!started.active) {
-                unawaited(
-                  maybeShowPostTourWidgetPrompt(
-                    context: context,
-                    prefs: ref.read(sharedPreferencesProvider),
-                  ),
-                );
+          scheduleAppTourKickoff(
+            ref: ref,
+            isMounted: () => context.mounted,
+            onReady: (started) {
+              if (!context.mounted) return;
+              if (started.active &&
+                  started.step != null &&
+                  path != started.step!.route) {
+                context.go(started.step!.route);
               }
-            }
-          });
+              if (!_widgetPromptResumeChecked) {
+                _widgetPromptResumeChecked = true;
+                if (!started.active) {
+                  unawaited(
+                    maybeShowPostTourWidgetPrompt(
+                      context: context,
+                      prefs: ref.read(sharedPreferencesProvider),
+                    ),
+                  );
+                }
+              }
+            },
+          );
         }
         if (!_hubAssetsWarm) {
           _hubAssetsWarm = true;

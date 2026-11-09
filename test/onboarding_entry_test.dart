@@ -10,6 +10,7 @@ import 'package:arin/presentation/onboarding/onboarding_dua_screen.dart';
 import 'package:arin/presentation/onboarding/onboarding_info_screen.dart';
 import 'package:arin/presentation/onboarding/onboarding_prepare_screen.dart';
 import 'package:arin/presentation/onboarding/onboarding_struggle_note_screen.dart';
+import 'package:arin/presentation/onboarding/onboarding_support_screen.dart';
 import 'package:arin/presentation/onboarding/onboarding_willpower_invite_screen.dart';
 import 'package:arin/core/constants/profile_prefs_keys.dart';
 import 'package:flutter/material.dart';
@@ -315,6 +316,41 @@ void main() {
     expect(l10n.onboardingFirstStepArinmaTitle, 'Arınma');
     expect(l10n.onboardingFirstStepGelisimTitle, 'Gelişim');
     expect(l10n.onboardingFirstStepLater, contains('Daha sonra'));
+  });
+
+  testWidgets('destek kartı puanı turdan ayırır', (tester) async {
+    var rated = false;
+    var continued = false;
+    await tester.pumpWidget(
+      MaterialApp(
+        locale: const Locale('tr'),
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        home: Scaffold(
+          body: OnboardingSupportScreen(
+            onBack: () {},
+            onRate: () => rated = true,
+            onContinueTour: () => continued = true,
+          ),
+        ),
+      ),
+    );
+    await tester.pump();
+
+    expect(find.text('Arın\'ı desteklemek ister misin?'), findsOneWidget);
+    expect(find.text('Evet, puan vereyim'), findsOneWidget);
+    expect(find.text('Uygulama turu ile devam et'), findsOneWidget);
+    expect(find.byIcon(Icons.star_rounded), findsNothing);
+    expect(find.byIcon(Icons.star_border_rounded), findsNWidgets(5));
+
+    await tester.tap(find.text('Evet, puan vereyim'));
+    await tester.pump();
+    expect(rated, isTrue);
+    expect(continued, isFalse);
+
+    await tester.tap(find.text('Uygulama turu ile devam et'));
+    await tester.pump();
+    expect(continued, isTrue);
   });
 
   testWidgets('ilk adım davetinde arınma, gelişim ve sonra kur var', (

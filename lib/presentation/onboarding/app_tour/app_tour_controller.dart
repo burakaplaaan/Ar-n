@@ -89,3 +89,20 @@ Future<void> persistAppTourFinished(SharedPreferences prefs) async {
 
 final appTourControllerProvider =
     NotifierProvider<AppTourController, AppTourState>(AppTourController.new);
+
+/// [maybeStart] provider state'ini yazar. flutter_riverpod 2.6 bu yazımı
+/// `build` içinde yakalayıp hata ekranı basar (`debugCanModifyProviders` →
+/// `markNeedsBuild` during build). Frame callback ağaç kurulduktan sonra
+/// çalışır; çağıran bunu bir kez planlamalıdır.
+void scheduleAppTourKickoff({
+  required WidgetRef ref,
+  required bool Function() isMounted,
+  required void Function(AppTourState started) onReady,
+}) {
+  WidgetsBinding.instance.addPostFrameCallback((_) {
+    if (!isMounted()) return;
+    ref.read(appTourControllerProvider.notifier).maybeStart();
+    if (!isMounted()) return;
+    onReady(ref.read(appTourControllerProvider));
+  });
+}
