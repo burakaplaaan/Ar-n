@@ -115,8 +115,30 @@ class MainActivity : FlutterActivity() {
         }
     }
 
+    override fun shouldDestroyEngineWithHost(): Boolean = !ArinAutoMediaService.retainEngine
+
+    override fun getCachedEngineId(): String? {
+        val cache = io.flutter.embedding.engine.FlutterEngineCache.getInstance()
+        return if (cache.get(ArinAutoBridge.ENGINE_ID) != null) {
+            ArinAutoBridge.ENGINE_ID
+        } else {
+            null
+        }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        ArinAutoBridge.activityAlive = true
+    }
+
+    override fun onDestroy() {
+        ArinAutoBridge.onActivityFinished()
+        super.onDestroy()
+    }
+
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
+        ArinAutoBridge.attachFromActivity(flutterEngine)
         val messenger = flutterEngine.dartExecutor.binaryMessenger
 
         systemBackGeneration += 1

@@ -88,15 +88,23 @@ import workmanager_apple
       name: "com.arin.arin/carplay",
       binaryMessenger: messenger
     )
-    ArinCarPlayBridge.ask = { text, done in
-      carPlayChannel.invokeMethod("ask", arguments: text) { value in
-        if let error = value as? FlutterError {
-          done(error.message ?? "Şu an cevap veremiyorum.")
-          return
+    ArinCarPlayBridge.channel = carPlayChannel
+    carPlayChannel.setMethodCallHandler { call, result in
+      switch call.method {
+      case "hostReady":
+        ArinCarPlayBridge.dartReady = true
+        DispatchQueue.main.async {
+          ArinCarPlayBridge.session?.notifyDartIfNeeded()
         }
-        let reply = (value as? String)?
-          .trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
-        done(reply)
+        result(nil)
+      case "onState":
+        let args = call.arguments as? [String: Any] ?? [:]
+        DispatchQueue.main.async {
+          ArinCarPlayBridge.session?.apply(args)
+        }
+        result(nil)
+      default:
+        result(FlutterMethodNotImplemented)
       }
     }
 

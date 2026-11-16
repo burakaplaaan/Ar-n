@@ -9,12 +9,9 @@
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <!-- Bazı OEM’ler (Xiaomi/Huawei/Oppo/Vivo) alarm clock’u bile whitelist dışıysa düşürüyor. -->
     <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
-    <!-- FOREGROUND_SERVICE ve FOREGROUND_SERVICE_MEDIA_PLAYBACK kaldırıldı:
-         Uygulama kodunda kendi Service'ini başlatmıyor (audioplayers
-         MediaPlayer süreç priority'sine güveniyor). İleride MediaSession
-         FGS eklenirse Android 14+ için bu izinler geri eklenecek.
-         Play Console "Prominent Disclosure" / data safety sayfasında
-         gereksiz izin beyanı tetiklememek için manifest'ten çıkarıldı. -->
+    <!-- Android Auto Kur'an oturumu arka planda çalarken medya ön plan servisi. -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
     <uses-permission
@@ -61,6 +58,17 @@
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
+        <meta-data
+            android:name="com.google.android.gms.car.application"
+            android:resource="@xml/automotive_app_desc" />
+        <service
+            android:name=".ArinAutoMediaService"
+            android:exported="true"
+            android:foregroundServiceType="mediaPlayback">
+            <intent-filter>
+                <action android:name="android.media.browse.MediaBrowserService" />
+            </intent-filter>
+        </service>
         <!-- Bazı emülatörlerde (BlueStacks vb.) Impeller boş ekran verebilir -->
         <meta-data
             android:name="io.flutter.embedding.android.EnableImpeller"

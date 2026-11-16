@@ -279,6 +279,15 @@ class QuranAudioNotifier extends StateNotifier<QuranAudioState> {
   Future<void> pause() async {
     if (_disposed) return;
     if (_suppressFocusPause > 0) return;
+    await _pauseNow();
+  }
+
+  /// Araç duraklatması ve CarPlay kopması. Oynatıcı kurulurken telefon
+  /// odağı yüzünden yutulan `pause` burada durmaz; ayet kaydı durur.
+  Future<void> pauseFromCar() => _pauseNow();
+
+  Future<void> _pauseNow() async {
+    if (_disposed) return;
     _epoch++;
     _invalidateCompletes();
     _armed = null;

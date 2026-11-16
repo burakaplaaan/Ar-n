@@ -58,7 +58,7 @@ import 'presentation/shared/widgets/global_edge_swipe_back.dart';
 import 'presentation/shared/widgets/location_change_listener.dart';
 import 'presentation/shared/widgets/widget_launch_gate_listener.dart';
 import 'presentation/assistant/assistant_session.dart';
-import 'presentation/assistant/carplay_assistant_host.dart';
+import 'presentation/assistant/carplay_quran_host.dart';
 import 'presentation/onboarding/app_tour/app_tour_controller.dart';
 import 'presentation/qibla/qibla_hub_back_dispatcher.dart';
 import 'presentation/qibla/qibla_hub_navigator_key.dart';
@@ -184,6 +184,10 @@ class _ArinAppState extends ConsumerState<ArinApp> with WidgetsBindingObserver {
     await ref
         .read(exploreBgmNotifierProvider.notifier)
         .pauseForVisibilityLoss();
+    if (QuranRemoteHost.holdsPlayback) {
+      await AudioSessionCoordinator.pauseOwner(AudioSessionOwner.healing);
+      return;
+    }
     await AudioSessionCoordinator.pauseActive();
   }
 
@@ -191,7 +195,7 @@ class _ArinAppState extends ConsumerState<ArinApp> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     _systemBackChannel.setMethodCallHandler(_handleNativeSystemBack);
-    CarPlayAssistantHost.bind(ref);
+    QuranRemoteHost.bind(ref);
     AdMobService.setRewardedPreloadForeground(true);
     WidgetsBinding.instance.addObserver(this);
     ArinWidgetSync.onPrayerWidgetActionsApplied = () {
@@ -411,6 +415,7 @@ class _ArinAppState extends ConsumerState<ArinApp> with WidgetsBindingObserver {
   @override
   void dispose() {
     _systemBackChannel.setMethodCallHandler(null);
+    QuranRemoteHost.unbind();
     AdMobService.setRewardedPreloadForeground(false);
     WidgetsBinding.instance.removeObserver(this);
     ArinWidgetSync.onPrayerWidgetActionsApplied = null;
