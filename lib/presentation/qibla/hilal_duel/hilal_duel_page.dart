@@ -3449,10 +3449,17 @@ class _PlayingBody extends StatelessWidget {
         ? resolution.round + 1
         : match.currentRound + 1;
 
-    final remainingMs = showReveal
-        ? 0
-        : (match.deadlineMs - now).clamp(0, 20000);
-    final seconds = showReveal ? 0 : (remainingMs / 1000).ceil();
+    final bothAnswered =
+        !match.isChallenge &&
+        !controller.challengeMode &&
+        (controller.selectedChoice != null || match.selfAnswered) &&
+        match.opponentAnswered;
+    // İki cevap da geldiyse sayaç turu tutmasın; çözüm anında açılsın.
+    final holdForClock = !showReveal && !bothAnswered;
+    final remainingMs = holdForClock
+        ? (match.deadlineMs - now).clamp(0, 20000)
+        : 0;
+    final seconds = holdForClock ? (remainingMs / 1000).ceil() : 0;
 
     final selfName = l10n.hilalDuelYouLabel;
     final opponentName = _shortPlayerName(
@@ -3495,7 +3502,7 @@ class _PlayingBody extends StatelessWidget {
           totalRounds: match.totalRounds,
           activeRound: activeRoundHud,
           seconds: seconds,
-          revealing: showReveal,
+          revealing: showReveal || bothAnswered,
           questionProgressLabel: l10n.hilalDuelQuestionProgress(
             displayRound,
             match.totalRounds,

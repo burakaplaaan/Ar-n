@@ -1959,7 +1959,7 @@ function _botWrongChoice(correctIndex) {
 /**
  * Canlı eşleşme bot planı: maç başına 1–3 doğru (genelde 2).
  * Seviye doğruluğu şişirmez. Bot insan cevaplayana kadar yazılmaz;
- * sonra afterHumanDelayMs bekler. Görünen süre insanın ~2/3'ü.
+ * insan cevaplayınca tur hemen kapanır. Görünen süre insanın ~2/3'ü.
  */
 function _botPlan(questionIds, _playerLevel) {
   const ids = Array.isArray(questionIds) ? questionIds : [];
@@ -2141,17 +2141,18 @@ function _challengeBotWeakPlan(questionIds) {
 
 /**
  * Bot cevabı zamanı.
- * İnsan bitirmeden yazılmaz (submit ile aynı anda "anında cevap" olmasın).
- * İnsan cevaplayınca 2.5–3.5 sn (bazen ~5 sn) sonra yazar.
+ * İnsan bitirmeden yazılmaz.
+ * İnsan cevaplayınca tur kapanır; kalan 20 sn beklenmez.
+ * Görünen süre `_botAnswerElapsedMs` ile ayrıca hesaplanır.
  */
 function _botReadyAtMs({
   roundStartedAtMs,
   plannedElapsedMs: _plannedElapsedMs,
   deadlineMs,
-  nowMs: _nowMs,
+  nowMs,
   humanAnswered,
-  humanElapsedMs,
-  afterHumanDelayMs,
+  humanElapsedMs: _humanElapsedMs,
+  afterHumanDelayMs: _afterHumanDelayMs,
 }) {
   const start = Math.max(0, Math.floor(Number(roundStartedAtMs) || 0));
   const deadline = Math.max(
@@ -2162,9 +2163,8 @@ function _botReadyAtMs({
   if (!humanAnswered) {
     return cap;
   }
-  const humanElapsed = Math.max(0, Math.floor(Number(humanElapsedMs) || 0));
-  const delay = Math.max(1_600, Math.floor(Number(afterHumanDelayMs) || 2_500));
-  return Math.min(start + humanElapsed + delay, cap);
+  const now = Math.floor(Number(nowMs) || 0);
+  return Math.min(Math.max(now, start), cap);
 }
 
 /** İnsan 15sn ise bot ~10sn görünsün (≈2/3, küçük sapma). */

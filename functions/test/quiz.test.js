@@ -1211,9 +1211,9 @@ test("bot plan caps live matches at 1-3 correct and delays after human", () => {
   assert.equal(t.pickBotCorrectCount(1), 1);
 });
 
-test("botReadyAtMs waits after human and does not write before them", () => {
+test("botReadyAtMs closes when the human answers and does not write before them", () => {
   const start = 1_000_000;
-  // İnsan 3 sn'de cevapladıysa 2.5 sn daha bekle.
+  // İnsan cevapladıysa bu anda yaz; kalan süre beklenmez.
   assert.equal(
     t.botReadyAtMs({
       roundStartedAtMs: start,
@@ -1224,9 +1224,8 @@ test("botReadyAtMs waits after human and does not write before them", () => {
       humanElapsedMs: 3_000,
       afterHumanDelayMs: 2_500,
     }),
-    start + 5_500,
+    start + 3_500,
   );
-  // Plan insandan önce dolmuş olsa bile submit anında yazma.
   assert.equal(
     t.botReadyAtMs({
       roundStartedAtMs: start,
@@ -1237,7 +1236,7 @@ test("botReadyAtMs waits after human and does not write before them", () => {
       humanElapsedMs: 15_000,
       afterHumanDelayMs: 2_500,
     }),
-    start + 17_500,
+    start + 15_000,
   );
   // İnsan yokken deadline'a kadar bekle — erken "Cevapladı" yok.
   assert.equal(
@@ -1251,7 +1250,7 @@ test("botReadyAtMs waits after human and does not write before them", () => {
     }),
     start + 19_800,
   );
-  // Gecikme deadline'ı ezmesin.
+  // Süre bitimine yakın cevap da turu o anda kapatır, zili beklemez.
   assert.equal(
     t.botReadyAtMs({
       roundStartedAtMs: start,
@@ -1262,7 +1261,7 @@ test("botReadyAtMs waits after human and does not write before them", () => {
       humanElapsedMs: 18_000,
       afterHumanDelayMs: 5_000,
     }),
-    start + 19_800,
+    start + 18_500,
   );
 });
 
