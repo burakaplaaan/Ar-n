@@ -1,12 +1,19 @@
 import CarPlay
-import Foundation
+import Flutter
+import MediaPlayer
+import UIKit
 
-/// CarPlay kökü: premium kilit, Hilal'de Bas konuş, iki satır ayar.
+/// Araçta Kur'an: açılınca kaldığın ayet, başlatınca sırayla tilavet.
 final class ArinCarPlaySession: NSObject {
   private let interface: CPInterfaceController
-  private let voice = ArinCarPlayVoice()
-  private var voiceTemplate: CPVoiceControlTemplate?
-  private var lastStateAt = Date.distantPast
+  private var tabs: CPTabBarTemplate?
+  private var surahList: CPListTemplate?
+  private var catalogReady = false
+  private var greeted = false
+  private var pending: [(String, Any?)] = []
+  private var installed: [(MPRemoteCommand, Any)] = []
+  private var artKey = ""
+  private var artImage: UIImage?
 
   init(interfaceController: CPInterfaceController) {
     interface = interfaceController
@@ -14,229 +21,285 @@ final class ArinCarPlaySession: NSObject {
   }
 
   func start() {
-    if ArinCarPlayStore.isPremium {
-      presentTabs()
-    } else {
-      presentLock()
-    }
+    ArinCarPlayBridge.session = self
+    installCommands()
+    presentRoot()
+    publishPlaceholder()
+    notifyDartIfNeeded()
   }
 
   func stop() {
-    voice.shutdown()
-    voiceTemplate = nil
+    greeted = false
+    pending.removeAll()
+    uninstallCommands()
+    if ArinCarPlayBridge.session === self {
+      ArinCarPlayBridge.session = nil
+    }
+    MPNowPlayingInfoCenter.default().nowPlayingInfo = nil
+    ArinCarPlayBridge.emit("disconnected")
   }
 
-  private func presentLock() {
-    let item = CPInformationItem(
-      title: "Kilitli",
-      detail: "Arabada Hilal yalnızca Premium ile konuşur."
-    )
-    let template = CPInformationTemplate(
-      title: "Arın",
-      layout: .leading,
-      items: [item],
-      actions: []
-    )
-    interface.setRootTemplate(template, animated: false, completion: nil)
-  }
-
-  private func presentTabs() {
-    let tabs = CPTabBarTemplate(templates: [makeHilalTemplate(), makeSettingsTemplate()])
-    tabs.delegate = self
-    interface.setRootTemplate(tabs, animated: false) { [weak self] _, _ in
-      if ArinCarPlayStore.autoListen {
-        self?.pushVoiceAndListen()
+  func notifyDartIfNeeded() {
+    guard ArinCarPlayBridge.dartReady, ArinCarPlayBridge.channel != nil else { return }
+    let first = !greeted
+    greeted = true
+    ArinCarPlayBridge.emit("connected") { [weak self] value in
+      guard let map = value as? [String: Any] else { return }
+      DispatchQueue.main.async {
+        self?.apply(map)
       }
     }
-  }
-
-  private func makeHilalTemplate() -> CPInformationTemplate {
-    let glance = CPInformationItem(
-      title: "Hilal",
-      detail: ArinCarPlayStore.glanceLine()
-    )
-    let talk = CPTextButton(title: "Bas konuş", textStyle: .confirm) { [weak self] _ in
-      self?.pushVoiceAndListen()
+    guard first else { return }
+    let queued = pending
+    pending.removeAll()
+    for item in queued {
+      ArinCarPlayBridge.emit(item.0, arguments: item.1)
     }
-    let template = CPInformationTemplate(
-      title: "Hilal",
-      layout: .leading,
-      items: [glance],
-      actions: [talk]
-    )
-    template.tabTitle = "Hilal"
-    template.tabImage = UIImage(systemName: "moon.stars")
-    return template
   }
 
-  private func makeVoiceTemplate() -> CPVoiceControlTemplate {
-    let states: [CPVoiceControlState] = [
-      CPVoiceControlState(
-        identifier: ArinHilalOrb.State.idle.rawValue,
-        titleVariants: ["Bas konuş", "Konuş"],
-        image: ArinHilalOrb.image(for: .idle),
-        repeats: true
-      ),
-      CPVoiceControlState(
-        identifier: ArinHilalOrb.State.listening.rawValue,
-        titleVariants: ["Dinliyorum", "Konuş"],
-        image: ArinHilalOrb.image(for: .listening),
-        repeats: true
-      ),
-      CPVoiceControlState(
-        identifier: ArinHilalOrb.State.thinking.rawValue,
-        titleVariants: ["Düşünüyorum", "Bir saniye"],
-        image: ArinHilalOrb.image(for: .thinking),
-        repeats: true
-      ),
-      CPVoiceControlState(
-        identifier: ArinHilalOrb.State.speaking.rawValue,
-        titleVariants: ["Hilal", "Dinle"],
-        image: ArinHilalOrb.image(for: .speaking),
-        repeats: true
-      ),
+  func apply(_ map: [String: Any]) {
+    guard Thread.isMainThread else {
+      DispatchQueue.main.async { [weak self] in self?.apply(map) }
+      return
+    }
+    updateNowPlaying(map)
+    if let title = map["listTitle"] as? String, !title.isEmpty {
+      surahList?.tabTitle = title
+    }
+    if !catalogReady, map["surahs"] != nil {
+      rebuildSurahs(map)
+    }
+  }
+
+  private func presentRoot() {
+    let now = CPNowPlayingTemplate.shared
+    now.tabTitle = "Kur'an"
+    now.tabImage = UIImage(systemName: "book.closed")
+
+    let waiting = CPListItem(text: "Kur'an", detailText: nil)
+    waiting.handler = { _, completion in completion() }
+    let list = CPListTemplate(title: "Sureler", sections: [CPListSection(items: [waiting])])
+    list.tabTitle = "Sureler"
+    list.tabImage = UIImage(systemName: "list.bullet")
+    surahList = list
+
+    let bar = CPTabBarTemplate(templates: [now, list])
+    tabs = bar
+    interface.setRootTemplate(bar, animated: false, completion: nil)
+  }
+
+  private func publishPlaceholder() {
+    let defaults = UserDefaults.standard
+    var surah = defaults.integer(forKey: "flutter.quran_last_surah")
+    var ayah = defaults.integer(forKey: "flutter.quran_last_ayah")
+    if surah < 1 || surah > 114 { surah = 1 }
+    if ayah < 1 { ayah = 1 }
+    apply([
+      "surah": surah,
+      "ayah": ayah,
+      "name": "Kur'an",
+      "line": "Sure \(surah) · \(ayah). ayet",
+      "ayahLine": "\(ayah). ayet",
+      "reciter": "Mişari Raşid el-Afasi",
+      "title": "Kur'an",
+      "playing": false,
+      "error": false,
+    ])
+  }
+
+  private func updateNowPlaying(_ map: [String: Any]) {
+    let surah = intValue(map["surah"]) ?? 1
+    let ayah = intValue(map["ayah"]) ?? 1
+    let name = (map["name"] as? String)?.trimmingCharacters(in: .whitespacesAndNewlines)
+    let title = (name?.isEmpty == false ? name! : nil) ?? "Kur'an"
+    let line = (map["line"] as? String) ?? "\(title) · \(ayah)"
+    let playing = boolValue(map["playing"])
+    let failed = boolValue(map["error"])
+    let reciter = (map["reciter"] as? String) ?? "Kur'an"
+    let album = (map["title"] as? String) ?? "Kur'an"
+    let verse = (map["verse"] as? String) ?? ""
+    let artist = failed ? ((map["errorText"] as? String) ?? reciter) : reciter
+
+    let key = "\(surah)|\(ayah)|\(verse)"
+    if artKey != key || artImage == nil {
+      artKey = key
+      artImage = renderCard(title: title, line: line, verse: verse)
+    }
+
+    var info: [String: Any] = [
+      MPMediaItemPropertyTitle: line,
+      MPMediaItemPropertyArtist: artist,
+      MPMediaItemPropertyAlbumTitle: album,
+      MPNowPlayingInfoPropertyPlaybackRate: (playing && !failed) ? 1.0 : 0.0,
     ]
-    return CPVoiceControlTemplate(voiceControlStates: states)
+    if let image = artImage {
+      info[MPMediaItemPropertyArtwork] = MPMediaItemArtwork(
+        boundsSize: image.size
+      ) { _ in image }
+    }
+    MPNowPlayingInfoCenter.default().nowPlayingInfo = info
   }
 
-  private func makeSettingsTemplate() -> CPListTemplate {
-    let speak = CPListItem(
-      text: "Sesli cevap",
-      detailText: ArinCarPlayStore.speakEnabled ? "Açık — Siri sesi" : "Kapalı"
+  private func rebuildSurahs(_ map: [String: Any]) {
+    guard let rows = map["surahs"] as? [[String: Any]], !rows.isEmpty else { return }
+    guard let list = surahList else { return }
+    var groups: [CPListItem] = []
+    var index = 0
+    let pageSize = 12
+    while index < rows.count {
+      let end = min(index + pageSize, rows.count)
+      let slice = Array(rows[index..<end])
+      let firstNumber = intValue(slice.first?["n"]) ?? (index + 1)
+      let lastNumber = intValue(slice.last?["n"]) ?? end
+      let firstName = (slice.first?["name"] as? String) ?? ""
+      let lastName = (slice.last?["name"] as? String) ?? ""
+      let item = CPListItem(
+        text: "\(firstNumber)–\(lastNumber)",
+        detailText: lastName.isEmpty ? firstName : "\(firstName) · \(lastName)"
+      )
+      item.handler = { [weak self] _, completion in
+        self?.pushSurahs(slice)
+        completion()
+      }
+      groups.append(item)
+      index = end
+    }
+    guard !groups.isEmpty else { return }
+    list.updateSections([CPListSection(items: groups)])
+    catalogReady = true
+  }
+
+  private func pushSurahs(_ rows: [[String: Any]]) {
+    var items: [CPListItem] = []
+    items.reserveCapacity(rows.count)
+    for row in rows {
+      guard let number = intValue(row["n"]) else { continue }
+      let name = (row["name"] as? String) ?? "\(number)"
+      let countLabel = (row["countLabel"] as? String) ?? ""
+      let arabic = (row["arabic"] as? String) ?? ""
+      let detail = arabic.isEmpty ? countLabel : "\(arabic) · \(countLabel)"
+      let item = CPListItem(text: "\(number). \(name)", detailText: detail)
+      item.handler = { [weak self] _, completion in
+        self?.send("playSurah", ["surah": number])
+        self?.showNowPlaying()
+        completion()
+      }
+      items.append(item)
+    }
+    guard !items.isEmpty else { return }
+    let page = CPListTemplate(
+      title: surahList?.tabTitle ?? "Sureler",
+      sections: [CPListSection(items: items)]
     )
-    speak.handler = { [weak self] _, done in
-      ArinCarPlayStore.speakEnabled.toggle()
-      self?.reloadSettings()
-      done()
-    }
-    let auto = CPListItem(
-      text: "Açılınca dinle",
-      detailText: ArinCarPlayStore.autoListen ? "Açık" : "Kapalı — Bas konuş"
-    )
-    auto.handler = { [weak self] _, done in
-      ArinCarPlayStore.autoListen.toggle()
-      self?.reloadSettings()
-      done()
-    }
-    let section = CPListSection(items: [speak, auto])
-    let template = CPListTemplate(title: "Ayarlar", sections: [section])
-    template.tabTitle = "Ayarlar"
-    template.tabImage = UIImage(systemName: "slider.horizontal.3")
-    return template
+    interface.pushTemplate(page, animated: true, completion: nil)
   }
 
-  private func reloadSettings() {
-    guard let tabs = interface.rootTemplate as? CPTabBarTemplate,
-          tabs.templates.count > 1
-    else { return }
-    var all = tabs.templates
-    all[1] = makeSettingsTemplate()
-    tabs.updateTemplates(all)
+  private func showNowPlaying() {
+    tabs?.selectedTemplate = CPNowPlayingTemplate.shared
   }
 
-  private func pushVoiceAndListen() {
-    guard ArinCarPlayStore.isPremium else {
-      presentLock()
-      return
-    }
-    if voiceTemplate != nil {
-      listen()
-      return
-    }
-    let next = makeVoiceTemplate()
-    voiceTemplate = next
-    interface.pushTemplate(next, animated: true) { [weak self] success, _ in
-      if success {
-        self?.listen()
-      } else {
-        self?.voiceTemplate = nil
-      }
-    }
-  }
+  private func renderCard(title: String, line: String, verse: String) -> UIImage {
+    let size = CGSize(width: 600, height: 600)
+    let renderer = UIGraphicsImageRenderer(size: size)
+    return renderer.image { _ in
+      UIColor(red: 0.07, green: 0.11, blue: 0.09, alpha: 1).setFill()
+      UIBezierPath(rect: CGRect(origin: .zero, size: size)).fill()
 
-  private func listen() {
-    applyState(.listening)
-    voice.startListening { [weak self] partial in
-      guard !partial.isEmpty else { return }
-      self?.applyState(.listening)
-    } onFinal: { [weak self] spoken in
-      self?.handleSpoken(spoken)
-    } onError: { [weak self] message in
-      self?.say(message)
-    }
-  }
+      let titleStyle = NSMutableParagraphStyle()
+      titleStyle.alignment = .center
+      let titleAttrs: [NSAttributedString.Key: Any] = [
+        .font: UIFont.systemFont(ofSize: 44, weight: .semibold),
+        .foregroundColor: UIColor(red: 0.86, green: 0.74, blue: 0.46, alpha: 1),
+        .paragraphStyle: titleStyle,
+      ]
+      let titleRect = CGRect(x: 36, y: 48, width: 528, height: 64)
+      title.draw(in: titleRect, withAttributes: titleAttrs)
 
-  private func handleSpoken(_ spoken: String) {
-    let text = spoken.trimmingCharacters(in: .whitespacesAndNewlines)
-    if text.isEmpty {
-      applyState(.idle)
-      return
-    }
-    applyState(.thinking)
-    if let ask = ArinCarPlayBridge.ask {
-      ask(text) { [weak self] reply in
-        guard let self else { return }
-        let spoken = reply.trimmingCharacters(in: .whitespacesAndNewlines)
-        self.say(spoken.isEmpty ? self.localFallback(for: text) : spoken)
-      }
-    } else {
-      say(localFallback(for: text))
-    }
-  }
+      let lineStyle = NSMutableParagraphStyle()
+      lineStyle.alignment = .center
+      let lineAttrs: [NSAttributedString.Key: Any] = [
+        .font: UIFont.systemFont(ofSize: 26, weight: .medium),
+        .foregroundColor: UIColor(white: 1, alpha: 0.82),
+        .paragraphStyle: lineStyle,
+      ]
+      line.draw(in: CGRect(x: 36, y: 120, width: 528, height: 40), withAttributes: lineAttrs)
 
-  private func say(_ reply: String) {
-    let text = reply.trimmingCharacters(in: .whitespacesAndNewlines)
-    guard !text.isEmpty else {
-      applyState(.idle)
-      return
-    }
-    applyState(.speaking)
-    if ArinCarPlayStore.speakEnabled {
-      voice.speak(text) { [weak self] in
-        guard let self else { return }
-        self.applyState(.idle)
-        if ArinCarPlayStore.autoListen {
-          self.listen()
-        }
-      }
-    } else {
-      applyState(.idle)
-    }
-  }
-
-  private func localFallback(for text: String) -> String {
-    let folded = text.lowercased(with: Locale(identifier: "tr_TR"))
-    if folded.contains("ayet") || folded.contains("söz") {
-      let verse = ArinCarPlayStore.quoteText
-      let source = ArinCarPlayStore.quoteSource
       if !verse.isEmpty {
-        return source.isEmpty ? verse : "\(source). \(verse)"
+        let verseStyle = NSMutableParagraphStyle()
+        verseStyle.alignment = .center
+        verseStyle.lineBreakMode = .byWordWrapping
+        let verseAttrs: [NSAttributedString.Key: Any] = [
+          .font: UIFont.systemFont(ofSize: 32, weight: .regular),
+          .foregroundColor: UIColor.white,
+          .paragraphStyle: verseStyle,
+        ]
+        verse.draw(
+          in: CGRect(x: 40, y: 190, width: 520, height: 360),
+          withAttributes: verseAttrs
+        )
       }
     }
-    return ArinCarPlayStore.glanceLine()
   }
 
-  private func applyState(_ state: ArinHilalOrb.State) {
-    let now = Date()
-    if now.timeIntervalSince(lastStateAt) < 0.35 { return }
-    lastStateAt = now
-    voiceTemplate?.activateVoiceControlState(withIdentifier: state.rawValue)
+  private func installCommands() {
+    UIApplication.shared.beginReceivingRemoteControlEvents()
+    let center = MPRemoteCommandCenter.shared()
+    bind(center.playCommand, "play")
+    bind(center.pauseCommand, "pause")
+    bind(center.togglePlayPauseCommand, "toggle")
+    bind(center.nextTrackCommand, "next")
+    bind(center.previousTrackCommand, "previous")
+  }
+
+  private func bind(_ command: MPRemoteCommand, _ method: String) {
+    command.isEnabled = true
+    let token = command.addTarget { [weak self] _ in
+      self?.send(method)
+      return .success
+    }
+    installed.append((command, token))
+  }
+
+  private func uninstallCommands() {
+    for (command, token) in installed {
+      command.removeTarget(token)
+      command.isEnabled = false
+    }
+    installed.removeAll()
+    UIApplication.shared.endReceivingRemoteControlEvents()
+  }
+
+  private func send(_ method: String, _ args: Any? = nil) {
+    guard greeted else {
+      pending.append((method, args))
+      return
+    }
+    ArinCarPlayBridge.emit(method, arguments: args)
+  }
+
+  private func intValue(_ any: Any?) -> Int? {
+    if let value = any as? Int { return value }
+    if let value = any as? NSNumber { return value.intValue }
+    return nil
+  }
+
+  private func boolValue(_ any: Any?) -> Bool {
+    if let value = any as? Bool { return value }
+    if let value = any as? NSNumber { return value.boolValue }
+    return false
   }
 }
 
-extension ArinCarPlaySession: CPTabBarTemplateDelegate {
-  func tabBarTemplate(
-    _ tabBarTemplate: CPTabBarTemplate,
-    didSelect selectedTemplate: CPTemplate
+enum ArinCarPlayBridge {
+  static var channel: FlutterMethodChannel?
+  static var dartReady = false
+  static weak var session: ArinCarPlaySession?
+
+  static func emit(
+    _ method: String,
+    arguments: Any? = nil,
+    result: FlutterResult? = nil
   ) {
-    if selectedTemplate is CPInformationTemplate {
-      return
-    }
-    voice.stopListening()
-    voice.stopSpeaking()
-    if voiceTemplate != nil {
-      voiceTemplate = nil
-      interface.popTemplate(animated: true, completion: nil)
-    }
+    channel?.invokeMethod(method, arguments: arguments, result: result)
   }
 }
