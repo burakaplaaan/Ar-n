@@ -23,6 +23,7 @@ import '../../data/services/fcm_token_service.dart';
 import '../../data/services/local_notification_permission_gate.dart';
 import '../../data/services/feature_permission_gate.dart';
 import '../../data/services/location_service.dart';
+import '../../data/services/purchase_service.dart';
 import '../../data/services/startup_permission_policy.dart';
 import '../shared/providers/user_profile_providers.dart';
 import '../shared/widgets/arin_top_toast.dart';
@@ -335,7 +336,21 @@ class _OnboardingPageState extends State<OnboardingPage> {
     if (_finishing || _supportReviewBusy) return;
     await _requestSupportReview();
     if (!mounted || _finishing) return;
-    await _finishToTour();
+    await _openMembershipGate();
+  }
+
+  Future<void> _openMembershipGate() async {
+    if (_finishing) return;
+    final alreadyPremium = await PurchaseService().isPremiumLocally();
+    if (!mounted) return;
+    if (alreadyPremium) {
+      await _finishToTour();
+      return;
+    }
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(kMembershipGatePendingKey, true);
+    if (!mounted) return;
+    context.go(AppRoutes.membershipGate);
   }
 
   Future<void> _finishToTour() async {
@@ -961,7 +976,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
         body: OnboardingSupportScreen(
           onBack: _handleBack,
           onRate: () => unawaited(_rateAndContinue()),
-          onContinueTour: () => unawaited(_finishToTour()),
+          onContinueTour: () => unawaited(_openMembershipGate()),
         ),
       ),
       _OnboardingPhase.slides => _buildSlides(context, l10n),

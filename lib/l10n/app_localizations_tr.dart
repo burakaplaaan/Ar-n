@@ -5111,6 +5111,71 @@ class AppLocalizationsTr extends AppLocalizations {
       'Reklamsız, kesintisiz ve kilitsiz manevi rutin.';
 
   @override
+  String membershipGateGreeting(String name) {
+    return 'Selam $name,';
+  }
+
+  @override
+  String get membershipGateGreetingPlain => 'Selam,';
+
+  @override
+  String get membershipGateBody =>
+      'Sunucu ve reklam giderleri arttı. Arın\'ı kapatmak yerine senden yıllık bir destek istiyoruz. Bu destek, yılda bir kahve tutarında.';
+
+  @override
+  String get membershipGatePerYear => 'yılda bir kez';
+
+  @override
+  String get membershipGateRenewal =>
+      'Bu destekle Arın\'ı bir yıl reklamsız ve kilitsiz kullanırsın. Ödeme her yıl yenilenir. İstediğin zaman Ayarlar\'dan iptal edebilirsin.';
+
+  @override
+  String get membershipGateIncludes => 'Bu üyelikle açılanlar';
+
+  @override
+  String get membershipGateFeaturePrayer => 'Namaz vakitleri ve kıble';
+
+  @override
+  String get membershipGateFeatureZikir => 'Zikirmatik';
+
+  @override
+  String get membershipGateFeatureExplore => 'İslami Keşfet';
+
+  @override
+  String get membershipGateFeatureAi => 'İslami yapay zeka';
+
+  @override
+  String get membershipGateFeatureWill => 'İrade ve alışkanlık takibi';
+
+  @override
+  String get membershipGateFeatureCircle => 'Dua Halkası';
+
+  @override
+  String get membershipGateFeatureDuel => 'Bilgi Düellosu';
+
+  @override
+  String get membershipGateFeatureWidgets =>
+      'Ana ekran ve kilit ekranı widget\'ları';
+
+  @override
+  String get membershipGateFeatureAds => 'Reklamsız kullanım';
+
+  @override
+  String get membershipGateCta => 'Yıllık üyeliği başlat';
+
+  @override
+  String get membershipGateApple => 'Ödeme Apple güvencesinde.';
+
+  @override
+  String get membershipGateGoogle => 'Ödeme Google Play güvencesinde.';
+
+  @override
+  String get membershipGateTerms => 'Şartlar';
+
+  @override
+  String get membershipGatePrivacy => 'Gizlilik';
+
+  @override
   String get premiumYearlyPlanTitle => 'Yıllık Premium';
 
   @override

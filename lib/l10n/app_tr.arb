@@ -2361,6 +2361,33 @@
   "premiumTitle": "ARIN Premium",
   "premiumActiveSubtitle": "Reklamsız ve kilitsiz deneyimin açık.",
   "premiumSubtitle": "Reklamsız, kesintisiz ve kilitsiz manevi rutin.",
+  "membershipGateGreeting": "Selam {name},",
+  "@membershipGateGreeting": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "membershipGateGreetingPlain": "Selam,",
+  "membershipGateBody": "Sunucu ve reklam giderleri arttı. Arın'ı kapatmak yerine senden yıllık bir destek istiyoruz. Bu destek, yılda bir kahve tutarında.",
+  "membershipGatePerYear": "yılda bir kez",
+  "membershipGateRenewal": "Bu destekle Arın'ı bir yıl reklamsız ve kilitsiz kullanırsın. Ödeme her yıl yenilenir. İstediğin zaman Ayarlar'dan iptal edebilirsin.",
+  "membershipGateIncludes": "Bu üyelikle açılanlar",
+  "membershipGateFeaturePrayer": "Namaz vakitleri ve kıble",
+  "membershipGateFeatureZikir": "Zikirmatik",
+  "membershipGateFeatureExplore": "İslami Keşfet",
+  "membershipGateFeatureAi": "İslami yapay zeka",
+  "membershipGateFeatureWill": "İrade ve alışkanlık takibi",
+  "membershipGateFeatureCircle": "Dua Halkası",
+  "membershipGateFeatureDuel": "Bilgi Düellosu",
+  "membershipGateFeatureWidgets": "Ana ekran ve kilit ekranı widget'ları",
+  "membershipGateFeatureAds": "Reklamsız kullanım",
+  "membershipGateCta": "Yıllık üyeliği başlat",
+  "membershipGateApple": "Ödeme Apple güvencesinde.",
+  "membershipGateGoogle": "Ödeme Google Play güvencesinde.",
+  "membershipGateTerms": "Şartlar",
+  "membershipGatePrivacy": "Gizlilik",
   "premiumYearlyPlanTitle": "Yıllık Premium",
   "premiumMostAdvantageousBadge": "EN AVANTAJLI",
   "premiumYearlyPlanSubtitle": "Yıllık Abonelik",

@@ -2361,6 +2361,33 @@
   "premiumTitle": "ARIN Premium",
   "premiumActiveSubtitle": "Your ad-free and unlocked experience is open.",
   "premiumSubtitle": "Ad-free, uninterrupted and unlocked spiritual routine.",
+  "membershipGateGreeting": "Hello {name},",
+  "@membershipGateGreeting": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "membershipGateGreetingPlain": "Hello,",
+  "membershipGateBody": "Server and ad costs went up. Instead of closing Arın, we're asking for a yearly contribution. It's about the price of one coffee a year.",
+  "membershipGatePerYear": "once a year",
+  "membershipGateRenewal": "With this, you use Arın ad-free and unlocked for a year. Payment renews each year. You can cancel anytime in Settings.",
+  "membershipGateIncludes": "This membership opens",
+  "membershipGateFeaturePrayer": "Prayer times and qibla",
+  "membershipGateFeatureZikir": "Tasbih counter",
+  "membershipGateFeatureExplore": "Islamic Explore",
+  "membershipGateFeatureAi": "Islamic AI",
+  "membershipGateFeatureWill": "Willpower and habit tracking",
+  "membershipGateFeatureCircle": "Prayer circle",
+  "membershipGateFeatureDuel": "Knowledge duel",
+  "membershipGateFeatureWidgets": "Home and lock screen widgets",
+  "membershipGateFeatureAds": "Ad-free use",
+  "membershipGateCta": "Start yearly membership",
+  "membershipGateApple": "Payment is secured by Apple.",
+  "membershipGateGoogle": "Payment is secured by Google Play.",
+  "membershipGateTerms": "Terms",
+  "membershipGatePrivacy": "Privacy",
   "premiumYearlyPlanTitle": "Yearly Premium",
   "premiumMostAdvantageousBadge": "BEST VALUE",
   "premiumYearlyPlanSubtitle": "Yearly Subscription",

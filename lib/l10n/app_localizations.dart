@@ -8905,6 +8905,126 @@ abstract class AppLocalizations {
   /// **'Reklamsız, kesintisiz ve kilitsiz manevi rutin.'**
   String get premiumSubtitle;
 
+  /// No description provided for @membershipGateGreeting.
+  ///
+  /// In tr, this message translates to:
+  /// **'Selam {name},'**
+  String membershipGateGreeting(String name);
+
+  /// No description provided for @membershipGateGreetingPlain.
+  ///
+  /// In tr, this message translates to:
+  /// **'Selam,'**
+  String get membershipGateGreetingPlain;
+
+  /// No description provided for @membershipGateBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sunucu ve reklam giderleri arttı. Arın\'ı kapatmak yerine senden yıllık bir destek istiyoruz. Bu destek, yılda bir kahve tutarında.'**
+  String get membershipGateBody;
+
+  /// No description provided for @membershipGatePerYear.
+  ///
+  /// In tr, this message translates to:
+  /// **'yılda bir kez'**
+  String get membershipGatePerYear;
+
+  /// No description provided for @membershipGateRenewal.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu destekle Arın\'ı bir yıl reklamsız ve kilitsiz kullanırsın. Ödeme her yıl yenilenir. İstediğin zaman Ayarlar\'dan iptal edebilirsin.'**
+  String get membershipGateRenewal;
+
+  /// No description provided for @membershipGateIncludes.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu üyelikle açılanlar'**
+  String get membershipGateIncludes;
+
+  /// No description provided for @membershipGateFeaturePrayer.
+  ///
+  /// In tr, this message translates to:
+  /// **'Namaz vakitleri ve kıble'**
+  String get membershipGateFeaturePrayer;
+
+  /// No description provided for @membershipGateFeatureZikir.
+  ///
+  /// In tr, this message translates to:
+  /// **'Zikirmatik'**
+  String get membershipGateFeatureZikir;
+
+  /// No description provided for @membershipGateFeatureExplore.
+  ///
+  /// In tr, this message translates to:
+  /// **'İslami Keşfet'**
+  String get membershipGateFeatureExplore;
+
+  /// No description provided for @membershipGateFeatureAi.
+  ///
+  /// In tr, this message translates to:
+  /// **'İslami yapay zeka'**
+  String get membershipGateFeatureAi;
+
+  /// No description provided for @membershipGateFeatureWill.
+  ///
+  /// In tr, this message translates to:
+  /// **'İrade ve alışkanlık takibi'**
+  String get membershipGateFeatureWill;
+
+  /// No description provided for @membershipGateFeatureCircle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Dua Halkası'**
+  String get membershipGateFeatureCircle;
+
+  /// No description provided for @membershipGateFeatureDuel.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bilgi Düellosu'**
+  String get membershipGateFeatureDuel;
+
+  /// No description provided for @membershipGateFeatureWidgets.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ana ekran ve kilit ekranı widget\'ları'**
+  String get membershipGateFeatureWidgets;
+
+  /// No description provided for @membershipGateFeatureAds.
+  ///
+  /// In tr, this message translates to:
+  /// **'Reklamsız kullanım'**
+  String get membershipGateFeatureAds;
+
+  /// No description provided for @membershipGateCta.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yıllık üyeliği başlat'**
+  String get membershipGateCta;
+
+  /// No description provided for @membershipGateApple.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ödeme Apple güvencesinde.'**
+  String get membershipGateApple;
+
+  /// No description provided for @membershipGateGoogle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ödeme Google Play güvencesinde.'**
+  String get membershipGateGoogle;
+
+  /// No description provided for @membershipGateTerms.
+  ///
+  /// In tr, this message translates to:
+  /// **'Şartlar'**
+  String get membershipGateTerms;
+
+  /// No description provided for @membershipGatePrivacy.
+  ///
+  /// In tr, this message translates to:
+  /// **'Gizlilik'**
+  String get membershipGatePrivacy;
+
   /// No description provided for @premiumYearlyPlanTitle.
   ///
   /// In tr, this message translates to:

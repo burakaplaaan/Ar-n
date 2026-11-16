@@ -14,6 +14,10 @@ bool shouldShowLocationDisclosure({
 /// İlk-kurulum tanıtımı bitene kadar sistem izin kutuları spotlight ile
 /// çakışmasın. Mevcut kurulumlarda pending yoksa erteleme yok.
 const String kAppTourPendingKey = 'app_tour_pending';
+
+/// Yeni kurulum, puan kartından sonra yıllık üyelik kapısında bekler.
+/// Eski kurulumlarda bu anahtar yoktur; onlara kapı açılmaz.
+const String kMembershipGatePendingKey = 'membership_gate_pending';
 const String kAppTourCompletedKey = 'app_tour_completed';
 const String kAppTourWidgetPromptPendingKey = 'app_tour_widget_prompt_pending';
 

@@ -5125,6 +5125,70 @@ class AppLocalizationsEn extends AppLocalizations {
       'Ad-free, uninterrupted and unlocked spiritual routine.';
 
   @override
+  String membershipGateGreeting(String name) {
+    return 'Hello $name,';
+  }
+
+  @override
+  String get membershipGateGreetingPlain => 'Hello,';
+
+  @override
+  String get membershipGateBody =>
+      'Server and ad costs went up. Instead of closing Arın, we\'re asking for a yearly contribution. It\'s about the price of one coffee a year.';
+
+  @override
+  String get membershipGatePerYear => 'once a year';
+
+  @override
+  String get membershipGateRenewal =>
+      'With this, you use Arın ad-free and unlocked for a year. Payment renews each year. You can cancel anytime in Settings.';
+
+  @override
+  String get membershipGateIncludes => 'This membership opens';
+
+  @override
+  String get membershipGateFeaturePrayer => 'Prayer times and qibla';
+
+  @override
+  String get membershipGateFeatureZikir => 'Tasbih counter';
+
+  @override
+  String get membershipGateFeatureExplore => 'Islamic Explore';
+
+  @override
+  String get membershipGateFeatureAi => 'Islamic AI';
+
+  @override
+  String get membershipGateFeatureWill => 'Willpower and habit tracking';
+
+  @override
+  String get membershipGateFeatureCircle => 'Prayer circle';
+
+  @override
+  String get membershipGateFeatureDuel => 'Knowledge duel';
+
+  @override
+  String get membershipGateFeatureWidgets => 'Home and lock screen widgets';
+
+  @override
+  String get membershipGateFeatureAds => 'Ad-free use';
+
+  @override
+  String get membershipGateCta => 'Start yearly membership';
+
+  @override
+  String get membershipGateApple => 'Payment is secured by Apple.';
+
+  @override
+  String get membershipGateGoogle => 'Payment is secured by Google Play.';
+
+  @override
+  String get membershipGateTerms => 'Terms';
+
+  @override
+  String get membershipGatePrivacy => 'Privacy';
+
+  @override
   String get premiumYearlyPlanTitle => 'Yearly Premium';
 
   @override

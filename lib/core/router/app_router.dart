@@ -55,6 +55,8 @@ import '../../presentation/inspire/inspire_viewer_session_provider.dart';
 import '../../presentation/moment_verse/moment_verse_page.dart';
 import '../../presentation/assistant/assistant_page.dart';
 import '../../presentation/assistant/assistant_return_pop_guard.dart';
+import '../../data/services/startup_permission_policy.dart';
+import '../../presentation/premium/membership_gate_page.dart';
 import '../../presentation/premium/premium_page.dart';
 import '../../presentation/shared/providers/auth_providers.dart';
 import '../../presentation/shared/providers/willpower_hub_nav_provider.dart';
@@ -68,6 +70,7 @@ abstract final class AppRoutes {
   static const String onboarding = '/onboarding';
   static const String onboardingSurvey = '/onboarding/survey';
   static const String appPrepare = '/app-prepare';
+  static const String membershipGate = '/membership-gate';
   static const String home = '/home';
   static const String premium = '/premium';
   static const String qibla = '/qibla';
@@ -247,6 +250,8 @@ final appRouterProvider = Provider<GoRouter>((ref) {
   });
 
   final onboardingDone = _onboardingDone(prefs, ref);
+  final membershipGatePending =
+      prefs.getBool(kMembershipGatePendingKey) == true;
 
   // Analytics: Firebase hazırsa her route değişiminde otomatik screen_view
   // yazar. Firebase yoksa observer null → listeye eklenmez, davranış değişmez.
@@ -254,13 +259,25 @@ final appRouterProvider = Provider<GoRouter>((ref) {
 
   return GoRouter(
     navigatorKey: rootNavigatorKey,
-    initialLocation: onboardingDone ? AppRoutes.home : AppRoutes.onboarding,
+    initialLocation: membershipGatePending
+        ? AppRoutes.membershipGate
+        : onboardingDone
+            ? AppRoutes.home
+            : AppRoutes.onboarding,
     refreshListenable: refresh,
     debugLogDiagnostics: kDebugMode,
     observers: analyticsObserver == null ? const [] : [analyticsObserver],
     redirect: (BuildContext context, GoRouterState state) {
       final done = _onboardingDone(prefs, ref);
       final path = state.uri.path;
+      final gatePending = prefs.getBool(kMembershipGatePendingKey) == true;
+      if (gatePending) {
+        if (path == AppRoutes.membershipGate) return null;
+        return AppRoutes.membershipGate;
+      }
+      if (path == AppRoutes.membershipGate) {
+        return done ? AppRoutes.home : AppRoutes.onboarding;
+      }
       final adminAsync = ref.read(isCurrentUserAdminProvider);
 
       if (!done) {
@@ -302,6 +319,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: AppRoutes.onboardingSurvey,
         pageBuilder: (context, state) =>
             _page(state, const OnboardingSurveyPage()),
+      ),
+      GoRoute(
+        path: AppRoutes.membershipGate,
+        pageBuilder: (context, state) =>
+            _page(state, const MembershipGatePage()),
       ),
       GoRoute(
         path: AppRoutes.appPrepare,

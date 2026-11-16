@@ -5084,6 +5084,71 @@ class AppLocalizationsAr extends AppLocalizations {
       'روتين روحي خالٍ من الإعلانات، غير منقطع ومفتوح.';
 
   @override
+  String membershipGateGreeting(String name) {
+    return 'سلام $name،';
+  }
+
+  @override
+  String get membershipGateGreetingPlain => 'سلام،';
+
+  @override
+  String get membershipGateBody =>
+      'ارتفعت تكاليف الخادم والإعلانات. بدل إغلاق آرين نطلب دعمًا سنويًا. هذا الدعم بقدر فنجان قهوة في السنة.';
+
+  @override
+  String get membershipGatePerYear => 'مرة في السنة';
+
+  @override
+  String get membershipGateRenewal =>
+      'بهذا الدعم تستخدم آرين بلا إعلانات وبلا قفل لمدة سنة. يتجدد الدفع كل عام. يمكنك الإلغاء من الإعدادات متى شئت.';
+
+  @override
+  String get membershipGateIncludes => 'تفتح هذه العضوية';
+
+  @override
+  String get membershipGateFeaturePrayer => 'مواقيت الصلاة والقبلة';
+
+  @override
+  String get membershipGateFeatureZikir => 'المسبحة';
+
+  @override
+  String get membershipGateFeatureExplore => 'استكشاف إسلامي';
+
+  @override
+  String get membershipGateFeatureAi => 'الذكاء الاصطناعي الإسلامي';
+
+  @override
+  String get membershipGateFeatureWill => 'الإرادة ومتابعة العادات';
+
+  @override
+  String get membershipGateFeatureCircle => 'حلقة الدعاء';
+
+  @override
+  String get membershipGateFeatureDuel => 'مباراة المعرفة';
+
+  @override
+  String get membershipGateFeatureWidgets =>
+      'أدوات الشاشة الرئيسية وشاشة القفل';
+
+  @override
+  String get membershipGateFeatureAds => 'استخدام بلا إعلانات';
+
+  @override
+  String get membershipGateCta => 'ابدأ العضوية السنوية';
+
+  @override
+  String get membershipGateApple => 'الدفع مؤمّن عبر Apple.';
+
+  @override
+  String get membershipGateGoogle => 'الدفع مؤمّن عبر Google Play.';
+
+  @override
+  String get membershipGateTerms => 'الشروط';
+
+  @override
+  String get membershipGatePrivacy => 'الخصوصية';
+
+  @override
   String get premiumYearlyPlanTitle => 'Premium سنوي';
 
   @override

@@ -53,7 +53,8 @@ bool assistantFabHiddenFor({
   }
   if (path == AppRoutes.onboarding ||
       path.startsWith('${AppRoutes.onboarding}/') ||
-      path == AppRoutes.appPrepare) {
+      path == AppRoutes.appPrepare ||
+      path == AppRoutes.membershipGate) {
     return true;
   }
   return false;

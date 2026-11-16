@@ -2361,6 +2361,33 @@
   "premiumTitle": "ARIN Premium",
   "premiumActiveSubtitle": "تجربتك الخالية من الإعلانات والمفتوحة متاحة.",
   "premiumSubtitle": "روتين روحي خالٍ من الإعلانات، غير منقطع ومفتوح.",
+  "membershipGateGreeting": "سلام {name}،",
+  "@membershipGateGreeting": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "membershipGateGreetingPlain": "سلام،",
+  "membershipGateBody": "ارتفعت تكاليف الخادم والإعلانات. بدل إغلاق آرين نطلب دعمًا سنويًا. هذا الدعم بقدر فنجان قهوة في السنة.",
+  "membershipGatePerYear": "مرة في السنة",
+  "membershipGateRenewal": "بهذا الدعم تستخدم آرين بلا إعلانات وبلا قفل لمدة سنة. يتجدد الدفع كل عام. يمكنك الإلغاء من الإعدادات متى شئت.",
+  "membershipGateIncludes": "تفتح هذه العضوية",
+  "membershipGateFeaturePrayer": "مواقيت الصلاة والقبلة",
+  "membershipGateFeatureZikir": "المسبحة",
+  "membershipGateFeatureExplore": "استكشاف إسلامي",
+  "membershipGateFeatureAi": "الذكاء الاصطناعي الإسلامي",
+  "membershipGateFeatureWill": "الإرادة ومتابعة العادات",
+  "membershipGateFeatureCircle": "حلقة الدعاء",
+  "membershipGateFeatureDuel": "مباراة المعرفة",
+  "membershipGateFeatureWidgets": "أدوات الشاشة الرئيسية وشاشة القفل",
+  "membershipGateFeatureAds": "استخدام بلا إعلانات",
+  "membershipGateCta": "ابدأ العضوية السنوية",
+  "membershipGateApple": "الدفع مؤمّن عبر Apple.",
+  "membershipGateGoogle": "الدفع مؤمّن عبر Google Play.",
+  "membershipGateTerms": "الشروط",
+  "membershipGatePrivacy": "الخصوصية",
   "premiumYearlyPlanTitle": "Premium سنوي",
   "premiumMostAdvantageousBadge": "الأكثر فائدة",
   "premiumYearlyPlanSubtitle": "اشتراك سنوي",
