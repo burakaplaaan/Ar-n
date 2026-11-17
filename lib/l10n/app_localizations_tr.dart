@@ -5120,7 +5120,7 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get membershipGateBody =>
-      'Sunucu ve reklam giderleri arttı. Arın\'ı kapatmak yerine senden yıllık bir destek istiyoruz. Bu destek, yılda bir kahve tutarında.';
+      'Sunucu ve reklam giderleri arttı. Arın\'ı ayakta tutabilmek için senden yıllık bir destek istiyoruz. Bu destek, yılda bir kahve tutarında.';
 
   @override
   String get membershipGatePerYear => 'yılda bir kez';

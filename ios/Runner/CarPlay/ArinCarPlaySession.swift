@@ -195,7 +195,9 @@ final class ArinCarPlaySession: NSObject {
   }
 
   private func showNowPlaying() {
-    tabs?.selectedTemplate = CPNowPlayingTemplate.shared
+    if #available(iOS 17.0, *) {
+      tabs?.selectTemplate(at: 0)
+    }
   }
 
   private func renderCard(title: String, line: String, verse: String) -> UIImage {

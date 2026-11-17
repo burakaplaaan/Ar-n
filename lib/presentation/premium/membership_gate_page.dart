@@ -22,8 +22,6 @@ import '../../data/services/fcm_token_service.dart';
 import '../../data/services/purchase_service.dart';
 import '../../data/services/startup_permission_policy.dart';
 import '../../l10n/app_localizations.dart';
-import '../onboarding/onboarding_entry_screens.dart';
-import '../onboarding/onboarding_flow_chrome.dart';
 import '../shared/providers/user_profile_providers.dart';
 import '../shared/widgets/arin_top_toast.dart';
 
@@ -39,7 +37,9 @@ class MembershipGatePage extends ConsumerStatefulWidget {
 }
 
 class _MembershipGatePageState extends ConsumerState<MembershipGatePage> {
-  String? _price;
+  static const _compareTry = '999,99 ₺';
+
+  StorePriceInfo? _yearly;
   bool _busy = false;
   bool _entering = false;
 
@@ -59,7 +59,7 @@ class _MembershipGatePageState extends ConsumerState<MembershipGatePage> {
     final info = prices[RevenueCatIds.yearlyProductId] ??
         StorePriceInfo.maybeCatalogFallback(RevenueCatIds.yearlyProductId);
     if (!mounted) return;
-    setState(() => _price = info?.priceString);
+    setState(() => _yearly = info);
   }
 
   Future<void> _purchase() async {
@@ -183,133 +183,235 @@ class _MembershipGatePageState extends ConsumerState<MembershipGatePage> {
     final storeLine = !kIsWeb && Platform.isAndroid
         ? l10n.membershipGateGoogle
         : l10n.membershipGateApple;
+    final yearly = _yearly;
+    final priceLabel = yearly?.priceString ?? '—';
+    final showCompare = yearly == null ||
+        yearly.currencyCode.toUpperCase() == 'TRY' ||
+        yearly.currencyCode.toUpperCase() == 'TL';
+    final monthlyLine = yearly == null || yearly.price <= 0
+        ? null
+        : l10n.premiumYearlyPerMonth(yearly.formatAmount(yearly.price / 12));
+    const features = <String Function(AppLocalizations)>[
+      _prayer,
+      _zikir,
+      _widgets,
+      _explore,
+      _ai,
+      _will,
+      _circle,
+      _duel,
+      _ads,
+    ];
 
     return PopScope(
       canPop: false,
       child: Scaffold(
-        backgroundColor: Colors.black,
-        body: Stack(
-          fit: StackFit.expand,
-          children: [
-            const OnboardingEntryBackdrop(),
-            SafeArea(
-              child: Column(
-                children: [
-                  Expanded(
-                    child: ListView(
-                      padding: const EdgeInsets.fromLTRB(28, 28, 28, 12),
-                      children: [
-                        Text(
-                          greeting,
-                          style: const TextStyle(
-                            fontFamily: 'Georgia',
-                            fontSize: 34,
-                            height: 1.15,
-                            fontWeight: FontWeight.w700,
-                            color: Colors.white,
+        backgroundColor: const Color(0xFF07110C),
+        body: DecoratedBox(
+          decoration: const BoxDecoration(
+            gradient: RadialGradient(
+              center: Alignment(0, -0.85),
+              radius: 1.15,
+              colors: [
+                Color(0xFF1B4D3E),
+                Color(0xFF07110C),
+              ],
+            ),
+          ),
+          child: SafeArea(
+            child: Stack(
+              children: [
+            Column(
+              children: [
+                Expanded(
+                  child: ListView(
+                    padding: const EdgeInsets.fromLTRB(22, 18, 22, 8),
+                    children: [
+                      const _GateMark(),
+                      const SizedBox(height: 16),
+                      Text(
+                        greeting,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          fontFamily: 'Georgia',
+                          fontSize: 32,
+                          height: 1.15,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.white,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      Text(
+                        l10n.membershipGateBody,
+                        textAlign: TextAlign.center,
+                        style: AppTextStyles.bodyMedium.copyWith(
+                          color: Colors.white.withValues(alpha: 0.72),
+                          fontSize: 15,
+                          height: 1.4,
+                        ),
+                      ),
+                      const SizedBox(height: 18),
+                      DecoratedBox(
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.06),
+                          borderRadius: BorderRadius.circular(22),
+                          border: Border.all(
+                            color: Colors.white.withValues(alpha: 0.08),
                           ),
                         ),
-                        const SizedBox(height: 18),
-                        Text(
-                          l10n.membershipGateBody,
-                          style: AppTextStyles.bodyMedium.copyWith(
-                            color: Colors.white.withValues(alpha: 0.78),
-                            fontSize: 16,
-                            height: 1.45,
-                          ),
-                        ),
-                        const SizedBox(height: 28),
-                        Text(
-                          _price ?? '—',
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 36,
-                            fontWeight: FontWeight.w800,
-                            letterSpacing: -0.6,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          l10n.membershipGatePerYear,
-                          style: AppTextStyles.labelLarge.copyWith(
-                            color: AppColors.goldAccent,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                        Text(
-                          l10n.membershipGateRenewal,
-                          style: AppTextStyles.bodyMedium.copyWith(
-                            color: Colors.white.withValues(alpha: 0.62),
-                            fontSize: 15,
-                            height: 1.4,
-                          ),
-                        ),
-                        const SizedBox(height: 28),
-                        Text(
-                          l10n.membershipGateIncludes,
-                          style: AppTextStyles.labelLarge.copyWith(
-                            color: Colors.white,
-                            fontWeight: FontWeight.w800,
-                          ),
-                        ),
-                        const SizedBox(height: 12),
-                        for (final feature in [
-                          l10n.membershipGateFeaturePrayer,
-                          l10n.membershipGateFeatureZikir,
-                          l10n.membershipGateFeatureExplore,
-                          l10n.membershipGateFeatureAi,
-                          l10n.membershipGateFeatureWill,
-                          l10n.membershipGateFeatureCircle,
-                          l10n.membershipGateFeatureDuel,
-                          l10n.membershipGateFeatureWidgets,
-                          l10n.membershipGateFeatureAds,
-                        ])
-                          Padding(
-                            padding: const EdgeInsets.only(bottom: 8),
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const Padding(
-                                  padding: EdgeInsets.only(top: 2),
-                                  child: Icon(
-                                    Icons.check_rounded,
-                                    color: AppColors.goldAccent,
-                                    size: 18,
+                        child: Padding(
+                          padding: const EdgeInsets.fromLTRB(18, 18, 18, 16),
+                          child: Column(
+                            children: [
+                              Align(
+                                alignment: Alignment.centerLeft,
+                                child: Text(
+                                  l10n.membershipGateIncludes,
+                                  style: AppTextStyles.labelLarge.copyWith(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w800,
                                   ),
                                 ),
-                                const SizedBox(width: 10),
-                                Expanded(
+                              ),
+                              const SizedBox(height: 10),
+                              for (final feature in features)
+                                Padding(
+                                  padding: const EdgeInsets.only(bottom: 7),
+                                  child: Row(
+                                    children: [
+                                      const Icon(
+                                        Icons.check_rounded,
+                                        color: AppColors.emeraldLight,
+                                        size: 18,
+                                      ),
+                                      const SizedBox(width: 10),
+                                      Expanded(
+                                        child: Text(
+                                          feature(l10n),
+                                          style: AppTextStyles.bodyMedium
+                                              .copyWith(
+                                            color: Colors.white
+                                                .withValues(alpha: 0.9),
+                                            fontSize: 14.5,
+                                            height: 1.25,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              const SizedBox(height: 10),
+                              if (showCompare)
+                                Text(
+                                  _compareTry,
+                                  style: TextStyle(
+                                    color: Colors.white.withValues(alpha: 0.42),
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                    decoration: TextDecoration.lineThrough,
+                                    decorationColor:
+                                        Colors.white.withValues(alpha: 0.42),
+                                  ),
+                                ),
+                              const SizedBox(height: 4),
+                              Text(
+                                priceLabel,
+                                textAlign: TextAlign.center,
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 40,
+                                  fontWeight: FontWeight.w800,
+                                  letterSpacing: -0.8,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              DecoratedBox(
+                                decoration: BoxDecoration(
+                                  color: AppColors.emeraldLight
+                                      .withValues(alpha: 0.18),
+                                  borderRadius: BorderRadius.circular(999),
+                                ),
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 12,
+                                    vertical: 5,
+                                  ),
                                   child: Text(
-                                    feature,
-                                    style: AppTextStyles.bodyMedium.copyWith(
-                                      color: Colors.white.withValues(alpha: 0.88),
-                                      fontSize: 15,
-                                      height: 1.3,
+                                    l10n.membershipGatePerYear,
+                                    style: AppTextStyles.labelMedium.copyWith(
+                                      color: AppColors.emeraldLight,
+                                      fontWeight: FontWeight.w800,
                                     ),
                                   ),
                                 ),
-                              ],
+                              ),
+                              const SizedBox(height: 12),
+                              Text(
+                                l10n.membershipGateRenewal,
+                                textAlign: TextAlign.center,
+                                style: AppTextStyles.bodyMedium.copyWith(
+                                  color: Colors.white.withValues(alpha: 0.55),
+                                  fontSize: 13,
+                                  height: 1.35,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(22, 8, 22, 4),
+                  child: SizedBox(
+                    width: double.infinity,
+                    height: 54,
+                    child: FilledButton(
+                      onPressed: _busy ? null : () => unawaited(_purchase()),
+                      style: FilledButton.styleFrom(
+                        backgroundColor: AppColors.emeraldLight,
+                        disabledBackgroundColor:
+                            AppColors.emeraldLight.withValues(alpha: 0.45),
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            l10n.membershipGateCta,
+                            style: const TextStyle(
+                              fontSize: 17,
+                              fontWeight: FontWeight.w800,
                             ),
                           ),
-                      ],
+                          const SizedBox(width: 8),
+                          const Icon(Icons.arrow_forward_rounded, size: 20),
+                        ],
+                      ),
                     ),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(28, 8, 28, 8),
-                    child: OnboardingCtaButton(
-                      label: l10n.membershipGateCta,
-                      enabled: !_busy,
-                      onPressed: _busy ? null : () => unawaited(_purchase()),
-                    ),
-                  ),
+                ),
+                if (monthlyLine != null)
                   Text(
-                    storeLine,
+                    monthlyLine,
                     textAlign: TextAlign.center,
                     style: AppTextStyles.labelMedium.copyWith(
-                      color: Colors.white.withValues(alpha: 0.45),
+                      color: Colors.white.withValues(alpha: 0.62),
+                      fontWeight: FontWeight.w700,
                     ),
                   ),
+                const SizedBox(height: 4),
+                Text(
+                  storeLine,
+                  textAlign: TextAlign.center,
+                  style: AppTextStyles.labelMedium.copyWith(
+                    color: Colors.white.withValues(alpha: 0.45),
+                  ),
+                ),
                   const SizedBox(height: 4),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -327,18 +429,41 @@ class _MembershipGatePageState extends ConsumerState<MembershipGatePage> {
                           _openUrl(MembershipGatePage.privacyPolicyUrl),
                         ),
                       ),
-                      _dot(),
-                      _Link(
-                        label: l10n.premiumRestorePurchasesLabel,
-                        onTap: _busy ? null : () => unawaited(_restore()),
-                      ),
                     ],
                   ),
                   const SizedBox(height: 8),
                 ],
               ),
+                Positioned(
+                  top: 0,
+                  right: 8,
+                  child: TextButton(
+                    onPressed: _busy ? null : () => unawaited(_restore()),
+                    style: TextButton.styleFrom(
+                      foregroundColor: Colors.white.withValues(alpha: 0.9),
+                      backgroundColor: Colors.white.withValues(alpha: 0.1),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 6,
+                      ),
+                      minimumSize: Size.zero,
+                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(999),
+                      ),
+                    ),
+                    child: Text(
+                      l10n.premiumRestorePurchasesLabel,
+                      style: const TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );
@@ -354,6 +479,42 @@ class _MembershipGatePageState extends ConsumerState<MembershipGatePage> {
     );
   }
 }
+
+class _GateMark extends StatelessWidget {
+  const _GateMark();
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Container(
+        width: 72,
+        height: 72,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          border: Border.all(
+            color: Colors.white.withValues(alpha: 0.14),
+          ),
+        ),
+        child: const ClipOval(
+          child: Image(
+            image: AssetImage('assets/branding/app_icon_1024.png'),
+            fit: BoxFit.cover,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+String _prayer(AppLocalizations l10n) => l10n.membershipGateFeaturePrayer;
+String _zikir(AppLocalizations l10n) => l10n.membershipGateFeatureZikir;
+String _widgets(AppLocalizations l10n) => l10n.membershipGateFeatureWidgets;
+String _explore(AppLocalizations l10n) => l10n.membershipGateFeatureExplore;
+String _ai(AppLocalizations l10n) => l10n.membershipGateFeatureAi;
+String _will(AppLocalizations l10n) => l10n.membershipGateFeatureWill;
+String _circle(AppLocalizations l10n) => l10n.membershipGateFeatureCircle;
+String _duel(AppLocalizations l10n) => l10n.membershipGateFeatureDuel;
+String _ads(AppLocalizations l10n) => l10n.membershipGateFeatureAds;
 
 class _Link extends StatelessWidget {
   const _Link({required this.label, required this.onTap});

@@ -8920,7 +8920,7 @@ abstract class AppLocalizations {
   /// No description provided for @membershipGateBody.
   ///
   /// In tr, this message translates to:
-  /// **'Sunucu ve reklam giderleri arttı. Arın\'ı kapatmak yerine senden yıllık bir destek istiyoruz. Bu destek, yılda bir kahve tutarında.'**
+  /// **'Sunucu ve reklam giderleri arttı. Arın\'ı ayakta tutabilmek için senden yıllık bir destek istiyoruz. Bu destek, yılda bir kahve tutarında.'**
   String get membershipGateBody;
 
   /// No description provided for @membershipGatePerYear.
