@@ -9,6 +9,7 @@ import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../core/analytics/arin_analytics.dart';
+import '../../core/firebase/firebase_bootstrap.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_text_styles.dart';
 import '../../core/constants/profile_prefs_keys.dart';
@@ -67,7 +68,7 @@ class _MembershipGatePageState extends ConsumerState<MembershipGatePage> {
     final l10n = AppLocalizations.of(context)!;
     setState(() => _busy = true);
     try {
-      final user = FirebaseAuth.instance.currentUser;
+      final user = isFirebaseReady ? FirebaseAuth.instance.currentUser : null;
       if (user != null) {
         try {
           await PurchaseService.loginUser(user.uid);
@@ -97,7 +98,7 @@ class _MembershipGatePageState extends ConsumerState<MembershipGatePage> {
     final l10n = AppLocalizations.of(context)!;
     setState(() => _busy = true);
     try {
-      final user = FirebaseAuth.instance.currentUser;
+      final user = isFirebaseReady ? FirebaseAuth.instance.currentUser : null;
       if (user != null) {
         try {
           await PurchaseService.loginUser(user.uid);

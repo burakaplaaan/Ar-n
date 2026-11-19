@@ -23,7 +23,6 @@ import '../../data/services/fcm_token_service.dart';
 import '../../data/services/local_notification_permission_gate.dart';
 import '../../data/services/feature_permission_gate.dart';
 import '../../data/services/location_service.dart';
-import '../../data/services/purchase_service.dart';
 import '../../data/services/startup_permission_policy.dart';
 import '../shared/providers/user_profile_providers.dart';
 import '../shared/widgets/arin_top_toast.dart';
@@ -341,12 +340,8 @@ class _OnboardingPageState extends State<OnboardingPage> {
 
   Future<void> _openMembershipGate() async {
     if (_finishing) return;
-    final alreadyPremium = await PurchaseService().isPremiumLocally();
-    if (!mounted) return;
-    if (alreadyPremium) {
-      await _finishToTour();
-      return;
-    }
+    // Kurulum bitmeden RevenueCat configure edilmez. Burada getCustomerInfo
+    // çağrısı iOS'ta süreci kapatır; ödeme ekranı hiç açılmaz.
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(kMembershipGatePendingKey, true);
     if (!mounted) return;

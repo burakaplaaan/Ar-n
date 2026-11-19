@@ -423,7 +423,7 @@ class PurchaseService {
 
   /// Cihaz üzerindeki anlık premium durumunu döner (Firestore'dan bağımsız).
   Future<bool> isPremiumLocally() async {
-    if (!_isSupportedPlatform) return false;
+    if (!_isSupportedPlatform || !_isConfigured) return false;
     try {
       final info = await Purchases.getCustomerInfo();
       return _hasPremium(info);
@@ -579,19 +579,12 @@ class PurchaseService {
 
   Future<bool> _waitUntilConfigured() async {
     if (_isConfigured) return true;
-    for (var i = 0; i < 3; i++) {
-      if (_isConfigured) return true;
-      if (_configureFuture != null) {
-        try {
-          await _configureFuture;
-        } catch (e) {
-          debugPrint('[PurchaseService] configure wait error: $e');
-          _isConfigured = false;
-          return false;
-        }
-      } else {
-        await Future<void>.delayed(const Duration(seconds: 1));
-      }
+    // Onboarding bitmeden deferred startup RevenueCat'i başlatmaz.
+    // Kapı ekranı satın alabilsin diye configure'u burada başlat.
+    try {
+      await initialize();
+    } catch (e) {
+      debugPrint('[PurchaseService] configure wait error: $e');
     }
     return _isConfigured;
   }
